@@ -24,11 +24,11 @@ PROMPT *** Create  table KL_Z240 ***
 begin 
   execute immediate '
   CREATE TABLE BARS.KL_Z240 
-   (	PREM VARCHAR2(3), 
-	Z240 VARCHAR2(2), 
-	T020 VARCHAR2(1), 
+   (	PREM CHAR(3), 
+	Z240 CHAR(2), 
+	T020 CHAR(1), 
 	TXT VARCHAR2(144), 
-	A010 VARCHAR2(2), 
+	A010 CHAR(2), 
 	D_OPEN DATE, 
 	D_CLOSE DATE, 
 	D_MODE DATE
@@ -61,8 +61,9 @@ COMMENT ON COLUMN BARS.KL_Z240.D_MODE IS '';
 
 
 PROMPT *** Create  grants  KL_Z240 ***
-grant SELECT                                                                 on KL_Z240         to BARSREADER_ROLE;
-grant SELECT                                                                 on KL_Z240         to UPLD;
+grant DELETE,INSERT,SELECT,UPDATE                                            on KL_Z240         to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on KL_Z240         to BARS_DM;
+grant DELETE,INSERT,SELECT,UPDATE                                            on KL_Z240         to START1;
 
 
 

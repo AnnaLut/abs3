@@ -58,9 +58,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  FOLDERS_GOU ***
-grant SELECT                                                                 on FOLDERS_GOU     to BARSREADER_ROLE;
 grant SELECT                                                                 on FOLDERS_GOU     to BARS_DM;
-grant SELECT                                                                 on FOLDERS_GOU     to UPLD;
 
 
 

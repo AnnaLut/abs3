@@ -135,10 +135,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_REPORTS_LIST ***
-grant SELECT                                                                 on CIM_REPORTS_LIST to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_REPORTS_LIST to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_REPORTS_LIST to CIM_ROLE;
-grant SELECT                                                                 on CIM_REPORTS_LIST to UPLD;
 
 
 

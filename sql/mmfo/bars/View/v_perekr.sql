@@ -14,10 +14,8 @@ b.nazn,m.nb from accounts a,specparam s, perekr_b b , banks m
 where a.acc=s.acc and s.ids=b.ids and b.mfob=m.mfo;
 
 PROMPT *** Create  grants  V_PEREKR ***
-grant SELECT                                                                 on V_PEREKR        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PEREKR        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PEREKR        to START1;
-grant SELECT                                                                 on V_PEREKR        to UPLD;
 
 
 

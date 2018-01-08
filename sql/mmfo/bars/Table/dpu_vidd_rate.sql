@@ -95,10 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUVIDDRATE_RATES ***
+PROMPT *** Create  constraint CC_DPUVIDDRATE_KV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_VIDD_RATE ADD CONSTRAINT CC_DPUVIDDRATE_RATES CHECK (max_rate is null or (max_rate is not null and max_rate >= rate)) ENABLE';
+  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (KV CONSTRAINT CC_DPUVIDDRATE_KV_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -107,10 +107,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUVIDDRATE_SUMMINCLUDE ***
+PROMPT *** Create  constraint CC_DPUVIDDRATE_TYPEID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_VIDD_RATE ADD CONSTRAINT CC_DPUVIDDRATE_SUMMINCLUDE CHECK (summ_include in (0, 1)) ENABLE';
+  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (TYPE_ID CONSTRAINT CC_DPUVIDDRATE_TYPEID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -119,10 +119,133 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUVIDDRATE_TERMINCLUDE ***
+PROMPT *** Create  constraint CC_DPUVIDDRATE_SUMMINCLUDE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_VIDD_RATE ADD CONSTRAINT CC_DPUVIDDRATE_TERMINCLUDE CHECK (term_include in (0, 1)) ENABLE';
+  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (SUMM_INCLUDE CONSTRAINT CC_DPUVIDDRATE_SUMMINCLUDE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUVIDDRATE_TERMINCLUDE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (TERM_INCLUDE CONSTRAINT CC_DPUVIDDRATE_TERMINCLUDE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUVIDDRATE_TERMDAYS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (TERM_DAYS CONSTRAINT CC_DPUVIDDRATE_TERMDAYS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUVIDDRATE_RATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (RATE CONSTRAINT CC_DPUVIDDRATE_RATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUVIDDRATE_TERM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (TERM CONSTRAINT CC_DPUVIDDRATE_TERM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUVIDDRATE_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (ID CONSTRAINT CC_DPUVIDDRATE_ID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUVIDDRATE_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (KF CONSTRAINT CC_DPUVIDDRATE_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPUVIDDRATE_DPUVIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_VIDD_RATE ADD CONSTRAINT FK_DPUVIDDRATE_DPUVIDD FOREIGN KEY (VIDD, TYPE_ID)
+	  REFERENCES BARS.DPU_VIDD (VIDD, TYPE_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPUVIDDRATE_DPUTYPES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_VIDD_RATE ADD CONSTRAINT FK_DPUVIDDRATE_DPUTYPES FOREIGN KEY (TYPE_ID)
+	  REFERENCES BARS.DPU_TYPES (TYPE_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPUVIDDRATE_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_VIDD_RATE ADD CONSTRAINT FK_DPUVIDDRATE_TABVAL FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUVIDDRATE_TERMS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_VIDD_RATE ADD CONSTRAINT CC_DPUVIDDRATE_TERMS CHECK (term * term_days = 0) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -145,10 +268,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUVIDDRATE_TERMS ***
+PROMPT *** Create  constraint CC_DPUVIDDRATE_TERMINCLUDE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_VIDD_RATE ADD CONSTRAINT CC_DPUVIDDRATE_TERMS CHECK (term * term_days = 0) ENABLE';
+  ALTER TABLE BARS.DPU_VIDD_RATE ADD CONSTRAINT CC_DPUVIDDRATE_TERMINCLUDE CHECK (term_include in (0, 1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -157,10 +280,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUVIDDRATE_KF_NN ***
+PROMPT *** Create  constraint CC_DPUVIDDRATE_RATES ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (KF CONSTRAINT CC_DPUVIDDRATE_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPU_VIDD_RATE ADD CONSTRAINT CC_DPUVIDDRATE_RATES CHECK (max_rate is null or (max_rate is not null and max_rate >= rate)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -169,94 +292,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUVIDDRATE_ID_NN ***
+PROMPT *** Create  constraint CC_DPUVIDDRATE_SUMMINCLUDE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (ID CONSTRAINT CC_DPUVIDDRATE_ID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUVIDDRATE_TERM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (TERM CONSTRAINT CC_DPUVIDDRATE_TERM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUVIDDRATE_RATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (RATE CONSTRAINT CC_DPUVIDDRATE_RATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUVIDDRATE_TERMDAYS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (TERM_DAYS CONSTRAINT CC_DPUVIDDRATE_TERMDAYS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUVIDDRATE_TERMINCLUDE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (TERM_INCLUDE CONSTRAINT CC_DPUVIDDRATE_TERMINCLUDE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUVIDDRATE_SUMMINCLUDE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (SUMM_INCLUDE CONSTRAINT CC_DPUVIDDRATE_SUMMINCLUDE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUVIDDRATE_TYPEID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (TYPE_ID CONSTRAINT CC_DPUVIDDRATE_TYPEID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUVIDDRATE_KV_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_VIDD_RATE MODIFY (KV CONSTRAINT CC_DPUVIDDRATE_KV_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPU_VIDD_RATE ADD CONSTRAINT CC_DPUVIDDRATE_SUMMINCLUDE CHECK (summ_include in (0, 1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -293,12 +332,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPU_VIDD_RATE ***
-grant SELECT                                                                 on DPU_VIDD_RATE   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPU_VIDD_RATE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_VIDD_RATE   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_VIDD_RATE   to DPT_ADMIN;
 grant SELECT                                                                 on DPU_VIDD_RATE   to DPT_ROLE;
-grant SELECT                                                                 on DPU_VIDD_RATE   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPU_VIDD_RATE   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPU_VIDD_RATE   to WR_REFREAD;
 

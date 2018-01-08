@@ -51,11 +51,9 @@ COMMENT ON COLUMN BARS.SREZERV_ERROR_TYPES.SORT_ORDER IS '';
 
 
 PROMPT *** Create  grants  SREZERV_ERROR_TYPES ***
-grant SELECT                                                                 on SREZERV_ERROR_TYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on SREZERV_ERROR_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SREZERV_ERROR_TYPES to BARS_DM;
 grant SELECT                                                                 on SREZERV_ERROR_TYPES to RCC_DEAL;
-grant SELECT                                                                 on SREZERV_ERROR_TYPES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SREZERV_ERROR_TYPES to WR_ALL_RIGHTS;
 
 

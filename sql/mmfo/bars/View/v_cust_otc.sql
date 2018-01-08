@@ -11,10 +11,8 @@ PROMPT *** Create  view V_CUST_OTC ***
   SELECT rnk, nmk, okpo, custtype, codcagent, nvl(tobo, 0) tobo FROM customer;
 
 PROMPT *** Create  grants  V_CUST_OTC ***
-grant SELECT                                                                 on V_CUST_OTC      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUST_OTC      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUST_OTC      to START1;
-grant SELECT                                                                 on V_CUST_OTC      to UPLD;
 
 
 

@@ -1,16 +1,17 @@
+prompt -- ======================================================
+prompt -- create sequence
+prompt -- ======================================================
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Sequence/S_PRVN_FIN_DEB_ARCH.sql =========**
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  sequence S_PRVN_FIN_DEB_ARCH ***
-
-   CREATE SEQUENCE  BARS.S_PRVN_FIN_DEB_ARCH  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 231290463 CACHE 10 ORDER  NOCYCLE ;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Sequence/S_PRVN_FIN_DEB_ARCH.sql =========**
-PROMPT ===================================================================================== 
+declare
+  l_seq_nm               varchar2(30);
+  e_seq_exists           exception;
+  pragma exception_init( e_seq_exists, -00955 );
+begin
+  l_seq_nm := 'S_PRVN_FIN_DEB_ARCH';
+  execute immediate 'create sequence '||l_seq_nm||' start with 1 increment by 1 nocycle cache 10 order';
+  dbms_output.put_line( 'Sequence "'||l_seq_nm||'" created.' );
+exception
+  when e_seq_exists then
+    dbms_output.put_line( 'Sequence "'||l_seq_nm||'" already exists.' );
+end;
+/

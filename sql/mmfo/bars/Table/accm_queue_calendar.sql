@@ -115,7 +115,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACCM_QUEUE_CALENDAR ***
-grant SELECT                                                                 on ACCM_QUEUE_CALENDAR to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_QUEUE_CALENDAR to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCM_QUEUE_CALENDAR to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_QUEUE_CALENDAR to START1;

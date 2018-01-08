@@ -96,12 +96,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_F84 ***
-grant SELECT                                                                 on CP_F84          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_F84          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_F84          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_F84          to CP_F84;
 grant SELECT                                                                 on CP_F84          to START1;
-grant SELECT                                                                 on CP_F84          to UPLD;
 
 
 

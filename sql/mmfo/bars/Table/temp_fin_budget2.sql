@@ -49,11 +49,9 @@ COMMENT ON COLUMN BARS.TEMP_FIN_BUDGET2.S IS '';
 
 
 PROMPT *** Create  grants  TEMP_FIN_BUDGET2 ***
-grant SELECT                                                                 on TEMP_FIN_BUDGET2 to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TEMP_FIN_BUDGET2 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TEMP_FIN_BUDGET2 to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TEMP_FIN_BUDGET2 to START1;
-grant SELECT                                                                 on TEMP_FIN_BUDGET2 to UPLD;
 
 
 

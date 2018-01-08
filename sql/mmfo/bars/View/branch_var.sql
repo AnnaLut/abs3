@@ -24,11 +24,9 @@ PROMPT *** Create  view BRANCH_VAR ***
    FROM DUAL;
 
 PROMPT *** Create  grants  BRANCH_VAR ***
-grant SELECT                                                                 on BRANCH_VAR      to BARSREADER_ROLE;
 grant SELECT                                                                 on BRANCH_VAR      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH_VAR      to CUST001;
 grant SELECT                                                                 on BRANCH_VAR      to START1;
-grant SELECT                                                                 on BRANCH_VAR      to UPLD;
 
 
 

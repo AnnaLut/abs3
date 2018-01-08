@@ -14,10 +14,8 @@ PROMPT *** Create  view PSK ***
  ;
 
 PROMPT *** Create  grants  PSK ***
-grant SELECT                                                                 on PSK             to BARSREADER_ROLE;
 grant SELECT                                                                 on PSK             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PSK             to START1;
-grant SELECT                                                                 on PSK             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PSK             to WR_ALL_RIGHTS;
 
 

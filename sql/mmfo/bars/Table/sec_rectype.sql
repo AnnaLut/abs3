@@ -129,11 +129,9 @@ exception when others then
 
 PROMPT *** Create  grants  SEC_RECTYPE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEC_RECTYPE     to ABS_ADMIN;
-grant SELECT                                                                 on SEC_RECTYPE     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SEC_RECTYPE     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEC_RECTYPE     to BARS_DM;
 grant SELECT                                                                 on SEC_RECTYPE     to START1;
-grant SELECT                                                                 on SEC_RECTYPE     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SEC_RECTYPE     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SEC_RECTYPE     to WR_REFREAD;
 

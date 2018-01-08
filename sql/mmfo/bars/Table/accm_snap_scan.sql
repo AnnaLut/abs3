@@ -93,82 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCMSNAPSCAN_FDAT_NN ***
+PROMPT *** Create  constraint CC_ACCMSNAPSCAN_MODDI_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (FDAT CONSTRAINT CC_ACCMSNAPSCAN_FDAT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMSNAPSCAN_TABNAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (TABLE_NAME CONSTRAINT CC_ACCMSNAPSCAN_TABNAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMSNAPSCAN_SCANSCN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (SCAN_SCN CONSTRAINT CC_ACCMSNAPSCAN_SCANSCN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMSNAPSCAN_SCANDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (SCAN_DATE CONSTRAINT CC_ACCMSNAPSCAN_SCANDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMSNAPSCAN_THRSCN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (THRESHOLD_SCN CONSTRAINT CC_ACCMSNAPSCAN_THRSCN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMSNAPSCAN_THRDI_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (THRESHOLD_DATEINFO CONSTRAINT CC_ACCMSNAPSCAN_THRDI_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMSNAPSCAN_MODACC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (MOD_ACC CONSTRAINT CC_ACCMSNAPSCAN_MODACC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (MOD_DATEINFO CONSTRAINT CC_ACCMSNAPSCAN_MODDI_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -189,10 +117,82 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCMSNAPSCAN_MODDI_NN ***
+PROMPT *** Create  constraint CC_ACCMSNAPSCAN_MODACC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (MOD_DATEINFO CONSTRAINT CC_ACCMSNAPSCAN_MODDI_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (MOD_ACC CONSTRAINT CC_ACCMSNAPSCAN_MODACC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMSNAPSCAN_THRDI_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (THRESHOLD_DATEINFO CONSTRAINT CC_ACCMSNAPSCAN_THRDI_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMSNAPSCAN_THRSCN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (THRESHOLD_SCN CONSTRAINT CC_ACCMSNAPSCAN_THRSCN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMSNAPSCAN_SCANDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (SCAN_DATE CONSTRAINT CC_ACCMSNAPSCAN_SCANDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMSNAPSCAN_SCANSCN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (SCAN_SCN CONSTRAINT CC_ACCMSNAPSCAN_SCANSCN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMSNAPSCAN_TABNAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (TABLE_NAME CONSTRAINT CC_ACCMSNAPSCAN_TABNAME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMSNAPSCAN_FDAT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_SNAP_SCAN MODIFY (FDAT CONSTRAINT CC_ACCMSNAPSCAN_FDAT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -229,11 +229,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACCM_SNAP_SCAN ***
-grant SELECT                                                                 on ACCM_SNAP_SCAN  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_SNAP_SCAN  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCM_SNAP_SCAN  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_SNAP_SCAN  to START1;
-grant SELECT                                                                 on ACCM_SNAP_SCAN  to UPLD;
 
 
 

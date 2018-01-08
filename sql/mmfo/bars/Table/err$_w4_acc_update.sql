@@ -123,10 +123,6 @@ COMMENT ON COLUMN BARS.ERR$_W4_ACC_UPDATE.PASS_STATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_W4_ACC_UPDATE ***
-grant SELECT                                                                 on ERR$_W4_ACC_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_W4_ACC_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

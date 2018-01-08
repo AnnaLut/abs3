@@ -77,9 +77,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  MOPER_ACCERTED_FILES ***
-grant SELECT                                                                 on MOPER_ACCERTED_FILES to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on MOPER_ACCERTED_FILES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on MOPER_ACCERTED_FILES to UPLD;
 
 
 

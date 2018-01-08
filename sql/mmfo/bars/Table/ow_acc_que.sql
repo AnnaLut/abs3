@@ -143,9 +143,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_ACC_QUE ***
-grant SELECT                                                                 on OW_ACC_QUE      to BARSREADER_ROLE;
 grant SELECT                                                                 on OW_ACC_QUE      to BARS_DM;
-grant SELECT                                                                 on OW_ACC_QUE      to UPLD;
 
 
 

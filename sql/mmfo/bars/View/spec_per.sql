@@ -30,10 +30,6 @@ PROMPT *** Create  view SPEC_PER ***
      FROM accounts a, specparam b
     WHERE a.acc = b.acc AND a.dazs IS NULL;
 
-PROMPT *** Create  grants  SPEC_PER ***
-grant SELECT                                                                 on SPEC_PER        to BARSREADER_ROLE;
-grant SELECT                                                                 on SPEC_PER        to UPLD;
-
 
 
 PROMPT ===================================================================================== 

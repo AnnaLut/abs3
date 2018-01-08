@@ -49,6 +49,32 @@ COMMENT ON COLUMN BARS.DPT_VIDD_BRANCH.BRANCH IS 'Код подразделения';
 
 
 
+PROMPT *** Create  constraint FK_DPTVIDDBRANCH_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_BRANCH ADD CONSTRAINT FK_DPTVIDDBRANCH_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTVIDDBRANCH_DPTVIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_BRANCH ADD CONSTRAINT FK_DPTVIDDBRANCH_DPTVIDD FOREIGN KEY (VIDD)
+	  REFERENCES BARS.DPT_VIDD (VIDD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DPTVIDDBRANCH_VIDD_NN ***
 begin   
  execute immediate '
@@ -101,11 +127,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_VIDD_BRANCH ***
-grant SELECT                                                                 on DPT_VIDD_BRANCH to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VIDD_BRANCH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VIDD_BRANCH to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_BRANCH to DPT_ADMIN;
-grant SELECT                                                                 on DPT_VIDD_BRANCH to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_BRANCH to VKLAD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VIDD_BRANCH to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_VIDD_BRANCH to WR_REFREAD;

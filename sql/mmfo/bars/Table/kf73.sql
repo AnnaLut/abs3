@@ -101,7 +101,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  KF73 ***
-grant SELECT                                                                 on KF73            to BARSREADER_ROLE;
 grant SELECT                                                                 on KF73            to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KF73            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KF73            to BARS_DM;

@@ -60,10 +60,8 @@ COMMENT ON COLUMN BARS.TMP_FILED2.ID_N IS 'Номер ID';
 
 PROMPT *** Create  grants  TMP_FILED2 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FILED2      to ABS_ADMIN;
-grant SELECT                                                                 on TMP_FILED2      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FILED2      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FILED2      to RPBN002;
-grant SELECT                                                                 on TMP_FILED2      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_FILED2      to WR_ALL_RIGHTS;
 
 

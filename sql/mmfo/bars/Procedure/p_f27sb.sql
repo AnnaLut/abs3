@@ -18,20 +18,20 @@ PROMPT *** Create  procedure P_F27SB ***
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 05.12.2017 - добавлен блок для формирования виртуальных оборотов для бал.
-             счетов перехода на новый план счетов
-13.11.2017 - удалил ненужные строки и изменил некоторые блоки формирования
-18.02.2016 - для файла за последний рабочий день года
-             из оборотов за месяц коды 50,51,60,61 не будут вычитаться
+             счетов перехода на новый план счетов 
+13.11.2017 - удалил ненужные строки и изменил некоторые блоки формирования 
+18.02.2016 - для файла за последний рабочий день года 
+             из оборотов за месяц коды 50,51,60,61 не будут вычитаться 
              годовые корретирующие обороты
 17.02.2016 - для декабря месяца будут включаться годовые корректирующие
              обороты
 08.02.2016 изменения для успешного формирования кодов показателей 50, 51,
-           60, 61, 90, 91, 00, 01
+           60, 61, 90, 91, 00, 01 
 26.05.2012 формируем в разрезе кодов территорий
 07.09.2011 поменяла f_pop_otcn на f_pop_otcn_snp
 30.04.2011 добавил acc,tobo в протокол
 01.03.2011 в поле комментарий вносим код TOBO и название счета
-10.07.2009 убрал ORDER BY для табл. RNBU_TRACE
+10.07.2009 убрал ORDER BY для табл. RNBU_TRACE	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 kodf_    varchar2(2):='27';
 rnk_     number;
@@ -100,24 +100,24 @@ k_sum_   number;
 
 -------------------------------------------------------------------------------
 CURSOR Saldo IS
-   SELECT s.rnk, s.acc, s.nls, s.kv, s.fdat, s.nbs,
+   SELECT s.rnk, s.acc, s.nls, s.kv, s.fdat, s.nbs, 
           s.ost, s.ostq,
-          s.dos, s.dosq,
+          s.dos, s.dosq, 
           s.kos, s.kosq,
-          s.dos96p, s.dosq96p,
+          s.dos96p, s.dosq96p, 
           s.kos96p, s.kosq96p,
           s.dos96, s.dosq96, s.kos96, s.kosq96,
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
-          nvl(l.k041,'1'), a.tobo, a.nms, NVL(trim(sp.ob22),'00')
+          nvl(l.k041,'1'), a.tobo, a.nms, NVL(trim(sp.ob22),'00') 
    FROM  otcn_saldo s, otcn_acc a, customer cc, kl_k040 l, specparam_int sp
-   WHERE s.acc=a.acc
-     and s.rnk=cc.rnk
-     and NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+)
+   WHERE s.acc=a.acc      
+     and s.rnk=cc.rnk   
+     and NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+) 
      and a.acc=sp.acc(+)
      and trunc(nvl(a.dat_alt, dat_ - 1), 'mm') <> trunc(dat_, 'mm')
          union all
-   SELECT s.rnk, s.acc, a.nls, s.kv, s.fdat, substr(d.acc_num, 1, 4) nbs,
+   SELECT s.rnk, s.acc, a.nls, s.kv, s.fdat, substr(d.acc_num, 1, 4) nbs, 
           (case when d.acc_type = 'OLD' then 0 else s.ost end) ost,
           (case when d.acc_type = 'OLD' then 0 else s.ostq end) ostq,
           (case when d.acc_type = 'OLD' then d.dos_repm  else s.dos - d.dos_repm end) dos,
@@ -141,18 +141,18 @@ CURSOR Saldo IS
           (case when d.acc_type = 'OLD' then 0 else s.dos96zg end) dos96zg,
           (case when d.acc_type = 'OLD' then 0 else s.kos96zg end) kos96zg,
           nvl(l.k041,'1'), a.tobo, a.nms, NVL(trim(sp.ob22),'00')
-   FROM  otcn_saldo s, otcn_acc a, nbur_kor_balances d, customer cc, kl_k040 l,
+   FROM  otcn_saldo s, otcn_acc a, nbur_kor_balances d, customer cc, kl_k040 l, 
          specparam_int sp
    WHERE a.acc=s.acc    and
          a.rnk=cc.rnk   and
          NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+)  and
-         a.acc=sp.acc(+) and
-         d.report_date between trunc(dat_, 'mm') and dat_ and
+         a.acc=sp.acc(+) and 
+         d.report_date between trunc(dat_, 'mm') and dat_ and 
          s.acc = d.acc_id and
          trunc(nvl(a.dat_alt, dat_ - 1), 'mm') = trunc(dat_, 'mm')  ;
 -------------------------------------------------------------------------------
 procedure p_ins(p_dat_ date, p_tp_ varchar2, p_acc_ number, p_nls_ varchar2,
-                p_nbs_ varchar2, p_ob22_ varchar2, p_kv_ smallint, p_k041_ varchar2,
+                p_nbs_ varchar2, p_ob22_ varchar2, p_kv_ smallint, p_k041_ varchar2, 
   		p_znap_ varchar2, p_comm_ varchar2, p_tobo_ varchar2, p_nbuc_ varchar2) IS
                 kod_ varchar2(12);
 
@@ -187,7 +187,7 @@ p_proc_set_int(kodf_,sheme_,nbuc1_,typ_);
 --- их остатков (номиналы+эквиваленты)+обороты+корректирующие обороты
 --- все эти действия выполняются в функции F_POP_OTCN
 
--- используем классификатор SB_R020
+-- используем классификатор SB_R020 
 sql_acc_ := 'select r020 from sb_r020 where f_27=''1'' ';
 
 if to_char(Dat_,'MM') in ('12','01','02','03','04','05','06') then
@@ -211,7 +211,7 @@ OPEN Saldo;
 
    comm_ := '';
 
-   IF typ_ > 0
+   IF typ_ > 0 
    THEN
       nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
    ELSE
@@ -219,12 +219,12 @@ OPEN Saldo;
    END IF;
 
    --- обороты по перекрытию 6,7 классов на 5040,5041
-   IF to_char(Dat_,'MM') = '12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '504%')
+   IF to_char(Dat_,'MM') = '12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '504%') 
    THEN
       SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
              NVL(SUM(decode(dk,1,1,0)*s),0)
          INTO d_sum_, k_sum_
-      FROM opldok
+      FROM opldok 
       WHERE fdat  between Dat_  AND Dat_+29 AND
             acc  = acc_   AND
             (tt like 'ZG8%'  or tt like 'ZG9%');
@@ -306,7 +306,7 @@ OPEN Saldo;
       Dosq_:= Dosq_ - Dosq96p_;
       Kos_ := Kos_ - Kos96p_;
       Kosq_:= Kosq_ - Kosq96p_;
-   else
+   else    
       Dos_ := Dos_ - Dos96p_ - Dos99_;
       Dosq_:= Dosq_ - Dosq96p_ - Dosq99_;
       Kos_ := Kos_ - Kos96p_ - Kos99_;
@@ -322,7 +322,7 @@ OPEN Saldo;
              WHERE fdat  = trunc(Dat_, 'mm') AND
                    acc  = acc_   AND
                    (tt like 'ZG1%' OR tt like 'ZG2%');
-
+   
       Dos_ := Dos_ - d_sum_;
       Kos_ := Kos_ - k_sum_;
    END IF;
@@ -411,7 +411,7 @@ OPEN Saldo;
 
    if to_char(Dat_,'MM') = '12' then
       Ostq_ := Ostq_ - Dosq96_ + Kosq96_ - Dosq99_ + Kosq99_;
-   else
+   else 
       Ostq_ := Ostq_-Dosq96_+Kosq96_;
    end if;
 

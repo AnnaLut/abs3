@@ -90,10 +90,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  NLK_TT ***
-grant SELECT                                                                 on NLK_TT          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NLK_TT          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NLK_TT          to START1;
-grant SELECT                                                                 on NLK_TT          to UPLD;
 
 
 

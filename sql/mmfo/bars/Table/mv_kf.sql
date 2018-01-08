@@ -72,11 +72,9 @@ exception when others then
 
 PROMPT *** Create  grants  MV_KF ***
 grant SELECT                                                                 on MV_KF           to BARSAQ with grant option;
-grant SELECT                                                                 on MV_KF           to BARSREADER_ROLE;
 grant SELECT                                                                 on MV_KF           to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on MV_KF           to BARS_DM;
 grant SELECT                                                                 on MV_KF           to PFU;
-grant SELECT                                                                 on MV_KF           to UPLD;
+grant SELECT                                                                 on MV_KF           to BARS_DM;
 
 
 

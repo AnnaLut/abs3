@@ -41,10 +41,8 @@ PROMPT *** Create  view BPK_ALL_ACCOUNTS ***
      FROM w4_acc;
 
 PROMPT *** Create  grants  BPK_ALL_ACCOUNTS ***
-grant SELECT                                                                 on BPK_ALL_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_ALL_ACCOUNTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_ALL_ACCOUNTS to BARS_DM;
-grant SELECT                                                                 on BPK_ALL_ACCOUNTS to UPLD;
 
 
 

@@ -70,9 +70,7 @@ COMMENT ON COLUMN BARS.ERR$_CC_ACCP.RNK IS '';
 
 
 PROMPT *** Create  grants  ERR$_CC_ACCP ***
-grant SELECT                                                                 on ERR$_CC_ACCP    to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CC_ACCP    to BARS_DM;
-grant SELECT                                                                 on ERR$_CC_ACCP    to UPLD;
 
 
 

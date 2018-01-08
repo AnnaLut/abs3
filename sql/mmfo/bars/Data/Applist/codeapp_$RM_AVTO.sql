@@ -1,3 +1,5 @@
+SET SERVEROUTPUT ON 
+SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_AVTO.sql =========*
 PROMPT ===================================================================================== 
@@ -16,11 +18,11 @@ PROMPT *** Create/replace  ARM  $RM_AVTO ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-	d integer := 0;
+    d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_AVTO створюємо (або оновлюємо) АРМ АРМ Виконання автоматичних операцій ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
-                             P_ARM_NAME              => l_application_name,
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
+                             P_ARM_NAME              => l_application_name, 
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -28,89 +30,77 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Автоматичні операції портфеля ДФО ********** ');
           --  Створюємо функцію Автоматичні операції портфеля ДФО
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Автоматичні операції портфеля ДФО',
                                                   p_funcname => '/barsroot/DptAdm/DptAdm/DPTAutoOperations',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Друк звітів ********** ');
           --  Створюємо функцію Друк звітів
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Друк звітів',
                                                   p_funcname => '/barsroot/cbirep/rep_list.aspx?codeapp=\S*',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
-
-      --  Створюємо дочірню функцію Друк звітів
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Друк звітів',
-															  p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+     
 
       --  Створюємо дочірню функцію Друк звітів
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Друк звітів',
-															  p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Друк звітів',
+                                                              p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Друк звітів
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'Друк звітів',
+                                                              p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Архів заявок (кредитна служба ТВБВ) ********** ');
           --  Створюємо функцію Архів заявок (кредитна служба ТВБВ)
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Архів заявок (кредитна служба ТВБВ)',
                                                   p_funcname => '/barsroot/credit/crdsrv/queries_arh.aspx?srvhr=tobo&type=all',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Картка заявки (архів)
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Картка заявки (архів)',
-															  p_funcname => '/barsroot/credit/crdsrv/bid_card_arh.aspx?bid_id=\d+',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Картка заявки (архів)',
+                                                              p_funcname => '/barsroot/credit/crdsrv/bid_card_arh.aspx?bid_id=\d+',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію x.Виконання разових процедур ********** ');
-          --  Створюємо функцію x.Виконання разових процедур
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перекриття, перерахування ПДФО+ВЗ до бюджету ********** ');
+          --  Створюємо функцію Перекриття, перерахування ПДФО+ВЗ до бюджету
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'x.Виконання разових процедур',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=SB_OB22[NSIFUNCTION]',
-                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,
+                                                  p_name     => 'Перекриття, перерахування ПДФО+ВЗ до бюджету',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_PDFO[NSIFUNCTION][PROC=>PUL_DAT(:A,null)][PAR=>:A(SEM=Звiтна дата 01/ММ/РР)][EXEC=>BEFORE]',
+                                                  p_rolename => 'START1' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перекриття, перерахування ПДФО до бюджету ********** ');
-          --  Створюємо функцію Перекриття, перерахування ПДФО до бюджету
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Перекриття, перерахування ПДФО до бюджету',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_PDFO[NSIFUNCTION][PROC=>PUL.PUT(''WDAT'',to_char(:P,''dd.mm.yyyy''))][PAR=>:P(SEM=Дата,TYPE=D)][EXEC=>BEFORE]',
-                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
+     
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_AVTO) - АРМ Виконання автоматичних операцій  ');
     l := l_function_ids.first;
@@ -118,8 +108,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-
-
+     
+     
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -133,15 +123,6 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
-umu.add_report2arm(212,'$RM_AVTO');
-umu.add_report2arm(271,'$RM_AVTO');
-umu.add_report2arm(437,'$RM_AVTO');
-umu.add_report2arm(522,'$RM_AVTO');
-umu.add_report2arm(523,'$RM_AVTO');
-umu.add_report2arm(524,'$RM_AVTO');
-umu.add_report2arm(525,'$RM_AVTO');
-umu.add_report2arm(708,'$RM_AVTO');
-commit;
 end;
 /
 

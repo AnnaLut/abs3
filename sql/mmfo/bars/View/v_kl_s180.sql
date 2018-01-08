@@ -14,10 +14,8 @@ select '*','Ћюбий термiн',to_date(null) from dual
  ;
 
 PROMPT *** Create  grants  V_KL_S180 ***
-grant SELECT                                                                 on V_KL_S180       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_KL_S180       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_KL_S180       to SALGL;
-grant SELECT                                                                 on V_KL_S180       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_KL_S180       to WR_ALL_RIGHTS;
 
 

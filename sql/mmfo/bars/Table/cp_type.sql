@@ -89,7 +89,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_TYPE ***
-grant SELECT                                                                 on CP_TYPE         to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_TYPE         to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_TYPE         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_TYPE         to BARS_DM;

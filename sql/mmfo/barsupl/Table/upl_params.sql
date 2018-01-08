@@ -48,10 +48,36 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_PARAM_UPLREGIONS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_PARAMS ADD CONSTRAINT FK_PARAM_UPLREGIONS FOREIGN KEY (KF)
+	  REFERENCES BARSUPL.UPL_REGIONS (KF) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C0033219 ***
 begin   
  execute immediate '
   ALTER TABLE BARSUPL.UPL_PARAMS MODIFY (KF NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_UPLPARAMS_GROUPID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_PARAMS ADD CONSTRAINT FK_UPLPARAMS_GROUPID FOREIGN KEY (GROUP_ID)
+	  REFERENCES BARSUPL.UPL_PARAM_GROUPS (GROUP_ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -75,7 +101,6 @@ exception when others then
 
 PROMPT *** Create  grants  UPL_PARAMS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on UPL_PARAMS      to BARS;
-grant SELECT                                                                 on UPL_PARAMS      to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on UPL_PARAMS      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on UPL_PARAMS      to UPLD;
 

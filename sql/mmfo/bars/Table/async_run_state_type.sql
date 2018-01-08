@@ -76,7 +76,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  ASYNC_RUN_STATE_TYPE ***
-grant SELECT                                                                 on ASYNC_RUN_STATE_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on ASYNC_RUN_STATE_TYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ASYNC_RUN_STATE_TYPE to BARS_DM;
 

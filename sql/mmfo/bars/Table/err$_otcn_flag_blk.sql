@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_OTCN_FLAG_BLK.ISP IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OTCN_FLAG_BLK ***
-grant SELECT                                                                 on ERR$_OTCN_FLAG_BLK to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OTCN_FLAG_BLK to UPLD;
-
 
 
 PROMPT ===================================================================================== 

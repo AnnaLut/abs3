@@ -13,10 +13,8 @@ PROMPT *** Create  view V_CM_OPERTYPE ***
  where clienttype is null or clienttype > 0;
 
 PROMPT *** Create  grants  V_CM_OPERTYPE ***
-grant SELECT                                                                 on V_CM_OPERTYPE   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CM_OPERTYPE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CM_OPERTYPE   to OW;
-grant SELECT                                                                 on V_CM_OPERTYPE   to UPLD;
 
 
 

@@ -132,10 +132,25 @@ COMMENT ON COLUMN PFU.PFU_EPP_LINE.RNK IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C00111505 ***
+PROMPT *** Create  constraint FK_EPP_LINE_REF_BATCH ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_EPP_LINE MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_EPP_LINE ADD CONSTRAINT FK_EPP_LINE_REF_BATCH FOREIGN KEY (BATCH_REQUEST_ID)
+	  REFERENCES PFU.PFU_EPP_BATCH_REQUEST (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_PFU_EPP_LINE ***
+begin   
+ execute immediate '
+  ALTER TABLE PFU.PFU_EPP_LINE ADD CONSTRAINT PK_PFU_EPP_LINE PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -156,12 +171,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_PFU_EPP_LINE ***
+PROMPT *** Create  constraint SYS_C00111505 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_EPP_LINE ADD CONSTRAINT PK_PFU_EPP_LINE PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGD  ENABLE';
+  ALTER TABLE PFU.PFU_EPP_LINE MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -196,10 +209,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  PFU_EPP_LINE ***
-grant SELECT                                                                 on PFU_EPP_LINE    to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_EPP_LINE    to UPLD;
 
 
 

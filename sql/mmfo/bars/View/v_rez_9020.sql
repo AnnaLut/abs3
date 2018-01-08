@@ -31,10 +31,8 @@ PROMPT *** Create  view V_REZ_9020 ***
               AND a.acc = f.acc(+)) x;
 
 PROMPT *** Create  grants  V_REZ_9020 ***
-grant SELECT                                                                 on V_REZ_9020      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REZ_9020      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_REZ_9020      to START1;
-grant SELECT                                                                 on V_REZ_9020      to UPLD;
 
 
 

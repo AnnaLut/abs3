@@ -59,7 +59,6 @@ exception when others then
 
 PROMPT *** Create  grants  FM_MAIL ***
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on FM_MAIL         to BARS;
-grant SELECT                                                                 on FM_MAIL         to BARSREADER_ROLE;
 
 
 

@@ -89,7 +89,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_DOX ***
-grant SELECT                                                                 on CP_DOX          to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_DOX          to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_DOX          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_DOX          to BARS_DM;

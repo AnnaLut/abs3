@@ -51,6 +51,32 @@ COMMENT ON COLUMN BARS.RKO_TTS.NTAR IS 'Код тарифа';
 
 
 
+PROMPT *** Create  constraint FK_RKO_TTS_TTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.RKO_TTS ADD CONSTRAINT FK_RKO_TTS_TTS FOREIGN KEY (TT)
+	  REFERENCES BARS.TTS (TT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_RKO_TTS_DK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.RKO_TTS ADD CONSTRAINT FK_RKO_TTS_DK FOREIGN KEY (DK)
+	  REFERENCES BARS.DK (DK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_RKO_TTS ***
 begin   
  execute immediate '
@@ -79,7 +105,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  RKO_TTS ***
-grant SELECT                                                                 on RKO_TTS         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RKO_TTS         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RKO_TTS         to RKO;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RKO_TTS         to TARIF;

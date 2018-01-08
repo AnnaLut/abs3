@@ -29,9 +29,7 @@ where  na.state_id in (1) and -- тільки діючі акредитації
 ;
 
 PROMPT *** Create  grants  V_ACTIVE_NOTARY_ACCREDITATION ***
-grant SELECT                                                                 on V_ACTIVE_NOTARY_ACCREDITATION to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACTIVE_NOTARY_ACCREDITATION to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ACTIVE_NOTARY_ACCREDITATION to UPLD;
 
 
 

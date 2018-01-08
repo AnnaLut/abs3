@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/SBON/View/V_SB_POST_PLAT.sql =========*** Run ***
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_SB_POST_PLAT ***
-
-  CREATE OR REPLACE FORCE VIEW SBON.V_SB_POST_PLAT ("ID_PLAT", "STATUS", "ID_DOG", "WORK_MODE", "CLIENT_CONTRACT", "ROZRAH", "NAZVA", "KOORG", "MFO", "SUMA_BORG", "SUM_OP", "SUMA_PLAT", "SUMA_KOM", "PURPOSE", "DODPAR", "DATE_START", "DATE_OPER") AS 
-  select p.id id_plat,
+create or replace view v_sb_post_plat as
+select p.id id_plat,
        case when p.state = 13 then 0
             else p.state
        end status,
@@ -50,9 +41,3 @@ left join bars.sto_sbon_order_free sbonf on sbonf.id = o.id
 left join bars.sto_sbon_order_contr sbonc on sbonc.id = o.id
 left join bars.sto_sbon_order_no_contr sbonnc on sbonnc.id = o.id
 where o.order_type_id in (2, 3, 4);
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/SBON/View/V_SB_POST_PLAT.sql =========*** End ***
-PROMPT ===================================================================================== 

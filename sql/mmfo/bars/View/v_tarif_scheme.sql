@@ -13,10 +13,8 @@ PROMPT *** Create  view V_TARIF_SCHEME ***
  where d_close is null or d_close > bankdate;
 
 PROMPT *** Create  grants  V_TARIF_SCHEME ***
-grant SELECT                                                                 on V_TARIF_SCHEME  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TARIF_SCHEME  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TARIF_SCHEME  to CUST001;
-grant SELECT                                                                 on V_TARIF_SCHEME  to UPLD;
 
 
 

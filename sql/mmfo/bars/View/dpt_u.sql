@@ -83,10 +83,8 @@ PROMPT *** Create  view DPT_U ***
 ;
 
 PROMPT *** Create  grants  DPT_U ***
-grant SELECT                                                                 on DPT_U           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_U           to BARS_ACCESS_DEFROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_U           to DPT_ROLE;
-grant SELECT                                                                 on DPT_U           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_U           to WR_ALL_RIGHTS;
 grant SELECT                                                                 on DPT_U           to WR_DEPOSIT_U;
 

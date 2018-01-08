@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции BMS
-prompt Наименование операции: BMS --5) # BMS/STOP-правило для прод/пок БМ
+prompt Наименование операции: --5) # BMS/STOP-правило для прод/пок БМ
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('BMS', 'BMS --5) # BMS/STOP-правило для прод/пок БМ', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'C_SLC(#(REF),#(S),#(KVA)) ', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('BMS', '--5) # BMS/STOP-правило для прод/пок БМ', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'C_SLC(#(REF),#(S),#(KVA)) ', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='BMS', name='BMS --5) # BMS/STOP-правило для прод/пок БМ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='C_SLC(#(REF),#(S),#(KVA)) ', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='BMS', name='--5) # BMS/STOP-правило для прод/пок БМ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='C_SLC(#(REF),#(S),#(KVA)) ', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='BMS';
   end;
   --------------------------------
@@ -100,7 +100,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции BMK
-prompt Наименование операции: BMK --5) # BMK/Купівля злитків БМ
+prompt Наименование операции: --5) # BMK/Купівля злитків БМ
 declare
   cnt_  number;
 begin
@@ -109,11 +109,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('BMK', 'BMK --5) # BMK/Купівля злитків БМ', 1, null, null, null, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', '#(tobopack.GetTOBOParam(''VP_09''))', null, 1, 0, 0, 0, null, null, 56, null, null, null, '0000100001000000000000000000000000010300000000000000000000000000', null);
+    values ('BMK', '--5) # BMK/Купівля злитків БМ', 1, null, null, null, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', '#(tobopack.GetTOBOParam(''VP_09''))', null, 1, 0, 0, 0, null, null, 56, null, null, null, '0000100001000000000000000000000000010300000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='BMK', name='BMK --5) # BMK/Купівля злитків БМ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa='#(tobopack.GetTOBOParam(''CASH11''))', nlsb='#(tobopack.GetTOBOParam(''VP_09''))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=56, proc=null, s3800=null, rang=null, flags='0000100001000000000000000000000000010300000000000000000000000000', nazn=null
+         set tt='BMK', name='--5) # BMK/Купівля злитків БМ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa='#(tobopack.GetTOBOParam(''CASH11''))', nlsb='#(tobopack.GetTOBOParam(''VP_09''))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=56, proc=null, s3800=null, rang=null, flags='0000100001000000000000000000000000010300000000000000000000000000', nazn=null
        where tt='BMK';
   end;
   --------------------------------

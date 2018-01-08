@@ -7,280 +7,157 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TAIUD_SKRYNKAND_UPDATE ***
 
-  CREATE OR REPLACE TRIGGER BARS.TAIUD_SKRYNKAND_UPDATE 
+CREATE OR REPLACE TRIGGER BARS.TAIUD_SKRYNKAND_UPDATE
 -- version 1.1 29.11.2016
 -- version 1.2 09.12.2016  V.Kharin
-after insert or update of nd, n_sk, sos, fio, adres, dat_begin, dat_end, tariff, branch, o_sk, mfok, nlsk, nls, ndoc, docdate, sdoc, rnk or delete ON BARS.SKRYNKA_ND
-for each row
+-- version 2.0 11.05.2017  V.Kharin
+after insert or delete or update 
+    ON BARS.SKRYNKA_ND
+    for each row
+/* !!! колонки БАЗОВОЇ таблиці, яких немає у ТРИГЕРІ :
+  DAT_CLOSE, DEAL_CREATED, IMPORTED 
+*/
 declare
-            l_otm    SKRYNKA_ND_UPDATE.chgaction%type := 0;
-            l_idupd  SKRYNKA_ND_UPDATE.idupd%type;
 
-            l_ND            SKRYNKA_ND_UPDATE.ND%type;
-            l_N_SK          SKRYNKA_ND_UPDATE.N_SK%type;
-            l_SOS           SKRYNKA_ND_UPDATE.SOS%type;
-            l_FIO           SKRYNKA_ND_UPDATE.FIO%type;
-            l_DOKUM         SKRYNKA_ND_UPDATE.DOKUM%type;
-            l_ISSUED        SKRYNKA_ND_UPDATE.ISSUED%type;
-            l_ADRES         SKRYNKA_ND_UPDATE.ADRES%type;
-            l_DAT_BEGIN     SKRYNKA_ND_UPDATE.DAT_BEGIN%type;
-            l_DAT_END       SKRYNKA_ND_UPDATE.DAT_END%type;
-            l_TEL           SKRYNKA_ND_UPDATE.TEL%type;
-            l_DOVER         SKRYNKA_ND_UPDATE.DOVER%type;
-            l_NMK           SKRYNKA_ND_UPDATE.NMK%type;
-            l_DOV_DAT1      SKRYNKA_ND_UPDATE.DOV_DAT1%type;
-            l_DOV_DAT2      SKRYNKA_ND_UPDATE.DOV_DAT2%type;
-            l_DOV_PASP      SKRYNKA_ND_UPDATE.DOV_PASP%type;
-            l_MFOK          SKRYNKA_ND_UPDATE.MFOK%type;
-            l_NLSK          SKRYNKA_ND_UPDATE.NLSK%type;
-            l_CUSTTYPE      SKRYNKA_ND_UPDATE.CUSTTYPE%type;
-            l_O_SK          SKRYNKA_ND_UPDATE.O_SK%type;
-            l_ISP_DOV       SKRYNKA_ND_UPDATE.ISP_DOV%type;
-            l_NDOV          SKRYNKA_ND_UPDATE.NDOV%type;
-            l_NLS           SKRYNKA_ND_UPDATE.NLS%type;
-            l_NDOC          SKRYNKA_ND_UPDATE.NDOC%type;
-            l_DOCDATE       SKRYNKA_ND_UPDATE.DOCDATE%type;
-            l_SDOC          SKRYNKA_ND_UPDATE.SDOC%type;
-            l_TARIFF        SKRYNKA_ND_UPDATE.TARIFF%type;
-            l_FIO2          SKRYNKA_ND_UPDATE.FIO2%type;
-            l_ISSUED2       SKRYNKA_ND_UPDATE.ISSUED2%type;
-            l_ADRES2        SKRYNKA_ND_UPDATE.ADRES2%type;
-            l_PASP2         SKRYNKA_ND_UPDATE.PASP2%type;
-            l_OKPO1         SKRYNKA_ND_UPDATE.OKPO1%type;
-            l_OKPO2         SKRYNKA_ND_UPDATE.OKPO2%type;
-            l_S_ARENDA      SKRYNKA_ND_UPDATE.S_ARENDA%type;
-            l_S_NDS         SKRYNKA_ND_UPDATE.S_NDS%type;
-            l_SD            SKRYNKA_ND_UPDATE.SD%type;
-            l_KEYCOUNT      SKRYNKA_ND_UPDATE.KEYCOUNT%type;
-            l_PRSKIDKA      SKRYNKA_ND_UPDATE.PRSKIDKA%type;
-            l_PENY          SKRYNKA_ND_UPDATE.PENY%type;
-            l_DATR2         SKRYNKA_ND_UPDATE.DATR2%type;
-            l_MR2           SKRYNKA_ND_UPDATE.MR2%type;
-            l_MR            SKRYNKA_ND_UPDATE.MR%type;
-            l_DATR          SKRYNKA_ND_UPDATE.DATR%type;
-            l_ADDND         SKRYNKA_ND_UPDATE.ADDND%type;
-            l_AMORT_DATE    SKRYNKA_ND_UPDATE.AMORT_DATE%type;
-            l_BRANCH        SKRYNKA_ND_UPDATE.BRANCH%type;
-            l_KF            SKRYNKA_ND_UPDATE.KF%type;
-            l_RNK           SKRYNKA_ND_UPDATE.RNK%type;
+    l_rec SKRYNKA_ND_UPDATE%rowtype;
+
+    procedure SAVE_CHANGES
+    is
+    begin
+
+        if ( l_rec.CHGACTION = 3 )  -- delete
+        then
+            l_rec.nd         := :old.nd;        l_rec.n_sk         := :old.n_sk;      l_rec.sos := :old.sos;           l_rec.fio := :old.fio; 
+            l_rec.adres      := :old.adres;     l_rec.dat_begin    := :old.dat_begin; l_rec.dat_end := :old.dat_end; 
+            l_rec.tariff     := :old.tariff;    l_rec.branch       := :old.branch;    l_rec.o_sk := :old.o_sk; 
+            l_rec.mfok       := :old.mfok;      l_rec.nlsk         := :old.nlsk;      l_rec.nls := :old.nls;           l_rec.ndoc := :old.ndoc; 
+            l_rec.docdate    := :old.docdate;   l_rec.sdoc         := :old.sdoc;      l_rec.rnk := :old.rnk; 
+            l_rec.kf         := :old.kf;
+            l_rec.dokum      := :old.dokum;     l_rec.issued       := :old.issued;    l_rec.tel := :old.tel;           l_rec.dover := :old.dover;
+            l_rec.nmk        := :old.nmk;       l_rec.dov_dat1     := :old.dov_dat1;  l_rec.dov_dat2 := :old.dov_dat2; l_rec.dov_pasp := :old.dov_pasp;
+            l_rec.custtype   := :old.custtype;  l_rec.isp_dov      := :old.isp_dov;   l_rec.ndov := :old.ndov;         l_rec.fio2 := :old.fio2;
+            l_rec.issued2    := :old.issued2;   l_rec.adres2       := :old.adres2;    l_rec.pasp2 := :old.pasp2;       l_rec.okpo1 := :old.okpo1;
+            l_rec.okpo2      := :old.okpo2;     l_rec.s_arenda     := :old.s_arenda;  l_rec.s_nds := :old.s_nds;       l_rec.sd := :old.sd;
+            l_rec.keycount   := :old.keycount;  l_rec.prskidka     := :old.prskidka;  l_rec.peny := :old.peny;         l_rec.datr2 := :old.datr2;
+            l_rec.mr2        := :old.mr2;       l_rec.mr           := :old.mr;        l_rec.datr := :old.datr;         l_rec.addnd := :old.addnd;
+            l_rec.amort_date := :old.amort_date;
+        else
+            l_rec.nd         := :new.nd;        l_rec.n_sk         := :new.n_sk;      l_rec.sos := :new.sos;           l_rec.fio := :new.fio; 
+            l_rec.adres      := :new.adres;     l_rec.dat_begin    := :new.dat_begin; l_rec.dat_end := :new.dat_end; 
+            l_rec.tariff     := :new.tariff;    l_rec.branch       := :new.branch;    l_rec.o_sk := :new.o_sk; 
+            l_rec.mfok       := :new.mfok;      l_rec.nlsk         := :new.nlsk;      l_rec.nls := :new.nls;           l_rec.ndoc := :new.ndoc; 
+            l_rec.docdate    := :new.docdate;   l_rec.sdoc         := :new.sdoc;      l_rec.rnk := :new.rnk; 
+            l_rec.kf         := :new.kf;
+            l_rec.dokum      := :new.dokum;     l_rec.issued       := :new.issued;    l_rec.tel := :new.tel;           l_rec.dover := :new.dover;
+            l_rec.nmk        := :new.nmk;       l_rec.dov_dat1     := :new.dov_dat1;  l_rec.dov_dat2 := :new.dov_dat2; l_rec.dov_pasp := :new.dov_pasp;
+            l_rec.custtype   := :new.custtype;  l_rec.isp_dov      := :new.isp_dov;   l_rec.ndov := :new.ndov;         l_rec.fio2 := :new.fio2;
+            l_rec.issued2    := :new.issued2;   l_rec.adres2       := :new.adres2;    l_rec.pasp2 := :new.pasp2;       l_rec.okpo1 := :new.okpo1;
+            l_rec.okpo2      := :new.okpo2;     l_rec.s_arenda     := :new.s_arenda;  l_rec.s_nds := :new.s_nds;       l_rec.sd := :new.sd;
+            l_rec.keycount   := :new.keycount;  l_rec.prskidka     := :new.prskidka;  l_rec.peny := :new.peny;         l_rec.datr2 := :new.datr2;
+            l_rec.mr2        := :new.mr2;       l_rec.mr           := :new.mr;        l_rec.datr := :new.datr;         l_rec.addnd := :new.addnd;
+            l_rec.amort_date := :new.amort_date;
+        end if;
+        l_rec.idupd         := bars_sqnc.get_nextval('s_skrynka_nd_update', l_rec.kf);
+        l_rec.effectdate    := coalesce(gl.bd, glb_bankdate);
+        l_rec.global_bdate  := glb_bankdate;    -- sysdate
+        l_rec.doneby        := user_name; --gl.aUID(NUMBER);    user_name(VARCHAR2);
+        l_rec.chgdate       := sysdate;
+
+        insert into BARS.SKRYNKA_ND_UPDATE values l_rec;
+
+      end SAVE_CHANGES;
 
 begin
-  if deleting then
-    l_otm         := 3;
-    l_ND           := :old.ND;
-    l_N_SK         := :old.N_SK;
-    l_SOS          := :old.SOS;
-    l_FIO          := :old.FIO;
-    l_DOKUM        := :old.DOKUM;
-    l_ISSUED       := :old.ISSUED;
-    l_ADRES        := :old.ADRES;
-    l_DAT_BEGIN    := :old.DAT_BEGIN;
-    l_DAT_END      := :old.DAT_END;
-    l_TEL          := :old.TEL;
-    l_DOVER        := :old.DOVER;
-    l_NMK          := :old.NMK;
-    l_DOV_DAT1     := :old.DOV_DAT1;
-    l_DOV_DAT2     := :old.DOV_DAT2;
-    l_DOV_PASP     := :old.DOV_PASP;
-    l_MFOK         := :old.MFOK;
-    l_NLSK         := :old.NLSK;
-    l_CUSTTYPE     := :old.CUSTTYPE;
-    l_O_SK         := :old.O_SK;
-    l_ISP_DOV      := :old.ISP_DOV;
-    l_NDOV         := :old.NDOV;
-    l_NLS          := :old.NLS;
-    l_NDOC         := :old.NDOC;
-    l_DOCDATE      := :old.DOCDATE;
-    l_SDOC         := :old.SDOC;
-    l_TARIFF       := :old.TARIFF;
-    l_FIO2         := :old.FIO2;
-    l_ISSUED2      := :old.ISSUED2;
-    l_ADRES2       := :old.ADRES2;
-    l_PASP2        := :old.PASP2;
-    l_OKPO1        := :old.OKPO1;
-    l_OKPO2        := :old.OKPO2;
-    l_S_ARENDA     := :old.S_ARENDA;
-    l_S_NDS        := :old.S_NDS;
-    l_SD           := :old.SD;
-    l_KEYCOUNT     := :old.KEYCOUNT;
-    l_PRSKIDKA     := :old.PRSKIDKA;
-    l_PENY         := :old.PENY;
-    l_DATR2        := :old.DATR2;
-    l_MR2          := :old.MR2;
-    l_MR           := :old.MR;
-    l_DATR         := :old.DATR;
-    l_ADDND        := :old.ADDND;
-    l_AMORT_DATE   := :old.AMORT_DATE;
-    l_BRANCH       := :old.BRANCH;
-    l_KF           := :old.KF;
-    l_RNK          := :old.RNK;
 
-  else
-    if inserting then
-      l_otm := 1;
-    elsif UPDATING then
-      l_otm := 2;
-    end if;
-    if l_otm>0 then
-                    l_ND           := :new.ND;
-                    l_N_SK         := :new.N_SK;
-                    l_SOS          := :new.SOS;
-                    l_FIO          := :new.FIO;
-                    l_DOKUM        := :new.DOKUM;
-                    l_ISSUED       := :new.ISSUED;
-                    l_ADRES        := :new.ADRES;
-                    l_DAT_BEGIN    := :new.DAT_BEGIN;
-                    l_DAT_END      := :new.DAT_END;
-                    l_TEL          := :new.TEL;
-                    l_DOVER        := :new.DOVER;
-                    l_NMK          := :new.NMK;
-                    l_DOV_DAT1     := :new.DOV_DAT1;
-                    l_DOV_DAT2     := :new.DOV_DAT2;
-                    l_DOV_PASP     := :new.DOV_PASP;
-                    l_MFOK         := :new.MFOK;
-                    l_NLSK         := :new.NLSK;
-                    l_CUSTTYPE     := :new.CUSTTYPE;
-                    l_O_SK         := :new.O_SK;
-                    l_ISP_DOV      := :new.ISP_DOV;
-                    l_NDOV         := :new.NDOV;
-                    l_NLS          := :new.NLS;
-                    l_NDOC         := :new.NDOC;
-                    l_DOCDATE      := :new.DOCDATE;
-                    l_SDOC         := :new.SDOC;
-                    l_TARIFF       := :new.TARIFF;
-                    l_FIO2         := :new.FIO2;
-                    l_ISSUED2      := :new.ISSUED2;
-                    l_ADRES2       := :new.ADRES2;
-                    l_PASP2        := :new.PASP2;
-                    l_OKPO1        := :new.OKPO1;
-                    l_OKPO2        := :new.OKPO2;
-                    l_S_ARENDA     := :new.S_ARENDA;
-                    l_S_NDS        := :new.S_NDS;
-                    l_SD           := :new.SD;
-                    l_KEYCOUNT     := :new.KEYCOUNT;
-                    l_PRSKIDKA     := :new.PRSKIDKA;
-                    l_PENY         := :new.PENY;
-                    l_DATR2        := :new.DATR2;
-                    l_MR2          := :new.MR2;
-                    l_MR           := :new.MR;
-                    l_DATR         := :new.DATR;
-                    l_ADDND        := :new.ADDND;
-                    l_AMORT_DATE   := :new.AMORT_DATE;
-                    l_BRANCH       := :new.BRANCH;
-                    l_KF           := :new.KF;
-                    l_RNK          := :new.RNK;
+  case
+    when inserting
+    then
 
-    end if;
-  end if;
+      l_rec.CHGACTION := 1;
+      SAVE_CHANGES;
 
-  if l_otm>0 then
-    l_idupd   := bars_sqnc.get_nextval('s_skrynka_nd_update', l_KF);
+    when deleting
+    then
 
-    insert
-    into   SKRYNKA_ND_UPDATE (      ND            ,
-                                    N_SK          ,
-                                    SOS           ,
-                                    FIO           ,
-                                    DOKUM         ,
-                                    ISSUED        ,
-                                    ADRES         ,
-                                    DAT_BEGIN     ,
-                                    DAT_END       ,
-                                    TEL           ,
-                                    DOVER         ,
-                                    NMK           ,
-                                    DOV_DAT1      ,
-                                    DOV_DAT2      ,
-                                    DOV_PASP      ,
-                                    MFOK          ,
-                                    NLSK          ,
-                                    CUSTTYPE      ,
-                                    O_SK          ,
-                                    ISP_DOV       ,
-                                    NDOV          ,
-                                    NLS           ,
-                                    NDOC          ,
-                                    DOCDATE       ,
-                                    SDOC          ,
-                                    TARIFF        ,
-                                    FIO2          ,
-                                    ISSUED2       ,
-                                    ADRES2        ,
-                                    PASP2         ,
-                                    OKPO1         ,
-                                    OKPO2         ,
-                                    S_ARENDA      ,
-                                    S_NDS         ,
-                                    SD            ,
-                                    KEYCOUNT      ,
-                                    PRSKIDKA      ,
-                                    PENY          ,
-                                    DATR2         ,
-                                    MR2           ,
-                                    MR            ,
-                                    DATR          ,
-                                    ADDND         ,
-                                    AMORT_DATE    ,
-                                    BRANCH        ,
-                                    KF            ,
-                                    CHGDATE       ,
-                                    CHGACTION     ,
-                                    DONEBY        ,
-                                    IDUPD  		  ,
-                                    RNK    )
-                     values (   l_ND            ,
-                                l_N_SK          ,
-                                l_SOS           ,
-                                l_FIO           ,
-                                l_DOKUM         ,
-                                l_ISSUED        ,
-                                l_ADRES         ,
-                                l_DAT_BEGIN     ,
-                                l_DAT_END       ,
-                                l_TEL           ,
-                                l_DOVER         ,
-                                l_NMK           ,
-                                l_DOV_DAT1      ,
-                                l_DOV_DAT2      ,
-                                l_DOV_PASP      ,
-                                l_MFOK          ,
-                                l_NLSK          ,
-                                l_CUSTTYPE      ,
-                                l_O_SK          ,
-                                l_ISP_DOV       ,
-                                l_NDOV          ,
-                                l_NLS           ,
-                                l_NDOC          ,
-                                l_DOCDATE       ,
-                                l_SDOC          ,
-                                l_TARIFF        ,
-                                l_FIO2          ,
-                                l_ISSUED2       ,
-                                l_ADRES2        ,
-                                l_PASP2         ,
-                                l_OKPO1         ,
-                                l_OKPO2         ,
-                                l_S_ARENDA      ,
-                                l_S_NDS         ,
-                                l_SD            ,
-                                l_KEYCOUNT      ,
-                                l_PRSKIDKA      ,
-                                l_PENY          ,
-                                l_DATR2         ,
-                                l_MR2           ,
-                                l_MR            ,
-                                l_DATR          ,
-                                l_ADDND         ,
-                                l_AMORT_DATE    ,
-                                l_BRANCH        ,
-                                l_KF        ,
-                                sysdate  ,
-                                l_otm    ,
-                                user_name,
-                                l_idupd,
-                                l_rnk);
-  end if;
-end;
+      l_rec.CHGACTION := 3;
+      SAVE_CHANGES;
+
+    when updating
+    then
+
+      case
+        when (:old.nd <> :new.nd) or (:old.kf <> :new.kf)-- !!! analize changing PRIMARY KEY - columns
+        then -- При зміні значеннь полів, що входять в PRIMARY KEY (для правильного відображення при вивантаженні даних до DWH)
+
+          -- породжуємо в історії запис про видалення
+          l_rec.CHGACTION := 3;
+          SAVE_CHANGES;
+
+          -- породжуємо в історії запис про вставку
+          l_rec.CHGACTION := 1;
+          SAVE_CHANGES;
+
+        when ( 
+                :old.n_sk <> :new.n_sk OR (:old.n_sk IS NULL AND :new.n_sk IS NOT NULL) OR (:old.n_sk IS NOT NULL AND :new.n_sk IS NULL)
+                or :old.sos <> :new.sos OR (:old.sos IS NULL AND :new.sos IS NOT NULL) OR (:old.sos IS NOT NULL AND :new.sos IS NULL)
+                or :old.fio <> :new.fio OR (:old.fio IS NULL AND :new.fio IS NOT NULL) OR (:old.fio IS NOT NULL AND :new.fio IS NULL)
+                or :old.adres <> :new.adres OR (:old.adres IS NULL AND :new.adres IS NOT NULL) OR (:old.adres IS NOT NULL AND :new.adres IS NULL)
+                or :old.dat_begin <> :new.dat_begin OR (:old.dat_begin IS NULL AND :new.dat_begin IS NOT NULL) OR (:old.dat_begin IS NOT NULL AND :new.dat_begin IS NULL)
+                or :old.dat_end <> :new.dat_end OR (:old.dat_end IS NULL AND :new.dat_end IS NOT NULL) OR (:old.dat_end IS NOT NULL AND :new.dat_end IS NULL)
+                or :old.tariff <> :new.tariff OR (:old.tariff IS NULL AND :new.tariff IS NOT NULL) OR (:old.tariff IS NOT NULL AND :new.tariff IS NULL)
+                or :old.branch <> :new.branch OR (:old.branch IS NULL AND :new.branch IS NOT NULL) OR (:old.branch IS NOT NULL AND :new.branch IS NULL)
+                or :old.o_sk <> :new.o_sk OR (:old.o_sk IS NULL AND :new.o_sk IS NOT NULL) OR (:old.o_sk IS NOT NULL AND :new.o_sk IS NULL)
+                or :old.mfok <> :new.mfok OR (:old.mfok IS NULL AND :new.mfok IS NOT NULL) OR (:old.mfok IS NOT NULL AND :new.mfok IS NULL)
+                or :old.nlsk <> :new.nlsk OR (:old.nlsk IS NULL AND :new.nlsk IS NOT NULL) OR (:old.nlsk IS NOT NULL AND :new.nlsk IS NULL)
+                or :old.nls <> :new.nls OR (:old.nls IS NULL AND :new.nls IS NOT NULL) OR (:old.nls IS NOT NULL AND :new.nls IS NULL)
+                or :old.ndoc <> :new.ndoc OR (:old.ndoc IS NULL AND :new.ndoc IS NOT NULL) OR (:old.ndoc IS NOT NULL AND :new.ndoc IS NULL)
+                or :old.docdate <> :new.docdate OR (:old.docdate IS NULL AND :new.docdate IS NOT NULL) OR (:old.docdate IS NOT NULL AND :new.docdate IS NULL)
+                or :old.sdoc <> :new.sdoc OR (:old.sdoc IS NULL AND :new.sdoc IS NOT NULL) OR (:old.sdoc IS NOT NULL AND :new.sdoc IS NULL)
+                or :old.rnk <> :new.rnk OR (:old.rnk IS NULL AND :new.rnk IS NOT NULL) OR (:old.rnk IS NOT NULL AND :new.rnk IS NULL)
+                or :old.dokum <> :new.dokum OR (:old.dokum IS NULL AND :new.dokum IS NOT NULL) OR (:old.dokum IS NOT NULL AND :new.dokum IS NULL)
+                or :old.issued <> :new.issued OR (:old.issued IS NULL AND :new.issued IS NOT NULL) OR (:old.issued IS NOT NULL AND :new.issued IS NULL)
+                or :old.tel <> :new.tel OR (:old.tel IS NULL AND :new.tel IS NOT NULL) OR (:old.tel IS NOT NULL AND :new.tel IS NULL)
+                or :old.dover <> :new.dover OR (:old.dover IS NULL AND :new.dover IS NOT NULL) OR (:old.dover IS NOT NULL AND :new.dover IS NULL)
+                or :old.nmk <> :new.nmk OR (:old.nmk IS NULL AND :new.nmk IS NOT NULL) OR (:old.nmk IS NOT NULL AND :new.nmk IS NULL)
+                or :old.dov_dat1 <> :new.dov_dat1 OR (:old.dov_dat1 IS NULL AND :new.dov_dat1 IS NOT NULL) OR (:old.dov_dat1 IS NOT NULL AND :new.dov_dat1 IS NULL)
+                or :old.dov_dat2 <> :new.dov_dat2 OR (:old.dov_dat2 IS NULL AND :new.dov_dat2 IS NOT NULL) OR (:old.dov_dat2 IS NOT NULL AND :new.dov_dat2 IS NULL)
+                or :old.dov_pasp <> :new.dov_pasp OR (:old.dov_pasp IS NULL AND :new.dov_pasp IS NOT NULL) OR (:old.dov_pasp IS NOT NULL AND :new.dov_pasp IS NULL)
+                or :old.custtype <> :new.custtype OR (:old.custtype IS NULL AND :new.custtype IS NOT NULL) OR (:old.custtype IS NOT NULL AND :new.custtype IS NULL)
+                or :old.isp_dov <> :new.isp_dov OR (:old.isp_dov IS NULL AND :new.isp_dov IS NOT NULL) OR (:old.isp_dov IS NOT NULL AND :new.isp_dov IS NULL)
+                or :old.ndov <> :new.ndov OR (:old.ndov IS NULL AND :new.ndov IS NOT NULL) OR (:old.ndov IS NOT NULL AND :new.ndov IS NULL)
+                or :old.fio2 <> :new.fio2 OR (:old.fio2 IS NULL AND :new.fio2 IS NOT NULL) OR (:old.fio2 IS NOT NULL AND :new.fio2 IS NULL)
+                or :old.issued2 <> :new.issued2 OR (:old.issued2 IS NULL AND :new.issued2 IS NOT NULL) OR (:old.issued2 IS NOT NULL AND :new.issued2 IS NULL)
+                or :old.adres2 <> :new.adres2 OR (:old.adres2 IS NULL AND :new.adres2 IS NOT NULL) OR (:old.adres2 IS NOT NULL AND :new.adres2 IS NULL)
+                or :old.pasp2 <> :new.pasp2 OR (:old.pasp2 IS NULL AND :new.pasp2 IS NOT NULL) OR (:old.pasp2 IS NOT NULL AND :new.pasp2 IS NULL)
+                or :old.okpo1 <> :new.okpo1 OR (:old.okpo1 IS NULL AND :new.okpo1 IS NOT NULL) OR (:old.okpo1 IS NOT NULL AND :new.okpo1 IS NULL)
+                or :old.okpo2 <> :new.okpo2 OR (:old.okpo2 IS NULL AND :new.okpo2 IS NOT NULL) OR (:old.okpo2 IS NOT NULL AND :new.okpo2 IS NULL)
+                or :old.s_arenda <> :new.s_arenda OR (:old.s_arenda IS NULL AND :new.s_arenda IS NOT NULL) OR (:old.s_arenda IS NOT NULL AND :new.s_arenda IS NULL)
+                or :old.s_nds <> :new.s_nds OR (:old.s_nds IS NULL AND :new.s_nds IS NOT NULL) OR (:old.s_nds IS NOT NULL AND :new.s_nds IS NULL)
+                or :old.sd <> :new.sd OR (:old.sd IS NULL AND :new.sd IS NOT NULL) OR (:old.sd IS NOT NULL AND :new.sd IS NULL)
+                or :old.keycount <> :new.keycount OR (:old.keycount IS NULL AND :new.keycount IS NOT NULL) OR (:old.keycount IS NOT NULL AND :new.keycount IS NULL)
+                or :old.prskidka <> :new.prskidka OR (:old.prskidka IS NULL AND :new.prskidka IS NOT NULL) OR (:old.prskidka IS NOT NULL AND :new.prskidka IS NULL)
+                or :old.peny <> :new.peny OR (:old.peny IS NULL AND :new.peny IS NOT NULL) OR (:old.peny IS NOT NULL AND :new.peny IS NULL)
+                or :old.datr2 <> :new.datr2 OR (:old.datr2 IS NULL AND :new.datr2 IS NOT NULL) OR (:old.datr2 IS NOT NULL AND :new.datr2 IS NULL)
+                or :old.mr2 <> :new.mr2 OR (:old.mr2 IS NULL AND :new.mr2 IS NOT NULL) OR (:old.mr2 IS NOT NULL AND :new.mr2 IS NULL)
+                or :old.mr <> :new.mr OR (:old.mr IS NULL AND :new.mr IS NOT NULL) OR (:old.mr IS NOT NULL AND :new.mr IS NULL)
+                or :old.datr <> :new.datr OR (:old.datr IS NULL AND :new.datr IS NOT NULL) OR (:old.datr IS NOT NULL AND :new.datr IS NULL)
+                or :old.addnd <> :new.addnd OR (:old.addnd IS NULL AND :new.addnd IS NOT NULL) OR (:old.addnd IS NOT NULL AND :new.addnd IS NULL)
+                or :old.amort_date <> :new.amort_date OR (:old.amort_date IS NULL AND :new.amort_date IS NOT NULL) OR (:old.amort_date IS NOT NULL AND :new.amort_date IS NULL)
+        )
+        then -- При зміні значеннь полів, що НЕ входять в PRIMARY KEY
+          -- протоколюємо внесені зміни
+          l_rec.CHGACTION := 2;
+          SAVE_CHANGES;
+
+        else
+          Null;
+      end case;
+
+    else
+      null;
+  end case;
+
+end TAIUD_SKRYNKAND_UPDATE;
 /
 ALTER TRIGGER BARS.TAIUD_SKRYNKAND_UPDATE ENABLE;
 

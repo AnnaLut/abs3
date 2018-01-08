@@ -120,9 +120,7 @@ COMMENT ON COLUMN BARS.ERR$_XML_IMPDOCS.VDAT IS '';
 
 
 PROMPT *** Create  grants  ERR$_XML_IMPDOCS ***
-grant SELECT                                                                 on ERR$_XML_IMPDOCS to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_XML_IMPDOCS to BARS_DM;
-grant SELECT                                                                 on ERR$_XML_IMPDOCS to UPLD;
 
 
 

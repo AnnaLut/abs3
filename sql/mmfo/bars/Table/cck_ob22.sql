@@ -69,8 +69,7 @@ begin
 	S36 CHAR(2), 
 	SD8 CHAR(2), 
 	PSTART VARCHAR2(50), 
-	PFINIS VARCHAR2(50), 
-	D_CLOSE DATE
+	PFINIS VARCHAR2(50)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -88,7 +87,6 @@ PROMPT *** ALTER_POLICIES to CCK_OB22 ***
 
 
 COMMENT ON TABLE BARS.CCK_OB22 IS 'Связи через ОБ22 в КП';
-COMMENT ON COLUMN BARS.CCK_OB22.D_CLOSE IS 'Дата закриття продукту';
 COMMENT ON COLUMN BARS.CCK_OB22.NBS IS 'БС  ~тела~кр';
 COMMENT ON COLUMN BARS.CCK_OB22.OB22 IS 'ob22~тела~кр';
 COMMENT ON COLUMN BARS.CCK_OB22.SPI IS 'ob22~премии~***5';
@@ -167,13 +165,21 @@ exception when others then
 
 
 PROMPT *** Create  grants  CCK_OB22 ***
-grant SELECT                                                                 on CCK_OB22        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_OB22        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_OB22        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_OB22        to RCC_DEAL;
-grant SELECT                                                                 on CCK_OB22        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_OB22        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CCK_OB22        to WR_REFREAD;
+
+
+begin
+    execute immediate 'alter table cck_ob22
+add D_CLOSE DATE';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
 
 
 

@@ -92,10 +92,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_IMP_FILE ***
-grant SELECT                                                                 on FM_IMP_FILE     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FM_IMP_FILE     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_IMP_FILE     to BARS_DM;
-grant SELECT                                                                 on FM_IMP_FILE     to UPLD;
 
 
 

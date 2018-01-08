@@ -1,23 +1,13 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F73_NN.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F73_NN ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_F73_NN (Dat_ DATE ,
+CREATE OR REPLACE PROCEDURE p_f73_NN (Dat_ DATE ,
  sheme_ varchar2 default 'G') IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #73 для КБ
-% COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 07/09/2017 (16/06/2017, 22/12/2016)
+% COPYRIGHT : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
+% VERSION : 16/06/2017 (22/12/2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
  sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 07.09.2017 вместо кода 349 формировался код 300. Исправлено  
 % 16.06.2017 внесены изменения которые были выполнены для ММФО 
 % 02.08.2016 для Дт 1101,1102 Кт 3800 и назначение пл. "прийнято монети"
 % или "прийнято з ГОУ" будет формироваться код "000"
@@ -393,7 +383,7 @@ BEGIN
 
               IF substr(nls_,1,3) in ('100','110') and to_number(d020_) > 300  THEN
 
-                 if substr(nlsk_,1,4)='3800' and d020_ in ('348','361','362','363','370') then
+                 if substr(nlsk_,1,4)='3800' and d020_ in ('361','362','363','370') then
                     d020_:=to_char(to_number(d020_)-100);
                  end if;
 
@@ -416,7 +406,7 @@ BEGIN
 
               IF substr(nlsk_,1,3) in ('100','110') and to_number(d020_) < 300  THEN
                  IF d020_<>'280' THEN
-                    if substr(nls_,1,4)='3800' and d020_ in ('248','261','262','263','270') then
+                    if substr(nls_,1,4)='3800' and d020_ in ('261','262','263','270') then
                        d020_:=to_char(to_number(d020_)+100);
                     end if;
                     if to_number(d020_)<300 then
@@ -454,15 +444,4 @@ BEGIN
     logger.info ('P_F73_NN: End for '||to_char(dat_,'dd.mm.yyyy'));
 END p_f73_NN;
 /
-show err;
 
-PROMPT *** Create  grants  P_F73_NN ***
-grant EXECUTE                                                                on P_F73_NN        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_F73_NN        to RPBN002;
-grant EXECUTE                                                                on P_F73_NN        to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F73_NN.sql =========*** End *** 
-PROMPT ===================================================================================== 

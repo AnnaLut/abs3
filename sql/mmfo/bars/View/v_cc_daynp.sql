@@ -19,10 +19,8 @@ UNION ALL
 SELECT 2, 'Наступний без вихіду на наступ. місяць' FROM DUAL;
 
 PROMPT *** Create  grants  V_CC_DAYNP ***
-grant SELECT                                                                 on V_CC_DAYNP      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CC_DAYNP      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CC_DAYNP      to RCC_DEAL;
-grant SELECT                                                                 on V_CC_DAYNP      to UPLD;
 
 
 

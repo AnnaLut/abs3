@@ -25,8 +25,7 @@ begin
   CREATE TABLE BARS.OW_OUT_FILES_SOURCE 
    (	ID NUMBER, 
 	FUNCNAME VARCHAR2(254), 
-	PROC VARCHAR2(4000), 
-	TYPE NUMBER
+	PROC VARCHAR2(4000)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -37,6 +36,13 @@ end;
 /
 
 
+begin
+    execute immediate 'alter table OW_OUT_FILES_SOURCE add type number ';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to OW_OUT_FILES_SOURCE ***
@@ -44,7 +50,6 @@ PROMPT *** ALTER_POLICIES to OW_OUT_FILES_SOURCE ***
 
 
 COMMENT ON TABLE BARS.OW_OUT_FILES_SOURCE IS '';
-COMMENT ON COLUMN BARS.OW_OUT_FILES_SOURCE.TYPE IS '';
 COMMENT ON COLUMN BARS.OW_OUT_FILES_SOURCE.ID IS 'Ідентифікатор';
 COMMENT ON COLUMN BARS.OW_OUT_FILES_SOURCE.FUNCNAME IS 'Назва функції для WEB';
 COMMENT ON COLUMN BARS.OW_OUT_FILES_SOURCE.PROC IS 'Процедура для формування файлу. ';
@@ -52,9 +57,7 @@ COMMENT ON COLUMN BARS.OW_OUT_FILES_SOURCE.PROC IS 'Процедура для формування фай
 
 
 PROMPT *** Create  grants  OW_OUT_FILES_SOURCE ***
-grant SELECT                                                                 on OW_OUT_FILES_SOURCE to BARSREADER_ROLE;
 grant SELECT                                                                 on OW_OUT_FILES_SOURCE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on OW_OUT_FILES_SOURCE to UPLD;
 
 
 

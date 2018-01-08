@@ -1,14 +1,11 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/EBK_CLOSED_CARD_V.sql =========*** Run 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view EBK_CLOSED_CARD_V ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.EBK_CLOSED_CARD_V ("KF", "RNK", "CUSTTYPE", "CHGDATE", "DATE_OFF") AS 
-  select b.KF
+CREATE OR REPLACE FORCE VIEW BARS.EBK_CLOSED_CARD_V
+( KF,
+  RNK,
+  CUSTTYPE,
+  CHGDATE,
+  DATE_OFF
+) as
+select b.KF
      , cu.RNK
      , CASE
          WHEN (cu.custtype = 2) THEN 'corp'
@@ -38,16 +35,8 @@ PROMPT *** Create  view EBK_CLOSED_CARD_V ***
                                           WHERE job_name = 'EBK_CARD_PACAKGES_JOB'
                                             AND status = 'SUCCEEDED'
                                           ORDER BY log_id ASC )
-                                 WHERE ROWNUM = 1 )
+                                 WHERE ROWNUM = 1 ) 
                             );
+/
 
-PROMPT *** Create  grants  EBK_CLOSED_CARD_V ***
-grant SELECT                                                                 on EBK_CLOSED_CARD_V to BARSREADER_ROLE;
-grant SELECT                                                                 on EBK_CLOSED_CARD_V to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on EBK_CLOSED_CARD_V to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/EBK_CLOSED_CARD_V.sql =========*** End 
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.EBK_CLOSED_CARD_V TO BARS_ACCESS_DEFROLE;

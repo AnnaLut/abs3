@@ -115,6 +115,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_KLPZKUPP_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP_ZKUPP ADD CONSTRAINT FK_KLPZKUPP_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KLPZKUPP_FL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP_ZKUPP ADD CONSTRAINT FK_KLPZKUPP_FL FOREIGN KEY (FL)
+	  REFERENCES BARS.KLP_FL (FL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_KLPZKUPP_KF_NN ***
 begin   
  execute immediate '
@@ -142,11 +168,9 @@ exception when others then
 
 PROMPT *** Create  grants  KLP_ZKUPP ***
 grant SELECT                                                                 on KLP_ZKUPP       to ABS_ADMIN;
-grant SELECT                                                                 on KLP_ZKUPP       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_ZKUPP       to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on KLP_ZKUPP       to PYOD001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_ZKUPP       to TECH_MOM1;
-grant SELECT                                                                 on KLP_ZKUPP       to UPLD;
 
 
 

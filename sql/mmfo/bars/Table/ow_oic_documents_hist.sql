@@ -106,6 +106,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OWOICDOCHIST_OWFILES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_OIC_DOCUMENTS_HIST ADD CONSTRAINT FK_OWOICDOCHIST_OWFILES FOREIGN KEY (ID)
+	  REFERENCES BARS.OW_FILES (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OWOICDOCUMENTSHIST_ID_NN ***
 begin   
  execute immediate '
@@ -144,11 +157,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_OIC_DOCUMENTS_HIST ***
-grant SELECT                                                                 on OW_OIC_DOCUMENTS_HIST to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on OW_OIC_DOCUMENTS_HIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_OIC_DOCUMENTS_HIST to BARS_DM;
 grant SELECT,UPDATE                                                          on OW_OIC_DOCUMENTS_HIST to OW;
-grant SELECT                                                                 on OW_OIC_DOCUMENTS_HIST to UPLD;
 
 
 

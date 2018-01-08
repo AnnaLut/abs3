@@ -91,6 +91,58 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_TAMOZHDOC_CONTRACTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TAMOZHDOC ADD CONSTRAINT FK_TAMOZHDOC_CONTRACTS FOREIGN KEY (ID)
+	  REFERENCES BARS.CONTRACTS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TAMOZHDOC_TOPCONTRACTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TAMOZHDOC ADD CONSTRAINT FK_TAMOZHDOC_TOPCONTRACTS FOREIGN KEY (PID)
+	  REFERENCES BARS.TOP_CONTRACTS (PID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TAMOZHDOC_TAMOZHDOCREESTR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TAMOZHDOC ADD CONSTRAINT FK_TAMOZHDOC_TAMOZHDOCREESTR FOREIGN KEY (IDR)
+	  REFERENCES BARS.TAMOZHDOC_REESTR (IDR) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TAMOZHDOC_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TAMOZHDOC ADD CONSTRAINT FK_TAMOZHDOC_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint NK_TAMOZHDOC_IDT ***
 begin   
  execute immediate '
@@ -117,10 +169,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  TAMOZHDOC ***
-grant SELECT                                                                 on TAMOZHDOC       to BARSREADER_ROLE;
 grant SELECT                                                                 on TAMOZHDOC       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TAMOZHDOC       to BARS_DM;
-grant SELECT                                                                 on TAMOZHDOC       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TAMOZHDOC       to WR_ALL_RIGHTS;
 grant SELECT                                                                 on TAMOZHDOC       to ZAY;
 

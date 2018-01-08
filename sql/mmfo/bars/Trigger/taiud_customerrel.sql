@@ -19,9 +19,6 @@ declare
   is
     l_old_key varchar2(38);
   begin
-    
-    BARS_AUDIT.TRACE('CUSTOMER_REL_UPDATE3: doneby='||user||', l_rec.EFFECTDATE='||COALESCE(gl.bd, glb_bankdate)||',  l_rec.GLOBAL_BDATE='||glb_bankdate );
-   
     if ( l_rec.CHGACTION = '3' )
     then
         l_rec.RNK           := :old.RNK;           l_rec.REL_ID        := :old.REL_ID;       l_rec.REL_RNK          := :old.REL_RNK;
@@ -43,20 +40,12 @@ declare
         l_rec.NAME_R        := :new.NAME_R;        l_rec.POSITION_R    := :new.POSITION_R;
     end if;
     bars_sqnc.split_key(l_rec.RNK, l_old_key, l_rec.KF);
-    
-     BARS_AUDIT.TRACE('CUSTOMER_REL_UPDATE2: doneby='||user||', l_rec.EFFECTDATE='||COALESCE(gl.bd, glb_bankdate)||',  l_rec.GLOBAL_BDATE='||glb_bankdate );
-   
-       
-  
     l_rec.IDUPD         := bars_sqnc.get_nextval('s_customerrelupdate', l_rec.KF);
     l_rec.EFFECTDATE    := COALESCE(gl.bd, glb_bankdate);
     l_rec.GLOBAL_BDATE  := glb_bankdate;    -- sysdate
     l_rec.DONEBY        := user; --gl.aUID;  user_name;
     l_rec.CHGDATE       := sysdate;
-   
-    
-   BARS_AUDIT.TRACE('CUSTOMER_REL_UPDATE4:'|| l_rec.CHGACTION ||' -- '||l_rec.CHGDATE ||' -- '||l_rec.DONEBY ||' -- '||l_rec.EFFECTDATE ||' -- '||l_rec.IDUPD||' -- '||l_rec.GLOBAL_BDATE  ||' -- '||l_rec.KF ||' -- '||l_rec.REL_ID ||' -- '||l_rec.REL_INTEXT ||' -- '||l_rec.REL_RNK ||' -- '||l_rec.RNK);  
-   
+
     insert into BARS.CUSTOMER_REL_UPDATE values l_rec;
   end SAVE_CHANGES;
   ---
@@ -116,7 +105,6 @@ begin
       null;
   end case;
 end TAIUD_CUSTOMERREL;
-
 /
 ALTER TRIGGER BARS.TAIUD_CUSTOMERREL ENABLE;
 

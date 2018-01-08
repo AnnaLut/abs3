@@ -60,12 +60,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_UPLCURJOBS_GROUPDATE ***
+PROMPT *** Create  constraint FK_CURRENTJOBS_UPLREGIONS ***
 begin   
  execute immediate '
-  ALTER TABLE BARSUPL.UPL_CURRENT_JOBS ADD CONSTRAINT UK_UPLCURJOBS_GROUPDATE UNIQUE (GROUP_ID, BANK_DATE, KF)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSUPLD  ENABLE';
+  ALTER TABLE BARSUPL.UPL_CURRENT_JOBS ADD CONSTRAINT FK_CURRENTJOBS_UPLREGIONS FOREIGN KEY (KF)
+	  REFERENCES BARSUPL.UPL_REGIONS (KF) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -78,6 +77,20 @@ PROMPT *** Create  constraint SYS_C0033100 ***
 begin   
  execute immediate '
   ALTER TABLE BARSUPL.UPL_CURRENT_JOBS MODIFY (KF NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint UK_UPLCURJOBS_GROUPDATE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_CURRENT_JOBS ADD CONSTRAINT UK_UPLCURJOBS_GROUPDATE UNIQUE (GROUP_ID, BANK_DATE, KF)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSUPLD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -112,10 +125,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  UPL_CURRENT_JOBS ***
-grant SELECT                                                                 on UPL_CURRENT_JOBS to BARSREADER_ROLE;
-grant SELECT                                                                 on UPL_CURRENT_JOBS to UPLD;
 
 
 

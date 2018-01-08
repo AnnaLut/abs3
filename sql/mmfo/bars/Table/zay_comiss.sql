@@ -93,34 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ZAYCOMISS_DK ***
+PROMPT *** Create  constraint CC_ZAYCOMISS_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAY_COMISS ADD CONSTRAINT CC_ZAYCOMISS_DK CHECK (dk in (1, 2)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ZAY_COMISS_ID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAY_COMISS MODIFY (ID CONSTRAINT CC_ZAY_COMISS_ID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ZAY_COMISS_DK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAY_COMISS MODIFY (DK CONSTRAINT CC_ZAY_COMISS_DK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ZAY_COMISS MODIFY (KF CONSTRAINT CC_ZAYCOMISS_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -141,10 +117,73 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ZAYCOMISS_KF_NN ***
+PROMPT *** Create  constraint CC_ZAY_COMISS_DK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAY_COMISS MODIFY (KF CONSTRAINT CC_ZAYCOMISS_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ZAY_COMISS MODIFY (DK CONSTRAINT CC_ZAY_COMISS_DK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ZAY_COMISS_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ZAY_COMISS MODIFY (ID CONSTRAINT CC_ZAY_COMISS_ID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ZAYCOMISS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ZAY_COMISS ADD CONSTRAINT FK_ZAYCOMISS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ZAYCOMISS_DK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ZAY_COMISS ADD CONSTRAINT CC_ZAYCOMISS_DK CHECK (dk in (1, 2)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ZAY_COMISS_RNK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ZAY_COMISS ADD CONSTRAINT FK_ZAY_COMISS_RNK FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint XFK_ZAY_COMISS_KV ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ZAY_COMISS ADD CONSTRAINT XFK_ZAY_COMISS_KV FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -168,10 +207,8 @@ exception when others then
 
 PROMPT *** Create  grants  ZAY_COMISS ***
 grant FLASHBACK,SELECT                                                       on ZAY_COMISS      to BARSAQ;
-grant SELECT                                                                 on ZAY_COMISS      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAY_COMISS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAY_COMISS      to BARS_DM;
-grant SELECT                                                                 on ZAY_COMISS      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAY_COMISS      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on ZAY_COMISS      to WR_REFREAD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_COMISS      to ZAY;

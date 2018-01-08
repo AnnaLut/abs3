@@ -14,10 +14,8 @@ where  substr(nls,1,1)='7' and  dazs is null and acc not in
  ;
 
 PROMPT *** Create  grants  V_OB22_N7 ***
-grant SELECT                                                                 on V_OB22_N7       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OB22_N7       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OB22_N7       to NALOG;
-grant SELECT                                                                 on V_OB22_N7       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OB22_N7       to WR_ALL_RIGHTS;
 
 

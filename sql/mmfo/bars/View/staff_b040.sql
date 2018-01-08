@@ -15,10 +15,6 @@ PROMPT *** Create  view STAFF_B040 ***
      FROM staff$base s 
      left join branch b on b.branch=s.branch;
 
-PROMPT *** Create  grants  STAFF_B040 ***
-grant SELECT                                                                 on STAFF_B040      to BARSREADER_ROLE;
-grant SELECT                                                                 on STAFF_B040      to UPLD;
-
 
 
 PROMPT ===================================================================================== 

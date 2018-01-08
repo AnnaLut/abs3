@@ -55,10 +55,8 @@ COMMENT ON COLUMN BARS.MOPER.S IS '';
 
 
 PROMPT *** Create  grants  MOPER ***
-grant SELECT                                                                 on MOPER           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MOPER           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MOPER           to START1;
-grant SELECT                                                                 on MOPER           to UPLD;
 
 
 

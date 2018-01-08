@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,8 +58,7 @@ declare
 begin
 
   l_tabsemantic := 'Претенденти на часткове погашення НОМIНАЛУ / V_CP_POG_NOM2';
-  l_tablinesdef := '10';
-  l_tabselect_statement := '';
+  l_tablinesdef := '';
   l_tabname     := 'V_CP_POG_NOM2';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,19 +119,19 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'DATD', 'D', 'Дата~угоди', '1.5', null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ND', 'C', '№~угоди', '1.5', null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NLS', 'C', 'Рахунок~НЕсистемний', '1.5', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NLSG', 'C', 'Рахунок~Системний', '1.5', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NMSG', 'C', 'Назва рах~Системного', '1.5', null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'OSTB', 'N', 'План.зал~НОМІНАЛУ', '1.5', null, 6, 0, 0, 0, 0, '', '# ##9.99', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'OSTC', 'N', 'Факт.зал~НОМІНАЛУ', '2', null, 5, 0, 0, 0, 0, '', '# ##9.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'OSTR', 'N', 'Купон', '1.5', null, 10, 0, 0, 0, 0, '', '# ##9.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'REF', 'N', 'Реф.~угоди', '1.5', null, 1, 0, 1, 0, 0, '', '', 0, 0, 'Count(*)', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'STR_REF', 'C', 'Всі реф.оп~угоди', '1.5', 200, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'KOL', 'N', 'Кіл.', '1', null, 2, 0, 0, 0, 0, '', '# ##9', 0, 0, 'Sum(KOL)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'ERR', 'C', 'Повідомлення', '2', null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SUM_NOM', 'N', 'Сума до~сплати НОМ', '1.5', null, 7, 0, 0, 0, 0, '', '# ##9.99', 0, 0, 'Sum(SUM_NOM)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'DATD', 'D', 'Дата~угоди', 1.5, null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ND', 'C', '№~угоди', 1.5, null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NLS', 'C', 'Рахунок~НЕсистемний', 1.5, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NLSG', 'C', 'Рахунок~Системний', 1.5, null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NMSG', 'C', 'Назва рах~Системного', 1.5, null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'OSTB', 'N', 'План.зал~НОМІНАЛУ', 1.5, null, 6, 0, 0, 0, 0, '', '# ##9.99', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'OSTC', 'N', 'Факт.зал~НОМІНАЛУ', 2, null, 5, 0, 0, 0, 0, '', '# ##9.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'OSTR', 'N', 'Купон', 1.5, null, 10, 0, 0, 0, 0, '', '# ##9.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'REF', 'N', 'Реф.~угоди', 1.5, null, 1, 0, 1, 0, 0, '', '', 0, 0, 'Count(*)', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'STR_REF', 'C', 'Всі реф.оп~угоди', 1.5, 200, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'KOL', 'N', 'Кіл.', 1, null, 2, 0, 0, 0, 0, '', '# ##9', 0, 0, 'Sum(KOL)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'ERR', 'C', 'Повідомлення', 2, null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SUM_NOM', 'N', 'Сума до~сплати НОМ', 1.5, null, 7, 0, 0, 0, 0, '', '# ##9.99', 0, 0, 'Sum(SUM_NOM)', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

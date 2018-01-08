@@ -53,9 +53,7 @@ COMMENT ON COLUMN BARS.BOP_COUNT.PR IS '';
 
 
 PROMPT *** Create  grants  BOP_COUNT ***
-grant SELECT                                                                 on BOP_COUNT       to BARSREADER_ROLE;
 grant SELECT                                                                 on BOP_COUNT       to BARS_DM;
-grant SELECT                                                                 on BOP_COUNT       to UPLD;
 
 
 

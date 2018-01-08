@@ -95,12 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_ACCTARIFARC ***
+PROMPT *** Create  constraint CC_ACCTARIFARC_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_TARIF_ARC ADD CONSTRAINT PK_ACCTARIFARC PRIMARY KEY (IDUPD)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.ACC_TARIF_ARC MODIFY (KF CONSTRAINT CC_ACCTARIFARC_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -137,6 +135,45 @@ PROMPT *** Create  constraint CC_ACCTARIFARC_EDATE ***
 begin   
  execute immediate '
   ALTER TABLE BARS.ACC_TARIF_ARC ADD CONSTRAINT CC_ACCTARIFARC_EDATE CHECK (edate = trunc(edate)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCTARIFARC_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_TARIF_ARC ADD CONSTRAINT FK_ACCTARIFARC_STAFF FOREIGN KEY (USER_ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCTARIFARC_BANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_TARIF_ARC ADD CONSTRAINT FK_ACCTARIFARC_BANKS FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCTARIFARC_ACCOUNTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_TARIF_ARC ADD CONSTRAINT FK_ACCTARIFARC_ACCOUNTS FOREIGN KEY (ACC)
+	  REFERENCES BARS.ACCOUNTS (ACC) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -253,10 +290,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCTARIFARC_KF_NN ***
+PROMPT *** Create  constraint PK_ACCTARIFARC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_TARIF_ARC MODIFY (KF CONSTRAINT CC_ACCTARIFARC_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_TARIF_ARC ADD CONSTRAINT PK_ACCTARIFARC PRIMARY KEY (IDUPD)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -308,11 +347,9 @@ exception when others then
 
 PROMPT *** Create  grants  ACC_TARIF_ARC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_TARIF_ARC   to ABS_ADMIN;
-grant SELECT                                                                 on ACC_TARIF_ARC   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_TARIF_ARC   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_TARIF_ARC   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_TARIF_ARC   to START1;
-grant SELECT                                                                 on ACC_TARIF_ARC   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_TARIF_ARC   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on ACC_TARIF_ARC   to WR_REFREAD;
 

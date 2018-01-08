@@ -1,12 +1,6 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_xmlklb_imp.sql =========*** Run
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_XMLKLB_IMP 
+create or replace package BARS_XMLKLB_IMP
 is
-
+  
   -----------------------------------------------------------------
   --
   --    Константы
@@ -340,7 +334,12 @@ is
 
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP 
+
+show errors
+
+----------------------------------------------------------------------------------------------------
+
+create or replace package body BARS_XMLKLB_IMP
 is
   ---------------------------------------------------------
   --
@@ -810,7 +809,7 @@ is
                  select nls, dazs
                   into p_impdoc.nlsa, l_dazs
                  from accounts where nlsalt = p_impdoc.nlsa and kv = p_impdoc.kv AND dat_alt IS NOT NULL;
-
+                 
                         if l_dazs is not null then
                            bars_error.raise_nerror(G_MODULE, 'CLOSE_PAYER_ACCOUNT', p_impdoc.nlsa, to_char(p_impdoc.kv));
                         end if;
@@ -901,11 +900,11 @@ is
             begin   -- Для перехода на новый план счетов пытаемся найти по nlsalt новый счет если пришол старый
                     select nls, dazs into p_impdoc.nlsb, l_dazs
                     from accounts where nlsalt = p_impdoc.nlsb and kv = p_impdoc.kv2 AND dat_alt IS NOT NULL;
-
+                 
                         if l_dazs is not null then
                            bars_error.raise_nerror(G_MODULE, 'CLOSE_PAYER_ACCOUNT', p_impdoc.nlsb, to_char(p_impdoc.kv));
                         end if;
-            exception when no_data_found then
+            exception when no_data_found then 
                bars_error.raise_error(G_MODULE, 169, p_impdoc.nlsb||'('||p_impdoc.kv2||')' );
             end;
          end;
@@ -1415,7 +1414,7 @@ is
       end;
 
       bars_audit.trace(l_trace||'перед gl.dyntt2');
-
+      
       gl.dyntt2 (
          sos_   => l_sos,
          mod1_  => l_paymode,
@@ -2004,7 +2003,7 @@ is
          --end if;
 
          begin
-
+            
             savepoint before_pay;
 
             gl.ref(l_ref);
@@ -2025,9 +2024,9 @@ is
              where impref  = p_impref;
 
             p_errcode := G_VALIDATE_OK;
-
+            
             bars_audit.info(l_trace||'Док-т с имп.рефом '||l_impdoc.impref||' оплачен рефом '||l_ref);
-
+            
          exception when others then
             rollback to before_pay;
             raise;
@@ -2045,11 +2044,11 @@ is
              , errmsg  = l_errmsg
              , status  = G_NOVALID
          where impref  = p_impref;
-
+        
         p_errcode := l_errcode;
-
+        
     end;
-
+    
   end PAY_DOC;
 
   -----------------------------------------------------------------
@@ -2065,11 +2064,11 @@ is
     title    constant   varchar2(64)  := $$PLSQL_UNIT||'.CLEAR_IMPORT_JOURNALS';
     l_min_dt date;
   begin
-
+    
     bars_audit.trace( '%s: Entry with ( p_date=%s ).', title, to_char(p_date,'dd/mm/yyyy') );
-
+    
     l_min_dt := trunc(sysdate) - 30;
-
+    
     for c in ( select impref
                  from XML_IMPDOCS
                 where ( STATUS in (G_PAYED, G_DELETED) and DAT < p_date )
@@ -2078,20 +2077,20 @@ is
       delete XML_IMPDOCSW where IMPREF = c.impref;
       delete XML_IMPDOCS  where IMPREF = c.impref;
     end loop;
-
+    
     l_min_dt := add_months( trunc(sysdate), -12 ); -- trunc(t.DAT,'YYYY')
-
+    
     delete XML_IMPFILES t
      where t.DAT < l_min_dt
        and not exists ( select 1
                           from XML_IMPDOCS d
                          where d.KF = t.KF
                            and d.FN = t.FN );
-
+    
     bars_audit.trace( '%s: Exit.', title );
-
+    
   end CLEAR_IMPORT_JOURNALS;
-
+   
    -----------------------------------------------------------------
    --    INIT_MISSING_FIELDS
    --
@@ -2149,12 +2148,12 @@ is
 
       -- для корректирующих установить дату валютирования в последнюю дату (банковську)
       -- прошлого месяца
-      if p_doc.tt = '096'
+      if p_doc.tt = '096' 
       then
          p_doc.datp := p_doc.vdat;
          p_doc.datd := trunc(sysdate);
          p_doc.vdat := dat_next_u(trunc(gl.bd, 'MM'),-1);  --add_months(last_day(gl.bd),-1);
-      elsif p_doc.tt = '097'
+      elsif p_doc.tt = '097' 
       then
          p_doc.datp := p_doc.vdat;
          p_doc.datd := trunc(sysdate);
@@ -2198,7 +2197,7 @@ is
    begin
 
       -- принитить допустимые доп реквизиты
-      if opfield_list.count  = 0
+      if opfield_list.count  = 0 
       then
         for c in (select tag from op_field)
         loop
@@ -2227,9 +2226,9 @@ is
 
           -- вставка док-та в БД с прверкой реквизитов
           bars_audit.trace(l_trace||'начало вставки док-та файла '||p_pack.hdr.pack_name||' датой '||to_char(gl.bd,'dd/mm/yyyy') );
-
+          
           l_impref := bars_sqnc.get_nextval('s_xmlimpdocs'); -- s_xmlimpdocs.nextval;
-
+          
           -- добавить недостающие значение - реквизиты сторон, если их нету и если они наши
           init_missing_fields(l_doc, l_impref);
 
@@ -2307,19 +2306,19 @@ is
 
   exception
     when others then
-
+      
       bars_context.set_context;
-
+  
       if not dbms_xmldom.isnull(l_xmldoc)
       then
         dbms_xmldom.freedocument(l_xmldoc);
       end if;
-
+  
       bars_audit.error( l_trace||'Ошибка обработки пакета документов: ' );
       bars_audit.error( sqlerrm );
-
+      
       raise;
-
+  
   end;
 
 
@@ -2371,17 +2370,17 @@ is
      for c in ( select IMPREF, S
                   from xml_impdocs  d
                      , xml_impfiles f
-                 where f.fn  = d.fn
+                 where f.fn  = d.fn 
                    and f.dat = d.dat
                    and f.dat = p_dat
                    and f.userid = user_id
-                   and f.fn = upper(p_filename)
+                   and f.fn = upper(p_filename) 
                    and status not in ( G_PAYED, G_DELETED ) )
      loop
-
+       
        PAY_DOC( c.impref, l_errcode );
-
-       if l_errcode = '0000'
+       
+       if l_errcode = '0000' 
        then
          p_okcnt  := p_okcnt + 1;
          p_oksum  := p_oksum + c.s;
@@ -2389,11 +2388,11 @@ is
          p_badcnt := p_badcnt + 1;
          p_badsum := p_badsum + c.s;
        end if;
-
+       
      end loop;
 
   end;
-
+  
   -----------------------------------------------------------------
   --    MAKE_IMPORT()
   --
@@ -2417,66 +2416,66 @@ is
     l_errmsg     varchar2(512);
   begin
 
-    if ( length(p_packname) > 30 )
+    if ( length(p_packname) > 30 ) 
     then
       bars_error.raise_nerror( G_MODULE, 'FILENAME_TOO_LONG', p_packname );
     end if;
-
+    
     bars_xmlklb.parse_header
     ( p_packname => '',
       p_indoc    => p_indoc,
       p_hdr      => l_pack.hdr );
-
+    
     bars_audit.trace( l_trace||' заголовок: '||l_pack.hdr.pack_name||' sender='||l_pack.hdr.sender );
-
+    
     bars_audit.info( l_trace||'Импорт файла '||l_pack.hdr.pack_name||' датой '||to_char(gl.bd,'dd/mm/yyyy') );
-
+    
     l_file_nm := upper(l_pack.hdr.pack_name);
-
+    
     begin
-
+      
       insert
         into XML_IMPFILES
            ( FN, DAT, USERID )
       values
            ( l_file_nm , GL.BD, USER_ID );
-
+      
     exception
       when DUP_VAL_ON_INDEX then
-
+        
         select f.DAT
-             , ' користувачем ' || nvl2(s.FIO,'"'||s.FIO||'"','#'||to_char(f.USERID)) ||
-               ' (' ||nvl(to_char(f.DOCS_QTY),'багато') || ' документів на ' ||
+             , ' користувачем ' || nvl2(s.FIO,'"'||s.FIO||'"','#'||to_char(f.USERID)) || 
+               ' (' ||nvl(to_char(f.DOCS_QTY),'багато') || ' документів на ' || 
                nvl2(f.DOCS_SUM, 'суму '||to_char(f.DOCS_SUM),'велику суму')  ||')'
           into l_file_dt
              , l_errmsg
           from XML_IMPFILES f
-          left
+          left 
           join STAFF$BASE s
             on ( s.ID = f.USERID )
          where f.FN = l_file_nm;
-
+        
         bars_audit.trace( l_trace || ' file_nm=' || l_file_nm || ', file_dt=' || to_char(l_file_dt,'dd/mm/yyyy') || l_errmsg );
-
+        
         if ( l_file_dt > add_months( GL.BD, -12 ) )
         then
-
+          
           l_errmsg := to_char(l_file_dt,'dd/mm/yyyy') || l_errmsg;
-
+          
           bars_error.raise_error( G_MODULE, 83, replace(l_file_nm,'$'), l_errmsg );
-
+          
         else
-
-          delete XML_IMPDOCSW
-           where IMPREF in ( select IMPREF
+          
+          delete XML_IMPDOCSW 
+           where IMPREF in ( select IMPREF 
                                from XML_IMPDOCS
                               where FN  = l_file_nm
                                 and DAT = l_file_dt );
-
+          
           delete XML_IMPDOCS
            where FN  = l_file_nm
              and DAT = l_file_dt;
-
+          
           update XML_IMPFILES
              set DAT      = GL.BD
                , USERID   = USER_ID
@@ -2484,35 +2483,35 @@ is
                , DOCS_QTY = 0
                , DOCS_SUM = 0
            where FN = l_file_nm;
-
+          
         end if;
-
+        
     end;
-
+    
     BARS_XMLKLB.PARSE_BODY
     ( p_indoc     => p_indoc,
       p_cbody     => l_pack.cbody );
-
-    if ( p_outdoc is not null )
+    
+    if ( p_outdoc is not null ) 
     then
 
       bars_audit.trace(l_trace||'исходящий документ не пуст');
-
+      
       insert_extern_docs( p_pack => l_pack, p_needreply=> 1, p_outdomdoc => l_outdomdoc);
-
+      
       BARS_XMLKLB.CREATE_DOCUMENT_REPLY
       ( p_bodydoc => l_outdomdoc,
         p_hdr     => l_pack.hdr,
         p_reply   => p_outdoc );
-
+      
     else
-
+      
       bars_audit.trace(l_trace||'исходящий документ ПУСТ');
-
+      
       insert_extern_docs(p_pack => l_pack );
-
+      
     end if;
-
+    
     update XML_IMPFILES f
        set ( f.DOCS_QTY, f.DOCS_SUM ) = ( select sum(1)   as DOCS_QTY
                                                , sum(d.S) as DOCS_SUM
@@ -2523,11 +2522,11 @@ is
      where FN     = l_file_nm
        and DAT    = GL.BD
        and USERID = USER_ID;
-
+    
     p_packname := l_pack.hdr.pack_name;
-
+    
     dbms_lob.freetemporary( l_pack.cbody );
-
+    
     bars_audit.trace( l_trace||' packname = '||p_packname );
 
   exception
@@ -2536,7 +2535,7 @@ is
       bars_audit.error(l_trace||sqlerrm);
       raise;
   end MAKE_IMPORT;
-
+  
   -----------------------------------------------------------------
   --    MAKE_IMPORT()
   --
@@ -2624,16 +2623,16 @@ is
     l_nbsb  varchar2(4);
     l_tt    varchar2(3);
   begin
-
+    
     l_nbsa := substr(p_nlsa,1,4);
     l_nbsb := substr(p_nlsb,1,4);
-
-    if (l_nbsa in ('1001','1002') or l_nbsb in ('1001','1002')) and p_dk<>0 and p_dk<>1
+    
+    if (l_nbsa in ('1001','1002') or l_nbsb in ('1001','1002')) and p_dk<>0 and p_dk<>1 
     then
       bars_error.raise_nerror(G_MODULE, 'NO_INFORM_FOR_CASH');
     end if;
 
-    if p_dk > 3 or p_dk < 0
+    if p_dk > 3 or p_dk < 0 
     then
       bars_error.raise_nerror(G_MODULE, 'NO_SUCH_DK');
     end if;
@@ -2676,16 +2675,7 @@ begin
   null;
 end bars_xmlklb_imp;
 /
- show err;
- 
-PROMPT *** Create  grants  BARS_XMLKLB_IMP ***
-grant EXECUTE                                                                on BARS_XMLKLB_IMP to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BARS_XMLKLB_IMP to KLBX;
-grant EXECUTE                                                                on BARS_XMLKLB_IMP to OPER000;
 
+show err;
  
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_xmlklb_imp.sql =========*** End
- PROMPT ===================================================================================== 
- 
+grant EXECUTE on BARS_XMLKLB_IMP to BARS_ACCESS_DEFROLE;

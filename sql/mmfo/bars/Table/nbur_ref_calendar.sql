@@ -80,10 +80,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0084968 ***
+PROMPT *** Create  constraint FK_FILES_CALENDAR ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_REF_CALENDAR MODIFY (REPORT_DATE NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_REF_CALENDAR ADD CONSTRAINT FK_FILES_CALENDAR FOREIGN KEY (FILE_ID)
+	  REFERENCES BARS.NBUR_REF_FILES (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -118,6 +119,18 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint SYS_C0084968 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NBUR_REF_CALENDAR MODIFY (REPORT_DATE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_NBUR_REF_CALENDAR ***
 begin   
  execute immediate '
@@ -132,9 +145,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_REF_CALENDAR ***
-grant SELECT                                                                 on NBUR_REF_CALENDAR to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_REF_CALENDAR to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on NBUR_REF_CALENDAR to UPLD;
 
 
 

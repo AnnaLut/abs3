@@ -35,10 +35,8 @@ union
 select nd, 'ACC_2628', acc_2628 from w4_acc;
 
 PROMPT *** Create  grants  V_W4_ND_ACC ***
-grant SELECT                                                                 on V_W4_ND_ACC     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_ND_ACC     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_W4_ND_ACC     to OW;
-grant SELECT                                                                 on V_W4_ND_ACC     to UPLD;
 
 
 

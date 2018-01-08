@@ -169,11 +169,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FX_DEAL_ACC ***
-grant SELECT                                                                 on FX_DEAL_ACC     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FX_DEAL_ACC     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FX_DEAL_ACC     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FX_DEAL_ACC     to FOREX;
-grant SELECT                                                                 on FX_DEAL_ACC     to UPLD;
 
 
 

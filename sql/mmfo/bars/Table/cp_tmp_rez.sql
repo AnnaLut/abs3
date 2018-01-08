@@ -171,11 +171,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_TMP_REZ ***
-grant SELECT                                                                 on CP_TMP_REZ      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_TMP_REZ      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_TMP_REZ      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_TMP_REZ      to START1;
-grant SELECT                                                                 on CP_TMP_REZ      to UPLD;
 
 
 

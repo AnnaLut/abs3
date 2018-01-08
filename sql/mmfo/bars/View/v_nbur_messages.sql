@@ -20,11 +20,9 @@ PROMPT *** Create  view V_NBUR_MESSAGES ***
     WHERE l.userid = f.id(+);
 
 PROMPT *** Create  grants  V_NBUR_MESSAGES ***
-grant SELECT                                                                 on V_NBUR_MESSAGES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_MESSAGES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_MESSAGES to RPBN002;
 grant SELECT                                                                 on V_NBUR_MESSAGES to START1;
-grant SELECT                                                                 on V_NBUR_MESSAGES to UPLD;
 
 
 

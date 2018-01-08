@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Портфель кредитiв';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'CC_V';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,30 +119,30 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ABDATE', 'D', 'Дата~початку~дії КД', '', null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'AIM', 'N', 'Цiль', '', null, 97, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'CC_ID', 'C', 'Зовн.~№~КД', '', null, 0, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'DWDATE', 'D', 'Дата~заверш~дії КД', '', null, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'FREQ', 'N', 'Перiод', '', null, 26, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'ID', 'N', 'Відп~інсп~по КД', '', null, 97, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'KV', 'N', 'Вал', '', null, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'ND', 'N', 'Реф КД~в АБС~~РАХУНКИ', '', null, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"exists(select 1 from V_ND_ACCOUNTS where nd=:ND and acc=a.acc)")', 0);
-  bars_metabase.add_column(l_tabid, 15, 'NLS', 'C', 'Осн~Рахунок~тіла КД', '', null, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'OSTC', 'N', 'Залишок~по тілу~КД', '', null, 13, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'PR', 'N', '%~ст', '', null, 12, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'RNK', 'N', 'РНК~позич~~КАРТКА', '', null, 2, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', 'EditCustomer( IifN(:VIDD <10,2,3), NUMBER_Null, :CC_NMK, CVIEW_ReadOnly, hWndForm, 0, "", FALSE)', 0);
-  bars_metabase.add_column(l_tabid, 21, 'S', 'N', 'Сума', '', null, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'SOUR', 'N', 'Джерело', '', null, 98, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'S080', 'C', 'Кат ризику S080', '', null, 95, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'VIDD', 'N', 'Вид~КД', '', null, 4, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'SROK', 'N', 'Термiн ~в мiсяцях', '', null, 98, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'DAY', 'N', 'День~оплати ', '', null, 20, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'DAZS', 'D', 'Фактична~Дата закр КД', '', null, 99, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'NAMK', 'C', 'Назва~Клиента', '', null, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 1, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'BRANCH', 'C', 'Бранч~КД', '', null, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'PROD', 'C', 'Код~Продукт', '', null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'SOS', 'N', 'Стан договору', '', null, 27, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'NDI', 'N', 'Реф ~пов`яз. дог', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ABDATE', 'D', 'Дата~початку~дії КД', null, null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'AIM', 'N', 'Цiль', null, null, 97, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'CC_ID', 'C', 'Зовн.~№~КД', null, null, 0, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'DWDATE', 'D', 'Дата~заверш~дії КД', null, null, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'FREQ', 'N', 'Перiод', null, null, 26, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'ID', 'N', 'Відп~інсп~по КД', null, null, 97, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'KV', 'N', 'Вал', null, null, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'ND', 'N', 'Реф КД~в АБС~~РАХУНКИ', null, null, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"exists(select 1 from V_ND_ACCOUNTS where nd=:ND and acc=a.acc)")', 0);
+  bars_metabase.add_column(l_tabid, 15, 'NLS', 'C', 'Осн~Рахунок~тіла КД', null, null, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'OSTC', 'N', 'Залишок~по тілу~КД', null, null, 13, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'PR', 'N', '%~ст', null, null, 12, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'RNK', 'N', 'РНК~позич~~КАРТКА', null, null, 2, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', 'EditCustomer( IifN(:VIDD <10,2,3), NUMBER_Null, :CC_NMK, CVIEW_ReadOnly, hWndForm, 0, "", FALSE)', 0);
+  bars_metabase.add_column(l_tabid, 21, 'S', 'N', 'Сума', null, null, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'SOUR', 'N', 'Джерело', null, null, 98, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'S080', 'C', 'Кат ризику S080', null, null, 95, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'VIDD', 'N', 'Вид~КД', null, null, 4, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'SROK', 'N', 'Термiн ~в мiсяцях', null, null, 98, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'DAY', 'N', 'День~оплати ', null, null, 20, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'DAZS', 'D', 'Фактична~Дата закр КД', null, null, 99, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'NAMK', 'C', 'Назва~Клиента', null, null, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 1, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'BRANCH', 'C', 'Бранч~КД', null, null, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'PROD', 'C', 'Код~Продукт', null, null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'SOS', 'N', 'Стан договору', null, null, 27, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'NDI', 'N', 'Реф ~пов`яз. дог', null, null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CC_AIM');

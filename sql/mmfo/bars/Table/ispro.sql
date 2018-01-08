@@ -63,10 +63,8 @@ COMMENT ON COLUMN BARS.ISPRO.STMT IS '';
 
 
 PROMPT *** Create  grants  ISPRO ***
-grant SELECT                                                                 on ISPRO           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ISPRO           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ISPRO           to START1;
-grant SELECT                                                                 on ISPRO           to UPLD;
 
 
 

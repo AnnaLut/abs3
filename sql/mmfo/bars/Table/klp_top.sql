@@ -51,6 +51,32 @@ COMMENT ON COLUMN BARS.KLP_TOP.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_KLPTOP_RNK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP_TOP ADD CONSTRAINT FK_KLPTOP_RNK FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KLPTOP_RNKP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP_TOP ADD CONSTRAINT FK_KLPTOP_RNKP FOREIGN KEY (RNKP)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_KLPTOP ***
 begin   
  execute immediate '
@@ -116,11 +142,9 @@ exception when others then
 
 PROMPT *** Create  grants  KLP_TOP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_TOP         to ABS_ADMIN;
-grant SELECT                                                                 on KLP_TOP         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLP_TOP         to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on KLP_TOP         to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_TOP         to TECH_MOM1;
-grant SELECT                                                                 on KLP_TOP         to UPLD;
 grant FLASHBACK,SELECT                                                       on KLP_TOP         to WR_REFREAD;
 
 

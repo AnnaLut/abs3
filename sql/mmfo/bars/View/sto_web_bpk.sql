@@ -33,10 +33,8 @@ PROMPT *** Create  view STO_WEB_BPK ***
 		  order by stmp desc;
 
 PROMPT *** Create  grants  STO_WEB_BPK ***
-grant SELECT                                                                 on STO_WEB_BPK     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_WEB_BPK     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_WEB_BPK     to PYOD001;
-grant SELECT                                                                 on STO_WEB_BPK     to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_WEB_BPK     to WR_REFREAD;
 
 

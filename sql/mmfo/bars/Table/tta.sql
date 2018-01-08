@@ -47,10 +47,8 @@ COMMENT ON COLUMN BARS.TTA.TTA IS '';
 
 
 PROMPT *** Create  grants  TTA ***
-grant SELECT                                                                 on TTA             to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TTA             to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TTA             to START1;
-grant SELECT                                                                 on TTA             to UPLD;
 
 
 

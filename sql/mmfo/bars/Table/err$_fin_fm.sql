@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_FIN_FM.VED IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_FIN_FM ***
-grant SELECT                                                                 on ERR$_FIN_FM     to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_FIN_FM     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -73,6 +73,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CCKRESTRACC_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CCK_RESTR_ACC ADD CONSTRAINT FK_CCKRESTRACC_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_CCKRESTR_ACC ***
 begin   
  execute immediate '
@@ -87,11 +100,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CCK_RESTR_ACC ***
-grant SELECT                                                                 on CCK_RESTR_ACC   to BARSREADER_ROLE;
-grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_RESTR_ACC   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CCK_RESTR_ACC   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_RESTR_ACC   to BARS_DM;
 grant SELECT                                                                 on CCK_RESTR_ACC   to RCC_DEAL;
-grant SELECT                                                                 on CCK_RESTR_ACC   to UPLD;
 
 
 

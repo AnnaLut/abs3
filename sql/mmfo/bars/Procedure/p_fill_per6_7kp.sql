@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FILL_PER6_7KP.sql =========*** R
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_FILL_PER6_7KP ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_FILL_PER6_7KP (p_nls5    VARCHAR2,
+CREATE OR REPLACE PROCEDURE p_fill_per6_7kp (p_nls5    VARCHAR2,
                                              p_nazn    VARCHAR2)
 IS
    -- Наповнення довідника перекриття коригуючих за грудень 6,7 кл. на 5040(5041)
@@ -76,13 +67,5 @@ BEGIN
       ORDER BY SUBSTR (a.nls, 1, 4), SUBSTR (a.nls, 6, 9);
 END;
 /
-show err;
 
-PROMPT *** Create  grants  P_FILL_PER6_7KP ***
-grant EXECUTE                                                                on P_FILL_PER6_7KP to BARS_ACCESS_DEFROLE;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FILL_PER6_7KP.sql =========*** E
-PROMPT ===================================================================================== 
+grant execute on p_fill_per6_7kp to bars_access_defrole;

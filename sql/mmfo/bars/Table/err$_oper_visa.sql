@@ -88,9 +88,7 @@ COMMENT ON COLUMN BARS.ERR$_OPER_VISA.REF IS '';
 
 
 PROMPT *** Create  grants  ERR$_OPER_VISA ***
-grant SELECT                                                                 on ERR$_OPER_VISA  to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_OPER_VISA  to BARS_DM;
-grant SELECT                                                                 on ERR$_OPER_VISA  to UPLD;
 
 
 

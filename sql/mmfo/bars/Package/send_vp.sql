@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/send_vp.sql =========*** Run *** ===
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.SEND_VP IS   G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'ver.1.0 08.11.2016 Пiдкрiплення Вал.Поз';
+CREATE OR REPLACE PACKAGE BARS.Send_VP IS   G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'ver.1.0 08.11.2016 Пiдкрiплення Вал.Поз';
   procedure PUT      ( p_acc number, p_n number, p_k number, p_q number, p_FF int, p_FT int  ) ;
   procedure PAY      ( p_Nazn varchar2) ;
   procedure PAY_RATE ( p_Nazn varchar2) ;
@@ -14,7 +8,8 @@
   -------------------
 END Send_VP;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.SEND_VP IS   G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'ver.1.0 08.11.2016 Пiдкрiплення Вал.Поз';
+---------------------------------------------
+CREATE OR REPLACE PACKAGE BODY BARS.Send_VP IS   G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'ver.1.0 08.11.2016 Пiдкрiплення Вал.Поз';
  g_errN number := -20203 ;
  g_errS varchar2(8) := 'Send_VP:'  ;
  nlchr char(2) := chr(13)||chr(10) ;
@@ -139,14 +134,3 @@ function body_version   return varchar2 is begin  return 'Package body Send_VP '
 begin  Null;
 END Send_VP;
 /
- show err;
- 
-PROMPT *** Create  grants  SEND_VP ***
-grant EXECUTE                                                                on SEND_VP         to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/send_vp.sql =========*** End *** ===
- PROMPT ===================================================================================== 
- 

@@ -77,9 +77,7 @@ PROMPT *** Create  view V_GRT_TYPES_OBU ***
  order by p.name;
 
 PROMPT *** Create  grants  V_GRT_TYPES_OBU ***
-grant SELECT                                                                 on V_GRT_TYPES_OBU to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GRT_TYPES_OBU to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_GRT_TYPES_OBU to UPLD;
 
 
 

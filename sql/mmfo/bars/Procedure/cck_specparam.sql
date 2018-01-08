@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/CCK_SPECPARAM.sql =========*** Run
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure CCK_SPECPARAM ***
-
-  CREATE OR REPLACE PROCEDURE BARS.CCK_SPECPARAM (ACC_   int, -- вн. номер подвязываемого счета под договор
+CREATE OR REPLACE PROCEDURE CCK_SPECPARAM(ACC_   int, -- вн. номер подвязываемого счета под договор
                                           NLS_   varchar2, -- лицевой номер подвязываемый счета под договор
                                           KV_    int, -- валюта подвязываемый счета под договор
                                           TIP_   varchar2, -- тип счета ('SS ','SN ' и тд)
@@ -258,10 +249,3 @@ begin
 
 end;
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/CCK_SPECPARAM.sql =========*** End
-PROMPT ===================================================================================== 

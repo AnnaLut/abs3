@@ -147,12 +147,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRVN_AUTOMATIC_EVENT ***
-grant SELECT                                                                 on PRVN_AUTOMATIC_EVENT to BARSREADER_ROLE;
 grant SELECT                                                                 on PRVN_AUTOMATIC_EVENT to BARSUPL;
 grant SELECT                                                                 on PRVN_AUTOMATIC_EVENT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRVN_AUTOMATIC_EVENT to BARS_DM;
 grant SELECT                                                                 on PRVN_AUTOMATIC_EVENT to START1;
-grant SELECT                                                                 on PRVN_AUTOMATIC_EVENT to UPLD;
 
 
 

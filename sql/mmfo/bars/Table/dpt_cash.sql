@@ -49,10 +49,8 @@ COMMENT ON COLUMN BARS.DPT_CASH.FLAG IS '';
 
 
 PROMPT *** Create  grants  DPT_CASH ***
-grant SELECT                                                                 on DPT_CASH        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_CASH        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_CASH        to BARS_DM;
-grant SELECT                                                                 on DPT_CASH        to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_CASH        to VKLAD;
 grant FLASHBACK,SELECT                                                       on DPT_CASH        to WR_REFREAD;
 

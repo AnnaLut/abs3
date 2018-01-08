@@ -29,10 +29,8 @@ PROMPT *** Create  view V_DPT_OPERATIONS ***
  ;
 
 PROMPT *** Create  grants  V_DPT_OPERATIONS ***
-grant SELECT                                                                 on V_DPT_OPERATIONS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_OPERATIONS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_OPERATIONS to DPT_ROLE;
-grant SELECT                                                                 on V_DPT_OPERATIONS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_OPERATIONS to WR_ALL_RIGHTS;
 
 

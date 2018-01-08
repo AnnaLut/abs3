@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('Z13', 'Z13-Метал - продаж РУ', 0, null, null, '#(get_nls_tt(''Z13'',''NLSK''))', null, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''09''))', null, '1000100000000000000000000000000000010000000000000000000000010000', null);
+    values ('Z13', 'Z13-Метал - продаж РУ', 0, null, null, null, null, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''09''))', null, '1000100000000000000000000000000000010000000000000000000000010000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='Z13', name='Z13-Метал - продаж РУ', dk=0, nlsm=null, kv=null, nlsk='#(get_nls_tt(''Z13'',''NLSK''))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''09''))', rang=null, flags='1000100000000000000000000000000000010000000000000000000000010000', nazn=null
+         set tt='Z13', name='Z13-Метал - продаж РУ', dk=0, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''09''))', rang=null, flags='1000100000000000000000000000000000010000000000000000000000010000', nazn=null
        where tt='Z13';
   end;
   --------------------------------

@@ -26,9 +26,7 @@ GROUP BY BRANCH, nbs, FDAT
  ;
 
 PROMPT *** Create  grants  V_BALANS_TOBO ***
-grant SELECT                                                                 on V_BALANS_TOBO   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BALANS_TOBO   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_BALANS_TOBO   to UPLD;
 grant SELECT                                                                 on V_BALANS_TOBO   to WEB_BALANS;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BALANS_TOBO   to WR_ALL_RIGHTS;
 

@@ -16,8 +16,6 @@ fpd_ number:=0;
 ppd_ number:=0;
 dy_ number:=0;
 
-PRAGMA AUTONOMOUS_TRANSACTION;
-
 /*
 функция для печати в договорах по БПК таблицы стоимости кредита
 */
@@ -48,11 +46,11 @@ DECODE(P_,0,
   when mod(to_number(to_char(add_months(sysdate,p_),'YYYY')),4)=0
   then 366
   else 365 end --сколько дней в году платежного периода
-,
-  nvl(a.lim/100,0) --лимит овера
+ ,
+  abs(nvl(a.lim/100,0)) --лимит овера
 ,
 nvl(
-case
+ case
     when to_number(to_char(sysdate,'DD'))>25 then
     to_number(nvl(f_acc_tag(a.acc,'PK_TERM'),cm.MM_MAX))
     --months_between(add_months(trunc(dat_begin,'MON'),nvl(cm.MM_MAX,12)),trunc(sysdate,'MON'))
@@ -65,7 +63,7 @@ case
 
 nvl(f_acc_tag(a.acc,'W4_KPROC'),cm.percent_cred) -- процент по кредиту - берем из cm_product
 
-into fpd_, dy_, lim_, mmax_, prc_
+ into fpd_, dy_, lim_, mmax_, prc_
 
 
 from accounts a, cm_product cm , W4_acc b, w4_card c
@@ -77,13 +75,7 @@ where
     and A.ACC=b.ACC_PK
 ;
 
-if mode_=8 --cколько дней в периоде
-then
-    begin
-    ret_:=fpd_;
-    end;
-
-ELSIF mode_=0 --%% ПО ПЛАТЕЖУ
+if mode_=0 --%% ПО ПЛАТЕЖУ
 then
 BEGIN
 
@@ -191,19 +183,46 @@ BEGIN
 ret_:=0;
 if bpk_s_vart(0,nd_,4)<>0
 then
-    insert into TMP_BPK_s_vart (dt, summ)
-    select trunc(sysdate) dt, nvl(decode(p_,0,-lim_,-lim_*((100-p_)/100)),0) summ from dual;
+with t as (select trunc(sysdate) dt, nvl(decode(p_,0,-lim_,-lim_*((100-p_)/100)),0) summ from dual union all
+            select to_date(bpk_s_vart(0,nd_,6), 'yyyymmdd') dt, bpk_s_vart(0,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(1,nd_,6), 'yyyymmdd') dt, bpk_s_vart(1,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(2,nd_,6), 'yyyymmdd') dt, bpk_s_vart(2,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(3,nd_,6), 'yyyymmdd') dt, bpk_s_vart(3,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(4,nd_,6), 'yyyymmdd') dt, bpk_s_vart(4,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(5,nd_,6), 'yyyymmdd') dt, bpk_s_vart(5,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(6,nd_,6), 'yyyymmdd') dt, bpk_s_vart(6,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(7,nd_,6), 'yyyymmdd') dt, bpk_s_vart(7,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(8,nd_,6), 'yyyymmdd') dt, bpk_s_vart(8,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(9,nd_,6), 'yyyymmdd') dt, bpk_s_vart(9,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(10,nd_,6), 'yyyymmdd') dt, bpk_s_vart(10,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(11,nd_,6), 'yyyymmdd') dt, bpk_s_vart(11,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(12,nd_,6), 'yyyymmdd') dt, bpk_s_vart(12,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(13,nd_,6), 'yyyymmdd') dt, bpk_s_vart(13,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(14,nd_,6), 'yyyymmdd') dt, bpk_s_vart(14,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(15,nd_,6), 'yyyymmdd') dt, bpk_s_vart(15,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(16,nd_,6), 'yyyymmdd') dt, bpk_s_vart(16,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(17,nd_,6), 'yyyymmdd') dt, bpk_s_vart(17,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(18,nd_,6), 'yyyymmdd') dt, bpk_s_vart(18,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(19,nd_,6), 'yyyymmdd') dt, bpk_s_vart(19,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(20,nd_,6), 'yyyymmdd') dt, bpk_s_vart(20,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(21,nd_,6), 'yyyymmdd') dt, bpk_s_vart(21,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(22,nd_,6), 'yyyymmdd') dt, bpk_s_vart(22,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(23,nd_,6), 'yyyymmdd') dt, bpk_s_vart(23,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(24,nd_,6), 'yyyymmdd') dt, bpk_s_vart(24,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(25,nd_,6), 'yyyymmdd') dt, bpk_s_vart(25,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(26,nd_,6), 'yyyymmdd') dt, bpk_s_vart(26,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(27,nd_,6), 'yyyymmdd') dt, bpk_s_vart(27,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(28,nd_,6), 'yyyymmdd') dt, bpk_s_vart(28,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(29,nd_,6), 'yyyymmdd') dt, bpk_s_vart(29,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(30,nd_,6), 'yyyymmdd') dt, bpk_s_vart(30,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(31,nd_,6), 'yyyymmdd') dt, bpk_s_vart(31,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(32,nd_,6), 'yyyymmdd') dt, bpk_s_vart(32,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(33,nd_,6), 'yyyymmdd') dt, bpk_s_vart(33,nd_,4) summ from dual union all
+select to_date(bpk_s_vart(34,nd_,6), 'yyyymmdd') dt, bpk_s_vart(34,nd_,4) summ from dual)
 
-    begin
-    for k in 0..mmax_-1
-     loop
-     insert into TMP_BPK_s_vart (dt, summ)
-      (select to_date(bpk_s_vart(k,nd_,6), 'yyyymmdd') dt, bpk_s_vart(k,nd_,4) summ from dual);
-     end loop;
-    end;
 
-           select round((1/pd-1)*100,4) into ret_ from
-            (select * from TMP_BPK_s_vart
+                select round((1/pd-1)*100,4) into ret_ from
+            (select * from t
              model
                 dimension by (row_number() over (order by dt) rn)
                 measures(dt-first_value(dt) over (order by dt) dt, summ s, 0 ss, 0 f_a, 0 f_b, 0 f_x, 0 a, 1 b, 0 pd, 0 iter)
@@ -221,7 +240,7 @@ then
                       )
                )
                where rn=1;
-    commit;
+
 else ret_:=0;
 end if;
 

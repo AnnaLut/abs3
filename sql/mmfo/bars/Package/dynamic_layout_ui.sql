@@ -1,10 +1,9 @@
-
  
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dynamic_layout_ui.sql =========*** R
  PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.DYNAMIC_LAYOUT_UI is
+
+create or replace package dynamic_layout_ui is
 
   --
   -- јвтор  : VIT
@@ -123,7 +122,7 @@
 
 end dynamic_layout_ui;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.DYNAMIC_LAYOUT_UI is
+create or replace package body dynamic_layout_ui is
 
   --
   -- јвтор : VIT
@@ -714,7 +713,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.DYNAMIC_LAYOUT_UI is
     l_parent_summ    number;
     l_header_nazn    ope_lot.nazn1%type;
     l_ostc           number(38, 2);
-    l_okpo_a         bars.tmp_dynamic_layout_detail.okpoa%type;
   begin
 
     begin
@@ -762,24 +760,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.DYNAMIC_LAYOUT_UI is
         raise_application_error(-20001,
                                 '¬казаний вид документу не знайдено');
     end;
-   ----------------------*******ƒл€ макет≥в юр ос≥б********** 
-    l_okpo_a := p_okpo_a;
-   
-    if ( flag = 1 and p_okpo_a is null) then
-        begin 
-        
-            select distinct okpo into l_okpo_a from customer 
-            where rnk = (select rnk from accounts where nls=p_nlsa and kv = p_kv)
-                  and date_off is null ;
-        end;         
-     end if;     
-    ------------------***************************************
+
     l_mf1.nd    := null;
     l_mf1.datd  := gl.bd;
     l_mf1.s     := null;
     l_mf1.nam_b := p_nam_b;
     l_mf1.nazn  := p_nazn;
-    l_mf1.okpoa := case when flag =1 then l_okpo_a else f_ourokpo end;
+    l_mf1.okpoa := f_ourokpo;
     l_mf1.okpob := p_okpo_b;
 
     begin
@@ -1182,4 +1169,5 @@ grant EXECUTE                                                                on 
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/dynamic_layout_ui.sql =========*** E
  PROMPT ===================================================================================== 
- 
+
+

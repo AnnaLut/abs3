@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Графiк погашення Траншів / CC_W_TRANSH';
   l_tablinesdef := '1000';
-  l_tabselect_statement := '';
   l_tabname     := 'CC_W_TRANSH';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,28 +119,26 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC', '1.5', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'COMM', 'C', 'Коментар', '1', 100, 60, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DAPP', 'D', 'Остання~дата~звірки', '1.3', null, 49, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'D_FAKT', 'D', 'Фактична~дата погаш~під/траншу', '1.3', null, 40, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'D_PLAN', 'D', 'Пл-дата погаш~~п/траншу', '1.3', null, 30, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'FDAT', 'D', 'Дата~видачі~траншу', '1.3', null, 18, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'KV', 'N', 'Код~вал', '.3', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NLS', 'C', 'Рахунок', '1.5', null, 15, 0, 0, 0, 0, '', '', 0, 0, '''Різниця''', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NPP', 'N', 'Ід.~під/~траншу', '.5', null, 1, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'REF', 'N', 'Реф.~видачі~траншу', '1.5', null, 19, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'REFP', 'N', 'Реф.~погашення~під/траншу', '1.5', null, 41, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'S', 'N', 'Загальна~сума виданого~траншу', '2', null, 20, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SV', 'N', 'Сума видачі~~під/траншу', '2', null, 25, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SZ', 'N', 'Сума погаш~~п/траншу', '2', null, 35, 0, 1, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'TIP', 'C', 'Тип~рах', '.3', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'SV1', 'N', 'Сума видачі ~ВІДОКРЕМЛ~під/траншу', '2', null, 26, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'D_PLAN1', 'D', 'Пл-дата погаш~ВІДОКРЕМЛ~під/траншу', '1.3', null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'SZ1', 'N', 'Сума погаш~ВІДОКРЕМЛ~під/траншу', '2', null, 36, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'DEL', 'N', 'НЕпогаш~сума~під/траншу', '1.5', null, 17, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(DEL)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'TXT', 'C', 'Стан~~під/траншу', '1', null, 50, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'OST', 'N', 'Залишок~на~пахунку', '1.5', null, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Min(OST)-Sum(DEL)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'ND', 'N', 'ND', '', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC', 1.5, null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'COMM', 'C', 'Коментар', 1, 100, 60, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAPP', 'D', 'Остання~дата~звірки', 1.3, null, 49, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'D_FAKT', 'D', 'Фактична~дата погаш~під/траншу', 1.3, null, 40, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'D_PLAN', 'D', 'Пл-дата погаш~~п/траншу', 1.3, null, 30, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'FDAT', 'D', 'Дата~видачі~траншу', 1.3, null, 18, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'KV', 'N', 'Код~вал', .3, null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NLS', 'C', 'Рахунок', 1.5, null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NPP', 'N', 'Ід.~під/~траншу', .5, null, 1, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'REF', 'N', 'Реф.~видачі~траншу', 1.5, null, 19, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'REFP', 'N', 'Реф.~погашення~під/траншу', 1.5, null, 41, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'S', 'N', 'Загальна~сума виданого~траншу', 2, null, 20, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SV', 'N', 'Сума видачі~~під/траншу', 2, null, 25, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SZ', 'N', 'Сума погаш~~п/траншу', 2, null, 35, 0, 1, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'TIP', 'C', 'Тип~рах', .3, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'SV1', 'N', 'Сума видачі ~ВІДОКРЕМЛ~під/траншу', 2, null, 26, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'D_PLAN1', 'D', 'Пл-дата погаш~ВІДОКРЕМЛ~під/траншу', 1.3, null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'SZ1', 'N', 'Сума погаш~ВІДОКРЕМЛ~під/траншу', 2, null, 36, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'DEL', 'N', 'НЕпогаш~сума~під/траншу', 2, null, 37, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'TXT', 'C', 'Стан~~під/траншу', 1, null, 50, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание процедур
   bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'cck_ui.TRS_UPD(:NPP,:SV1,:D_PLAN,:D_PLAN1,:SZ,:SZ1,:COMM)');
@@ -154,16 +147,7 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Старт.переформування таблиці траншів по КД ', 'cck_ui.TRS0 ( null )', '', 'ONCE', 'Ви дійсно бажаєте виконати  Старт.переформування ?', 'Виконано!', '', '', '', 71);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 2, 'Графік лімітів кредитування', '', '', 'EACH', '', '', '79', '', '/barsroot/CreditUi/glk/Index/?id=:ND', 79);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 3, 'Відокремлення траншу (створення нового підтраншу)', 'cck_ui.TRS_UPD(:NPP,:V,:D_PLAN,:D,:SZ,:Z,:T)', ':V(SEM=Сума видачі,TYPE=N),:D(SEM=Планова дата погаш,,TYPE=D),:Z(SEM=Сума погашена,TYPE=N),:T(SEM=Підстава) ', 'SELECTED_ONE', '', '', '', '', '', 44);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 4, 'Об`єднати ДВА однорідні ВИДІЛЕНІ транші в ОДИН', 'cck_ui.TRS_ADD(:NPP) ', '', 'EACH', '', '', '', '', '', 70);
+  bars_metabase.add_nsifunction(l_tabid, 99, '! Старт.переформування таблиці траншів по КД ', 'cck_ui.TRS0 ( null )', '', 'ONCE', 'Ви дійсно бажаєте виконати  Старт.переформування ?', 'Виконано!', '', '', '', null);
 
   -- добавляем описание раскраски
   bars_metabase.add_tblcolor(l_tabid, 1, null, ':D_FAKT IS not null', 2, 'COLOR_LightGreen');

@@ -157,7 +157,6 @@ exception when others then
 
 PROMPT *** Create  grants  FILE_OUT ***
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on FILE_OUT        to BARS;
-grant SELECT                                                                 on FILE_OUT        to BARSREADER_ROLE;
 
 
 

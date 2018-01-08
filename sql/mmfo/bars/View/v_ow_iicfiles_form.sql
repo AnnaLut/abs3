@@ -207,10 +207,8 @@ PROMPT *** Create  view V_OW_IICFILES_FORM ***
                    WHERE acc = q.acc AND sos = 1);
 
 PROMPT *** Create  grants  V_OW_IICFILES_FORM ***
-grant SELECT                                                                 on V_OW_IICFILES_FORM to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_IICFILES_FORM to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_IICFILES_FORM to OW;
-grant SELECT                                                                 on V_OW_IICFILES_FORM to UPLD;
 
 
 

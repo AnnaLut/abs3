@@ -69,10 +69,6 @@ COMMENT ON COLUMN BARS.ERR$_DPT_REQ_CHGINTS.BRANCH IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPT_REQ_CHGINTS ***
-grant SELECT                                                                 on ERR$_DPT_REQ_CHGINTS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPT_REQ_CHGINTS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

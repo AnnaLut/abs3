@@ -58,6 +58,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_FC_UPLREGIONS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_FILE_COUNTERS ADD CONSTRAINT FK_FC_UPLREGIONS FOREIGN KEY (KF)
+	  REFERENCES BARSUPL.UPL_REGIONS (KF) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_UPLFILECOUNTS_FILEID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_FILE_COUNTERS ADD CONSTRAINT FK_UPLFILECOUNTS_FILEID FOREIGN KEY (FILE_ID)
+	  REFERENCES BARSUPL.UPL_FILES (FILE_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_UPLFILECOUNTERS ***
 begin   
  execute immediate '
@@ -70,10 +96,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  UPL_FILE_COUNTERS ***
-grant SELECT                                                                 on UPL_FILE_COUNTERS to BARSREADER_ROLE;
-grant SELECT                                                                 on UPL_FILE_COUNTERS to UPLD;
 
 
 

@@ -18,9 +18,7 @@ PROMPT *** Create  view V_SEC_ATTR_JOURNAL ***
 
 PROMPT *** Create  grants  V_SEC_ATTR_JOURNAL ***
 grant SELECT                                                                 on V_SEC_ATTR_JOURNAL to ABS_ADMIN;
-grant SELECT                                                                 on V_SEC_ATTR_JOURNAL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SEC_ATTR_JOURNAL to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_SEC_ATTR_JOURNAL to UPLD;
 
 
 

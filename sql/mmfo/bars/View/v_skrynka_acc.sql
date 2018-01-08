@@ -15,8 +15,6 @@ select acc, n_sk, tip
 from skrynka_acc_arc;
 
 PROMPT *** Create  grants  V_SKRYNKA_ACC ***
-grant SELECT                                                                 on V_SKRYNKA_ACC   to BARSREADER_ROLE;
-grant SELECT                                                                 on V_SKRYNKA_ACC   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SKRYNKA_ACC   to WR_ALL_RIGHTS;
 
 

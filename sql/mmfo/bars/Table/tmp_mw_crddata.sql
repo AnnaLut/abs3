@@ -121,10 +121,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_MW_CRDDATA ***
-grant SELECT                                                                 on TMP_MW_CRDDATA  to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_MW_CRDDATA  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

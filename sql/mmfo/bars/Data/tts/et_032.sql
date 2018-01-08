@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции K34
-prompt Наименование операции: K34 К34 Комісія за видачу коштів Master Card клієнтам ін.банків
+prompt Наименование операции: К34 Комісія за видачу коштів Master Card клієнтам ін.банків
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K34', 'K34 К34 Комісія за видачу коштів Master Card клієнтам ін.банків', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2 (''NLS_651019'',0))', 980, null, 980, null, null, null, null, 0, 0, 0, 0, 'GL.P_ICURVAL(#(KVA),F_TARIF(24,#(KVA),#(NLSA),#(S)),SYSDATE)', null, 5, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', 'Комісія за видачу коштів по БПК "Master Card" клієнту іншого банку');
+    values ('K34', 'К34 Комісія за видачу коштів Master Card клієнтам ін.банків', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2 (''NLS_611019'',0))', 980, null, 980, null, null, null, null, 0, 0, 0, 0, 'GL.P_ICURVAL(#(KVA),F_TARIF(24,#(KVA),#(NLSA),#(S)),SYSDATE)', null, 5, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', 'Комісія за видачу коштів по БПК "Master Card" клієнту іншого банку');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K34', name='K34 К34 Комісія за видачу коштів Master Card клієнтам ін.банків', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2 (''NLS_651019'',0))', kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='GL.P_ICURVAL(#(KVA),F_TARIF(24,#(KVA),#(NLSA),#(S)),SYSDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn='Комісія за видачу коштів по БПК "Master Card" клієнту іншого банку'
+         set tt='K34', name='К34 Комісія за видачу коштів Master Card клієнтам ін.банків', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2 (''NLS_611019'',0))', kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='GL.P_ICURVAL(#(KVA),F_TARIF(24,#(KVA),#(NLSA),#(S)),SYSDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn='Комісія за видачу коштів по БПК "Master Card" клієнту іншого банку'
        where tt='K34';
   end;
   --------------------------------

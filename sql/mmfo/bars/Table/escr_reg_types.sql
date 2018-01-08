@@ -78,9 +78,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ESCR_REG_TYPES ***
-grant SELECT                                                                 on ESCR_REG_TYPES  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ESCR_REG_TYPES  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on ESCR_REG_TYPES  to UPLD;
 
 
 

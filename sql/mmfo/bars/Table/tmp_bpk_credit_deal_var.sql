@@ -106,10 +106,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119418 ***
+PROMPT *** Create  constraint SYS_C00119422 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_BPK_CREDIT_DEAL_VAR MODIFY (DEAL_RNK NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_BPK_CREDIT_DEAL_VAR MODIFY (KF NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -154,20 +154,16 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119422 ***
+PROMPT *** Create  constraint SYS_C00119418 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_BPK_CREDIT_DEAL_VAR MODIFY (KF NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_BPK_CREDIT_DEAL_VAR MODIFY (DEAL_RNK NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-
-PROMPT *** Create  grants  TMP_BPK_CREDIT_DEAL_VAR ***
-grant SELECT                                                                 on TMP_BPK_CREDIT_DEAL_VAR to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_BPK_CREDIT_DEAL_VAR to UPLD;
 
 
 

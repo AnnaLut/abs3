@@ -54,9 +54,7 @@ where c.custtype = 3
   and c.rnk = p.rnk;
 
 PROMPT *** Create  grants  V_EBKC_PRIVATE_ENT_REL ***
-grant SELECT                                                                 on V_EBKC_PRIVATE_ENT_REL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_EBKC_PRIVATE_ENT_REL to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_EBKC_PRIVATE_ENT_REL to UPLD;
 
 
 

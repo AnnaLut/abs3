@@ -75,11 +75,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DCP_B ***
-grant SELECT                                                                 on DCP_B           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DCP_B           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DCP_B           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DCP_B           to START1;
-grant SELECT                                                                 on DCP_B           to UPLD;
 
 
 

@@ -74,10 +74,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACC_NOK ***
-grant SELECT                                                                 on ACC_NOK         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_NOK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_NOK         to BARS_DM;
-grant SELECT                                                                 on ACC_NOK         to UPLD;
 grant FLASHBACK,SELECT                                                       on ACC_NOK         to WR_REFREAD;
 
 

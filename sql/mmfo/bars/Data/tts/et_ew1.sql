@@ -111,7 +111,7 @@ begin
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 2, ''EW1'', 3, null, ''MFOB NOT IN (select MFO from BANKS_RU)'', 3) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 2, ''EW1'', 3, null, null, 3) - первичный ключ не найден!');
       else raise;
       end if;
   end;

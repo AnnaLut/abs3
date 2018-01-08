@@ -141,6 +141,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_ZAYSPLITTINGAMNT_ZAYSALETPS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ZAY_SPLITTING_AMOUNT ADD CONSTRAINT FK_ZAYSPLITTINGAMNT_ZAYSALETPS FOREIGN KEY (SALE_TP)
+	  REFERENCES BARS.ZAY_SALE_TYPES (TP_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint UK_ZAYSPLITTINGAMNT ***
 begin   
  execute immediate '
@@ -197,9 +210,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAY_SPLITTING_AMOUNT ***
-grant SELECT                                                                 on ZAY_SPLITTING_AMOUNT to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_SPLITTING_AMOUNT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on ZAY_SPLITTING_AMOUNT to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_SPLITTING_AMOUNT to ZAY;
 
 

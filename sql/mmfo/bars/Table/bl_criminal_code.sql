@@ -69,11 +69,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BL_CRIMINAL_CODE ***
-grant SELECT                                                                 on BL_CRIMINAL_CODE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BL_CRIMINAL_CODE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BL_CRIMINAL_CODE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BL_CRIMINAL_CODE to START1;
-grant SELECT                                                                 on BL_CRIMINAL_CODE to UPLD;
 
 
 

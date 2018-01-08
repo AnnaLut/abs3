@@ -14,7 +14,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :  Процедура формирование файла #8B для КБ      (Крым)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :  03/01/2018 (26/10/2017)
+% VERSION     :  26/10/2017 (16/05/2016)
 %------------------------------------------------------------------------------
 % 16.05.2016 - будем включать и пассивные остатки для начисленных и 
 %              просроченных счетов процентов
@@ -1353,106 +1353,46 @@ BEGIN
    -- для Крыма   ( 19.06.2014 )
    if mfo_ = 324805 then
       delete from tmp_nbu where kodf=kodf_ and datf = dat_;
-        
-      if dat_ < to_date('27122017', 'ddmmyyyy') then
-          -- нараховані доходи
-          select sum(DECODE(substr(kodp,1,1),'1', znap, -znap)) 
-             into s_nd
-          from tmp_nbu 
-          where kodf='C5' 
-            and datf = dat_
-            and ( (substr(kodp,2,4) like '14_8%' and substr(kodp,6,1) in ('3','9') ) or 
-                  (substr(kodp,2,4) like '3__8%' and substr(kodp,6,1) in ('4','8','C','E') ) or 
-                  (substr(kodp,2,4) like '4__8%' and substr(kodp,6,1) in ('4') ) or 
-                  (substr(kodp,2,4) like '20_8%' and substr(kodp,6,1) in ('4','6','8') ) or 
-                  (substr(kodp,2,4) like '21_8%' and substr(kodp,6,1) in ('6','8','A') ) or 
-                  (substr(kodp,2,4) in ('2208','2218','2228') and substr(kodp,6,1) in ('4') ) or 
-                  (substr(kodp,2,4) in ('2238') and substr(kodp,6,1) in ('4','6','9') ) or 
-                  (substr(kodp,2,4) in ('2607','2627','2657') and substr(kodp,6,1) in ('4') ) or               
-                  (substr(kodp,2,4) in ('3570','3578') and substr(kodp,6,1) in ('4') ) 
-                ) ;
 
-          -- резерв
-          select sum(znap) 
-             into s_rez
-          from tmp_nbu 
-          where kodf='C5' 
-            and datf = dat_
-            and ( substr(kodp,2,5) in ('14905','14915','3190B','31915',
-                                       '32905','32915','14925','14935',
-                                       '24005','24015','35995' )
-                ) ;
+      -- нараховані доходи
+      select sum(DECODE(substr(kodp,1,1),'1', znap, -znap)) 
+         into s_nd
+      from tmp_nbu 
+      where kodf='C5' 
+        and datf = dat_
+        and ( (substr(kodp,2,4) like '14_8%' and substr(kodp,6,1) in ('3','9') ) or 
+              (substr(kodp,2,4) like '3__8%' and substr(kodp,6,1) in ('4','8','C','E') ) or 
+              (substr(kodp,2,4) like '4__8%' and substr(kodp,6,1) in ('4') ) or 
+              (substr(kodp,2,4) like '20_8%' and substr(kodp,6,1) in ('4','6','8') ) or 
+              (substr(kodp,2,4) like '21_8%' and substr(kodp,6,1) in ('6','8','A') ) or 
+              (substr(kodp,2,4) in ('2208','2218','2228') and substr(kodp,6,1) in ('4') ) or 
+              (substr(kodp,2,4) in ('2238') and substr(kodp,6,1) in ('4','6','9') ) or 
+              (substr(kodp,2,4) in ('2607','2627','2657') and substr(kodp,6,1) in ('4') ) or               
+              (substr(kodp,2,4) in ('3570','3578') and substr(kodp,6,1) in ('4') ) 
+            ) ;
 
-          -- простроченні нараховані доходи
-          select sum(decode(substr(FIELD_CODE,1,2),'10', FIELD_VALUE, -FIELD_VALUE)) 
-             into s_pnd
-          from V_NBUR_#01
-          where REPORT_DATE = dat_
-            and substr(FIELD_CODE,1,2) in ('10','20') 
-            and substr(FIELD_CODE,3,4) in ('1419','1429','3119','3219',
-                                       '2029','2039','2069','2079','2089',
-                                       '2109','2119','2129','2139',
-                                       '2209','2219','2229','2239',
-                                           '3579' );
-      else
-          -- нараховані доходи
-          select sum(DECODE(substr(kodp,1,1),'1', znap, -znap)) 
-             into s_nd
-          from tmp_nbu 
-          where kodf='C5' 
-            and datf = dat_
-            and ( (substr(kodp,2,4) like '14_8' and substr(kodp,6,1) in ('5','9','B') ) or 
-                  (substr(kodp,2,4) in ('1508') and substr(kodp,6,1) in ('1','2','3','4','5','6') ) or
-                  (substr(kodp,2,4) in ('1518') and substr(kodp,6,1) in ('1','2') ) or
-                  (substr(kodp,2,4) in ('1528','2048','2248','2438','2458') and substr(kodp,6,1) in ('1','2','3','4','5','6') ) or 
-                  (substr(kodp,2,4) in ('1538','1548') and substr(kodp,6,1) in ('1','2','3','4') ) or
-                  (substr(kodp,2,4) in ('1607','2607','2627','2657') ) and substr(kodp,1,1) = '1' or
-                  (substr(kodp,2,4) in ('2018','2088','2118','2138','2328','2338','2348','2408','2418','2428','3570','3578') and substr(kodp,6,1) in ('1','2') ) or
-                  (substr(kodp,2,4) in ('2028','2038','2078','2208','2218','2228') and substr(kodp,6,1) in ('1') ) or 
-                  (substr(kodp,2,4) in ('2068','2108','2128','2238','2318') and substr(kodp,6,1) in ('1','2','3') ) or
-                  (substr(kodp,2,4) in ('2148','2388') and substr(kodp,6,1) in ('1','2','3','4','5','6','7','8','9','A') ) or 
-                  (substr(kodp,2,4) in ('2308','2358') and substr(kodp,6,1) in ('1','2','3','4') ) or
-                  (substr(kodp,2,4) in ('2368') and substr(kodp,6,1) in ('1','2','3','4','5','6','7','8','9','A','B','C') ) or
-                  (substr(kodp,2,4) in ('2378') and substr(kodp,6,1) in ('1','2','3','4','5','6','7','8') ) or 
-                  (substr(kodp,2,4) in ('2398') and substr(kodp,6,1) in ('1','2','3','4','5','6','7','8','9') ) or 
-                  (substr(kodp,2,4) in ('3008') and substr(kodp,6,1) in ('6','B') ) or
-                  (substr(kodp,2,4) in ('3018') and substr(kodp,6,1) in ('5','9','B','E','F','O') ) or
-                  (substr(kodp,2,4) in ('3108') and substr(kodp,6,1) in ('2','5','6','9') ) or 
-                  (substr(kodp,2,4) in ('3118') and substr(kodp,6,1) in ('5','7','B','E','F','L') ) or
-                  (substr(kodp,2,4) in ('3218') and substr(kodp,6,1) in ('2','3','6','9','A','C') ) or
-                  (substr(kodp,2,4) in ('3568') and substr(kodp,6,1) in ('1','3') ) 
-                ) 
-            and substr(kodp,7,1) = '3';
+      -- резерв
+      select sum(znap) 
+         into s_rez
+      from tmp_nbu 
+      where kodf='C5' 
+        and datf = dat_
+        and ( substr(kodp,2,5) in ('14905','14915','3190B','31915',
+                                   '32905','32915','14925','14935',
+                                   '24005','24015','35995' )
+            ) ;
 
-          -- резерв
-          select sum(znap) 
-             into s_rez
-          from tmp_nbu 
-          where kodf='C5' 
-            and datf = dat_
-            and ( (substr(kodp,1,5) in ('21419','21429') and substr(kodp,6,1) in ('5','9','B') ) or 
-                  (substr(kodp,1,5) in ('21509','21529','22249') and substr(kodp,6,1) in ('1','2','3','4','5','6') ) or
-                  (substr(kodp,1,5) in ('21519','22019','22089','22119','22139','22329','22239','22249') and substr(kodp,6,1) in ('1','2') ) or
-                  (substr(kodp,1,5) in ('21549') and substr(kodp,6,1) in ('1','2','3','4') ) or
-                  (substr(kodp,1,5) in ('21609') ) and substr(kodp,6,1) = '3' or
-                  (substr(kodp,1,5) in ('22029','22039','22079','22209','22219','22229','23599') ) and substr(kodp,6,1) = '1' or
-                  (substr(kodp,1,5) in ('22049') and substr(kodp,6,1) in ('1','2','3','4','5','6','7','8','9') ) or 
-                  (substr(kodp,1,5) in ('22069','22109','22129','22239','22319') and substr(kodp,6,1) in ('1','2','3') ) or
-                  (substr(kodp,1,5) in ('22149','22389') and substr(kodp,6,1) in ('1','2','3','4','5','6','7','8','9','A') ) or 
-                  (substr(kodp,1,5) in ('22309','22359') and substr(kodp,6,1) in ('1','2','3','4') ) or
-                  (substr(kodp,1,5) in ('22369') and substr(kodp,6,1) in ('1','2','3','4','5','6','7','8','9','A','B','C') ) or
-                  (substr(kodp,1,5) in ('22379') and substr(kodp,6,1) in ('1','2','3','4','5','6','7','8') ) or 
-                  (substr(kodp,1,5) in ('22409','22419','22429') and substr(kodp,6,1) in ('1','2') ) or
-                  (substr(kodp,1,5) in ('22439') and substr(kodp,6,1) in ('1','2','3','4','5','6') ) or 
-                  (substr(kodp,1,5) in ('22609','22629','22659') ) or
-                  (substr(kodp,1,5) in ('23119') and substr(kodp,6,1) in ('5','7','B','E','F','L') ) or
-                  (substr(kodp,1,5) in ('23219') and substr(kodp,6,1) in ('2','3','6','9','A','C') ) or
-                  (substr(kodp,1,5) in ('23569') and substr(kodp,6,1) in ('1','3') ) 
-                ) 
-                and substr(kodp,7,1) = '3';
-                
-           s_pnd := 0;
-      end if;                                           
+      -- простроченні нараховані доходи
+      select sum(decode(substr(FIELD_CODE,1,2),'10', FIELD_VALUE, -FIELD_VALUE)) 
+         into s_pnd
+      from V_NBUR_#01
+      where REPORT_DATE = dat_
+        and substr(FIELD_CODE,1,2) in ('10','20') 
+        and substr(FIELD_CODE,3,4) in ('1419','1429','3119','3219',
+                                   '2029','2039','2069','2079','2089',
+                                   '2109','2119','2129','2139',
+                                   '2209','2219','2229','2239',
+                                   '3579' );
                                       
       if Dat_ >= to_date('09032016','ddmmyyyy') and 
          Dat_ <= to_date('10052016','ddmmyyyy')

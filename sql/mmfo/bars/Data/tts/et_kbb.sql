@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции KBB
-prompt Наименование операции: KBB off DPT - Первинний внесок гот. ВАЛ
+prompt Наименование операции: off DPT - Первинний внесок гот. ВАЛ
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KBB', 'KBB off DPT - Первинний внесок гот. ВАЛ', 0, '#(tobopack.GetTOBOParam(''TRDPT''))', null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, '#(tobopack.GetTOBOParam(''TRDPT''))', '#( TOBOPACK.GetToboCASH)', null, 0, 0, 0, 0, null, null, null, null, null, null, '0001100000000000000000000000000000010100000000000000000000000000', null);
+    values ('KBB', 'off DPT - Первинний внесок гот. ВАЛ', 0, '#(tobopack.GetTOBOParam(''TRDPT''))', null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, '#(tobopack.GetTOBOParam(''TRDPT''))', '#( TOBOPACK.GetToboCASH)', null, 0, 0, 0, 0, null, null, null, null, null, null, '0001100000000000000000000000000000010100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KBB', name='KBB off DPT - Первинний внесок гот. ВАЛ', dk=0, nlsm='#(tobopack.GetTOBOParam(''TRDPT''))', kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=null, nlss=null, nlsa='#(tobopack.GetTOBOParam(''TRDPT''))', nlsb='#( TOBOPACK.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0001100000000000000000000000000000010100000000000000000000000000', nazn=null
+         set tt='KBB', name='off DPT - Первинний внесок гот. ВАЛ', dk=0, nlsm='#(tobopack.GetTOBOParam(''TRDPT''))', kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=null, nlss=null, nlsa='#(tobopack.GetTOBOParam(''TRDPT''))', nlsb='#( TOBOPACK.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0001100000000000000000000000000000010100000000000000000000000000', nazn=null
        where tt='KBB';
   end;
   --------------------------------

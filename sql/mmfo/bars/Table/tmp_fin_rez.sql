@@ -59,10 +59,8 @@ COMMENT ON COLUMN BARS.TMP_FIN_REZ.DAT2 IS '';
 
 
 PROMPT *** Create  grants  TMP_FIN_REZ ***
-grant SELECT                                                                 on TMP_FIN_REZ     to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_FIN_REZ     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_FIN_REZ     to SALGL;
-grant SELECT                                                                 on TMP_FIN_REZ     to UPLD;
 
 
 

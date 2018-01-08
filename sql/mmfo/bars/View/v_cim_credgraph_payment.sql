@@ -14,9 +14,7 @@ PROMPT *** Create  view V_CIM_CREDGRAPH_PAYMENT ***
      order by p.dat;
 
 PROMPT *** Create  grants  V_CIM_CREDGRAPH_PAYMENT ***
-grant SELECT                                                                 on V_CIM_CREDGRAPH_PAYMENT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_CREDGRAPH_PAYMENT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_CREDGRAPH_PAYMENT to UPLD;
 
 
 

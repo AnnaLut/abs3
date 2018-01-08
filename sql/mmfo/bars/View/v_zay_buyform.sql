@@ -80,9 +80,7 @@ PROMPT *** Create  view V_ZAY_BUYFORM ***
    ORDER BY id DESC;
 
 PROMPT *** Create  grants  V_ZAY_BUYFORM ***
-grant SELECT                                                                 on V_ZAY_BUYFORM   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY_BUYFORM   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ZAY_BUYFORM   to UPLD;
 grant SELECT                                                                 on V_ZAY_BUYFORM   to ZAY;
 
 

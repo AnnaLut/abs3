@@ -61,6 +61,19 @@ COMMENT ON COLUMN BARS.TMP_OVR.BRANCH IS '';
 
 
 
+PROMPT *** Create  constraint FK_TMP_OVR_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_OVR ADD CONSTRAINT FK_TMP_OVR_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_TMPOVR_BRANCH_NN ***
 begin   
  execute immediate '
@@ -74,12 +87,10 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_OVR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OVR         to BARS009;
-grant SELECT                                                                 on TMP_OVR         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on TMP_OVR         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_OVR         to BARS_DM;
 grant DELETE,INSERT,SELECT                                                   on TMP_OVR         to ELT;
 grant SELECT                                                                 on TMP_OVR         to RCC_DEAL;
-grant SELECT                                                                 on TMP_OVR         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_OVR         to WR_ALL_RIGHTS;
 
 

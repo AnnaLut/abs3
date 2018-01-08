@@ -67,6 +67,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_REPRINT_REPORTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REPRINT ADD CONSTRAINT FK_REPRINT_REPORTS FOREIGN KEY (ID)
+	  REFERENCES BARS.REPORTS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_REPRINT_ID_NN ***
 begin   
  execute immediate '
@@ -108,13 +121,11 @@ PROMPT *** Create  grants  REPRINT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPRINT         to ABS_ADMIN;
 grant SELECT                                                                 on REPRINT         to BARS009;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on REPRINT         to BARS010;
-grant SELECT                                                                 on REPRINT         to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on REPRINT         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REPRINT         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPRINT         to RCC_DEAL;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on REPRINT         to RPBN001;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on REPRINT         to START1;
-grant SELECT                                                                 on REPRINT         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REPRINT         to WR_ALL_RIGHTS;
 
 

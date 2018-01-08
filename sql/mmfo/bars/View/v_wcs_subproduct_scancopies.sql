@@ -13,9 +13,7 @@ PROMPT *** Create  view V_WCS_SUBPRODUCT_SCANCOPIES ***
  where ss.scopy_id = s.scopy_id;
 
 PROMPT *** Create  grants  V_WCS_SUBPRODUCT_SCANCOPIES ***
-grant SELECT                                                                 on V_WCS_SUBPRODUCT_SCANCOPIES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SUBPRODUCT_SCANCOPIES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_SUBPRODUCT_SCANCOPIES to UPLD;
 
 
 

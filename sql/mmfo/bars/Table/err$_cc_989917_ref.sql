@@ -61,10 +61,6 @@ COMMENT ON COLUMN BARS.ERR$_CC_989917_REF.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CC_989917_REF ***
-grant SELECT                                                                 on ERR$_CC_989917_REF to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CC_989917_REF to UPLD;
-
 
 
 PROMPT ===================================================================================== 

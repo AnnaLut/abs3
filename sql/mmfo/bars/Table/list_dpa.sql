@@ -83,9 +83,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  LIST_DPA ***
-grant SELECT                                                                 on LIST_DPA        to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on LIST_DPA        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on LIST_DPA        to UPLD;
 grant FLASHBACK,SELECT                                                       on LIST_DPA        to WR_REFREAD;
 
 

@@ -106,6 +106,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_REZW4BPK_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REZ_W4_BPK ADD CONSTRAINT FK_REZW4BPK_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_REZ_W4_BPK ***
 begin   
  execute immediate '
@@ -148,11 +161,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_W4_BPK ***
-grant SELECT                                                                 on REZ_W4_BPK      to BARSREADER_ROLE;
 grant SELECT                                                                 on REZ_W4_BPK      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ_W4_BPK      to RCC_DEAL;
 grant SELECT                                                                 on REZ_W4_BPK      to START1;
-grant SELECT                                                                 on REZ_W4_BPK      to UPLD;
 
 
 

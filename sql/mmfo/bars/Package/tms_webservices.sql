@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/tms_webservices.sql =========*** Run
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.TMS_WEBSERVICES is
+create or replace package tms_webservices is
 
     -- Author  : VITALII.KHOMIDA
     -- Created : 30.01.2017 8:10:56
@@ -17,7 +11,7 @@
     procedure load_insiders;
 end tms_webservices;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.TMS_WEBSERVICES is
+create or replace package body tms_webservices is
 
   FUNCTION get_data_from_xml(p_dataxml xmltype, p_param varchar2)
   RETURN varchar2
@@ -496,7 +490,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.TMS_WEBSERVICES is
 
             begin
                 insert into customer_ri
-                values (bars_sqnc.get_nextval('s_customer_ri'),        -- id        number
+                values (bars_sqnc.get_nextval('s_customer_ri'),        -- id        number 
                         l_idcode,                                      -- idcode    varchar2(10)   Код за ЄДРПОУ/ДРФО
                         l_doct,                                        -- doct      number(2)      Тип документа
                         l_docs,                                        -- docs      varchar2(10)   Серія документа
@@ -664,17 +658,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.TMS_WEBSERVICES is
                     if (l_receipt_file_path not like '%\') then
                         l_receipt_file_path := l_receipt_file_path || '\';
                     end if;
-                    BARS_AUDIT.LOG_INFO('tms_webservices.load_insiders', 'path : ' || l_receipt_file_path || l_receipt_file_name, p_auxiliary_info => l_receipt_clob);
 
-                    begin
-                        ext_file_mgr.put_file_text(l_receipt_clob, l_receipt_file_path || l_receipt_file_name, p_overwrite => 1);
-                    exception
-                        when others then
-                             BARS_AUDIT.LOG_ERROR('tms_webservices.load_insiders (receipt failure)',
-                                                  'path : ' || l_receipt_file_path || l_receipt_file_name || chr(10) ||
-                                                  sqlerrm || chr(10) || dbms_utility.format_error_backtrace(),
-                                                  p_auxiliary_info => l_receipt_clob);
-                    end;
+                    ext_file_mgr.put_file_text(l_receipt_clob, l_receipt_file_path || l_receipt_file_name, p_overwrite => 1);
                 end loop;
 
 
@@ -683,15 +668,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.TMS_WEBSERVICES is
                         l_archive_file_path := l_archive_file_path || '\';
                     end if;
 
-                    begin
-                        ext_file_mgr.put_file_text(l_file_clob, l_archive_file_path || l_file_name, p_overwrite => 1);
-                    exception
-                        when others then
-                             BARS_AUDIT.LOG_ERROR('tms_webservices.load_insiders (archive failure)',
-                                                  'path : ' || l_archive_file_path || l_file_name || chr(10) ||
-                                                  sqlerrm || chr(10) || dbms_utility.format_error_backtrace(),
-                                                  p_auxiliary_info => l_file_clob);
-                    end;
+                    ext_file_mgr.put_file_text(l_file_clob, l_archive_file_path || l_file_name, p_overwrite => 1);
                 end if;
 
                 ext_file_mgr.remove_file(l_insiders_file_list(i));
@@ -705,10 +682,3 @@ CREATE OR REPLACE PACKAGE BODY BARS.TMS_WEBSERVICES is
 end tms_webservices;
 /
  show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/tms_webservices.sql =========*** End
- PROMPT ===================================================================================== 
- 

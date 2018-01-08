@@ -14,10 +14,8 @@ order by logname;
 
 PROMPT *** Create  grants  V_USER ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_USER          to ABS_ADMIN;
-grant SELECT                                                                 on V_USER          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USER          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_USER          to START1;
-grant SELECT                                                                 on V_USER          to UPLD;
 grant FLASHBACK,SELECT                                                       on V_USER          to WR_REFREAD;
 
 

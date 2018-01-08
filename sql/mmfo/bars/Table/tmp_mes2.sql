@@ -93,10 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010399 ***
+PROMPT *** Create  constraint SYS_C0010401 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_MES2 MODIFY (BRANCH NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_MES2 MODIFY (NAME_PP NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -117,10 +117,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010401 ***
+PROMPT *** Create  constraint SYS_C0010399 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_MES2 MODIFY (NAME_PP NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_MES2 MODIFY (BRANCH NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -141,10 +141,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_MES2 ***
-grant SELECT                                                                 on TMP_MES2        to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_MES2        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_MES2        to START1;
-grant SELECT                                                                 on TMP_MES2        to UPLD;
 
 
 

@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Клієнти з недіючими рахунками на дату';
   l_tablinesdef := '100';
-  l_tabselect_statement := '';
   l_tabname     := 'V_NRU_NLS';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,27 +119,27 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ADR', 'C', 'Адреса~реєстрації~05', '4', null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'BLKD', 'N', 'Код~блк~11', '.3', null, 50, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'BUSSL', 'N', 'Код~БН~01', '.2', null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DAPP', 'D', 'Дата~ост.руху~09', '', null, 40, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KOL', 'N', 'Пов’яз~рах~12', '.5', null, 60, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KV', 'N', 'Вал~рах~08', '.3', null, 35, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NLS', 'C', '№ рах~ІСТОРІЯ~07', '', null, 30, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=1', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NMK', 'C', 'Назва кл~КАРТКА~04', '3', null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/clientregister/registration.aspx?readonly=1'||chr(38)||'rnk=:RNK', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'OKPO', 'C', 'ЄДРПОУ~ІПН~03', '', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'OST', 'N', 'Залишок~на дату~10', '', null, 45, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'RNK', 'N', 'РНК Кл~РАХУНКИ~02', '', null, 5, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/customerlist/custacc.aspx?type=0'||chr(38)||'rnk=:RNK'||chr(38)||'mod=ro', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'TEL', 'C', 'Контактні~телефони~06', '3', null, 25, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'ZDAT', 'D', 'Звітна~дата~00', '1.5', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'BUS', 'C', 'Бізнес~Напрамок~01`', '1', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'BLK', 'C', 'Причина~блокування~11`', '3', null, 55, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'ACC', 'N', 'ACC', '', null, 99, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'PRIM', 'C', 'Примітка~Увага~13', '5', null, 70, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'NBS', 'C', 'Бал.рах', '', null, 80, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'OK', 'B', 'Винести~в НЕрухомі~ОК', '1.2', null, 65, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'BRANCH', 'C', 'Бранч', '2.5', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'SERR', 'C', 'Помилка', '3', null, 66, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ADR', 'C', 'Адреса~реєстрації~05', 4, null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BLKD', 'N', 'Код~блк~11', .3, null, 50, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'BUSSL', 'N', 'Код~БН~01', .2, null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DAPP', 'D', 'Дата~ост.руху~09', null, null, 40, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KOL', 'N', 'Пов’яз~рах~12', .5, null, 60, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KV', 'N', 'Вал~рах~08', .3, null, 35, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NLS', 'C', '№ рах~ІСТОРІЯ~07', null, null, 30, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=1', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NMK', 'C', 'Назва кл~КАРТКА~04', 3, null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/clientregister/registration.aspx?readonly=1'||chr(38)||'rnk=:RNK', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'OKPO', 'C', 'ЄДРПОУ~ІПН~03', null, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'OST', 'N', 'Залишок~на дату~10', null, null, 45, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'RNK', 'N', 'РНК Кл~РАХУНКИ~02', null, null, 5, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/customerlist/custacc.aspx?type=0'||chr(38)||'rnk=:RNK'||chr(38)||'mod=ro', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'TEL', 'C', 'Контактні~телефони~06', 3, null, 25, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'ZDAT', 'D', 'Звітна~дата~00', 1.5, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'BUS', 'C', 'Бізнес~Напрамок~01`', 1, null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'BLK', 'C', 'Причина~блокування~11`', 3, null, 55, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'ACC', 'N', 'ACC', null, null, 99, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'PRIM', 'C', 'Примітка~Увага~13', 5, null, 70, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'NBS', 'C', 'Бал.рах', null, null, 80, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'OK', 'B', 'Винести~в НЕрухомі~ОК', 1.2, null, 65, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'BRANCH', 'C', 'Бранч', 2.5, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'SERR', 'C', 'Помилка', 3, null, 66, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 11, 1, 'ASC ');

@@ -80,10 +80,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  XSL_STORAGE ***
-grant SELECT                                                                 on XSL_STORAGE     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on XSL_STORAGE     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on XSL_STORAGE     to START1;
-grant SELECT                                                                 on XSL_STORAGE     to UPLD;
 
 
 

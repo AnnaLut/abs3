@@ -59,7 +59,6 @@ exception when others then
 
 PROMPT *** Create  grants  UPL_PARAM_GROUPS ***
 grant SELECT                                                                 on UPL_PARAM_GROUPS to BARS;
-grant SELECT                                                                 on UPL_PARAM_GROUPS to BARSREADER_ROLE;
 grant SELECT                                                                 on UPL_PARAM_GROUPS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on UPL_PARAM_GROUPS to UPLD;
 

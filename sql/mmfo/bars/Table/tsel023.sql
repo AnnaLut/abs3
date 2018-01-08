@@ -116,10 +116,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TSEL023_ID ***
+PROMPT *** Create  constraint CC_TSEL023_KVB ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TSEL023 MODIFY (ID CONSTRAINT CC_TSEL023_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.TSEL023 MODIFY (KVB CONSTRAINT CC_TSEL023_KVB NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -152,10 +152,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TSEL023_KVB ***
+PROMPT *** Create  constraint CC_TSEL023_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TSEL023 MODIFY (KVB CONSTRAINT CC_TSEL023_KVB NOT NULL ENABLE)';
+  ALTER TABLE BARS.TSEL023 MODIFY (ID CONSTRAINT CC_TSEL023_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -164,10 +164,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  TSEL023 ***
-grant SELECT                                                                 on TSEL023         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TSEL023         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TSEL023         to START1;
-grant SELECT                                                                 on TSEL023         to UPLD;
 
 
 

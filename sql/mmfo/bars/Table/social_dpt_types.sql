@@ -85,6 +85,54 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_SOCIALDPTTYPES_CARDTYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_DPT_TYPES MODIFY (CARD_TYPE CONSTRAINT CC_SOCIALDPTTYPES_CARDTYPE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SOCIALDPTTYPES_ACTIVITY_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_DPT_TYPES MODIFY (ACTIVITY CONSTRAINT CC_SOCIALDPTTYPES_ACTIVITY_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SOCIALDPTTYPES_DPTVIDD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_DPT_TYPES MODIFY (DPT_VIDD CONSTRAINT CC_SOCIALDPTTYPES_DPTVIDD_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SOCIALDPTTYPES_ACCTYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_DPT_TYPES MODIFY (ACC_TYPE CONSTRAINT CC_SOCIALDPTTYPES_ACCTYPE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SOCIALDPTTYPES_ACCTYPE ***
 begin   
  execute immediate '
@@ -111,58 +159,36 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SOCIALDPTTYPES_TIPS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_DPT_TYPES ADD CONSTRAINT FK_SOCIALDPTTYPES_TIPS FOREIGN KEY (ACC_TYPE)
+	  REFERENCES BARS.TIPS (TIP) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SOCIALDPTTYPES_DPTVIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_DPT_TYPES ADD CONSTRAINT FK_SOCIALDPTTYPES_DPTVIDD FOREIGN KEY (DPT_VIDD)
+	  REFERENCES BARS.DPT_VIDD (VIDD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SOCIALDPTTYPES_NAME_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.SOCIAL_DPT_TYPES MODIFY (NAME CONSTRAINT CC_SOCIALDPTTYPES_NAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SOCIALDPTTYPES_ACCTYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_DPT_TYPES MODIFY (ACC_TYPE CONSTRAINT CC_SOCIALDPTTYPES_ACCTYPE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SOCIALDPTTYPES_DPTVIDD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_DPT_TYPES MODIFY (DPT_VIDD CONSTRAINT CC_SOCIALDPTTYPES_DPTVIDD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SOCIALDPTTYPES_ACTIVITY_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_DPT_TYPES MODIFY (ACTIVITY CONSTRAINT CC_SOCIALDPTTYPES_ACTIVITY_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SOCIALDPTTYPES_CARDTYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_DPT_TYPES MODIFY (CARD_TYPE CONSTRAINT CC_SOCIALDPTTYPES_CARDTYPE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -213,11 +239,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SOCIAL_DPT_TYPES ***
-grant SELECT                                                                 on SOCIAL_DPT_TYPES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SOCIAL_DPT_TYPES to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SOCIAL_DPT_TYPES to DPT_ADMIN;
 grant SELECT                                                                 on SOCIAL_DPT_TYPES to KLBX;
-grant SELECT                                                                 on SOCIAL_DPT_TYPES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SOCIAL_DPT_TYPES to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SOCIAL_DPT_TYPES to WR_REFREAD;
 

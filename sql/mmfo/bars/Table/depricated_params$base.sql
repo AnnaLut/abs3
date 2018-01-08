@@ -50,10 +50,23 @@ COMMENT ON COLUMN BARS.DEPRICATED_PARAMS$BASE.KF IS 'Код филиала';
 
 
 
-PROMPT *** Create  constraint CC_PARAMS$BASE_PAR_NN ***
+PROMPT *** Create  constraint FK_PARAMS$BASE_BANKS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DEPRICATED_PARAMS$BASE MODIFY (PAR CONSTRAINT CC_PARAMS$BASE_PAR_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DEPRICATED_PARAMS$BASE ADD CONSTRAINT FK_PARAMS$BASE_BANKS FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PARAMS$BASE_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEPRICATED_PARAMS$BASE ADD CONSTRAINT CC_PARAMS$BASE_KF_NN CHECK (KF IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -76,10 +89,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PARAMS$BASE_KF_NN ***
+PROMPT *** Create  constraint CC_PARAMS$BASE_PAR_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DEPRICATED_PARAMS$BASE ADD CONSTRAINT CC_PARAMS$BASE_KF_NN CHECK (KF IS NOT NULL) ENABLE';
+  ALTER TABLE BARS.DEPRICATED_PARAMS$BASE MODIFY (PAR CONSTRAINT CC_PARAMS$BASE_PAR_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -103,11 +116,9 @@ exception when others then
 
 PROMPT *** Create  grants  DEPRICATED_PARAMS$BASE ***
 grant FLASHBACK,REFERENCES,SELECT                                            on DEPRICATED_PARAMS$BASE to BARSAQ with grant option;
-grant SELECT                                                                 on DEPRICATED_PARAMS$BASE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEPRICATED_PARAMS$BASE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEPRICATED_PARAMS$BASE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEPRICATED_PARAMS$BASE to START1;
-grant SELECT                                                                 on DEPRICATED_PARAMS$BASE to UPLD;
 grant SELECT                                                                 on DEPRICATED_PARAMS$BASE to WCS_SYNC_USER;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEPRICATED_PARAMS$BASE to WR_ALL_RIGHTS;
 

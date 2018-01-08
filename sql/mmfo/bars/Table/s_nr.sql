@@ -103,10 +103,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  S_NR ***
-grant SELECT                                                                 on S_NR            to BARSREADER_ROLE;
 grant SELECT                                                                 on S_NR            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on S_NR            to BARS_DM;
-grant SELECT                                                                 on S_NR            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on S_NR            to WR_ALL_RIGHTS;
 grant SELECT                                                                 on S_NR            to WR_QDOCS;
 

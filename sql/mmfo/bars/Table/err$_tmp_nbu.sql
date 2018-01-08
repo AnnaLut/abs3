@@ -68,9 +68,7 @@ COMMENT ON COLUMN BARS.ERR$_TMP_NBU.ORA_ERR_NUMBER$ IS '';
 
 
 PROMPT *** Create  grants  ERR$_TMP_NBU ***
-grant SELECT                                                                 on ERR$_TMP_NBU    to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_TMP_NBU    to BARS_DM;
-grant SELECT                                                                 on ERR$_TMP_NBU    to UPLD;
 
 
 

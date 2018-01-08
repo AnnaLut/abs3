@@ -77,11 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPA_TYPE ***
-grant SELECT                                                                 on DPA_TYPE        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPA_TYPE        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPA_TYPE        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPA_TYPE        to RPBN002;
-grant SELECT                                                                 on DPA_TYPE        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPA_TYPE        to WR_ALL_RIGHTS;
 
 

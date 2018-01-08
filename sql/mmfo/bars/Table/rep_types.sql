@@ -77,11 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  REP_TYPES ***
-grant SELECT                                                                 on REP_TYPES       to BARSREADER_ROLE;
 grant SELECT                                                                 on REP_TYPES       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REP_TYPES       to BARS_DM;
 grant SELECT                                                                 on REP_TYPES       to RPBN001;
-grant SELECT                                                                 on REP_TYPES       to UPLD;
 
 
 

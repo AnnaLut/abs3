@@ -144,11 +144,9 @@ nvl(RR.obs,1)=so.obs and
 PROMPT *** Create  grants  OVER_V ***
 grant SELECT                                                                 on OVER_V          to ABS_ADMIN;
 grant SELECT                                                                 on OVER_V          to BARS009;
-grant SELECT                                                                 on OVER_V          to BARSREADER_ROLE;
 grant SELECT                                                                 on OVER_V          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OVER_V          to TECH005;
 grant SELECT                                                                 on OVER_V          to TECH006;
-grant SELECT                                                                 on OVER_V          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OVER_V          to WR_ALL_RIGHTS;
 
 

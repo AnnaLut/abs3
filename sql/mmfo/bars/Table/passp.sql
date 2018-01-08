@@ -122,7 +122,6 @@ PROMPT *** Create  grants  PASSP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PASSP           to ABS_ADMIN;
 grant SELECT                                                                 on PASSP           to BARSAQ with grant option;
 grant SELECT                                                                 on PASSP           to BARSAQ_ADM with grant option;
-grant SELECT                                                                 on PASSP           to BARSREADER_ROLE;
 grant SELECT                                                                 on PASSP           to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PASSP           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PASSP           to BARS_DM;
@@ -131,7 +130,6 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on PASSP           to DPT_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PASSP           to PASSP;
 grant SELECT                                                                 on PASSP           to START1;
-grant SELECT                                                                 on PASSP           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PASSP           to WR_ALL_RIGHTS;
 grant SELECT                                                                 on PASSP           to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on PASSP           to WR_REFREAD;

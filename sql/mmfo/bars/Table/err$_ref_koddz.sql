@@ -55,10 +55,6 @@ COMMENT ON COLUMN BARS.ERR$_REF_KODDZ.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_REF_KODDZ ***
-grant SELECT                                                                 on ERR$_REF_KODDZ  to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_REF_KODDZ  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

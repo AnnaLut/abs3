@@ -63,10 +63,8 @@ COMMENT ON COLUMN BARS.TMP_SAL.BRANCH IS '';
 
 
 PROMPT *** Create  grants  TMP_SAL ***
-grant SELECT                                                                 on TMP_SAL         to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_SAL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_SAL         to RPBN001;
-grant SELECT                                                                 on TMP_SAL         to UPLD;
 
 
 

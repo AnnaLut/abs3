@@ -13,9 +13,7 @@ from CIM_CREDIT_F503_PURPOSE
 where delete_date is null;
 
 PROMPT *** Create  grants  V_CIM_CREDIT_F503_PURPOSE ***
-grant SELECT                                                                 on V_CIM_CREDIT_F503_PURPOSE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_CREDIT_F503_PURPOSE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_CREDIT_F503_PURPOSE to UPLD;
 
 
 

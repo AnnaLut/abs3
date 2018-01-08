@@ -48,10 +48,8 @@ PROMPT *** Create  view KAS_VV1 ***
                          AND a1.ostb <> 0);
 
 PROMPT *** Create  grants  KAS_VV1 ***
-grant SELECT                                                                 on KAS_VV1         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_VV1         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_VV1         to PYOD001;
-grant SELECT                                                                 on KAS_VV1         to UPLD;
 
 
 

@@ -93,6 +93,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CPALIEN_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_ALIEN ADD CONSTRAINT FK_CPALIEN_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XAK_CPALIENID ***
 begin   
  execute immediate '
@@ -107,11 +120,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_ALIEN ***
-grant SELECT                                                                 on CP_ALIEN        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_ALIEN        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_ALIEN        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_ALIEN        to START1;
-grant SELECT                                                                 on CP_ALIEN        to UPLD;
 
 
 

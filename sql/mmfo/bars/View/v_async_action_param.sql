@@ -31,9 +31,7 @@ PROMPT *** Create  view V_ASYNC_ACTION_PARAM ***
         asp.param_pos;
 
 PROMPT *** Create  grants  V_ASYNC_ACTION_PARAM ***
-grant SELECT                                                                 on V_ASYNC_ACTION_PARAM to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ASYNC_ACTION_PARAM to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ASYNC_ACTION_PARAM to UPLD;
 
 
 

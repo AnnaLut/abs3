@@ -51,10 +51,6 @@ COMMENT ON COLUMN BARS.TMP_ZAPROS_VARIABLE.KODZ IS '';
 
 
 
-PROMPT *** Create  grants  TMP_ZAPROS_VARIABLE ***
-grant SELECT                                                                 on TMP_ZAPROS_VARIABLE to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_ZAPROS_VARIABLE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

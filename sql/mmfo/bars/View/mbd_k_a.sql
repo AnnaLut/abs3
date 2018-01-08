@@ -16,10 +16,8 @@ where c.custtype=1   AND  c.rnk=d.rnk  AND  d.nd=p.nd     AND
       d.vidd=v.vidd  AND  p.adds= 0    AND  P.ACCS=A.ACC;
 
 PROMPT *** Create  grants  MBD_K_A ***
-grant SELECT                                                                 on MBD_K_A         to BARSREADER_ROLE;
 grant SELECT                                                                 on MBD_K_A         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MBD_K_A         to FOREX;
-grant SELECT                                                                 on MBD_K_A         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MBD_K_A         to WR_ALL_RIGHTS;
 
 

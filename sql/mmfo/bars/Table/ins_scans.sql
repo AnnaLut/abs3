@@ -101,10 +101,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  INS_SCANS ***
-grant SELECT                                                                 on INS_SCANS       to BARSREADER_ROLE;
-grant SELECT                                                                 on INS_SCANS       to UPLD;
-
 
 
 PROMPT ===================================================================================== 

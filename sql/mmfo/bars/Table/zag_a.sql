@@ -71,6 +71,32 @@ COMMENT ON COLUMN BARS.ZAG_A.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_ZAGA_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ZAG_A ADD CONSTRAINT FK_ZAGA_TABVAL FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ZAGA_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ZAG_A ADD CONSTRAINT FK_ZAGA_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_ZAGA_SKR_NN ***
 begin   
  execute immediate '
@@ -95,10 +121,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ZAGA_DAT_NN ***
+PROMPT *** Create  constraint PK_ZAGA ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAG_A MODIFY (DAT CONSTRAINT CC_ZAGA_DAT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ZAG_A ADD CONSTRAINT PK_ZAGA PRIMARY KEY (KF, DAT, FN)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -143,12 +171,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_ZAGA ***
+PROMPT *** Create  constraint CC_ZAGA_DAT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAG_A ADD CONSTRAINT PK_ZAGA PRIMARY KEY (KF, DAT, FN)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.ZAG_A MODIFY (DAT CONSTRAINT CC_ZAGA_DAT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -185,14 +211,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAG_A ***
-grant SELECT                                                                 on ZAG_A           to BARSREADER_ROLE;
 grant DELETE,SELECT,UPDATE                                                   on ZAG_A           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAG_A           to BARS_DM;
 grant INSERT                                                                 on ZAG_A           to SBB_NC;
 grant DELETE                                                                 on ZAG_A           to TECH001;
 grant DELETE                                                                 on ZAG_A           to TECH002;
 grant SELECT,UPDATE                                                          on ZAG_A           to TOSS;
-grant SELECT                                                                 on ZAG_A           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAG_A           to WR_ALL_RIGHTS;
 grant SELECT                                                                 on ZAG_A           to WR_DOCVIEW;
 

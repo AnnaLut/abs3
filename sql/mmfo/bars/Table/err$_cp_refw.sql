@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_CP_REFW.VALUE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CP_REFW ***
-grant SELECT                                                                 on ERR$_CP_REFW    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CP_REFW    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

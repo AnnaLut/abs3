@@ -27,10 +27,8 @@ PROMPT *** Create  view V_CASH1 ***
    GROUP BY a.kv, a.nbs, SUBSTR (a.branch, 1, 15), b2.NAME;
 
 PROMPT *** Create  grants  V_CASH1 ***
-grant SELECT                                                                 on V_CASH1         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CASH1         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CASH1         to SALGL;
-grant SELECT                                                                 on V_CASH1         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CASH1         to WR_ALL_RIGHTS;
 
 

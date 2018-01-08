@@ -69,6 +69,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CASHSNAPSHOT_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CASH_SNAPSHOT ADD CONSTRAINT FK_CASHSNAPSHOT_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint XFK_CASHSNAPSHOT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CASH_SNAPSHOT ADD CONSTRAINT XFK_CASHSNAPSHOT FOREIGN KEY (BRANCH, OPDATE)
+	  REFERENCES BARS.CASH_OPEN (BRANCH, OPDATE) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_CASHSNAPSHOT_BR_NN ***
 begin   
  execute immediate '
@@ -95,12 +121,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CASH_SNAPSHOT ***
-grant SELECT                                                                 on CASH_SNAPSHOT   to BARSREADER_ROLE;
 grant SELECT                                                                 on CASH_SNAPSHOT   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CASH_SNAPSHOT   to BARS_DM;
 grant SELECT                                                                 on CASH_SNAPSHOT   to OPER000;
 grant SELECT                                                                 on CASH_SNAPSHOT   to RPBN001;
-grant SELECT                                                                 on CASH_SNAPSHOT   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CASH_SNAPSHOT   to WR_ALL_RIGHTS;
 
 

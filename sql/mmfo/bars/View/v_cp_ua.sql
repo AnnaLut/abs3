@@ -21,10 +21,8 @@ PROMPT *** Create  view V_CP_UA ***
     WHERE 1=1 and frm = 25;
 
 PROMPT *** Create  grants  V_CP_UA ***
-grant SELECT                                                                 on V_CP_UA         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_UA         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_UA         to START1;
-grant SELECT                                                                 on V_CP_UA         to UPLD;
 
 
 

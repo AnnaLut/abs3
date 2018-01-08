@@ -71,10 +71,6 @@ COMMENT ON COLUMN BARS.ERR$_CC_RAZ_KOMIS_TARIF.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CC_RAZ_KOMIS_TARIF ***
-grant SELECT                                                                 on ERR$_CC_RAZ_KOMIS_TARIF to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CC_RAZ_KOMIS_TARIF to UPLD;
-
 
 
 PROMPT ===================================================================================== 

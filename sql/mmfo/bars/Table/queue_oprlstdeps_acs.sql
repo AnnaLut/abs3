@@ -87,7 +87,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  QUEUE_OPRLSTDEPS_ACS ***
-grant SELECT                                                                 on QUEUE_OPRLSTDEPS_ACS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on QUEUE_OPRLSTDEPS_ACS to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on QUEUE_OPRLSTDEPS_ACS to START1;
 

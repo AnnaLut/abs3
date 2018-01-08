@@ -1744,7 +1744,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
       elsif i.file_type = 11 then
         pfu_ru_file_utl.get_restart_epp_processing(i.file_data, i.id);
       elsif i.file_type = 12 then
-        pfu_ru_file_utl.get_branch_processing(i.file_data, i.id);
+        pfu_ru_file_utl.get_branch_processing(i.file_data, i.id); 
       elsif i.file_type = 14 then
         pfu_ru_file_utl.get_report_processing(i.file_data, i.id);
       elsif i.file_type = 15 then

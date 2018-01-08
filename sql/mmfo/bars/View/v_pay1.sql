@@ -215,10 +215,8 @@ PROMPT *** Create  view V_PAY1 ***
                   AND fost (a.acc, z.DAT) < 0);
 
 PROMPT *** Create  grants  V_PAY1 ***
-grant SELECT                                                                 on V_PAY1          to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PAY1          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PAY1          to RCC_DEAL;
-grant SELECT                                                                 on V_PAY1          to UPLD;
 
 
 

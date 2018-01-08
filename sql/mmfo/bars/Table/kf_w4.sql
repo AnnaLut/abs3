@@ -46,11 +46,9 @@ COMMENT ON COLUMN BARS.KF_W4.CODEW4 IS '';
 
 
 PROMPT *** Create  grants  KF_W4 ***
-grant SELECT                                                                 on KF_W4           to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on KF_W4           to BARS_ACCESS_DEFROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on KF_W4           to BARS_CONNECT;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on KF_W4           to START1;
-grant SELECT                                                                 on KF_W4           to UPLD;
 
 
 

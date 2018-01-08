@@ -45,9 +45,7 @@ PROMPT *** Create  view CC_W_LIM2 ***
            AND o.acc = a.acc);
 
 PROMPT *** Create  grants  CC_W_LIM2 ***
-grant SELECT                                                                 on CC_W_LIM2       to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_W_LIM2       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on CC_W_LIM2       to UPLD;
 
 
 

@@ -26,10 +26,8 @@ PROMPT *** Create  view RNK_PLUS1 ***
          a.acc=c.acc;
 
 PROMPT *** Create  grants  RNK_PLUS1 ***
-grant SELECT                                                                 on RNK_PLUS1       to BARSREADER_ROLE;
 grant SELECT                                                                 on RNK_PLUS1       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RNK_PLUS1       to START1;
-grant SELECT                                                                 on RNK_PLUS1       to UPLD;
 
 
 

@@ -71,6 +71,45 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_ACCOUNTSP_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTSP ADD CONSTRAINT FK_ACCOUNTSP_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCOUNTSP_ACCOUNTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTSP ADD CONSTRAINT FK_ACCOUNTSP_ACCOUNTS FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCOUNTSP_SPARAM_LIST ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTSP ADD CONSTRAINT FK_ACCOUNTSP_SPARAM_LIST FOREIGN KEY (PARID)
+	  REFERENCES BARS.SPARAM_LIST (SPID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_ACCOUNTSP_KF_NN ***
 begin   
  execute immediate '
@@ -97,11 +136,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACCOUNTSP ***
-grant SELECT                                                                 on ACCOUNTSP       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCOUNTSP       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCOUNTSP       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCOUNTSP       to START1;
-grant SELECT                                                                 on ACCOUNTSP       to UPLD;
 
 
 

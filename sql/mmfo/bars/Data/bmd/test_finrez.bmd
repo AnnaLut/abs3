@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Обсяг формування резерву';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'TEST_FINREZ';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,27 +119,27 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', '', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'код~безбалансового~отделения', '', 30, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'FONDID', 'N', 'код показателя (из REZ_FONDNBS)', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Код~вал', '', 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NLS_R', 'C', 'Номер~рахунку~резерву', '', 15, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'OB22', 'C', 'OB22~счета~резерва', '', 2, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'S080', 'C', 'Кат~якості', '', 1, 7, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'SQ_CURS', 'N', 'величина ~менения эквивалента фонда связанная с к', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'SQ_DEL', 'N', 'Зміни~S_DELрозрахунк~резерву~(екв.)', '', 22, 21, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(SQ_DEL) ', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'SQ_ISP', 'N', 'использов~фонда на ~погашение ~задолженности экв', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'SQ_NEWF', 'N', 'новый фонд по таблице TMP_REZ_RISK эквивалент по к', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'SQ_OLDF1', 'N', 'Фактично~сформований~резерв~(еквівалент)', '', 22, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (SQ_OLDF1) ', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SQ_OLDF2', 'N', 'Розрахунковий~резерв~(екв)', '', 22, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(SQ_OLDF2)', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SQ_OLDF3', 'N', 'Остаток на счетах фонда на текущую дату эквивалент', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, 'Sum(SQ_OLDF3) ', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'S_DEL', 'N', 'Зміни~розрахунко~резерву (ном.)', '', 22, 20, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'S_ISP', 'N', 'использовано фонда на погашение задолженности номи', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'S_NEWF', 'N', 'новый фонд по таблице TMP_REZ_RISK номинал', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'S_OLDF1', 'N', 'Фактично~сформований~ резерв~(номінал)', '', 22, 15, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (S_OLDF1) ', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'S_OLDF2', 'N', 'Розрахунк~резерв~(номінал)', '', 22, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'TXT', 'C', 'Фактично~сформований ~резерв~ (номінал)', '', 200, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'NBS', 'C', 'Бал~рах', '', 4, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', '', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'код~безбалансового~отделения', null, 30, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'FONDID', 'N', 'код показателя (из REZ_FONDNBS)', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Код~вал', null, 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NLS_R', 'C', 'Номер~рахунку~резерву', null, 15, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'OB22', 'C', 'OB22~счета~резерва', null, 2, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'S080', 'C', 'Кат~якості', null, 1, 7, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'SQ_CURS', 'N', 'величина ~менения эквивалента фонда связанная с к', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'SQ_DEL', 'N', 'Зміни~S_DELрозрахунк~резерву~(екв.)', null, 22, 21, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(SQ_DEL) ', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'SQ_ISP', 'N', 'использов~фонда на ~погашение ~задолженности экв', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'SQ_NEWF', 'N', 'новый фонд по таблице TMP_REZ_RISK эквивалент по к', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'SQ_OLDF1', 'N', 'Фактично~сформований~резерв~(еквівалент)', null, 22, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (SQ_OLDF1) ', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SQ_OLDF2', 'N', 'Розрахунковий~резерв~(екв)', null, 22, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(SQ_OLDF2)', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SQ_OLDF3', 'N', 'Остаток на счетах фонда на текущую дату эквивалент', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, 'Sum(SQ_OLDF3) ', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'S_DEL', 'N', 'Зміни~розрахунко~резерву (ном.)', null, 22, 20, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'S_ISP', 'N', 'использовано фонда на погашение задолженности номи', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'S_NEWF', 'N', 'новый фонд по таблице TMP_REZ_RISK номинал', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'S_OLDF1', 'N', 'Фактично~сформований~ резерв~(номінал)', null, 22, 15, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (S_OLDF1) ', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'S_OLDF2', 'N', 'Розрахунк~резерв~(номінал)', null, 22, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'TXT', 'C', 'Фактично~сформований ~резерв~ (номінал)', null, 200, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'NBS', 'C', 'Бал~рах', null, 4, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

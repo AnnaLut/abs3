@@ -47,13 +47,11 @@ COMMENT ON COLUMN BARS.SCLI_ZKP.ZKPO IS '';
 
 
 PROMPT *** Create  grants  SCLI_ZKP ***
-grant SELECT                                                                 on SCLI_ZKP        to BARSREADER_ROLE;
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SCLI_ZKP        to BARS_ACCESS_DEFROLE;
+grant FLASHBACK,SELECT                                                       on SCLI_ZKP        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SCLI_ZKP        to BARS_DM;
 grant SELECT                                                                 on SCLI_ZKP        to RPBN001;
 grant SELECT                                                                 on SCLI_ZKP        to SALGL;
 grant SELECT                                                                 on SCLI_ZKP        to START1;
-grant SELECT                                                                 on SCLI_ZKP        to UPLD;
 grant FLASHBACK,SELECT                                                       on SCLI_ZKP        to WR_REFREAD;
 
 

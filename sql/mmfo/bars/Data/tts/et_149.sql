@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('149', '149-Отримання підкріплення (надлишків) БМ від ЦА через інкас', 0, null, null, '#(get_nls_tt(''149'',''NLSK''))', null, null, null, null, null, 0, 0, 0, 0, null, null, 37, null, null, null, '1000100001000000000000000000000000010000000000000000000000000000', 'Отримання підкріплення (надлишків)  БМ від філій або ЦАчерез підрозділ інкасації');
+    values ('149', '149-Отримання підкріплення (надлишків) БМ від ЦА через інкас', 0, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, 37, null, null, null, '1000100001000000000000000000000000010000000000000000000000000000', 'Отримання підкріплення (надлишків)  БМ від філій або ЦАчерез підрозділ інкасації');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='149', name='149-Отримання підкріплення (надлишків) БМ від ЦА через інкас', dk=0, nlsm=null, kv=null, nlsk='#(get_nls_tt(''149'',''NLSK''))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=37, proc=null, s3800=null, rang=null, flags='1000100001000000000000000000000000010000000000000000000000000000', nazn='Отримання підкріплення (надлишків)  БМ від філій або ЦАчерез підрозділ інкасації'
+         set tt='149', name='149-Отримання підкріплення (надлишків) БМ від ЦА через інкас', dk=0, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=37, proc=null, s3800=null, rang=null, flags='1000100001000000000000000000000000010000000000000000000000000000', nazn='Отримання підкріплення (надлишків)  БМ від філій або ЦАчерез підрозділ інкасації'
        where tt='149';
   end;
   --------------------------------

@@ -20,9 +20,7 @@ PROMPT *** Create  view V_WCS_MACS ***
  order by m.id;
 
 PROMPT *** Create  grants  V_WCS_MACS ***
-grant SELECT                                                                 on V_WCS_MACS      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_MACS      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_MACS      to UPLD;
 
 
 

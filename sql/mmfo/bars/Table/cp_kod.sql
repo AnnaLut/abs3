@@ -70,9 +70,8 @@ begin
 	PAWN NUMBER(*,0), 
 	HIERARCHY_ID NUMBER(*,0), 
 	FIN_351 NUMBER, 
-	PD NUMBER, 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
-	FAIR_METHOD_ID NUMBER(2,0)
+	PD NUMBER,
+        KF varchar2(6) default sys_context(''bars_context'',''user_mfo'')        
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 0 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -92,8 +91,6 @@ PROMPT *** ALTER_POLICIES to CP_KOD ***
 COMMENT ON TABLE BARS.CP_KOD IS 'Справочник кодов ЦБ';
 COMMENT ON COLUMN BARS.CP_KOD.FIN_351 IS 'Фін.стан згідно 351 пост.';
 COMMENT ON COLUMN BARS.CP_KOD.PD IS 'PD';
-COMMENT ON COLUMN BARS.CP_KOD.KF IS '';
-COMMENT ON COLUMN BARS.CP_KOD.FAIR_METHOD_ID IS 'Метод розрахунку справедливої вартості';
 COMMENT ON COLUMN BARS.CP_KOD.ID IS 'Номер пп - первичный ключ';
 COMMENT ON COLUMN BARS.CP_KOD.EMI IS 'Вид эмитента';
 COMMENT ON COLUMN BARS.CP_KOD.DOX IS 'Вид доходности';
@@ -148,20 +145,6 @@ COMMENT ON COLUMN BARS.CP_KOD.HIERARCHY_ID IS 'Рівень ієрархії справедливої варт
 
 
 
-PROMPT *** Create  constraint XPK_CP_KOD_ID_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CP_KOD ADD CONSTRAINT XPK_CP_KOD_ID_KF PRIMARY KEY (ID, KF)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C008837 ***
 begin   
  execute immediate '
@@ -174,10 +157,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CHK_CP_KOD_RNK ***
+PROMPT *** Create  constraint FX_CP_KOD_IDT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CP_KOD ADD CONSTRAINT CHK_CP_KOD_RNK CHECK (RNK is not null) ENABLE';
+  ALTER TABLE BARS.CP_KOD ADD CONSTRAINT FX_CP_KOD_IDT FOREIGN KEY (IDT)
+	  REFERENCES BARS.CP_TYPE (IDT) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -186,46 +170,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C008836 ***
+PROMPT *** Create  constraint SYS_C008842 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CP_KOD MODIFY (ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CPKOD_DOX_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CP_KOD MODIFY (DOX CONSTRAINT CC_CPKOD_DOX_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008839 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CP_KOD MODIFY (CP_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008840 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CP_KOD MODIFY (KV NOT NULL ENABLE)';
+  ALTER TABLE BARS.CP_KOD MODIFY (DAT_EM NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -246,10 +194,190 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C008842 ***
+PROMPT *** Create  constraint SYS_C008840 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CP_KOD MODIFY (DAT_EM NOT NULL ENABLE)';
+  ALTER TABLE BARS.CP_KOD MODIFY (KV NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008839 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_KOD MODIFY (CP_ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CPKOD_DOX_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_KOD MODIFY (DOX CONSTRAINT CC_CPKOD_DOX_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008836 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_KOD MODIFY (ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CP_KOD_VNCRR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_KOD ADD CONSTRAINT FK_CP_KOD_VNCRR FOREIGN KEY (VNCRR)
+	  REFERENCES BARS.CCK_RATING (CODE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CP_KOD_TIP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_KOD ADD CONSTRAINT FK_CP_KOD_TIP FOREIGN KEY (TIP)
+	  REFERENCES BARS.CC_TIPD (TIPD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CP_KOD_EMI ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_KOD ADD CONSTRAINT FK_CP_KOD_EMI FOREIGN KEY (EMI)
+	  REFERENCES BARS.CP_EMI (EMI) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CP_KOD_DOX ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_KOD ADD CONSTRAINT FK_CP_KOD_DOX FOREIGN KEY (DOX)
+	  REFERENCES BARS.CP_DOX (DOX) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CP_HIERARCHY ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_KOD ADD CONSTRAINT FK_CP_HIERARCHY FOREIGN KEY (HIERARCHY_ID)
+	  REFERENCES BARS.CP_HIERARCHY (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CHK_CP_KOD_RNK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_KOD ADD CONSTRAINT CHK_CP_KOD_RNK CHECK (RNK is not null) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+/*
+PROMPT *** Create  constraint XPK_CP_KOD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_KOD ADD CONSTRAINT XPK_CP_KOD PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+*/
+begin   
+ execute immediate 'alter table CP_KOD drop constraint XPK_CP_KOD cascade';
+exception when others then
+  if  sqlcode=-2443 then null; else raise; end if;
+end;
+/
+
+PROMPT *** Create  constraint XPK_CP_KOD_ID_KF ***
+begin   
+ execute immediate 'alter table CP_KOD add constraint XPK_CP_KOD_ID_KF primary key (ID, KF)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+PROMPT *** Create  constraint CP_KOD_BASEY ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_KOD ADD CONSTRAINT CP_KOD_BASEY FOREIGN KEY (BASEY)
+	  REFERENCES BARS.BASEY (BASEY) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CP_KOD_RNK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_KOD ADD CONSTRAINT CP_KOD_RNK FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CP_KOD_VR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_KOD ADD CONSTRAINT CP_KOD_VR FOREIGN KEY (AMORT)
+	  REFERENCES BARS.CP_VR (VR) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -271,36 +399,78 @@ exception when others then
 
 
 
-
-PROMPT *** Create  index XAK_CP_ID_DAT_EM ***
+/*
+PROMPT *** Create  index XPK_CP_KOD ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.XAK_CP_ID_DAT_EM ON BARS.CP_KOD (CP_ID, KF, DAT_EM) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index XPK_CP_KOD_ID_KF ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.XPK_CP_KOD_ID_KF ON BARS.CP_KOD (ID, KF) 
+  CREATE UNIQUE INDEX BARS.XPK_CP_KOD ON BARS.CP_KOD (ID) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+*/
+
+begin   
+ execute immediate 'drop index XPK_CP_KOD';
+exception when others then
+  if  sqlcode=-1418  then null; else raise; end if;
+ end;
+/
+
+
+begin   
+ execute immediate 'drop index XAK_CP_ID_CP_KOD';
+exception when others then
+  if  sqlcode=-1418  then null; else raise; end if;
+ end;
+/
+
+/*
+PROMPT *** Create  index XAK_CP_ID_CP_KOD ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.XAK_CP_ID_CP_KOD ON BARS.CP_KOD (CP_ID, DAT_EM) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE USERS ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+*/
+begin   
+ execute immediate 'CREATE UNIQUE INDEX BARS.XAK_CP_ID_DAT_EM ON BARS.CP_KOD (CP_ID, KF, DAT_EM) 
+  TABLESPACE BRSMDLI';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+begin
+    execute immediate 'alter table CP_KOD add fair_method_id number(2)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+COMMENT ON COLUMN BARS.CP_KOD.fair_method_id IS 'Метод розрахунку справедливої вартості';
+
+
+begin   
+ execute immediate 'alter table CP_KOD
+  add constraint FK_CP_FAIR_METHOD foreign key (FAIR_METHOD_ID)
+  references cp_fair_method (ID)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 
 PROMPT *** Create  grants  CP_KOD ***
-grant SELECT                                                                 on CP_KOD          to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_KOD          to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_KOD          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_KOD          to BARS_DM;

@@ -26,11 +26,9 @@ PROMPT *** Create  view VALUABLES_NLS ***
      FROM valuables;
 
 PROMPT *** Create  grants  VALUABLES_NLS ***
-grant SELECT                                                                 on VALUABLES_NLS   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VALUABLES_NLS   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VALUABLES_NLS   to PYOD001;
 grant SELECT                                                                 on VALUABLES_NLS   to START1;
-grant SELECT                                                                 on VALUABLES_NLS   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VALUABLES_NLS   to WR_ALL_RIGHTS;
 grant SELECT                                                                 on VALUABLES_NLS   to WR_DOC_INPUT;
 grant FLASHBACK,SELECT                                                       on VALUABLES_NLS   to WR_REFREAD;

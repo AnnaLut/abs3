@@ -29,10 +29,8 @@ PROMPT *** Create  view V_OB_CORPORATION_SESSION ***
    ORDER BY 1 DESC;
 
 PROMPT *** Create  grants  V_OB_CORPORATION_SESSION ***
-grant SELECT                                                                 on V_OB_CORPORATION_SESSION to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OB_CORPORATION_SESSION to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OB_CORPORATION_SESSION to CORP_CLIENT;
-grant SELECT                                                                 on V_OB_CORPORATION_SESSION to UPLD;
 
 
 

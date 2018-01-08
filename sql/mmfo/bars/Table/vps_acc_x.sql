@@ -73,10 +73,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  VPS_ACC_X ***
-grant SELECT                                                                 on VPS_ACC_X       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VPS_ACC_X       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VPS_ACC_X       to START1;
-grant SELECT                                                                 on VPS_ACC_X       to UPLD;
 
 
 

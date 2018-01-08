@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Провідник по "гілці" РОЛЬОВОЇ МОДЕЛІ / M_ROLE_FIL';
   l_tablinesdef := '20';
-  l_tabselect_statement := '';
   l_tabname     := 'M_ROLE_FIL';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,16 +119,16 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'Грп.Користур.~ролі', '1', null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=M_ROLE_ACC[NSIFUNCTION][ACCESSCODE=>7][PROC=>PUL.PUT(''RI'',:ID)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ARMC', 'N', 'Cen-АРМ~ролі', '1', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=M_ROLE_ARMC[NSIFUNCTION][ACCESSCODE=>7][PROC=>PUL.PUT(''RI'',:ID);PUL.PUT( ''ROLE'', :CODE)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'ARMW', 'N', 'Web_АРМ~ролі', '1', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=M_ROLE_ARMW[NSIFUNCTION][ACCESSCODE=>7][PROC=>PUL.PUT(''RI'',:ID)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'CHK', 'N', 'Грп.Контролю~ролі', '1.5', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=M_ROLE_CHK[NSIFUNCTION][ACCESSCODE=>7][PROC=>PUL.PUT(''RI'',:ID)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'CODE', 'C', 'Симв.код~ролі', '2', 100, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'ID', 'N', 'Числ.код~ролі', '.5', null, 1, 0, 1, 0, 0, '', '', 0, 0, 'Count(*)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NAME', 'C', 'Назва~ролі', '4', 100, 3, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'OTC', 'N', 'Стат.звіти~ролі', '1', null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=M_ROLE_OTC[NSIFUNCTION][ACCESSCODE=>7][PROC=>PUL.PUT(''RI'',:ID)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'STA', 'N', 'Користувачі~ролі', '1.5', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=M_ROLE_STA[NSIFUNCTION][ACCESSCODE=>7][PROC=>PUL.PUT(''RI'',:ID);PUL.PUT( ''ROLE'', :CODE)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'TTS', 'N', 'Операції~ролі', '1', null, 8, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=M_ROLE_TTS[NSIFUNCTION][ACCESSCODE=>7][PROC=>PUL.PUT(''RI'',:ID);PUL.PUT( ''ROLE'', :CODE) ][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'Грп.Користур.~ролі', 1, null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=M_ROLE_ACC[NSIFUNCTION][ACCESSCODE=>7][PROC=>PUL.PUT(''RI'',:ID)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ARMC', 'N', 'Cen-АРМ~ролі', 1, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=M_ROLE_ARMC[NSIFUNCTION][ACCESSCODE=>7][PROC=>PUL.PUT(''RI'',:ID);PUL.PUT( ''ROLE'', :CODE)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'ARMW', 'N', 'Web_АРМ~ролі', 1, null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=M_ROLE_ARMW[NSIFUNCTION][ACCESSCODE=>7][PROC=>PUL.PUT(''RI'',:ID)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'CHK', 'N', 'Грп.Контролю~ролі', 1.5, null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=M_ROLE_CHK[NSIFUNCTION][ACCESSCODE=>7][PROC=>PUL.PUT(''RI'',:ID)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'CODE', 'C', 'Симв.код~ролі', 2, 100, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'ID', 'N', 'Числ.код~ролі', .5, null, 1, 0, 1, 0, 0, '', '', 0, 0, 'Count(*)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NAME', 'C', 'Назва~ролі', 4, 100, 3, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'OTC', 'N', 'Стат.звіти~ролі', 1, null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=M_ROLE_OTC[NSIFUNCTION][ACCESSCODE=>7][PROC=>PUL.PUT(''RI'',:ID)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'STA', 'N', 'Користувачі~ролі', 1.5, null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=M_ROLE_STA[NSIFUNCTION][ACCESSCODE=>7][PROC=>PUL.PUT(''RI'',:ID);PUL.PUT( ''ROLE'', :CODE)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'TTS', 'N', 'Операції~ролі', 1, null, 8, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=M_ROLE_TTS[NSIFUNCTION][ACCESSCODE=>7][PROC=>PUL.PUT(''RI'',:ID);PUL.PUT( ''ROLE'', :CODE) ][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

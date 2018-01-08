@@ -145,9 +145,6 @@ COMMENT ON COLUMN BARSAQ.T.CLIENT_ID IS '';
 
 
 
-PROMPT *** Create  grants  T ***
-grant SELECT                                                                 on T               to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

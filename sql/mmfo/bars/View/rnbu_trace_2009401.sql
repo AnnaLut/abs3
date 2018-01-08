@@ -11,9 +11,7 @@ PROMPT *** Create  view RNBU_TRACE_2009401 ***
   select substr(kodp,3,3) COL_P2, substr(kodp,6,10) COL_P3, substr(kodp,1,2) COL_P1, substr(kodp,20,3) COL_P5, substr(kodp,16,4) COL_P4, substr(kodp,23,1) COL_P6, znap COL_P7,  RNBU_TRACE."RECID",RNBU_TRACE."USERID",RNBU_TRACE."NLS",RNBU_TRACE."KV",RNBU_TRACE."ODATE",RNBU_TRACE."KODP",RNBU_TRACE."ZNAP",RNBU_TRACE."NBUC",RNBU_TRACE."ISP",RNBU_TRACE."RNK",RNBU_TRACE."ACC",RNBU_TRACE."REF",RNBU_TRACE."COMM",RNBU_TRACE."ND",RNBU_TRACE."MDATE",RNBU_TRACE."TOBO" from RNBU_TRACE;
 
 PROMPT *** Create  grants  RNBU_TRACE_2009401 ***
-grant SELECT                                                                 on RNBU_TRACE_2009401 to BARSREADER_ROLE;
 grant SELECT                                                                 on RNBU_TRACE_2009401 to RPBN002;
-grant SELECT                                                                 on RNBU_TRACE_2009401 to UPLD;
 
 
 

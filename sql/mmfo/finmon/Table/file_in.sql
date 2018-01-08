@@ -47,7 +47,7 @@ begin
  execute immediate '
   ALTER TABLE FINMON.FILE_IN ADD CONSTRAINT XPK_FILE_IN PRIMARY KEY (ID, BRANCH_ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE USERS  ENABLE';
+  TABLESPACE BRSIMPDATA300465  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -135,7 +135,7 @@ begin
  execute immediate '
   CREATE UNIQUE INDEX FINMON.XPK_FILE_IN ON FINMON.FILE_IN (ID, BRANCH_ID) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE USERS ';
+  TABLESPACE BRSIMPDATA300465 ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
@@ -145,7 +145,6 @@ exception when others then
 
 PROMPT *** Create  grants  FILE_IN ***
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on FILE_IN         to BARS;
-grant SELECT                                                                 on FILE_IN         to BARSREADER_ROLE;
 
 
 

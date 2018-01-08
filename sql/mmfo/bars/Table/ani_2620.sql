@@ -49,9 +49,7 @@ COMMENT ON COLUMN BARS.ANI_2620.OB22 IS '';
 
 
 PROMPT *** Create  grants  ANI_2620 ***
-grant SELECT                                                                 on ANI_2620        to BARSREADER_ROLE;
 grant SELECT                                                                 on ANI_2620        to BARS_DM;
-grant SELECT                                                                 on ANI_2620        to UPLD;
 
 
 

@@ -71,9 +71,7 @@ PROMPT *** Create  view V_USER_LOCPAY_DOCS ***
           and a.userid = us.id;
 
 PROMPT *** Create  grants  V_USER_LOCPAY_DOCS ***
-grant SELECT                                                                 on V_USER_LOCPAY_DOCS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USER_LOCPAY_DOCS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_USER_LOCPAY_DOCS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USER_LOCPAY_DOCS to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_USER_LOCPAY_DOCS to WR_CHCKINNR_CASH;
 

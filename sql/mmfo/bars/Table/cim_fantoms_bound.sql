@@ -83,12 +83,10 @@ COMMENT ON COLUMN BARS.CIM_FANTOMS_BOUND.BORG_REASON IS 'Причина заборгованості'
 
 
 
-PROMPT *** Create  constraint PK_FANTOMSBOUND ***
+PROMPT *** Create  constraint CC_CIMFANTOMSBOUND_DIR_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_FANTOMS_BOUND ADD CONSTRAINT PK_FANTOMSBOUND PRIMARY KEY (BOUND_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CIM_FANTOMS_BOUND MODIFY (DIRECT CONSTRAINT CC_CIMFANTOMSBOUND_DIR_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -109,10 +107,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMFANTOMSBOUND_DIR_NN ***
+PROMPT *** Create  constraint PK_FANTOMSBOUND ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_FANTOMS_BOUND MODIFY (DIRECT CONSTRAINT CC_CIMFANTOMSBOUND_DIR_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_FANTOMS_BOUND ADD CONSTRAINT PK_FANTOMSBOUND PRIMARY KEY (BOUND_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -133,10 +133,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMFANTOMSBOUND_PAYFLAG_NN ***
+PROMPT *** Create  constraint CC_CIMFANTOMSBOUND_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_FANTOMS_BOUND MODIFY (PAY_FLAG CONSTRAINT CC_CIMFANTOMSBOUND_PAYFLAG_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_FANTOMS_BOUND MODIFY (BRANCH CONSTRAINT CC_CIMFANTOMSBOUND_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -181,10 +181,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMFANTOMSBOUND_BRANCH_NN ***
+PROMPT *** Create  constraint CC_CIMFANTOMSBOUND_PAYFLAG_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_FANTOMS_BOUND MODIFY (BRANCH CONSTRAINT CC_CIMFANTOMSBOUND_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_FANTOMS_BOUND MODIFY (PAY_FLAG CONSTRAINT CC_CIMFANTOMSBOUND_PAYFLAG_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -207,11 +207,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_FANTOMS_BOUND ***
-grant SELECT                                                                 on CIM_FANTOMS_BOUND to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_FANTOMS_BOUND to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_FANTOMS_BOUND to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_FANTOMS_BOUND to CIM_ROLE;
-grant SELECT                                                                 on CIM_FANTOMS_BOUND to UPLD;
 
 
 

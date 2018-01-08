@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции !ZP
-prompt Наименование операции: !ZP STOP-контроль (Зарплата)
+prompt Наименование операции: STOP-контроль (Зарплата)
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!ZP', '!ZP STOP-контроль (Зарплата)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_CHECK_ZP(#(REF))', null, null, null, '0', null, '0040M0000000000000000000040M000000000000000000000000000000000000', null);
+    values ('!ZP', 'STOP-контроль (Зарплата)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_CHECK_ZP(#(REF))', null, null, null, null, null, '0040M0000000000000000000040M000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!ZP', name='!ZP STOP-контроль (Зарплата)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_ZP(#(REF))', s2=null, sk=null, proc=null, s3800='0', rang=null, flags='0040M0000000000000000000040M000000000000000000000000000000000000', nazn=null
+         set tt='!ZP', name='STOP-контроль (Зарплата)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_ZP(#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0040M0000000000000000000040M000000000000000000000000000000000000', nazn=null
        where tt='!ZP';
   end;
   --------------------------------
@@ -89,7 +89,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции CL2
-prompt Наименование операции: CL2 Internet-Banking CorpLight: СЕП
+prompt Наименование операции: Internet-Banking CorpLight: СЕП
 declare
   cnt_  number;
 begin
@@ -98,11 +98,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CL2', 'CL2 Internet-Banking CorpLight: СЕП', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 1, 1, 0, 0, null, null, null, null, null, null, '1101000000000000000000000000000000110000000000000000000000000000', null);
+    values ('CL2', 'Internet-Banking CorpLight: СЕП', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 1, 1, 0, 0, null, null, null, null, null, null, '1101000000000000000000000000000000110000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CL2', name='CL2 Internet-Banking CorpLight: СЕП', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1101000000000000000000000000000000110000000000000000000000000000', nazn=null
+         set tt='CL2', name='Internet-Banking CorpLight: СЕП', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1101000000000000000000000000000000110000000000000000000000000000', nazn=null
        where tt='CL2';
   end;
   --------------------------------
@@ -303,56 +303,56 @@ begin
   delete from chklist_tts where tt='CL2';
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (7, 'CL2', 2, null, 'kv<>980', null);
+    values (5, 'CL2', 1, null, null, 3);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 7, ''CL2'', 2, null, ''kv<>980'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''CL2'', 1, null, null, 3) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (11, 'CL2', 4, null, '((substr(NLSA,1,4) in (''2062'',''2063'',''2072'',''2073'',''2082'',''2083'',''2102'',''2103'',''2112'',''2113'',''2122'',''2123'',''2132'',''2133'')) or kv<>980 )', null);
+    values (7, 'CL2', 2, null, '(f_cim_visa_condition(dk, kv, nlsa, nlsb) is not null and kv<>980)', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 11, ''CL2'', 4, null, ''((substr(NLSA,1,4) in (''''2062'''',''''2063'''',''''2072'''',''''2073'''',''''2082'''',''''2083'''',''''2102'''',''''2103'''',''''2112'''',''''2113'''',''''2122'''',''''2123'''',''''2132'''',''''2133'''')) or kv<>980 )'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 7, ''CL2'', 2, null, ''(f_cim_visa_condition(dk, kv, nlsa, nlsb) is not null and kv<>980)'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (25, 'CL2', 1, null, null, 3);
+    values (11, 'CL2', 4, null, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 25, ''CL2'', 1, null, null, 3) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 11, ''CL2'', 4, null, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (38, 'CL2', 6, null, '( NLSA like ''20%'' or NLSA like ''21%'' or NLSA like ''22%'' )', null);
+    values (38, 'CL2', 3, null, '( NLSA like ''20%'' or NLSA like ''21%'' or NLSA like ''22%'' )', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 38, ''CL2'', 6, null, ''( NLSA like ''''20%'''' or NLSA like ''''21%'''' or NLSA like ''''22%'''' )'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 38, ''CL2'', 3, null, ''( NLSA like ''''20%'''' or NLSA like ''''21%'''' or NLSA like ''''22%'''' )'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (94, 'CL2', 8, null, '( bis=1 )', 3);
+    values (94, 'CL2', 5, null, 'bis=1', 3);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 94, ''CL2'', 8, null, ''( bis=1 )'', 3) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 94, ''CL2'', 5, null, ''bis=1'', 3) - первичный ключ не найден!');
       else raise;
       end if;
   end;

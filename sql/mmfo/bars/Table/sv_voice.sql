@@ -147,10 +147,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  SV_VOICE ***
-grant SELECT                                                                 on SV_VOICE        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_VOICE        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_VOICE        to RPBN002;
-grant SELECT                                                                 on SV_VOICE        to UPLD;
 
 
 

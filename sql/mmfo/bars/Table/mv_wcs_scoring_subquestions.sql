@@ -48,9 +48,7 @@ COMMENT ON COLUMN BARS.MV_WCS_SCORING_SUBQUESTIONS.QUESTION_ID IS 'Ідентифікатор
 
 
 PROMPT *** Create  grants  MV_WCS_SCORING_SUBQUESTIONS ***
-grant SELECT                                                                 on MV_WCS_SCORING_SUBQUESTIONS to BARSREADER_ROLE;
 grant SELECT                                                                 on MV_WCS_SCORING_SUBQUESTIONS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on MV_WCS_SCORING_SUBQUESTIONS to UPLD;
 
 
 

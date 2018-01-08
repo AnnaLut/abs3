@@ -110,11 +110,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BARS_BOARD ***
-grant SELECT                                                                 on BARS_BOARD      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BARS_BOARD      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BARS_BOARD      to BARS_DM;
 grant SELECT                                                                 on BARS_BOARD      to BASIC_INFO;
-grant SELECT                                                                 on BARS_BOARD      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BARS_BOARD      to WR_ALL_RIGHTS;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BARS_BOARD      to WR_BOARD;
 

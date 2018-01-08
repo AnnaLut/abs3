@@ -22,9 +22,7 @@ PROMPT *** Create  view V_INS_CORPS ***
  order by c.rnk desc;
 
 PROMPT *** Create  grants  V_INS_CORPS ***
-grant SELECT                                                                 on V_INS_CORPS     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_CORPS     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INS_CORPS     to UPLD;
 
 
 

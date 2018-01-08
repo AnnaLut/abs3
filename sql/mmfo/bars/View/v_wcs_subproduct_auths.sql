@@ -13,9 +13,7 @@ PROMPT *** Create  view V_WCS_SUBPRODUCT_AUTHS ***
  where sa.auth_id = a.auth_id;
 
 PROMPT *** Create  grants  V_WCS_SUBPRODUCT_AUTHS ***
-grant SELECT                                                                 on V_WCS_SUBPRODUCT_AUTHS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SUBPRODUCT_AUTHS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_SUBPRODUCT_AUTHS to UPLD;
 
 
 

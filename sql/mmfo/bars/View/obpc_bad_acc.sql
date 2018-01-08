@@ -24,10 +24,8 @@ select a.branch, null, a.nls, v.lcv, a.nms, c.okpo, a.daos, a.ostc/100
    and a.branch like sys_context ('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  OBPC_BAD_ACC ***
-grant SELECT                                                                 on OBPC_BAD_ACC    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_BAD_ACC    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_BAD_ACC    to OBPC;
-grant SELECT                                                                 on OBPC_BAD_ACC    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_BAD_ACC    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on OBPC_BAD_ACC    to WR_REFREAD;
 

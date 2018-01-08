@@ -1,3 +1,5 @@
+SET SERVEROUTPUT ON 
+SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_CDMI.sql =========*
 PROMPT ===================================================================================== 
@@ -16,11 +18,11 @@ PROMPT *** Create/replace  ARM  $RM_CDMI ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-	d integer := 0;
+    d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_CDMI створюємо (або оновлюємо) АРМ Робота з ЄБК ФО ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
-                             P_ARM_NAME              => l_application_name,
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
+                             P_ARM_NAME              => l_application_name, 
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -28,44 +30,173 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію АРМ Дедублікації ФО ********** ');
           --  Створюємо функцію АРМ Дедублікації ФО
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'АРМ Дедублікації ФО',
                                                   p_funcname => '/barsroot/cdm/Deduplicate/Index?type=individualPerson',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
+     
 
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію АРМ Якості ФО ********** ');
+          --  Створюємо функцію АРМ Якості ФО
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'АРМ Якості ФО',
+                                                  p_funcname => '/barsroot/cdm/Quality/Index?type=individualPerson',
+                                                  p_rolename => '' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
+     
+
+      --  Створюємо дочірню функцію АРМ Якості ФО (рекомендації по клієнту)
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'АРМ Якості ФО (рекомендації по клієнту)',
+                                                              p_funcname => '/barsroot/cdm/quality/getcustadvisorylist\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію АРМ Якості ФО (групи якості)
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'АРМ Якості ФО (групи якості)',
+                                                              p_funcname => '/barsroot/cdm/quality/getgroups\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію АРМ Якості ФО (збереження змін)
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'АРМ Якості ФО (збереження змін)',
+                                                              p_funcname => '/barsroot/cdm/quality/savecustomerattributes\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію АРМ Якості ФО (головна сторінка)
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'АРМ Якості ФО (головна сторінка)',
+                                                              p_funcname => '/barsroot/cdm/quality/index\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію АРМ Якості ФО (джерело довідників)
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'АРМ Якості ФО (джерело довідників)',
+                                                              p_funcname => '/barsroot/cdm/quality/getdialogdata\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію АРМ Якості ФО (інші групи якості)
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'АРМ Якості ФО (інші групи якості)',
+                                                              p_funcname => '/barsroot/cdm/quality/getqualitygrouplist\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію АРМ Якості ФО (головна сторінка - синонім)
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'АРМ Якості ФО (головна сторінка - синонім)',
+                                                              p_funcname => '/barsroot/cdm/quality\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію АРМ Якості ФО (джерело списків)
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'АРМ Якості ФО (джерело списків)',
+                                                              p_funcname => '/barsroot/cdm/quality/getdropdowndata\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію АРМ Якості ФО (групи атрибутів)
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'АРМ Якості ФО (групи атрибутів)',
+                                                              p_funcname => '/barsroot/cdm/quality/getallattrgroups\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію АРМ Якості ФО (списки рекомендацій)
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'АРМ Якості ФО (списки рекомендацій)',
+                                                              p_funcname => '/barsroot/cdm/quality/getadvisorylist\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію АРМ Якості ФО (підгрупи якості)
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'АРМ Якості ФО (підгрупи якості)',
+                                                              p_funcname => '/barsroot/cdm/quality/getsubgroups\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію АРМ Якості ФО (усі атрибути)
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'АРМ Якості ФО (усі атрибути)',
+                                                              p_funcname => '/barsroot/cdm/quality/getcustattributeslist\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію АРМ Якості ФО (рекомендації)
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'АРМ Якості ФО (рекомендації)',
+                                                              p_funcname => '/barsroot/cdm/quality/advisorylist\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Реєстрація Клієнтів і Рахунків  (ФО) ********** ');
           --  Створюємо функцію Реєстрація Клієнтів і Рахунків  (ФО)
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Реєстрація Клієнтів і Рахунків  (ФО)',
                                                   p_funcname => '/barsroot/clients/customers/index/?custtype=person',
-                                                  p_rolename => 'WR_CUSTLIST' ,
+                                                  p_rolename => 'WR_CUSTLIST' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Картка контрагента
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Картка контрагента',
-															  p_funcname => '/barsroot/clientregister/default.aspx?client=\w+',
-															  p_rolename => 'WR_CUSTREG' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Картка контрагента',
+                                                              p_funcname => '/barsroot/clientregister/default.aspx?client=\w+',
+                                                              p_rolename => 'WR_CUSTREG' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Перегляд рахунків контрагенту
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Перегляд рахунків контрагенту',
-															  p_funcname => '/barsroot/customerlist/custacc.aspx?type=0&rnk=\d+(&mod=ro)*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Перегляд рахунків контрагенту',
+                                                              p_funcname => '/barsroot/customerlist/custacc.aspx?type=0&rnk=\d+(&mod=ro)*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_CDMI) - Робота з ЄБК ФО  ');
     l := l_function_ids.first;
@@ -73,8 +204,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-
-
+     
+     
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -88,7 +219,6 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
-commit;
 end;
 /
 

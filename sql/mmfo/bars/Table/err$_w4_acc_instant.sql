@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_W4_ACC_INSTANT.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_W4_ACC_INSTANT ***
-grant SELECT                                                                 on ERR$_W4_ACC_INSTANT to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_W4_ACC_INSTANT to UPLD;
-
 
 
 PROMPT ===================================================================================== 

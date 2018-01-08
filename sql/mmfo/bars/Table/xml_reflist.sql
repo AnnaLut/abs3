@@ -93,10 +93,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_REFLIST ***
-grant SELECT                                                                 on XML_REFLIST     to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_REFLIST     to BARS_DM;
 grant SELECT                                                                 on XML_REFLIST     to KLBX;
-grant SELECT                                                                 on XML_REFLIST     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_REFLIST     to WR_ALL_RIGHTS;
 
 

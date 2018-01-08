@@ -19,10 +19,8 @@ PROMPT *** Create  view V_BANKS_REPORT3_INT ***
     WHERE s.kodf = r.kodf AND r.kod = 3 AND s.kodp IS NOT NULL;
 
 PROMPT *** Create  grants  V_BANKS_REPORT3_INT ***
-grant SELECT                                                                 on V_BANKS_REPORT3_INT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BANKS_REPORT3_INT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BANKS_REPORT3_INT to RPBN002;
-grant SELECT                                                                 on V_BANKS_REPORT3_INT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BANKS_REPORT3_INT to WR_ALL_RIGHTS;
 
 

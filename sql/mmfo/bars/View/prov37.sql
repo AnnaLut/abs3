@@ -29,10 +29,8 @@ where  a.acc=w.acc and
 group  by a.kk;
 
 PROMPT *** Create  grants  PROV37 ***
-grant SELECT                                                                 on PROV37          to BARSREADER_ROLE;
 grant SELECT                                                                 on PROV37          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PROV37          to START1;
-grant SELECT                                                                 on PROV37          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PROV37          to WR_ALL_RIGHTS;
 
 

@@ -90,12 +90,10 @@ exception when others then
 
 PROMPT *** Create  grants  CC_MPAWN ***
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CC_MPAWN        to BARS009;
-grant SELECT                                                                 on CC_MPAWN        to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_MPAWN        to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_MPAWN        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_MPAWN        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_MPAWN        to RCC_DEAL;
-grant SELECT                                                                 on CC_MPAWN        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_MPAWN        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CC_MPAWN        to WR_REFREAD;
 

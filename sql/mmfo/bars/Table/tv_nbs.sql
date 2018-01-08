@@ -47,6 +47,19 @@ COMMENT ON COLUMN BARS.TV_NBS.NBS IS '';
 
 
 
+PROMPT *** Create  constraint R_PS_TV_NBS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TV_NBS ADD CONSTRAINT R_PS_TV_NBS FOREIGN KEY (NBS)
+	  REFERENCES BARS.PS (NBS) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint NK_TV_NBS_NBS ***
 begin   
  execute immediate '
@@ -59,10 +72,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  TV_NBS ***
-grant SELECT                                                                 on TV_NBS          to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on TV_NBS          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TV_NBS          to BARS_DM;
-grant SELECT                                                                 on TV_NBS          to UPLD;
 grant FLASHBACK,SELECT                                                       on TV_NBS          to WR_REFREAD;
 
 

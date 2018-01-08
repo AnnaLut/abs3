@@ -7,8 +7,9 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TIU_CMCLIENT ***
 
-  CREATE OR REPLACE TRIGGER BARS.TIU_CMCLIENT 
-instead of update ON BARS.CM_CLIENT for each row
+  Create or replace trigger tiu_cmclient
+instead of update on cm_client 
+for each row
 begin
    if :new.oper_status not in (2,3,10) then
       raise_application_error (-20000, 'Недопустимый статус операции ' || :new.oper_status);
@@ -23,8 +24,6 @@ begin
    end if;
 end;
 /
-ALTER TRIGGER BARS.TIU_CMCLIENT ENABLE;
-
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TIU_CMCLIENT.sql =========*** End **

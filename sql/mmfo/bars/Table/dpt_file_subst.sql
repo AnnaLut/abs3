@@ -62,6 +62,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_DPTFILESUBST_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_FILE_SUBST ADD CONSTRAINT FK_DPTFILESUBST_BRANCH FOREIGN KEY (PARENT_BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTFILESUBST_BRANCH2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_FILE_SUBST ADD CONSTRAINT FK_DPTFILESUBST_BRANCH2 FOREIGN KEY (CHILD_BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DPTFILESUBST_PBRANCH_NN ***
 begin   
  execute immediate '
@@ -100,11 +126,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_FILE_SUBST ***
-grant SELECT                                                                 on DPT_FILE_SUBST  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_FILE_SUBST  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_FILE_SUBST  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_FILE_SUBST  to DPT_ROLE;
-grant SELECT                                                                 on DPT_FILE_SUBST  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_FILE_SUBST  to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_FILE_SUBST  to WR_REFREAD;
 

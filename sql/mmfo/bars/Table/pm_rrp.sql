@@ -89,7 +89,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  PM_RRP ***
-grant SELECT                                                                 on PM_RRP          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PM_RRP          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PM_RRP          to PM_RRP;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PM_RRP          to SEP_ROLE;

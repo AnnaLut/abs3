@@ -90,11 +90,9 @@ exception when others then
 
 PROMPT *** Create  grants  CC_RAZ_KOMIS_TYPE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_RAZ_KOMIS_TYPE to ABS_ADMIN;
-grant SELECT                                                                 on CC_RAZ_KOMIS_TYPE to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_RAZ_KOMIS_TYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_RAZ_KOMIS_TYPE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_RAZ_KOMIS_TYPE to RCC_DEAL;
-grant SELECT                                                                 on CC_RAZ_KOMIS_TYPE to UPLD;
 grant FLASHBACK,SELECT                                                       on CC_RAZ_KOMIS_TYPE to WR_REFREAD;
 
 

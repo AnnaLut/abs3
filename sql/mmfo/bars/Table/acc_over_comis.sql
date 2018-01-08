@@ -69,6 +69,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_ACCOVERCOMIS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER_COMIS ADD CONSTRAINT FK_ACCOVERCOMIS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCOVERCOMIS_ACCOUNTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER_COMIS ADD CONSTRAINT FK_ACCOVERCOMIS_ACCOUNTS FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C007441 ***
 begin   
  execute immediate '
@@ -109,13 +135,11 @@ exception when others then
 PROMPT *** Create  grants  ACC_OVER_COMIS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_COMIS  to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_COMIS  to BARS009;
-grant SELECT                                                                 on ACC_OVER_COMIS  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_COMIS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_OVER_COMIS  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_COMIS  to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_COMIS  to TECH005;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_COMIS  to TECH006;
-grant SELECT                                                                 on ACC_OVER_COMIS  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_OVER_COMIS  to WR_ALL_RIGHTS;
 
 

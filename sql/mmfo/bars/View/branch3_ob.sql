@@ -26,10 +26,8 @@ PROMPT *** Create  view BRANCH3_OB ***
           AND date_closed IS NULL;
 
 PROMPT *** Create  grants  BRANCH3_OB ***
-grant SELECT                                                                 on BRANCH3_OB      to BARSREADER_ROLE;
 grant SELECT                                                                 on BRANCH3_OB      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH3_OB      to START1;
-grant SELECT                                                                 on BRANCH3_OB      to UPLD;
 
 
 

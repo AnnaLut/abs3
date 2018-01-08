@@ -85,8 +85,7 @@ COMMENT ON COLUMN BARS.SB_POK_1.DATA_M IS '';
 
 
 PROMPT *** Create  grants  SB_POK_1 ***
-grant SELECT                                                                 on SB_POK_1        to BARSREADER_ROLE;
-grant SELECT                                                                 on SB_POK_1        to UPLD;
+grant SELECT                                                                 on SB_POK_1        to BARS_DM;
 
 
 

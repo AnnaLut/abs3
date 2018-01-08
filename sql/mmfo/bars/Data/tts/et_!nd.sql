@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции !ND
-prompt Наименование операции: !ND STOP-контроль(Перекази-нерезиденти)
+prompt Наименование операции: STOP-контроль(Перекази-нерезиденти)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!ND', '!ND STOP-контроль(Перекази-нерезиденти)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_CHECK_ND_REZ(#(REF))', null, null, null, null, null, '0000100000000000000000000001000000000000000000000000000000000000', null);
+    values ('!ND', 'STOP-контроль(Перекази-нерезиденти)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_CHECK_ND_REZ(#(REF))', null, null, null, null, null, '0000100000000000000000000001000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!ND', name='!ND STOP-контроль(Перекази-нерезиденти)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_ND_REZ(#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000001000000000000000000000000000000000000', nazn=null
+         set tt='!ND', name='STOP-контроль(Перекази-нерезиденти)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_ND_REZ(#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000001000000000000000000000000000000000000', nazn=null
        where tt='!ND';
   end;
   --------------------------------

@@ -79,10 +79,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  INS_TASK_STATUSES ***
-grant SELECT                                                                 on INS_TASK_STATUSES to BARSREADER_ROLE;
-grant SELECT                                                                 on INS_TASK_STATUSES to UPLD;
-
 
 
 PROMPT ===================================================================================== 

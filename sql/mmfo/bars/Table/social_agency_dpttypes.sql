@@ -49,12 +49,38 @@ COMMENT ON COLUMN BARS.SOCIAL_AGENCY_DPTTYPES.DPTTYPE IS 'Код типу договору';
 
 
 
+PROMPT *** Create  constraint FK_SOCAGNDPTYPE_SOCIALDPTTYPES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_AGENCY_DPTTYPES ADD CONSTRAINT FK_SOCAGNDPTYPE_SOCIALDPTTYPES FOREIGN KEY (DPTTYPE)
+	  REFERENCES BARS.SOCIAL_DPT_TYPES (TYPE_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_SOCAGNDPTYPE ***
 begin   
  execute immediate '
   ALTER TABLE BARS.SOCIAL_AGENCY_DPTTYPES ADD CONSTRAINT PK_SOCAGNDPTYPE PRIMARY KEY (AGNTYPE, DPTTYPE)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYNI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SOCAGNDPTYPE_SOCAGNTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_AGENCY_DPTTYPES ADD CONSTRAINT FK_SOCAGNDPTYPE_SOCAGNTYPE FOREIGN KEY (AGNTYPE)
+	  REFERENCES BARS.SOCIAL_AGENCY_TYPE (TYPE_ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -101,11 +127,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SOCIAL_AGENCY_DPTTYPES ***
-grant SELECT                                                                 on SOCIAL_AGENCY_DPTTYPES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SOCIAL_AGENCY_DPTTYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SOCIAL_AGENCY_DPTTYPES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SOCIAL_AGENCY_DPTTYPES to DPT_ADMIN;
-grant SELECT                                                                 on SOCIAL_AGENCY_DPTTYPES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SOCIAL_AGENCY_DPTTYPES to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SOCIAL_AGENCY_DPTTYPES to WR_REFREAD;
 

@@ -65,6 +65,45 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint R_FIN_FIN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FIN_OBS_S080 ADD CONSTRAINT R_FIN_FIN FOREIGN KEY (FIN)
+	  REFERENCES BARS.STAN_FIN (FIN) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_FIN_RISK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FIN_OBS_S080 ADD CONSTRAINT R_FIN_RISK FOREIGN KEY (S080)
+	  REFERENCES BARS.CRISK (CRISK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_OBS_OBS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FIN_OBS_S080 ADD CONSTRAINT R_OBS_OBS FOREIGN KEY (OBS)
+	  REFERENCES BARS.STAN_OBS (OBS) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint NK_FIN_OBS_S080_FIN ***
 begin   
  execute immediate '
@@ -105,14 +144,12 @@ exception when others then
 PROMPT *** Create  grants  FIN_OBS_S080 ***
 grant SELECT                                                                 on FIN_OBS_S080    to ABS_ADMIN;
 grant SELECT                                                                 on FIN_OBS_S080    to BARS009;
-grant SELECT                                                                 on FIN_OBS_S080    to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_OBS_S080    to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_OBS_S080    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_OBS_S080    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_OBS_S080    to RCC_DEAL;
 grant SELECT                                                                 on FIN_OBS_S080    to TECH005;
 grant SELECT                                                                 on FIN_OBS_S080    to TECH006;
-grant SELECT                                                                 on FIN_OBS_S080    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_OBS_S080    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on FIN_OBS_S080    to WR_REFREAD;
 

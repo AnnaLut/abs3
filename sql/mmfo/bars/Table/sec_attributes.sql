@@ -164,10 +164,8 @@ exception when others then
 
 PROMPT *** Create  grants  SEC_ATTRIBUTES ***
 grant SELECT                                                                 on SEC_ATTRIBUTES  to ABS_ADMIN;
-grant SELECT                                                                 on SEC_ATTRIBUTES  to BARSREADER_ROLE;
 grant SELECT                                                                 on SEC_ATTRIBUTES  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEC_ATTRIBUTES  to BARS_DM;
-grant SELECT                                                                 on SEC_ATTRIBUTES  to UPLD;
 
 
 

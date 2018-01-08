@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_CIM_CONTRACTS_TRADE.WITHOUT_ACTS IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIM_CONTRACTS_TRADE ***
-grant SELECT                                                                 on ERR$_CIM_CONTRACTS_TRADE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIM_CONTRACTS_TRADE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

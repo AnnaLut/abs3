@@ -13,9 +13,7 @@ PROMPT *** Create  view V_OW_OICREVFILES_FORM ***
   join oper o on t.ref = o.ref and t.revflag in(1, 2) and t.state = 0;
 
 PROMPT *** Create  grants  V_OW_OICREVFILES_FORM ***
-grant SELECT                                                                 on V_OW_OICREVFILES_FORM to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on V_OW_OICREVFILES_FORM to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_OW_OICREVFILES_FORM to UPLD;
 
 
 

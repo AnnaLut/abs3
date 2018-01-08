@@ -14,10 +14,8 @@ PROMPT *** Create  view V_CCTAG_CODES ***
 ;
 
 PROMPT *** Create  grants  V_CCTAG_CODES ***
-grant SELECT                                                                 on V_CCTAG_CODES   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CCTAG_CODES   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CCTAG_CODES   to RCC_DEAL;
-grant SELECT                                                                 on V_CCTAG_CODES   to UPLD;
 
 
 

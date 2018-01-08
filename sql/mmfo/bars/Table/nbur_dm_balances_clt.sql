@@ -204,10 +204,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMBALANCESCLT_CLTACCID_NN ***
+PROMPT *** Create  constraint CC_DMBALANCESCLT_ASTCUSTID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_BALANCES_CLT MODIFY (CLT_ACC_ID CONSTRAINT CC_DMBALANCESCLT_CLTACCID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_BALANCES_CLT MODIFY (AST_CUST_ID CONSTRAINT CC_DMBALANCESCLT_ASTCUSTID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -240,10 +240,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMBALANCESCLT_ASTCUSTID_NN ***
+PROMPT *** Create  constraint CC_DMBALANCESCLT_CLTACCID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_BALANCES_CLT MODIFY (AST_CUST_ID CONSTRAINT CC_DMBALANCESCLT_ASTCUSTID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_BALANCES_CLT MODIFY (CLT_ACC_ID CONSTRAINT CC_DMBALANCESCLT_CLTACCID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -344,9 +344,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_DM_BALANCES_CLT ***
-grant SELECT                                                                 on NBUR_DM_BALANCES_CLT to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_DM_BALANCES_CLT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on NBUR_DM_BALANCES_CLT to UPLD;
 
 
 

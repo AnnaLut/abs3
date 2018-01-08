@@ -177,11 +177,9 @@ COMMENT ON COLUMN BARS.TEMP_KAS_OB.K33 IS '';
 
 
 PROMPT *** Create  grants  TEMP_KAS_OB ***
-grant SELECT                                                                 on TEMP_KAS_OB     to BARSREADER_ROLE;
 grant SELECT                                                                 on TEMP_KAS_OB     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TEMP_KAS_OB     to BARS_DM;
 grant SELECT                                                                 on TEMP_KAS_OB     to START1;
-grant SELECT                                                                 on TEMP_KAS_OB     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TEMP_KAS_OB     to WR_ALL_RIGHTS;
 
 

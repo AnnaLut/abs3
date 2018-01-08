@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'FOREX: Netting мiж угодами';
   l_tablinesdef := '30';
-  l_tabselect_statement := '';
   l_tabname     := 'V_FOREX_NETTING';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,25 +119,25 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'RNK', 'N', '№~контраг.', '1.2', null, 0, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DAT_A', 'D', 'Дата вал-А', '1.2', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DAT_B', 'D', 'Дата вал-Б', '1.2', null, 21, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DEAL_TAG', 'N', 'Реф. угоди', '1.2', null, 30, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF', 'DocViewContentsEx(hWndForm, :REF) ', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KVA', 'N', 'Вал-А', '.7', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'KVB', 'N', 'Вал-Б', '.7', null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NETA', 'B', 'Netting вал-А', '1.2', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NLSA', 'C', 'Рахунок-А', '1', null, 41, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NLSB', 'C', 'Рахунок-Б', '1', null, 42, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SA', 'N', 'Сума А', '1.5', null, 13, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFA', 'DocViewContentsEx(hWndForm, :REFA) ', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SB', 'N', 'Сума Б', '1.5', null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFB', 'DocViewContentsEx(hWndForm, :REFB) ', 0);
-  bars_metabase.add_column(l_tabid, 15, 'NTIK', 'C', '№ тікету', '', null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=V_FOREX_DEAL_DOCUMENTS[NSIFUNCTION][CONDITIONS=> V_FOREX_DEAL_DOCUMENTS.deal_tag=:DEAL_TAG][DESCR=>Документи по угоді][ACCESSCODE=>1][showDialogWindow=>false] [OpenInWindow]', 'ShowAllDocs(hWndMDI,1,0," a.ref in (select ref from FX_DEAL_REF where deal_tag   =  :DEAL_TAG  ) ", " Бух.док по угоді " )', 0);
-  bars_metabase.add_column(l_tabid, 16, 'DAT', 'D', 'Дата угоди', '1.2', null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'NETB', 'B', 'Netting вал-Б', '1.2', null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'DETALI', 'C', 'Деталi', '', null, 28, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'REFA', 'N', 'Документ по вал А', '', null, 35, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'REFB', 'N', 'Документ по вал Б', '', null, 36, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'REF', 'N', 'REF', '', null, 34, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'NMK', 'A', 'Найменування контрагента', '3', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'RNK', 'N', '№~контраг.', 1.2, null, 0, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAT_A', 'D', 'Дата вал-А', 1.2, null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DAT_B', 'D', 'Дата вал-Б', 1.2, null, 21, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DEAL_TAG', 'N', 'Реф. угоди', 1.2, null, 30, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF', 'DocViewContentsEx(hWndForm, :REF) ', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KVA', 'N', 'Вал-А', .7, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'KVB', 'N', 'Вал-Б', .7, null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NETA', 'B', 'Netting вал-А', 1.2, null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NLSA', 'C', 'Рахунок-А', 1, null, 41, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NLSB', 'C', 'Рахунок-Б', 1, null, 42, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SA', 'N', 'Сума А', 1.5, null, 13, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFA', 'DocViewContentsEx(hWndForm, :REFA) ', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SB', 'N', 'Сума Б', 1.5, null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFB', 'DocViewContentsEx(hWndForm, :REFB) ', 0);
+  bars_metabase.add_column(l_tabid, 15, 'NTIK', 'C', '№ тікету', null, null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=V_FOREX_DEAL_DOCUMENTS[NSIFUNCTION][CONDITIONS=> V_FOREX_DEAL_DOCUMENTS.deal_tag=:DEAL_TAG][DESCR=>Документи по угоді][ACCESSCODE=>1][showDialogWindow=>false] [OpenInWindow]', 'ShowAllDocs(hWndMDI,1,0," a.ref in (select ref from FX_DEAL_REF where deal_tag   =  :DEAL_TAG  ) ", " Бух.док по угоді " )', 0);
+  bars_metabase.add_column(l_tabid, 16, 'DAT', 'D', 'Дата угоди', 1.2, null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'NETB', 'B', 'Netting вал-Б', 1.2, null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'DETALI', 'C', 'Деталi', null, null, 28, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'REFA', 'N', 'Документ по вал А', null, null, 35, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'REFB', 'N', 'Документ по вал Б', null, null, 36, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'REF', 'N', 'REF', null, null, 34, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'NMK', 'A', 'Найменування контрагента', 3, null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

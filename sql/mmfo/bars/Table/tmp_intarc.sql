@@ -93,10 +93,88 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPINTARC_ID_NN ***
+PROMPT *** Create  constraint FK_TMPINTARC_TABVAL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_INTARC MODIFY (ID CONSTRAINT CC_TMPINTARC_ID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_INTARC ADD CONSTRAINT FK_TMPINTARC_TABVAL FOREIGN KEY (LCV)
+	  REFERENCES BARS.TABVAL$GLOBAL (LCV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTARC_TABVAL2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTARC ADD CONSTRAINT FK_TMPINTARC_TABVAL2 FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTARC_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTARC ADD CONSTRAINT FK_TMPINTARC_STAFF FOREIGN KEY (USERID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTARC_INTIDN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTARC ADD CONSTRAINT FK_TMPINTARC_INTIDN FOREIGN KEY (ID)
+	  REFERENCES BARS.INT_IDN (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTARC_PS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTARC ADD CONSTRAINT FK_TMPINTARC_PS FOREIGN KEY (NBS)
+	  REFERENCES BARS.PS (NBS) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTARC_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTARC ADD CONSTRAINT FK_TMPINTARC_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTARC_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTARC MODIFY (KF CONSTRAINT CC_TMPINTARC_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -117,10 +195,23 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPINTARC_KF_NN ***
+PROMPT *** Create  constraint FK_TMPINTARC_ACCOUNTS2 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_INTARC MODIFY (KF CONSTRAINT CC_TMPINTARC_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_INTARC ADD CONSTRAINT FK_TMPINTARC_ACCOUNTS2 FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTARC_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTARC MODIFY (ID CONSTRAINT CC_TMPINTARC_ID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -144,13 +235,11 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_INTARC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INTARC      to BARS010;
-grant SELECT                                                                 on TMP_INTARC      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INTARC      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_INTARC      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INTARC      to DPT_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INTARC      to RCC_DEAL;
 grant SELECT                                                                 on TMP_INTARC      to RPBN001;
-grant SELECT                                                                 on TMP_INTARC      to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INTARC      to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_INTARC      to WR_ALL_RIGHTS;
 

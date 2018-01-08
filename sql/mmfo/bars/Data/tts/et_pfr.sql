@@ -52,12 +52,12 @@ begin
   delete from chklist_tts where tt='PFR';
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (11, 'PFR', 1, null, null, 3);
+    values (11, 'PFR', 1, null, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 11, ''PFR'', 1, null, null, 3) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 11, ''PFR'', 1, null, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

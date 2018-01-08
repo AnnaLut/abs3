@@ -93,6 +93,18 @@ COMMENT ON COLUMN BARS.CUSTOMER_ADDRESS_UPDATE.ROOM IS '';
 
 
 
+PROMPT *** Create  constraint CC_CUSTOMERADDRESSUPDATE_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (KF CONSTRAINT CC_CUSTOMERADDRESSUPDATE_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_CUSTADDRUPD ***
 begin   
  execute immediate '
@@ -107,10 +119,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMERADDRESSUPDATE_KF_NN ***
+PROMPT *** Create  constraint FK_CUSTOMERADDRESSUPDATE_KF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (KF CONSTRAINT CC_CUSTOMERADDRESSUPDATE_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE ADD CONSTRAINT FK_CUSTOMERADDRESSUPDATE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -143,10 +156,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTADDRUPD_EFFECTDATE_NN ***
+PROMPT *** Create  constraint CC_CUSTADDRUPD_COUNTRY_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (EFFECTDATE CONSTRAINT CC_CUSTADDRUPD_EFFECTDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (COUNTRY CONSTRAINT CC_CUSTADDRUPD_COUNTRY_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -203,10 +216,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTADDRUPD_COUNTRY_NN ***
+PROMPT *** Create  constraint CC_CUSTADDRUPD_EFFECTDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (COUNTRY CONSTRAINT CC_CUSTADDRUPD_COUNTRY_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CUSTOMER_ADDRESS_UPDATE MODIFY (EFFECTDATE CONSTRAINT CC_CUSTADDRUPD_EFFECTDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -257,7 +270,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUSTOMER_ADDRESS_UPDATE ***
-grant SELECT                                                                 on CUSTOMER_ADDRESS_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTOMER_ADDRESS_UPDATE to BARSUPL;
 grant SELECT                                                                 on CUSTOMER_ADDRESS_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_ADDRESS_UPDATE to BARS_DM;

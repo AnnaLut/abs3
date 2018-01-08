@@ -87,12 +87,24 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_OWSALARYFILES ***
+PROMPT *** Create  constraint FK_OWSALARYFILES_KF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OW_SALARY_FILES ADD CONSTRAINT PK_OWSALARYFILES PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD  ENABLE';
+  ALTER TABLE BARS.OW_SALARY_FILES ADD CONSTRAINT FK_OWSALARYFILES_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OWSALARYFILES_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_SALARY_FILES ADD CONSTRAINT FK_OWSALARYFILES_STAFF FOREIGN KEY (ISP)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -105,6 +117,20 @@ PROMPT *** Create  constraint CC_OWSALARYFILES_KF_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.OW_SALARY_FILES MODIFY (KF CONSTRAINT CC_OWSALARYFILES_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_OWSALARYFILES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_SALARY_FILES ADD CONSTRAINT PK_OWSALARYFILES PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -127,11 +153,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_SALARY_FILES ***
-grant SELECT                                                                 on OW_SALARY_FILES to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on OW_SALARY_FILES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_SALARY_FILES to BARS_DM;
 grant INSERT,SELECT                                                          on OW_SALARY_FILES to OW;
-grant SELECT                                                                 on OW_SALARY_FILES to UPLD;
 
 
 

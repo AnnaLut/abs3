@@ -104,11 +104,9 @@ exception when others then
 
 PROMPT *** Create  grants  CC_RAZ_KOMIS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_RAZ_KOMIS    to ABS_ADMIN;
-grant SELECT                                                                 on CC_RAZ_KOMIS    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_RAZ_KOMIS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_RAZ_KOMIS    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_RAZ_KOMIS    to RCC_DEAL;
-grant SELECT                                                                 on CC_RAZ_KOMIS    to UPLD;
 grant FLASHBACK,SELECT                                                       on CC_RAZ_KOMIS    to WR_REFREAD;
 
 

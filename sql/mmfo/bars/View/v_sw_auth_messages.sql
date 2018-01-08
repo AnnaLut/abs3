@@ -19,9 +19,7 @@ with read only
 
 PROMPT *** Create  grants  V_SW_AUTH_MESSAGES ***
 grant SELECT                                                                 on V_SW_AUTH_MESSAGES to BARS013;
-grant SELECT                                                                 on V_SW_AUTH_MESSAGES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW_AUTH_MESSAGES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_SW_AUTH_MESSAGES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SW_AUTH_MESSAGES to WR_ALL_RIGHTS;
 
 

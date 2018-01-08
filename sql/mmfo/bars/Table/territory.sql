@@ -84,7 +84,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  TERRITORY ***
-grant SELECT                                                                 on TERRITORY       to BARSREADER_ROLE;
 grant SELECT                                                                 on TERRITORY       to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TERRITORY       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TERRITORY       to BARS_DM;

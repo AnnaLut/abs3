@@ -294,9 +294,7 @@ PROMPT *** Create  view V_MBM_LOAN_ACCOUNTS ***
         ;
 
 PROMPT *** Create  grants  V_MBM_LOAN_ACCOUNTS ***
-grant SELECT                                                                 on V_MBM_LOAN_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBM_LOAN_ACCOUNTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_MBM_LOAN_ACCOUNTS to UPLD;
 
 
 

@@ -55,11 +55,9 @@ COMMENT ON COLUMN BARS.BIC.K_INBANK IS '';
 
 
 PROMPT *** Create  grants  BIC ***
-grant SELECT                                                                 on BIC             to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BIC             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BIC             to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BIC             to START1;
-grant SELECT                                                                 on BIC             to UPLD;
 
 
 

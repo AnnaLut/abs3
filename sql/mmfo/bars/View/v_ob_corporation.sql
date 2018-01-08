@@ -21,10 +21,8 @@ PROMPT *** Create  view V_OB_CORPORATION ***
     CONNECT BY PRIOR C.ID = C.PARENT_ID;
 
 PROMPT *** Create  grants  V_OB_CORPORATION ***
-grant SELECT                                                                 on V_OB_CORPORATION to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OB_CORPORATION to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OB_CORPORATION to START1;
-grant SELECT                                                                 on V_OB_CORPORATION to UPLD;
 
 
 

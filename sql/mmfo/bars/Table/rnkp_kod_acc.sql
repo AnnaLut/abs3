@@ -65,6 +65,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint XFK_RNKPKODACC_KODK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.RNKP_KOD_ACC ADD CONSTRAINT XFK_RNKPKODACC_KODK FOREIGN KEY (KODK)
+	  REFERENCES BARS.KOD_CLI (KOD_CLI) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint XFK_RNKPKODACC_RNK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.RNKP_KOD_ACC ADD CONSTRAINT XFK_RNKPKODACC_RNK FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XPK_RNKPKODACC ***
 begin   
  execute immediate '
@@ -79,11 +105,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  RNKP_KOD_ACC ***
-grant SELECT                                                                 on RNKP_KOD_ACC    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNKP_KOD_ACC    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RNKP_KOD_ACC    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNKP_KOD_ACC    to START1;
-grant SELECT                                                                 on RNKP_KOD_ACC    to UPLD;
 
 
 

@@ -27,10 +27,8 @@ PROMPT *** Create  view V_RKO_LST ***
     WHERE v.acc = a.acc;
 
 PROMPT *** Create  grants  V_RKO_LST ***
-grant SELECT                                                                 on V_RKO_LST       to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_RKO_LST       to BARS_ACCESS_DEFROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_RKO_LST       to RKO;
-grant SELECT                                                                 on V_RKO_LST       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_RKO_LST       to WR_ALL_RIGHTS;
 
 

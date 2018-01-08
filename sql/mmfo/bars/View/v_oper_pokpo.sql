@@ -13,10 +13,8 @@ PROMPT *** Create  view V_OPER_POKPO ***
    where tag='POKPO';
 
 PROMPT *** Create  grants  V_OPER_POKPO ***
-grant SELECT                                                                 on V_OPER_POKPO    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OPER_POKPO    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OPER_POKPO    to START1;
-grant SELECT                                                                 on V_OPER_POKPO    to UPLD;
 
 
 

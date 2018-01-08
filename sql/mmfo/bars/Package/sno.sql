@@ -724,120 +724,334 @@ CREATE OR REPLACE PACKAGE BODY BARS.SNO IS
     end;
   end ATO2;
 
- procedure DEL1 (p_otm1 int, -- = 1 Выровнять ГПП с остатком на счете 
+  ----########################################
+  procedure DEL1(p_otm1 int, -- = 1 Выровнять ГПП с остатком на счете
                  p_otm2 int, -- = 1 Отменить весь остаточный ГПП
                  p_bal  int, -- = -1 - зменшити с конца ГПП = подтянуть вверх
-                             -- =  1 - зменшити с начала ГПП= опустить вниз
+                 -- =  1 - зменшити с начала ГПП= опустить вниз
                  p_acc number) is
-   sno accounts%rowtype ; 
-   l_nd number; l_ref1 number; l_ref2 number; l_S number; l_acc number; l_koeff number; l_del number; 
+    sno     accounts%rowtype;
+    l_nd    number;
+    l_ref1  number;
+    l_ref2  number;
+    l_S     number;
+    l_acc   number;
+    l_koeff number;
+    l_del   number;
 
-   procedure RAW_GPP(p_ND number, p_Bal number, p_Ref number, p_acc number) is
-     l_Dat31 date; l_fdat date;  xx opldok%rowtype;  LL SYS_REFCURSOR;   OO SYS_REFCURSOR;   
-   begin
+    procedure RAW_GPP(p_ND  number,
+                      p_Bal number,
+                      p_Ref number,
+                      p_acc number) is
+      l_Dat31 date;
+      l_fdat  date;
+      xx      opldok%rowtype;
+      LL      SYS_REFCURSOR;
+      OO      SYS_REFCURSOR;
+    begin
 
-     null;
-/*
-     OPEN LL FOR  select Dat_Next_U(trunc(fdat,'MM'), -1), FDAT       from cc_lim 
-                  where nd = p_ND and Dat_Next_U(trunc(fdat,'MM'), -1) > gl.bdate and nvl(NOT_SN,0) <> 1   order by fdat ;
+      OPEN LL FOR
+        select Dat_Next_U(trunc(fdat, 'MM'), -1), FDAT
+          from cc_lim
+         where nd = p_ND
+           and Dat_Next_U(trunc(fdat, 'MM'), -1) > gl.bdate
+           and nvl(NOT_SN, 0) <> 1
+         order by fdat;
 
-     OPEN OO FOR  select * from opldok where ref= p_ref and sos= 3 and dk= 1 and acc= p_acc order by fdat ;
+      OPEN OO FOR
+        select *
+          from opldok
+         where ref = p_ref
+           and sos = 3
+           and dk = 1
+           and acc = p_acc
+         order by fdat;
 
-     FETCH LL into l_Dat31, l_FDAT ;  If LL%NOTFOUND then goto END_1 ; end if ;
-     FETCH OO into XX ;               If OO%NOTFOUND then goto END_1 ; end if ;
-     ------------------------------------------------------------
-     LOOP
-          If    l_dat31 < xx.fdat then  FETCH LL into l_Dat31, l_FDAT ;  If LL%NOTFOUND then goto END_1 ; end if ;
-          elsIf l_dat31 = xx.fdat then  insert into sno_gpp (nd,acc,fdat,dat31, sump1) values (p_nd, p_acc, L_FDAT, l_dat31, xx.s);
-                                        FETCH LL into l_Dat31, l_FDAT ;  If LL%NOTFOUND then goto END_1 ; end if ;
-                                        FETCH OO into XX ;               If OO%NOTFOUND then goto END_1 ; end if ;
-          else                                                                               goto END_1 ;
+      FETCH LL
+        into l_Dat31, l_FDAT;
+      If LL%NOTFOUND then
+        goto END_1;
+      end if;
+      FETCH OO
+        into XX;
+      If OO%NOTFOUND then
+        goto END_1;
+      end if;
+      ------------------------------------------------------------
+      LOOP
+        If l_dat31 < xx.fdat then
+          FETCH LL
+            into l_Dat31, l_FDAT;
+          If LL%NOTFOUND then
+            goto END_1;
           end if;
-     end loop ;
-    ---------------------------------------
-    <<END_1>> null;     close LL ; close OO ;
-*/
-   end RAW_GPP;
+        elsIf l_dat31 = xx.fdat then
+          insert into sno_gpp
+            (nd, acc, fdat, dat31, sump1)
+          values
+            (p_nd, p_acc, L_FDAT, l_dat31, xx.s);
+          FETCH LL
+            into l_Dat31, l_FDAT;
+          If LL%NOTFOUND then
+            goto END_1;
+          end if;
+          FETCH OO
+            into XX;
+          If OO%NOTFOUND then
+            goto END_1;
+          end if;
+        else
+          goto END_1;
+        end if;
+      end loop;
+      ---------------------------------------
+      <<END_1>>
+      null;
+      close LL;
+      close OO;
 
- begin
+    end RAW_GPP;
 
-   begin select nd into l_nd from nd_acc   where acc = p_acc and rownum = 1 ;
-         PUL.Set_Mas_Ini('WACC', 'a.acc in (select acc from nd_acc where nd='||l_ND||')' , null ) ;
-   EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(-(20203),'Не знайдено угоду для рахунку SNO'); 
-   end;
+  begin
 
-   If p_otm1 = 1 and p_otm2 = 1 then  raise_application_error(-(20203),'Не можна одночасно CКОРОТИТИ та ВІДМІНИТИ залишок~ГПП'); end if;
-   If p_otm1 = 0 and p_otm2 = 0 then  raise_application_error(-(20203),'Потрiбно задати  CКОРОТИТИ або ВІДМІНИТИ залишок~ГПП');  end if;
+    begin
+      select nd
+        into l_nd
+        from nd_acc
+       where acc = p_acc
+         and rownum = 1;
+      PUL.Set_Mas_Ini('WACC',
+                      'a.acc in (select acc from nd_acc where nd=' || l_ND || ')',
+                      null);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        raise_application_error(- (20203),
+                                'Не знайдено угоду для рахунку SNO');
+    end;
 
-   begin select *  into sno  from accounts where acc = p_acc and ostc=ostb  ;
-   EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(-(20203),'Є незавiзованi документи по рах.SNO'); 
-   end;
+    If p_otm1 = 1 and p_otm2 = 1 then
+      raise_application_error(- (20203),
+                              'Не можна одночасно CКОРОТИТИ та ВІДМІНИТИ залишок~ГПП');
+    end if;
+    If p_otm1 = 0 and p_otm2 = 0 then
+      raise_application_error(- (20203),
+                              'Потрiбно задати  CКОРОТИТИ або ВІДМІНИТИ залишок~ГПП');
+    end if;
 
-   begin select ref  into l_ref1  from sno_ref x 
-         where acc = p_acc and  exists ( select 1 from opldok where ref = x.ref and sos= 3 and tt = 'GPP' ) ;
-   EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(-(20203),'Не знайдено реф.ГПП '); 
-   end;
+    begin
+      select *
+        into sno
+        from accounts
+       where acc = p_acc
+         and ostc = ostb;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        raise_application_error(- (20203),
+                                'Є незавiзованi документи по рах.SNO');
+    end;
 
-   l_ref2 := GET_REF_BAK(0);
-   ----------------------------------------
-   delete from  sno_GPP    where nd = l_nd and acc = p_acc ;
+    begin
+      select ref
+        into l_ref1
+        from sno_ref x
+       where acc = p_acc
+         and exists (select 1
+                from opldok
+               where ref = x.ref
+                 and sos = 3
+                 and tt = 'GPP');
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        raise_application_error(- (20203),
+                                'Не знайдено реф.ГПП ');
+    end;
 
-   If  p_otm2 = 1    then  ---------- Вiдмiнити залишок~ГПП
-       update opldok set ref = l_ref2 where ref = l_ref1 and sos in (1,3) and tt = 'GPP';
-       update oper   set sos = 3      where ref = l_ref2;   ful_bak( l_ref2 );  
-       delete from   sno_ref          where nd  = l_nd and acc = p_acc;
-       INSERT INTO cc_sob (ND,FDAT,ISP,TXT,otm) VALUES    (l_ND, gl.bDATE, gl.aUid, 'Вiдмiнити залишок~ГПП', 6 ); 
-       RETURN;
-   end if ;  
+    l_ref2 := GET_REF_BAK(0);
+    ----------------------------------------
+    delete from sno_GPP
+     where nd = l_nd
+       and acc = p_acc;
 
-   -- Вирівняти   залишок~ГПП
-   If p_bal not in ( 1,-1) then raise_application_error(-(20203),'Невірний спосіб балансування ='||p_bal );   end if;
-   l_S :=  (sno.ostf + sno.ostc);     
+    If p_otm2 = 1 then
+      ---------- Вiдмiнити залишок~ГПП
+      update opldok
+         set ref = l_ref2
+       where ref = l_ref1
+         and sos in (1, 3)
+         and tt = 'GPP';
+      update oper set sos = 3 where ref = l_ref2;
+      ful_bak(l_ref2);
+      delete from sno_ref
+       where nd = l_nd
+         and acc = p_acc;
 
-   If    l_S = 0 then     null ;
-   ElsIf l_s > 0 then             -- На SNO меньше, чем в ГПК. сокращение сверху/снизу  
-      INSERT INTO cc_sob (ND,FDAT,ISP,TXT,otm) VALUES    (l_ND, gl.bDATE, gl.aUid, 'Скорочено залишок ГПП на '|| l_S||', баланс= '|| p_bal, 6 ); 
+      ------ begin select nd into l_nd from sno_ref where nd = l_nd and acc <> p_acc and rownum=1 ; -- перестроить sno_gpp - пока нет
+      ------ EXCEPTION WHEN NO_DATA_FOUND THEN null;
+      ------ end;
 
-      for k in ( select * from opldok where ref=l_ref1  and acc=sno.acc and dk=1 and sos=3 and tt='GPP'  order by p_bal * to_number (to_char(fdat,'yyyymmdd'))   )
-      loop
-         if l_s > 0 then 
-            if l_s >= k.S then l_s := l_s - k.S  ; 
-            else               l_s := k.s - l_s  ;
-              select acc into l_acc from opldok where dk = 1-k.dk and ref = k.ref and stmt = k.stmt;
-              gl.pay2 ( NULL, l_ref1, k.fdat, k.tt, sno.kv, 1, to_char(sno.acc), l_s, l_s, 1, 'Скоротити~ГПП' );
-              gl.pay2 ( NULL, l_ref1, k.fdat, k.tt, sno.kv, 0, to_char(l_acc  ), l_s, l_s, 0, 'Скоротити~ГПП' );
-              l_s :=  0;
-            end if;
-            update opldok set  ref  = l_ref2  where ref = l_ref1 and stmt = k.stmt; 
-            if l_s = 0 then EXIT;  end if;
-            ------------------------------
-         end if; 
+      INSERT INTO cc_sob
+        (ND, FDAT, ISP, TXT, otm)
+      VALUES
+        (l_ND,
+         gl.bDATE,
+         gl.aUid,
+         'Вiдмiнити залишок~ГПП',
+         6);
+      RETURN;
+    end if;
+
+    -- Вирівняти   залишок~ГПП
+    If p_bal not in (1, -1) then
+      raise_application_error(- (20203),
+                              'Невірний спосіб балансування =' || p_bal);
+    end if;
+    l_S := (sno.ostf + sno.ostc);
+
+    If l_S = 0 then
+      ----  RAW_GPP(l_ND, (-1)*p_Bal , l_Ref1, p_acc ) ;    -- движок вверх/вниз
+      RETURN;
+    end if;
+
+    If l_s > 0 then
+      -- На SNO меньше, чем в ГПК. сокращение сверху/снизу
+      INSERT INTO cc_sob
+        (ND, FDAT, ISP, TXT, otm)
+      VALUES
+        (l_ND,
+         gl.bDATE,
+         gl.aUid,
+         'Скорочено залишок ГПП на ' || l_S || ', баланс= ' || p_bal,
+         6);
+
+      for k in (select *
+                  from opldok
+                 where ref = l_ref1
+                   and acc = sno.acc
+                   and dk = 1
+                   and sos = 3
+                   and tt = 'GPP'
+                 order by p_bal * to_number(to_char(fdat, 'yyyymmdd'))) loop
+        if l_s > 0 then
+          if l_s >= k.S then
+            l_s := l_s - k.S;
+          else
+            l_s := k.s - l_s;
+            select acc
+              into l_acc
+              from opldok
+             where dk = 1 - k.dk
+               and ref = k.ref
+               and stmt = k.stmt;
+            gl.pay2(NULL,
+                    l_ref1,
+                    k.fdat,
+                    k.tt,
+                    sno.kv,
+                    1,
+                    to_char(sno.acc),
+                    l_s,
+                    l_s,
+                    1,
+                    'Скоротити~ГПП');
+            gl.pay2(NULL,
+                    l_ref1,
+                    k.fdat,
+                    k.tt,
+                    sno.kv,
+                    0,
+                    to_char(l_acc),
+                    l_s,
+                    l_s,
+                    0,
+                    'Скоротити~ГПП');
+            l_s := 0;
+          end if;
+          update opldok
+             set ref = l_ref2
+           where ref = l_ref1
+             and stmt = k.stmt;
+          if l_s = 0 then
+            EXIT;
+          end if;
+          ------------------------------
+        end if;
       end loop;
 
-   ElsIf l_s < 0  then   -- На SNO больше, чем в ГПК. добавить в удельном весе каждоме платежу и сбалансировать
-      l_s     := - l_S;
-      l_koeff :=   l_S/ sno.ostF;
-      INSERT INTO cc_sob (ND,FDAT,ISP,TXT,otm) VALUES    (l_ND, gl.bDATE, gl.aUid, 'Збільшено залишок ГПП на '|| l_S||' зі збільш.пл в питомій вазі '|| l_koeff , 6 ); 
-      select l_S - sum( round(s*l_koeff,0)) into l_del from opldok where ref = l_ref1  and acc=sno.acc and dk=1 and sos=3 and tt='GPP'  ;
+    ElsIf l_s < 0 then
+      -- На SNO больше, чем в ГПК. добавить в удельном весе каждоме платежу и сбалансировать
+      l_s     := -l_S;
+      l_koeff := l_S / sno.ostF;
+      INSERT INTO cc_sob
+        (ND, FDAT, ISP, TXT, otm)
+      VALUES
+        (l_ND,
+         gl.bDATE,
+         gl.aUid,
+         'Збільшено залишок ГПП на ' || l_S ||
+         ' зі збільш.пл в питомій вазі ' || l_koeff,
+         6);
 
-      for k in ( select * from opldok where ref=l_ref1  and acc=sno.acc and dk=1 and sos=3 and tt='GPP'  order by p_bal * to_number (to_char(fdat,'yyyymmdd'))   )
-      loop k.S   := k.S + round(k.s*l_koeff,0) + l_Del; 
-           l_Del := 0;
-           If k.s > 0 then 
-              select acc into l_acc from opldok where dk = 1-k.dk and ref = k.ref and stmt = k.stmt;
-              gl.pay2 (NULL, l_ref1 , k.fdat, k.tt, sno.kv, 1, to_char(sno.acc), k.s, k.s, 1, 'Збільшити ГПП' );
-              gl.pay2 (NULL, l_ref1 , k.fdat, k.tt, sno.kv, 0, to_char(l_acc  ), k.s, k.s, 0, 'Збільшити ГПП' );
-           end if;
-           update opldok set  ref  = l_ref2  where ref = l_ref1 and stmt = k.stmt;    
-        end loop;
-   end if;
-   update oper set sos =  3 where ref = l_ref2;                                                                                                        
-   ful_bak( l_ref2 );   
+      select l_S - sum(round(s * l_koeff, 0))
+        into l_del
+        from opldok
+       where ref = l_ref1
+         and acc = sno.acc
+         and dk = 1
+         and sos = 3
+         and tt = 'GPP';
 
--- RAW_GPP(l_ND, p_Bal, l_Ref1, p_acc ) ;    
-   insert into sno_gpp ( ND,FDAT,SUMP1,ACC,DAT31)
-      select l_ND, o.fdat, o.s, o.acc , o.fdat  from  opldok o where o.ref = l_Ref1 and dk = 1 and sos = 3  ;
- end DEL1 ; 
+      for k in (select *
+                  from opldok
+                 where ref = l_ref1
+                   and acc = sno.acc
+                   and dk = 1
+                   and sos = 3
+                   and tt = 'GPP'
+                 order by p_bal * to_number(to_char(fdat, 'yyyymmdd'))) loop
+        k.S   := k.S + round(k.s * l_koeff, 0) + l_Del;
+        l_Del := 0;
+        If k.s > 0 then
+          select acc
+            into l_acc
+            from opldok
+           where dk = 1 - k.dk
+             and ref = k.ref
+             and stmt = k.stmt;
+          gl.pay2(NULL,
+                  l_ref1,
+                  k.fdat,
+                  k.tt,
+                  sno.kv,
+                  1,
+                  to_char(sno.acc),
+                  k.s,
+                  k.s,
+                  1,
+                  'Збільшити ГПП');
+          gl.pay2(NULL,
+                  l_ref1,
+                  k.fdat,
+                  k.tt,
+                  sno.kv,
+                  0,
+                  to_char(l_acc),
+                  k.s,
+                  k.s,
+                  0,
+                  'Збільшити ГПП');
+        end if;
+        update opldok
+           set ref = l_ref2
+         where ref = l_ref1
+           and stmt = k.stmt;
+      end loop;
+    end if;
+    update oper set sos = 3 where ref = l_ref2;
+    ful_bak(l_ref2);
+
+    RAW_GPP(l_ND, p_Bal, l_Ref1, p_acc);
+
+  end DEL1;
 
   -----------------------------------------------------
   procedure P1_SNO(p_nd      number,
@@ -1386,7 +1600,7 @@ end if;
       else
         l_id := p_id;
       end if;
- /*  raise_application_error (-20005,'TEST');*/
+
       insert into T2_sno
         (dat, s, id, otm, ND, KV, NLS, sa)
       values
@@ -1394,7 +1608,7 @@ end if;
 
     ElsIf p_mode = 2 then
       update T2_sno
-         set dat = p_dat,FDAT=p_dat, s = p_s * 100, sa = p_sa * 100
+         set dat = p_dat, s = p_s * 100, sa = p_sa * 100
        where id = p_id
          and acc = l_acc;
 

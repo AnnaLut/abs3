@@ -42,11 +42,9 @@ from sparam_list b, sparam_codes c
 where b.code  = c.code;
 
 PROMPT *** Create  grants  V_PS_SPARAM ***
-grant SELECT                                                                 on V_PS_SPARAM     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PS_SPARAM     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PS_SPARAM     to CUST001;
 grant SELECT                                                                 on V_PS_SPARAM     to START1;
-grant SELECT                                                                 on V_PS_SPARAM     to UPLD;
 
 
 

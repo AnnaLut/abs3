@@ -44,9 +44,7 @@ COMMENT ON COLUMN BARS.TMP_NMK_OUTPUT4.OUTPUT_LINE IS '';
 
 
 PROMPT *** Create  grants  TMP_NMK_OUTPUT4 ***
-grant SELECT                                                                 on TMP_NMK_OUTPUT4 to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_NMK_OUTPUT4 to BARS_DM;
-grant SELECT                                                                 on TMP_NMK_OUTPUT4 to UPLD;
 
 
 

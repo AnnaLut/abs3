@@ -85,10 +85,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPDUALOPLDOK_ACTION_NN ***
+PROMPT *** Create  constraint CC_TMPDUALOPLDOK_STMT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.TMP_DUAL_OPLDOK MODIFY (ACTION CONSTRAINT CC_TMPDUALOPLDOK_ACTION_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.TMP_DUAL_OPLDOK MODIFY (STMT CONSTRAINT CC_TMPDUALOPLDOK_STMT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -109,10 +109,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPDUALOPLDOK_STMT_NN ***
+PROMPT *** Create  constraint CC_TMPDUALOPLDOK_ACTION_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.TMP_DUAL_OPLDOK MODIFY (STMT CONSTRAINT CC_TMPDUALOPLDOK_STMT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.TMP_DUAL_OPLDOK MODIFY (ACTION CONSTRAINT CC_TMPDUALOPLDOK_ACTION_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -134,7 +134,6 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_DUAL_OPLDOK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DUAL_OPLDOK to BARS;
-grant SELECT                                                                 on TMP_DUAL_OPLDOK to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_DUAL_OPLDOK to REFSYNC_USR;
 
 

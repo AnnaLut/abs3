@@ -37,9 +37,7 @@ join   accounts pea on pea.acc = i.acrb
 where  t.reckoning_id = sys_context('bars_pul', 'reckoning_id');
 
 PROMPT *** Create  grants  V_MBDK_INT_RECKONING ***
-grant SELECT                                                                 on V_MBDK_INT_RECKONING to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBDK_INT_RECKONING to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_MBDK_INT_RECKONING to UPLD;
 
 
 

@@ -89,10 +89,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  RNBU_REPORT_SUBHEADER ***
-grant SELECT                                                                 on RNBU_REPORT_SUBHEADER to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_REPORT_SUBHEADER to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_REPORT_SUBHEADER to START1;
-grant SELECT                                                                 on RNBU_REPORT_SUBHEADER to UPLD;
 
 
 

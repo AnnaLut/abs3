@@ -103,6 +103,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_LINESR_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.LINES_R ADD CONSTRAINT FK_LINESR_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_LINESR_ZAGF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.LINES_R ADD CONSTRAINT FK_LINESR_ZAGF FOREIGN KEY (KF, FN, DAT)
+	  REFERENCES BARS.ZAG_F (KF, FN, DAT) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_LINESR_KF_NN ***
 begin   
  execute immediate '
@@ -129,11 +155,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  LINES_R ***
-grant SELECT                                                                 on LINES_R         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LINES_R         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LINES_R         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LINES_R         to RPBN002;
-grant SELECT                                                                 on LINES_R         to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LINES_R         to WR_ALL_RIGHTS;
 
 

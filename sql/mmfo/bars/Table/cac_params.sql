@@ -91,11 +91,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CAC_PARAMS ***
-grant SELECT                                                                 on CAC_PARAMS      to BARSREADER_ROLE;
 grant SELECT                                                                 on CAC_PARAMS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CAC_PARAMS      to BARS_DM;
 grant SELECT                                                                 on CAC_PARAMS      to START1;
-grant SELECT                                                                 on CAC_PARAMS      to UPLD;
 
 
 

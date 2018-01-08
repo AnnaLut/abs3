@@ -44,9 +44,7 @@ COMMENT ON COLUMN BARS.ARC_RRP_BAD.REC IS '';
 
 
 PROMPT *** Create  grants  ARC_RRP_BAD ***
-grant SELECT                                                                 on ARC_RRP_BAD     to BARSREADER_ROLE;
 grant SELECT                                                                 on ARC_RRP_BAD     to BARS_DM;
-grant SELECT                                                                 on ARC_RRP_BAD     to UPLD;
 
 
 

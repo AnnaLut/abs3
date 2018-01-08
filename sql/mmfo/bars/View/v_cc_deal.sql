@@ -25,9 +25,7 @@ PROMPT *** Create  view V_CC_DEAL ***
      FROM cc_deal c;
 
 PROMPT *** Create  grants  V_CC_DEAL ***
-grant SELECT                                                                 on V_CC_DEAL       to BARSREADER_ROLE;
 grant DELETE,SELECT,UPDATE                                                   on V_CC_DEAL       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CC_DEAL       to UPLD;
 
 
 

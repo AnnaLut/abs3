@@ -89,12 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_VR ***
-grant SELECT                                                                 on CP_VR           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_VR           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_VR           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_VR           to CP_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_VR           to START1;
-grant SELECT                                                                 on CP_VR           to UPLD;
 grant FLASHBACK,SELECT                                                       on CP_VR           to WR_REFREAD;
 
 

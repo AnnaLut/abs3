@@ -32,9 +32,7 @@ from ( select ID, XXX,
      ) x;
 
 PROMPT *** Create  grants  M_ROLE_TYPV ***
-grant SELECT                                                                 on M_ROLE_TYPV     to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_TYPV     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on M_ROLE_TYPV     to UPLD;
 
 
 

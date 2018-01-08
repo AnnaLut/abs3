@@ -96,10 +96,23 @@ COMMENT ON COLUMN BARS.INS_DEALS.RENEW_NEWID IS 'Ідентифікатор нового договору с
 
 
 
-PROMPT *** Create  constraint SYS_C0033306 ***
+PROMPT *** Create  constraint FK_INSDEALS_PARTNERTYPES ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INS_DEALS MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.INS_DEALS ADD CONSTRAINT FK_INSDEALS_PARTNERTYPES FOREIGN KEY (PARTNER_ID, TYPE_ID, KF)
+	  REFERENCES BARS.INS_PARTNER_TYPES (PARTNER_ID, TYPE_ID, KF) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INSDEALS_RENEWNEED ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_DEALS ADD CONSTRAINT CC_INSDEALS_RENEWNEED CHECK (renew_need in (0, 1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -302,6 +315,136 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_INSDEALS_BRANCH_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_DEALS ADD CONSTRAINT FK_INSDEALS_BRANCH_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INSDEALS_STFID_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_DEALS ADD CONSTRAINT FK_INSDEALS_STFID_STAFF FOREIGN KEY (STAFF_ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INSDEALS_STSID_STATUSES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_DEALS ADD CONSTRAINT FK_INSDEALS_STSID_STATUSES FOREIGN KEY (STATUS_ID)
+	  REFERENCES BARS.INS_DEAL_STATUSES (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INSDEALS_SKV_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_DEALS ADD CONSTRAINT FK_INSDEALS_SKV_TABVAL FOREIGN KEY (SUM_KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INSDEALS_OT_OBJTYPES_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_DEALS ADD CONSTRAINT FK_INSDEALS_OT_OBJTYPES_ID FOREIGN KEY (OBJECT_TYPE)
+	  REFERENCES BARS.INS_OBJECT_TYPES (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INSDEALS_RNK_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_DEALS ADD CONSTRAINT FK_INSDEALS_RNK_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INSDEALS_GRTID_GRTDEALS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_DEALS ADD CONSTRAINT FK_INSDEALS_GRTID_GRTDEALS FOREIGN KEY (GRT_ID)
+	  REFERENCES BARS.GRT_DEALS (DEAL_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INSDEALS_ND_CCDEAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_DEALS ADD CONSTRAINT FK_INSDEALS_ND_CCDEAL FOREIGN KEY (ND)
+	  REFERENCES BARS.CC_DEAL (ND) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INSDEALS_PF_FREQ ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_DEALS ADD CONSTRAINT FK_INSDEALS_PF_FREQ FOREIGN KEY (PAY_FREQ)
+	  REFERENCES BARS.FREQ (FREQ) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INSDEALS_NEWID_INSDEALS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_DEALS ADD CONSTRAINT FK_INSDEALS_NEWID_INSDEALS FOREIGN KEY (RENEW_NEWID, KF)
+	  REFERENCES BARS.INS_DEALS (ID, KF) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_INSDEALS_TARIFF_OR_SUM ***
 begin   
  execute immediate '
@@ -314,10 +457,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_INSDEALS_RENEWNEED ***
+PROMPT *** Create  constraint SYS_C0033306 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INS_DEALS ADD CONSTRAINT CC_INSDEALS_RENEWNEED CHECK (renew_need in (0, 1)) ENABLE';
+  ALTER TABLE BARS.INS_DEALS MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -340,9 +483,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  INS_DEALS ***
-grant SELECT                                                                 on INS_DEALS       to BARSREADER_ROLE;
 grant SELECT                                                                 on INS_DEALS       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on INS_DEALS       to UPLD;
 
 
 

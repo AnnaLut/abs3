@@ -73,9 +73,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TICKETS_ADVERTISING_BRANCH ***
-grant SELECT                                                                 on TICKETS_ADVERTISING_BRANCH to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on TICKETS_ADVERTISING_BRANCH to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on TICKETS_ADVERTISING_BRANCH to UPLD;
 
 
 

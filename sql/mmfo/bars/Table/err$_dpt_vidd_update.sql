@@ -135,10 +135,6 @@ COMMENT ON COLUMN BARS.ERR$_DPT_VIDD_UPDATE.BSA IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPT_VIDD_UPDATE ***
-grant SELECT                                                                 on ERR$_DPT_VIDD_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPT_VIDD_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

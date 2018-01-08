@@ -78,9 +78,7 @@ PROMPT *** Create  view V_DPU_TOTALS ***
 ;
 
 PROMPT *** Create  grants  V_DPU_TOTALS ***
-grant SELECT                                                                 on V_DPU_TOTALS    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPU_TOTALS    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DPU_TOTALS    to UPLD;
 
 
 

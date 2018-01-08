@@ -89,6 +89,19 @@ COMMENT ON COLUMN BARS.OBPC_TRAN.IDN IS '¹';
 
 
 
+PROMPT *** Create  constraint FK_OBPC_TRAN_FILES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TRAN ADD CONSTRAINT FK_OBPC_TRAN_FILES FOREIGN KEY (ID)
+	  REFERENCES BARS.OBPC_FILES (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_OBPCTRAN ***
 begin   
  execute immediate '
@@ -159,13 +172,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_TRAN ***
-grant SELECT                                                                 on OBPC_TRAN       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_TRAN       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_TRAN       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_TRAN       to OBPC;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_TRAN       to OBPC_TRAN;
 grant SELECT                                                                 on OBPC_TRAN       to RPBN001;
-grant SELECT                                                                 on OBPC_TRAN       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_TRAN       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on OBPC_TRAN       to WR_REFREAD;
 

@@ -40,10 +40,8 @@ PROMPT *** Create  view V_DPT_MOVE2DMND ***
  ;
 
 PROMPT *** Create  grants  V_DPT_MOVE2DMND ***
-grant SELECT                                                                 on V_DPT_MOVE2DMND to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_MOVE2DMND to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_MOVE2DMND to START1;
-grant SELECT                                                                 on V_DPT_MOVE2DMND to UPLD;
 
 
 

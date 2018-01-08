@@ -50,10 +50,8 @@ select    a.accc,
       and a.bdat = s.bdat(+);
 
 PROMPT *** Create  grants  SALOST ***
-grant SELECT                                                                 on SALOST          to BARSREADER_ROLE;
 grant SELECT                                                                 on SALOST          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALOST          to START1;
-grant SELECT                                                                 on SALOST          to UPLD;
 
 
 

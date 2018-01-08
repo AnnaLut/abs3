@@ -12,7 +12,7 @@ AFTER UPDATE
 OF SIGN_DATE
 ON BARS.EAD_DOCS
 for each row
- WHEN (
+  WHEN (
 new.SIGN_DATE is not null
       ) DECLARE
 tmp_count number;
@@ -52,7 +52,7 @@ INSERT  into ead_sync_queue   (id,
                        type_id,
                        obj_id,
                        status_id)
-               VALUES (s_eadsyncqueue.nextval,
+               VALUES (bars_sqnc.get_nextval('s_eadsyncqueue'),
                        SYSDATE,
                        'DOC',
                        :NEW.id,
@@ -65,6 +65,7 @@ INSERT  into ead_sync_queue   (id,
        -- Consider logging the error and then re-raise
        RAISE;*/
 END;
+
 /
 ALTER TRIGGER BARS.EAD_DOCS_SIGN DISABLE;
 

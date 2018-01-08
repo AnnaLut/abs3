@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('BN3', 'd на суму ПДВ ', 1, '#(NBS_OB22(''2909'',''23''))', 980, '#(NBS_OB22(''3622'',''51''))', 980, null, null, null, null, 0, 0, 0, 0, 'BNY ( 3 )', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('BN3', 'd на суму ПДВ ', 1, '#(NBS_OB22(''2909'',''23''))', 980, '36229005', 980, null, null, null, null, 0, 0, 0, 0, 'BNY ( 3 )', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='BN3', name='d на суму ПДВ ', dk=1, nlsm='#(NBS_OB22(''2909'',''23''))', kv=980, nlsk='#(NBS_OB22(''3622'',''51''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='BNY ( 3 )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='BN3', name='d на суму ПДВ ', dk=1, nlsm='#(NBS_OB22(''2909'',''23''))', kv=980, nlsk='36229005', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='BNY ( 3 )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='BN3';
   end;
   --------------------------------
@@ -155,7 +155,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции BN4
-prompt Наименование операции: BN4 d Дохід від реалізації ювiлейних монет
+prompt Наименование операции: d Дохід від реалізації ювiлейних монет
 declare
   cnt_  number;
 begin
@@ -164,11 +164,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('BN4', 'BN4 d Дохід від реалізації ювiлейних монет', 1, '#(NBS_OB22(''2909'',''23''))', 980, '#(NBS_OB22(''6399'',''14''))', 980, null, null, null, null, 0, 0, 0, 0, 'BNY (4 )', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('BN4', 'd Дохід від реалізації ювiлейних монет', 1, '#(NBS_OB22(''2909'',''23''))', 980, '#(NBS_OB22(''6399'',''14''))', 980, null, null, null, null, 0, 0, 0, 0, 'BNY (4 )', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='BN4', name='BN4 d Дохід від реалізації ювiлейних монет', dk=1, nlsm='#(NBS_OB22(''2909'',''23''))', kv=980, nlsk='#(NBS_OB22(''6399'',''14''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='BNY (4 )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='BN4', name='d Дохід від реалізації ювiлейних монет', dk=1, nlsm='#(NBS_OB22(''2909'',''23''))', kv=980, nlsk='#(NBS_OB22(''6399'',''14''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='BNY (4 )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='BN4';
   end;
   --------------------------------
@@ -198,7 +198,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции BNF
-prompt Наименование операции: BNF d Реалізація футляра ЮМ
+prompt Наименование операции: d Реалізація футляра ЮМ
 declare
   cnt_  number;
 begin
@@ -207,11 +207,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('BNF', 'BNF d Реалізація футляра ЮМ', 1, '#(NBS_OB22(''2909'',''23''))', 980, '#(NBS_OB22(''3400'',''19''))', 980, null, null, null, null, 0, 0, 0, 0, 'BNY (5 )', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('BNF', 'd Реалізація футляра ЮМ', 1, '#(NBS_OB22(''2909'',''23''))', 980, '#(NBS_OB22(''3400'',''19''))', 980, null, null, null, null, 0, 0, 0, 0, 'BNY (5 )', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='BNF', name='BNF d Реалізація футляра ЮМ', dk=1, nlsm='#(NBS_OB22(''2909'',''23''))', kv=980, nlsk='#(NBS_OB22(''3400'',''19''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='BNY (5 )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='BNF', name='d Реалізація футляра ЮМ', dk=1, nlsm='#(NBS_OB22(''2909'',''23''))', kv=980, nlsk='#(NBS_OB22(''3400'',''19''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='BNY (5 )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='BNF';
   end;
   --------------------------------
@@ -241,7 +241,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции BNU
-prompt Наименование операции: BNU d на суму вартості ювілейних монет
+prompt Наименование операции: d на суму вартості ювілейних монет 
 declare
   cnt_  number;
 begin
@@ -250,11 +250,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('BNU', 'BNU d на суму вартості ювілейних монет', 1, '#(NBS_OB22(''2909'',''23''))', 980, '#(NBS_OB22(''3400'',''08''))', 980, null, null, null, null, 0, 0, 0, 0, 'BNY (2 )', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('BNU', 'd на суму вартості ювілейних монет ', 1, '#(NBS_OB22(''2909'',''23''))', 980, '#(NBS_OB22(''3400'',''08''))', 980, null, null, null, null, 0, 0, 0, 0, 'BNY (2 )', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='BNU', name='BNU d на суму вартості ювілейних монет', dk=1, nlsm='#(NBS_OB22(''2909'',''23''))', kv=980, nlsk='#(NBS_OB22(''3400'',''08''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='BNY (2 )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='BNU', name='d на суму вартості ювілейних монет ', dk=1, nlsm='#(NBS_OB22(''2909'',''23''))', kv=980, nlsk='#(NBS_OB22(''3400'',''08''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='BNY (2 )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='BNU';
   end;
   --------------------------------
@@ -284,7 +284,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции BNY
-prompt Наименование операции: BNY Реалізація ЮМ (не платіжні) за відпускною ціною ОБ
+prompt Наименование операции: Реалізація ЮМ (не платіжні) за відпускною ціною ОБ
 declare
   cnt_  number;
 begin
@@ -293,11 +293,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('BNY', 'BNY Реалізація ЮМ (не платіжні) за відпускною ціною ОБ', 1, null, 980, null, 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', '#(NBS_OB22(''2909'',''23''))', null, 1, 0, 0, 0, '#(BM__K) * ( #(BM__R) + #(BM_FR) ) ', '#(BM__K)*#(BM__R)', 32, null, null, null, '0000100001000001000000000000000000010000000000000000000000000000', 'Реалізація #(BM__N) , #(BM__K) шт. , #(BM_FN) ');
+    values ('BNY', 'Реалізація ЮМ (не платіжні) за відпускною ціною ОБ', 1, null, 980, null, 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', '#(NBS_OB22(''2909'',''23''))', null, 1, 0, 0, 0, '#(BM__K) * ( #(BM__R) + #(BM_FR) ) ', '#(BM__K)*#(BM__R)', 32, null, null, null, '0000100001000001000000000000000000010000000000000000000000000000', 'Реалізація #(BM__N) , #(BM__K) шт. , #(BM_FN) ');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='BNY', name='BNY Реалізація ЮМ (не платіжні) за відпускною ціною ОБ', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', nlsb='#(NBS_OB22(''2909'',''23''))', mfob=null, flc=1, fli=0, flv=0, flr=0, s='#(BM__K) * ( #(BM__R) + #(BM_FR) ) ', s2='#(BM__K)*#(BM__R)', sk=32, proc=null, s3800=null, rang=null, flags='0000100001000001000000000000000000010000000000000000000000000000', nazn='Реалізація #(BM__N) , #(BM__K) шт. , #(BM_FN) '
+         set tt='BNY', name='Реалізація ЮМ (не платіжні) за відпускною ціною ОБ', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', nlsb='#(NBS_OB22(''2909'',''23''))', mfob=null, flc=1, fli=0, flv=0, flr=0, s='#(BM__K) * ( #(BM__R) + #(BM_FR) ) ', s2='#(BM__K)*#(BM__R)', sk=32, proc=null, s3800=null, rang=null, flags='0000100001000001000000000000000000010000000000000000000000000000', nazn='Реалізація #(BM__N) , #(BM__K) шт. , #(BM_FN) '
        where tt='BNY';
   end;
   --------------------------------

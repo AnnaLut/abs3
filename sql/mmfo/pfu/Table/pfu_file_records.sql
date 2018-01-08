@@ -90,10 +90,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PFUFILERECORDS_FILEID_NN ***
+PROMPT *** Create  constraint CC_PFUFILERECORD_RECID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_FILE_RECORDS ADD CONSTRAINT CC_PFUFILERECORDS_FILEID_NN CHECK (FILE_ID IS NOT NULL) ENABLE';
+  ALTER TABLE PFU.PFU_FILE_RECORDS ADD CONSTRAINT CC_PFUFILERECORD_RECID_NN CHECK (REC_ID IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -114,10 +114,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PFUFILERECORD_RECID_NN ***
+PROMPT *** Create  constraint CC_PFUFILERECORDS_FILEID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_FILE_RECORDS ADD CONSTRAINT CC_PFUFILERECORD_RECID_NN CHECK (REC_ID IS NOT NULL) ENABLE';
+  ALTER TABLE PFU.PFU_FILE_RECORDS ADD CONSTRAINT CC_PFUFILERECORDS_FILEID_NN CHECK (FILE_ID IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -183,9 +183,7 @@ exception when others then
 
 PROMPT *** Create  grants  PFU_FILE_RECORDS ***
 grant SELECT,UPDATE                                                          on PFU_FILE_RECORDS to BARS;
-grant SELECT                                                                 on PFU_FILE_RECORDS to BARSREADER_ROLE;
 grant SELECT                                                                 on PFU_FILE_RECORDS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on PFU_FILE_RECORDS to UPLD;
 
 
 

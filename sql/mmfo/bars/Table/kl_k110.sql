@@ -71,7 +71,6 @@ COMMENT ON COLUMN BARS.KL_K110.K113_OLD IS '';
 
 
 PROMPT *** Create  grants  KL_K110 ***
-grant SELECT                                                                 on KL_K110         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_K110         to BARSUPL;
 grant SELECT                                                                 on KL_K110         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_K110         to BARS_DM;

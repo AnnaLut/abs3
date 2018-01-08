@@ -65,10 +65,10 @@ COMMENT ON COLUMN BARS.ND_TXT_UPDATE.GLOBAL_BDATE IS 'Глобальная банковская дата
 
 
 
-PROMPT *** Create  constraint CC_ND_TXTUPDATE_CHGACTION ***
+PROMPT *** Create  constraint CC_NDTXTUPDATE_CHGACTION ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ND_TXT_UPDATE ADD CONSTRAINT CC_ND_TXTUPDATE_CHGACTION CHECK (chgaction in (1,2,3)) ENABLE';
+  ALTER TABLE BARS.ND_TXT_UPDATE ADD CONSTRAINT CC_NDTXTUPDATE_CHGACTION CHECK (chgaction in (1,2,3)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -77,10 +77,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_NDTXTUPDATE_CHGACTION ***
+PROMPT *** Create  constraint CC_ND_TXTUPDATE_CHGACTION ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ND_TXT_UPDATE ADD CONSTRAINT CC_NDTXTUPDATE_CHGACTION CHECK (chgaction in (1,2,3)) ENABLE';
+  ALTER TABLE BARS.ND_TXT_UPDATE ADD CONSTRAINT CC_ND_TXTUPDATE_CHGACTION CHECK (chgaction in (1,2,3)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -127,10 +127,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint C_ND_TXTUPDATE_CHGDATE_NN ***
+PROMPT *** Create  constraint CC_NDTXTUPD_GLOBALBD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ND_TXT_UPDATE MODIFY (CHGDATE CONSTRAINT C_ND_TXTUPDATE_CHGDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ND_TXT_UPDATE MODIFY (GLOBAL_BDATE CONSTRAINT CC_NDTXTUPD_GLOBALBD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -199,10 +199,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_NDTXTUPD_GLOBALBD_NN ***
+PROMPT *** Create  constraint C_ND_TXTUPDATE_CHGDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ND_TXT_UPDATE MODIFY (GLOBAL_BDATE CONSTRAINT CC_NDTXTUPD_GLOBALBD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ND_TXT_UPDATE MODIFY (CHGDATE CONSTRAINT C_ND_TXTUPDATE_CHGDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -267,7 +267,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  ND_TXT_UPDATE ***
-grant SELECT                                                                 on ND_TXT_UPDATE   to BARSREADER_ROLE;
 grant SELECT                                                                 on ND_TXT_UPDATE   to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ND_TXT_UPDATE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ND_TXT_UPDATE   to BARS_DM;

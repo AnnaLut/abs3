@@ -15,10 +15,8 @@ union all
 select substr(gl.kf||'_'||mfop||'_'||mfo,1,20) as sort_code, banks.mfo, banks.sab, banks.nb, banks.blk from banks where mfop in (select mfo from banks where kodn=6 and mfop=gl.kf);
 
 PROMPT *** Create  grants  V_BANKS_MOD3 ***
-grant SELECT                                                                 on V_BANKS_MOD3    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BANKS_MOD3    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BANKS_MOD3    to START1;
-grant SELECT                                                                 on V_BANKS_MOD3    to UPLD;
 
 
 

@@ -17,26 +17,26 @@ PROMPT *** Create  procedure P_F2D_NN ***
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-11.03.2016 протокол формирования будет сохраняться в таблицу
+11.03.2016 протокол формирования будет сохраняться в таблицу 
            OTCN_TRACE_70
 03.11.2015 значение показателя 64 будем определять также как и в файле #E2.
 30.09.2014 для банка Надра будут включаться проводки Дт 2650 Кт 1919
            Дт 2909 Кт 1919
-           для 315784 (Хмельницького РУ) будут включаться проводки
+           для 315784 (Хмельницького РУ) будут включаться проводки 
            Дт 2600,2620,2650 Кт 2909
 25.09.2014 с 25.09.2014 новый файл отчетности аналог файла #E2
 24.06.2014 вместо доп.реквизита 57A будем обрабатывать доп.реквизит 58A
            - SWIFT_CODE (после изменеия перечня доп.реквизитов)
 03.06.2014 для доп.реквизита tag like '59%' выбираем первых 3 символа
            из поля VALUE
-09.04.2014 включались суммы док-тов >=1001$ а необходимо 1000.01$ и больше
-03.04.2014 будут отбираться суммы документов строго больше 1000$
-27.02.2014 для ОПЕРУ СБ не будем включать проводки вида
+09.04.2014 включались суммы док-тов >=1001$ а необходимо 1000.01$ и больше 
+03.04.2014 будут отбираться суммы документов строго больше 1000$ 
+27.02.2014 для ОПЕРУ СБ не будем включать проводки вида 
            Дт '37396506' Кт '1500%' и назначение "розрахунки за чеками"
 19.02.2014 для физлиц резидентов не имеющих ОКРО определяем серию и номер
            паспорта
 13.02.2014 будут включаться док-ты с суммой не менее 1000.00$
-08.01.2014 для ОПЕРУ СБ будем включать проводки вида
+08.01.2014 для ОПЕРУ СБ будем включать проводки вида 
            Дт '37396506' Кт '1500%' и назначение "розрахунки за чеками"
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
    kodf_      VARCHAR2 (2)   := '2D';
@@ -134,15 +134,15 @@ PROMPT *** Create  procedure P_F2D_NN ***
    --курсор по контрагентам
    CURSOR c_main
    IS
-      SELECT   t.ko, decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),
+      SELECT   t.ko, decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)), 
                c.rnk, trim(c.okpo), c.nmk, TO_CHAR (c.country), c.adr,
                NVL (c.ved, '00000'), c.codcagent, NVL(SUM (t.s_eqv),0),
-               NVL(SUM (gl.p_icurval (t.kv, t.s_kom, dat_)),0)
-          FROM OTCN_PROV_TEMP t, customer c, tobo b
+               NVL(SUM (gl.p_icurval (t.kv, t.s_kom, dat_)),0)  
+          FROM OTCN_PROV_TEMP t, customer c, tobo b  
          WHERE t.rnk = c.rnk
-           and c.tobo = b.tobo
+           and c.tobo = b.tobo   
       GROUP BY t.ko,
-               decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),
+               decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)), 
                c.rnk,
                c.okpo,
                c.nmk,
@@ -247,7 +247,7 @@ PROMPT *** Create  procedure P_F2D_NN ***
                d1#E2_ := '37';    -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
             if nlsk_ like '1500%' and
-                nls_ in ('37394501547') --and  --,'37396506')
+                nls_ in ('37394501547') --and  --,'37396506') 
             then
                d1#E2_ := '31';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
@@ -258,11 +258,11 @@ PROMPT *** Create  procedure P_F2D_NN ***
             if instr(lower(nazn_),'грош') > 0 then
                d1#E2_ := '38';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
-
+            
             if mfo_ <> 300120 and instr(lower(nazn_),'комерц') > 0 then
                d1#E2_ := '38';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
-
+            
             if instr(lower(nazn_),'соц_альний переказ') > 0 then
                d1#E2_ := '38';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
@@ -274,7 +274,7 @@ PROMPT *** Create  procedure P_F2D_NN ***
 
          if mfo_ = 353575 then
             p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 2), '00');
-         else
+         else 
             if TRIM (p_value_) is null and d1#E2_ is not null then
                p_value_ := NVL (SUBSTR (TRIM (d1#E2_), 1, 2), '00');
             else
@@ -305,7 +305,7 @@ PROMPT *** Create  procedure P_F2D_NN ***
          IF p_value_ is null THEN
             p_value_ := f_get_swift_country(REF_);
          end if;
-
+         
          country_ := NVL (LPAD (SUBSTR (TRIM (p_value_), 1, 3), 3, '0'), '000');
          p_value_ :=
             NVL (SUBSTR (TRIM (p_value_), 1, 70),
@@ -388,9 +388,9 @@ BEGIN
    END;
 
    sum_kom := gl.p_icurval(840, 100000, dat_);  -- сума комiсiї
-
+    
    kol_ref_ := 0;
-
+   
    IF mfou_=300465 and mfo_ != mfou_ and Dat_ > to_date('28072009','ddmmyyyy')
    THEN
       select count(*)
@@ -404,7 +404,7 @@ BEGIN
         and d_rec like '%D' || to_char(Dat_, 'yymmdd') || '%';
    END IF;
 
-   if ( (mfou_ = 300465 and mfou_ = mfo_) OR mfou_ <> 300465 ) and kol_ref_ = 0
+   if ( (mfou_ = 300465 and mfou_ = mfo_) OR mfou_ <> 300465 ) and kol_ref_ = 0 
    then
         -- отбор проводок, удовлетворяющих условию
         -- надходження вiд нерезидентiв
@@ -465,7 +465,7 @@ BEGIN
                    OR (o.nlsd LIKE '191992%'     and
                        (o.nlsk LIKE '1500%' or o.nlsk like '1600%') and
                        mfo_ in (300465) )
-                   OR (o.nlsd in ('37394501547') and
+                   OR (o.nlsd in ('37394501547') and  
                        o.nlsk LIKE '1500%' and
                        mfo_ in (300465) )
                    OR (o.nlsd LIKE '15_8%'     and
@@ -476,15 +476,15 @@ BEGIN
                        mfo_ in (300465) )
                    OR ((o.nlsd LIKE '292430003718%' or o.nlsd LIKE '292460003717%') and  -- 22/07/2013
                         o.nlsk LIKE '1500%'  and
-                       mfo_ in (300465) )
+                       mfo_ in (300465) )    
                    OR ( o.nlsd like '3800%'   -- 29/07/2012
                         AND SUBSTR (o.nlsk, 1, 4) in ('1500','1600')
                         AND mfo_ in (300465)
-                        AND ref in (select ref
-                                    from oper
-                                    where (((nlsa like '70%' or nlsa like '71%' or nlsa like '75%') and
+                        AND ref in (select ref 
+                                    from oper 
+                                    where (((nlsa like '70%' or nlsa like '71%' or nlsa like '75%') and 
                                            (nlsb like '1500%' or nlsb like '1600%')) or
-                                           ((nlsa like '1500%' or nlsa like '1600%') and
+                                           ((nlsa like '1500%' or nlsa like '1600%') and 
                                             (nlsb like '70%' or nlsb like '71%' or nlsb like '75%')))
                                    )
                         AND gl.p_icurval(o.kv, o.s*100, dat_) > sum_kom ))
@@ -541,7 +541,7 @@ BEGIN
                      o.nlsk, o.nazn,
                      o.s * 100 s_nom,
                      gl.p_icurval (o.kv, o.s * 100, dat_) s_eqv
-            FROM provodki_otc o,
+            FROM provodki_otc o, 
                ( select o.ref
                   from arc_rrp a, oper o
                   where trunc(a.dat_a) >= Dat_
@@ -551,7 +551,7 @@ BEGIN
                     and trim(a.d_rec) is not null
                     and a.d_rec like '%D' || to_char(Dat_, 'yymmdd') || '%'
                     and substr(a.d_rec, 6+instr(a.d_rec, '#CREF:'),
-                        instr(substr(a.d_rec, 6+instr(a.d_rec, '#CREF:')), '#')-1) = o.ref_a) v
+                        instr(substr(a.d_rec, 6+instr(a.d_rec, '#CREF:')), '#')-1) = o.ref_a) v 
             WHERE o.kv != 980
               and o.fdat between Dat_ - 10 and dat_
               and o.ref = v.ref);
@@ -586,18 +586,18 @@ BEGIN
          END;
       end if;
 
-      -- для физлиц резидентов не имеющих OKPO
+      -- для физлиц резидентов не имеющих OKPO 
       --определяем серию и номер паспорта из PERSON
       if codc_ = 5 and trim(okpo_) in ('99999','999999999','00000','000000000','0000000000')
       then
          BEGIN
-            select ser, numdoc
+            select ser, numdoc 
                into ser_, numdoc_
             from person
             where rnk = rnk_
               and rownum=1;
-         okpo_ := trim(ser_) || ' ' || trim(numdoc_);
-         EXCEPTION WHEN NO_DATA_FOUND THEN
+         okpo_ := trim(ser_) || ' ' || trim(numdoc_);               
+         EXCEPTION WHEN NO_DATA_FOUND THEN 
             null;
          END;
       end if;
@@ -712,7 +712,7 @@ BEGIN
                         SELECT '804'
                            INTO kod_g_
                         FROM OPERW
-                        WHERE REF = ref_
+                        WHERE REF = ref_ 
                           AND tag like '59%'
                           AND substr(trim(value),1,3)='/UA';
                      EXCEPTION WHEN NO_DATA_FOUND THEN
@@ -720,7 +720,7 @@ BEGIN
                             SELECT '804'
                                INTO kod_g_
                             FROM OPERW
-                            WHERE REF = ref_
+                            WHERE REF = ref_ 
                               AND tag like '59%'
                               AND instr(UPPER(trim(value)),'UKRAINE') > 0;
                          EXCEPTION WHEN NO_DATA_FOUND THEN
@@ -903,7 +903,7 @@ BEGIN
                          d1#E2_ := null;
                      END;
 
-                     if d1#E2_ in ('01','02','03','04','05','06','07','08') and formOk_
+                     if d1#E2_ in ('01','02','03','04','05','06','07','08') and formOk_ 
                      then
                         nnnn_ := nnnn_ + 1;
                         -- код валюти

@@ -13,10 +13,8 @@ from (select rnk, count (*) kol from cp_kod where rnk is NOT  null group by rnk 
 where k.rnk = c.rnk;
 
 PROMPT *** Create  grants  V_CP_EMI ***
-grant SELECT                                                                 on V_CP_EMI        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_EMI        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_EMI        to START1;
-grant SELECT                                                                 on V_CP_EMI        to UPLD;
 
 
 

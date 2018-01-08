@@ -1,13 +1,7 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/RPT_CUSTOMER_SEGMENT.sql =========
-PROMPT ===================================================================================== 
-
-
 PROMPT *** Create  procedure RPT_CUSTOMER_SEGMENT ***
 
-  CREATE OR REPLACE PROCEDURE BARS.RPT_CUSTOMER_SEGMENT (
+create or replace procedure rpt_customer_segment(
     p_branch in varchar2,
     p_activity_segment_id in varchar2,
     p_financial_segment_id in varchar2,
@@ -123,7 +117,7 @@ begin
                            a10.number_value transactor_subsegment
                    from    customer c
                    join    (select object_id, attribute_id, max(t.number_value) keep (dense_rank last order by t.value_date) number_value
-                            from ATTRIBUTE_VALUE_BY_DATE t group by object_id, attribute_id)
+                            from ATTRIBUTE_VALUE_BY_DATE t group by object_id, attribute_id) 
                                                     a1 on a1.object_id = c.rnk and
                                                         a1.attribute_id = l_activity_segment_attr_id and
                                                         (l_activity_segment_id is null or a1.number_value = l_activity_segment_id)

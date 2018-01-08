@@ -51,6 +51,19 @@ COMMENT ON COLUMN BARS.NAEK_COUNTERS.CNT IS '';
 
 
 
+PROMPT *** Create  constraint FK_NAEKCOUNTERS_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_COUNTERS ADD CONSTRAINT FK_NAEKCOUNTERS_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_NAEKCOUNTERS_RNK_NN ***
 begin   
  execute immediate '
@@ -115,10 +128,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  NAEK_COUNTERS ***
-grant SELECT                                                                 on NAEK_COUNTERS   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAEK_COUNTERS   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAEK_COUNTERS   to START1;
-grant SELECT                                                                 on NAEK_COUNTERS   to UPLD;
 
 
 

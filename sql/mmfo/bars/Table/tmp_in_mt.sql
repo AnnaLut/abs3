@@ -101,11 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_IN_MT ***
-grant SELECT                                                                 on TMP_IN_MT       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_IN_MT       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_IN_MT       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_IN_MT       to START1;
-grant SELECT                                                                 on TMP_IN_MT       to UPLD;
 
 
 

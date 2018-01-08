@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_REF_QUE.OTM IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_REF_QUE ***
-grant SELECT                                                                 on ERR$_REF_QUE    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_REF_QUE    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

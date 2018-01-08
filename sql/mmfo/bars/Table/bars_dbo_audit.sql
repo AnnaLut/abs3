@@ -85,10 +85,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  BARS_DBO_AUDIT ***
-grant SELECT                                                                 on BARS_DBO_AUDIT  to BARSREADER_ROLE;
-grant SELECT                                                                 on BARS_DBO_AUDIT  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

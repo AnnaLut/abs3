@@ -95,11 +95,9 @@ COMMENT ON COLUMN BARS.ANI_DEL6.G25 IS '';
 
 
 PROMPT *** Create  grants  ANI_DEL6 ***
-grant SELECT                                                                 on ANI_DEL6        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANI_DEL6        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANI_DEL6        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANI_DEL6        to START1;
-grant SELECT                                                                 on ANI_DEL6        to UPLD;
 
 
 

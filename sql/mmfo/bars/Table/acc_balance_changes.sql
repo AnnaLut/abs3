@@ -69,6 +69,32 @@ COMMENT ON COLUMN BARS.ACC_BALANCE_CHANGES.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_ACCBALCH_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_BALANCE_CHANGES ADD CONSTRAINT FK_ACCBALCH_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCBALCH_ACCOUNTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_BALANCE_CHANGES ADD CONSTRAINT FK_ACCBALCH_ACCOUNTS FOREIGN KEY (ACC)
+	  REFERENCES BARS.ACCOUNTS (ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_ACCBALCH_ID_NN ***
 begin   
  execute immediate '
@@ -93,10 +119,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCBALCH_RNK_NN ***
+PROMPT *** Create  constraint PK_ACCBALCH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_BALANCE_CHANGES MODIFY (RNK CONSTRAINT CC_ACCBALCH_RNK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_BALANCE_CHANGES ADD CONSTRAINT PK_ACCBALCH PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -153,12 +181,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_ACCBALCH ***
+PROMPT *** Create  constraint CC_ACCBALCH_RNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_BALANCE_CHANGES ADD CONSTRAINT PK_ACCBALCH PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.ACC_BALANCE_CHANGES MODIFY (RNK CONSTRAINT CC_ACCBALCH_RNK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -181,7 +207,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACC_BALANCE_CHANGES ***
-grant SELECT                                                                 on ACC_BALANCE_CHANGES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_BALANCE_CHANGES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_BALANCE_CHANGES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_BALANCE_CHANGES to START1;

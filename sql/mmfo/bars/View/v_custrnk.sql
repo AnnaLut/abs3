@@ -14,9 +14,7 @@ PROMPT *** Create  view V_CUSTRNK ***
    ORDER BY CIN_CUST.RNK ASC;
 
 PROMPT *** Create  grants  V_CUSTRNK ***
-grant SELECT                                                                 on V_CUSTRNK       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTRNK       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CUSTRNK       to UPLD;
 
 
 

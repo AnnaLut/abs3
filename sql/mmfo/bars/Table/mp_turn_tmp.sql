@@ -52,10 +52,6 @@ COMMENT ON COLUMN BARS.MP_TURN_TMP.STMT IS '';
 
 
 
-PROMPT *** Create  grants  MP_TURN_TMP ***
-grant SELECT                                                                 on MP_TURN_TMP     to BARSREADER_ROLE;
-grant SELECT                                                                 on MP_TURN_TMP     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

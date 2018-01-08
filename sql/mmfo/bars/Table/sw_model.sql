@@ -105,6 +105,90 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_SWMODEL_EDITVAL_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MODEL MODIFY (EDITVAL CONSTRAINT CC_SWMODEL_EDITVAL_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWMODEL_SEQSTAT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MODEL MODIFY (SEQSTAT CONSTRAINT CC_SWMODEL_SEQSTAT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWMODEL_EMPTY_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MODEL MODIFY (EMPTY CONSTRAINT CC_SWMODEL_EMPTY_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWMODEL_STATUS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MODEL MODIFY (STATUS CONSTRAINT CC_SWMODEL_STATUS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWMODEL_TAG_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MODEL MODIFY (TAG CONSTRAINT CC_SWMODEL_TAG_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWMODEL_SEQ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MODEL MODIFY (SEQ CONSTRAINT CC_SWMODEL_SEQ_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWMODEL_NUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MODEL MODIFY (NUM CONSTRAINT CC_SWMODEL_NUM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SWMODEL_RPBLK ***
 begin   
  execute immediate '
@@ -189,94 +273,62 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SWMODEL_SWMT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MODEL ADD CONSTRAINT FK_SWMODEL_SWMT FOREIGN KEY (MT)
+	  REFERENCES BARS.SW_MT (MT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWMODEL_SWSEQ ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MODEL ADD CONSTRAINT FK_SWMODEL_SWSEQ FOREIGN KEY (SEQ)
+	  REFERENCES BARS.SW_SEQ (SEQ) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWMODEL_SWTAG ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MODEL ADD CONSTRAINT FK_SWMODEL_SWTAG FOREIGN KEY (TAG)
+	  REFERENCES BARS.SW_TAG (TAG) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWMODEL_SWOPT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MODEL ADD CONSTRAINT FK_SWMODEL_SWOPT FOREIGN KEY (OPT)
+	  REFERENCES BARS.SW_OPT (OPT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SWMODEL_MT_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.SW_MODEL MODIFY (MT CONSTRAINT CC_SWMODEL_MT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWMODEL_NUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_MODEL MODIFY (NUM CONSTRAINT CC_SWMODEL_NUM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWMODEL_SEQ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_MODEL MODIFY (SEQ CONSTRAINT CC_SWMODEL_SEQ_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWMODEL_TAG_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_MODEL MODIFY (TAG CONSTRAINT CC_SWMODEL_TAG_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWMODEL_STATUS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_MODEL MODIFY (STATUS CONSTRAINT CC_SWMODEL_STATUS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWMODEL_EMPTY_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_MODEL MODIFY (EMPTY CONSTRAINT CC_SWMODEL_EMPTY_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWMODEL_SEQSTAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_MODEL MODIFY (SEQSTAT CONSTRAINT CC_SWMODEL_SEQSTAT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWMODEL_EDITVAL_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_MODEL MODIFY (EDITVAL CONSTRAINT CC_SWMODEL_EDITVAL_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -300,11 +352,9 @@ exception when others then
 
 PROMPT *** Create  grants  SW_MODEL ***
 grant SELECT                                                                 on SW_MODEL        to BARS013;
-grant SELECT                                                                 on SW_MODEL        to BARSREADER_ROLE;
 grant SELECT                                                                 on SW_MODEL        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_MODEL        to BARS_DM;
 grant SELECT                                                                 on SW_MODEL        to START1;
-grant SELECT                                                                 on SW_MODEL        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_MODEL        to WR_ALL_RIGHTS;
 
 

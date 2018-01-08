@@ -135,6 +135,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SEP_RECEIV_REF_STO_RECEIVER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STO_SEP_ORDER ADD CONSTRAINT FK_SEP_RECEIV_REF_STO_RECEIVER FOREIGN KEY (ID)
+	  REFERENCES BARS.STO_ORDER (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_STO_SEP_ORDER ***
 begin   
  execute immediate '
@@ -149,11 +162,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  STO_SEP_ORDER ***
-grant SELECT                                                                 on STO_SEP_ORDER   to BARSREADER_ROLE;
 grant SELECT                                                                 on STO_SEP_ORDER   to BARSUPL;
 grant SELECT                                                                 on STO_SEP_ORDER   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on STO_SEP_ORDER   to SBON;
-grant SELECT                                                                 on STO_SEP_ORDER   to UPLD;
 
 
 

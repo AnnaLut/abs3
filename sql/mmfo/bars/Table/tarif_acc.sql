@@ -72,10 +72,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  TARIF_ACC ***
-grant SELECT                                                                 on TARIF_ACC       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TARIF_ACC       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,UPDATE                                                   on TARIF_ACC       to START1;
-grant SELECT                                                                 on TARIF_ACC       to UPLD;
 grant FLASHBACK,SELECT                                                       on TARIF_ACC       to WR_REFREAD;
 
 

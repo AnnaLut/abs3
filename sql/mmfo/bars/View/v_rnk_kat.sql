@@ -96,10 +96,8 @@ WHERE a.nbs IN ('1811', '1819', '2800', '2801', '2805', '2806', '2809', '3540', 
       AND SYS_CONTEXT ('bars_gl', 'okpo') <> c.OKPO;
 
 PROMPT *** Create  grants  V_RNK_KAT ***
-grant SELECT                                                                 on V_RNK_KAT       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RNK_KAT       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_RNK_KAT       to START1;
-grant SELECT                                                                 on V_RNK_KAT       to UPLD;
 
 
 

@@ -14,10 +14,8 @@ PROMPT *** Create  view V_CUST_BUN ***
 ORDER BY c1.rnk, c2.rnk;
 
 PROMPT *** Create  grants  V_CUST_BUN ***
-grant SELECT                                                                 on V_CUST_BUN      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUST_BUN      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUST_BUN      to START1;
-grant SELECT                                                                 on V_CUST_BUN      to UPLD;
 
 
 

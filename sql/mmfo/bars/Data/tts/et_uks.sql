@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции UKS
-prompt Наименование операции: UKS Облік ощадної книжки(отримання з комори)
+prompt Наименование операции: Облік ощадної книжки(отримання з комори)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('UKS', 'UKS Облік ощадної книжки(отримання з комори)', 1, null, 980, null, 980, null, null, '#(nbs_ob22 (''9893'',''31''))', null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', 'Отрим. з комори ощад.книж.');
+    values ('UKS', 'Облік ощадної книжки(отримання з комори)', 1, null, 980, null, 980, null, null, '#(nbs_ob22 (''9893'',''31''))', null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', 'Отрим. з комори ощад.книж.');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='UKS', name='UKS Облік ощадної книжки(отримання з комори)', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb='#(nbs_ob22 (''9893'',''31''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='Отрим. з комори ощад.книж.'
+         set tt='UKS', name='Облік ощадної книжки(отримання з комори)', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb='#(nbs_ob22 (''9893'',''31''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='Отрим. з комори ощад.книж.'
        where tt='UKS';
   end;
   --------------------------------

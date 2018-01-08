@@ -129,9 +129,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ATTRIBUTE_HISTORY_DELETION ***
-grant SELECT                                                                 on ATTRIBUTE_HISTORY_DELETION to BARSREADER_ROLE;
 grant SELECT                                                                 on ATTRIBUTE_HISTORY_DELETION to BARS_DM;
-grant SELECT                                                                 on ATTRIBUTE_HISTORY_DELETION to UPLD;
 
 
 

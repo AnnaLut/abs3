@@ -214,9 +214,7 @@ COMMENT ON COLUMN BARS.TMP_NBU23_REZ_03.ZAL_SVQ IS '';
 
 
 PROMPT *** Create  grants  TMP_NBU23_REZ_03 ***
-grant SELECT                                                                 on TMP_NBU23_REZ_03 to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_NBU23_REZ_03 to BARS_DM;
-grant SELECT                                                                 on TMP_NBU23_REZ_03 to UPLD;
 
 
 

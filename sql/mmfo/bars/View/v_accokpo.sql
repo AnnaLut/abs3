@@ -13,10 +13,8 @@ PROMPT *** Create  view V_ACCOKPO ***
  where  a.rnk=c.rnk;
 
 PROMPT *** Create  grants  V_ACCOKPO ***
-grant SELECT                                                                 on V_ACCOKPO       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACCOKPO       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ACCOKPO       to START1;
-grant SELECT                                                                 on V_ACCOKPO       to UPLD;
 
 
 

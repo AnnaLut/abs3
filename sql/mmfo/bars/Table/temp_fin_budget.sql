@@ -169,10 +169,8 @@ COMMENT ON COLUMN BARS.TEMP_FIN_BUDGET.SUMA13_14_15_16 IS '';
 
 
 PROMPT *** Create  grants  TEMP_FIN_BUDGET ***
-grant SELECT                                                                 on TEMP_FIN_BUDGET to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TEMP_FIN_BUDGET to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TEMP_FIN_BUDGET to START1;
-grant SELECT                                                                 on TEMP_FIN_BUDGET to UPLD;
 
 
 

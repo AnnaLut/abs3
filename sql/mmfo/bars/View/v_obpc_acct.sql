@@ -18,10 +18,8 @@ select 2, card_acct, currency, lacct
    and nvl(status,'0') <> '4';
 
 PROMPT *** Create  grants  V_OBPC_ACCT ***
-grant SELECT                                                                 on V_OBPC_ACCT     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OBPC_ACCT     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OBPC_ACCT     to OBPC;
-grant SELECT                                                                 on V_OBPC_ACCT     to UPLD;
 
 
 

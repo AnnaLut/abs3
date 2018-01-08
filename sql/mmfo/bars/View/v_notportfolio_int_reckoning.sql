@@ -49,9 +49,7 @@ PROMPT *** Create  view V_NOTPORTFOLIO_INT_RECKONING ***
 order by a.acc, i.id, t.date_from;
 
 PROMPT *** Create  grants  V_NOTPORTFOLIO_INT_RECKONING ***
-grant SELECT                                                                 on V_NOTPORTFOLIO_INT_RECKONING to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NOTPORTFOLIO_INT_RECKONING to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_NOTPORTFOLIO_INT_RECKONING to UPLD;
 
 
 

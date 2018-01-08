@@ -36,9 +36,7 @@ where a.tt=c.tt
 
 PROMPT *** Create  grants  V_USERADM_USER_TTS ***
 grant SELECT                                                                 on V_USERADM_USER_TTS to ABS_ADMIN;
-grant SELECT                                                                 on V_USERADM_USER_TTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USERADM_USER_TTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_USERADM_USER_TTS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USERADM_USER_TTS to WR_ALL_RIGHTS;
 
 

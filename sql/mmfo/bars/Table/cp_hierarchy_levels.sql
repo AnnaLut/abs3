@@ -54,11 +54,9 @@ COMMENT ON COLUMN BARS.CP_HIERARCHY_LEVELS.DESCRIPTION IS '';
 
 
 PROMPT *** Create  grants  CP_HIERARCHY_LEVELS ***
-grant SELECT                                                                 on CP_HIERARCHY_LEVELS to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CP_HIERARCHY_LEVELS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_HIERARCHY_LEVELS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_HIERARCHY_LEVELS to CP_ROLE;
-grant SELECT                                                                 on CP_HIERARCHY_LEVELS to UPLD;
 
 
 

@@ -105,11 +105,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SV_TICK ***
-grant SELECT                                                                 on SV_TICK         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_TICK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SV_TICK         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_TICK         to RPBN002;
-grant SELECT                                                                 on SV_TICK         to UPLD;
 
 
 

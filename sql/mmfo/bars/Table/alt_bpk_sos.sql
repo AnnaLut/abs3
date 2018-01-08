@@ -77,10 +77,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  ALT_BPK_SOS ***
-grant SELECT                                                                 on ALT_BPK_SOS     to BARSREADER_ROLE;
 grant SELECT                                                                 on ALT_BPK_SOS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ALT_BPK_SOS     to BARS_DM;
-grant SELECT                                                                 on ALT_BPK_SOS     to UPLD;
 
 
 

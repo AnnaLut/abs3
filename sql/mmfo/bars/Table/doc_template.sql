@@ -101,11 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DOC_TEMPLATE ***
-grant SELECT                                                                 on DOC_TEMPLATE    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DOC_TEMPLATE    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DOC_TEMPLATE    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DOC_TEMPLATE    to START1;
-grant SELECT                                                                 on DOC_TEMPLATE    to UPLD;
 
 
 

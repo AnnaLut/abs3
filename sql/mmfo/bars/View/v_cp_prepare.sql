@@ -11,10 +11,6 @@ PROMPT *** Create  view V_CP_PREPARE ***
   SELECT "RUNN","ACC","NMSA","NLSA","KVA","ID_A","NMSB","NLSB","KVB","ID_B","FDAT","TDAT","IR","OSTT","INT","OST","NAZN","TT"
      FROM TABLE (value_paper.make_int_prepare);
 
-PROMPT *** Create  grants  V_CP_PREPARE ***
-grant SELECT                                                                 on V_CP_PREPARE    to BARSREADER_ROLE;
-grant SELECT                                                                 on V_CP_PREPARE    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

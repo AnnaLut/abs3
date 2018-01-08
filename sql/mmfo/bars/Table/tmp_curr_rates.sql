@@ -138,9 +138,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_CURR_RATES ***
-grant SELECT                                                                 on TMP_CURR_RATES  to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_CURR_RATES  to BARS_DM;
-grant SELECT                                                                 on TMP_CURR_RATES  to UPLD;
 
 
 

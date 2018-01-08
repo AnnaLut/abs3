@@ -18,9 +18,7 @@ PROMPT *** Create  view V_WCS_AUTHORIZATIONS ***
  order by a.id;
 
 PROMPT *** Create  grants  V_WCS_AUTHORIZATIONS ***
-grant SELECT                                                                 on V_WCS_AUTHORIZATIONS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_AUTHORIZATIONS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_AUTHORIZATIONS to UPLD;
 
 
 

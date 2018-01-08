@@ -53,11 +53,9 @@ COMMENT ON COLUMN BARS.TMP_CCK_CKL.SUMP IS 'Сума виноса~на проср.';
 
 
 PROMPT *** Create  grants  TMP_CCK_CKL ***
-grant SELECT                                                                 on TMP_CCK_CKL     to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_CCK_CKL     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_CCK_CKL     to RCC_DEAL;
 grant SELECT                                                                 on TMP_CCK_CKL     to START1;
-grant SELECT                                                                 on TMP_CCK_CKL     to UPLD;
 
 
 

@@ -76,7 +76,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBKC_CUST_TYPES ***
-grant SELECT                                                                 on EBKC_CUST_TYPES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBKC_CUST_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBKC_CUST_TYPES to BARS_DM;
 

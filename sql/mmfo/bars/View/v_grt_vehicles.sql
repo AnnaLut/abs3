@@ -87,9 +87,7 @@ where d.deal_id = v.deal_id (+)
   and v.type = vt.type_id (+);
 
 PROMPT *** Create  grants  V_GRT_VEHICLES ***
-grant SELECT                                                                 on V_GRT_VEHICLES  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GRT_VEHICLES  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_GRT_VEHICLES  to UPLD;
 
 
 

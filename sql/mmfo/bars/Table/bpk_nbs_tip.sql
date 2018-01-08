@@ -77,9 +77,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_NBS_TIP ***
-grant SELECT                                                                 on BPK_NBS_TIP     to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_NBS_TIP     to BARS_DM;
-grant SELECT                                                                 on BPK_NBS_TIP     to UPLD;
 
 
 

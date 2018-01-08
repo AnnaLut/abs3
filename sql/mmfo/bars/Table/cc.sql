@@ -49,11 +49,9 @@ COMMENT ON COLUMN BARS.CC.K_CC IS '';
 
 
 PROMPT *** Create  grants  CC ***
-grant SELECT                                                                 on CC              to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC              to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC              to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC              to START1;
-grant SELECT                                                                 on CC              to UPLD;
 
 
 

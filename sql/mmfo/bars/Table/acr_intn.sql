@@ -71,10 +71,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010162 ***
+PROMPT *** Create  constraint SYS_C0010164 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACR_INTN MODIFY (ACC NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACR_INTN MODIFY (FDAT NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -95,10 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010164 ***
+PROMPT *** Create  constraint SYS_C0010162 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACR_INTN MODIFY (FDAT NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACR_INTN MODIFY (ACC NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -122,13 +122,11 @@ PROMPT *** Create  grants  ACR_INTN ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACR_INTN        to ABS_ADMIN;
 grant DELETE,SELECT                                                          on ACR_INTN        to BARS009;
 grant DELETE,SELECT                                                          on ACR_INTN        to BARS010;
-grant SELECT                                                                 on ACR_INTN        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACR_INTN        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACR_INTN        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACR_INTN        to DPT_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACR_INTN        to RCC_DEAL;
 grant SELECT                                                                 on ACR_INTN        to START1;
-grant SELECT                                                                 on ACR_INTN        to UPLD;
 grant DELETE,UPDATE                                                          on ACR_INTN        to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACR_INTN        to WR_ALL_RIGHTS;
 

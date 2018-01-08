@@ -71,6 +71,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_MVO_SABO_NAZN_VOB ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MVO_SABO_NAZN ADD CONSTRAINT FK_MVO_SABO_NAZN_VOB FOREIGN KEY (VOB)
+	  REFERENCES BARS.VOB (VOB) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_MVO_SABO_NAZN_TT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MVO_SABO_NAZN ADD CONSTRAINT FK_MVO_SABO_NAZN_TT FOREIGN KEY (TT)
+	  REFERENCES BARS.TTS (TT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XPK_MVO_SABO_NAZN ***
 begin   
  execute immediate '
@@ -85,11 +111,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  MVO_SABO_NAZN ***
-grant SELECT                                                                 on MVO_SABO_NAZN   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MVO_SABO_NAZN   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MVO_SABO_NAZN   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MVO_SABO_NAZN   to MVO;
-grant SELECT                                                                 on MVO_SABO_NAZN   to UPLD;
 grant FLASHBACK,SELECT                                                       on MVO_SABO_NAZN   to WR_REFREAD;
 
 

@@ -32,6 +32,45 @@ COMMENT ON COLUMN FINMON.BANK_UFILE.ID IS '';
 
 
 
+PROMPT *** Create  constraint FK_BANK_UFILE_BRANCH_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.BANK_UFILE ADD CONSTRAINT FK_BANK_UFILE_BRANCH_ID FOREIGN KEY (BRANCH_ID)
+	  REFERENCES FINMON.BANK (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_BANK_UFILE_STATUS ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.BANK_UFILE ADD CONSTRAINT FK_BANK_UFILE_STATUS FOREIGN KEY (STATUS)
+	  REFERENCES FINMON.STATUS_FILE (STATUS_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_BANK_UFILE_FILE_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.BANK_UFILE ADD CONSTRAINT FK_BANK_UFILE_FILE_ID FOREIGN KEY (FILE_ID, BRANCH_ID)
+	  REFERENCES FINMON.FILE_OUT (ID, BRANCH_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint XPK_BANK_UFILE_ID ***
 begin   
  execute immediate '
@@ -58,10 +97,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0032073 ***
+PROMPT *** Create  constraint SYS_C0032074 ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.BANK_UFILE MODIFY (STATUS NOT NULL ENABLE)';
+  ALTER TABLE FINMON.BANK_UFILE MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -70,10 +109,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0032074 ***
+PROMPT *** Create  constraint SYS_C0032073 ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.BANK_UFILE MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE FINMON.BANK_UFILE MODIFY (STATUS NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -94,9 +133,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  BANK_UFILE ***
-grant SELECT                                                                 on BANK_UFILE      to BARSREADER_ROLE;
 
 
 

@@ -119,10 +119,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAPROS_DUBLS ***
-grant SELECT                                                                 on ZAPROS_DUBLS    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAPROS_DUBLS    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAPROS_DUBLS    to START1;
-grant SELECT                                                                 on ZAPROS_DUBLS    to UPLD;
 
 
 

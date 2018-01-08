@@ -150,9 +150,7 @@ COMMENT ON COLUMN BARS.ERR$_CP_KOD_UPDATE.HIERARCHY_ID IS '';
 
 
 PROMPT *** Create  grants  ERR$_CP_KOD_UPDATE ***
-grant SELECT                                                                 on ERR$_CP_KOD_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CP_KOD_UPDATE to BARS_DM;
-grant SELECT                                                                 on ERR$_CP_KOD_UPDATE to UPLD;
 
 
 

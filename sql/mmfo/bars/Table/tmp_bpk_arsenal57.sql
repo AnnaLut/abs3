@@ -64,11 +64,9 @@ COMMENT ON COLUMN BARS.TMP_BPK_ARSENAL57.BDAY IS '';
 
 
 PROMPT *** Create  grants  TMP_BPK_ARSENAL57 ***
-grant SELECT                                                                 on TMP_BPK_ARSENAL57 to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_BPK_ARSENAL57 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_BPK_ARSENAL57 to BARS_DM;
 grant SELECT                                                                 on TMP_BPK_ARSENAL57 to RPBN001;
-grant SELECT                                                                 on TMP_BPK_ARSENAL57 to UPLD;
 
 
 

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции TO8
-prompt Наименование операции: TO8 Нестача в сумці інкасованої готівки (до перерахування)
+prompt Наименование операции: Нестача в сумці інкасованої готівки (до перерахування)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('TO8', 'TO8 Нестача в сумці інкасованої готівки (до перерахування)', 1, null, 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', 980, null, '#(nbs_ob22 (''2809'',''13''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', null, 0, 0, 0, 0, null, null, null, null, null, null, '1100100000000000000000000000000000010000000000000000000000000000', null);
+    values ('TO8', 'Нестача в сумці інкасованої готівки (до перерахування)', 1, null, 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', 980, null, '#(nbs_ob22 (''2809'',''13''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', null, 0, 0, 0, 0, null, null, null, null, null, null, '1100100000000000000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='TO8', name='TO8 Нестача в сумці інкасованої готівки (до перерахування)', dk=1, nlsm=null, kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''2809'',''13''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1100100000000000000000000000000000010000000000000000000000000000', nazn=null
+         set tt='TO8', name='Нестача в сумці інкасованої готівки (до перерахування)', dk=1, nlsm=null, kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''2809'',''13''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1100100000000000000000000000000000010000000000000000000000000000', nazn=null
        where tt='TO8';
   end;
   --------------------------------

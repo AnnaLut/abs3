@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'ЦП Угоди-Документи';
   l_tablinesdef := '10';
-  l_tabselect_statement := '';
   l_tabname     := 'V_CP_WARRANTY_REFS_W';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,17 +119,17 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACCA', 'N', '', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ACCB', 'N', '', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'CP_REF', 'N', 'Ідентифікатор~угоди ЦП', '', 22, 0, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:CP_REF', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NAZN', 'C', 'Призначення платежу', '5', 160, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NLSA', 'C', 'Рахунок А', '', 15, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '//barsroot/viewaccounts/accountform.aspx?type=0'||chr(38)||'rnk='||chr(38)||'accessmode=1'||chr(38)||'acc=:ACCA', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NLSB', 'C', 'Рахунок Б', '', 15, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '//barsroot/viewaccounts/accountform.aspx?type=0'||chr(38)||'rnk='||chr(38)||'accessmode=1'||chr(38)||'acc=:ACCB', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'OPER_REF', 'N', 'Референс~проводки', '', 22, 1, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:OPER_REF', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'PAWN', 'N', 'Тип~забезпечення', '', 22, 2, 0, 0, 1, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'PDAT', 'D', 'Дата~операції', '', 10, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'S', 'N', 'Сума', '', 22, 7, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'TT', 'C', 'Код~операції~в АБС', '', 3, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACCA', 'N', '', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ACCB', 'N', '', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'CP_REF', 'N', 'Ідентифікатор~угоди ЦП', null, 22, 0, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:CP_REF', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NAZN', 'C', 'Призначення платежу', 5, 160, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NLSA', 'C', 'Рахунок А', null, 15, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '//barsroot/viewaccounts/accountform.aspx?type=0'||chr(38)||'rnk='||chr(38)||'accessmode=1'||chr(38)||'acc=:ACCA', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NLSB', 'C', 'Рахунок Б', null, 15, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '//barsroot/viewaccounts/accountform.aspx?type=0'||chr(38)||'rnk='||chr(38)||'accessmode=1'||chr(38)||'acc=:ACCB', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'OPER_REF', 'N', 'Референс~проводки', null, 22, 1, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:OPER_REF', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'PAWN', 'N', 'Тип~забезпечення', null, 22, 2, 0, 0, 1, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'PDAT', 'D', 'Дата~операції', null, 10, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'S', 'N', 'Сума', null, 22, 7, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'TT', 'C', 'Код~операції~в АБС', null, 3, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CC_PAWN');

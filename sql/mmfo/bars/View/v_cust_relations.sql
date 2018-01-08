@@ -140,9 +140,7 @@ PROMPT *** Create  view V_CUST_RELATIONS ***
  order by cr.rnk, cr.rel_intext, cr.rel_rnk;
 
 PROMPT *** Create  grants  V_CUST_RELATIONS ***
-grant SELECT                                                                 on V_CUST_RELATIONS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUST_RELATIONS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CUST_RELATIONS to UPLD;
 
 
 

@@ -130,9 +130,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  PFU_CA_FILES_TRACKING ***
-grant SELECT                                                                 on PFU_CA_FILES_TRACKING to BARSREADER_ROLE;
 grant SELECT                                                                 on PFU_CA_FILES_TRACKING to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on PFU_CA_FILES_TRACKING to UPLD;
 
 
 

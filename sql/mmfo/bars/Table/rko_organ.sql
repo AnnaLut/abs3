@@ -101,11 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  RKO_ORGAN ***
-grant SELECT                                                                 on RKO_ORGAN       to BARSREADER_ROLE;
 grant SELECT                                                                 on RKO_ORGAN       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RKO_ORGAN       to BARS_DM;
 grant SELECT                                                                 on RKO_ORGAN       to CUST001;
-grant SELECT                                                                 on RKO_ORGAN       to UPLD;
 
 
 

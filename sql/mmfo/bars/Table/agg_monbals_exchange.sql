@@ -107,70 +107,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_AGG_MONBALS_EXG_ACC_NN ***
+PROMPT *** Create  constraint CC_AGG_MONBALS_EXG_KOSQ_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE MODIFY (ACC CONSTRAINT CC_AGG_MONBALS_EXG_ACC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_AGG_MONBALS_EXG_RNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE MODIFY (RNK CONSTRAINT CC_AGG_MONBALS_EXG_RNK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_AGG_MONBALS_EXG_OST_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE MODIFY (OST CONSTRAINT CC_AGG_MONBALS_EXG_OST_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_AGG_MONBALS_EXG_OSTQ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE MODIFY (OSTQ CONSTRAINT CC_AGG_MONBALS_EXG_OSTQ_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_AGG_MONBALS_EXG_DOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE MODIFY (DOS CONSTRAINT CC_AGG_MONBALS_EXG_DOS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_AGG_MONBALS_EXG_DOSQ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE MODIFY (DOSQ CONSTRAINT CC_AGG_MONBALS_EXG_DOSQ_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE MODIFY (KOSQ CONSTRAINT CC_AGG_MONBALS_EXG_KOSQ_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -191,10 +131,70 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_AGG_MONBALS_EXG_KOSQ_NN ***
+PROMPT *** Create  constraint CC_AGG_MONBALS_EXG_DOSQ_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE MODIFY (KOSQ CONSTRAINT CC_AGG_MONBALS_EXG_KOSQ_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE MODIFY (DOSQ CONSTRAINT CC_AGG_MONBALS_EXG_DOSQ_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_AGG_MONBALS_EXG_DOS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE MODIFY (DOS CONSTRAINT CC_AGG_MONBALS_EXG_DOS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_AGG_MONBALS_EXG_OSTQ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE MODIFY (OSTQ CONSTRAINT CC_AGG_MONBALS_EXG_OSTQ_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_AGG_MONBALS_EXG_OST_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE MODIFY (OST CONSTRAINT CC_AGG_MONBALS_EXG_OST_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_AGG_MONBALS_EXG_RNK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE MODIFY (RNK CONSTRAINT CC_AGG_MONBALS_EXG_RNK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_AGG_MONBALS_EXG_ACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE MODIFY (ACC CONSTRAINT CC_AGG_MONBALS_EXG_ACC_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -217,9 +217,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  AGG_MONBALS_EXCHANGE ***
-grant SELECT                                                                 on AGG_MONBALS_EXCHANGE to BARSREADER_ROLE;
 grant ALTER,SELECT                                                           on AGG_MONBALS_EXCHANGE to DM;
-grant SELECT                                                                 on AGG_MONBALS_EXCHANGE to UPLD;
 
 
 

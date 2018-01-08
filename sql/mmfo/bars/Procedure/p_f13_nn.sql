@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_F13_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла #13 для КБ
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 26.10.2017 (07/08/2014)
+% VERSION     : 07/08/2014 (11/12/2012)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
     sheme_ - схема формирования
@@ -60,9 +60,9 @@ CURS_ CURSORType;
 --- позабалансовый сим.89 из OPERW (tag='SK_ZB') выручка прошлого месяца
 --- проводится в первые числа следующего месяца
 CURSOR ZBSIMVOL89 IS
-   SELECT  /*+ leading(s) */
-         unique o.nlsa, o.kv, p.FDAT,
-         SUBSTR(s.value,1,2), p.s, p.ref
+   SELECT  /*+ parallel(8)*/
+      DISTINCT o.nlsa, o.kv, p.FDAT,
+           SUBSTR(s.value,1,2), p.s, p.ref
    FROM OPER o, OPLDOK p, ACCOUNTS c, OPERW s
    WHERE c.acc=p.acc
      and c.kv=980
@@ -144,7 +144,7 @@ BEGIN
           fetch CURS_ into acc_, nls_, acc1_, nlsk_, kv_, data_, kodp_, znap_, ref_;
        EXIT WHEN CURS_%NOTFOUND;
 
-       IF substr(nls_,1,3) not in ('262','263') and nls_ not like '2909%' THEN
+       IF substr(nls_,1,3) not in ('262','263') THEN
           nls_:=nlsk_;
           acc_:=acc1_;
        END IF;
@@ -184,6 +184,15 @@ BEGIN
 
     END LOOP;
     CLOSE BaseL;
+
+    --- недостающие позабалансовые символа
+--    FOR i IN (SELECT d010 FROM KL_D010
+--        WHERE f_13='1' AND TO_NUMBER(d010)>73 AND d_close IS NULL AND
+--        d010 NOT IN (SELECT kodp FROM TMP_NBU WHERE kodf=kodf_ AND datf=Dat_))
+--    LOOP
+--       INSERT INTO TMP_NBU (kodf, datf, kodp, znap, nbuc) VALUES
+--                           (kodf_, Dat_, i.d010, '0', nbuc1_);
+--    END LOOP;
 
     logger.info ('P_F13_NN: End for '||to_char(dat_,'dd.mm.yyyy'));
 ----------------------------------------

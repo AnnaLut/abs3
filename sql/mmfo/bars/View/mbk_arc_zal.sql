@@ -34,10 +34,8 @@ PROMPT *** Create  view MBK_ARC_ZAL ***
    and exists (select nd from cc_accp where acc=c.acc and nd>mbd_k_a.nd);
 
 PROMPT *** Create  grants  MBK_ARC_ZAL ***
-grant SELECT                                                                 on MBK_ARC_ZAL     to BARSREADER_ROLE;
 grant SELECT                                                                 on MBK_ARC_ZAL     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MBK_ARC_ZAL     to FOREX;
-grant SELECT                                                                 on MBK_ARC_ZAL     to UPLD;
 
 
 

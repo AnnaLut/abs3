@@ -128,94 +128,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C006991 ***
+PROMPT *** Create  constraint SYS_C007000 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (LOGNAME NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006992 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (TYPE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006993 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (CLSID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006994 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (BRANCH NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006995 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (TOBO NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006996 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (CSCHEMA NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006997 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (USEARC NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006998 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (WEB_PROFILE NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (USEGTW NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -236,10 +152,94 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C007000 ***
+PROMPT *** Create  constraint SYS_C006998 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (USEGTW NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (WEB_PROFILE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006997 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (USEARC NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006996 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (CSCHEMA NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006995 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (TOBO NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006994 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (BRANCH NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006993 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (CLSID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006992 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (TYPE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006991 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_STAFF_DONTTOUCH MODIFY (LOGNAME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -248,9 +248,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_ARCH_STAFF_DONTTOUCH ***
-grant SELECT                                                                 on TMP_ARCH_STAFF_DONTTOUCH to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_ARCH_STAFF_DONTTOUCH to BARS_DM;
-grant SELECT                                                                 on TMP_ARCH_STAFF_DONTTOUCH to UPLD;
 
 
 

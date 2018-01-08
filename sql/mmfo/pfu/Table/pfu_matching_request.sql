@@ -30,10 +30,6 @@ COMMENT ON COLUMN PFU.PFU_MATCHING_REQUEST.PFU_MATCHING_XML IS 'Китованция';
 
 
 
-PROMPT *** Create  grants  PFU_MATCHING_REQUEST ***
-grant SELECT                                                                 on PFU_MATCHING_REQUEST to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_MATCHING_REQUEST to UPLD;
-
 
 
 PROMPT ===================================================================================== 

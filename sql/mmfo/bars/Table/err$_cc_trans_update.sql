@@ -87,10 +87,6 @@ COMMENT ON COLUMN BARS.ERR$_CC_TRANS_UPDATE.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CC_TRANS_UPDATE ***
-grant SELECT                                                                 on ERR$_CC_TRANS_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CC_TRANS_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F08_NN ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F08_NN (Dat_ DATE,
+CREATE OR REPLACE PROCEDURE BARS.P_F08_NN (Dat_ DATE,
                                       sheme_ varchar2 default 'G')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #08 для КБ

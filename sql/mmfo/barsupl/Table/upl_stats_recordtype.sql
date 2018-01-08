@@ -55,10 +55,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  UPL_STATS_RECORDTYPE ***
-grant SELECT                                                                 on UPL_STATS_RECORDTYPE to BARSREADER_ROLE;
-grant SELECT                                                                 on UPL_STATS_RECORDTYPE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -13,7 +13,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования файла 1P (ПБ-1)
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    01/06/2017 (11/04/2017)
+% VERSION     :    11/04/2017 (07/02/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -217,7 +217,141 @@ BEGIN
    IF mfou_ = 300465 AND mfou_ != mfo_g
    THEN
       FOR k
-         IN (SELECT p.pdat pdat,
+         IN (SELECT p.REF REF
+               FROM provodki_otc p
+              WHERE     p.fdat BETWEEN Dat1_ AND Dat_
+                    AND p.kv NOT IN (959, 961, 962, 964, 980)
+                    AND (p.nlsd LIKE '100%' OR p.nlsk LIKE '100%'))
+      LOOP
+         BEGIN
+            INSERT INTO operw (REF, tag, VALUE)
+                 VALUES (k.REF, 'KOD_N', '0000000');
+         EXCEPTION
+            WHEN OTHERS
+            THEN
+               NULL;
+         END;
+
+         kod_g_ := NULL;
+         kod_g_pb1 := NULL;
+
+         FOR z IN (SELECT *
+                     FROM operw
+                    WHERE REF = k.REF)
+         LOOP
+            -- с 01.08.2012 добавляется код страны отправителя или получателя перевода
+            IF     z.tag LIKE 'n%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+            END IF;
+
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'n%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                      ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
+
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D6#70%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+            END IF;
+
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D6#70%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                      ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
+
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D6#E2%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+            END IF;
+
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D6#E2%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                      ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
+
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D1#E9%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
+            END IF;
+
+            IF     kod_g_ IS NULL
+               AND z.tag LIKE 'D1#E9%'
+               AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
+                      ('O', 'P', 'О', 'П')
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
+
+            IF kod_g_ IS NULL AND z.tag LIKE 'F1%'
+            THEN
+               kod_g_ := SUBSTR (TRIM (z.VALUE), 8, 3);
+            END IF;
+
+            IF kod_g_ IS NULL AND z.tag = 'KOD_G'
+            THEN
+               kod_g_pb1 := SUBSTR (TRIM (z.VALUE), 1, 3);
+            END IF;
+         END LOOP;
+
+         IF kod_g_ IS NULL AND kod_g_pb1 IS NOT NULL
+         THEN
+            kod_g_ := kod_g_pb1;
+         END IF;
+
+         BEGIN
+            INSERT INTO operw (REF, tag, VALUE)
+                 VALUES (k.REF, 'KOD_G', kod_g_);
+         EXCEPTION
+            WHEN OTHERS
+            THEN
+               UPDATE operw a
+                  SET a.VALUE = kod_g_
+                WHERE a.tag = 'KOD_G' AND a.REF = k.REF;
+         END;
+
+         BEGIN
+            INSERT INTO operw (REF, tag, VALUE)
+                 VALUES (k.REF, 'KOD_B', '000');
+         EXCEPTION
+            WHEN OTHERS
+            THEN
+               NULL;
+         END;
+
+         UPDATE operw a
+            SET a.VALUE = '804'
+          WHERE     a.tag = 'KOD_G'
+                AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) = '000')
+                AND a.REF = k.REF;
+
+         UPDATE operw a
+            SET a.VALUE = '6'
+          WHERE     a.tag = 'KOD_B'
+                AND (   TRIM (a.VALUE) IS NULL
+                     OR TRIM (a.VALUE) = '000'
+                     OR TRIM (a.VALUE) = '25')
+                AND a.REF = k.REF;
+      END LOOP;
+
+      FOR k
+         IN (  SELECT p.pdat pdat,
                       p.fdat fdat,
                       p.REF REF,
                       p.tt tt,
@@ -236,134 +370,6 @@ BEGIN
                       AND (p.nlsd LIKE '100%' OR p.nlsk LIKE '100%')
              ORDER BY 1, 2, 3)
       LOOP
-         if k.kv NOT IN (959, 961, 962, 964, 980) then
-             BEGIN
-                INSERT INTO operw (REF, tag, VALUE)
-                     VALUES (k.REF, 'KOD_N', '0000000');
-             EXCEPTION
-                WHEN OTHERS
-                THEN
-                   NULL;
-             END;
-
-             kod_g_ := NULL;
-             kod_g_pb1 := NULL;
-
-             FOR z IN (SELECT *
-                         FROM operw
-                        WHERE REF = k.REF)
-             LOOP
-                -- с 01.08.2012 добавляется код страны отправителя или получателя перевода
-                IF     z.tag LIKE 'n%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-                END IF;
-
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'n%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                          ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
-
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D6#70%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-                END IF;
-
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D6#70%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                          ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
-
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D6#E2%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-                END IF;
-
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D6#E2%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                          ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
-
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D1#E9%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) IN ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 2, 3);
-                END IF;
-
-                IF     kod_g_ IS NULL
-                   AND z.tag LIKE 'D1#E9%'
-                   AND SUBSTR (TRIM (z.VALUE), 1, 1) NOT IN
-                          ('O', 'P', 'О', 'П')
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
-
-                IF kod_g_ IS NULL AND z.tag LIKE 'F1%'
-                THEN
-                   kod_g_ := SUBSTR (TRIM (z.VALUE), 8, 3);
-                END IF;
-
-                IF kod_g_ IS NULL AND z.tag = 'KOD_G'
-                THEN
-                   kod_g_pb1 := SUBSTR (TRIM (z.VALUE), 1, 3);
-                END IF;
-             END LOOP;
-
-             IF kod_g_ IS NULL AND kod_g_pb1 IS NOT NULL
-             THEN
-                kod_g_ := kod_g_pb1;
-             END IF;
-
-             BEGIN
-                INSERT INTO operw (REF, tag, VALUE)
-                     VALUES (k.REF, 'KOD_G', kod_g_);
-             EXCEPTION
-                WHEN OTHERS
-                THEN
-                   UPDATE operw a
-                      SET a.VALUE = kod_g_
-                    WHERE a.tag = 'KOD_G' AND a.REF = k.REF;
-             END;
-
-             BEGIN
-                INSERT INTO operw (REF, tag, VALUE)
-                     VALUES (k.REF, 'KOD_B', '000');
-             EXCEPTION
-                WHEN OTHERS
-                THEN
-                   NULL;
-             END;
-
-             UPDATE operw a
-                SET a.VALUE = '804'
-              WHERE     a.tag = 'KOD_G'
-                    AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) = '000')
-                    AND a.REF = k.REF;
-
-             UPDATE operw a
-                SET a.VALUE = '6'
-              WHERE     a.tag = 'KOD_B'
-                    AND (   TRIM (a.VALUE) IS NULL
-                         OR TRIM (a.VALUE) = '000'
-                         OR TRIM (a.VALUE) = '25')
-                    AND a.REF = k.REF;
-         end if;
-
          BEGIN
             SELECT SUBSTR (TRIM (VALUE), 1, 1)
               INTO rezid_o
@@ -1861,8 +1867,7 @@ BEGIN
       END IF;
 
       FOR k
-         IN (  SELECT /*+ index(o, IDX_OPLDOK_KF_FDAT_ACC) */
-                      o.REF,
+         IN (  SELECT o.REF,
                       o.TT TT,
                       o.FDAT,
                       o.DK,

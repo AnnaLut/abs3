@@ -71,6 +71,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CCKOLBASE_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_KOL$BASE ADD CONSTRAINT FK_CCKOLBASE_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C008468 ***
 begin   
  execute immediate '
@@ -109,11 +122,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_KOL$BASE ***
-grant SELECT                                                                 on CC_KOL$BASE     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_KOL$BASE     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_KOL$BASE     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_KOL$BASE     to RCC_DEAL;
-grant SELECT                                                                 on CC_KOL$BASE     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_KOL$BASE     to WR_ALL_RIGHTS;
 
 

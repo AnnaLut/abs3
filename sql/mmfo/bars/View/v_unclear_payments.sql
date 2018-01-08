@@ -46,9 +46,7 @@ PROMPT *** Create  view V_UNCLEAR_PAYMENTS ***
 
 PROMPT *** Create  grants  V_UNCLEAR_PAYMENTS ***
 grant DELETE,SELECT,UPDATE                                                   on V_UNCLEAR_PAYMENTS to BARS015;
-grant SELECT                                                                 on V_UNCLEAR_PAYMENTS to BARSREADER_ROLE;
 grant DELETE,SELECT,UPDATE                                                   on V_UNCLEAR_PAYMENTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_UNCLEAR_PAYMENTS to UPLD;
 
 
 

@@ -79,10 +79,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_ACC_REG9 ***
-grant SELECT                                                                 on TMP_ACC_REG9    to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_ACC_REG9    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_ACC_REG9    to RPBN001;
-grant SELECT                                                                 on TMP_ACC_REG9    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_ACC_REG9    to WR_ALL_RIGHTS;
 
 

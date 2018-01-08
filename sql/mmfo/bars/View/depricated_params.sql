@@ -8,19 +8,19 @@ PROMPT =========================================================================
 PROMPT *** Create  view DEPRICATED_PARAMS ***
 
   CREATE OR REPLACE FORCE VIEW BARS.DEPRICATED_PARAMS ("PAR", "VAL", "COMM") AS 
-  select t.attribute_code par, t.attribute_value val, a.attribute_desc comm
-from   branch_attribute_value t
-left join branch_attribute a on a.attribute_code = t.attribute_code
-where  t.branch_code = bars_context.make_branch(sys_context ('bars_context', 'user_mfo')) or
-       t.branch_code = '/'
-;
+  select par, val, comm
+     from params$base
+    where kf = sys_context ('bars_context', 'user_mfo')
+   union all
+   select par, val, comm
+     from params$global
+ ;
 
 PROMPT *** Create  grants  DEPRICATED_PARAMS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEPRICATED_PARAMS to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEPRICATED_PARAMS to BARS014;
 grant FLASHBACK,REFERENCES,SELECT                                            on DEPRICATED_PARAMS to BARSAQ with grant option;
 grant SELECT                                                                 on DEPRICATED_PARAMS to BARSAQ_ADM;
-grant SELECT                                                                 on DEPRICATED_PARAMS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEPRICATED_PARAMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEPRICATED_PARAMS to BARS_CONNECT;
 grant FLASHBACK,SELECT                                                       on DEPRICATED_PARAMS to BASIC_INFO;
@@ -39,7 +39,6 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on DEPRICATED_PARAMS to SUR_ROLE;
 grant UPDATE                                                                 on DEPRICATED_PARAMS to TECH005;
 grant SELECT                                                                 on DEPRICATED_PARAMS to TOSS;
-grant SELECT                                                                 on DEPRICATED_PARAMS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEPRICATED_PARAMS to WR_ALL_RIGHTS;
 grant SELECT                                                                 on DEPRICATED_PARAMS to WR_CHCKINNR_ALL;
 grant SELECT                                                                 on DEPRICATED_PARAMS to WR_CHCKINNR_CASH;

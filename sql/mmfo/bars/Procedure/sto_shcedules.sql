@@ -1,10 +1,4 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/STO_SHCEDULES.sql =========*** Run
-PROMPT ===================================================================================== 
-
-
 PROMPT *** Create  procedure STO_SHCEDULES ***
 
   CREATE OR REPLACE PROCEDURE BARS.STO_SHCEDULES IS
@@ -38,9 +32,3 @@ PROMPT *** Create  procedure STO_SHCEDULES ***
   END sto_shcedules;
 /
 show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/STO_SHCEDULES.sql =========*** End
-PROMPT ===================================================================================== 

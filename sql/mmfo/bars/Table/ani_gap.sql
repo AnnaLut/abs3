@@ -151,11 +151,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ANI_GAP ***
-grant SELECT                                                                 on ANI_GAP         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANI_GAP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANI_GAP         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANI_GAP         to SALGL;
-grant SELECT                                                                 on ANI_GAP         to UPLD;
 
 
 

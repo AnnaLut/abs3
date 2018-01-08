@@ -65,10 +65,6 @@ COMMENT ON COLUMN BARS.ERR$_FIN_ND_HIST.VAL_DATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_FIN_ND_HIST ***
-grant SELECT                                                                 on ERR$_FIN_ND_HIST to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_FIN_ND_HIST to UPLD;
-
 
 
 PROMPT ===================================================================================== 

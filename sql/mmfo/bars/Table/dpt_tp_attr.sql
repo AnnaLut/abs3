@@ -53,10 +53,8 @@ COMMENT ON COLUMN BARS.DPT_TP_ATTR.COMMENTS IS '';
 
 
 PROMPT *** Create  grants  DPT_TP_ATTR ***
-grant SELECT                                                                 on DPT_TP_ATTR     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_TP_ATTR     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_TP_ATTR     to BARS_DM;
-grant SELECT                                                                 on DPT_TP_ATTR     to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_TP_ATTR     to VKLAD;
 grant FLASHBACK,SELECT                                                       on DPT_TP_ATTR     to WR_REFREAD;
 

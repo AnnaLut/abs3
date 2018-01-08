@@ -2,6 +2,7 @@ set lines 1000
 set trimspool on
 set serveroutput on size 1000000
 
+
 prompt Создание / Обновление операции WD2
 prompt Наименование операции: WD2-ВОЗВРАТ МБ (СЭП,ВПС)
 declare
@@ -123,7 +124,7 @@ begin
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 42, ''WD2'', 6, null, ''((KV=980 AND S<=30000000000) OR (KV<>980 AND GL.P_ICURVAL(KV,S,BANKDATE)<=30000000000)) AND substr(NLSA,1,2)<>''''27'''' AND substr(NLSA,1,3)<>''''366'''''', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 42, ''WD2'', 6, null, ''((KV=980 AND S<=30000000000) OR (KV<>980 AND GL.P_ICURVAL(KV,S,BANKDATE)<=30000000000)) AND substr(NLSA,1,2)<>''27'' AND substr(NLSA,1,3)<>''366'''', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

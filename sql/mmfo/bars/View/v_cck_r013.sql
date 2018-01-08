@@ -20,10 +20,8 @@ where d.sos  < 15  and d.vidd in (1,2,3,11,12,13) and d.nd = n8.nd and n8.acc = 
   and a2.acc = s2.acc and d.rnk = c.rnk ;
 
 PROMPT *** Create  grants  V_CCK_R013 ***
-grant SELECT                                                                 on V_CCK_R013      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CCK_R013      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CCK_R013      to START1;
-grant SELECT                                                                 on V_CCK_R013      to UPLD;
 
 
 

@@ -27,9 +27,7 @@ PROMPT *** Create  view V_WCS_BID_SURVEY_GROUPS ***
  order by b.id, sg.survey_id, sg.ord;
 
 PROMPT *** Create  grants  V_WCS_BID_SURVEY_GROUPS ***
-grant SELECT                                                                 on V_WCS_BID_SURVEY_GROUPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_BID_SURVEY_GROUPS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_BID_SURVEY_GROUPS to UPLD;
 
 
 

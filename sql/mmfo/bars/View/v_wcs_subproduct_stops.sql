@@ -21,9 +21,7 @@ PROMPT *** Create  view V_WCS_SUBPRODUCT_STOPS ***
  order by ss.subproduct_id, s.type_id, s.stop_id;
 
 PROMPT *** Create  grants  V_WCS_SUBPRODUCT_STOPS ***
-grant SELECT                                                                 on V_WCS_SUBPRODUCT_STOPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SUBPRODUCT_STOPS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_SUBPRODUCT_STOPS to UPLD;
 
 
 

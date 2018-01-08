@@ -70,12 +70,10 @@ COMMENT ON COLUMN BARS.KOD_14.PR_MOG IS '';
 
 PROMPT *** Create  grants  KOD_14 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_14          to ABS_ADMIN;
-grant SELECT                                                                 on KOD_14          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_14          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_14          to BARS_DM;
 grant SELECT                                                                 on KOD_14          to CUST001;
 grant SELECT                                                                 on KOD_14          to START1;
-grant SELECT                                                                 on KOD_14          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KOD_14          to WR_ALL_RIGHTS;
 
 

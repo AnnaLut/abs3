@@ -22,10 +22,8 @@ WHERE a.accc is not NULL AND
       o.tt  in ('R01' ,'D01' );
 
 PROMPT *** Create  grants  NAL_2 ***
-grant SELECT                                                                 on NAL_2           to BARSREADER_ROLE;
 grant SELECT                                                                 on NAL_2           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NAL_2           to START1;
-grant SELECT                                                                 on NAL_2           to UPLD;
 
 
 

@@ -35,9 +35,7 @@ PROMPT *** Create  view V_DPU_PENALTIES ***
 ;
 
 PROMPT *** Create  grants  V_DPU_PENALTIES ***
-grant SELECT                                                                 on V_DPU_PENALTIES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPU_PENALTIES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DPU_PENALTIES to UPLD;
 
 
 

@@ -15,8 +15,6 @@ where t.tabid=c.tabid
  ;
 
 PROMPT *** Create  grants  V_META_TABLES ***
-grant SELECT                                                                 on V_META_TABLES   to BARSREADER_ROLE;
-grant SELECT                                                                 on V_META_TABLES   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_META_TABLES   to WR_ALL_RIGHTS;
 
 

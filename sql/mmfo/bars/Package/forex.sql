@@ -1,10 +1,9 @@
-
  
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/forex.sql =========*** Run *** =====
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.FOREX 
+ PROMPT =====================================================================================
+
+CREATE OR REPLACE PACKAGE BARS.FOREX
 
 is
 
@@ -14,7 +13,7 @@ g_header_defs     constant varchar2(512) := '';
 /*
  18.07.2017 Sta - передано напрямую. Все 92** проверены.
 
- 28.10.2016 Sta Переоцінка до "справедл.вартості"= поточному оф.курсу коротких одноногих.
+ 28.10.2016 Sta Переоцінка до "справедл.вартості"= поточному оф.курсу коротких одноногих. 
 
  20.10.2016 Проверка возможности пролонгации второг ноги
  15.01.2015 Анул.поч.угоду + Анул.ВСЮ.угоду
@@ -34,12 +33,12 @@ function header_version return varchar2;
 -- body_version - возвращает версию тела пакета
 function body_version return varchar2;
 ------------------------------------------
-function open_accF
+function open_accF 
 ( p_rnk   number,
   p_nbs   accounts.nbs%type,
   p_kv    accounts.kv%type ) return number ;
 
-procedure open_accP
+procedure open_accP 
 ( p_swaptag    number,
   p_rnk        fx_deal_acc.rnk%type,
   p_fxtype     fx_deal_acc.fx_type%type,
@@ -47,7 +46,7 @@ procedure open_accP
   p_kv         fx_deal_acc.kv%type,
   p_acc    out number ) ;
 ------------------------------------------
-procedure REV_SPOT_OB (p_dat date, p_DEAL_TAG int ) ; -- 28.10.2016 Sta Переоцінка до "справедл.вартості"= поточному оф.курсу коротких одноногих.
+procedure REV_SPOT_OB (p_dat date, p_DEAL_TAG int ) ; -- 28.10.2016 Sta Переоцінка до "справедл.вартості"= поточному оф.курсу коротких одноногих. 
 
 procedure LONG_TERM   (p_mode int , p_SWAP_TAG int, p_DEAL_TAG int ) ;
 --Проверка возможности пролонгации второг ноги
@@ -177,13 +176,14 @@ procedure set_int_ratn_mb ( p_date date, p_kv number, p_term number, p_ir number
 --Відсоткові ставки на  МБ ринку
 end forex;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.FOREX is
+
+CREATE OR REPLACE PACKAGE BODY BARS.FOREX  is
 
   g_body_version    constant varchar2(64)  := 'version 1.5 18.07.2017-3';
 
 /*
  18.07.2017 Sta - передано напрямую. Все 92** проверены.
- 05.07.2017 Sta Форекс-продукты в разрезе ДЛ/КОР + 1/2 (вал/депо) в всязи с переходом на новые бал счета
+ 05.07.2017 Sta Форекс-продукты в разрезе ДЛ/КОР + 1/2 (вал/депо) в всязи с переходом на новые бал счета 
 
  10.03.2017 Sta закоментарено    ---- update oper   set dk  = 1, kv = xx.kva, nlsa = l_1819, s = xx.suma, kv2 = xx.kvb, nlsb = l_1819, s2 = xx.sumb where ref = xx.ref ;
  24.02.2017 Sta + Алена Ш. Де-лонгация( но НЕ лонгация !!!!)  депо-свoпов
@@ -831,7 +831,7 @@ begin
 
   l_nbs  := substr(l_column, 1, 4);
   l_ob22 := substr(l_column, 6, 2);
-
+  
   if l_nbs is null then     raise_application_error(-20000, 'Не задано бал.рах для типу FOREX-угоди ' || l_kod );  end if;
 
   l_acc := FOREX.open_accF(p_rnk, l_nbs, p_kv);
@@ -866,12 +866,12 @@ is
 
 begin
   L_FOREX_KOD := pul.get('FOREX_KOD');
-  begin  -- ищем свободный
+  begin  -- ищем свободный 
      select a.acc into l_acc   from  accounts a, forex_ob22 f
       where a.rnk = p_rnk        and a.kv =  p_kv                                                          -- совпадает по РНК и по вал
         and f.kod = L_FOREX_KOD  and decode (p_kvtype,'A', f.s9a,f.s9p) like a.nbs||'_'||a.ob22            -- совпадает по бал+об22
         and a.ostb = 0 and a.ostf = 0 and a.ostc = 0  and a.dazs  is null                                  -- без остатка, но  не закрыт
-        and (a.dapp is null or a.dapp < gl.bdate -10) and rownum = 1;                                      -- работал более 10 дней назад ==>> любой из таких
+        and (a.dapp is null or a.dapp < gl.bdate -10) and rownum = 1;                                      -- работал более 10 дней назад ==>> любой из таких 
   exception when no_data_found then  FOREX.open_accP (p_swaptag, p_rnk, p_fxtype , p_kvtype, p_kv, l_acc); -- или откріваем новый
   end;
 
@@ -1119,7 +1119,7 @@ end f_dopr_b;
 --
 procedure pay_forward_vn (
   p_fxdeal in out fx_deal%rowtype,
-  p_fxtype        varchar2, ----Не исп, т.к. только ДЛ/КОР (от дат). а надо про ноги + вал/депо
+  p_fxtype        varchar2, ----Не исп, т.к. только ДЛ/КОР (от дат). а надо про ноги + вал/депо 
   p_cust          t_cust,
   p_tt            varchar2,
   p_nazn          varchar2 )
@@ -1169,12 +1169,12 @@ logger.info('XXX-11*'|| gl.bdate||'*'||p_fxdeal.dat_a||'*'|| p_fxdeal.dat_b||'*'
 
 --logger.info('XXX-2*'|| gl.bdate||p_fxdeal.dat_a||'*'|| p_fxdeal.dat_b||'*');
 
-  If p_fxdeal.dat_a > gl.bdate then
+  If p_fxdeal.dat_a > gl.bdate then 
      pay_subdoc(0, l_oper.ref, gl.bdate,       l_oper.tt, 1, p_fxdeal.kva, l_oper.nlsa, p_fxdeal.suma, p_fxdeal.kva, l_tt_nls,    p_fxdeal.suma, 'Розкрити вимоги');
      pay_subdoc(0, l_oper.ref, p_fxdeal.dat_a, l_oper.tt, 0, p_fxdeal.kva, l_oper.nlsa, p_fxdeal.suma, p_fxdeal.kva, l_tt_nls,    p_fxdeal.suma, 'Закрити вимоги');
   end if ;
 
-  If p_fxdeal.dat_b > gl.bdate then
+  If p_fxdeal.dat_b > gl.bdate then 
      pay_subdoc(0, l_oper.ref, gl.bdate,       l_oper.tt, 1, p_fxdeal.kvb, l_tt_nls,    p_fxdeal.sumb, p_fxdeal.kvb, l_oper.nlsb, p_fxdeal.sumb, 'Розкрити зобов`язання');
      pay_subdoc(0, l_oper.ref, p_fxdeal.dat_b, l_oper.tt, 0, p_fxdeal.kvb, l_tt_nls,    p_fxdeal.sumb, p_fxdeal.kvb, l_oper.nlsb, p_fxdeal.sumb, 'Закрити зобов`язання');
  end if;
@@ -1375,8 +1375,8 @@ procedure pay_fx2 (
 is
 begin
 
-  if    p_fxtype = g_fxtype_tod or p_fxtype = g_fxtype_split then  pay_tod     (p_fxdeal, p_cust, p_nazn) ;
-  elsif p_fxtype = g_fxtype_spot                             then  pay_spot    (p_fxdeal, p_cust, p_nazn) ;  -- 1.2 - SPOT
+  if    p_fxtype = g_fxtype_tod or p_fxtype = g_fxtype_split then  pay_tod     (p_fxdeal, p_cust, p_nazn) ; 
+  elsif p_fxtype = g_fxtype_spot                             then  pay_spot    (p_fxdeal, p_cust, p_nazn) ;  -- 1.2 - SPOT   
   else                                                             pay_forward (p_fxdeal, p_cust, p_nazn) ;  -- 1.3 - FORVARD
   end if;
 
@@ -2122,7 +2122,7 @@ begin
   l_Kod := Substr ( FOREX.get_forextype3K ( xx.deal_tag) , 1, 30) ;
 
   If l_Kod like '%TOD%' then return; end if;
-  ----
+  ---- 
   begin select * into f_OB  from forex_ob22  where kod = l_kod  ;
   exception when no_data_found then  raise_application_error(-(20203), 'Не налаштовано (в forex_ob22) параметри переоцiнки для ' || l_kod);
   end;
@@ -2396,17 +2396,3 @@ begin
   init;
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  FOREX ***
-grant EXECUTE                                                                on FOREX           to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on FOREX           to BARS_CONNECT;
-grant EXECUTE                                                                on FOREX           to FOREX;
-grant EXECUTE                                                                on FOREX           to START1;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/forex.sql =========*** End *** =====
- PROMPT ===================================================================================== 
- 

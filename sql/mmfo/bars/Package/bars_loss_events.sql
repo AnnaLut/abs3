@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_loss_events.sql =========*** Ru
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_LOSS_EVENTS 
+CREATE OR REPLACE PACKAGE BARS.BARS_LOSS_EVENTS
 is
 /*
   28.10.2015 Sta специфическое понятие  «ДОГОВОР для ЦБ» = СДЕЛКА -- по согласованию с ХД
@@ -43,9 +37,14 @@ is
 
 end BARS_LOSS_EVENTS;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_LOSS_EVENTS 
+
+show err
+
+----------------------------------------------------------------------------------------------------
+
+create or replace package body BARS_LOSS_EVENTS
 is
-  g_body_version  constant varchar2(64)  := 'version 5.6  16.11.2017';
+  g_body_version  constant varchar2(64) := 'version 5.7  05.01.2018';
 /*
   02.10.2017 KVA - COBUSUPABS-6451 - ... не для всех типов договоров учитывается признак корректирующих проводок
   11.07.2017 LSO - COBUPRVNIX-30 - Розрахунок подій дефолту для хоз.дебиторки
@@ -500,11 +499,12 @@ is
         then
           select min(DAT_SPZ(a.ACC, p_date, l_ZO))
             into x_event_date
-            from BARS.ACCOUNTS a
-            join BARS.ND_ACC   n
+            from ACCOUNTS a
+            join ND_ACC   n
               on ( n.ACC = a.ACC )
-           where n.nd = p_nd
-             and (a.nbs like '15_7' or a.nbs like '15_8');
+           where n.ND = p_nd
+             and a.NBS like '15__'
+             and a.TIP in ( 'SP ', 'SPN' );
         end if;
 
       when g_OVR
@@ -1096,8 +1096,8 @@ begin
 --  ТО, алгоритм определения остатка (ost_korr или FOST) можно заменить на проверку полей xoz_ref (s и s0)
 --  это облегчит выборку. Но надо проверить.
     FOR c_f IN ( SELECT x.id, A.RNK, g_XOZ as OBJ, 21 as vidd
-                  FROM xoz_ref x
-                  JOIN accounts a
+                  FROM xoz_ref x 
+                  JOIN accounts a 
                     ON (a.acc = x.acc)
                  WHERE ( ( a.NBS = '3552' AND a.ob22 IN ('01','02','03','13') ) or
                          ( a.NBS = '3559' AND a.ob22 IN ('06','07','08')      ) )
@@ -1124,18 +1124,5 @@ end loss_events;
 
 end bars_loss_events;
 /
- show err;
- 
-PROMPT *** Create  grants  BARS_LOSS_EVENTS ***
-grant EXECUTE                                                                on BARS_LOSS_EVENTS to BARSUPL;
-grant EXECUTE                                                                on BARS_LOSS_EVENTS to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BARS_LOSS_EVENTS to START1;
-grant EXECUTE                                                                on BARS_LOSS_EVENTS to TECH005;
-grant EXECUTE                                                                on BARS_LOSS_EVENTS to UPLD;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_loss_events.sql =========*** En
- PROMPT ===================================================================================== 
- 
+show err;

@@ -129,12 +129,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SCHEME_1C ***
-grant SELECT                                                                 on SCHEME_1C       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SCHEME_1C       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SCHEME_1C       to BARS_DM;
 grant SELECT                                                                 on SCHEME_1C       to SBB_LZ;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SCHEME_1C       to SCHEME_1C;
-grant SELECT                                                                 on SCHEME_1C       to UPLD;
 grant FLASHBACK,SELECT                                                       on SCHEME_1C       to WR_REFREAD;
 
 

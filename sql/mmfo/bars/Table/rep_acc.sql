@@ -97,12 +97,10 @@ exception when others then
 PROMPT *** Create  grants  REP_ACC ***
 grant SELECT                                                                 on REP_ACC         to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REP_ACC         to BARS014;
-grant SELECT                                                                 on REP_ACC         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REP_ACC         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REP_ACC         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REP_ACC         to RPBN001;
 grant SELECT                                                                 on REP_ACC         to TASK_LIST;
-grant SELECT                                                                 on REP_ACC         to UPLD;
 grant FLASHBACK,SELECT                                                       on REP_ACC         to WR_REFREAD;
 
 

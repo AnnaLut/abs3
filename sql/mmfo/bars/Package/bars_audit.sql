@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_audit.sql =========*** Run *** 
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.BARS_AUDIT 
+create or replace package bars.bars_audit
 is
 
     -------------------------------------------------------
@@ -514,7 +514,7 @@ is
         p_make_context_snapshot in boolean default false);
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_AUDIT 
+create or replace package body bars.bars_audit
 is
 
 
@@ -2420,7 +2420,6 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on BARS_AUDIT      to IBS;
 grant EXECUTE                                                                on BARS_AUDIT      to LOG_ROLE;
 grant EXECUTE                                                                on BARS_AUDIT      to START1;
-grant EXECUTE                                                                on BARS_AUDIT      to UPLD;
 grant EXECUTE                                                                on BARS_AUDIT      to WR_ALL_RIGHTS;
 
  
@@ -2428,4 +2427,3 @@ grant EXECUTE                                                                on 
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_audit.sql =========*** End *** 
  PROMPT ===================================================================================== 
- 

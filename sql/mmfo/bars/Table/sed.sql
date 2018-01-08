@@ -116,14 +116,12 @@ exception when others then
 
 PROMPT *** Create  grants  SED ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SED             to ABS_ADMIN;
-grant SELECT                                                                 on SED             to BARSREADER_ROLE;
 grant SELECT                                                                 on SED             to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SED             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SED             to BARS_DM;
 grant SELECT                                                                 on SED             to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SED             to SED;
 grant SELECT                                                                 on SED             to START1;
-grant SELECT                                                                 on SED             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SED             to WR_ALL_RIGHTS;
 grant SELECT                                                                 on SED             to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on SED             to WR_REFREAD;

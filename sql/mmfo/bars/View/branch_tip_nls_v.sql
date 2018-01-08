@@ -16,10 +16,8 @@ PROMPT *** Create  view BRANCH_TIP_NLS_V ***
 
 PROMPT *** Create  grants  BRANCH_TIP_NLS_V ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BRANCH_TIP_NLS_V to ABS_ADMIN;
-grant SELECT                                                                 on BRANCH_TIP_NLS_V to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRANCH_TIP_NLS_V to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH_TIP_NLS_V to CUST001;
-grant SELECT                                                                 on BRANCH_TIP_NLS_V to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRANCH_TIP_NLS_V to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BRANCH_TIP_NLS_V to WR_REFREAD;
 

@@ -12,9 +12,7 @@ PROMPT *** Create  view M_ROLE_REFT ***
 from references r, TYPEREF t,  meta_tables M where  m.tabid = r.tabid and r.type = t.type  (+);
 
 PROMPT *** Create  grants  M_ROLE_REFT ***
-grant SELECT                                                                 on M_ROLE_REFT     to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_REFT     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on M_ROLE_REFT     to UPLD;
 
 
 

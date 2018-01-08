@@ -48,9 +48,7 @@ PROMPT *** Create  view VW_ESCR_REGISTER_LIST ***
                WHERE rm.out_doc_id = t.id);
 
 PROMPT *** Create  grants  VW_ESCR_REGISTER_LIST ***
-grant SELECT                                                                 on VW_ESCR_REGISTER_LIST to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_REGISTER_LIST to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on VW_ESCR_REGISTER_LIST to UPLD;
 
 
 

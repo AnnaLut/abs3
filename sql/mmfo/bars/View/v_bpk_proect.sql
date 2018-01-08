@@ -17,11 +17,9 @@ select b.id, b.name, b.okpo, p.code, p.name, p.grp_code
  where b.product_code = p.code
    and p.grp_code = 'SALARY'
    and nvl(b.used_w4,0) = 1;
-
+grant select on BARS.V_BPK_PROECT to BARSREADER_ROLE;
 PROMPT *** Create  grants  V_BPK_PROECT ***
-grant SELECT                                                                 on V_BPK_PROECT    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BPK_PROECT    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_BPK_PROECT    to UPLD;
 
 
 

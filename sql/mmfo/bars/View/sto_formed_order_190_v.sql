@@ -167,9 +167,7 @@ PROMPT *** Create  view STO_FORMED_ORDER_190_V ***
     WHERE c.rnk = l.rnk AND l.ids = d.ids AND d.kva = a.kv AND a.nls = d.nlsa;
 
 PROMPT *** Create  grants  STO_FORMED_ORDER_190_V ***
-grant SELECT                                                                 on STO_FORMED_ORDER_190_V to BARSREADER_ROLE;
 grant SELECT                                                                 on STO_FORMED_ORDER_190_V to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on STO_FORMED_ORDER_190_V to UPLD;
 
 
 

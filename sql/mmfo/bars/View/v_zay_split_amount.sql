@@ -47,9 +47,7 @@ PROMPT *** Create  view V_ZAY_SPLIT_AMOUNT ***
 ;
 
 PROMPT *** Create  grants  V_ZAY_SPLIT_AMOUNT ***
-grant SELECT                                                                 on V_ZAY_SPLIT_AMOUNT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY_SPLIT_AMOUNT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ZAY_SPLIT_AMOUNT to UPLD;
 grant SELECT                                                                 on V_ZAY_SPLIT_AMOUNT to ZAY;
 
 

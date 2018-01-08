@@ -25,10 +25,8 @@ PROMPT *** Create  view V_PROVODKI ***
  ;
 
 PROMPT *** Create  grants  V_PROVODKI ***
-grant SELECT                                                                 on V_PROVODKI      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PROVODKI      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PROVODKI      to SALGL;
-grant SELECT                                                                 on V_PROVODKI      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_PROVODKI      to WR_ALL_RIGHTS;
 
 

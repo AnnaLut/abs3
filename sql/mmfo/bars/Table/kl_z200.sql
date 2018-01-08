@@ -57,10 +57,8 @@ COMMENT ON COLUMN BARS.KL_Z200.D_MODE IS '';
 
 
 PROMPT *** Create  grants  KL_Z200 ***
-grant SELECT                                                                 on KL_Z200         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_Z200         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_Z200         to START1;
-grant SELECT                                                                 on KL_Z200         to UPLD;
 
 
 

@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/PFU/View/V_PFU_PAYM_FIELDS.sql =========*** Run *
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_PFU_PAYM_FIELDS ***
-
-  CREATE OR REPLACE FORCE VIEW PFU.V_PFU_PAYM_FIELDS ("ACC_2909", "OKPO_2909", "MFO_2909", "NAME_2909", "ACC_2560", "OKPO_2560", "MFO_2560", "NAME_2560", "DEBET_TTS", "SUM", "NAZN", "ID") AS 
-  select (select acc.acc_num
+create or replace view pfu.v_pfu_paym_fields as
+select (select acc.acc_num
           from pfu_acc_trans_2909 acc
          where acc.kf = ltrim(per.receiver_mfo,'0')) acc_2909,
        nvl((select nvl(cu.okpo,'123456789')
@@ -49,9 +40,3 @@ PROMPT *** Create  view V_PFU_PAYM_FIELDS ***
           from pfu_file pf, pfu_envelope_request per
          where per.id = pf.envelope_request_id
       order by pf.envelope_request_id desc;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/PFU/View/V_PFU_PAYM_FIELDS.sql =========*** End *
-PROMPT ===================================================================================== 

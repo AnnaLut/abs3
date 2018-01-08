@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_OW_COMIS_MASK.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OW_COMIS_MASK ***
-grant SELECT                                                                 on ERR$_OW_COMIS_MASK to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OW_COMIS_MASK to UPLD;
-
 
 
 PROMPT ===================================================================================== 

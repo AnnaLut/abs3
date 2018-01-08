@@ -81,10 +81,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_VYP ***
-grant SELECT                                                                 on TMP_VYP         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_VYP         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_VYP         to START1;
-grant SELECT                                                                 on TMP_VYP         to UPLD;
 
 
 

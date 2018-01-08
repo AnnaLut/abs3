@@ -19,9 +19,7 @@ PROMPT *** Create  view V_WCS_MGR_CHANGE_BIDS ***
    and 0 = wcs_utl.has_bid_state(b.bid_id, 'NEW_SBP_SELECTING');
 
 PROMPT *** Create  grants  V_WCS_MGR_CHANGE_BIDS ***
-grant SELECT                                                                 on V_WCS_MGR_CHANGE_BIDS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_MGR_CHANGE_BIDS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_MGR_CHANGE_BIDS to UPLD;
 
 
 

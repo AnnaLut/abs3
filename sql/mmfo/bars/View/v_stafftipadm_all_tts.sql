@@ -19,9 +19,7 @@ select a.tt, a.name
 
 PROMPT *** Create  grants  V_STAFFTIPADM_ALL_TTS ***
 grant SELECT                                                                 on V_STAFFTIPADM_ALL_TTS to ABS_ADMIN;
-grant SELECT                                                                 on V_STAFFTIPADM_ALL_TTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFFTIPADM_ALL_TTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_STAFFTIPADM_ALL_TTS to UPLD;
 
 
 

@@ -78,6 +78,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_FINRNKOKPO_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FIN_RNK_OKPO ADD CONSTRAINT FK_FINRNKOKPO_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_FIN_RNK_OKPO ***
 begin   
  execute immediate '
@@ -92,11 +105,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_RNK_OKPO ***
-grant SELECT                                                                 on FIN_RNK_OKPO    to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_RNK_OKPO    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_RNK_OKPO    to RCC_DEAL;
 grant SELECT                                                                 on FIN_RNK_OKPO    to START1;
-grant SELECT                                                                 on FIN_RNK_OKPO    to UPLD;
 
 
 

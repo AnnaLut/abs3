@@ -91,10 +91,6 @@ COMMENT ON COLUMN BARS.ERR$_CIM_1PB_RU_DOC.ORA_ERR_MESG$ IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIM_1PB_RU_DOC ***
-grant SELECT                                                                 on ERR$_CIM_1PB_RU_DOC to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIM_1PB_RU_DOC to UPLD;
-
 
 
 PROMPT ===================================================================================== 

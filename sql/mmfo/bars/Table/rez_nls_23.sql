@@ -72,12 +72,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_NLS_23 ***
-grant SELECT                                                                 on REZ_NLS_23      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZ_NLS_23      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ_NLS_23      to BARS_DM;
 grant SELECT                                                                 on REZ_NLS_23      to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZ_NLS_23      to START1;
-grant SELECT                                                                 on REZ_NLS_23      to UPLD;
 
 
 

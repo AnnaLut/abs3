@@ -10,10 +10,6 @@ PROMPT *** Create  view AQ$BARS_MSG_QT_S ***
   CREATE OR REPLACE FORCE VIEW BARS.AQ$BARS_MSG_QT_S ("QUEUE", "NAME", "ADDRESS", "PROTOCOL", "TRANSFORMATION", "QUEUE_TO_QUEUE") AS 
   SELECT queue_name QUEUE, name NAME , address ADDRESS , protocol PROTOCOL, trans_name TRANSFORMATION, decode(bitand(SUBSCRIBER_TYPE, 512), 512, 'TRUE', 'FALSE') QUEUE_TO_QUEUE  FROM "AQ$_BARS_MSG_QT_S" s  WHERE (bitand(s.subscriber_type, 1) = 1)  WITH READ ONLY;
 
-PROMPT *** Create  grants  AQ$BARS_MSG_QT_S ***
-grant SELECT                                                                 on AQ$BARS_MSG_QT_S to BARSREADER_ROLE;
-grant SELECT                                                                 on AQ$BARS_MSG_QT_S to UPLD;
-
 
 
 PROMPT ===================================================================================== 

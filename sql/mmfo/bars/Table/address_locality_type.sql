@@ -79,11 +79,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ADDRESS_LOCALITY_TYPE ***
-grant SELECT                                                                 on ADDRESS_LOCALITY_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on ADDRESS_LOCALITY_TYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ADDRESS_LOCALITY_TYPE to BARS_DM;
 grant SELECT                                                                 on ADDRESS_LOCALITY_TYPE to START1;
-grant SELECT                                                                 on ADDRESS_LOCALITY_TYPE to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ADDRESS_LOCALITY_TYPE to WR_ALL_RIGHTS;
 
 

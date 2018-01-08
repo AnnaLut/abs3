@@ -22,9 +22,7 @@ PROMPT *** Create  view V_ZAY_KV_KURS ***
 ORDER BY s.sort_ord, t.kv;
 
 PROMPT *** Create  grants  V_ZAY_KV_KURS ***
-grant SELECT                                                                 on V_ZAY_KV_KURS   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY_KV_KURS   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ZAY_KV_KURS   to UPLD;
 
 
 

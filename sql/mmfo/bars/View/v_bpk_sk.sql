@@ -35,9 +35,7 @@ PROMPT *** Create  view V_BPK_SK ***
    ORDER BY w.code;
 
 PROMPT *** Create  grants  V_BPK_SK ***
-grant SELECT                                                                 on V_BPK_SK        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BPK_SK        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_BPK_SK        to UPLD;
 
 
 

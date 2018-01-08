@@ -105,11 +105,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUSTOMER_RI ***
-grant SELECT                                                                 on CUSTOMER_RI     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_RI     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_RI     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_RI     to TECH005;
-grant SELECT                                                                 on CUSTOMER_RI     to UPLD;
 
 
 

@@ -90,9 +90,7 @@ where d.grt_type_id = t.type_id
   and d.status_id = ds.status_id;
 
 PROMPT *** Create  grants  V_GRT_DEALS ***
-grant SELECT                                                                 on V_GRT_DEALS     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GRT_DEALS     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_GRT_DEALS     to UPLD;
 
 
 

@@ -158,8 +158,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_AQ_DOCSTMT ***
-grant SELECT                                                                 on SW_AQ_DOCSTMT   to BARSREADER_ROLE;
-grant SELECT                                                                 on SW_AQ_DOCSTMT   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_AQ_DOCSTMT   to WR_ALL_RIGHTS;
 
 

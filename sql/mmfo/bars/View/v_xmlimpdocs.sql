@@ -14,14 +14,12 @@ PROMPT *** Create  view V_XMLIMPDOCS ***
  VDAT, VOB, ERRCODE, ERRMSG, d.status, descript, D_REC, BIS, f.userid, fio
 from xml_impdocs d, xml_impfiles f,  xml_impstatus s, staff$base t
 where d.fn = f.fn and d.dat = f.dat and f.userid = t.id
-      and s.status = d.status
+      and s.status = d.status 
  ;
 
 PROMPT *** Create  grants  V_XMLIMPDOCS ***
-grant SELECT                                                                 on V_XMLIMPDOCS    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_XMLIMPDOCS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_XMLIMPDOCS    to OPER000;
-grant SELECT                                                                 on V_XMLIMPDOCS    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_XMLIMPDOCS    to WR_ALL_RIGHTS;
 
 

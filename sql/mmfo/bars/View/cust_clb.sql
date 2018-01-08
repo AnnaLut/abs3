@@ -31,10 +31,8 @@ PROMPT *** Create  view CUST_CLB ***
    WITH READ ONLY;
 
 PROMPT *** Create  grants  CUST_CLB ***
-grant SELECT                                                                 on CUST_CLB        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUST_CLB        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_CLB        to CUST_CLB;
-grant SELECT                                                                 on CUST_CLB        to UPLD;
 grant FLASHBACK,SELECT                                                       on CUST_CLB        to WR_REFREAD;
 
 

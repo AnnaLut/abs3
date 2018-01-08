@@ -79,6 +79,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SPECPARAMINTUPD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SPECPARAM_INT_UPDATE ADD CONSTRAINT FK_SPECPARAMINTUPD FOREIGN KEY (USER_NAME)
+	  REFERENCES BARS.STAFF$BASE (LOGNAME) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SPECPARAMINTUPD_DATE_NN ***
 begin   
  execute immediate '
@@ -141,11 +154,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SPECPARAM_INT_UPDATE ***
-grant SELECT                                                                 on SPECPARAM_INT_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on SPECPARAM_INT_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SPECPARAM_INT_UPDATE to BARS_DM;
 grant SELECT                                                                 on SPECPARAM_INT_UPDATE to RPBN001;
-grant SELECT                                                                 on SPECPARAM_INT_UPDATE to UPLD;
 
 
 

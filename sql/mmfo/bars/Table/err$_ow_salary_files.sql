@@ -69,10 +69,6 @@ COMMENT ON COLUMN BARS.ERR$_OW_SALARY_FILES.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OW_SALARY_FILES ***
-grant SELECT                                                                 on ERR$_OW_SALARY_FILES to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OW_SALARY_FILES to UPLD;
-
 
 
 PROMPT ===================================================================================== 

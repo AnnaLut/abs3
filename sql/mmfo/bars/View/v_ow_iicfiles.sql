@@ -23,10 +23,8 @@ PROMPT *** Create  view V_OW_IICFILES ***
  where f.file_name = r.f_n(+);
 
 PROMPT *** Create  grants  V_OW_IICFILES ***
-grant SELECT                                                                 on V_OW_IICFILES   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_IICFILES   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_IICFILES   to OW;
-grant SELECT                                                                 on V_OW_IICFILES   to UPLD;
 
 
 

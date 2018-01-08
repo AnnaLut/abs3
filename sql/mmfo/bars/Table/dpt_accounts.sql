@@ -101,6 +101,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_DPTACCOUNTS_DPTDPTALL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_ACCOUNTS ADD CONSTRAINT FK_DPTACCOUNTS_DPTDPTALL FOREIGN KEY (DPTID)
+	  REFERENCES BARS.DPT_DEPOSIT_ALL (DEPOSIT_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTACCOUNTS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_ACCOUNTS ADD CONSTRAINT FK_DPTACCOUNTS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_DPTACCOUNTS ***
 begin   
  execute immediate '
@@ -115,7 +141,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_ACCOUNTS ***
-grant SELECT                                                                 on DPT_ACCOUNTS    to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_ACCOUNTS    to BARS_ACCESS_DEFROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on DPT_ACCOUNTS    to BARS_DM;
 grant SELECT                                                                 on DPT_ACCOUNTS    to START1;

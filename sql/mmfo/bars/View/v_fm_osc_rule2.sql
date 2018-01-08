@@ -1,14 +1,23 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_FM_OSC_RULE2.sql =========*** Run ***
-PROMPT ===================================================================================== 
-
-
 PROMPT *** Create  view V_FM_OSC_RULE2 ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_FM_OSC_RULE2 ("REF", "VDAT") AS 
-  SELECT o.REF, o.vdat
+
+create or replace view v_fm_osc_rule2 (ref, vdat) as
+-- ============================================================================
+-- 2. Грошові кошти у готівковій формі
+-- ============================================================================
+-- Код обов’язкового ФМ: 1010, 1011, 1012, 1020, 1021, 1022, 1031, 1032 
+-- ============================================================================
+-- SUM=15000000 та
+-- ( ACCOUNTS=1001, 1002, 1005 (тільки свого МФО) або
+--   ACCOUNTSA = 2902, 2909 (тільки свого МФО) )
+-- <кореспонденція з рахунками 20, 21, 22, 25, 26, 28, 29, 37 груп рахунків (в т.ч. рахунків інших банків)
+-- 21.04.2017 - добавили в соответствии с COBUSUPABS-5844
+-- 1. «Код ОП» належить коду «РКК»
+-- 2. ACCOUNTSA = 2625 та ACCOUNTSB = 2924 та PURPOSE = «видач» (будь яка позиція)
+-- 3. ACCOUNTSA = 2924 та ACCOUNTSB = 2924 та PURPOSE = «Видача готівки» (початок стрічки призначення) або PURPOSE = «зарахування» (будь яка позиція) або PURPOSE = «поповнення» (будь яка позиція).
+-- 4. ACCOUNTSA = 2924 та ACCOUNTSB = 2625
+-- ============================================================================
+SELECT o.REF, o.vdat
      FROM oper o
     WHERE     (       SUBSTR (o.nlsa, 1, 4) IN ('1001', '1002', '1005') AND o.mfoa = f_ourmfo
                   AND SUBSTR (o.nlsb, 1, 2) IN ('20','21','22','25','26','28','29','37')
@@ -35,15 +44,5 @@ PROMPT *** Create  view V_FM_OSC_RULE2 ***
           AND gl.p_icurval (NVL (o.kv, 980), NVL (o.s, 0), o.vdat) >=
                  15000000;
 
-PROMPT *** Create  grants  V_FM_OSC_RULE2 ***
-grant SELECT                                                                 on V_FM_OSC_RULE2  to BARSREADER_ROLE;
-grant SELECT                                                                 on V_FM_OSC_RULE2  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_FM_OSC_RULE2  to FINMON01;
-grant SELECT                                                                 on V_FM_OSC_RULE2  to START1;
-grant SELECT                                                                 on V_FM_OSC_RULE2  to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_FM_OSC_RULE2.sql =========*** End ***
-PROMPT ===================================================================================== 
+grant select on v_fm_osc_rule2 to finmon01;
+grant select on v_fm_osc_rule2 to bars_access_defrole;

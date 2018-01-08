@@ -77,10 +77,6 @@ COMMENT ON COLUMN BARS.ERR$_ZAG_MC.N IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ZAG_MC ***
-grant SELECT                                                                 on ERR$_ZAG_MC     to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ZAG_MC     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

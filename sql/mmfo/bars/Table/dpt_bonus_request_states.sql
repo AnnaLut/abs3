@@ -101,9 +101,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_BONUS_REQUEST_STATES ***
-grant SELECT                                                                 on DPT_BONUS_REQUEST_STATES to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_BONUS_REQUEST_STATES to BARS_DM;
-grant SELECT                                                                 on DPT_BONUS_REQUEST_STATES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_BONUS_REQUEST_STATES to WR_ALL_RIGHTS;
 
 

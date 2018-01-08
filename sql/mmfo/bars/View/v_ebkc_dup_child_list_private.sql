@@ -1,14 +1,19 @@
+prompt ==================================
+prompt Create view v_ebkc_dup_child_list_private
+prompt ==================================
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_EBKC_DUP_CHILD_LIST_PRIVATE.sql =====
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_EBKC_DUP_CHILD_LIST_PRIVATE ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_EBKC_DUP_CHILD_LIST_PRIVATE ("KF", "M_RNK", "D_RNK", "OKPO", "NMK", "PRODUCT", "LAST_MODIFC_DATE", "CARD_QUALITY", "SORT_NUM") AS 
-  select KF
+create or replace view BARS.V_EBKC_DUP_CHILD_LIST_PRIVATE
+( KF
+, M_RNK
+, D_RNK
+, OKPO
+, NMK
+, PRODUCT
+, LAST_MODIFC_DATE
+, CARD_QUALITY
+, SORT_NUM
+) as /* открытые дубликаты */
+select KF
      , M_RNK
      , D_RNK
      , OKPO
@@ -21,11 +26,11 @@ PROMPT *** Create  view V_EBKC_DUP_CHILD_LIST_PRIVATE ***
                 edg.m_rnk,
                 edg.d_rnk,
                 (select max(quality)
-                   from EBKC_QUALITYATTR_GROUPS
+                   from EBKC_QUALITYATTR_GROUPS 
                   where kf  = edg.kf
                     and rnk = edg.d_rnk
                     and name = 'card'
-                    and cust_type = 'P') as card_quality,
+                    and cust_type = 'P') as card_quality,  
                 cst.okpo,
                 cst.nmk,
                 (select name from ebk_groups where id = ebkc_pack.get_group_id( edg.d_rnk, edg.kf ) ) as product,
@@ -37,13 +42,10 @@ PROMPT *** Create  view V_EBKC_DUP_CHILD_LIST_PRIVATE ***
             and cst.DATE_OFF is null
        );
 
-PROMPT *** Create  grants  V_EBKC_DUP_CHILD_LIST_PRIVATE ***
-grant SELECT                                                                 on V_EBKC_DUP_CHILD_LIST_PRIVATE to BARSREADER_ROLE;
-grant SELECT                                                                 on V_EBKC_DUP_CHILD_LIST_PRIVATE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_EBKC_DUP_CHILD_LIST_PRIVATE to UPLD;
+show err
 
+prompt ==================================
+prompt Grants
+prompt ==================================
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_EBKC_DUP_CHILD_LIST_PRIVATE.sql =====
-PROMPT ===================================================================================== 
+grant select on v_ebkc_dup_child_list_private to bars_access_defrole;

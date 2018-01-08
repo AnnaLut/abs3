@@ -132,12 +132,10 @@ exception when others then
 
 PROMPT *** Create  grants  DPU_DEALW ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_DEALW       to ABS_ADMIN;
-grant SELECT                                                                 on DPU_DEALW       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_DEALW       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_DEALW       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_DEALW       to DPT_ADMIN;
 grant SELECT                                                                 on DPU_DEALW       to START1;
-grant SELECT                                                                 on DPU_DEALW       to UPLD;
 
 
 

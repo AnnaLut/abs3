@@ -52,9 +52,7 @@ COMMENT ON COLUMN BARS.TMP_CRKR_REPORT_TVBV.SS IS '';
 
 
 PROMPT *** Create  grants  TMP_CRKR_REPORT_TVBV ***
-grant SELECT                                                                 on TMP_CRKR_REPORT_TVBV to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CRKR_REPORT_TVBV to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on TMP_CRKR_REPORT_TVBV to UPLD;
 
 
 

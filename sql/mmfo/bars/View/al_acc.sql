@@ -27,10 +27,8 @@ PROMPT *** Create  view AL_ACC ***
    GROUP BY o.otd;
 
 PROMPT *** Create  grants  AL_ACC ***
-grant SELECT                                                                 on AL_ACC          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on AL_ACC          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AL_ACC          to SALGL;
-grant SELECT                                                                 on AL_ACC          to UPLD;
 
 
 

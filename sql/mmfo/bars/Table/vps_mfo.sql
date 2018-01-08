@@ -87,10 +87,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  VPS_MFO ***
-grant SELECT                                                                 on VPS_MFO         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VPS_MFO         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VPS_MFO         to START1;
-grant SELECT                                                                 on VPS_MFO         to UPLD;
 
 
 

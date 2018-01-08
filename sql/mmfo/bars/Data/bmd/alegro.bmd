@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'ALEGRO';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'ALEGRO';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,65 +119,65 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACCOUNT09', 'C', '№ рахунку установи (2909/09)', '1', 20, 76, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ACCOUNT1', 'C', 'Номер~рахунку~1', '1', 10, 51, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'ACCOUNT2', 'C', 'Номер~рахунку~2', '1', 70, 52, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'ACCOUNT24', 'C', '№ рахунку~установи~(2909/24)', '1', 20, 53, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'ACCOUNT3', 'C', 'Номер~рахунку~3', '1', 20, 54, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'ACCOUNT4', 'C', 'Номер~рахунку~4', '1', 30, 59, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'ACCOUNTMVPS', 'C', 'Счет 2909', '2', 14, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'ACTUALITY', 'C', 'Статус~установи', '1', 10, 61, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'ADDRESS', 'C', 'Адрес', '2.5', 100, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'ADDRESSENG', 'C', 'Адрес отделения (ENG)', '1', 100, 98, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'ADDRESSRUS', 'C', 'Адрес отделения (RUS)', '2.5', 100, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'BUHGALTERPHONE', 'C', 'Телефон~гол.бухг', '1', 10, 58, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'CITYCODE', 'C', 'Мiжмiський~код', '1.4', 10, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'CITYNAME', 'C', 'Населенный~пункт (УКР)', '2', 30, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'CITYNAMEENG', 'C', 'Населенный пункт (ENG)', '1', 30, 92, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'CITYNAMERUS', 'C', 'Населенный~пункт (РУС)', '2', 30, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'CLOSEDATE', 'D', 'Дата~закриття', '1', 10, 63, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'CUREXCHANGECONTRACTS', 'N', 'ПОВ~за агент.~угодами', '1', 22, 64, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'CUREXCHANGEPOINTS', 'N', 'Власнi~ПОВ,~ аренда', '1', 22, 65, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'EMAIL', 'C', 'E-Mail', '1', 40, 66, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'EMITSERVICE', 'C', 'Послуги~по~емiсiї', '1', 10, 67, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'EMPLOYNUMBER', 'C', 'Кiлькiсть~спiвпрацiвникiв', '1', 10, 68, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'FAX', 'C', 'Факс', '1', 20, 69, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'FOSSMAIL', 'C', 'FossMail', '1', 60, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'GEOGRAFICALCODE', 'C', 'Код~географiчного~розташування', '1', 10, 71, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'GLAVBUHGALTER', 'C', 'Гол.~бухгалтер', '1', 40, 72, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'KOATUU', 'N', 'код КОАТУУ', '1', 22, 52, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'MANAGER', 'C', 'Керуючий~установою', '1', 40, 53, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'MANAGERPHONE', 'C', 'Телефон~керiвника', '1', 10, 54, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'MFO', 'C', 'МФО', '1', 6, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'NAME', 'C', 'Назва', '3', 70, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'NAMEENGB', 'C', 'Наименование отделения (ENG)', '1', 70, 91, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'NAMEENGR', 'C', 'Наименование региона (ENG)', '3', 30, 90, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 34, 'NAMERUSB', 'C', 'Отделение (РУС)', '4.5', 70, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'NAMERUSR', 'C', 'Регион (РУС)', '3', 30, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 36, 'NAMEUKRB', 'C', 'Oтделениe (УКР)', '4.5', 70, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 37, 'NAMEUKRR', 'C', 'Pегион (УКР)', '3', 30, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 38, 'NBUMAIL', 'C', 'NBU Mail', '1', 10, 83, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 39, 'NUM', 'C', 'Номер~отделения', '1.3', 30, 0, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 40, 'OPENDATE', 'D', 'Дата~вiдкриття', '1', 10, 85, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 41, 'OPERWINDOWSACTIVE', 'N', 'Активнi~операцiйнi~каси~(iн.вал)', '', 22, 86, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 42, 'ORDERPUNKTNUMBER', 'C', '№ пункту~виплати~переказiв', '', 10, 87, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 43, 'PARENTID', 'N', 'Пiдпорядкована', '', 22, 88, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 44, 'PAYMENTATM', 'C', 'Видача~готiвки~за~допомогою~ATM', '1', 10, 55, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 45, 'PAYMENTIMP', 'C', 'Видача~готiвки~за~допомогою~IMP', '1', 10, 77, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 46, 'PAYMENTPOS', 'C', 'Видача~готiвки~за~допомогою~POS', '1', 10, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 47, 'PHONE', 'C', 'Телефон~установи', '1', 20, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 48, 'POSTALINDEX', 'C', 'Почтовий~индекс', '.8', 10, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 49, 'PRIVACYFORM', 'C', 'Форма~власностi~примiщення', '1', 20, 45, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 50, 'QUATERSAREA', 'C', 'Площа~примiщень~установи', '1', 20, 46, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 51, 'RANGE', 'C', 'Ранг', '1', 10, 47, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 52, 'REGBICCODE', 'C', 'ВIС-код~регионального~управления', '1.8', 11, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 53, 'REGCODE', 'C', 'Регистрационный код', '2.6', 30, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 54, 'REPORTBRANCH', 'N', 'Установа,~яка обробляє~звiтнiсть', '1', 22, 50, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 55, 'RESPONSIBLEPERSON', 'C', 'Вiдповiдальна~особа~за~мережу', '1', 40, 48, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 56, 'RESPONSIBLEPHONE', 'C', 'Телефон~вiдповiд.~за мережу~особи', '1', 10, 49, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 57, 'TERMINALNAME', 'C', 'Назва~термiналу', '1', 20, 51, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 58, 'VAL', 'N', 'Ознака~здiйснення~платежiв~в iн.вал(0/1)', '1', 22, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 59, 'ZKPO', 'C', 'ЗКПО~(ЄДРПОУ)', '1.2', 10, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACCOUNT09', 'C', '№ рахунку установи (2909/09)', 1, 20, 76, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ACCOUNT1', 'C', 'Номер~рахунку~1', 1, 10, 51, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'ACCOUNT2', 'C', 'Номер~рахунку~2', 1, 70, 52, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ACCOUNT24', 'C', '№ рахунку~установи~(2909/24)', 1, 20, 53, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'ACCOUNT3', 'C', 'Номер~рахунку~3', 1, 20, 54, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'ACCOUNT4', 'C', 'Номер~рахунку~4', 1, 30, 59, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'ACCOUNTMVPS', 'C', 'Счет 2909', 2, 14, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'ACTUALITY', 'C', 'Статус~установи', 1, 10, 61, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'ADDRESS', 'C', 'Адрес', 2.5, 100, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'ADDRESSENG', 'C', 'Адрес отделения (ENG)', 1, 100, 98, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'ADDRESSRUS', 'C', 'Адрес отделения (RUS)', 2.5, 100, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'BUHGALTERPHONE', 'C', 'Телефон~гол.бухг', 1, 10, 58, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'CITYCODE', 'C', 'Мiжмiський~код', 1.4, 10, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'CITYNAME', 'C', 'Населенный~пункт (УКР)', 2, 30, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'CITYNAMEENG', 'C', 'Населенный пункт (ENG)', 1, 30, 92, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'CITYNAMERUS', 'C', 'Населенный~пункт (РУС)', 2, 30, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'CLOSEDATE', 'D', 'Дата~закриття', 1, 10, 63, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'CUREXCHANGECONTRACTS', 'N', 'ПОВ~за агент.~угодами', 1, 22, 64, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'CUREXCHANGEPOINTS', 'N', 'Власнi~ПОВ,~ аренда', 1, 22, 65, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'EMAIL', 'C', 'E-Mail', 1, 40, 66, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'EMITSERVICE', 'C', 'Послуги~по~емiсiї', 1, 10, 67, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'EMPLOYNUMBER', 'C', 'Кiлькiсть~спiвпрацiвникiв', 1, 10, 68, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'FAX', 'C', 'Факс', 1, 20, 69, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'FOSSMAIL', 'C', 'FossMail', 1, 60, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'GEOGRAFICALCODE', 'C', 'Код~географiчного~розташування', 1, 10, 71, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'GLAVBUHGALTER', 'C', 'Гол.~бухгалтер', 1, 40, 72, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'KOATUU', 'N', 'код КОАТУУ', 1, 22, 52, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'MANAGER', 'C', 'Керуючий~установою', 1, 40, 53, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'MANAGERPHONE', 'C', 'Телефон~керiвника', 1, 10, 54, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'MFO', 'C', 'МФО', 1, 6, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'NAME', 'C', 'Назва', 3, 70, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'NAMEENGB', 'C', 'Наименование отделения (ENG)', 1, 70, 91, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'NAMEENGR', 'C', 'Наименование региона (ENG)', 3, 30, 90, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'NAMERUSB', 'C', 'Отделение (РУС)', 4.5, 70, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'NAMERUSR', 'C', 'Регион (РУС)', 3, 30, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'NAMEUKRB', 'C', 'Oтделениe (УКР)', 4.5, 70, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'NAMEUKRR', 'C', 'Pегион (УКР)', 3, 30, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'NBUMAIL', 'C', 'NBU Mail', 1, 10, 83, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'NUM', 'C', 'Номер~отделения', 1.3, 30, 0, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'OPENDATE', 'D', 'Дата~вiдкриття', 1, 10, 85, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 41, 'OPERWINDOWSACTIVE', 'N', 'Активнi~операцiйнi~каси~(iн.вал)', null, 22, 86, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 42, 'ORDERPUNKTNUMBER', 'C', '№ пункту~виплати~переказiв', null, 10, 87, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 43, 'PARENTID', 'N', 'Пiдпорядкована', null, 22, 88, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 44, 'PAYMENTATM', 'C', 'Видача~готiвки~за~допомогою~ATM', 1, 10, 55, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 45, 'PAYMENTIMP', 'C', 'Видача~готiвки~за~допомогою~IMP', 1, 10, 77, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 46, 'PAYMENTPOS', 'C', 'Видача~готiвки~за~допомогою~POS', 1, 10, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 47, 'PHONE', 'C', 'Телефон~установи', 1, 20, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 48, 'POSTALINDEX', 'C', 'Почтовий~индекс', .8, 10, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 49, 'PRIVACYFORM', 'C', 'Форма~власностi~примiщення', 1, 20, 45, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 50, 'QUATERSAREA', 'C', 'Площа~примiщень~установи', 1, 20, 46, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 51, 'RANGE', 'C', 'Ранг', 1, 10, 47, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 52, 'REGBICCODE', 'C', 'ВIС-код~регионального~управления', 1.8, 11, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 53, 'REGCODE', 'C', 'Регистрационный код', 2.6, 30, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 54, 'REPORTBRANCH', 'N', 'Установа,~яка обробляє~звiтнiсть', 1, 22, 50, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 55, 'RESPONSIBLEPERSON', 'C', 'Вiдповiдальна~особа~за~мережу', 1, 40, 48, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 56, 'RESPONSIBLEPHONE', 'C', 'Телефон~вiдповiд.~за мережу~особи', 1, 10, 49, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 57, 'TERMINALNAME', 'C', 'Назва~термiналу', 1, 20, 51, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 58, 'VAL', 'N', 'Ознака~здiйснення~платежiв~в iн.вал(0/1)', 1, 22, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 59, 'ZKPO', 'C', 'ЗКПО~(ЄДРПОУ)', 1.2, 10, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

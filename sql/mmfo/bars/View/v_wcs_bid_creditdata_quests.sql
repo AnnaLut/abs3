@@ -39,9 +39,7 @@ PROMPT *** Create  view V_WCS_BID_CREDITDATA_QUESTS ***
    ORDER BY b.id, cb.ord;
 
 PROMPT *** Create  grants  V_WCS_BID_CREDITDATA_QUESTS ***
-grant SELECT                                                                 on V_WCS_BID_CREDITDATA_QUESTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_BID_CREDITDATA_QUESTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_BID_CREDITDATA_QUESTS to UPLD;
 
 
 

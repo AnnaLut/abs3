@@ -73,10 +73,6 @@ COMMENT ON COLUMN BARS.ERR$_SW_950_ARCH.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SW_950_ARCH ***
-grant SELECT                                                                 on ERR$_SW_950_ARCH to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SW_950_ARCH to UPLD;
-
 
 
 PROMPT ===================================================================================== 

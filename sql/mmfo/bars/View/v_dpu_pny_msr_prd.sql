@@ -13,10 +13,6 @@ PROMPT *** Create  view V_DPU_PNY_MSR_PRD ***
   from DPT_SHSROK
 ;
 
-PROMPT *** Create  grants  V_DPU_PNY_MSR_PRD ***
-grant SELECT                                                                 on V_DPU_PNY_MSR_PRD to BARSREADER_ROLE;
-grant SELECT                                                                 on V_DPU_PNY_MSR_PRD to UPLD;
-
 
 
 PROMPT ===================================================================================== 

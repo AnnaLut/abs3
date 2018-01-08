@@ -24,7 +24,7 @@ begin
   execute immediate '
   CREATE TABLE BARS.VIP_TEMPLATE 
    (	TEMPLATE CLOB
-   ) SEGMENT CREATION IMMEDIATE 
+   ) SEGMENT CREATION DEFERRED 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSDYND 
@@ -49,9 +49,7 @@ COMMENT ON COLUMN BARS.VIP_TEMPLATE.TEMPLATE IS '';
 
 
 PROMPT *** Create  grants  VIP_TEMPLATE ***
-grant SELECT                                                                 on VIP_TEMPLATE    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VIP_TEMPLATE    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on VIP_TEMPLATE    to UPLD;
 
 
 

@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ca_compen.sql =========*** Run *** =
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.CA_COMPEN 
+create or replace package ca_compen
 is
   version_header  constant  varchar2(64) := 'version 1.05 07.04.2017 14:36';
 
@@ -58,7 +58,7 @@ is
                                   p_key     in  varchar2,
                                   p_ref     out oper.ref%type,
                                   p_int_buf out varchar2,
-                                  p_sep_buf out varchar2);
+                                  p_sep_buf out varchar2); 
 
   -- установка подписей на документ
   procedure put_doc_sign(p_ref in integer, p_key in varchar2, p_int_sign in varchar2, p_sep_sign in varchar2);
@@ -69,7 +69,7 @@ is
 
 end ca_compen;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CA_COMPEN 
+create or replace package body ca_compen
 as
   version_body  constant  varchar2(64) := 'version 1.17 11.04.2017 17:10';
 

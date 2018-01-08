@@ -131,11 +131,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BOND ***
-grant SELECT                                                                 on BOND            to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BOND            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BOND            to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BOND            to START1;
-grant SELECT                                                                 on BOND            to UPLD;
 
 
 

@@ -26,8 +26,7 @@ begin
   CREATE TABLE BARS.PEREKR_DOG 
    (	IDG NUMBER(38,0), 
 	DOG VARCHAR2(100), 
-	PRIM VARCHAR2(70), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+	PRIM VARCHAR2(70)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 0 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -37,7 +36,14 @@ exception when others then
 end; 
 /
 
-
+PROMPT **** ADD KF ****** 
+begin
+  execute immediate 
+    ' ALTER TABLE PEREKR_DOG add (KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''))';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to PEREKR_DOG ***
@@ -48,7 +54,6 @@ COMMENT ON TABLE BARS.PEREKR_DOG IS 'Перекрытия. Номера договоров';
 COMMENT ON COLUMN BARS.PEREKR_DOG.IDG IS 'Код группы';
 COMMENT ON COLUMN BARS.PEREKR_DOG.DOG IS 'Номер договора';
 COMMENT ON COLUMN BARS.PEREKR_DOG.PRIM IS '';
-COMMENT ON COLUMN BARS.PEREKR_DOG.KF IS '';
 
 
 
@@ -88,6 +93,15 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  constraint FK_PEREKR_DOG_PEREKR_G ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PEREKR_DOG ADD CONSTRAINT FK_PEREKR_DOG_PEREKR_G FOREIGN KEY (KF, IDG) 
+      REFERENCES BARS.PEREKR_G (KF, IDG) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 
@@ -104,17 +118,16 @@ exception when others then
 
 
 
+
 PROMPT *** Create  grants  PEREKR_DOG ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PEREKR_DOG      to ABS_ADMIN;
 grant SELECT                                                                 on PEREKR_DOG      to BARS015;
-grant SELECT                                                                 on PEREKR_DOG      to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on PEREKR_DOG      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PEREKR_DOG      to BARS_DM;
 grant SELECT                                                                 on PEREKR_DOG      to DPT_ADMIN;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on PEREKR_DOG      to REF0000;
 grant SELECT                                                                 on PEREKR_DOG      to R_KP;
 grant SELECT                                                                 on PEREKR_DOG      to START1;
-grant SELECT                                                                 on PEREKR_DOG      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PEREKR_DOG      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on PEREKR_DOG      to WR_REFREAD;
 

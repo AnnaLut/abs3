@@ -13,9 +13,7 @@ PROMPT *** Create  view V_INS_LIMITS ***
  order by l.id;
 
 PROMPT *** Create  grants  V_INS_LIMITS ***
-grant SELECT                                                                 on V_INS_LIMITS    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_LIMITS    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INS_LIMITS    to UPLD;
 
 
 

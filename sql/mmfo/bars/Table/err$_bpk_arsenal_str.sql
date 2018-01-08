@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_BPK_ARSENAL_STR.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_BPK_ARSENAL_STR ***
-grant SELECT                                                                 on ERR$_BPK_ARSENAL_STR to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_BPK_ARSENAL_STR to UPLD;
-
 
 
 PROMPT ===================================================================================== 

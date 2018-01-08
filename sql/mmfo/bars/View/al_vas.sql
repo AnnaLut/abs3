@@ -61,10 +61,8 @@ PROMPT *** Create  view AL_VAS ***
    GROUP BY 0, o.vdat, DECODE (SUBSTR (t.flags, 1, 1), 1, 'Ð', 'Ï');
 
 PROMPT *** Create  grants  AL_VAS ***
-grant SELECT                                                                 on AL_VAS          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on AL_VAS          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AL_VAS          to SALGL;
-grant SELECT                                                                 on AL_VAS          to UPLD;
 
 
 

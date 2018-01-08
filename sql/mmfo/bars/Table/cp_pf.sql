@@ -93,7 +93,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_PF ***
-grant SELECT                                                                 on CP_PF           to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_PF           to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_PF           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_PF           to BARS_DM;

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции 00K
-prompt Наименование операции: 00K Відсилання дорожніх чеків (9910)
+prompt Наименование операции: Відсилання дорожніх чеків (9910)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('00K', '00K Відсилання дорожніх чеків (9910)', 1, '#(nbs_ob22 (''9910'',''01''))', null, '#(nbs_ob22 (''9830'',''01''))', null, null, '#(nbs_ob22 (''9910'',''01''))', '#(nbs_ob22 (''9830'',''01''))', null, 0, 0, 0, 0, null, null, null, null, null, null, '1000100000000000000000000000000000010000000000000000000000000000', 'Відсилання дорожніх чеків');
+    values ('00K', 'Відсилання дорожніх чеків (9910)', 1, '#(nbs_ob22 (''9910'',''01''))', null, '#(nbs_ob22 (''9830'',''01''))', null, null, '#(nbs_ob22 (''9910'',''01''))', '#(nbs_ob22 (''9830'',''01''))', null, 0, 0, 0, 0, null, null, null, null, null, null, '1000100000000000000000000000000000010000000000000000000000000000', 'Відсилання дорожніх чеків');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='00K', name='00K Відсилання дорожніх чеків (9910)', dk=1, nlsm='#(nbs_ob22 (''9910'',''01''))', kv=null, nlsk='#(nbs_ob22 (''9830'',''01''))', kvk=null, nlss=null, nlsa='#(nbs_ob22 (''9910'',''01''))', nlsb='#(nbs_ob22 (''9830'',''01''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1000100000000000000000000000000000010000000000000000000000000000', nazn='Відсилання дорожніх чеків'
+         set tt='00K', name='Відсилання дорожніх чеків (9910)', dk=1, nlsm='#(nbs_ob22 (''9910'',''01''))', kv=null, nlsk='#(nbs_ob22 (''9830'',''01''))', kvk=null, nlss=null, nlsa='#(nbs_ob22 (''9910'',''01''))', nlsb='#(nbs_ob22 (''9830'',''01''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1000100000000000000000000000000000010000000000000000000000000000', nazn='Відсилання дорожніх чеків'
        where tt='00K';
   end;
   --------------------------------

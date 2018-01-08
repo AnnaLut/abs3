@@ -175,11 +175,9 @@ COMMENT ON COLUMN BARS.INV_CCK_UL.G64 IS '64 Сума неамортизованого дисконту ';
 
 
 PROMPT *** Create  grants  INV_CCK_UL ***
-grant SELECT                                                                 on INV_CCK_UL      to BARSREADER_ROLE;
 grant SELECT                                                                 on INV_CCK_UL      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INV_CCK_UL      to BARS_DM;
 grant SELECT                                                                 on INV_CCK_UL      to RCC_DEAL;
-grant SELECT                                                                 on INV_CCK_UL      to UPLD;
 
 
 

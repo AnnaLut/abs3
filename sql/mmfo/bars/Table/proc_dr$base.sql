@@ -87,6 +87,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_PROC_DR$BASE_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PROC_DR$BASE ADD CONSTRAINT FK_PROC_DR$BASE_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_PROC_DR$BASE_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PROC_DR$BASE ADD CONSTRAINT FK_PROC_DR$BASE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C008641 ***
 begin   
  execute immediate '
@@ -99,10 +125,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C008638 ***
+PROMPT *** Create  constraint CC_PROC_DR$BASE_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PROC_DR$BASE MODIFY (NBS NOT NULL ENABLE)';
+  ALTER TABLE BARS.PROC_DR$BASE ADD CONSTRAINT CC_PROC_DR$BASE_BRANCH_NN CHECK (BRANCH IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -159,10 +185,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PROC_DR$BASE_BRANCH_NN ***
+PROMPT *** Create  constraint SYS_C008638 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PROC_DR$BASE ADD CONSTRAINT CC_PROC_DR$BASE_BRANCH_NN CHECK (BRANCH IS NOT NULL) ENABLE';
+  ALTER TABLE BARS.PROC_DR$BASE MODIFY (NBS NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -185,11 +211,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  PROC_DR$BASE ***
-grant SELECT                                                                 on PROC_DR$BASE    to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on PROC_DR$BASE    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PROC_DR$BASE    to BARS_DM;
 grant SELECT                                                                 on PROC_DR$BASE    to START1;
-grant SELECT                                                                 on PROC_DR$BASE    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PROC_DR$BASE    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on PROC_DR$BASE    to WR_REFREAD;
 

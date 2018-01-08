@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KD3', 'Комiсiя за перерахування суми вкладу за товари та послуги', 1, null, null, '#(nbs_ob22 (''6510'',''10''))', null, null, null, '#(nbs_ob22 (''6510'',''10''))', null, 0, 0, 0, 0, 'F_TARIF(3, #(KVA),#(NLSA), #(S))', null, null, null, null, null, '0000000000000000000000000000000000000000000000000000000000000000', null);
+    values ('KD3', 'Комiсiя за перерахування суми вкладу за товари та послуги', 1, null, null, '61103010122561 ', null, null, null, '61103010122561 ', null, 0, 0, 0, 0, 'F_TARIF(3, #(KVA),#(NLSA), #(S))', null, null, null, null, null, '0000000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KD3', name='Комiсiя за перерахування суми вкладу за товари та послуги', dk=1, nlsm=null, kv=null, nlsk='#(nbs_ob22 (''6510'',''10''))', kvk=null, nlss=null, nlsa=null, nlsb='#(nbs_ob22 (''6510'',''10''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(3, #(KVA),#(NLSA), #(S))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='KD3', name='Комiсiя за перерахування суми вкладу за товари та послуги', dk=1, nlsm=null, kv=null, nlsk='61103010122561 ', kvk=null, nlss=null, nlsa=null, nlsb='61103010122561 ', mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(3, #(KVA),#(NLSA), #(S))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='KD3';
   end;
   --------------------------------
@@ -89,7 +89,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции DP7
-prompt Наименование операции: DP7 Перерахування суми вкладу в нац.вал(мiжбанк)з ком. за товари i пос
+prompt Наименование операции: Перерахування суми вкладу в нац.вал(мiжбанк)з ком. за товари i послуги
 declare
   cnt_  number;
 begin
@@ -98,11 +98,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DP7', 'DP7 Перерахування суми вкладу в нац.вал(мiжбанк)з ком. за товари i пос', 1, null, 980, '#(get_proc_nls(''T00'',#(KVA)))', 980, null, null, null, null, 1, 1, 0, 0, null, null, null, null, null, 0, '0300100000000000000000000000000000010000000000000000000000000000', 'Повернення коштів згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DP7', 'Перерахування суми вкладу в нац.вал(мiжбанк)з ком. за товари i послуги', 1, null, 980, '#(get_proc_nls(''T00'',#(KVA)))', 980, null, null, null, null, 1, 1, 0, 0, null, null, null, null, null, 0, '0300100000000000000000000000000000010000000000000000000000000000', 'Повернення коштів згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DP7', name='DP7 Перерахування суми вкладу в нац.вал(мiжбанк)з ком. за товари i пос', dk=1, nlsm=null, kv=980, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0300100000000000000000000000000000010000000000000000000000000000', nazn='Повернення коштів згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DP7', name='Перерахування суми вкладу в нац.вал(мiжбанк)з ком. за товари i послуги', dk=1, nlsm=null, kv=980, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0300100000000000000000000000000000010000000000000000000000000000', nazn='Повернення коштів згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DP7';
   end;
   --------------------------------

@@ -18,9 +18,7 @@ group by a.nbs, a.fdat
  ;
 
 PROMPT *** Create  grants  V_BALANS_ALL ***
-grant SELECT                                                                 on V_BALANS_ALL    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BALANS_ALL    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_BALANS_ALL    to UPLD;
 grant SELECT                                                                 on V_BALANS_ALL    to WEB_BALANS;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BALANS_ALL    to WR_ALL_RIGHTS;
 

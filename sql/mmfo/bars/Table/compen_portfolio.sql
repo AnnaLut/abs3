@@ -149,11 +149,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  COMPEN_PORTFOLIO ***
-grant SELECT                                                                 on COMPEN_PORTFOLIO to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on COMPEN_PORTFOLIO to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on COMPEN_PORTFOLIO to BARS_DM;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on COMPEN_PORTFOLIO to START1;
-grant SELECT                                                                 on COMPEN_PORTFOLIO to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on COMPEN_PORTFOLIO to WR_ALL_RIGHTS;
 
 

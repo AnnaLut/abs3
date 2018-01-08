@@ -75,9 +75,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  REP_LICNAZNTT ***
-grant SELECT                                                                 on REP_LICNAZNTT   to BARSREADER_ROLE;
 grant SELECT                                                                 on REP_LICNAZNTT   to BARS_DM;
-grant SELECT                                                                 on REP_LICNAZNTT   to UPLD;
 
 
 

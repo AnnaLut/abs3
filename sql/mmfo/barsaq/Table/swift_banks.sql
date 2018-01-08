@@ -87,9 +87,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  SWIFT_BANKS ***
-grant SELECT                                                                 on SWIFT_BANKS     to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

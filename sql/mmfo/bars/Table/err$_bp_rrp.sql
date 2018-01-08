@@ -64,9 +64,7 @@ COMMENT ON COLUMN BARS.ERR$_BP_RRP.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_BP_RRP ***
-grant SELECT                                                                 on ERR$_BP_RRP     to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_BP_RRP     to BARS_DM;
-grant SELECT                                                                 on ERR$_BP_RRP     to UPLD;
 
 
 

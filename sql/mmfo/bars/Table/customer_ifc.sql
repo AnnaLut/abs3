@@ -75,6 +75,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint R_INTERBANK_CUSTOMERIFC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_IFC ADD CONSTRAINT R_INTERBANK_CUSTOMERIFC FOREIGN KEY (FLI)
+	  REFERENCES BARS.INTERBANK (FLI) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_SWBANKS_CUSTOMER_IFC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_IFC ADD CONSTRAINT R_SWBANKS_CUSTOMER_IFC FOREIGN KEY (NOSTRO_BANK)
+	  REFERENCES BARS.SW_BANKS (BIC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XPK_CUSTOMER_IFC ***
 begin   
  execute immediate '
@@ -89,11 +115,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUSTOMER_IFC ***
-grant SELECT                                                                 on CUSTOMER_IFC    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTOMER_IFC    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_IFC    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_IFC    to SWIFT001;
-grant SELECT                                                                 on CUSTOMER_IFC    to UPLD;
 grant FLASHBACK,SELECT                                                       on CUSTOMER_IFC    to WR_REFREAD;
 
 

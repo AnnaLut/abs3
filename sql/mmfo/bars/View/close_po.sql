@@ -52,10 +52,6 @@ where  (a.ostc <> 0 or a.dazs is null )
             )
 ;
 
-PROMPT *** Create  grants  CLOSE_PO ***
-grant SELECT                                                                 on CLOSE_PO        to BARSREADER_ROLE;
-grant SELECT                                                                 on CLOSE_PO        to UPLD;
-
 
 
 PROMPT ===================================================================================== 

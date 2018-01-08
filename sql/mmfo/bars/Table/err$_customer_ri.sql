@@ -72,9 +72,7 @@ COMMENT ON COLUMN BARS.ERR$_CUSTOMER_RI.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_CUSTOMER_RI ***
-grant SELECT                                                                 on ERR$_CUSTOMER_RI to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CUSTOMER_RI to BARS_DM;
-grant SELECT                                                                 on ERR$_CUSTOMER_RI to UPLD;
 
 
 

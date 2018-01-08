@@ -13,11 +13,9 @@ PROMPT *** Create  view CUST_EL2 ***
   FROM   customer;
 
 PROMPT *** Create  grants  CUST_EL2 ***
-grant SELECT                                                                 on CUST_EL2        to BARSREADER_ROLE;
 grant SELECT                                                                 on CUST_EL2        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUST_EL2        to REF0000;
 grant SELECT                                                                 on CUST_EL2        to START1;
-grant SELECT                                                                 on CUST_EL2        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUST_EL2        to WR_ALL_RIGHTS;
 
 

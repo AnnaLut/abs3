@@ -17,10 +17,8 @@ PROMPT *** Create  view V_FINREZ ***
           AND LENGTH (br3_finrez (o.REF, o.stmt, o.dk)) < 22;
 
 PROMPT *** Create  grants  V_FINREZ ***
-grant SELECT                                                                 on V_FINREZ        to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_FINREZ        to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_FINREZ        to START1;
-grant SELECT                                                                 on V_FINREZ        to UPLD;
 
 
 

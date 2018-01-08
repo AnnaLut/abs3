@@ -101,7 +101,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  OPERLIST_ACSPUB ***
-grant SELECT                                                                 on OPERLIST_ACSPUB to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OPERLIST_ACSPUB to WR_ALL_RIGHTS;
 
 

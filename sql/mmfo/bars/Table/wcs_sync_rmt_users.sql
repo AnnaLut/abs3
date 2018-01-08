@@ -131,8 +131,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SYNC_RMT_USERS ***
-grant SELECT                                                                 on WCS_SYNC_RMT_USERS to BARSREADER_ROLE;
-grant SELECT                                                                 on WCS_SYNC_RMT_USERS to UPLD;
 grant INSERT,SELECT,UPDATE                                                   on WCS_SYNC_RMT_USERS to WCS_SYNC_USER;
 
 

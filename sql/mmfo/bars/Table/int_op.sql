@@ -91,12 +91,10 @@ exception when others then
 PROMPT *** Create  grants  INT_OP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_OP          to ABS_ADMIN;
 grant SELECT                                                                 on INT_OP          to BARS010;
-grant SELECT                                                                 on INT_OP          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_OP          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_OP          to BARS_DM;
 grant SELECT                                                                 on INT_OP          to DPT;
 grant SELECT                                                                 on INT_OP          to START1;
-grant SELECT                                                                 on INT_OP          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_OP          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on INT_OP          to WR_REFREAD;
 

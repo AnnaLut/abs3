@@ -84,11 +84,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPA_ACC ***
-grant SELECT                                                                 on DPA_ACC         to BARSREADER_ROLE;
 grant INSERT                                                                 on DPA_ACC         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPA_ACC         to BARS_DM;
 grant INSERT                                                                 on DPA_ACC         to RPBN002;
-grant SELECT                                                                 on DPA_ACC         to UPLD;
 
 
 

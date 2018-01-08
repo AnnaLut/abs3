@@ -57,10 +57,8 @@ COMMENT ON COLUMN BARS.STRU_SB.TXT IS '';
 
 
 PROMPT *** Create  grants  STRU_SB ***
-grant SELECT                                                                 on STRU_SB         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STRU_SB         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STRU_SB         to START1;
-grant SELECT                                                                 on STRU_SB         to UPLD;
 
 
 

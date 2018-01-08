@@ -87,9 +87,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  META_DEP_EVENT ***
-grant SELECT                                                                 on META_DEP_EVENT  to BARSREADER_ROLE;
 grant SELECT                                                                 on META_DEP_EVENT  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on META_DEP_EVENT  to UPLD;
 
 
 

@@ -57,10 +57,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  UPL_PROCESS_STATUS ***
-grant SELECT                                                                 on UPL_PROCESS_STATUS to BARSREADER_ROLE;
-grant SELECT                                                                 on UPL_PROCESS_STATUS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

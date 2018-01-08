@@ -65,6 +65,19 @@ COMMENT ON COLUMN BARS.BPK_NBS_OB22.OB_3579 IS 'ќб22 до 3579';
 
 
 
+PROMPT *** Create  constraint FK_BPKNBSOB22_TIP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_NBS_OB22 ADD CONSTRAINT FK_BPKNBSOB22_TIP FOREIGN KEY (TIP)
+	  REFERENCES BARS.TIPS (TIP) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_BPKNBSOB22 ***
 begin   
  execute immediate '
@@ -93,11 +106,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_NBS_OB22 ***
-grant SELECT                                                                 on BPK_NBS_OB22    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BPK_NBS_OB22    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_NBS_OB22    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_NBS_OB22    to OBPC;
-grant SELECT                                                                 on BPK_NBS_OB22    to UPLD;
 grant FLASHBACK,SELECT                                                       on BPK_NBS_OB22    to WR_REFREAD;
 
 

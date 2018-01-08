@@ -27,9 +27,9 @@ begin
 	D_OPEN DATE, 
 	D_CLOSE DATE
    ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+  PCTFREE 10 PCTUSED 0 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
-  TABLESPACE BRSDYND ';
+  TABLESPACE USERS ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
@@ -50,6 +50,9 @@ COMMENT ON COLUMN BARS.KOD_D6_1.D_OPEN IS '';
 COMMENT ON COLUMN BARS.KOD_D6_1.D_CLOSE IS '';
 
 
+
+PROMPT *** Create  grants  KOD_D6_1 ***
+grant SELECT                                                                 on KOD_D6_1        to BARS_DM;
 
 
 

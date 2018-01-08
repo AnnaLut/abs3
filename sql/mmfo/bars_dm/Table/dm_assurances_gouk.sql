@@ -42,6 +42,19 @@ COMMENT ON COLUMN BARS_DM.DM_ASSURANCES_GOUK.DEP_BANK IS 'Номер установи банку';
 
 
 
+PROMPT *** Create  constraint FK_DMASSURANCES_PERID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS_DM.DM_ASSURANCES_GOUK ADD CONSTRAINT FK_DMASSURANCES_PERID FOREIGN KEY (PER_ID)
+	  REFERENCES BARS_DM.PERIODS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index I_DMASSGOUK_REL_PERID ***
 begin   
  execute immediate '
@@ -57,9 +70,7 @@ exception when others then
 
 PROMPT *** Create  grants  DM_ASSURANCES_GOUK ***
 grant SELECT                                                                 on DM_ASSURANCES_GOUK to BARS;
-grant SELECT                                                                 on DM_ASSURANCES_GOUK to BARSREADER_ROLE;
 grant SELECT                                                                 on DM_ASSURANCES_GOUK to BARSUPL;
-grant SELECT                                                                 on DM_ASSURANCES_GOUK to UPLD;
 
 
 

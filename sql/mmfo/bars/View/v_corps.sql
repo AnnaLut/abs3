@@ -36,9 +36,7 @@ WHERE cc.rnk = q.rnk
     AND q.req_type IN (0, 2);
 
 PROMPT *** Create  grants  V_CORPS ***
-grant SELECT                                                                 on V_CORPS         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CORPS         to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CORPS         to UPLD;
 
 
 

@@ -83,12 +83,10 @@ COMMENT ON COLUMN BARS.CIM_PAYMENTS_BOUND.BORG_REASON IS 'Причина заборгованості
 
 
 
-PROMPT *** Create  constraint PK_PAYMENTSBOUND ***
+PROMPT *** Create  constraint CC_CIMPAYMENTSBOUND_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_PAYMENTS_BOUND ADD CONSTRAINT PK_PAYMENTSBOUND PRIMARY KEY (BOUND_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CIM_PAYMENTS_BOUND MODIFY (BOUND_ID CONSTRAINT CC_CIMPAYMENTSBOUND_ID_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -97,10 +95,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMPAYMENTSBOUND_ID_NN ***
+PROMPT *** Create  constraint PK_PAYMENTSBOUND ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_PAYMENTS_BOUND MODIFY (BOUND_ID CONSTRAINT CC_CIMPAYMENTSBOUND_ID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_PAYMENTS_BOUND ADD CONSTRAINT PK_PAYMENTSBOUND PRIMARY KEY (BOUND_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -195,11 +195,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_PAYMENTS_BOUND ***
-grant SELECT                                                                 on CIM_PAYMENTS_BOUND to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_PAYMENTS_BOUND to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_PAYMENTS_BOUND to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_PAYMENTS_BOUND to CIM_ROLE;
-grant SELECT                                                                 on CIM_PAYMENTS_BOUND to UPLD;
 
 
 

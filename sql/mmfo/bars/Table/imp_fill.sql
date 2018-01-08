@@ -56,9 +56,7 @@ COMMENT ON COLUMN BARS.IMP_FILL.PNAME IS '';
 
 
 PROMPT *** Create  grants  IMP_FILL ***
-grant SELECT                                                                 on IMP_FILL        to BARSREADER_ROLE;
 grant SELECT                                                                 on IMP_FILL        to BARS_DM;
-grant SELECT                                                                 on IMP_FILL        to UPLD;
 
 
 

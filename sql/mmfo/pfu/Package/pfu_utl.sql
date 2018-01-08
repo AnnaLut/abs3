@@ -35,7 +35,7 @@
     REQ_TYPE_VERIFY_LIST           constant varchar2(30) := 'GET_VERIFICATION_LIST';
     REQ_TYPE_VERIFY                constant varchar2(30) := 'GET_VERIFICATION';
     REQ_TYPE_CHANGE_ATTR           constant varchar2(30) := 'POST_REPLACEMENT_ACCOUNT';
-
+    
 
     ENV_STATE_LIST_RECEIVED        constant varchar2(30) := 'ENVLIST_RECEIVED';
     ENV_STATE_ENVELOPE_RECEIVED    constant varchar2(30) := 'ENVELOPE_RECEIVED';
@@ -78,7 +78,7 @@
         p_request_id in integer,
         p_raise_ndf in boolean default true)
     return pfu_death_list_request%rowtype;
-
+    
     function read_verify_list_request(
         p_request_id in integer,
         p_raise_ndf in boolean default true)
@@ -110,7 +110,7 @@
         p_date_to   in date,
         p_opfu_code in varchar2 default null)
     return integer;
-
+    
     function create_verify_list_request(
         p_date_from in date,
         p_date_to   in date)
@@ -141,7 +141,7 @@
         p_check_lines_count in integer,
         p_parent_request_id in integer)
     return integer;
-
+    
     function create_verification(
         p_pfu_death_id in integer,
         p_pfu_branch_code in varchar2,
@@ -150,7 +150,7 @@
         p_check_lines_count in integer,
         p_parent_request_id in integer)
     return integer;
-
+    
     function create_death_file(
         p_death_request_id in integer,
         p_fileid in varchar2,
@@ -161,7 +161,7 @@
     procedure create_matching(p_xml in clob,
                               p_parent_request_id in integer,
                               p_match_type in number);
-
+                              
     procedure create_no_turnover(p_xml in clob,
                                 p_parent_request_id in integer,
                                 p_request_id out integer);
@@ -356,7 +356,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_UTL as
              else return null;
              end if;
     end;
-
+    
     function read_verify_list_request(
         p_request_id in integer,
         p_raise_ndf in boolean default true)
@@ -506,7 +506,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_UTL as
 
         return l_request_id;
     end;
-
+    
     function create_verify_list_request(
         p_date_from in date,
         p_date_to   in date)
@@ -516,7 +516,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_UTL as
     begin
 
         l_request_id := create_request(pfu_utl.REQ_TYPE_VERIFY_LIST);
-
+        
         insert into pfu_verification_list_request
         values (l_request_id, p_date_from, p_date_to, sysdate);
 
@@ -621,7 +621,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_UTL as
 
         return l_request_id;
     end;
-
+    
     function create_verification(
         p_pfu_death_id in integer,
         p_pfu_branch_code in varchar2,
@@ -669,10 +669,10 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_UTL as
     begin
         l_request_id := create_request(case p_match_type when 1
                                                          then pfu_utl.REQ_TYPE_MATCHING1
-                                                         when 2
-                                                         then pfu_utl.REQ_TYPE_MATCHING2
-                                                         when 3
-                                                         then pfu_utl.REQ_TYPE_DEATH_MATCHING end,
+                                                         when 2 
+                                                         then pfu_utl.REQ_TYPE_MATCHING2 
+                                                         when 3 
+                                                         then pfu_utl.REQ_TYPE_DEATH_MATCHING end, 
                                        p_parent_request_id);
 
         insert into pfu_matching_request
@@ -684,14 +684,14 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_UTL as
                       'Запит на формування квитанції зареєстрований');
 
     end;
-
+    
     procedure create_no_turnover(p_xml in clob,
                                 p_parent_request_id in integer,
                                 p_request_id out integer)
 
     is
     begin
-        p_request_id := create_request(pfu_utl.REQ_TYPE_NO_TURNOVER,
+        p_request_id := create_request(pfu_utl.REQ_TYPE_NO_TURNOVER, 
                                        p_parent_request_id);
 
         insert into pfu_no_turnover_request
@@ -703,7 +703,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_UTL as
                       'Запит на формування повідомлення зареєстрований');
 
     end;
-
+    
     procedure create_replacement(p_xml in clob)
     is
         l_request_id integer;

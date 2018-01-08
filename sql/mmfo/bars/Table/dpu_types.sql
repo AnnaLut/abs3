@@ -107,118 +107,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUTYPES_TERMLIMIT ***
+PROMPT *** Create  constraint CC_DPUTYPES_TERMMAX_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_TYPES ADD CONSTRAINT CC_DPUTYPES_TERMLIMIT CHECK ( TERM_MIN <= TERM_MAX ) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUTYPES_COMPROC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_TYPES ADD CONSTRAINT CC_DPUTYPES_COMPROC CHECK ( COMPROC in ( 0, 1 ) ) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUTYPES_FLACTIVE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_TYPES MODIFY (FL_ACTIVE CONSTRAINT CC_DPUTYPES_FLACTIVE_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUTYPES_FLACTIVE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_TYPES ADD CONSTRAINT CC_DPUTYPES_FLACTIVE CHECK ( FL_ACTIVE in ( 0, 1 ) ) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUTYPES_AMNTLIMIT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_TYPES ADD CONSTRAINT CC_DPUTYPES_AMNTLIMIT CHECK ( SUM_MIN <= SUM_MAX ) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUTYPES_TYPEID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_TYPES MODIFY (TYPE_ID CONSTRAINT CC_DPUTYPES_TYPEID_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUTYPES_TYPENAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_TYPES MODIFY (TYPE_NAME CONSTRAINT CC_DPUTYPES_TYPENAME_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUTYPES_SUMMIN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_TYPES MODIFY (SUM_MIN CONSTRAINT CC_DPUTYPES_SUMMIN_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUTYPES_STOPID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_TYPES MODIFY (STOP_ID CONSTRAINT CC_DPUTYPES_STOPID_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUTYPES_COMPROC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_TYPES MODIFY (COMPROC CONSTRAINT CC_DPUTYPES_COMPROC_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.DPU_TYPES MODIFY (TERM_MAX CONSTRAINT CC_DPUTYPES_TERMMAX_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -239,10 +131,118 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUTYPES_TERMMAX_NN ***
+PROMPT *** Create  constraint CC_DPUTYPES_COMPROC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_TYPES MODIFY (TERM_MAX CONSTRAINT CC_DPUTYPES_TERMMAX_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.DPU_TYPES MODIFY (COMPROC CONSTRAINT CC_DPUTYPES_COMPROC_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUTYPES_STOPID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_TYPES MODIFY (STOP_ID CONSTRAINT CC_DPUTYPES_STOPID_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUTYPES_SUMMIN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_TYPES MODIFY (SUM_MIN CONSTRAINT CC_DPUTYPES_SUMMIN_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUTYPES_TYPENAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_TYPES MODIFY (TYPE_NAME CONSTRAINT CC_DPUTYPES_TYPENAME_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUTYPES_TYPEID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_TYPES MODIFY (TYPE_ID CONSTRAINT CC_DPUTYPES_TYPEID_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUTYPES_AMNTLIMIT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_TYPES ADD CONSTRAINT CC_DPUTYPES_AMNTLIMIT CHECK ( SUM_MIN <= SUM_MAX ) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUTYPES_FLACTIVE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_TYPES ADD CONSTRAINT CC_DPUTYPES_FLACTIVE CHECK ( FL_ACTIVE in ( 0, 1 ) ) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUTYPES_FLACTIVE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_TYPES MODIFY (FL_ACTIVE CONSTRAINT CC_DPUTYPES_FLACTIVE_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUTYPES_COMPROC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_TYPES ADD CONSTRAINT CC_DPUTYPES_COMPROC CHECK ( COMPROC in ( 0, 1 ) ) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUTYPES_TERMLIMIT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_TYPES ADD CONSTRAINT CC_DPUTYPES_TERMLIMIT CHECK ( TERM_MIN <= TERM_MAX ) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -265,13 +265,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPU_TYPES ***
-grant SELECT                                                                 on DPU_TYPES       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPU_TYPES       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_TYPES       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_TYPES       to DPT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_TYPES       to DPT_ADMIN;
 grant SELECT                                                                 on DPU_TYPES       to DPT_ROLE;
-grant SELECT                                                                 on DPU_TYPES       to UPLD;
 grant SELECT                                                                 on DPU_TYPES       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPU_TYPES       to WR_REFREAD;
 

@@ -76,6 +76,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_EWATYPE_TYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_EWA_TYPES ADD CONSTRAINT FK_EWATYPE_TYPE FOREIGN KEY (EXT_ID)
+	  REFERENCES BARS.INS_TYPES (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index SYS_C0033460 ***
 begin   
  execute immediate '
@@ -90,9 +103,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  INS_EWA_TYPES ***
-grant SELECT                                                                 on INS_EWA_TYPES   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INS_EWA_TYPES   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on INS_EWA_TYPES   to UPLD;
 
 
 

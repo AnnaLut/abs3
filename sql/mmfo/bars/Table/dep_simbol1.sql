@@ -129,10 +129,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  DEP_SIMBOL1 ***
-grant SELECT                                                                 on DEP_SIMBOL1     to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on DEP_SIMBOL1     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEP_SIMBOL1     to BARS_DM;
-grant SELECT                                                                 on DEP_SIMBOL1     to UPLD;
 grant FLASHBACK,SELECT                                                       on DEP_SIMBOL1     to WR_REFREAD;
 
 

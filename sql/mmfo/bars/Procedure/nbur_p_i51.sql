@@ -91,8 +91,7 @@ BEGIN
                          nbuc,
                          colname,
                          VALUE
-                    FROM (SELECT /*+ ordered*/
-                                 b.cust_id,
+                    FROM (SELECT b.cust_id,
                                  b.acc_id,
                                  a.maturity_date,
                                  a.kf,

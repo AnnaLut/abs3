@@ -15,10 +15,8 @@ from
 WHERE T.KOD = A.KOD (+) ;
 
 PROMPT *** Create  grants  V8_OVRN ***
-grant SELECT                                                                 on V8_OVRN         to BARSREADER_ROLE;
 grant SELECT                                                                 on V8_OVRN         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V8_OVRN         to START1;
-grant SELECT                                                                 on V8_OVRN         to UPLD;
 
 
 

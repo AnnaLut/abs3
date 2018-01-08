@@ -29,10 +29,7 @@ begin
 	K_03 NUMBER(*,0), 
 	K_79 NUMBER(*,0), 
 	K_83 NUMBER(*,0), 
-	PRIM VARCHAR2(20), 
-	BRANCH VARCHAR2(30) DEFAULT SYS_CONTEXT (''bars_context'', ''user_branch''), 
-	K_I3 NUMBER(*,0), 
-	K_B8 NUMBER(*,0)
+	PRIM VARCHAR2(20)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -43,7 +40,13 @@ end;
 /
 
 
-
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.ND_9819 ADD (PRIM VARCHAR2(20))';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
 
 PROMPT *** ALTER_POLICIES to ND_9819 ***
  exec bpa.alter_policies('ND_9819');
@@ -56,10 +59,33 @@ COMMENT ON COLUMN BARS.ND_9819.K_03 IS '';
 COMMENT ON COLUMN BARS.ND_9819.K_79 IS '';
 COMMENT ON COLUMN BARS.ND_9819.K_83 IS '';
 COMMENT ON COLUMN BARS.ND_9819.PRIM IS '';
-COMMENT ON COLUMN BARS.ND_9819.BRANCH IS 'Бранч сховища';
-COMMENT ON COLUMN BARS.ND_9819.K_I3 IS '';
-COMMENT ON COLUMN BARS.ND_9819.K_B8 IS '';
 
+
+--truncate table ND_9819;
+
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.ND_9819 ADD (BRANCH VARCHAR2(30 BYTE) DEFAULT SYS_CONTEXT (''bars_context'', ''user_branch''))';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.ND_9819 ADD (K_I3 NUMBER(*,0))';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.ND_9819 ADD (K_B8 NUMBER(*,0))';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+
+COMMENT ON COLUMN  BARS.ND_9819.BRANCH IS  'Бранч сховища';
 
 
 PROMPT *** Create  grants  ND_9819 ***
@@ -67,7 +93,6 @@ grant SELECT                                                                 on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on ND_9819         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ND_9819         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ND_9819         to START1;
-grant SELECT                                                                 on ND_9819         to UPLD;
 
 
 

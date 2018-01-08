@@ -133,10 +133,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_KLF_KODF_NN ***
+PROMPT *** Create  constraint CC_KLF_SEMANTIC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.KL_F00$GLOBAL MODIFY (KODF CONSTRAINT CC_KLF_KODF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.KL_F00$GLOBAL MODIFY (SEMANTIC CONSTRAINT CC_KLF_SEMANTIC_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -181,10 +181,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_KLF_SEMANTIC_NN ***
+PROMPT *** Create  constraint CC_KLF_KODF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.KL_F00$GLOBAL MODIFY (SEMANTIC CONSTRAINT CC_KLF_SEMANTIC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.KL_F00$GLOBAL MODIFY (KODF CONSTRAINT CC_KLF_KODF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -222,12 +222,10 @@ exception when others then
 
 PROMPT *** Create  grants  KL_F00$GLOBAL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F00$GLOBAL   to ABS_ADMIN;
-grant SELECT                                                                 on KL_F00$GLOBAL   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F00$GLOBAL   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_F00$GLOBAL   to BARS_DM;
 grant SELECT,UPDATE                                                          on KL_F00$GLOBAL   to RPBN002;
 grant SELECT                                                                 on KL_F00$GLOBAL   to START1;
-grant SELECT                                                                 on KL_F00$GLOBAL   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F00$GLOBAL   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KL_F00$GLOBAL   to WR_REFREAD;
 

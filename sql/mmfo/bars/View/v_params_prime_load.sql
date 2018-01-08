@@ -23,9 +23,7 @@ unpivot((value, is_empty, is_edit) for tag in ((int_value, n_is_empty, n_is_edit
                                               (g_value, g_is_empty, g_is_edit) as 'KOD_G'));
 
 PROMPT *** Create  grants  V_PARAMS_PRIME_LOAD ***
-grant SELECT                                                                 on V_PARAMS_PRIME_LOAD to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PARAMS_PRIME_LOAD to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_PARAMS_PRIME_LOAD to UPLD;
 
 
 

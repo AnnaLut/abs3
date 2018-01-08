@@ -82,11 +82,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ARJK ***
-grant SELECT                                                                 on ARJK            to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ARJK            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ARJK            to BARS_DM;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ARJK            to RCC_DEAL;
-grant SELECT                                                                 on ARJK            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ARJK            to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on ARJK            to WR_REFREAD;
 

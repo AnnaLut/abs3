@@ -93,9 +93,7 @@ PROMPT *** Create  view V_WCS_BID_PHASES_TIMELIMITS ***
    ORDER BY b.crt_date DESC, b.bid_id DESC, ptl.phase_ord;
 
 PROMPT *** Create  grants  V_WCS_BID_PHASES_TIMELIMITS ***
-grant SELECT                                                                 on V_WCS_BID_PHASES_TIMELIMITS to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_WCS_BID_PHASES_TIMELIMITS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_BID_PHASES_TIMELIMITS to UPLD;
 grant SELECT                                                                 on V_WCS_BID_PHASES_TIMELIMITS to WCS_SYNC_USER;
 grant FLASHBACK,SELECT                                                       on V_WCS_BID_PHASES_TIMELIMITS to WR_REFREAD;
 

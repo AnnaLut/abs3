@@ -1,16 +1,17 @@
+prompt -- ======================================================
+prompt -- create sequence
+prompt -- ======================================================
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Sequence/S_FIRST_NAMES.sql =========*** Run 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  sequence S_FIRST_NAMES ***
-
-   CREATE SEQUENCE  BARS.S_FIRST_NAMES  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 3000 NOCACHE  ORDER  NOCYCLE ;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Sequence/S_FIRST_NAMES.sql =========*** End 
-PROMPT ===================================================================================== 
+begin
+  execute immediate 'CREATE SEQUENCE BARS.S_FIRST_NAMES START WITH 3000 INCREMENT BY 1 NOCACHE NOCYCLE ORDER';
+  dbms_output.put_line('sequence S_FIRST_NAMES created.');
+exception 
+  when others then 
+    if (sqlcode = -00955) 
+    then 
+      dbms_output.put_line('sequence S_FIRST_NAMES already exists.');
+    else 
+      raise; 
+    end if;
+end;  
+/

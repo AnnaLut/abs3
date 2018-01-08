@@ -27,7 +27,6 @@ begin
    (	D050 VARCHAR2(5), 
 	D051 VARCHAR2(2), 
 	D052 VARCHAR2(1), 
-	K_DFM NUMBER(4,0), 
 	TXT VARCHAR2(135), 
 	TXT64 VARCHAR2(64), 
 	D_OPEN DATE, 
@@ -53,7 +52,6 @@ COMMENT ON TABLE BARS.KL_D050 IS '';
 COMMENT ON COLUMN BARS.KL_D050.D050 IS '';
 COMMENT ON COLUMN BARS.KL_D050.D051 IS '';
 COMMENT ON COLUMN BARS.KL_D050.D052 IS '';
-COMMENT ON COLUMN BARS.KL_D050.K_DFM IS '';
 COMMENT ON COLUMN BARS.KL_D050.TXT IS '';
 COMMENT ON COLUMN BARS.KL_D050.TXT64 IS '';
 COMMENT ON COLUMN BARS.KL_D050.D_OPEN IS '';
@@ -63,7 +61,7 @@ COMMENT ON COLUMN BARS.KL_D050.D_MODE IS '';
 
 
 PROMPT *** Create  grants  KL_D050 ***
-grant SELECT                                                                 on KL_D050         to UPLD;
+grant SELECT                                                                 on KL_D050         to BARS_DM;
 
 
 

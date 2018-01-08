@@ -89,12 +89,10 @@ COMMENT ON COLUMN BARS.CCK_AN_TMP_UPB.TOBO IS '';
 
 
 PROMPT *** Create  grants  CCK_AN_TMP_UPB ***
-grant SELECT                                                                 on CCK_AN_TMP_UPB  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_AN_TMP_UPB  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_AN_TMP_UPB  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_AN_TMP_UPB  to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_AN_TMP_UPB  to RPBN001;
-grant SELECT                                                                 on CCK_AN_TMP_UPB  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_AN_TMP_UPB  to WR_ALL_RIGHTS;
 
 

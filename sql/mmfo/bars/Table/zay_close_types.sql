@@ -76,9 +76,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAY_CLOSE_TYPES ***
-grant SELECT                                                                 on ZAY_CLOSE_TYPES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAY_CLOSE_TYPES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on ZAY_CLOSE_TYPES to UPLD;
 grant FLASHBACK,SELECT                                                       on ZAY_CLOSE_TYPES to WR_REFREAD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_CLOSE_TYPES to ZAY;
 

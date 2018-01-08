@@ -13,10 +13,8 @@ PROMPT *** Create  view V_OPER_FIO ***
    where tag= 'FIO';
 
 PROMPT *** Create  grants  V_OPER_FIO ***
-grant SELECT                                                                 on V_OPER_FIO      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OPER_FIO      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OPER_FIO      to START1;
-grant SELECT                                                                 on V_OPER_FIO      to UPLD;
 
 
 

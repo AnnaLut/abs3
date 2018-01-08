@@ -146,14 +146,12 @@ exception when others then
 
 PROMPT *** Create  grants  CUST_REL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_REL        to ABS_ADMIN;
-grant SELECT                                                                 on CUST_REL        to BARSREADER_ROLE;
 grant SELECT                                                                 on CUST_REL        to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUST_REL        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUST_REL        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_REL        to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_REL        to REF0000;
 grant SELECT                                                                 on CUST_REL        to START1;
-grant SELECT                                                                 on CUST_REL        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUST_REL        to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CUST_REL        to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on CUST_REL        to WR_REFREAD;

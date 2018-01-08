@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции KBM
-prompt Наименование операции: KBM off DPT - Повернення суми вкладу в ін.валюті готівкою
+prompt Наименование операции: off DPT - Повернення суми вкладу в ін.валюті готівкою
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KBM', 'KBM off DPT - Повернення суми вкладу в ін.валюті готівкою', 1, null, null, null, null, null, null, '#(tobopack.GetToboCASH)', null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000010000000000000000000000000000', 'Повернення депозиту згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('KBM', 'off DPT - Повернення суми вкладу в ін.валюті готівкою', 1, null, null, null, null, null, null, '#(tobopack.GetToboCASH)', null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000010000000000000000000000000000', 'Повернення депозиту згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KBM', name='KBM off DPT - Повернення суми вкладу в ін.валюті готівкою', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb='#(tobopack.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn='Повернення депозиту згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='KBM', name='off DPT - Повернення суми вкладу в ін.валюті готівкою', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb='#(tobopack.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn='Повернення депозиту згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='KBM';
   end;
   --------------------------------

@@ -73,6 +73,19 @@ COMMENT ON COLUMN BARS.OTCN_F71_HISTORY.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_OTCNF71HISTORY_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OTCN_F71_HISTORY ADD CONSTRAINT FK_OTCNF71HISTORY_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C009344 ***
 begin   
  execute immediate '
@@ -112,7 +125,7 @@ exception when others then
 PROMPT *** Create  index I1_OTCN_F71_HISTORY ***
 begin   
  execute immediate '
-  CREATE INDEX BARS.I1_OTCN_F71_HISTORY ON BARS.OTCN_F71_HISTORY (KF, DATF, ACC) 
+  CREATE INDEX BARS.I1_OTCN_F71_HISTORY ON BARS.OTCN_F71_HISTORY (DATF, ACC) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYNI ';
 exception when others then
@@ -124,10 +137,8 @@ exception when others then
 
 PROMPT *** Create  grants  OTCN_F71_HISTORY ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F71_HISTORY to ABS_ADMIN;
-grant SELECT                                                                 on OTCN_F71_HISTORY to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_F71_HISTORY to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F71_HISTORY to RPBN002;
-grant SELECT                                                                 on OTCN_F71_HISTORY to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_F71_HISTORY to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on OTCN_F71_HISTORY to WR_REFREAD;
 

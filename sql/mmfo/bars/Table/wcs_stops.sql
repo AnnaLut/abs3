@@ -69,6 +69,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_STOPS_TID_STOPTYPES_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_STOPS ADD CONSTRAINT FK_STOPS_TID_STOPTYPES_ID FOREIGN KEY (TYPE_ID)
+	  REFERENCES BARS.WCS_STOP_TYPES (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STOPS_RQID_QUEST_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_STOPS ADD CONSTRAINT FK_STOPS_RQID_QUEST_ID FOREIGN KEY (RESULT_QID)
+	  REFERENCES BARS.WCS_QUESTIONS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_STOPS_NAME_NN ***
 begin   
  execute immediate '
@@ -81,10 +107,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_STOPS_TYPEID_NN ***
+PROMPT *** Create  constraint CC_STOPS_RESULTQID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_STOPS MODIFY (TYPE_ID CONSTRAINT CC_STOPS_TYPEID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_STOPS MODIFY (RESULT_QID CONSTRAINT CC_STOPS_RESULTQID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -93,10 +119,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_STOPS_RESULTQID_NN ***
+PROMPT *** Create  constraint CC_STOPS_TYPEID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_STOPS MODIFY (RESULT_QID CONSTRAINT CC_STOPS_RESULTQID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_STOPS MODIFY (TYPE_ID CONSTRAINT CC_STOPS_TYPEID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -119,11 +145,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_STOPS ***
-grant SELECT                                                                 on WCS_STOPS       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_STOPS       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_STOPS       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_STOPS       to START1;
-grant SELECT                                                                 on WCS_STOPS       to UPLD;
 
 
 

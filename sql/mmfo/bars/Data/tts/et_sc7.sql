@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DP!
-prompt Наименование операции: DP! +D: STOP-правило на поповнення вкладу
+prompt Наименование операции: +D: STOP-правило на поповнення вкладу
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DP!', 'DP! +D: STOP-правило на поповнення вкладу', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, '0', null, null, null, null, 0, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('DP!', '+D: STOP-правило на поповнення вкладу', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, '0', null, null, null, null, 0, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DP!', name='DP! +D: STOP-правило на поповнення вкладу', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='0', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='DP!', name='+D: STOP-правило на поповнення вкладу', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='0', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='DP!';
   end;
   --------------------------------
@@ -57,7 +57,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции SC7
-prompt Наименование операции: SC7 Поповнення вкладу в нац.валюті готівкою
+prompt Наименование операции: Поповнення вкладу в нац.валюті готівкою
 declare
   cnt_  number;
 begin
@@ -66,11 +66,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('SC7', 'SC7 Поповнення вкладу в нац.валюті готівкою', 0, null, 980, null, 980, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 1, 0, 0, 0, null, null, 16, null, null, null, '0000100001000000000000000000000000010000000000000000000000000000', 'Поповнення згідно договору  #{dpt_social.f_nazn(''U'',#(ND))}');
+    values ('SC7', 'Поповнення вкладу в нац.валюті готівкою', 0, null, 980, null, 980, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 1, 0, 0, 0, null, null, 16, null, null, null, '0000100001000000000000000000000000010000000000000000000000000000', 'Поповнення згідно договору  #{dpt_social.f_nazn(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='SC7', name='SC7 Поповнення вкладу в нац.валюті готівкою', dk=0, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=16, proc=null, s3800=null, rang=null, flags='0000100001000000000000000000000000010000000000000000000000000000', nazn='Поповнення згідно договору  #{dpt_social.f_nazn(''U'',#(ND))}'
+         set tt='SC7', name='Поповнення вкладу в нац.валюті готівкою', dk=0, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=16, proc=null, s3800=null, rang=null, flags='0000100001000000000000000000000000010000000000000000000000000000', nazn='Поповнення згідно договору  #{dpt_social.f_nazn(''U'',#(ND))}'
        where tt='SC7';
   end;
   --------------------------------

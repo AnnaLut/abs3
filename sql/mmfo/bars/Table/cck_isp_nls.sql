@@ -55,6 +55,45 @@ COMMENT ON COLUMN BARS.CCK_ISP_NLS.BRANCH IS 'Бранч обслуговування виконавцем';
 
 
 
+PROMPT *** Create  constraint CCK_ISP_NLS_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CCK_ISP_NLS ADD CONSTRAINT CCK_ISP_NLS_STAFF FOREIGN KEY (ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CCK_ISP_NLS_ISP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CCK_ISP_NLS ADD CONSTRAINT CCK_ISP_NLS_ISP FOREIGN KEY (ISP)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CCK_ISP_NLS_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CCK_ISP_NLS ADD CONSTRAINT CCK_ISP_NLS_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CCK_ISP_NLS_ISP_NN ***
 begin   
  execute immediate '
@@ -91,11 +130,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CCK_ISP_NLS ***
-grant SELECT                                                                 on CCK_ISP_NLS     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_ISP_NLS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_ISP_NLS     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_ISP_NLS     to RCC_DEAL;
-grant SELECT                                                                 on CCK_ISP_NLS     to UPLD;
 grant FLASHBACK,SELECT                                                       on CCK_ISP_NLS     to WR_REFREAD;
 
 

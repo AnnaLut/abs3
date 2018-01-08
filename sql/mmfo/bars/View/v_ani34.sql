@@ -58,10 +58,8 @@ PROMPT *** Create  view V_ANI34 ***
 WHERE z.rnk = c.rnk;
 
 PROMPT *** Create  grants  V_ANI34 ***
-grant SELECT                                                                 on V_ANI34         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ANI34         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ANI34         to START1;
-grant SELECT                                                                 on V_ANI34         to UPLD;
 
 
 

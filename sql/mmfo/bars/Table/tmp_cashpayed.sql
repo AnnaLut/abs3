@@ -132,10 +132,8 @@ COMMENT ON COLUMN BARS.TMP_CASHPAYED.LASTVISA_USERID IS 'Користувач, що виконува
 
 
 PROMPT *** Create  grants  TMP_CASHPAYED ***
-grant SELECT                                                                 on TMP_CASHPAYED   to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TMP_CASHPAYED   to BARS_ACCESS_DEFROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TMP_CASHPAYED   to RPBN001;
-grant SELECT                                                                 on TMP_CASHPAYED   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_CASHPAYED   to WR_ALL_RIGHTS;
 
 

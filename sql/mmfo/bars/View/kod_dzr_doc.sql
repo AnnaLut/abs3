@@ -29,10 +29,8 @@ PROMPT *** Create  view KOD_DZR_DOC ***
     WHERE o.REF = t.RNK;
 
 PROMPT *** Create  grants  KOD_DZR_DOC ***
-grant SELECT                                                                 on KOD_DZR_DOC     to BARSREADER_ROLE;
 grant SELECT                                                                 on KOD_DZR_DOC     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_DZR_DOC     to START1;
-grant SELECT                                                                 on KOD_DZR_DOC     to UPLD;
 
 
 

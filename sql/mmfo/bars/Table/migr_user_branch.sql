@@ -64,6 +64,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_MIGRUB_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MIGR_USER_BRANCH ADD CONSTRAINT FK_MIGRUB_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_MIGRUB_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MIGR_USER_BRANCH ADD CONSTRAINT FK_MIGRUB_STAFF FOREIGN KEY (ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_MIGRUB_ID_NN ***
 begin   
  execute immediate '
@@ -102,9 +128,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  MIGR_USER_BRANCH ***
-grant SELECT                                                                 on MIGR_USER_BRANCH to BARSREADER_ROLE;
 grant SELECT                                                                 on MIGR_USER_BRANCH to BARS_DM;
-grant SELECT                                                                 on MIGR_USER_BRANCH to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MIGR_USER_BRANCH to WR_ALL_RIGHTS;
 
 

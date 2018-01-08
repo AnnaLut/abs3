@@ -81,10 +81,11 @@ COMMENT ON COLUMN BARS.SW_950D.STMT_DK IS '';
 
 
 
-PROMPT *** Create  constraint CC_SW950D_KF_NN ***
+PROMPT *** Create  constraint FK_SW950D_ACCOUNTS2 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_950D MODIFY (KF CONSTRAINT CC_SW950D_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_950D ADD CONSTRAINT FK_SW950D_ACCOUNTS2 FOREIGN KEY (KF, CONTRA_ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -93,10 +94,71 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SW950D_CHECKEDIND ***
+PROMPT *** Create  constraint FK_SW950D_SWMT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_950D ADD CONSTRAINT CC_SW950D_CHECKEDIND CHECK (checked_ind in (''Y'', ''N'')) ENABLE';
+  ALTER TABLE BARS.SW_950D ADD CONSTRAINT FK_SW950D_SWMT FOREIGN KEY (MT)
+	  REFERENCES BARS.SW_MT (MT) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SW950D_VDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_950D MODIFY (VDATE CONSTRAINT CC_SW950D_VDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SW950D_THEIRREF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_950D MODIFY (THEIR_REF CONSTRAINT CC_SW950D_THEIRREF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SW950D_S_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_950D MODIFY (S CONSTRAINT CC_SW950D_S_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SW950D_N_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_950D MODIFY (N CONSTRAINT CC_SW950D_N_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SW950D_SWREF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_950D MODIFY (SWREF CONSTRAINT CC_SW950D_SWREF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -119,10 +181,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SW950D_SWREF_NN ***
+PROMPT *** Create  constraint CC_SW950D_CHECKEDIND ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_950D MODIFY (SWREF CONSTRAINT CC_SW950D_SWREF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_950D ADD CONSTRAINT CC_SW950D_CHECKEDIND CHECK (checked_ind in (''Y'', ''N'')) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -131,10 +193,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SW950D_N_NN ***
+PROMPT *** Create  constraint CC_SW950D_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_950D MODIFY (N CONSTRAINT CC_SW950D_N_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_950D MODIFY (KF CONSTRAINT CC_SW950D_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -143,10 +205,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SW950D_S_NN ***
+PROMPT *** Create  constraint FK_SW950D_SWJOURNAL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_950D MODIFY (S CONSTRAINT CC_SW950D_S_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_950D ADD CONSTRAINT FK_SW950D_SWJOURNAL FOREIGN KEY (SWREF)
+	  REFERENCES BARS.SW_JOURNAL (SWREF) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -155,10 +218,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SW950D_THEIRREF_NN ***
+PROMPT *** Create  constraint FK_SW950D_KF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_950D MODIFY (THEIR_REF CONSTRAINT CC_SW950D_THEIRREF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_950D ADD CONSTRAINT FK_SW950D_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -167,10 +231,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SW950D_VDATE_NN ***
+PROMPT *** Create  constraint FK_SW950D_SWTT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_950D MODIFY (VDATE CONSTRAINT CC_SW950D_VDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_950D ADD CONSTRAINT FK_SW950D_SWTT FOREIGN KEY (SWTT)
+	  REFERENCES BARS.SW_TT (SWTT) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -194,10 +259,8 @@ exception when others then
 
 PROMPT *** Create  grants  SW_950D ***
 grant SELECT,UPDATE                                                          on SW_950D         to BARS013;
-grant SELECT                                                                 on SW_950D         to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on SW_950D         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_950D         to BARS_DM;
-grant SELECT                                                                 on SW_950D         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_950D         to WR_ALL_RIGHTS;
 
 

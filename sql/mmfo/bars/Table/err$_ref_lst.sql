@@ -71,10 +71,6 @@ COMMENT ON COLUMN BARS.ERR$_REF_LST.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_REF_LST ***
-grant SELECT                                                                 on ERR$_REF_LST    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_REF_LST    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

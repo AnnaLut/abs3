@@ -86,10 +86,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_ND_HIST ***
-grant SELECT                                                                 on FIN_ND_HIST     to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on FIN_ND_HIST     to BARS_ACCESS_DEFROLE;
 grant INSERT,SELECT,UPDATE                                                   on FIN_ND_HIST     to START1;
-grant SELECT                                                                 on FIN_ND_HIST     to UPLD;
 
 
 

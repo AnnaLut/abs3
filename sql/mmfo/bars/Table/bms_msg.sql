@@ -90,10 +90,8 @@ exception when others then
 
 PROMPT *** Create  grants  BMS_MSG ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BMS_MSG         to ABS_ADMIN;
-grant SELECT                                                                 on BMS_MSG         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BMS_MSG         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BMS_MSG         to BARS_DM;
-grant SELECT                                                                 on BMS_MSG         to UPLD;
 
 
 

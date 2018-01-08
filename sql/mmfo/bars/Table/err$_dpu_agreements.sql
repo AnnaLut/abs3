@@ -93,10 +93,6 @@ COMMENT ON COLUMN BARS.ERR$_DPU_AGREEMENTS.COMMENTS IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPU_AGREEMENTS ***
-grant SELECT                                                                 on ERR$_DPU_AGREEMENTS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPU_AGREEMENTS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -123,10 +123,6 @@ COMMENT ON COLUMN BARS.ERR$_PRVN_FLOW_DEALS_VAR.ORA_ERR_MESG$ IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_PRVN_FLOW_DEALS_VAR ***
-grant SELECT                                                                 on ERR$_PRVN_FLOW_DEALS_VAR to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_PRVN_FLOW_DEALS_VAR to UPLD;
-
 
 
 PROMPT ===================================================================================== 

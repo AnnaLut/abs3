@@ -25,9 +25,7 @@ where a.constraint_type='P'
 
 PROMPT *** Create  grants  V_COLDEL ***
 grant SELECT                                                                 on V_COLDEL        to ABS_ADMIN;
-grant SELECT                                                                 on V_COLDEL        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_COLDEL        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_COLDEL        to UPLD;
 grant SELECT                                                                 on V_COLDEL        to WR_ALL_RIGHTS;
 
 

@@ -14,8 +14,6 @@ PROMPT *** Create  view V_ARC_DPT_PAYMENTS ***
 ;
 
 PROMPT *** Create  grants  V_ARC_DPT_PAYMENTS ***
-grant SELECT                                                                 on V_ARC_DPT_PAYMENTS to BARSREADER_ROLE;
-grant SELECT                                                                 on V_ARC_DPT_PAYMENTS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ARC_DPT_PAYMENTS to WR_ALL_RIGHTS;
 
 

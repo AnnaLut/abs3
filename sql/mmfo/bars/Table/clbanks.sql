@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CLBANKS ***
-grant SELECT                                                                 on CLBANKS         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CLBANKS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CLBANKS         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CLBANKS         to CLBANKS;
-grant SELECT                                                                 on CLBANKS         to UPLD;
 grant FLASHBACK,SELECT                                                       on CLBANKS         to WR_REFREAD;
 
 

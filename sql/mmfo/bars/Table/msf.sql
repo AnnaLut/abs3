@@ -94,13 +94,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  MSF ***
-grant SELECT                                                                 on MSF             to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MSF             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MSF             to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MSF             to MSF;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MSF             to SEP_ROLE;
 grant SELECT                                                                 on MSF             to START1;
-grant SELECT                                                                 on MSF             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MSF             to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on MSF             to WR_REFREAD;
 

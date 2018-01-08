@@ -75,11 +75,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CH_1A ***
-grant SELECT                                                                 on CH_1A           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CH_1A           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CH_1A           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CH_1A           to RCH_1;
-grant SELECT                                                                 on CH_1A           to UPLD;
 grant FLASHBACK,SELECT                                                       on CH_1A           to WR_REFREAD;
 
 

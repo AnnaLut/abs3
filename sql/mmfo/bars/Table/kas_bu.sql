@@ -65,6 +65,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_KASBU_IDS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KAS_BU ADD CONSTRAINT FK_KASBU_IDS FOREIGN KEY (IDS)
+	  REFERENCES BARS.KAS_U (IDS) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KASBU_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KAS_BU ADD CONSTRAINT FK_KASBU_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_KASBU_KF_NN ***
 begin   
  execute immediate '
@@ -92,10 +118,8 @@ exception when others then
 
 PROMPT *** Create  grants  KAS_BU ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_BU          to ABS_ADMIN;
-grant SELECT                                                                 on KAS_BU          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KAS_BU          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KAS_BU          to PYOD001;
-grant SELECT                                                                 on KAS_BU          to UPLD;
 grant FLASHBACK,SELECT                                                       on KAS_BU          to WR_REFREAD;
 
 

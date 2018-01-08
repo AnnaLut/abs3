@@ -13,9 +13,7 @@ PROMPT *** Create  view V_CHECK_VAL_WEB ***
      where kv in (select kvc from ch_kv));
 
 PROMPT *** Create  grants  V_CHECK_VAL_WEB ***
-grant SELECT                                                                 on V_CHECK_VAL_WEB to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CHECK_VAL_WEB to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CHECK_VAL_WEB to UPLD;
 
 
 

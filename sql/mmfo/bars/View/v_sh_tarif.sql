@@ -18,11 +18,9 @@ select 0, t.kod, t.kv, t.name, t.tar, t.pr, t.smin, t.kv_smin, t.smax, t.kv_smax
   from v_tarif t;
 
 PROMPT *** Create  grants  V_SH_TARIF ***
-grant SELECT                                                                 on V_SH_TARIF      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SH_TARIF      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SH_TARIF      to CUST001;
 grant SELECT                                                                 on V_SH_TARIF      to START1;
-grant SELECT                                                                 on V_SH_TARIF      to UPLD;
 
 
 

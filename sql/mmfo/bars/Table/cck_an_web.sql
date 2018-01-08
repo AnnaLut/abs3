@@ -114,9 +114,7 @@ COMMENT ON COLUMN BARS.CCK_AN_WEB.REC_ID IS '';
 
 
 PROMPT *** Create  grants  CCK_AN_WEB ***
-grant SELECT                                                                 on CCK_AN_WEB      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on CCK_AN_WEB      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on CCK_AN_WEB      to UPLD;
 
 
 

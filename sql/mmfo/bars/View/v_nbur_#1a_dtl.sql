@@ -26,12 +26,12 @@ PROMPT *** Create  view V_NBUR_#1A_DTL ***
      , p.KV
      , p.MATURITY_DATE
      , p.CUST_ID
-     , c.OKPO CUST_CODE
-     , c.NMK  CUST_NAME
+     , c.CUST_CODE
+     , c.CUST_NAME
      , p.ND
-     , a.CC_ID AGRM_NUM
-     , a.SDATE BEG_DT
-     , a.WDATE END_DT
+     , a.AGRM_NUM
+     , a.BEG_DT
+     , a.END_DT
      , p.REF
      , p.BRANCH
   from NBUR_DETAIL_PROTOCOLS_ARCH p
@@ -42,19 +42,21 @@ PROMPT *** Create  view V_NBUR_#1A_DTL ***
          v.KF          = p.KF          and
          v.VERSION_ID  = p.VERSION_ID  and
          v.FILE_ID     = f.ID )           
-  LEFT OUTER JOIN CUSTOMER c
-    on ( p.KF          = c.KF          and
-         p.CUST_ID     = c.RNK )
-  LEFT OUTER JOIN CC_DEAL a 
-    on ( p.KF          = a.KF          and
-         p.nd          = a.ND )
+  left outer
+  join V_NBUR_DM_CUSTOMERS c
+    on ( p.REPORT_DATE = c.REPORT_DATE and
+         p.KF          = c.KF          and
+         p.CUST_ID    = c.CUST_ID )
+  left outer
+  join V_NBUR_DM_AGREEMENTS a
+    on ( p.REPORT_DATE = a.REPORT_DATE and
+         p.KF          = a.KF          and
+         p.nd          = a.AGRM_ID )
  where p.REPORT_CODE = '#1A'
    and v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED' );
 
 PROMPT *** Create  grants  V_NBUR_#1A_DTL ***
-grant SELECT                                                                 on V_NBUR_#1A_DTL  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_#1A_DTL  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_NBUR_#1A_DTL  to UPLD;
 
 
 

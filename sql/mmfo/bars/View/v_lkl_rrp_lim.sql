@@ -49,9 +49,7 @@ PROMPT *** Create  view V_LKL_RRP_LIM ***
    ORDER BY lkl_rrp.mfo, lkl_rrp.kv;
 
 PROMPT *** Create  grants  V_LKL_RRP_LIM ***
-grant SELECT                                                                 on V_LKL_RRP_LIM   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_LKL_RRP_LIM   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_LKL_RRP_LIM   to UPLD;
 
 
 

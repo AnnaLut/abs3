@@ -18,9 +18,7 @@ PROMPT *** Create  view V_INS_FEES ***
  order by f.id;
 
 PROMPT *** Create  grants  V_INS_FEES ***
-grant SELECT                                                                 on V_INS_FEES      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_FEES      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INS_FEES      to UPLD;
 
 
 

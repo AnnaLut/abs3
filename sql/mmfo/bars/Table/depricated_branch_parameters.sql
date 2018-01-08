@@ -86,6 +86,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_BRANCHPARAMS_BRANCHTAGS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEPRICATED_BRANCH_PARAMETERS ADD CONSTRAINT FK_BRANCHPARAMS_BRANCHTAGS FOREIGN KEY (TAG)
+	  REFERENCES BARS.DEPRICATED_BRANCH_TAGS (TAG) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_BRANCHPARAMS_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEPRICATED_BRANCH_PARAMETERS ADD CONSTRAINT FK_BRANCHPARAMS_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_BRANCHPARAMS ***
 begin   
  execute immediate '
@@ -101,14 +127,12 @@ exception when others then
 
 PROMPT *** Create  grants  DEPRICATED_BRANCH_PARAMETERS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEPRICATED_BRANCH_PARAMETERS to ABS_ADMIN;
-grant SELECT                                                                 on DEPRICATED_BRANCH_PARAMETERS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEPRICATED_BRANCH_PARAMETERS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEPRICATED_BRANCH_PARAMETERS to BARS_DM;
 grant INSERT,UPDATE                                                          on DEPRICATED_BRANCH_PARAMETERS to CUST001;
 grant SELECT                                                                 on DEPRICATED_BRANCH_PARAMETERS to KLBX;
 grant SELECT                                                                 on DEPRICATED_BRANCH_PARAMETERS to SALGL;
 grant SELECT                                                                 on DEPRICATED_BRANCH_PARAMETERS to START1;
-grant SELECT                                                                 on DEPRICATED_BRANCH_PARAMETERS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEPRICATED_BRANCH_PARAMETERS to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DEPRICATED_BRANCH_PARAMETERS to WR_REFREAD;
 

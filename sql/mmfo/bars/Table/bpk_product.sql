@@ -97,108 +97,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_BPKPRODUCT ***
+PROMPT *** Create  constraint CC_BPKPRODUCT_LIMIT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_PRODUCT ADD CONSTRAINT UK_BPKPRODUCT UNIQUE (TYPE, CARD_TYPE, KV, KK, COND_SET, NBS, OB22)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKPRODUCT_ID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_PRODUCT MODIFY (ID CONSTRAINT CC_BPKPRODUCT_ID_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKPRODUCT_NAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_PRODUCT MODIFY (NAME CONSTRAINT CC_BPKPRODUCT_NAME_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKPRODUCT_TYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_PRODUCT MODIFY (TYPE CONSTRAINT CC_BPKPRODUCT_TYPE_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKPRODUCT_CARDTYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_PRODUCT MODIFY (CARD_TYPE CONSTRAINT CC_BPKPRODUCT_CARDTYPE_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKPRODUCT_KV_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_PRODUCT MODIFY (KV CONSTRAINT CC_BPKPRODUCT_KV_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKPRODUCT_KK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_PRODUCT MODIFY (KK CONSTRAINT CC_BPKPRODUCT_KK_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKPRODUCT_CONDSET_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_PRODUCT MODIFY (COND_SET CONSTRAINT CC_BPKPRODUCT_CONDSET_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKPRODUCT_NBS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_PRODUCT MODIFY (NBS CONSTRAINT CC_BPKPRODUCT_NBS_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.BPK_PRODUCT MODIFY (LIMIT CONSTRAINT CC_BPKPRODUCT_LIMIT_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -219,10 +121,160 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKPRODUCT_LIMIT_NN ***
+PROMPT *** Create  constraint CC_BPKPRODUCT_NBS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_PRODUCT MODIFY (LIMIT CONSTRAINT CC_BPKPRODUCT_LIMIT_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.BPK_PRODUCT MODIFY (NBS CONSTRAINT CC_BPKPRODUCT_NBS_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BPKPRODUCT_CONDSET_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_PRODUCT MODIFY (COND_SET CONSTRAINT CC_BPKPRODUCT_CONDSET_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BPKPRODUCT_KK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_PRODUCT MODIFY (KK CONSTRAINT CC_BPKPRODUCT_KK_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BPKPRODUCT_KV_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_PRODUCT MODIFY (KV CONSTRAINT CC_BPKPRODUCT_KV_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BPKPRODUCT_CARDTYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_PRODUCT MODIFY (CARD_TYPE CONSTRAINT CC_BPKPRODUCT_CARDTYPE_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BPKPRODUCT_TYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_PRODUCT MODIFY (TYPE CONSTRAINT CC_BPKPRODUCT_TYPE_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BPKPRODUCT_NAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_PRODUCT MODIFY (NAME CONSTRAINT CC_BPKPRODUCT_NAME_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint UK_BPKPRODUCT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_PRODUCT ADD CONSTRAINT UK_BPKPRODUCT UNIQUE (TYPE, CARD_TYPE, KV, KK, COND_SET, NBS, OB22)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_BPKPRODUCT_DEMANDACCTYPE2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_PRODUCT ADD CONSTRAINT FK_BPKPRODUCT_DEMANDACCTYPE2 FOREIGN KEY (TYPE, CARD_TYPE)
+	  REFERENCES BARS.DEMAND_ACC_TYPE (TYPE, CARD_TYPE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_BPKPRODUCT_DEMANDKK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_PRODUCT ADD CONSTRAINT FK_BPKPRODUCT_DEMANDKK FOREIGN KEY (KK)
+	  REFERENCES BARS.DEMAND_KK (KK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_BPKPRODUCT_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_PRODUCT ADD CONSTRAINT FK_BPKPRODUCT_TABVAL FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_BPKPRODUCT_BPKNBS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_PRODUCT ADD CONSTRAINT FK_BPKPRODUCT_BPKNBS FOREIGN KEY (NBS, OB22)
+	  REFERENCES BARS.BPK_NBS (NBS, OB22) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BPKPRODUCT_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_PRODUCT MODIFY (ID CONSTRAINT CC_BPKPRODUCT_ID_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -259,12 +311,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_PRODUCT ***
-grant SELECT                                                                 on BPK_PRODUCT     to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_PRODUCT     to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_PRODUCT     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_PRODUCT     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_PRODUCT     to OBPC;
-grant SELECT                                                                 on BPK_PRODUCT     to UPLD;
 
 
 

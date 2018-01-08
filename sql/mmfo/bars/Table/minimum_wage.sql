@@ -102,12 +102,10 @@ exception when others then
 
 PROMPT *** Create  grants  MINIMUM_WAGE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on MINIMUM_WAGE    to ABS_ADMIN;
-grant SELECT                                                                 on MINIMUM_WAGE    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MINIMUM_WAGE    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MINIMUM_WAGE    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MINIMUM_WAGE    to DPT_ADMIN;
 grant SELECT                                                                 on MINIMUM_WAGE    to START1;
-grant SELECT                                                                 on MINIMUM_WAGE    to UPLD;
 grant FLASHBACK,SELECT                                                       on MINIMUM_WAGE    to WR_REFREAD;
 
 

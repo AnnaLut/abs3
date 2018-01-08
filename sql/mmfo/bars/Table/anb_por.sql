@@ -77,12 +77,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  ANB_POR ***
-grant SELECT                                                                 on ANB_POR         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANB_POR         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANB_POR         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANB_POR         to RCC_DEAL;
 grant SELECT                                                                 on ANB_POR         to SALGL;
-grant SELECT                                                                 on ANB_POR         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ANB_POR         to WR_ALL_RIGHTS;
 
 

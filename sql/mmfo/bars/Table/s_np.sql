@@ -49,10 +49,8 @@ COMMENT ON COLUMN BARS.S_NP.N_NP IS '';
 
 
 PROMPT *** Create  grants  S_NP ***
-grant SELECT                                                                 on S_NP            to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S_NP            to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S_NP            to START1;
-grant SELECT                                                                 on S_NP            to UPLD;
 
 
 

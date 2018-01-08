@@ -28,10 +28,8 @@ PROMPT *** Create  view V_DEBREG_RES_S ***
      FROM DEBREG_RES_S;
 
 PROMPT *** Create  grants  V_DEBREG_RES_S ***
-grant SELECT                                                                 on V_DEBREG_RES_S  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DEBREG_RES_S  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DEBREG_RES_S  to DEB_REG;
-grant SELECT                                                                 on V_DEBREG_RES_S  to UPLD;
 
 
 

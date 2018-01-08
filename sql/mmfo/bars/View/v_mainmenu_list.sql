@@ -34,10 +34,8 @@ PROMPT *** Create  view V_MAINMENU_LIST ***
  ;
 
 PROMPT *** Create  grants  V_MAINMENU_LIST ***
-grant SELECT                                                                 on V_MAINMENU_LIST to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MAINMENU_LIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_MAINMENU_LIST to START1;
-grant SELECT                                                                 on V_MAINMENU_LIST to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_MAINMENU_LIST to WR_ALL_RIGHTS;
 
 

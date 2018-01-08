@@ -77,10 +77,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  MWAY_MAPPING_BRANCH ***
-grant SELECT                                                                 on MWAY_MAPPING_BRANCH to BARSREADER_ROLE;
-grant SELECT                                                                 on MWAY_MAPPING_BRANCH to UPLD;
-
 
 
 PROMPT ===================================================================================== 

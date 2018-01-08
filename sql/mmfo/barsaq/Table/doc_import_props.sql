@@ -44,6 +44,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_DOCIMPPROPS_DOCIMP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.DOC_IMPORT_PROPS ADD CONSTRAINT FK_DOCIMPPROPS_DOCIMP FOREIGN KEY (EXT_REF)
+	  REFERENCES BARSAQ.DOC_IMPORT (EXT_REF) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DOCIMPPROPS_OPFILED ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.DOC_IMPORT_PROPS ADD CONSTRAINT FK_DOCIMPPROPS_OPFILED FOREIGN KEY (TAG)
+	  REFERENCES BARS.OP_FIELD (TAG) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DOCIMPORTPROPS_EXTREF_NN ***
 begin   
  execute immediate '
@@ -94,7 +120,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  DOC_IMPORT_PROPS ***
-grant SELECT                                                                 on DOC_IMPORT_PROPS to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on DOC_IMPORT_PROPS to REFSYNC_USR;
 
 

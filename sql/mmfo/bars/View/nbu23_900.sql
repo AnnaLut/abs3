@@ -15,10 +15,8 @@ PROMPT *** Create  view NBU23_900 ***
    and a.nbs in ('9000','9002','9001','9003',9020,9100);
 
 PROMPT *** Create  grants  NBU23_900 ***
-grant SELECT                                                                 on NBU23_900       to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on NBU23_900       to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on NBU23_900       to START1;
-grant SELECT                                                                 on NBU23_900       to UPLD;
 
 
 

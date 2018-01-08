@@ -90,12 +90,10 @@ exception when others then
 
 PROMPT *** Create  grants  SW_TAG ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_TAG          to BARS013;
-grant SELECT                                                                 on SW_TAG          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_TAG          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_TAG          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_TAG          to SWIFT001;
 grant INSERT                                                                 on SW_TAG          to SWTOSS;
-grant SELECT                                                                 on SW_TAG          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_TAG          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SW_TAG          to WR_REFREAD;
 

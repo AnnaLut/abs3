@@ -1,54 +1,40 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FE8_NN.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_FE8_NN ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_FE8_NN (dat_     DATE,
+CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
                                       sheme_   VARCHAR2 DEFAULT 'G',
                                       prnk_    NUMBER DEFAULT NULL ) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E8 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2008.  All Rights Reserved.
-% VERSION     : 11/10/2017 (12/09/2017, 02/08/2017)
+% VERSION     : 16/08/2017 (02/08/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-11.10.2017 - для групп бал.счетоа 270, 366 дату начала договора вибираем из
-             поля SDATE табл. CC_DEAL  вместо bdate табл. CC_ADD
-12.09.2017 - для групп бал.счетоа 270, 366 номер договора, идентификатор
-             договора, дату начала и дату окончания договора вибираем из
-             CC_DEAL
 02.08.2017 - добален блок для изменения %% ставки для счетов овердрафтов
-             и добавлен блок вилучення дуже старих вкладів
+             и добавлен блок вилучення дуже старих вкладів 
              (до 01/01/2000 - узгоджено з Квашук)
-25.01.2017 - изменяем %% ставку для счетов овердрафтов если на конец месяца
-             остаток активный но с учетом корректирующих оборотов
+25.01.2017 - изменяем %% ставку для счетов овердрафтов если на конец месяца 
+             остаток активный но с учетом корректирующих оборотов 
              стал пассивный
 27.12.2016 -при отсутствии кода региона в параметрах он выбирается по МФО
             из rcukru
-06.12.2016 - для нерезидентов в коде ZZZZZZZZZZ вместо условной нумерации
-             будет код региона плюс условный номер (4 последних символа)
-09.11.2016 - для бал.счета 3351 НЕ будет выполняться расшифровка в разрезе
-             контрагентов банков т.к. данные счета открыты в разрезе
+06.12.2016 - для нерезидентов в коде ZZZZZZZZZZ вместо условной нумерации 
+             будет код региона плюс условный номер (4 последних символа)  
+09.11.2016 - для бал.счета 3351 НЕ будет выполняться расшифровка в разрезе 
+             контрагентов банков т.к. данные счета открыты в разрезе 
              контрагентов.
 13.05.2016 - для банков нерезидентов будем формировать K021='4' вместо '9'
-06.05.2016 - для бал.счета 3351 будет выполняться расшифровка в разрезе
+06.05.2016 - для бал.счета 3351 будет выполняться расшифровка в разрезе 
              контрагентов банков
-26.04.2016 - для ФЛ нерезидентов код ZZZZZZZZZZ будем формировать как
-             'CC' || <серия + номер паспорта>
-21.04.2016 - для бал.счета 2658 и Ob22='01' не будет формироваться
+26.04.2016 - для ФЛ нерезидентов код ZZZZZZZZZZ будем формировать как 
+             'CC' || <серия + номер паспорта>  
+21.04.2016 - для бал.счета 2658 и Ob22='01' не будет формироваться 
              показатель 112 (дата окончания договора)
-14.04.2016 - вместо параметра признак инсайдера/неинсайдера(1,2) будем
+14.04.2016 - вместо параметра признак инсайдера/неинсайдера(1,2) будем 
              формировать значение поля K060 (PRINSIDER в CUSTOMER)
 11.04.2016 - заменил выражение формирования даты из CUSTOMERW по TAG='RKO_D'
 05.04.2016 - не будем формировать показатель DDD='150'
-18.03.2016 - на 01.04.2016 будет формироваться новая часть показателя
-             "ознака ідентифікаційного коду" (параметр K021 из KOD_K021)
+18.03.2016 - на 01.04.2016 будет формироваться новая часть показателя 
+             "ознака ідентифікаційного коду" (параметр K021 из KOD_K021) 
              в поле P085 (табл.OTCN_F71_CUST) заполняем K021
 03.03.2016 - для некоторых РУ СБ будем включать клиентов у которых сумма
              пассивных остатков больше равна 50 000.00 и только для физлиц
@@ -76,7 +62,7 @@ PROMPT *** Create  procedure P_FE8_NN ***
    our_reg_     NUMBER;
    our_rnk_     NUMBER;
    kol_rnk      NUMBER;
-   max_rnk      NUMBER;
+   max_rnk      NUMBER; 
    pasp_sn1_    VARCHAR2 (20);
    b040_        VARCHAR2 (20);
    sab_         VARCHAR2 (3);
@@ -171,64 +157,64 @@ PROMPT *** Create  procedure P_FE8_NN ***
    ncontru_     NUMBER                := 0;
    sum_contr_   NUMBER                := 0;
    sql_    varchar2(1000);
-   dat_izm1     date := to_date('31/08/2013','dd/mm/yyyy');
-   dat_izm2     date := to_date('31/03/2016','dd/mm/yyyy');
-   dat_izm3     date := to_date('31/01/2017','dd/mm/yyyy');
+   dat_izm1     date := to_date('31/08/2013','dd/mm/yyyy'); 
+   dat_izm2     date := to_date('31/03/2016','dd/mm/yyyy'); 
+   dat_izm3     date := to_date('31/01/2017','dd/mm/yyyy'); 
    ret_         NUMBER;
    sql_acc_     clob:='';
-
+   
    FL_D8_       number := F_Get_Params('DPULINE8', -1);
 
 --Остатки
    CURSOR saldo
    IS
-      SELECT   a.acc, a.nls,
-               a.nbs,
+      SELECT   a.acc, a.nls, 
+               a.nbs, 
                a.nmk, a.rnk, NVL (f.k074, '0'), a.okpo, a.codc,
-               a.country, a.c_reg, a.ved, a.prins,
-               (case when a.nbs like '8%' then '2'||substr(a.nbs,2) else a.nbs end) nbs,
-               a.daos, a.mdate,
+               a.country, a.c_reg, a.ved, a.prins, 
+               (case when a.nbs like '8%' then '2'||substr(a.nbs,2) else a.nbs end) nbs, 
+               a.daos, a.mdate, 
                decode(a.kv, 980, a.ost, a.ostq) ostq,
                a.kv, a.fdat, a.tip, a.custtype, NVL (TRIM (k.ddd), '121'), a.ostf,
                a.glb, a.kb, a.vost, a.ostq_no96
           FROM (SELECT /*+ordered */
                        s.acc, s.nls, s.nbs, s.kv, s.daos, s.mdate, aa.fdat,
-                       aa.ost - aa.dos96 + aa.kos96 ost,
-                       aa.ostq - aa.dosq96 + aa.kosq96 ostq, s.tip, s.isp,
+                       aa.ost - aa.dos96 + aa.kos96 ost, 
+                       aa.ostq - aa.dosq96 + aa.kosq96 ostq, s.tip, s.isp, 
                        DECODE(mfou_, 300465, DECODE(mfo_, 300465, c.rnk, DECODE(c.rnkp, NULL, c.rnk, c.rnkp)), c.rnk) RNK,
                        c.nmk, LPAD (TRIM (c.okpo), 10, '0') okpo, 2 - MOD (c.codcagent, 2) codc, c.country, c.c_reg,
                        NVL (c.ved, '00000') ved,
-                       c.prinsider prins,
-                       DECODE (c.custtype, 1, 2, 2, 2, DECODE (sed, 91, 3, 1)) custtype,
+                       c.prinsider prins, 
+                       DECODE (c.custtype, 1, 2, 2, 2, DECODE (sed, 91, 3, 1)) custtype, 
                        c.ise, d.ostf,
-                       NVL(rc.glb,0) glb, NVL(cb.alt_bic,'0') kb, aa.vost,
-                       decode(aa.kv, 980, aa.ost, aa.ostq) ostq_no96
-                  FROM otcn_f71_rnk d, customer c, otcn_saldo aa, otcn_acc s,
+                       NVL(rc.glb,0) glb, NVL(cb.alt_bic,'0') kb, aa.vost, 
+                       decode(aa.kv, 980, aa.ost, aa.ostq) ostq_no96 
+                  FROM otcn_f71_rnk d, customer c, otcn_saldo aa, otcn_acc s, 
                        custbank cb, rcukru rc
                  WHERE DECODE(mfou_, 300465, DECODE(mfo_, 300465, c.rnk, DECODE(c.rnkp, NULL, c.rnk, c.rnkp)), c.rnk) = d.rnk
                    and aa.rnk = c.rnk
-                   and c.rnk = cb.rnk(+)
+                   and c.rnk = cb.rnk(+) 
                    and cb.mfo=rc.mfo(+)
-                   AND aa.acc = s.acc
-                   AND aa.rnk = s.rnk
+                   AND aa.acc = s.acc 
+                   AND aa.rnk = s.rnk 
                    AND aa.ost - aa.dos96 + aa.kos96 <> 0 ) a,
                kl_k070 f,
-               kl_f3_29 k
+               kl_f3_29 k   
          WHERE a.ise = f.k070(+)
            AND replace(substr(a.nbs,1,1),'8','2')||substr(a.nbs,2) = k.r020
            AND k.kf = 'E8'
            AND ( (NVL(k.ddd,'121') = '122' and a.nbs like '___6%' and a.ost < 0) OR
-                 (NVL(k.ddd,'121') = '122' and a.nbs not like '___6%' and a.ost > 0) OR
+                 (NVL(k.ddd,'121') = '122' and a.nbs not like '___6%' and a.ost > 0) OR 
                  (NVL(k.ddd,'121') <> '122' and a.ost > 0)
-               )
-           AND nvl(f.d_close, dat_ + 1) > dat_
+               )   
+           AND nvl(f.d_close, dat_ + 1) > dat_ 
       ORDER BY a.okpo, a.rnk, a.nbs;
 
 -- конртрагенты
    CURSOR c_cust
    IS
       SELECT   rnk, okpo, rez, custtype, p010, p020, p025,
-               p050, p055, p060, p085
+               p050, p055, p060, p085 
           FROM otcn_f71_cust
       ORDER BY okpo, rnk;
 
@@ -239,7 +225,7 @@ PROMPT *** Create  procedure P_FE8_NN ***
                p130, p150
           FROM otcn_f71_temp
          WHERE rnk = rnk_
-           and p120 != 0
+           and p120 != 0  
       ORDER BY nd, p090, nbs, kv;
 
 -- параметры контрагента и депозитного договора (константы)
@@ -339,7 +325,7 @@ PROMPT *** Create  procedure P_FE8_NN ***
             k021_ := '9';
          END IF;
 
-         IF custtype_ in (1, 3) and rez_ = 1
+         IF custtype_ in (1, 3) and rez_ = 1 
          THEN
             BEGIN
                SELECT LPAD (SUBSTR (TRIM (ser) || TRIM (numdoc), 1, 10),
@@ -384,27 +370,27 @@ PROMPT *** Create  procedure P_FE8_NN ***
             k021_ := '9';
          END IF;
 
-         if mfo_ = 324805 and custtype_ = 1 and rez_ = 2
+         if mfo_ = 324805 and custtype_ = 1 and rez_ = 2 
          then
             kod_okpo := trim(kod_okpo);
             k021_ := '9';
          end if;
 
-         IF custtype_ in (1, 3) and rez_ = 1
+         IF custtype_ in (1, 3) and rez_ = 1 
          THEN
             kod_okpo := LPAD (kod_okpo, 10, '0');
-            k021_ := '2';
+            k021_ := '2'; 
          END IF;
-
-      END IF;
+         
+      END IF; 
 
       -- ФЛ предприниматели
-      --IF custtype_ = 3
+      --IF custtype_ = 3  
       --THEN
       --   kod_okpo := LPAD (kod_okpo, 10, '0');
       --end if;
 
-      -- Юрлица резиденты, нерезиденты
+      -- Юрлица резиденты, нерезиденты 
       IF custtype_ =2 and kod_okpo in ('00000','000000000','0000000000','99999','999999999')
       THEN
          IF custtype_ = 2 and rez_ = 2 and glb_ = 0 and kb_ = '0'
@@ -419,7 +405,7 @@ PROMPT *** Create  procedure P_FE8_NN ***
             k021_ := '9';
          END IF;
 
-         -- Юрлица резиденты
+         -- Юрлица резиденты 
          IF custtype_ = 2 and rez_ = 1 and glb_ = 0 and kb_ = '0'
          THEN
             ncontr_ := ncontr_ + 1;
@@ -430,7 +416,7 @@ PROMPT *** Create  procedure P_FE8_NN ***
 
       IF custtype_ = 2 and kod_okpo not in ('00000','000000000','0000000000','99999','999999999')
       THEN
-         IF custtype_ = 2 and rez_ = 1 and glb_ = 0 and kb_ = '0'
+         IF custtype_ = 2 and rez_ = 1 and glb_ = 0 and kb_ = '0' 
          THEN
             kod_okpo := LPAD (kod_okpo, 10, '0');
             k021_ := '1';
@@ -453,8 +439,8 @@ PROMPT *** Create  procedure P_FE8_NN ***
          END IF;
       END IF;
 
-      -- банки резиденты
-      IF custtype_ = 2 and rez_ = 1 and glb_ <> 0
+      -- банки резиденты 
+      IF custtype_ = 2 and rez_ = 1 and glb_ <> 0 
       THEN
          kod_okpo := LPAD ( glb_, 10, '0');
          k021_ := '3';
@@ -470,18 +456,18 @@ PROMPT *** Create  procedure P_FE8_NN ***
       -- т.к при заполненном RNKP не всегда коректно формируются эти параметры
       if custtype_ in (1, 2, 3) and rez_ = 1 then
          begin
-            select nmk,
-                   --LPAD(trim(okpo), 10, '0'),
+            select nmk, 
+                   --LPAD(trim(okpo), 10, '0'), 
                    DECODE (custtype, 1, 2, 2, 2, DECODE (sed, 91, 3, 1)),
                    ved, c_reg
                into p010_, custtype_, ved_, reg_  -- kod_okpo,
-            from customer
+            from customer 
             where rnk=rnk_;
          exception when no_data_found then
             null;
-         end;
+         end; 
       end if;
-
+       
       -- определение вида экономической деятельности
       k110_ := NVL (ved_, '00000');
 
@@ -511,7 +497,7 @@ PROMPT *** Create  procedure P_FE8_NN ***
          reg_ := 0;
       END IF;
 
-      select count(*)
+      select count(*)  
          into kol_rnk
       from otcn_f71_cust
       where rnk = rnk_;
@@ -535,7 +521,7 @@ PROMPT *** Create  procedure P_FE8_NN ***
 -- запись реквизитов депозитных договоров
    BEGIN
       --- реквизиты контрагента заполняются только при изменении контрагента
-      IF p_rnk_ IS NULL OR p_rnk_ <> rnk_   --and p_okpo_ <> kod_okpo
+      IF p_rnk_ IS NULL OR p_rnk_ <> rnk_   --and p_okpo_ <> kod_okpo  
       THEN
          p_ins_contr;
       END IF;
@@ -549,40 +535,40 @@ PROMPT *** Create  procedure P_FE8_NN ***
          p150_ := '0';
       END IF;
 
-      -- расшифровка 3351
+      -- расшифровка 3351 
       if substr(nls_,1,4) in ('3351')
       then
          begin
-            select fx.deal_tag, fx.dat_a
+            select fx.deal_tag, fx.dat_a 
                into p090_, p111p_
             from fx_deal fx
-            where fx.ref = ( select min(t.ref)
+            where fx.ref = ( select min(t.ref) 
                              from TMP_VPKLB t
                              where t.sk = rnk_
-                             group by t.sk);
+                             group by t.sk);  
          exception when no_data_found then
             null;
          end;
 
          begin
-            select fx.dat_a
+            select fx.dat_a 
                into p112p_
             from fx_deal fx
-            where fx.ref = ( select max(t.ref)
+            where fx.ref = ( select max(t.ref) 
                              from TMP_VPKLB t
                              where t.sk = rnk_
-                             group by t.sk);
+                             group by t.sk);  
          exception when no_data_found then
             null;
          end;
 
          --begin
-         --   select fx.rnk, min(fx.deal_tag), min(fx.dat_a), max(fx.dat_a)
+         --   select fx.rnk, min(fx.deal_tag), min(fx.dat_a), max(fx.dat_a)  
          --      into rnk_3351, p090_, p111p_, p112p_
          --   from TMP_VPKLB t, fx_deal fx
          --   where t.sk = rnk_
          --      and t.sk = fx.rnk
-         --      and t.ref = fx.ref
+         --      and t.ref = fx.ref 
          --   group by fx.rnk;
          --exception when no_data_found then
          --   null;
@@ -621,7 +607,7 @@ PROMPT *** Create  procedure P_FE8_NN ***
 -------------------------------------------------------------------
 BEGIN
    commit;
-
+   
    EXECUTE IMMEDIATE 'ALTER SESSION ENABLE PARALLEL DML';
 -------------------------------------------------------------------
    logger.info ('P_FE8: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy'));
@@ -741,8 +727,8 @@ BEGIN
    -- для некоторых РУ Сбербанка сначала включаем всех клиентов
    -- у которых сумма остатков больше равна 50000.00
    -- а затем исключаем клиентов Физлицо у которых сумма < 200000000 (2 млн.)
-   if dat_ >= to_date('30052014','ddmmyyyy') and
-      mfo_ in (322669, 311647, 300465, 302076, 303398, 305482)
+   if dat_ >= to_date('30052014','ddmmyyyy') and 
+      mfo_ in (322669, 311647, 300465, 302076, 303398, 305482) 
    then
       smax_ := 5000000;
    end if;
@@ -752,21 +738,21 @@ BEGIN
        sql_acc_ := 'select /*+PARALLEL(8) */ * from accounts a where nvl(nbs, substr(nls,1,4)) in ';
        sql_acc_ := sql_acc_ || '(select r020 from kl_f3_29 where kf=''E8'') ';
        sql_acc_ := sql_acc_ || ' and (nls, kv) NOT IN (SELECT nls, kv FROM kf91) ';
-
+       
        if FL_D8_ = '8' then
           sql_acc_ := sql_acc_ || ' and acc not in (select gen_acc
                                                     from v_dpu_rel_acc_all
                                                     where gen_acc is not null ) ';
-
-          sql_acc_ := sql_acc_ || ' UNION ALL ';
-
-          sql_acc_ := sql_acc_ || ' select /*+PARALLEL(8) */ *
-                                         from accounts a
+          
+          sql_acc_ := sql_acc_ || ' UNION ALL ';                                             
+                                                    
+          sql_acc_ := sql_acc_ || ' select /*+PARALLEL(8) */ * 
+                                         from accounts a 
                                          where acc in (select dep_acc
                                                         from v_dpu_rel_acc_all
-                                                        where gen_acc is not null)';
+                                                        where gen_acc is not null)';                                 
        end if;
-
+           
        ret_ := F_Pop_Otcn(Dat_, 2, sql_acc_, null, 0, 1);
    else
        sql_acc_ := 'select * from accounts where rnk = '||to_char(prnk_)||' and nbs in ';
@@ -776,63 +762,63 @@ BEGIN
           sql_acc_ := sql_acc_ || ' and acc not in (select gen_acc
                                                     from v_dpu_rel_acc_all
                                                     where gen_acc is not null ) ';
-
-          sql_acc_ := sql_acc_ || ' UNION ALL ';
-
+          
+          sql_acc_ := sql_acc_ || ' UNION ALL ';                                             
+                                                    
           sql_acc_ := sql_acc_ || ' select distinct a.acc, a.nls, a.kv, substr(a.nlsalt,1,4) nbs,
-                                           a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip,
+                                           a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip, 
                                            a.vid, a.mdate, a.dazs, a.accc, a.tobo
-                                    from (select  /*+PARALLEL(8) */ *
+                                    from (select  /*+PARALLEL(8) */ * 
                                          from accounts
-                                         where rnk = '||to_char(prnk_)||' and
+                                         where rnk = '||to_char(prnk_)||' and 
                                                acc in (select dep_acc
                                                         from v_dpu_rel_acc_all
                                                         where gen_acc is not null
                                                        )
-                                         ) a ';
+                                         ) a ';                                 
        end if;
-
+           
        ret_ := F_Pop_Otcn(Dat_, 2, sql_acc_, null, 0, 1);
    end if;
-
+    
    -- вилучення дуже старих вкладів (до 01/01/2000 - узгоджено з Квашук)
    delete from otcn_saldo where acc in (select acc from accounts where daos < to_date('01012000','ddmmyyyy'));
-
+      
    INSERT INTO otcn_f71_rnk
                 (rnk, ostf)
-       SELECT
+       SELECT  
               rnk, ost
          FROM (SELECT   rnk, SUM (ost) ost
-               FROM (SELECT
+               FROM (SELECT  
                             DECODE(mfou_, 300465, DECODE(mfo_, 300465, c.rnk, DECODE(c.rnkp, NULL, c.rnk, c.rnkp)),
                                           353575, DECODE(c.rnkp, NULL, c.rnk, c.rnkp), c.rnk) RNK,
                             decode(v.kv, 980, s.ost - s.dos96 + s.kos96, s.ostq - s.dosq96 + s.kosq96) ost
                            FROM otcn_saldo s, otcn_acc v, customer c
                           WHERE s.acc = v.acc
-                            AND s.rnk = v.rnk
+                            AND s.rnk = v.rnk 
                             AND c.rnk = v.rnk
-                            AND ( (c.rnk <> our_rnk_ and mfo_ <> 300465) OR
+                            AND ( (c.rnk <> our_rnk_ and mfo_ <> 300465) OR 
                                   (c.rnk <> 0 and mfo_ = 300465) )
                              AND c.codcagent < 7
                             AND s.ost - s.dos96 + s.kos96 > 0)
             GROUP BY rnk)
          WHERE ABS (ost) >= smax_ ;
-
-   -- для всех РУ Сбербанка сначала включаем всех клиентов
-   -- у которых сумма остатков больше равна 2000.00
+  
+   -- для всех РУ Сбербанка сначала включаем всех клиентов 
+   -- у которых сумма остатков больше равна 2000.00 
    -- а затем исключаем клиентов Физлицо у которых сумма < 200000000 (2 млн.)
    if dat_ >= to_date('30052014','ddmmyyyy') and mfou_ = 300465 then
-      delete from otcn_f71_rnk o
+      delete from otcn_f71_rnk o 
       where o.ostf < 200000000
-        and exists (select 1
-                    from customer c
-                    where c.rnk = o.rnk
+        and exists (select 1 
+                    from customer c 
+                    where c.rnk = o.rnk 
                       and c.codcagent in (5,6)
                       and NVL(trim(c.sed),'00')<>'91');
    end if;
-
+   
    --20,07,2017  по Криму виключаємо консолідовані рахунки фізосіб
-   if mfo_ = 324805 then
+   if mfo_ = 324805 then 
       delete from otcn_f71_rnk o where rnk in (29992702, 35051702, 45427002);
    end if;
 --------------------------------------------------------------------------
@@ -845,13 +831,13 @@ BEGIN
             custtype_, ddd_, sum_d_, glb_, kb_, p130_BCZ, ostq_no96_;
 
       EXIT WHEN saldo%NOTFOUND;
-
+      
       nd_ := NULL;
       nkd_ := 'N дог.';
       p090_ := nkd_;
-
+      
       begin
-        p130_ := acrn_otc.fproc (acc_, dat_);
+        p130_ := acrn_otc.fproc (acc_, dat_); 
       exception
         when others then
             p130_ := 0;
@@ -859,21 +845,21 @@ BEGIN
       end;
 
       -- новый блок для овердрафтов остаток на конец месяца активный
-      -- но с учетом корректирующих оборотов стал пассивный
-      if nbs_ in ('2600','2605','2620','2625','2650','2655') and
+      -- но с учетом корректирующих оборотов стал пассивный 
+      if nbs_ in ('2600','2605','2620','2625','2650','2655') and 
          p120_ > 0 and ostq_no96_ < 0
       then
          begin
-         select i.ir
+         select i.ir 
             into p130_
          from int_ratn i
-         where i.acc = acc_
-           and i.id = 1
+         where i.acc = acc_ 
+           and i.id = 1 
            and i.bdat = ( select max(bdat)
                           from int_ratn
-                          where acc=acc_
+                          where acc=acc_ 
                             and id =1
-                            and bdat <= dat_
+                            and bdat <= dat_ 
                          );
          exception
             when others  then p130_ := 0;
@@ -883,7 +869,7 @@ BEGIN
       if mfo_ = 324485 then
          glb_ := 81;
       end if;
-
+   
       if mfo_ = 325569 then
          glb_ := 93;
       end if;
@@ -934,15 +920,15 @@ BEGIN
       if Dat_ > dat_izm3 and (nls_ like '270%' or nls_ like '366%')
       then
          BEGIN
-            select nd
-               into p_nd_
-            from nd_acc
+            select nd 
+               into p_nd_ 
+            from nd_acc 
             where acc = acc_;
          EXCEPTION WHEN NO_DATA_FOUND THEN
             null;
-         END;
+         END; 
       end if;
-
+ 
       s04_ := 0;
       f91_ := 0;
 
@@ -976,7 +962,7 @@ BEGIN
                IF pog_ AND p120_ = 0 THEN
                   SELECT NVL (cc_id, nkd_), sdate, wdate, nd,
                          gl.p_icurval (kv, LIMIT, dat_) * 100
-                     INTO p090_, p111p_, p112p_, nd_,
+                     INTO p090_, p111p_, p112p_, nd_, 
                           sum_zd_
                   FROM mbd_k_a
                   WHERE acc = acc_ AND nd = p_nd_;
@@ -992,10 +978,10 @@ BEGIN
 
                   --- общая сумма по одному договору
                   BEGIN
-                     SELECT NVL(SUM(ABS(decode(s.kv, 980, s.ost - s.dos96 + s.kos96,
+                     SELECT NVL(SUM(ABS(decode(s.kv, 980, s.ost - s.dos96 + s.kos96, 
                                                           s.ostq - s.dosq96 + s.kosq96))),0)
                         INTO sum_71
-                     FROM mbd_k_a p, otcn_saldo s
+                     FROM mbd_k_a p, otcn_saldo s 
                      WHERE p.nd = nd_
                        AND p.acc = s.acc;
                   EXCEPTION WHEN NO_DATA_FOUND THEN
@@ -1037,7 +1023,7 @@ BEGIN
 
                      --- общая сумма по одному договору
                      BEGIN
-                        SELECT NVL(SUM(ABS(decode(s.kv, 980, s.ost - s.dos96 + s.kos96,
+                        SELECT NVL(SUM(ABS(decode(s.kv, 980, s.ost - s.dos96 + s.kos96, 
                                                           s.ostq - s.dosq96 + s.kosq96))),0)
                            INTO sum_71
                         FROM dpt_deposit p, otcn_saldo s
@@ -1055,7 +1041,7 @@ BEGIN
 
                      --- общая сумма по одному договору
                      BEGIN
-                        SELECT NVL(SUM(ABS(decode(s.kv, 980, s.ost - s.dos96 + s.kos96,
+                        SELECT NVL(SUM(ABS(decode(s.kv, 980, s.ost - s.dos96 + s.kos96, 
                                                           s.ostq - s.dosq96 + s.kosq96))),0)
                            INTO sum_71
                         FROM dpt_deposit_clos p, otcn_saldo s
@@ -1083,7 +1069,7 @@ BEGIN
 
                      --- общая сумма по одному договору
                      BEGIN
-                        SELECT NVL(SUM(ABS(decode(s.kv, 980, s.ost - s.dos96 + s.kos96,
+                        SELECT NVL(SUM(ABS(decode(s.kv, 980, s.ost - s.dos96 + s.kos96, 
                                                           s.ostq - s.dosq96 + s.kosq96))),0)
                            INTO sum_71
                         FROM dpu_deal p, otcn_saldo s
@@ -1116,8 +1102,8 @@ BEGIN
          END IF;
 
         -- обработка счетов инсайдеров и неинсайдеров банка выбираем все депозиты
-         IF (sum_71 >= 0 OR pog_)   --p060_ in ('1','2') AND
-         THEN
+         IF (sum_71 >= 0 OR pog_)   --p060_ in ('1','2') AND 
+         THEN                               
             IF nls_ LIKE '1%' THEN
                BEGIN
                   SELECT NVL (cc_id, nkd_), sdate, wdate
@@ -1141,8 +1127,8 @@ BEGIN
                    exception
                        WHEN NO_DATA_FOUND THEN
                           p111p_ := p111_;
-                   end;
-
+                   end;         
+                   
                    -- дата зак_нчення д_ї угоди
                    begin
                        SELECT to_date(SUBSTR (trim(VALUE), 1, 8), 'ddmmyyyy')
@@ -1153,7 +1139,7 @@ BEGIN
                    exception
                        WHEN NO_DATA_FOUND THEN
                           p112p_ := p112_;
-                   end;
+                   end;    
                 else
                     SELECT c.daos, c.mdate
                        INTO p111p_, p112p_
@@ -1161,17 +1147,17 @@ BEGIN
                     WHERE c.acc = acc_;
                 end if;
 
-                if Dat_ > dat_izm3 and nls_ like '366%'
-                then
+                if Dat_ > dat_izm3 and nls_ like '366%' 
+                then 
                    BEGIN
                       SELECT c.nd, NVL (c.cc_id, nkd_), c.sdate, c.wdate
                          INTO nd_, p090_, p111p_, p112p_
-                      FROM cc_deal c
+                      FROM cc_deal c 
                       WHERE c.nd = p_nd_;
                    EXCEPTION WHEN NO_DATA_FOUND THEN
                       null;
-                   END;
-                end if;
+                   END;   
+                end if;                 
             ELSE
                BEGIN
                  SELECT NVL (c.nd, nkd_), c.datz, c.dat_end  --c.dat_begin, c.dat_end
@@ -1230,25 +1216,25 @@ BEGIN
                     END;
                  END;
                END;
-
-               if Dat_ > dat_izm3 and nls_ like '270%'
-               then
+               
+               if Dat_ > dat_izm3 and nls_ like '270%' 
+               then 
                   BEGIN
                      SELECT c.nd, NVL (c.cc_id, nkd_), c.sdate, c.wdate
                         INTO nd_, p090_, p111p_, p112p_
-                     FROM cc_deal c
+                     FROM cc_deal c 
                      WHERE c.nd = p_nd_;
                   EXCEPTION WHEN NO_DATA_FOUND THEN
                      null;
-                  END;
-               end if;
+                  END;   
+               end if;                 
 
-               if nls_ LIKE '260%' OR (nls_ like '2650%' and r013_ !='8')
-                 OR (nls_ like '2655%' and r013_ != '1')
+               if nls_ LIKE '260%' OR (nls_ like '2650%' and r013_ !='8') 
+                 OR (nls_ like '2655%' and r013_ != '1')  
                then
                  p112p_ := null;
                end if;
-
+               
             END IF;
 
             IF SUBSTR (nls_, 4, 1) = '8'  AND SUBSTR (nbs_, 4, 1) = '8' THEN
@@ -1273,10 +1259,10 @@ BEGIN
                   END;
                ELSE
                   if nls_ not like '260%' AND nls_ not like '2650%' AND
-                     nls_ not like '2655%'
+                     nls_ not like '2655%' 
                   then
                      BEGIN
-                        SELECT n.deposit_id, NVL (n.nd, nkd_), n.datz,
+                        SELECT n.deposit_id, NVL (n.nd, nkd_), n.datz, 
                                n.dat_end
                            INTO nd_, p090_, p111p_,
                                 p112p_
@@ -1287,7 +1273,7 @@ BEGIN
                           AND ROWNUM = 1;
                      EXCEPTION WHEN NO_DATA_FOUND THEN
                         BEGIN
-                           SELECT n.deposit_id, NVL (n.nd, nkd_), n.datz,
+                           SELECT n.deposit_id, NVL (n.nd, nkd_), n.datz,  
                                   n.dat_end
                               INTO nd_, p090_, p111p_,
                                   p112p_
@@ -1299,7 +1285,7 @@ BEGIN
                              AND ROWNUM = 1;
                         EXCEPTION WHEN NO_DATA_FOUND THEN
                            BEGIN
-                              SELECT n.dpu_id, NVL (n.nd, nkd_), n.datz,
+                              SELECT n.dpu_id, NVL (n.nd, nkd_), n.datz,  
                                      n.dat_end
                                  INTO nd_, p090_, p111p_,
                                      p112p_
@@ -1364,13 +1350,13 @@ BEGIN
                      BEGIN
                         SELECT c.nd, NVL (c.cc_id, nkd_), c.sdate, c.wdate
                            INTO nd_, p090_, p111p_, p112p_
-                        FROM cc_deal c
+                        FROM cc_deal c 
                         WHERE c.nd = p_nd_;
                      EXCEPTION WHEN NO_DATA_FOUND THEN
                         null;
                      END;
                   end if;
-
+ 
                END IF;
             END IF;
 
@@ -1399,14 +1385,14 @@ BEGIN
 
       sum_d_ := 0;
 
-      select count(*)
+      select count(*) 
          into kolz_
       from rnbu_trace
       where substr(kodp,4,10)=kod_okpo;
 
-      if kolz_ = 0 then
+      if kolz_ = 0 then 
          BEGIN
-            select 1
+            select 1 
                into glb_
             from custbank
             where rnk = rnk_;
@@ -1414,23 +1400,23 @@ BEGIN
             glb_ := 0;
          END;
 
-          if rez_ in (2,4,6) then  --and substr(kod_okpo,1,2) != 'IN' then
+          if rez_ in (2,4,6) then  --and substr(kod_okpo,1,2) != 'IN' then 
              okpo_nerez := trim(kod_okpo);
-             if mfo_ = 324805 and substr(kod_okpo,1,2) <> 'IN' then
+             if mfo_ = 324805 and substr(kod_okpo,1,2) <> 'IN' then 
                 kod_okpo := 'IN'||LPAD (substr(trim(kod_okpo),1,8), 8, '0');
              end if;
 
-             if length(okpo_nerez) > 8 then
+             if length(okpo_nerez) > 8 then 
                 kodp_ := kod_okpo || '0000' || '0000' || '000' || k021_;
-                -- код ОКПО нерезидента
+                -- код ОКПО нерезидента 
                 p_ins ('019' || kodp_, okpo_nerez);
              end if;
-          end if;
-
+          end if;   
+   
           -- для банк?в резидент?в
           IF custtype_ = 2 and rez_ = 1 then
              BEGIN
-                select NVL(rc.nb, p010_)
+                select NVL(rc.nb, p010_) 
                    into p010_
                 from custbank cb, rcukru rc
                 where cb.rnk = rnk_
@@ -1444,9 +1430,9 @@ BEGIN
           -- для банк?в нерезидент?в
           IF custtype_ = 2 and rez_ = 2 then
              BEGIN
-                select NVL(rc.name, p010_)
+                select NVL(rc.name, p010_) 
                    into p010_
-                from custbank cb, rc_bnk rc
+                from custbank cb, rc_bnk rc 
                 where cb.rnk = rnk_
                   and cb.alt_bic = rc.b010;
                 k021_ := '4';
@@ -1455,13 +1441,13 @@ BEGIN
              END;
           END IF;
 
-          kodp_ := kod_okpo || '0000' || '0000' || '000' || k021_;
+          kodp_ := kod_okpo || '0000' || '0000' || '000' || k021_;       
 
           -- название контрагента
           -- согласно постанове 434 от 18.12.2008 для ФЛ и ФЛ предпринимателей
           -- название контрагента не заполняется
-          if custtype_ in (1, 3) then
-             if 300465 in (mfo_, mfou_) then
+          if custtype_ in (1, 3) then  
+             if 300465 in (mfo_, mfou_) then 
                 p_ins ('010' || kodp_, 'Ф_зична особа');
              else
                 p_ins ('010' || kodp_, '');
@@ -1472,7 +1458,7 @@ BEGIN
 
           -- исключается на 01.10.2013
           -- на 01.10.2014 снова будет формироваться
-          if dat_ <= dat_izm1 OR dat_ > to_date('29092014','ddmmyyyy')
+          if dat_ <= dat_izm1 OR dat_ > to_date('29092014','ddmmyyyy') 
           then
              -- код сектора экономики K074
              p_ins ('021' || kodp_, p020_);
@@ -1481,14 +1467,14 @@ BEGIN
           p_ins ('025' || kodp_, k110_);
           -- код страны
           p_ins ('050' || kodp_, LPAD (TO_CHAR (p050_),3,'0'));
-
+          
           -- код региона
-          if custtype_ in (1, 3) then
+          if custtype_ in (1, 3) then  
              p_ins ('055' || kodp_, '0');
           else
              p_ins ('055' || kodp_, TO_CHAR (reg_));
           end if;
-
+          
           -- признак инсайдера
           p_ins ('060' || kodp_, LPAD (TO_CHAR (p060_), 2, '0'));
           -- ознака контрагента/iнсайдера
@@ -1511,7 +1497,7 @@ BEGIN
             from sal s
             where s.acc=acc_
               and fdat BETWEEN Dat1_ and Dat_;
-
+              
             if kos_ <> 0 then
                p120_ := kos_;
             end if;
@@ -1533,7 +1519,7 @@ BEGIN
 
                 if custtype_ in (1, 2) then
                    BEGIN
-                      select NVL(deb02, p111_), NVL(deb03, p112_), NVL(ob22,'00')
+                      select NVL(deb02, p111_), NVL(deb03, p112_), NVL(ob22,'00') 
                          into p111_, p112_, ob22_
                       from specparam_int
                       where acc=acc_;
@@ -1551,59 +1537,59 @@ BEGIN
                    p070_ := '2625';
                 end if;
 
-                if mfou_ = 300465 and ((p070_ like '25%' and p070_ not in ('2525','2546')) or
+                if mfou_ = 300465 and ((p070_ like '25%' and p070_ not in ('2525','2546')) or 
                                        (p070_='2600' and ob22_='01') or
                                        (p070_ in ('2560','2561','2562','2565','2568','2601',
                                                   '2602','2603','2604','2605','2608','2625',
-                                                  '2628','2655')) or
+                                                  '2628','2655')) or 
                                        ((p070_='2650' or p070_='2658') and ob22_='01') or
                                        (p070_='2620' and ob22_ in ('05','07','17','20','21','22','28','29')))
                 then
                    p112_ := null;
-                end if;
+                end if;                                                     
 
                 -- _дентиф_катор договору
-                p_ins ('090' || kod_okpo || kod_nnnn || '0000' || '000' || k021_, p090_,
+                p_ins ('090' || kod_okpo || kod_nnnn || '0000' || '000' || k021_, p090_, 
                        nls_
                       );
-
+                
                 -- дата виникнення зобов'язання банку (депозиту)
                 p_ins ('111' || kod_okpo || kod_nnnn || '0000' || '000' || k021_,
                        TO_CHAR (p111_, dfmt_),
-                       nls_
+                       nls_ 
                       );
 
-                if mfou_ = 300465 and ( ( p070_ like '25%' and p070_ not in ('2525','2546')) or
+                if mfou_ = 300465 and ( ( p070_ like '25%' and p070_ not in ('2525','2546')) or 
                                         ( p070_ in ('1600','1919','2525','2546','2600',
                                                     '2602','2603','2604','2605','2608',
-                                                    '2620','2625','2628','2650','2655','2658')
-                                        )
-                                      )
+                                                    '2620','2625','2628','2650','2655','2658') 
+                                        ) 
+                                      ) 
                    and p112_ is not null then
 
                    -- дата погашення зобов'язання банку (депозиту) згiдно з договором
                    p_ins ('112' || kod_okpo || kod_nnnn || '0000' || '000' || k021_,
-                          TO_CHAR (p112_, dfmt_),
-                          nls_
+                          TO_CHAR (p112_, dfmt_), 
+                          nls_ 
                          );
                 end if;
-                if mfou_ <> 300465 or
-                   ( mfou_ = 300465 and p070_ not like '25%'
+                if mfou_ <> 300465 or 
+                   ( mfou_ = 300465 and p070_ not like '25%'  
                                     and p070_ not in ('1600','1919','2600','2601',
                                                       '2602','2603','2604','2605',
                                                       '2608','2620','2625','2628',
-                                                      '2650','2655','2658') ) or
+                                                      '2650','2655','2658') ) or 
                    (mfou_ = 300465 and p070_ in ('2525','2546') )
-                then
+                then 
                    -- дата погашення зобов'язання банку (депозиту) згiдно з договором
                    p_ins ('112' || kod_okpo || kod_nnnn || '0000' || '000' || k021_,
-                          TO_CHAR (p112_, dfmt_),
-                          nls_
+                          TO_CHAR (p112_, dfmt_), 
+                          nls_ 
                          );
                 end if;
 
                 nnnn_ := nnnn_ + 1;
-
+ 
              END IF;
 
              IF ddd_ = '122'
@@ -1613,7 +1599,7 @@ BEGIN
                        TO_CHAR (p120_),
                        nls_
                       );
-                sum_d_ := sum_d_ + p120_;
+                sum_d_ := sum_d_ + p120_; 
              ELSE
                  p_ins (ddd_ || kod_okpo || kod_nnnn || p070_ || LPAD (TO_CHAR (p140_), 3, '0') || k021_,
                        TO_CHAR (ABS (p120_)),
@@ -1624,8 +1610,8 @@ BEGIN
 
              -- процентна ставка за депозитом
              p_ins ('130' || kod_okpo || kod_nnnn || '0000' || LPAD (TO_CHAR (p140_), 3, '0') || k021_,
-                    LTRIM (TO_CHAR (p130_, fmt_)),
-                    nls_
+                    LTRIM (TO_CHAR (p130_, fmt_)), 
+                    nls_ 
                     );
          end if;
 
@@ -1649,7 +1635,7 @@ BEGIN
    END LOOP;
 
        p_rnk_ := rnk_;
-
+ 
    CLOSE c_cust;
 
 ----------------------------------------------------
@@ -1684,43 +1670,43 @@ BEGIN
    CLOSE basel;
 ----------------------------------------
    if mfou_ = 300120 then
-      for k in ( select acc, znap
-                 from rnbu_trace
-                 where kodp like '130%'
+      for k in ( select acc, znap 
+                 from rnbu_trace 
+                 where kodp like '130%' 
                    and substr(nls,1,3) in ('261','262','263')
-               )
+               ) 
 
          loop
 
             select nvl(sum(ostq*(ndat - bdat)*ir)/sum(decode(ostq,0,(ndat - bdat),ostq*(ndat - bdat))), k.znap)
                into znap_
-            from (
+            from ( 
                   select fost(i.acc,i.bdat-1) ostq, dat1_ bdat, i.bdat ndat, acrn_otc.fprocn(i.acc, i.id, i.bdat-1) ir
-                  from int_ratn i
+                  from int_ratn i 
                   where i.acc = k.acc and
                         i.id = 1 and
-                        i.bdat in (select min(bdat)
-                                   from int_ratn
-                                   where acc=i.acc and
+                        i.bdat in (select min(bdat) 
+                                   from int_ratn 
+                                   where acc=i.acc and 
                                          to_char(bdat,'MMYYYY')=to_char(dat_,'MMYYYY') )
-                  UNION ALL
-                  select ostq, decode(bdat, daos, bdat+1, bdat) bdat,
+                  UNION ALL 
+                  select ostq, decode(bdat, daos, bdat+1, bdat) bdat, 
                          nvl(lead(bdat) over (partition by acc order by bdat), dat_+1) ndat, ir
-                  from (select fost(i.acc,i.bdat) ostq, i.acc, i.bdat,
+                  from (select fost(i.acc,i.bdat) ostq, i.acc, i.bdat, 
                                acrn_otc.fprocn(i.acc, i.id, i.bdat) ir,
                                a.daos daos
-                        from int_ratn i, accounts a
+                        from int_ratn i, accounts a  
                         where i.acc = k.acc and
                               i.id = 1 and
-                              i.bdat between dat1_ and dat_ and
-                              i.acc = a.acc
+                              i.bdat between dat1_ and dat_ and 
+                              i.acc = a.acc 
                        )
                  );
 
             update rnbu_trace set znap = znap_
-            where acc = k.acc and
+            where acc = k.acc and 
                   kodp like '130%';
-
+         
          end loop;
 
    end if;
@@ -1764,18 +1750,8 @@ BEGIN
    END LOOP;
 
    CLOSE basel2;
-
+   
    logger.info ('P_FE8: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 ----------------------------------------
 END p_fe8_nn;
 /
-show err;
-
-PROMPT *** Create  grants  P_FE8_NN ***
-grant EXECUTE                                                                on P_FE8_NN        to BARS_ACCESS_DEFROLE;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FE8_NN.sql =========*** End *** 
-PROMPT ===================================================================================== 

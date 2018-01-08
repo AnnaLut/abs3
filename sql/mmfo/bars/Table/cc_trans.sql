@@ -97,6 +97,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CCTRANS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_TRANS ADD CONSTRAINT FK_CCTRANS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_CCTRANS ***
 begin   
  execute immediate '
@@ -125,12 +138,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_TRANS ***
-grant SELECT                                                                 on CC_TRANS        to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_TRANS        to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_TRANS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_TRANS        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_TRANS        to RCC_DEAL;
-grant SELECT                                                                 on CC_TRANS        to UPLD;
 grant FLASHBACK,SELECT                                                       on CC_TRANS        to WR_REFREAD;
 
 

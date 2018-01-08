@@ -77,10 +77,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBK_GROUPS ***
-grant SELECT                                                                 on EBK_GROUPS      to BARSREADER_ROLE;
 grant SELECT                                                                 on EBK_GROUPS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBK_GROUPS      to BARS_DM;
-grant SELECT                                                                 on EBK_GROUPS      to UPLD;
 
 
 

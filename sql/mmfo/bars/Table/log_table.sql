@@ -129,10 +129,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  LOG_TABLE ***
-grant SELECT                                                                 on LOG_TABLE       to BARSREADER_ROLE;
-grant SELECT                                                                 on LOG_TABLE       to UPLD;
-
 
 
 PROMPT ===================================================================================== 

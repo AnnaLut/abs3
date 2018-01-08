@@ -107,10 +107,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_KORDATAF95_V05_NN ***
+PROMPT *** Create  constraint PK_KORDATAF95 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_KOR_DATA_F95 MODIFY (VAR_05 CONSTRAINT CC_KORDATAF95_V05_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_KOR_DATA_F95 ADD CONSTRAINT PK_KORDATAF95 PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -143,12 +145,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_KORDATAF95 ***
+PROMPT *** Create  constraint CC_KORDATAF95_V05_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_KOR_DATA_F95 ADD CONSTRAINT PK_KORDATAF95 PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.NBUR_KOR_DATA_F95 MODIFY (VAR_05 CONSTRAINT CC_KORDATAF95_V05_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -171,11 +171,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_KOR_DATA_F95 ***
-grant SELECT                                                                 on NBUR_KOR_DATA_F95 to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_KOR_DATA_F95 to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBUR_KOR_DATA_F95 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_KOR_DATA_F95 to RPBN002;
-grant SELECT                                                                 on NBUR_KOR_DATA_F95 to UPLD;
 
 
 

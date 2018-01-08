@@ -111,10 +111,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  NBUR_STATS_TABLE ***
-grant SELECT                                                                 on NBUR_STATS_TABLE to BARSREADER_ROLE;
-grant SELECT                                                                 on NBUR_STATS_TABLE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

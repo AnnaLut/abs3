@@ -65,10 +65,6 @@ COMMENT ON COLUMN BARS.ERR$_CC_KOL_SP.ID IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CC_KOL_SP ***
-grant SELECT                                                                 on ERR$_CC_KOL_SP  to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CC_KOL_SP  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

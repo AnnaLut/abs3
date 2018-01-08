@@ -14,10 +14,8 @@ PROMPT *** Create  view V_SPOT ***
     WHERE s.acc = i.acc ;
 
 PROMPT *** Create  grants  V_SPOT ***
-grant SELECT                                                                 on V_SPOT          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SPOT          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_SPOT          to PYOD001;
-grant SELECT                                                                 on V_SPOT          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SPOT          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_SPOT          to WR_REFREAD;
 

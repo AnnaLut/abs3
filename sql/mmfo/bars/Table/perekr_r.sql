@@ -51,6 +51,19 @@ COMMENT ON COLUMN BARS.PEREKR_R.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_PEREKRR_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PEREKR_R ADD CONSTRAINT FK_PEREKRR_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C009832 ***
 begin   
  execute immediate '
@@ -116,12 +129,10 @@ exception when others then
 
 PROMPT *** Create  grants  PEREKR_R ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PEREKR_R        to ABS_ADMIN;
-grant SELECT                                                                 on PEREKR_R        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PEREKR_R        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PEREKR_R        to BARS_DM;
 grant SELECT                                                                 on PEREKR_R        to RPBN001;
 grant SELECT                                                                 on PEREKR_R        to START1;
-grant SELECT                                                                 on PEREKR_R        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PEREKR_R        to WR_ALL_RIGHTS;
 
 

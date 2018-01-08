@@ -55,9 +55,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  STATUS_RECORD ***
-grant SELECT                                                                 on STATUS_RECORD   to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

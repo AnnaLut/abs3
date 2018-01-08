@@ -15,9 +15,7 @@ PROMPT *** Create  view V_W4_INSTANT_CARDS ***
  where d.sub_code like i.sub_code || '%';
 
 PROMPT *** Create  grants  V_W4_INSTANT_CARDS ***
-grant SELECT                                                                 on V_W4_INSTANT_CARDS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_INSTANT_CARDS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_W4_INSTANT_CARDS to UPLD;
 
 
 

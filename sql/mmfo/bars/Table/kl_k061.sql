@@ -49,10 +49,6 @@ COMMENT ON COLUMN BARS.KL_K061.D_CLOSE IS '';
 
 
 
-PROMPT *** Create  grants  KL_K061 ***
-grant SELECT                                                                 on KL_K061         to BARSREADER_ROLE;
-grant SELECT                                                                 on KL_K061         to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -117,12 +117,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_CATEGORY ***
-grant SELECT                                                                 on FM_CATEGORY     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FM_CATEGORY     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_CATEGORY     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FM_CATEGORY     to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FM_CATEGORY     to FINMON01;
-grant SELECT                                                                 on FM_CATEGORY     to UPLD;
 
 
 

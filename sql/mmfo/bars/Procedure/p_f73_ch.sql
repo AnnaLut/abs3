@@ -1,23 +1,12 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F73_CH.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F73_CH ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_F73_CH (Dat1_ Date, Dat_ Date) IS
+CREATE OR REPLACE PROCEDURE BARS.P_F73_CH (Dat1_ Date, Dat_ Date) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура дозаполнения кодов "DDD" для файла #73 
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 04/12/2017 (07/09/2017)
+% VERSION     : 16/06/2017 (26/05/2017, 22/12/2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat1_ - начальная дата периода отчета
            Dat_  - конечная  дата периода отчета
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-07.09.2017 для проводок Дт 2628, 2638 Кт 100* будет формироваться код 341 
-           вместо кода 370 
 13.06.2017 на 01.07.2017 нові показники для операцій конверсії 248, 348
 26.05.2017 закоментарил строку 1211 т.к. не изменялся доп.реквизит D#73 
            со значения "232" на "000"
@@ -53,17 +42,18 @@ BEGIN
 
    for k in (select a.*, w1.ref ref1, w1.d020 val1, w2.d020 val2, w3.d020 val3
                 from (
-                    select p.pdat, p.fdat, p.ref, p.tt, p.accd, p.nlsd, p.kv, p.acck, 
-                          p.nlsk, p.nazn, p.soso sos, 
+                    select o.pdat, p.fdat, p.ref, p.tt, p.accd, p.nlsd, p.kv, p.acck, 
+                          p.nlsk, p.nazn, o.sos, 
                           NVL(p.ob22d,'00') ob22d, NVL(p.ob22k,'00') ob22k  
-                   from provodki_otc p
+                   from provodki_otc p, oper o  
                    where p.fdat BETWEEN Dat1_ and Dat_ 
                      and p.kv<>980 
-                     and ( (p.nlsd LIKE '100%' and p.nlsk NOT LIKE '1007%') OR
-                           (p.nlsd NOT LIKE '1007%' and p.nlsk LIKE '100%') OR
+                     and ( (p.nbsd LIKE '100%' and p.nbsk NOT LIKE '1007%') OR
+                           (p.nbsd NOT LIKE '1007%' and p.nbsk LIKE '100%') OR
                            (p.nlsd LIKE '1101%' or p.nlsd LIKE '1102%') OR 
                            (p.nlsk LIKE '1101%' or p.nlsk LIKE '1102%')
                          )
+                     and p.ref=o.ref
                     order by 1,2,3) a
                 left outer join
                 (select ref, tag, trim(substr(value,1,3)) d020
@@ -1177,17 +1167,16 @@ BEGIN
       -- видано IВ на iншi цiлi
       if substr(k.nlsd,1,4) IN ('2628','2638','3500') and k.nlsk LIKE '100%' then 
 
-         -- 07/09/2017 змінив код 370 на код 341 (Башкевич нові вимоги) 
-         update operw a set a.value='341'
+         update operw a set a.value='370'
          where a.tag='D#73'   
-           and (a.value is null or a.value NOT LIKE '341%') 
+           and (a.value is null or a.value NOT LIKE '370%') 
            and a.ref=k.ref
            and k.tt not in (SELECT substr(tag,-3) FROM op_rules 
                             WHERE tag LIKE '73%'); 
 
-         update operw a set a.value='341'
+         update operw a set a.value='370'
          where a.tag='73'||k.tt 
-           and (a.value is null or a.value NOT LIKE '341%') 
+           and (a.value is null or a.value NOT LIKE '370%') 
            and a.ref=k.ref; 
 
       end if;
@@ -1298,10 +1287,4 @@ BEGIN
    logger.info ('P_F73_CH: End for '||to_char(dat_,'dd.mm.yyyy'));
 end p_f73_ch;
 /
-show err;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F73_CH.sql =========*** End *** 
-PROMPT ===================================================================================== 

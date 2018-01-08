@@ -25,9 +25,7 @@ PROMPT *** Create  view V_WCS_AUTHORIZATION_QUESTIONS ***
    and q.type_id = qt.id;
 
 PROMPT *** Create  grants  V_WCS_AUTHORIZATION_QUESTIONS ***
-grant SELECT                                                                 on V_WCS_AUTHORIZATION_QUESTIONS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_AUTHORIZATION_QUESTIONS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_AUTHORIZATION_QUESTIONS to UPLD;
 
 
 

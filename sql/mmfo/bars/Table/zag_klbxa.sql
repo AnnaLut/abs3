@@ -78,9 +78,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAG_KLBXA ***
-grant SELECT                                                                 on ZAG_KLBXA       to BARSREADER_ROLE;
 grant SELECT                                                                 on ZAG_KLBXA       to BARS_DM;
-grant SELECT                                                                 on ZAG_KLBXA       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAG_KLBXA       to WR_ALL_RIGHTS;
 
 

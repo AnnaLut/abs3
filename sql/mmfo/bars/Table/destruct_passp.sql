@@ -79,11 +79,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DESTRUCT_PASSP ***
-grant SELECT                                                                 on DESTRUCT_PASSP  to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on DESTRUCT_PASSP  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DESTRUCT_PASSP  to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on DESTRUCT_PASSP  to START1;
-grant SELECT                                                                 on DESTRUCT_PASSP  to UPLD;
 
 
 

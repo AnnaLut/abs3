@@ -1,15 +1,88 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/MBK_DEAL.sql =========*** Run *** =====
 PROMPT ===================================================================================== 
 
-
 PROMPT *** Create  view MBK_DEAL ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.MBK_DEAL ("USERID", "CODE_PRODUCT", "NAME_PRODUCT", "NBS", "OB22", "IRR", "ND", "CC_ID", "VIDD", "VIDD_NAME", "S_PR", "TIPD", "DATE_B", "DATE_U", "DATE_V", "DATE_END", "N_NBU", "D_NBU", "S", "A_NLS", "A_OSTC", "A_OSTB", "A_OSTF", "A_MDATE", "A_ACC", "A_ACCC", "A_KV", "A_GRP", "A_TIP", "B_NLS", "B_OSTC", "B_OSTB", "B_OSTF", "B_MDATE", "MFOKRED", "B_ACC", "B_ACCC", "B_KV", "B_GRP", "RNK", "MFOPERC", "NMK", "NMKK", "OKPO", "COUNTRY", "NUM_ND", "KPROLOG", "DAT_ND", "MFO", "KOD_B", "BIC", "ACCKRED", "ACCPERC", "REFP", "SWI_ACC", "SWI_BIC", "SWI_REF", "SWO_ACC", "SWO_BIC", "SWO_REF", "ALT_PARTYB", "INTERM_B", "FIELD_58D", "INT_PARTYA", "INT_PARTYB", "INT_INTERMA", "INT_INTERMB", "INT_AMOUNT", "RAT", "ACRB", "ACR_DAT", "BASEY", "NLS_1819") AS 
-  SELECT d.user_id USERID,
-          p.code_product,
+    CREATE OR REPLACE FORCE VIEW BARS.MBK_DEAL
+(
+   USERID,
+   CODE_PRODUCT,
+   NAME_PRODUCT,
+   NBS,
+   OB22,
+   IRR,
+   ND,
+   CC_ID,
+   VIDD,
+   VIDD_NAME,
+   S_PR,
+   TIPD,
+   DATE_B,
+   DATE_U,
+   DATE_V,
+   DATE_END,
+   N_NBU,
+   D_NBU,
+   S,
+   A_NLS,
+   A_OSTC,
+   A_OSTB,
+   A_OSTF,
+   A_MDATE,
+   A_ACC,
+   A_ACCC,
+   A_KV,
+   A_GRP,
+   A_TIP,
+   B_NLS,
+   B_OSTC,
+   B_OSTB,
+   B_OSTF,
+   B_MDATE,
+   MFOKRED,
+   B_ACC,
+   B_ACCC,
+   B_KV,
+   B_GRP,
+   RNK,
+   MFOPERC,
+   NMK,
+   NMKK,
+   OKPO,
+   COUNTRY,
+   NUM_ND,
+   KPROLOG,
+   DAT_ND,
+   MFO,
+   KOD_B,
+   BIC,
+   ACCKRED,
+   ACCPERC,
+   REFP,
+   SWI_ACC,
+   SWI_BIC,
+   SWI_REF,
+   SWO_ACC,
+   SWO_BIC,
+   SWO_REF,
+   ALT_PARTYB,
+   INTERM_B,
+   FIELD_58D,
+   INT_PARTYA,
+   INT_PARTYB,
+   INT_INTERMA,
+   INT_INTERMB,
+   INT_AMOUNT,
+   RAT,
+   ACRB,
+   ACR_DAT,
+   BASEY,
+   NLS_1819
+)
+AS
+   SELECT d.user_id USERID,
+          p.code_product, 
           p.NAME_PRODUCT,
           p.nbs,
           p.ob22,
@@ -111,10 +184,9 @@ PROMPT *** Create  view MBK_DEAL ***
           AND d.wdate = NVL (a.mdate, TO_DATE ('31/12/2050', 'dd-mm-yyyy'));
 
 PROMPT *** Create  grants  MBK_DEAL ***
-grant SELECT                                                                 on MBK_DEAL        to BARSREADER_ROLE;
-grant SELECT                                                                 on MBK_DEAL        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on MBK_DEAL        to FOREX;
-grant SELECT                                                                 on MBK_DEAL        to UPLD;
+
+grant SELECT       on MBK_DEAL        to BARS_ACCESS_DEFROLE;
+grant SELECT       on MBK_DEAL        to FOREX;
 
 
 

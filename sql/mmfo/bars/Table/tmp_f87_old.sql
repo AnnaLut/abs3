@@ -49,10 +49,8 @@ COMMENT ON COLUMN BARS.TMP_F87_OLD.ZNAP IS '';
 
 
 PROMPT *** Create  grants  TMP_F87_OLD ***
-grant SELECT                                                                 on TMP_F87_OLD     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_F87_OLD     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_F87_OLD     to START1;
-grant SELECT                                                                 on TMP_F87_OLD     to UPLD;
 
 
 

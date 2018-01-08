@@ -18,9 +18,7 @@ PROMPT *** Create  view V_WCS_SCORINGS ***
  order by s.id;
 
 PROMPT *** Create  grants  V_WCS_SCORINGS ***
-grant SELECT                                                                 on V_WCS_SCORINGS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SCORINGS  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_SCORINGS  to UPLD;
 
 
 

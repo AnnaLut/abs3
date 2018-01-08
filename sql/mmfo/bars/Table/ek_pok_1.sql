@@ -88,6 +88,9 @@ COMMENT ON COLUMN BARS.EK_POK_1.DATA_M IS '';
 
 
 
+PROMPT *** Create  grants  EK_POK_1 ***
+grant SELECT                                                                 on EK_POK_1        to BARS_DM;
+
 
 
 PROMPT ===================================================================================== 

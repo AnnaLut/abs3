@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_ACC_FIN_OBS_KAT.PR IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ACC_FIN_OBS_KAT ***
-grant SELECT                                                                 on ERR$_ACC_FIN_OBS_KAT to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ACC_FIN_OBS_KAT to UPLD;
-
 
 
 PROMPT ===================================================================================== 

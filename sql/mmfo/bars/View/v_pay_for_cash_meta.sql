@@ -30,9 +30,7 @@ PROMPT *** Create  view V_PAY_FOR_CASH_META ***
           and (a.ostc <> 0 or a.ostb <> 0 or b.s <> 0);
 
 PROMPT *** Create  grants  V_PAY_FOR_CASH_META ***
-grant SELECT                                                                 on V_PAY_FOR_CASH_META to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PAY_FOR_CASH_META to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_PAY_FOR_CASH_META to UPLD;
 
 
 

@@ -47,10 +47,6 @@ COMMENT ON COLUMN BARS.TMP_BPK_TAGS.TYPE IS '';
 
 
 
-PROMPT *** Create  grants  TMP_BPK_TAGS ***
-grant SELECT                                                                 on TMP_BPK_TAGS    to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_BPK_TAGS    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

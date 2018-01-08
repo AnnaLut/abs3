@@ -77,12 +77,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPU_RU ***
-grant SELECT                                                                 on DPU_RU          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_RU          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_RU          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_RU          to RPBN001;
 grant SELECT                                                                 on DPU_RU          to START1;
-grant SELECT                                                                 on DPU_RU          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPU_RU          to WR_ALL_RIGHTS;
 grant SELECT                                                                 on DPU_RU          to WR_CREPORTS;
 

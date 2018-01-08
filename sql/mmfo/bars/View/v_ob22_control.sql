@@ -29,9 +29,7 @@ PROMPT *** Create  view V_OB22_CONTROL ***
                                                WHERE D_CLOSE IS NULL);
 
 PROMPT *** Create  grants  V_OB22_CONTROL ***
-grant SELECT                                                                 on V_OB22_CONTROL  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OB22_CONTROL  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_OB22_CONTROL  to UPLD;
 
 
 

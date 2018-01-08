@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_NBUR_#70 ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_NBUR_#70 ("REPORT_DATE", "KF", "VERSION_ID", "NBUC", "FIELD_CODE", "SEG_01", "SEG_02", "FIELD_VALUE") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_NBUR_#70 ("REPORT_DATE", "KF", "VERSION_ID", "NBUC", "FIELD_CODE", "SEG_01", "SEG_02", "FIELD_VALUE", "ERROR_MSG", "ADJ_IND") AS 
   select p.REPORT_DATE
      , p.KF
      , p.VERSION_ID
@@ -16,6 +16,8 @@ PROMPT *** Create  view V_NBUR_#70 ***
      , SUBSTR(p.FIELD_CODE,1,2) as SEG_01
      , SUBSTR(p.FIELD_CODE,3,3) as SEG_02
      , p.FIELD_VALUE
+     , p.ERROR_MSG
+     , p.ADJ_IND
   from NBUR_AGG_PROTOCOLS_ARCH p
   join NBUR_REF_FILES f
     on ( f.FILE_CODE = p.REPORT_CODE )
@@ -28,9 +30,7 @@ PROMPT *** Create  view V_NBUR_#70 ***
    and v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED' );
 
 PROMPT *** Create  grants  V_NBUR_#70 ***
-grant SELECT                                                                 on V_NBUR_#70      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_#70      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_NBUR_#70      to UPLD;
 
 
 

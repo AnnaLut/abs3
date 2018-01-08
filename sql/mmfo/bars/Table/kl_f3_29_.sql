@@ -59,11 +59,9 @@ COMMENT ON COLUMN BARS.KL_F3_29_.S240 IS '';
 
 
 PROMPT *** Create  grants  KL_F3_29_ ***
-grant SELECT                                                                 on KL_F3_29_       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F3_29_       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_F3_29_       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F3_29_       to START1;
-grant SELECT                                                                 on KL_F3_29_       to UPLD;
 
 
 

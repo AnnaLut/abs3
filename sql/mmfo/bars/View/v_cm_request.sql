@@ -45,10 +45,8 @@ PROMPT *** Create  view V_CM_REQUEST ***
 --   and a.branch like sys_context('bars_context','user_branch_mask');
 
 PROMPT *** Create  grants  V_CM_REQUEST ***
-grant SELECT                                                                 on V_CM_REQUEST    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CM_REQUEST    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CM_REQUEST    to OW;
-grant SELECT                                                                 on V_CM_REQUEST    to UPLD;
 
 
 

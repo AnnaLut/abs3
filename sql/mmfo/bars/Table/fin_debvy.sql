@@ -65,11 +65,9 @@ COMMENT ON COLUMN BARS.FIN_DEBVY.RNK IS '';
 
 
 PROMPT *** Create  grants  FIN_DEBVY ***
-grant SELECT                                                                 on FIN_DEBVY       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_DEBVY       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_DEBVY       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_DEBVY       to START1;
-grant SELECT                                                                 on FIN_DEBVY       to UPLD;
 
 
 

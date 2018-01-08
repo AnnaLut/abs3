@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Таблиця КД та їх потоків-заголовки';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'PRVN_FLOW_DEALS';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,49 +119,49 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'АСС~тіла', '', null, 21, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DAT_ADD', 'D', 'Дата~внесення', '', null, 97, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'ID', 'N', 'Ід~в табл ~*Грош.потік', '', null, 35, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'FunNSIEditFFiltered("PRVN_FLOW_DETAILS",2," ID="||Str(:ID)||" and MDAT=to_date(''"||SalFmtFormatDateTime(:ZDAT,''dd/MM/yyyy'')||"'',''dd/mm/yyyy'')")', 0);
-  bars_metabase.add_column(l_tabid, 4, 'IRR0', 'N', 'Eф.ст~по КД', '', null, 30, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Реф КД~в АБС~*його~*рахунки', '', null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions, "a.ACC in (select acc from nd_acc where nd = :ND ) " )', 0);
-  bars_metabase.add_column(l_tabid, 6, 'RNK', 'N', 'РНК~ позич.', '', null, 91, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'VIDD', 'N', 'Вид~КД', '', null, 96, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'WDATE', 'D', 'Дата~завершен~Початкова', '', null, 95, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'KV', 'N', 'Код~вал~рах', '', null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'PR_TR', 'B', 'Транш~лінія', '', null, 26, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'I_CR9', 'B', 'Відн~лінія', '', null, 25, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'IR', 'C', 'Ном.ст~по рах.', '', null, 31, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'OST/100', 'N', 'Залишок~рах~*Картка~SS', '', null, 50, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'ZDAT', 'D', 'Звітна~дата', '', null, 0, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'FL2', 'B', '% на~пот.день', '', null, 32, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'KV8', 'N', 'Код~вал~КД', '', null, 19, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'SDATE', 'D', 'Дата~Початку~*ГЛК/ГПК~* В архіві', '', null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'FunNSIEditFFiltered("CC_W_LIM_ARC",2," ND = " || Str( :ND)  ) ', 0);
-  bars_metabase.add_column(l_tabid, 18, 'K', 'N', 'Коеф~`SS  :~Сум(`SS)~Угода+екв', '', null, 49, 0, 0, 0, 0, '', '#0.0000', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'OST8/100', 'N', 'Залишок~тіла КД~~LIM', '', null, 70, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'OSTQ/100', 'N', 'Зал~екв~рах~`SS', '', null, 51, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'OST8Q/100', 'N', 'Зал-екв~тіла КД~~`LIM', '', null, 71, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'TIP', 'C', 'Тип~Рах', '', null, 22, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'DAOS', 'D', 'Дата вiдкр~рах', '', null, 93, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'VAR_WDATE', 'D', 'Дата~заверш~*ГЛК/ГПК~*Поточні', '', null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'FunNSIEditFFiltered("CC_W_LIM",2," ND = " || Str( :ND)  ) ', 0);
-  bars_metabase.add_column(l_tabid, 27, 'SN/100', 'N', 'Нарах~відсотки~~SN', '', null, 53, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'CR9/100', 'N', 'Невикорис~ліміт~9129~`CR9', '', null, 65, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'SPN/100', 'N', 'Простроч~нарах~відсотки~SPN+SLN', '', null, 62, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'SNO/100', 'N', 'Нарах~відклад~відсотки~SNO', '', null, 55, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'SN8/100', 'N', 'Пеня~~~`SN8', '', null, 64, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'SK0/100', 'N', 'Нарах.~місячна~комісія~`SK0', '', null, 54, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'SK9/100', 'N', 'Простроч~Нарахов~комісія~`SK9+SLK', '', null, 63, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 34, 'SDI/100', 'N', 'Дисконт~Премія~~SDI/SPI', '', null, 61, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'S36/100', 'N', 'Заг.Дох.~майбутніх~періодів~`3600', '', null, 60, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 36, 'SP/100', 'N', 'Залишок~рах~простр~SP', '', null, 52, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 37, 'DAZS', 'D', 'Дата ~ факт.закр~рахунку~ SS', '', null, 94, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 38, 'K1', 'N', 'Коеф~SS  :~Сум(SS)~Угода+вал', '', null, 48, 0, 0, 0, 0, '', '#0.0000', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 39, 'ADD2', 'B', 'Строрити~Грош.потік~по ID', '', null, 41, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 40, 'BAL0', 'B', 'Балансувати.~Грош.потік~по ND', '', null, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 43, 'ZO', 'B', 'З корр~об', '', null, 36, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 44, 'SD1/100', 'N', 'SD1~Проц.дох.~з поч.року', '', null, 81, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 45, 'FV_REZB', 'N', 'Резерв по~ Бал.части КД~ Расчет~Finevare', '', null, 80, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 46, 'SD2/100', 'N', 'SD2~Аморт.дох.~з поч року', '', null, 82, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 47, 'SNA/100', 'N', 'SNA~НЕвизнані~дох.~', '', null, 83, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'АСС~тіла', null, null, 21, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DAT_ADD', 'D', 'Дата~внесення', null, null, 97, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'ID', 'N', 'Ід~в табл ~*Грош.потік', null, null, 35, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'FunNSIEditFFiltered("PRVN_FLOW_DETAILS",2," ID="||Str(:ID)||" and MDAT=to_date(''"||SalFmtFormatDateTime(:ZDAT,''dd/MM/yyyy'')||"'',''dd/mm/yyyy'')")', 0);
+  bars_metabase.add_column(l_tabid, 4, 'IRR0', 'N', 'Eф.ст~по КД', null, null, 30, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Реф КД~в АБС~*його~*рахунки', null, null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions, "a.ACC in (select acc from nd_acc where nd = :ND ) " )', 0);
+  bars_metabase.add_column(l_tabid, 6, 'RNK', 'N', 'РНК~ позич.', null, null, 91, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'VIDD', 'N', 'Вид~КД', null, null, 96, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'WDATE', 'D', 'Дата~завершен~Початкова', null, null, 95, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'KV', 'N', 'Код~вал~рах', null, null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'PR_TR', 'B', 'Транш~лінія', null, null, 26, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'I_CR9', 'B', 'Відн~лінія', null, null, 25, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'IR', 'C', 'Ном.ст~по рах.', null, null, 31, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'OST/100', 'N', 'Залишок~рах~*Картка~SS', null, null, 50, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'ZDAT', 'D', 'Звітна~дата', null, null, 0, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'FL2', 'B', '% на~пот.день', null, null, 32, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'KV8', 'N', 'Код~вал~КД', null, null, 19, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'SDATE', 'D', 'Дата~Початку~*ГЛК/ГПК~* В архіві', null, null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'FunNSIEditFFiltered("CC_W_LIM_ARC",2," ND = " || Str( :ND)  ) ', 0);
+  bars_metabase.add_column(l_tabid, 18, 'K', 'N', 'Коеф~`SS  :~Сум(`SS)~Угода+екв', null, null, 49, 0, 0, 0, 0, '', '#0.0000', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'OST8/100', 'N', 'Залишок~тіла КД~~LIM', null, null, 70, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'OSTQ/100', 'N', 'Зал~екв~рах~`SS', null, null, 51, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'OST8Q/100', 'N', 'Зал-екв~тіла КД~~`LIM', null, null, 71, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'TIP', 'C', 'Тип~Рах', null, null, 22, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'DAOS', 'D', 'Дата вiдкр~рах', null, null, 93, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'VAR_WDATE', 'D', 'Дата~заверш~*ГЛК/ГПК~*Поточні', null, null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'FunNSIEditFFiltered("CC_W_LIM",2," ND = " || Str( :ND)  ) ', 0);
+  bars_metabase.add_column(l_tabid, 27, 'SN/100', 'N', 'Нарах~відсотки~~SN', null, null, 53, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'CR9/100', 'N', 'Невикорис~ліміт~9129~`CR9', null, null, 65, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'SPN/100', 'N', 'Простроч~нарах~відсотки~SPN+SLN', null, null, 62, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'SNO/100', 'N', 'Нарах~відклад~відсотки~SNO', null, null, 55, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'SN8/100', 'N', 'Пеня~~~`SN8', null, null, 64, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'SK0/100', 'N', 'Нарах.~місячна~комісія~`SK0', null, null, 54, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'SK9/100', 'N', 'Простроч~Нарахов~комісія~`SK9+SLK', null, null, 63, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'SDI/100', 'N', 'Дисконт~Премія~~SDI/SPI', null, null, 61, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'S36/100', 'N', 'Заг.Дох.~майбутніх~періодів~`3600', null, null, 60, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'SP/100', 'N', 'Залишок~рах~простр~SP', null, null, 52, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'DAZS', 'D', 'Дата ~ факт.закр~рахунку~ SS', null, null, 94, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'K1', 'N', 'Коеф~SS  :~Сум(SS)~Угода+вал', null, null, 48, 0, 0, 0, 0, '', '#0.0000', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'ADD2', 'B', 'Строрити~Грош.потік~по ID', null, null, 41, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'BAL0', 'B', 'Балансувати.~Грош.потік~по ND', null, null, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 43, 'ZO', 'B', 'З корр~об', null, null, 36, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 44, 'SD1/100', 'N', 'SD1~Проц.дох.~з поч.року', null, null, 81, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 45, 'FV_REZB', 'N', 'Резерв по~ Бал.части КД~ Расчет~Finevare', null, null, 80, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 46, 'SD2/100', 'N', 'SD2~Аморт.дох.~з поч року', null, null, 82, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 47, 'SNA/100', 'N', 'SNA~НЕвизнані~дох.~', null, null, 83, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('ACCOUNTS');

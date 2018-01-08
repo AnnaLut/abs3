@@ -92,10 +92,8 @@ COMMENT ON COLUMN BARS.TMP_PRIOCOM_CLIENTS.CODE IS '';
 
 
 PROMPT *** Create  grants  TMP_PRIOCOM_CLIENTS ***
-grant SELECT                                                                 on TMP_PRIOCOM_CLIENTS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_PRIOCOM_CLIENTS to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_PRIOCOM_CLIENTS to START1;
-grant SELECT                                                                 on TMP_PRIOCOM_CLIENTS to UPLD;
 
 
 

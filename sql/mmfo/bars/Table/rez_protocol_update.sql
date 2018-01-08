@@ -93,46 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_REZPRTCLUPD_IDUPD_NN ***
+PROMPT *** Create  constraint CC_REZPRTCLUPD_GLOBALBD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.REZ_PROTOCOL_UPDATE MODIFY (IDUPD CONSTRAINT CC_REZPRTCLUPD_IDUPD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_REZPRTCLUPD_CHGACTION_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REZ_PROTOCOL_UPDATE MODIFY (CHGACTION CONSTRAINT CC_REZPRTCLUPD_CHGACTION_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_REZPRTCLUPD_EFFECTDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REZ_PROTOCOL_UPDATE MODIFY (EFFECTDATE CONSTRAINT CC_REZPRTCLUPD_EFFECTDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_REZPRTCLUPD_CHGDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REZ_PROTOCOL_UPDATE MODIFY (CHGDATE CONSTRAINT CC_REZPRTCLUPD_CHGDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.REZ_PROTOCOL_UPDATE MODIFY (GLOBAL_BDATE CONSTRAINT CC_REZPRTCLUPD_GLOBALBD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -153,10 +117,59 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_REZPRTCLUPD_GLOBALBD_NN ***
+PROMPT *** Create  constraint CC_REZPRTCLUPD_CHGDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.REZ_PROTOCOL_UPDATE MODIFY (GLOBAL_BDATE CONSTRAINT CC_REZPRTCLUPD_GLOBALBD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.REZ_PROTOCOL_UPDATE MODIFY (CHGDATE CONSTRAINT CC_REZPRTCLUPD_CHGDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_REZPRTCLUPD_EFFECTDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REZ_PROTOCOL_UPDATE MODIFY (EFFECTDATE CONSTRAINT CC_REZPRTCLUPD_EFFECTDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_REZPRTCLUPD_CHGACTION_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REZ_PROTOCOL_UPDATE MODIFY (CHGACTION CONSTRAINT CC_REZPRTCLUPD_CHGACTION_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_REZPROTOCOLUPDATE_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REZ_PROTOCOL_UPDATE ADD CONSTRAINT FK_REZPROTOCOLUPDATE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_REZPRTCLUPD_IDUPD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REZ_PROTOCOL_UPDATE MODIFY (IDUPD CONSTRAINT CC_REZPRTCLUPD_IDUPD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -207,7 +220,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_PROTOCOL_UPDATE ***
-grant SELECT                                                                 on REZ_PROTOCOL_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on REZ_PROTOCOL_UPDATE to BARSUPL;
 grant SELECT                                                                 on REZ_PROTOCOL_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ_PROTOCOL_UPDATE to BARS_DM;

@@ -108,6 +108,20 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint FK_SALDOA_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SALDOA ADD CONSTRAINT FK_SALDOA_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SALDOA_ACC_NN ***
 begin   
  execute immediate '
@@ -120,10 +134,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SALDOA_FDAT_NN ***
+PROMPT *** Create  constraint CC_SALDOA_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SALDOA MODIFY (FDAT CONSTRAINT CC_SALDOA_FDAT_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SALDOA MODIFY (KF CONSTRAINT CC_SALDOA_KF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -204,10 +218,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SALDOA_KF_NN ***
+PROMPT *** Create  constraint CC_SALDOA_FDAT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SALDOA MODIFY (KF CONSTRAINT CC_SALDOA_KF_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SALDOA MODIFY (FDAT CONSTRAINT CC_SALDOA_FDAT_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -221,11 +235,13 @@ begin
  execute immediate '
   CREATE UNIQUE INDEX BARS.PK_SALDOA ON BARS.SALDOA (ACC, FDAT) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSALI ';
+  TABLESPACE BRSSALI';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+
+
 
 
 
@@ -235,7 +251,6 @@ grant FLASHBACK,REFERENCES,SELECT,UPDATE                                     on 
 grant REFERENCES,UPDATE                                                      on SALDOA          to BARSAQ_ADM;
 grant SELECT                                                                 on SALDOA          to BARSAQ_ADM with grant option;
 grant SELECT                                                                 on SALDOA          to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on SALDOA          to BARSREADER_ROLE;
 grant SELECT                                                                 on SALDOA          to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDOA          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALDOA          to BARS_DM;
@@ -246,7 +261,6 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on SALDOA          to RPBN001;
 grant SELECT                                                                 on SALDOA          to RPBN002;
 grant SELECT                                                                 on SALDOA          to START1;
-grant SELECT                                                                 on SALDOA          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SALDOA          to WR_ALL_RIGHTS;
 grant SELECT                                                                 on SALDOA          to WR_CUSTLIST;
 grant SELECT                                                                 on SALDOA          to WR_DEPOSIT_U;

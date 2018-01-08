@@ -84,10 +84,6 @@ COMMENT ON COLUMN BARS.PB_1.REFC IS '';
 
 
 
-PROMPT *** Create  grants  PB_1 ***
-grant SELECT                                                                 on PB_1            to BARSREADER_ROLE;
-grant SELECT                                                                 on PB_1            to UPLD;
-
 
 
 PROMPT ===================================================================================== 

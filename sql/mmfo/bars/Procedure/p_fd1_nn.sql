@@ -144,8 +144,8 @@ BEGIN
 
    nbuc_ := nbuc1_;
 
-   insert /*+APPEND  */
-   into otcn_acc(acc, nls, kv, nbs, rnk, daos, dapp,
+   insert /*+APPEND  */ 
+   into otcn_acc(acc, nls, kv, nbs, rnk, daos, dapp, 
         isp, nms, lim, pap, tip, vid, mdate, dazs, accc, tobo)
    select /*+PARALLEL(8) */
           a.acc,a.nls,a.kv,a.nbs,a.rnk,a.daos,a.dapp,
@@ -159,7 +159,7 @@ BEGIN
           (a.nbs is not null and a.nbs in (select distinct r020 from kl_f3_29 where kf='D1') and
            Dat_ > dat_izm)) ;
 
-   insert /*+APPEND  */
+   insert /*+APPEND  */ 
    into otcn_saldo (odate, fdat, acc, nls, kv, nbs, rnk, ost, dos, kos)
    select /*+PARALLEL(8) */
           dat_, dat_, a.acc, s.nls, s.kv, s.nbs, s.rnk, sum(a.ostf),

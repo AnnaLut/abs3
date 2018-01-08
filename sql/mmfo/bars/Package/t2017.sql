@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/t2017.sql =========*** Run *** =====
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.T2017 IS
+CREATE OR REPLACE PACKAGE BARS.T2017 IS
 
    g_header_version   constant varchar2 (64) := 'version 1.9  14.12.2017';
    g_trace            constant varchar2 (64) := 'T2017:';
@@ -43,7 +37,7 @@ procedure T_Param      (p_mode int, p_kf varchar2);
 procedure T_CP         (p_mode int);
 
 --	Процедура-3  трансформации справочников , которые можно отложить на пару часиков
-procedure ZAY     ( p_KF varchar2) ; --  Авто-трансформація додаткових рекв  в ZAY-
+procedure ZAY     ( p_KF varchar2) ; --  Авто-трансформація додаткових рекв  в ZAY- 
 procedure TAG_KF  ( p_KF varchar2) ; --  Авто-трансформація додаткових рекв  в ACCOUNTSW
 procedure spec_par( p_mode int) ; --  Авто-трансформація Specparam
 procedure OTCN    ( p_mode int) ; --  Авто-трансформація довідників по звітності
@@ -72,7 +66,12 @@ procedure PROCDR_39;
 -------------------
 END T2017;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.T2017 
+
+show errors
+
+--------------------------------------------------------
+
+CREATE OR REPLACE PACKAGE BODY BARS.T2017
 IS
   g_body_version   CONSTANT VARCHAR2(64) := 'version 1.22  15.12.2017';
   g_errN number  := -20203;
@@ -80,10 +79,10 @@ IS
   bnk_dt date;
 /*
   14.12.2017 LSO Добавлена процедура по перекодированию proc_dr$base по кредитым ресурсам
-  13.12.2017 Sta доп.рекв ELT6_1
+  13.12.2017 Sta доп.рекв ELT6_1 
   08.12.2017 Sta CP - Зашила 2 счета явно
   06.12.2017 Sta 3119 in CP  + CP для всех РУ
-  05.12.2017 Sta надо включить cc_pawn в список изменяемых справочников в полях   NBSZ ,  NBSZ1, NBSZ2,  NBSZ3  поменять 9010
+  05.12.2017 Sta надо включить cc_pawn в список изменяемых справочников в полях   NBSZ ,  NBSZ1, NBSZ2,  NBSZ3  поменять 9010 
   30.11.2017 LSO Добавлены коректировки в справочник CCK_OB22
   30.11.2017 Sta Использование прозноз-счетов
   24.11.2017 Sta + В.Харин      -- Update  chgaction = 2 Восстановить для ХД дату открытия = дате открытия из accounts aa_old.DAOS
@@ -94,9 +93,9 @@ OB_CORPORATION_NBS_REPORT_GRC
 procedure CLS   (p_mode int, p_kf varchar2)   is  l_dazs date ;  --  Авто-закр рах, що вилучено в НБУ
 begin return;
    bars_audit.info('T2017:CLS Start для '||p_kf);
-
-   bc.go (p_kf);
-   l_dazs := gl.bdate +1 ;
+ 
+   bc.go (p_kf); 
+   l_dazs := gl.bdate +1 ;   
    for Z in (select Rowid RI from accounts A where A.dazs is null and A.ostc = 0 and exists (select 1 from PS x where x.nbs = A.nbs and x.d_close is not null) )
    loop  update accounts set dazs = greatest ( l_dazs , dapp+1)  where rowid = z.RI;   end loop; -- z
 
@@ -110,12 +109,12 @@ procedure E01
 , p_tbl       varchar2
 , p_nbs_old   varchar2 default null
 , p_nbs_new   varchar2 default null
-)  is
-begin
+)  is 
+begin 
   if ( p_Er = -00001 )
   then null;
-  else raise_application_error( -20000 ,'Помилка: '|| p_er || '/'|| p_tbl || '( r020_old='||p_nbs_old||', r020_new='|| p_nbs_new||' ).' );
-  end if;
+  else raise_application_error( -20000 ,'Помилка: '|| p_er || '/'|| p_tbl || '( r020_old='||p_nbs_old||', r020_new='|| p_nbs_new||' ).' ); 
+  end if; 
 end E01;
 -----------------------------------------------------------------------------
 --
@@ -252,18 +251,18 @@ begin
         begin
         for i in (select * from bars.dpt_vidd where bsd = p_R020_old) loop
            update bars.dpt_vidd set bsd = p_R020_new where vidd = i.vidd and bsd = p_R020_old;
-
+           
            begin
            select val
            into old_value
-           from bars.dpt_vidd_params
+           from bars.dpt_vidd_params 
            where vidd = i.vidd and tag = 'DPT_OB22';
            exception when no_data_found then
              old_value := '-999999';
            end;
-
+           
            if old_value <> '-999999' then
-
+             
            begin
            select t.ob_new
            into new_value
@@ -272,13 +271,13 @@ begin
            exception when no_data_found then
              new_value := '-999999';
            end;
-
+           
            if new_value <> '-999999' then
              update bars.dpt_vidd_params dvp set val = new_value where vidd = i.vidd and tag = 'DPT_OB22';
            end if;
-
+           
            end if;
-
+           
         end loop;
         end;
         --- ============================================================ ---
@@ -338,7 +337,7 @@ procedure ob1 ( tt transfer_2017%rowtype )  is
 begin
    bars_audit.info('T2017.OB1 Start '||tt.R020_old||' -> '||tt.R020_new||'. ob22:'||tt.ob_old||' -> '||tt.ob_new);
    suda;
-
+   
    -- Коди OB22 для рахунків
    insert into SB_OB22(R020,    OB22,    TXT,               D_OPEN)
    select tt.R020_new, tt.ob_new, NVL(tt.comm,l_txt), bnk_dt
@@ -366,22 +365,22 @@ begin
    update tts set nlsk = REPLACE (nlsk , ''''||tt.r020_old||'''', ''''||tt.r020_new||'''' ) where  nlsk  like y_like and nlsm not like n_like;
    update tts set nlsa = REPLACE (nlsa , ''''||tt.r020_old||'''', ''''||tt.r020_new||'''' ) where  nlsa  like y_like and nlsm not like n_like;
    update tts set nlsb = REPLACE (nlsb , ''''||tt.r020_old||'''', ''''||tt.r020_new||'''' ) where  nlsb  like y_like and nlsm not like n_like;
-
+ 
    begin --БалРахунки  <->   Операцiї
      update PS_TTS       set nbs  =  tt.r020_new, ob22 =tt.ob_new  where nbs    = tt.r020_old and ob22 = tt.ob_old ;
    exception when others then T2017.E01(SQLCODE,'PS_TTS',tt.r020_old,tt.r020_new);
    end;
-
+   
    begin --0. БАЗОВI тарифи
      update tarif        set nbs  =  tt.r020_new, ob22 =tt.ob_new  where nbs    = tt.r020_old and ob22 = tt.ob_old ;
    exception when others then T2017.E01(SQLCODE,'tarif',tt.r020_old,tt.r020_new);
    end;
-
+   
    begin --<<ФО:Комiсiя за послуги>>
      update RAZ_KOM      set KOD  =  tt.r020_new||      tt.ob_new  where KOD    = tt.r020_old||          tt.ob_old ;
    exception when others then T2017.E01(SQLCODE,'RAZ_KOM',tt.r020_old,tt.r020_new);
    end;
-
+   
    begin --Закордоннi перекази ФО. Котловi рах обiлiку
      update MONEY2       set nbs  =  tt.r020_new, ob22 =tt.ob_new  where nbs    = tt.r020_old and ob22 = tt.ob_old ;
    exception when others then T2017.E01(SQLCODE,'MONEY2',tt.r020_old,tt.r020_new);
@@ -435,7 +434,7 @@ begin
     suda;
     update TRANSFER_2017 set dat_beg = bnk_dt where r020_old = tt.r020_old and ob_old = tt.ob_old and r020_new = tt.r020_new and ob_new = tt.ob_new;
     commit;
-
+   
 exception when others then
     suda;
     bars_audit.error(l_trace||'ошибка быполнения:'||sqlerrm||', стек:'||dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());
@@ -506,29 +505,29 @@ begin
   --update cck_ob22 set D_CLOSE  = bnk_dt where nbs = OLD.NBS and ob22 = OLD.OB22 and exists(select 1 from transfer_2017 x where OLD.NBS = x.r020_old and OLD.OB22 = x.ob_old) ;
 
     bars_audit.info(l_trace||'  обнолвнеие таблицы CCK_OB22  NEW.NBS = '||NEW.NBS||'NEW.Ob22 = '||NEW.Ob22);
-
+    
     begin
       insert into CCK_OB22 values NEW;
     exception  WHEN DUP_VAL_ON_INDEX THEN
-      update CCK_OB22 set
-        SPI       = case when  NEW.SPI is null then     OLD.SPI     else    NEW.SPI     end,
-        SDI       = case when  NEW.SDI is null then     OLD.SDI     else    NEW.SDI     end,
-        SP        = case when  NEW.SP is null then      OLD.SP      else    NEW.SP      end,
-        SN        = case when  NEW.SN is null then      OLD.SN      else    NEW.SN      end ,
-        SPN       = case when  NEW.SPN is null then     OLD.SPN     else    NEW.SPN     end,
-        SPN_31    = case when  NEW.SPN_31 is null then  OLD.SPN_31  else    NEW.SPN_31  end,
-        SPN_61    = case when  NEW.SPN_61 is null then  OLD.SPN_61  else    NEW.SPN_61  end,
-        SPN_181   = case when  NEW.SPN_181 is null then OLD.SPN_181 else    NEW.SPN_181 end,
-        SK9       = case when  NEW.SK9 is null then     OLD.SK9     else    NEW.SK9     end,
-        SK9_31    = case when  NEW.SK9_31 is null then  OLD.SK9_31  else    NEW.SK9_31  end,
-        SK9_61    = case when  NEW.SK9_61 is null then  OLD.SK9_61  else    NEW.SK9_61  end,
-        SK9_181   = case when  NEW.SK9_181 is null then OLD.SK9_181 else    NEW.SK9_181 end,
-        SD_N      = case when  NEW.SD_N is null then    OLD.SD_N    else    NEW.SD_N    end,
-        SD_I      = case when  NEW.SD_I is null then    OLD.SD_I    else    NEW.SD_I    end,
-        SD_M      = case when  NEW.SD_M is null then    OLD.SD_M    else    NEW.SD_M    end,
-        SD_J      = case when  NEW.SD_J is null then    OLD.SD_J    else    NEW.SD_J    end,
-        SD_SK0    = case when  NEW.SD_SK0 is null then  OLD.SD_SK0  else    NEW.SD_SK0  end,
-        SD_9129   = case when  NEW.SD_9129 is null then OLD.SD_9129 else    NEW.SD_9129 end,
+      update CCK_OB22 set 
+        SPI       = case when  NEW.SPI is null then     OLD.SPI     else    NEW.SPI     end,     
+        SDI       = case when  NEW.SDI is null then     OLD.SDI     else    NEW.SDI     end,     
+        SP        = case when  NEW.SP is null then      OLD.SP      else    NEW.SP      end,      
+        SN        = case when  NEW.SN is null then      OLD.SN      else    NEW.SN      end ,      
+        SPN       = case when  NEW.SPN is null then     OLD.SPN     else    NEW.SPN     end,     
+        SPN_31    = case when  NEW.SPN_31 is null then  OLD.SPN_31  else    NEW.SPN_31  end,  
+        SPN_61    = case when  NEW.SPN_61 is null then  OLD.SPN_61  else    NEW.SPN_61  end,  
+        SPN_181   = case when  NEW.SPN_181 is null then OLD.SPN_181 else    NEW.SPN_181 end, 
+        SK9       = case when  NEW.SK9 is null then     OLD.SK9     else    NEW.SK9     end,     
+        SK9_31    = case when  NEW.SK9_31 is null then  OLD.SK9_31  else    NEW.SK9_31  end,  
+        SK9_61    = case when  NEW.SK9_61 is null then  OLD.SK9_61  else    NEW.SK9_61  end,  
+        SK9_181   = case when  NEW.SK9_181 is null then OLD.SK9_181 else    NEW.SK9_181 end, 
+        SD_N      = case when  NEW.SD_N is null then    OLD.SD_N    else    NEW.SD_N    end,    
+        SD_I      = case when  NEW.SD_I is null then    OLD.SD_I    else    NEW.SD_I    end,    
+        SD_M      = case when  NEW.SD_M is null then    OLD.SD_M    else    NEW.SD_M    end,    
+        SD_J      = case when  NEW.SD_J is null then    OLD.SD_J    else    NEW.SD_J    end,    
+        SD_SK0    = case when  NEW.SD_SK0 is null then  OLD.SD_SK0  else    NEW.SD_SK0  end,  
+        SD_9129   = case when  NEW.SD_9129 is null then OLD.SD_9129 else    NEW.SD_9129 end, 
         SD_SK4    = case when  NEW.SD_SK4 is null then  OLD.SD_SK4  else    NEW.SD_SK4  end
         where   nbs = NEW.NBS and ob22 = NEW.OB22;
     end;
@@ -602,24 +601,24 @@ end;
 
 end T_CCk;
 -------------------------------------------------------------------------------------
-procedure TGR ( p_mode varchar2) IS
+procedure TGR ( p_mode varchar2) IS 
 begin
   execute immediate ' alter trigger TBU_ACCOUNTS_CHECKBLK        ' || p_mode ;
   execute immediate ' alter trigger tau_accounts_ATM             ' || p_mode ;
   execute immediate ' alter trigger tiu_acca                     ' || p_mode ;
-  execute immediate ' alter trigger TBU_ACCOUNTS_DAOS            ' || p_mode ;
-  execute immediate ' alter trigger TU_SAL                       ' || p_mode ;
-  execute immediate ' alter trigger TAIU_ACCOUNTS_OB22           ' || p_mode ;
-  execute immediate ' alter trigger TBU_ACCOUNTS_TAX             ' || p_mode ;
-  execute immediate ' alter trigger TAI_ACCOUNTS_CP              ' || p_mode ;
-  execute immediate ' alter trigger TAU_ACCOUNTS_CP_OSTC         ' || p_mode ;
-  execute immediate ' alter trigger TU_DPT_PAYMENTS              ' || p_mode ;
-  execute immediate ' alter trigger TU_KOB1                      ' || p_mode ;
-  execute immediate ' alter trigger TIU_ACCOUNTS_BRANCH_TOBO     ' || p_mode ;
-  execute immediate ' alter trigger TIU_ACCOUNTS_NEWCASH         ' || p_mode ;
-  execute immediate ' alter trigger TIU_BLKD11                   ' || p_mode ;
-  execute immediate ' alter trigger TAU_ACCOUNTS_OST67           ' || p_mode ;
-  execute immediate ' alter trigger TAU_OSTX_KPROLOG             ' || p_mode ;
+  execute immediate ' alter trigger TBU_ACCOUNTS_DAOS            ' || p_mode ;  
+  execute immediate ' alter trigger TU_SAL                       ' || p_mode ;  
+  execute immediate ' alter trigger TAIU_ACCOUNTS_OB22           ' || p_mode ;  
+  execute immediate ' alter trigger TBU_ACCOUNTS_TAX             ' || p_mode ;              
+  execute immediate ' alter trigger TAI_ACCOUNTS_CP              ' || p_mode ;  
+  execute immediate ' alter trigger TAU_ACCOUNTS_CP_OSTC         ' || p_mode ;  
+  execute immediate ' alter trigger TU_DPT_PAYMENTS              ' || p_mode ;              
+  execute immediate ' alter trigger TU_KOB1                      ' || p_mode ;  
+  execute immediate ' alter trigger TIU_ACCOUNTS_BRANCH_TOBO     ' || p_mode ;  
+  execute immediate ' alter trigger TIU_ACCOUNTS_NEWCASH         ' || p_mode ;              
+  execute immediate ' alter trigger TIU_BLKD11                   ' || p_mode ;  
+  execute immediate ' alter trigger TAU_ACCOUNTS_OST67           ' || p_mode ;  
+  execute immediate ' alter trigger TAU_OSTX_KPROLOG             ' || p_mode ;            
   execute immediate ' alter trigger TBIU_ACCOUNTS_DESTRUCT_PASSP ' || p_mode ;
 --execute immediate ' alter trigger TBI_ACCOUNTS_ALL             ' || p_mode ;
   execute immediate ' alter trigger TBU_ACCOUNTS_1004            ' || p_mode ;
@@ -656,7 +655,7 @@ begin
 
 end TGR ;
 -------------------------------------------------
-procedure ACC_1x (p_nbs varchar2, p_ob22 varchar2, p_nbs_notlike varchar2 ,p_kf varchar2) is
+procedure ACC_1x (p_nbs varchar2, p_ob22 varchar2, p_nbs_notlike varchar2 ,p_kf varchar2) is 
   l_trace  varchar(500) := g_trace||'.'||'ACC1: ';
   l_tt     transfer_2017%rowtype;
   l_nbs    varchar2(4)  := 'xxxx'   ;
@@ -666,16 +665,16 @@ procedure ACC_1x (p_nbs varchar2, p_ob22 varchar2, p_nbs_notlike varchar2 ,p_kf 
 begin bc.go( p_KF) ;
 
    bars_audit.info('T2017.ACC_1X Start kf=' ||p_kf);
-
+   
    ----------------------------------------------- выборка пула счетов по балансовому и об22
-   for aa in (select a.* from accounts a
-               where a.dat_alt is null and a.dazs is null
+   for aa in (select a.* from accounts a     
+               where a.dat_alt is null and a.dazs is null 
                  and exists (select 1 from transfer_2017 t where nbs=t.r020_old and a.ob22=t.ob_old )
                order by KF, nbs, ob22 )
    loop
 
-      If aa.nbs <> l_nbs  or aa.ob22 <> l_ob22 then
-
+      If aa.nbs <> l_nbs  or aa.ob22 <> l_ob22 then   
+         
          bars_audit.info('T2017.ACC_1X Work kf=' ||p_kf || ' r020_old = '||aa.nbs||' ob_old = '||aa.ob22);
          update TRANSFER_2017 set dat_end = bnk_dt, col = nvl(col,0) + 1  where r020_old =  l_nbs and ob_old = l_ob22;
          commit;
@@ -698,7 +697,7 @@ begin bc.go( p_KF) ;
    -- BRANCH_PARAMETERS
    t2017.T_Param ( 0, p_kf );
    ------
-/* Фіалкович Олена Анатоліївна <FialkovichEA@oschadbank.ua>  МФО регионов, в которых есть АРМ ЦБ и внесистемные счета:
+/* Фіалкович Олена Анатоліївна <FialkovichEA@oschadbank.ua>  МФО регионов, в которых есть АРМ ЦБ и внесистемные счета: 
 Днепропетровское РУ              305482
 Львовское РУ                     325796
 Харьковское РУ                   351823
@@ -730,14 +729,14 @@ procedure opn     ( p_mode int,  aa_old accounts%rowtype,  tt transfer_2017%rowt
 
 begin
       aa_new := aa_old;
-      If aa_old.NBS ='3579' then
-         If aa_old.tip  = 'ODB'  then   aa_NEW.tip := 'OFR' ; else aa_NEW.tip := aa_OLD.tip ;  end if;
+      If aa_old.NBS ='3579' then      
+         If aa_old.tip  = 'ODB'  then   aa_NEW.tip := 'OFR' ; else aa_NEW.tip := aa_OLD.tip ;  end if;  
       end if;
 
       --30.11.2017 Sta Использование прозноз-счетов
-      begin
+      begin 
          select nvl(trim(new_nls), vkrzn ( substr(gl.aMfo,1,5) , tt.R020_NEW ||'0'|| trunc ( dbms_random.value (1, 999999999 ) ) )) into AA_NEW.NLS
-           from TRANSFORM_2017_FORECAST
+           from TRANSFORM_2017_FORECAST 
           where acc = aa_old.acc;
       EXCEPTION WHEN NO_DATA_FOUND   THEN AA_NEW.NLS :=  Vkrzn( substr( gl.amfo,1,5), tt.r020_new||'0' || substr( aa_OLD.nls, 6,9) ); -- сохраняем старый хвост
       end;
@@ -762,10 +761,10 @@ begin
 
             l_count := 0;
             EXIT ;
-         exception when others then
+         exception when others then     
             l_err := sqlerrm;
             if sqlcode=-1 then AA_NEW.NLS := vkrzn ( substr(gl.aMfo,1,5) , tt.R020_NEW ||'0'|| trunc ( dbms_random.value (1, 999999999 ) ) );
-            else
+            else 
               exit;
             end if;
             l_count := l_count + 1;
@@ -803,7 +802,7 @@ begin
          VALUES (aa_old.acc   ,aa_old.nls  ,aa_old.nlsalt,aa_old.kv    ,tt.R020_OLD   ,aa_old.nbs2,aa_old.daos  ,aa_old.isp   ,aa_old.nms   ,aa_old.pap,
               aa_old.grp   ,aa_old.sec  ,aa_old.seci  ,aa_old.seco  ,aa_old.vid   ,aa_old.tip , bnk_dt,   -- дата закр
               aa_old.blkd  ,aa_old.blkk  ,aa_old.lim,   aa_old.pos   ,aa_old.accc ,aa_old.tobo,aa_old.mdate ,aa_old.ostx  ,aa_old.rnk ,aa_old.kf    ,
-              sysdate      ,3,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, aa_old.ob22 ,
+              sysdate      ,3,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, aa_old.ob22 , 
               bnk_dt, aa_old.send_sms);
 
          ----- открыть chgaction = 1
@@ -813,7 +812,7 @@ begin
          VALUES (aa_old.acc  ,aa_new.nls  ,aa_old.nls ,aa_old.kv ,tt.R020_NEW,aa_old.nbs2, bnk_dt,-- дата откр
                  aa_old.isp  ,aa_old.nms  ,aa_old.pap ,aa_old.grp,aa_old.sec ,aa_old.seci, aa_old.seco,aa_old.vid  ,aa_NEW.tip ,  -- yjdsq nbg cx
                  aa_old.dazs ,aa_old.blkd ,aa_old.blkk,aa_old.lim, aa_old.pos,aa_old.accc,aa_old.tobo ,aa_old.mdate,aa_old.ostx,aa_old.rnk ,aa_old.kf   ,
-                 sysdate     ,1,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, tt.ob_new ,
+                 sysdate     ,1,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, tt.ob_new , 
                  bnk_dt, aa_old.send_sms   );
 
           -- Update  chgaction = 2 Восстановить для ХД дату открытия = дате открытия из accounts aa_old.DAOS
@@ -823,15 +822,15 @@ begin
          VALUES (aa_old.acc  ,aa_new.nls  ,aa_old.nls ,aa_old.kv ,tt.R020_NEW,aa_old.nbs2, aa_old.DAOS ,-- дата откр
                  aa_old.isp  ,aa_old.nms  ,aa_old.pap ,aa_old.grp,aa_old.sec ,aa_old.seci, aa_old.seco,aa_old.vid  ,aa_NEW.tip ,  -- yjdsq nbg cx
                  aa_old.dazs ,aa_old.blkd ,aa_old.blkk,aa_old.lim, aa_old.pos,aa_old.accc,aa_old.tobo ,aa_old.mdate,aa_old.ostx,aa_old.rnk ,aa_old.kf   ,
-                 sysdate     ,2,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, tt.ob_new ,
+                 sysdate     ,2,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, tt.ob_new , 
                  bnk_dt, aa_old.send_sms   );
        ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-      end if;  -- l_count > 0
+      end if;  -- l_count > 0 
 
 end OPN ;
 ----------------
 
-procedure transfer_accounts(p_nbs varchar2, p_ob22 varchar2, p_nbs_notlike varchar2,p_kf varchar2) is
+procedure transfer_accounts(p_nbs varchar2, p_ob22 varchar2, p_nbs_notlike varchar2,p_kf varchar2) is 
 
   l_trace  varchar(500) := g_trace||'.'||'transfer_accounts: ';
   l_tt     transfer_2017%rowtype;
@@ -853,7 +852,7 @@ begin
                      where a.dat_alt is null and a.dazs is null
                         and a.nbs = t.r020_old
                         and a.ob22 = t.ob_old
-                        and a.nbs     like p_nbs ||'%'
+                        and a.nbs     like p_nbs ||'%' 
                         and a.nbs NOT LIKE p_nbs_notlike||'%'
 -----------------------and t.dat_end is null
                       order by nbs, ob22
@@ -886,10 +885,10 @@ exception when others then
 end transfer_accounts;
 ------------------------
 procedure T_Param      (p_mode int, p_kf varchar2) is
-  f_mmfo varchar2(10) ;
+  f_mmfo varchar2(10) ; 
   l_nls varchar2(15);
   l_Branch varchar2 (22) := '/' || p_kf || '/%';
-begin
+begin  
   bars_audit.info('T2017.T_Param Start kf='|| p_kf );
   bc.go(p_kf);
   f_mmfo  := NVL(  GetGlobalOption(Par_ => 'IS_MMFO') , '*');
@@ -906,14 +905,14 @@ begin
                                        'NLS_611414' , -- 6114	Комісійні доходи за прийом переказу по с.МВПС
                                        'DEP_S3'     , -- 6119	Рахунок 6119'
                                        'NLS_611001' , -- 6119	Комісійні доходи за операціями з лотерейними білетами
-                                       'GNLS_6026'  , -- 6026
-                                       'GNLS_6042'  , -- 6042
+                                       'GNLS_6026'  , -- 6026	
+                                       'GNLS_6042'  , -- 6042	
                                        'M_6399_14'  , -- 6399	Дохід від реалізації юв.монет
                                        'DEP_S6'     ) -- 3579	Рахунок 3579 загальний для деп.сейфів
             )
     loop begin select nls into l_nls from accounts where dat_alt is not null and nlsalt = trim ( bp.val) ;
-               If f_mmfo  = '1' then  EXECUTE IMMEDIATE '
-                  update BRANCH_ATTRIBUTE_VALUE  set ATTRIBUTE_VALUE= :NLS where ATTRIBUTE_CODE= :TAL and BRANCH_CODE= :BRANCH ' using l_nls, bp.tag, bp.branch ;
+               If f_mmfo  = '1' then  EXECUTE IMMEDIATE ' 
+                  update BRANCH_ATTRIBUTE_VALUE  set ATTRIBUTE_VALUE= :NLS where ATTRIBUTE_CODE= :TAL and BRANCH_CODE= :BRANCH ' using l_nls, bp.tag, bp.branch ; 
                else
                   update BRANCH_PARAMETERS  set VAL  = l_NLS  where rowid = bp.RI;
                end if;
@@ -928,9 +927,9 @@ end T_Param ;
 procedure T_CP (p_mode int) is
 begin  bars_audit.info('T2017.T_CP Start');
 
-  for k in (select acc, kf, NLS, NLSALT, NBS from accounts where  dat_alt is not null and dazs is null
+  for k in (select acc, kf, NLS, NLSALT, NBS from accounts where  dat_alt is not null and dazs is null 
               and nbs IN ('1416','1426','3116','3328','3216','3118','3320',
-                          '6128','6122','6124','6120','6127','6126','6223','6121','6125')
+                          '6128','6122','6124','6120','6127','6126','6223','6121','6125') 
             )
   LOOP Update cp_accc set
               NLSA    = decode  (nlsA   , K.NLSALT, K.NLS, NLSA   ),
@@ -953,7 +952,7 @@ begin  bars_audit.info('T2017.T_CP Start');
               S2VP1   = decode  (S2VP1  , K.NLSALT, K.NLS, S2VP1  ),
               S6499   = decode  (S6499  , K.NLSALT, K.NLS, S6499  ),
               S7499   = decode  (S7499  , K.NLSALT, K.NLS, S7499  )
-        where d_close is null ;
+        where d_close is null ;                        
 
         If k.NBS <> SUBSTR(k.nlsalt,1,4) then
            for  DOCH in (select Rowid RI , nls, nlsalt from accounts where accc = k.Acc and dazs is null )
@@ -967,7 +966,7 @@ begin  bars_audit.info('T2017.T_CP Start');
                 Else                                                                        DOCH.nls := VKRZN ( Substr( gl.AMFO,1,5), k.NBS ||'0'|| Substr (DOCH.NLS,6,9) );
                 end if;
 
-                begin update accounts set nls = DOCH.nls , nlsalt = DOCH.nlsalt where Rowid  = DOCH.RI;
+                begin update accounts set nls = DOCH.nls , nlsalt = DOCH.nlsalt where Rowid  = DOCH.RI;  
                 exception  when others then  null;
                 end;
 
@@ -1005,15 +1004,15 @@ begin   bc.go(p_KF);
   bc.go ('/');
 
 
-  If p_kf = '300465' then    execute immediate '
+  If p_kf = '300465' then    execute immediate '   
      update ZAY_MFO_NLS29 z  set NLS6114  = NVL( (select nls from accounts where nlsalt = z.NLS6114 and kf = z.MFO  and dat_alt is not null and rownum = 1 ), NLS6114 )
      where NLS6114 is not null ' ;
-                            execute immediate '
-     delete from OB_CORPORATION_NBS_REPORT_GRC x
+                            execute immediate '   
+     delete from OB_CORPORATION_NBS_REPORT_GRC x 
       where exists ( select 1 from transfer_2017 where r020_old = x.nbs ) and  not exists ( select 1 from transfer_2017 where r020_new = x.nbs ) ' ;
 
-                             execute immediate '
-     delete from OB_CORPORATION_NBS_REPORT    x
+                             execute immediate '   
+     delete from OB_CORPORATION_NBS_REPORT    x 
       where exists ( select 1 from transfer_2017 where r020_old = x.nbs ) and  not exists ( select 1 from transfer_2017 where r020_new = x.nbs ) ' ;
 
    end if;
@@ -1026,7 +1025,7 @@ end ZAY;
 procedure TAG_KF ( p_KF varchar2) is --  Авто-трансформація додаткових рекв  в ACCOUNTSW
 begin
   bc.go(p_KF);
-
+ 
   For w in  (select  Rowid RI,  value from accountsW where tag in ( 'S6110' ,'ELT6_1')  and kf = p_KF  )
   loop begin select  nls into w.value from accounts  where nlsalt = w.value and dat_alt is not null and rownum = 1  ;
              update accountsW set value = w.value where rowid = w.RI;
@@ -1045,17 +1044,17 @@ begin
   loop
     bc.go (k.KF);
     -- большая табл счетов, политизированная по KF, потому идем от счета
-    update SPECPARAM_INT s set s.R020_FA = (select r020_new from transfer_2017 t
-           where kf = k.KF
+    update SPECPARAM_INT s set s.R020_FA = (select r020_new from transfer_2017 t 
+           where kf = k.KF 
              and t.r020_old = s.R020_FA and rownum =1 ) where s.R020_FA is not null;
     commit;
     T2017.TAG_KF ( k.KF ) ;
     commit ;
-    T2017.ZAY    ( k.KF ) ;
+    T2017.ZAY    ( k.KF ) ; 
     commit;
-
+    
 	bc.go (k.KF);
-    for j in ( select  i.rowid, i.mfob, i.nlsb, i.kvb, f.new_nls, i.id
+    for j in ( select  i.rowid, i.mfob, i.nlsb, i.kvb, f.new_nls, i.id 
                  from bars.int_accn i, bars.transform_2017_forecast f
                 where i.mfob = k.KF
                   and i.mfob = f.kf
@@ -1065,38 +1064,38 @@ begin
     loop
       update bars.int_accn set nlsb = j.new_nls where rowid = j.rowid;
     end loop;
-
-
+	
+	
     commit;
   end loop;
-
-
-
+  
+  
+  
       -- Лившиц Геннадий
 	bc.go('/'); -- возвращаемся на слэш
 	BEGIN
 		For i in (select d.deposit_id, d.branch, a.nls, d.kf
-		from bars.dpt_deposit d, bars.accounts a
+		from bars.dpt_deposit d, bars.accounts a 
 		where a.nlsalt = d.nls_p and a.kf = d.mfo_p
 		and a.kv = d.kv and d.nls_p like '2635%') loop
 			bc.go(i.kf);
 			update dpt_deposit set nls_p = i.nls where deposit_id = i.deposit_id;
 		end loop;
-
+		
 		commit;
-
+		
 		For i in (select d.deposit_id, d.branch, a.nls, d.kf
-		from bars.dpt_deposit d, bars.accounts a
+		from bars.dpt_deposit d, bars.accounts a 
 		where a.nlsalt = d.nls_d and a.kf = d.mfo_d
 		and a.kv = d.kv and d.nls_d like '2635%') loop
 			bc.go(i.kf);
 			update dpt_deposit set nls_d = i.nls where deposit_id = i.deposit_id;
 		end loop;
-
+		
 		commit;
     END;
 
-
+	
 	-- Липских Александр
 	bc.go('/'); -- возвращаемся на слэш
 	BEGIN
@@ -1109,7 +1108,7 @@ begin
                        where a.nlsalt = d.nlsa
                          and a.kf = d.kf
                          and a.kv = d.kva
-                         and d.nlsa like '2635%')
+                         and d.nlsa like '2635%') 
             loop
                 update sto_det
                    set nlsa = i.nls
@@ -1121,7 +1120,7 @@ begin
                        where a.nlsalt = d.nlsb
                          and a.kf = d.mfob
                          and a.kv = d.kvb
-                         and d.nlsb like '2635%')
+                         and d.nlsb like '2635%') 
             loop
                 update sto_det
                    set nlsb = i.nls
@@ -1131,7 +1130,7 @@ begin
         bc.home;
     END;
 
-
+  
 
 
 end spec_par;
@@ -1282,8 +1281,8 @@ end ead_reswitch_cdckeys;
 procedure disable_scheduler_jobs
 is
 begin
-  for rec in (select owner||'.'||job_name as job_name from dba_scheduler_jobs
-              where job_name in ('IMPORT_DAY', 'IMPORT_MONTH')
+  for rec in (select owner||'.'||job_name as job_name from dba_scheduler_jobs 
+              where job_name in ('IMPORT_DAY', 'IMPORT_MONTH') 
               or job_name like 'CIG%'
               or job_name like 'EAD%'
               or job_name like 'CRM_UPLOAD%')
@@ -1296,8 +1295,8 @@ end disable_scheduler_jobs;
 procedure enable_scheduler_jobs
 is
 begin
-  for rec in (select owner||'.'||job_name as job_name from dba_scheduler_jobs
-              where job_name in ('IMPORT_DAY', 'IMPORT_MONTH')
+  for rec in (select owner||'.'||job_name as job_name from dba_scheduler_jobs 
+              where job_name in ('IMPORT_DAY', 'IMPORT_MONTH') 
               or job_name like 'CIG%'
               or (job_name like 'EAD%' and job_name not in ('EAD_SYNC', 'EAD_SYNC_CORP', 'EAD_SYNC_ZAP_BO'))
               or job_name like 'CRM_UPLOAD%')
@@ -1409,11 +1408,4 @@ BEGIN
   bnk_dt := coalesce(GL.GBD(),DAT_NEXT_U(trunc(sysdate),0),trunc(sysdate));
 END T2017;
 /
- show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/t2017.sql =========*** End *** =====
- PROMPT ===================================================================================== 
- 
+show errors

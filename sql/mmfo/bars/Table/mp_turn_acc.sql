@@ -64,12 +64,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  MP_TURN_ACC ***
-grant SELECT                                                                 on MP_TURN_ACC     to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MP_TURN_ACC     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MP_TURN_ACC     to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MP_TURN_ACC     to MVO;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MP_TURN_ACC     to START1;
-grant SELECT                                                                 on MP_TURN_ACC     to UPLD;
 grant FLASHBACK,SELECT                                                       on MP_TURN_ACC     to WR_REFREAD;
 
 

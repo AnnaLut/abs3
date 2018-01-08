@@ -77,34 +77,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SWACCSPARAM_ACC_NN ***
+PROMPT *** Create  constraint PK_SWACCSPARAM ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_ACC_SPARAM MODIFY (ACC CONSTRAINT CC_SWACCSPARAM_ACC_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWACCSPARAM_USE4MT950_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_ACC_SPARAM MODIFY (USE4MT950 CONSTRAINT CC_SWACCSPARAM_USE4MT950_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWACCSPARAM_USE4MT900_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_ACC_SPARAM MODIFY (USE4MT900 CONSTRAINT CC_SWACCSPARAM_USE4MT900_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SW_ACC_SPARAM ADD CONSTRAINT PK_SWACCSPARAM PRIMARY KEY (ACC)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -125,12 +103,60 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_SWACCSPARAM ***
+PROMPT *** Create  constraint CC_SWACCSPARAM_USE4MT900_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_ACC_SPARAM ADD CONSTRAINT PK_SWACCSPARAM PRIMARY KEY (ACC)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.SW_ACC_SPARAM MODIFY (USE4MT900 CONSTRAINT CC_SWACCSPARAM_USE4MT900_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWACCSPARAM_USE4MT950_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_ACC_SPARAM MODIFY (USE4MT950 CONSTRAINT CC_SWACCSPARAM_USE4MT950_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWACCSPARAM_ACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_ACC_SPARAM MODIFY (ACC CONSTRAINT CC_SWACCSPARAM_ACC_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWACCSPARAM_ACCOUNTS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_ACC_SPARAM ADD CONSTRAINT FK_SWACCSPARAM_ACCOUNTS2 FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWACCSPARAM_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_ACC_SPARAM ADD CONSTRAINT FK_SWACCSPARAM_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -154,11 +180,9 @@ exception when others then
 
 PROMPT *** Create  grants  SW_ACC_SPARAM ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_ACC_SPARAM   to BARS013;
-grant SELECT                                                                 on SW_ACC_SPARAM   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_ACC_SPARAM   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_ACC_SPARAM   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_ACC_SPARAM   to CUST001;
-grant SELECT                                                                 on SW_ACC_SPARAM   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_ACC_SPARAM   to WR_ALL_RIGHTS;
 
 

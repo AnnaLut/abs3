@@ -47,8 +47,6 @@ COMMENT ON COLUMN BARS.MIGR_MAILNLS_CLOB.X IS '';
 
 
 PROMPT *** Create  grants  MIGR_MAILNLS_CLOB ***
-grant SELECT                                                                 on MIGR_MAILNLS_CLOB to BARSREADER_ROLE;
-grant SELECT                                                                 on MIGR_MAILNLS_CLOB to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MIGR_MAILNLS_CLOB to WR_ALL_RIGHTS;
 
 

@@ -30,11 +30,9 @@ WHERE a.DAZS is NULL
   ----and ACRN.FPROCN(a.ACC,1,gl.BD)>0;
 
 PROMPT *** Create  grants  V_ACR ***
-grant SELECT                                                                 on V_ACR           to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_ACR           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_ACR           to DPT_ADMIN;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_ACR           to START1;
-grant SELECT                                                                 on V_ACR           to UPLD;
 grant FLASHBACK,SELECT                                                       on V_ACR           to WR_REFREAD;
 
 

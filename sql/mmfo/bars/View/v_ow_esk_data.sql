@@ -20,10 +20,8 @@ PROMPT *** Create  view V_OW_ESK_DATA ***
    and o.acc_pk = a.acc(+);
 
 PROMPT *** Create  grants  V_OW_ESK_DATA ***
-grant SELECT                                                                 on V_OW_ESK_DATA   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_ESK_DATA   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_ESK_DATA   to OW;
-grant SELECT                                                                 on V_OW_ESK_DATA   to UPLD;
 
 
 

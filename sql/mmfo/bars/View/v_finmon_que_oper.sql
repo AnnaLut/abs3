@@ -20,13 +20,12 @@ PROMPT *** Create  view V_FINMON_QUE_OPER ***
           o.sk,
           o.nlsa,
           o.s,
-          gl.p_icurval (NVL (o.kv, 980), NVL (o.s, 0), o.vdat) AS sq,
+          gl.p_icurval(nvl(o.kv,980), nvl(o.s,0), o.vdat) as sq,
           o.mfoa,
           o.nam_a,
           o.nlsb,
           o.s2,
-          gl.p_icurval (COALESCE (o.kv2, o.kv, 980), NVL (o.s2, 0), o.vdat)
-             AS sq2,
+          gl.p_icurval(coalesce(o.kv2, o.kv, 980), nvl(o.s2,0), o.vdat) as sq2,
           o.mfob,
           o.nam_b,
           o.vdat,
@@ -35,7 +34,7 @@ PROMPT *** Create  view V_FINMON_QUE_OPER ***
           o.id_a,
           o.id_b,
           o.kv,
-          NVL (o.kv2, o.kv),
+          nvl(o.kv2, o.kv),
           UPPER (f.status) status,
           NVL2 (f.status,
                 (SELECT name
@@ -45,12 +44,12 @@ PROMPT *** Create  view V_FINMON_QUE_OPER ***
              status_name,
           f.opr_vid1,
           f.opr_vid2,
-          fv2.agg AS fv2_agg,
+          fv2.agg as fv2_agg,
           f.comm_vid2,
           f.opr_vid3,
-          fv3.agg AS fv3_agg,
+          fv3.agg as fv3_agg,
           f.comm_vid3,
-          NVL (f.monitor_mode, 0) AS monitor_mode,
+          nvl(f.monitor_mode, 0) as monitor_mode,
           f.agent_id,
           f.in_date,
           f.rnk_a,
@@ -83,21 +82,19 @@ PROMPT *** Create  view V_FINMON_QUE_OPER ***
           tabval t,
           tabval t2,
           finmon_que f,
-          (  SELECT f.id AS id,
-                    LISTAGG (f.vid, ' ') WITHIN GROUP (ORDER BY (f.vid)) AS agg
-               FROM finmon_que_vid2 f
-           GROUP BY f.id) fv2,
-          (  SELECT f.id AS id,
-                    LISTAGG (f.vid, ' ') WITHIN GROUP (ORDER BY (f.vid)) AS agg
-               FROM finmon_que_vid3 f
-           GROUP BY f.id) fv3,
+          (select f.id as id, listagg(f.vid, ' ') within group (order by (f.vid)) as agg
+           from finmon_que_vid2 f
+           group by f.id) fv2,
+          (select f.id as id, listagg(f.vid, ' ') within group (order by (f.vid)) as agg
+           from finmon_que_vid3 f
+           group by f.id) fv3,
           fm_ref_que q,
           staff$base s
     WHERE     o.kv = t.kv
           AND NVL (o.kv2, o.kv) = t2.kv
           AND o.REF = f.REF(+)
-          AND f.id = fv2.id(+)
-          AND f.id = fv3.id(+)
+          AND f.id = fv2.id (+)
+          AND f.id = fv3.id (+)
           AND f.agent_id = s.id(+)
           AND o.REF = q.REF(+)
           AND (   o.branch LIKE
@@ -119,13 +116,12 @@ PROMPT *** Create  view V_FINMON_QUE_OPER ***
                                  AND kv = NVL (o.kv2, o.kv)
                                  AND branch LIKE
                                         SYS_CONTEXT ('bars_context',
-                                                     'user_branch_mask')));
+                                                     'user_branch_mask')))
+;
 
 PROMPT *** Create  grants  V_FINMON_QUE_OPER ***
-grant SELECT                                                                 on V_FINMON_QUE_OPER to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FINMON_QUE_OPER to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FINMON_QUE_OPER to FINMON01;
-grant SELECT                                                                 on V_FINMON_QUE_OPER to UPLD;
 
 
 

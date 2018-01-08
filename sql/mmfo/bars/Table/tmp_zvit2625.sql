@@ -72,10 +72,8 @@ COMMENT ON COLUMN BARS.TMP_ZVIT2625.UAH_SUMMA1 IS '';
 
 
 PROMPT *** Create  grants  TMP_ZVIT2625 ***
-grant SELECT                                                                 on TMP_ZVIT2625    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_ZVIT2625    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_ZVIT2625    to START1;
-grant SELECT                                                                 on TMP_ZVIT2625    to UPLD;
 
 
 

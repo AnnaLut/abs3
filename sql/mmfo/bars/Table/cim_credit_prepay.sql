@@ -77,11 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_CREDIT_PREPAY ***
-grant SELECT                                                                 on CIM_CREDIT_PREPAY to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CREDIT_PREPAY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_CREDIT_PREPAY to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CREDIT_PREPAY to CIM_ROLE;
-grant SELECT                                                                 on CIM_CREDIT_PREPAY to UPLD;
 
 
 

@@ -217,10 +217,6 @@ COMMENT ON COLUMN BARS.ERR$_REZ_CR.ORA_ERR_TAG$ IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_REZ_CR ***
-grant SELECT                                                                 on ERR$_REZ_CR     to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_REZ_CR     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -12,10 +12,8 @@ PROMPT *** Create  view OBPC_ACC_ACCO ***
       FROM ACCOUNTS WHERE TIP = 'SS ' AND DAZS IS NULL;
 
 PROMPT *** Create  grants  OBPC_ACC_ACCO ***
-grant SELECT                                                                 on OBPC_ACC_ACCO   to BARSREADER_ROLE;
 grant SELECT                                                                 on OBPC_ACC_ACCO   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_ACC_ACCO   to START1;
-grant SELECT                                                                 on OBPC_ACC_ACCO   to UPLD;
 
 
 

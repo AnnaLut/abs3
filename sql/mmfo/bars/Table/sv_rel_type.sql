@@ -49,12 +49,10 @@ COMMENT ON COLUMN BARS.SV_REL_TYPE.NAME IS 'Взаємозв’язки особи з банком ';
 
 
 
-PROMPT *** Create  constraint PK_SVRELTYPE ***
+PROMPT *** Create  constraint CC_SVRELTYPE_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SV_REL_TYPE ADD CONSTRAINT PK_SVRELTYPE PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.SV_REL_TYPE ADD CONSTRAINT CC_SVRELTYPE_ID_NN CHECK (ID IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -63,10 +61,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SVRELTYPE_ID_NN ***
+PROMPT *** Create  constraint PK_SVRELTYPE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SV_REL_TYPE ADD CONSTRAINT CC_SVRELTYPE_ID_NN CHECK (ID IS NOT NULL) ENABLE';
+  ALTER TABLE BARS.SV_REL_TYPE ADD CONSTRAINT PK_SVRELTYPE PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SV_REL_TYPE ***
-grant SELECT                                                                 on SV_REL_TYPE     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_REL_TYPE     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SV_REL_TYPE     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_REL_TYPE     to RPBN002;
-grant SELECT                                                                 on SV_REL_TYPE     to UPLD;
 
 
 

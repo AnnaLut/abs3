@@ -75,11 +75,9 @@ COMMENT ON COLUMN BARS.CCK_INT.F09 IS '';
 
 
 PROMPT *** Create  grants  CCK_INT ***
-grant SELECT                                                                 on CCK_INT         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_INT         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_INT         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_INT         to RCC_DEAL;
-grant SELECT                                                                 on CCK_INT         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_INT         to WR_ALL_RIGHTS;
 
 

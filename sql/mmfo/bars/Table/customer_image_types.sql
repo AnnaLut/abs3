@@ -102,11 +102,9 @@ exception when others then
 
 PROMPT *** Create  grants  CUSTOMER_IMAGE_TYPES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_IMAGE_TYPES to ABS_ADMIN;
-grant SELECT                                                                 on CUSTOMER_IMAGE_TYPES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_IMAGE_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_IMAGE_TYPES to BARS_DM;
 grant SELECT                                                                 on CUSTOMER_IMAGE_TYPES to START1;
-grant SELECT                                                                 on CUSTOMER_IMAGE_TYPES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTOMER_IMAGE_TYPES to WR_ALL_RIGHTS;
 
 

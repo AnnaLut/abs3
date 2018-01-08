@@ -29,10 +29,8 @@ PROMPT *** Create  view NBU23_CCK_BN_KOR ***
           AND d.vidd >= 1500 AND d.vidd < 1600 AND d.sdate < NVL (TO_DATE (pul.get_mas_ini_val ('sFdat1'), 'dd.mm.yyyy'), gl.bd);
 
 PROMPT *** Create  grants  NBU23_CCK_BN_KOR ***
-grant SELECT                                                                 on NBU23_CCK_BN_KOR to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on NBU23_CCK_BN_KOR to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on NBU23_CCK_BN_KOR to START1;
-grant SELECT                                                                 on NBU23_CCK_BN_KOR to UPLD;
 
 
 

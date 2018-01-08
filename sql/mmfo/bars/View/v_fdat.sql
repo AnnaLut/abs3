@@ -12,9 +12,7 @@ PROMPT *** Create  view V_FDAT ***
 order by fdat desc;
 
 PROMPT *** Create  grants  V_FDAT ***
-grant SELECT                                                                 on V_FDAT          to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_FDAT          to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_FDAT          to UPLD;
 
 
 

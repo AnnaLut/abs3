@@ -77,12 +77,10 @@ COMMENT ON COLUMN BARS.KOD_D5.D_MODE IS '';
 
 
 PROMPT *** Create  grants  KOD_D5 ***
-grant SELECT                                                                 on KOD_D5          to BARSREADER_ROLE;
 grant SELECT                                                                 on KOD_D5          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_D5          to BARS_DM;
 grant SELECT                                                                 on KOD_D5          to RPBN002;
 grant SELECT                                                                 on KOD_D5          to START1;
-grant SELECT                                                                 on KOD_D5          to UPLD;
 
 
 

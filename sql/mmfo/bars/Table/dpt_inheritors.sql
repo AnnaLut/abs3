@@ -79,12 +79,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_DPTINHERIT ***
+PROMPT *** Create  constraint CC_DPTINHERITORS_ATTRINCOME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_INHERITORS ADD CONSTRAINT PK_DPTINHERIT PRIMARY KEY (DPT_ID, INHERIT_CUSTID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.DPT_INHERITORS MODIFY (ATTR_INCOME CONSTRAINT CC_DPTINHERITORS_ATTRINCOME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -109,6 +107,58 @@ PROMPT *** Create  constraint CC_DPTINHERIT_INHERITSTATE ***
 begin   
  execute immediate '
   ALTER TABLE BARS.DPT_INHERITORS ADD CONSTRAINT CC_DPTINHERIT_INHERITSTATE CHECK (inherit_state in (0, 1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTINHERIT_DPTDPTALL2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_INHERITORS ADD CONSTRAINT FK_DPTINHERIT_DPTDPTALL2 FOREIGN KEY (KF, DPT_ID)
+	  REFERENCES BARS.DPT_DEPOSIT_ALL (KF, DEPOSIT_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTINHERIT_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_INHERITORS ADD CONSTRAINT FK_DPTINHERIT_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTINHERIT_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_INHERITORS ADD CONSTRAINT FK_DPTINHERIT_CUSTOMER FOREIGN KEY (INHERIT_CUSTID)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTINHERIT_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_INHERITORS ADD CONSTRAINT FK_DPTINHERIT_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -237,10 +287,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTINHERITORS_ATTRINCOME_NN ***
+PROMPT *** Create  constraint PK_DPTINHERIT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_INHERITORS MODIFY (ATTR_INCOME CONSTRAINT CC_DPTINHERITORS_ATTRINCOME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_INHERITORS ADD CONSTRAINT PK_DPTINHERIT PRIMARY KEY (DPT_ID, INHERIT_CUSTID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -277,10 +329,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_INHERITORS ***
-grant SELECT                                                                 on DPT_INHERITORS  to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_INHERITORS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_INHERITORS  to BARS_DM;
-grant SELECT                                                                 on DPT_INHERITORS  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_INHERITORS  to WR_ALL_RIGHTS;
 
 

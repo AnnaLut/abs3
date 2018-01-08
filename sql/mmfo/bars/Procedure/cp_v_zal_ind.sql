@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure CP_V_ZAL_IND ***
 
-  CREATE OR REPLACE PROCEDURE BARS.CP_V_ZAL_IND 
+ create or replace procedure CP_V_ZAL_IND
   (p_ref number, p_acc number, p_id number, p_kol_zal number, p_dat_zal date, p_mode int, p_rnk number, p_id_zal number)
 is
   l_datz       date;
@@ -33,8 +33,8 @@ BEGIN  null;
  l_acc       := nvl(p_acc,      PUL.get('CP_ACC'));
  l_id_zal    := p_id_zal ;
  /*l_id_zal := nvl(p_id_zal,PUL.get('CP_ID_ZAL')) ;*/
-
-
+ 
+ 
  l_datz:=p_DAT_ZAL;
  l_datz2:=nvl(p_DAT_ZAL, to_date('31.12.2099','dd.mm.yyyy'));
 

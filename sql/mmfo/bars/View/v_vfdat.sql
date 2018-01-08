@@ -14,9 +14,7 @@ PROMPT *** Create  view V_VFDAT ***
    ORDER BY fdat DESC;
 
 PROMPT *** Create  grants  V_VFDAT ***
-grant SELECT                                                                 on V_VFDAT         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_VFDAT         to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_VFDAT         to UPLD;
 
 
 

@@ -28,10 +28,8 @@ where k.id  = x.id (+)
 ;
 
 PROMPT *** Create  grants  V_CP_ALL_ZAL ***
-grant SELECT                                                                 on V_CP_ALL_ZAL    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_ALL_ZAL    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_ALL_ZAL    to START1;
-grant SELECT                                                                 on V_CP_ALL_ZAL    to UPLD;
 
 
 

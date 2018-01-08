@@ -88,8 +88,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  TEMPLATES_BAK ***
-grant SELECT                                                                 on TEMPLATES_BAK   to BARSREADER_ROLE;
-grant SELECT                                                                 on TEMPLATES_BAK   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TEMPLATES_BAK   to WR_ALL_RIGHTS;
 
 

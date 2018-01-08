@@ -63,9 +63,7 @@ COMMENT ON COLUMN BARS.KL_K051.D_OPEN IS '';
 
 
 PROMPT *** Create  grants  KL_K051 ***
-grant SELECT                                                                 on KL_K051         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_K051         to BARS_DM;
-grant SELECT                                                                 on KL_K051         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_K051         to WR_ALL_RIGHTS;
 
 

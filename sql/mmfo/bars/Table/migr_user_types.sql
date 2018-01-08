@@ -65,6 +65,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_MIGRUSERTYPES_LOGNAME ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MIGR_USER_TYPES ADD CONSTRAINT FK_MIGRUSERTYPES_LOGNAME FOREIGN KEY (LOGNAME)
+	  REFERENCES BARS.STAFF$BASE (LOGNAME) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_MIGRUSERTYPES_TYPEID_NN ***
 begin   
  execute immediate '
@@ -103,11 +116,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  MIGR_USER_TYPES ***
-grant SELECT                                                                 on MIGR_USER_TYPES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MIGR_USER_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MIGR_USER_TYPES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MIGR_USER_TYPES to START1;
-grant SELECT                                                                 on MIGR_USER_TYPES to UPLD;
 
 
 

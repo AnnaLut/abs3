@@ -53,10 +53,8 @@ PROMPT *** Create  view AUD_DPT ***
       AND (v.ob22de != NVL (ad.ob22, '__') OR v.ob22ie != NVL (ai.ob22, '__') );
 
 PROMPT *** Create  grants  AUD_DPT ***
-grant SELECT                                                                 on AUD_DPT         to BARSREADER_ROLE;
 grant SELECT                                                                 on AUD_DPT         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AUD_DPT         to SALGL;
-grant SELECT                                                                 on AUD_DPT         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on AUD_DPT         to WR_ALL_RIGHTS;
 
 

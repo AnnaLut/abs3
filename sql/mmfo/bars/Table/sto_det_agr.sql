@@ -49,10 +49,8 @@ COMMENT ON COLUMN BARS.STO_DET_AGR.AGR_ID IS '';
 
 
 PROMPT *** Create  grants  STO_DET_AGR ***
-grant SELECT                                                                 on STO_DET_AGR     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_DET_AGR     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STO_DET_AGR     to BARS_DM;
-grant SELECT                                                                 on STO_DET_AGR     to UPLD;
 
 
 

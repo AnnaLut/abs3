@@ -70,18 +70,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025680 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_CURRENT_DATE_TRACK MODIFY (VALUE_DATE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C0025681 ***
 begin   
  execute immediate '
@@ -93,10 +81,20 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint SYS_C0025680 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ATTRIBUTE_CURRENT_DATE_TRACK MODIFY (VALUE_DATE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  ATTRIBUTE_CURRENT_DATE_TRACK ***
-grant SELECT                                                                 on ATTRIBUTE_CURRENT_DATE_TRACK to BARSREADER_ROLE;
 grant SELECT                                                                 on ATTRIBUTE_CURRENT_DATE_TRACK to BARS_DM;
-grant SELECT                                                                 on ATTRIBUTE_CURRENT_DATE_TRACK to UPLD;
 
 
 

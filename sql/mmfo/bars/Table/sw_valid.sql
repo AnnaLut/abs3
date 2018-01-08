@@ -49,6 +49,19 @@ COMMENT ON COLUMN BARS.SW_VALID.SWRULE IS '';
 
 
 
+PROMPT *** Create  constraint R_SWOPT_SWVALID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_VALID ADD CONSTRAINT R_SWOPT_SWVALID FOREIGN KEY (OPT)
+	  REFERENCES BARS.SW_OPT (OPT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C009783 ***
 begin   
  execute immediate '
@@ -101,10 +114,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_VALID ***
-grant SELECT                                                                 on SW_VALID        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_VALID        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_VALID        to START1;
-grant SELECT                                                                 on SW_VALID        to UPLD;
 
 
 

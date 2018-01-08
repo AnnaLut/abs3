@@ -89,10 +89,6 @@ COMMENT ON COLUMN BARS.ERR$_REZ_ZAL.OSTC_Z31 IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_REZ_ZAL ***
-grant SELECT                                                                 on ERR$_REZ_ZAL    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_REZ_ZAL    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

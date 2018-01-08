@@ -49,11 +49,9 @@ COMMENT ON COLUMN BARS.CAT_CHORNOBYL.CATEGORY IS 'Категорія';
 
 
 PROMPT *** Create  grants  CAT_CHORNOBYL ***
-grant SELECT                                                                 on CAT_CHORNOBYL   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CAT_CHORNOBYL   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CAT_CHORNOBYL   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CAT_CHORNOBYL   to RCC_DEAL;
-grant SELECT                                                                 on CAT_CHORNOBYL   to UPLD;
 
 
 

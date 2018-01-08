@@ -69,11 +69,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_RNK_KAT ***
-grant SELECT                                                                 on TMP_RNK_KAT     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_RNK_KAT     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_RNK_KAT     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_RNK_KAT     to START1;
-grant SELECT                                                                 on TMP_RNK_KAT     to UPLD;
 
 
 

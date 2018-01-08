@@ -18,10 +18,8 @@ and branch like sys_context('bars_context','user_branch')||'%'
  ;
 
 PROMPT *** Create  grants  V_REPCHOOSE_ISP ***
-grant SELECT                                                                 on V_REPCHOOSE_ISP to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REPCHOOSE_ISP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_REPCHOOSE_ISP to RPBN001;
-grant SELECT                                                                 on V_REPCHOOSE_ISP to UPLD;
 
 
 

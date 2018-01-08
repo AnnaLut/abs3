@@ -19,9 +19,7 @@ PROMPT *** Create  view V_WCS_SUBPRODUCT_INSURANCES ***
  order by si.subproduct_id, si.ord;
 
 PROMPT *** Create  grants  V_WCS_SUBPRODUCT_INSURANCES ***
-grant SELECT                                                                 on V_WCS_SUBPRODUCT_INSURANCES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SUBPRODUCT_INSURANCES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_SUBPRODUCT_INSURANCES to UPLD;
 
 
 

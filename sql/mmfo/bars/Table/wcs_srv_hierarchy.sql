@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SRV_HIERARCHY ***
-grant SELECT                                                                 on WCS_SRV_HIERARCHY to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_SRV_HIERARCHY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_SRV_HIERARCHY to BARS_DM;
 grant SELECT                                                                 on WCS_SRV_HIERARCHY to START1;
-grant SELECT                                                                 on WCS_SRV_HIERARCHY to UPLD;
 
 
 

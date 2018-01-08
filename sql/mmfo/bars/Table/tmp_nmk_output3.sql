@@ -43,10 +43,6 @@ COMMENT ON COLUMN BARS.TMP_NMK_OUTPUT3.OUTPUT_LINE IS '';
 
 
 
-PROMPT *** Create  grants  TMP_NMK_OUTPUT3 ***
-grant SELECT                                                                 on TMP_NMK_OUTPUT3 to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_NMK_OUTPUT3 to UPLD;
-
 
 
 PROMPT ===================================================================================== 

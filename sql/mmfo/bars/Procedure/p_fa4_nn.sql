@@ -214,7 +214,7 @@ OPEN Saldo;
       nbuc_ := nbuc1_;
    end if;
 
-   --k041_ := f_k041(f_country_hist(rnk_, dat_));
+   k041_ := f_k041(f_country_hist(rnk_, dat_));
 
    --- после перехода на новые DRAPSы
    --- обороты по перекрытию 6,7 классов на 5040,5041

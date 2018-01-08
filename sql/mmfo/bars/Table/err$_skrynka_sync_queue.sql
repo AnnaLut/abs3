@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_SKRYNKA_SYNC_QUEUE.ERR_TEXT IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SKRYNKA_SYNC_QUEUE ***
-grant SELECT                                                                 on ERR$_SKRYNKA_SYNC_QUEUE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SKRYNKA_SYNC_QUEUE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

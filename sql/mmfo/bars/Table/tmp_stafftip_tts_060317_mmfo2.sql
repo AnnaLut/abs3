@@ -46,18 +46,6 @@ COMMENT ON COLUMN BARS.TMP_STAFFTIP_TTS_060317_MMFO2.TT IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C00110816 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_STAFFTIP_TTS_060317_MMFO2 MODIFY (ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C00110817 ***
 begin   
  execute immediate '
@@ -69,9 +57,17 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_STAFFTIP_TTS_060317_MMFO2 ***
-grant SELECT                                                                 on TMP_STAFFTIP_TTS_060317_MMFO2 to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_STAFFTIP_TTS_060317_MMFO2 to UPLD;
+
+PROMPT *** Create  constraint SYS_C00110816 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_STAFFTIP_TTS_060317_MMFO2 MODIFY (ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
 
 
 

@@ -32,11 +32,9 @@ PROMPT *** Create  view V_NBUR_LIST_FORM_ALL ***
           AND L.USER_ID = u.id(+);
 
 PROMPT *** Create  grants  V_NBUR_LIST_FORM_ALL ***
-grant SELECT                                                                 on V_NBUR_LIST_FORM_ALL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_LIST_FORM_ALL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_LIST_FORM_ALL to RPBN002;
 grant SELECT                                                                 on V_NBUR_LIST_FORM_ALL to START1;
-grant SELECT                                                                 on V_NBUR_LIST_FORM_ALL to UPLD;
 
 
 

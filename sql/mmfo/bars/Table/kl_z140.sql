@@ -51,10 +51,6 @@ COMMENT ON COLUMN BARS.KL_Z140.D_MODE IS '';
 
 
 
-PROMPT *** Create  grants  KL_Z140 ***
-grant SELECT                                                                 on KL_Z140         to BARSREADER_ROLE;
-grant SELECT                                                                 on KL_Z140         to UPLD;
-
 
 
 PROMPT ===================================================================================== 

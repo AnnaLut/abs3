@@ -155,12 +155,12 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('KOD_N', 'AA2', 'M', 0, 5, '2343001', null);
+    values ('KOD_N', 'AA2', 'M', 0, 5, '2344001', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''KOD_N'', ''AA2'', ''M'', 0, 5, ''2343001'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''KOD_N'', ''AA2'', ''M'', 0, 5, ''2344001'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

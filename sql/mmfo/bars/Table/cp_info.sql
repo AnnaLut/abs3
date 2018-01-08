@@ -69,6 +69,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CP_INFO_BYR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_INFO ADD CONSTRAINT FK_CP_INFO_BYR FOREIGN KEY (BYR)
+	  REFERENCES BARS.CP_BYR (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C005370 ***
 begin   
  execute immediate '
@@ -107,11 +120,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_INFO ***
-grant SELECT                                                                 on CP_INFO         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_INFO         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_INFO         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_INFO         to CP_ROLE;
-grant SELECT                                                                 on CP_INFO         to UPLD;
 grant FLASHBACK,SELECT                                                       on CP_INFO         to WR_REFREAD;
 
 

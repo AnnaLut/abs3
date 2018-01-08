@@ -17,9 +17,7 @@ PROMPT *** Create  view V_SW_MVPS_PAYDOCS ***
 
 PROMPT *** Create  grants  V_SW_MVPS_PAYDOCS ***
 grant SELECT                                                                 on V_SW_MVPS_PAYDOCS to BARS013;
-grant SELECT                                                                 on V_SW_MVPS_PAYDOCS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW_MVPS_PAYDOCS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_SW_MVPS_PAYDOCS to UPLD;
 
 
 

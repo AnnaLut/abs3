@@ -54,10 +54,8 @@ COMMENT ON COLUMN BARS.DDL_UTILS_STORE_BARSDB.SQL_TEXT IS '';
 
 PROMPT *** Create  grants  DDL_UTILS_STORE_BARSDB ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DDL_UTILS_STORE_BARSDB to ABS_ADMIN;
-grant SELECT                                                                 on DDL_UTILS_STORE_BARSDB to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DDL_UTILS_STORE_BARSDB to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DDL_UTILS_STORE_BARSDB to BARS_DM;
-grant SELECT                                                                 on DDL_UTILS_STORE_BARSDB to UPLD;
 
 
 

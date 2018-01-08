@@ -34,9 +34,7 @@ PROMPT *** Create  view V_EBKC_LEGAL_ATTR_LIST ***
       and eca.cust_type = 'L';
 
 PROMPT *** Create  grants  V_EBKC_LEGAL_ATTR_LIST ***
-grant SELECT                                                                 on V_EBKC_LEGAL_ATTR_LIST to BARSREADER_ROLE;
 grant SELECT                                                                 on V_EBKC_LEGAL_ATTR_LIST to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_EBKC_LEGAL_ATTR_LIST to UPLD;
 
 
 

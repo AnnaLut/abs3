@@ -97,10 +97,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_GRTVEHICLES_TYPE_NN ***
+PROMPT *** Create  constraint FK_VEHICLES_VEHTYPES ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_VEHICLES MODIFY (TYPE CONSTRAINT CC_GRTVEHICLES_TYPE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.GRT_VEHICLES ADD CONSTRAINT FK_VEHICLES_VEHTYPES FOREIGN KEY (TYPE)
+	  REFERENCES BARS.GRT_VEHICLE_TYPES (TYPE_ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -109,34 +110,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_GRTVEHICLES_MODEL_NN ***
+PROMPT *** Create  constraint CC_GRTVEHICLES_VIN_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_VEHICLES MODIFY (MODEL CONSTRAINT CC_GRTVEHICLES_MODEL_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTVEHICLES_REGNUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_VEHICLES MODIFY (VEH_REG_NUM CONSTRAINT CC_GRTVEHICLES_REGNUM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTVEHICLES_MADEDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_VEHICLES MODIFY (MADE_DATE CONSTRAINT CC_GRTVEHICLES_MADEDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.GRT_VEHICLES MODIFY (VIN CONSTRAINT CC_GRTVEHICLES_VIN_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -157,10 +134,59 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_GRTVEHICLES_VIN_NN ***
+PROMPT *** Create  constraint CC_GRTVEHICLES_MADEDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_VEHICLES MODIFY (VIN CONSTRAINT CC_GRTVEHICLES_VIN_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.GRT_VEHICLES MODIFY (MADE_DATE CONSTRAINT CC_GRTVEHICLES_MADEDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTVEHICLES_REGNUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_VEHICLES MODIFY (VEH_REG_NUM CONSTRAINT CC_GRTVEHICLES_REGNUM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTVEHICLES_MODEL_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_VEHICLES MODIFY (MODEL CONSTRAINT CC_GRTVEHICLES_MODEL_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_VEHICLES_DEALS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_VEHICLES ADD CONSTRAINT FK_VEHICLES_DEALS FOREIGN KEY (DEAL_ID)
+	  REFERENCES BARS.GRT_DEALS (DEAL_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTVEHICLES_TYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_VEHICLES MODIFY (TYPE CONSTRAINT CC_GRTVEHICLES_TYPE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -183,11 +209,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRT_VEHICLES ***
-grant SELECT                                                                 on GRT_VEHICLES    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRT_VEHICLES    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRT_VEHICLES    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRT_VEHICLES    to START1;
-grant SELECT                                                                 on GRT_VEHICLES    to UPLD;
 
 
 

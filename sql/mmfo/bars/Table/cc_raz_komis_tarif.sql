@@ -65,6 +65,45 @@ COMMENT ON COLUMN BARS.CC_RAZ_KOMIS_TARIF.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_CC_RAZ_KOMIS_TARIF_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_RAZ_KOMIS_TARIF ADD CONSTRAINT FK_CC_RAZ_KOMIS_TARIF_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CC_RAZ_KOMIS_TARIF_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_RAZ_KOMIS_TARIF ADD CONSTRAINT FK_CC_RAZ_KOMIS_TARIF_TABVAL FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_RAZ_KOMIS_TARIF_TYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_RAZ_KOMIS_TARIF ADD CONSTRAINT CC_RAZ_KOMIS_TARIF_TYPE FOREIGN KEY (TIP)
+	  REFERENCES BARS.CC_RAZ_KOMIS_TYPE (TIP) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_RAZ_KOMIS_TARIF_NN ***
 begin   
  execute immediate '
@@ -77,10 +116,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_RAZ_KOMIS_TARIF_KV_NN ***
+PROMPT *** Create  constraint CC_RAZ_KOMIS_TARIF_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_RAZ_KOMIS_TARIF MODIFY (KV CONSTRAINT CC_RAZ_KOMIS_TARIF_KV_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_RAZ_KOMIS_TARIF MODIFY (KF CONSTRAINT CC_RAZ_KOMIS_TARIF_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -137,10 +176,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_RAZ_KOMIS_TARIF_KF_NN ***
+PROMPT *** Create  constraint CC_RAZ_KOMIS_TARIF_KV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_RAZ_KOMIS_TARIF MODIFY (KF CONSTRAINT CC_RAZ_KOMIS_TARIF_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_RAZ_KOMIS_TARIF MODIFY (KV CONSTRAINT CC_RAZ_KOMIS_TARIF_KV_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -164,11 +203,9 @@ exception when others then
 
 PROMPT *** Create  grants  CC_RAZ_KOMIS_TARIF ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_RAZ_KOMIS_TARIF to ABS_ADMIN;
-grant SELECT                                                                 on CC_RAZ_KOMIS_TARIF to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_RAZ_KOMIS_TARIF to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_RAZ_KOMIS_TARIF to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_RAZ_KOMIS_TARIF to RCC_DEAL;
-grant SELECT                                                                 on CC_RAZ_KOMIS_TARIF to UPLD;
 grant FLASHBACK,SELECT                                                       on CC_RAZ_KOMIS_TARIF to WR_REFREAD;
 
 

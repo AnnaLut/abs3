@@ -1,14 +1,6 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_EBKC_PRIVATE_ENT.sql =========*** Run
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_EBKC_PRIVATE_ENT ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_EBKC_PRIVATE_ENT ("KF", "RNK", "LASTCHANGEDT", "DATE_OFF", "DATE_ON", "NMK", "NMKV", "NMKK", "K014", "COUNTRY", "TGR", "OKPO", "OKPO_EXCLUSION", "PRINSIDER", "K010", "ISE", "FS", "VED", "K050", "SED", "AU_ZIP", "AU_TERID", "AU_REGION", "AU_AREA", "AU_LOCALITY", "AU_ADRESS", "AU_HOME", "AU_HOMEPART", "AU_ROOM", "AU_COMM", "AF_ZIP", "AF_TERID", "AF_REGION", "AF_AREA", "AF_LOCALITY", "AF_ADRESS", "AF_HOME", "AF_HOMEPART", "AF_ROOM", "AF_COMM", "C_REG", "C_DST", "ADM", "DATEA", "DATET", "RGADM", "RGTAX", "PCOD_K050", "PASSP", "SER", "NUMDOC", "ORGAN", "PDATE", "ACTUAL_DATE", "EDDR_ID", "BDAY", "BPLACE", "SEX", "CELLPHONE", "CRISK", "MB", "K013", "MS_GR", "EMAIL", "CIGPO") AS 
-  select c.kf,                                                 -- Код РУ (код МФО)
+CREATE OR REPLACE FORCE VIEW BARS.V_EBKC_PRIVATE_ENT
+as /* Дані по ФОПах для ЄБК  */
+select c.kf,                                                 -- Код РУ (код МФО)
        c.rnk,                                                 -- Реєстр. № (РНК)
        GREATEST( ( select max(cu.CHGDATE) from BARS.CUSTOMER_UPDATE  cu where cu.RNK = c.RNK )
                , ( select max(cu.CHGDATE) from BARS.CUSTOMERW_UPDATE cu where cu.RNK = c.RNK )
@@ -23,12 +15,12 @@ PROMPT *** Create  view V_EBKC_PRIVATE_ENT ***
        c.country,                                        --Країна клієнта (К040)
        c.tgr,                                           --Тип державного реєстру
        c.okpo,                                            --Ідентифікаційний код
-       ( SELECT cw.VALUE FROM customerw cw
+       ( SELECT cw.VALUE FROM customerw cw 
           WHERE cw.tag = 'EXCLN' AND cw.rnk = c.rnk
        ) as OKPO_EXCLUSION,                           -- Ознака виключення Ідент
        c.prinsider,                                   -- Ознака інсайдера (К060)
        c.codcagent as k010,                      --Характеристика клієнта (К010)
-       --Економічні нормативи
+       --Економічні нормативи    
        c.ise,                                    --Інст. сектор економіки (К070)
        c.fs,                                            --Форма власності (К080)
        c.ved,                                         --Вид ек. діяльності(К110)
@@ -65,7 +57,7 @@ PROMPT *** Create  view V_EBKC_PRIVATE_ENT ***
        c.rgadm,                                         --Номер реєстрації у ДПА
        c.rgtax,                                             --Реєстр. номер у ПІ
        '' as pcod_k050,                                 --?Податковий код (К050)
-       --Реквізити клієнта
+       --Реквізити клієнта      
        p.passp,                                                  --Тип документа
        p.ser,                                                  --Серія документа
        p.numdoc,                                               --Номер документа
@@ -76,12 +68,12 @@ PROMPT *** Create  view V_EBKC_PRIVATE_ENT ***
        p.bday,                                                 --Дата народження
        p.bplace,                                              --Місце народження
        p.sex,                                                            --Стать
-       p.cellphone,                                                  --Моб. тел.
+       p.cellphone,                                                  --Моб. тел.    
        --Додаткова інформація
        c.crisk,                                              --Клас позичальника
        c.mb   ,                                --приналежність до малого бізнесу
        --Додаткові реквізити
-       ( select value from bars.CUSTOMERW cw
+       ( select value from bars.CUSTOMERW cw 
           where cw.tag='K013 ' and c.rnk=cw.rnk
        ) as k013,                                     -- Код виду клієнта (K013)
        ( select value from bars.CUSTOMERW cw
@@ -128,11 +120,11 @@ PROMPT *** Create  view V_EBKC_PRIVATE_ENT ***
                 "'2'_C14" af_room_type,
                 "'2'_C15" af_room,
                 "'2'_C16" af_terid
-          from ( select rnk, type_id, country,zip, domain, region, locality_type, locality, address, street_type, street,
+          from ( select rnk, type_id, country,zip, domain, region, locality_type, locality, address, street_type, street, 
                         home_type, home, homepart_type, homepart, room_type, room, territory_id
                    from BARS.CUSTOMER_ADDRESS
-               )  pivot ( max(country) c1, max(zip) c2, max(domain) c3, max(region) c4, max(locality_type) c5, max(locality) c6,
-                          max(address) c7, max(street_type) c8, max(street) c9, max(home_type) c10, max(home) c11,
+               )  pivot ( max(country) c1, max(zip) c2, max(domain) c3, max(region) c4, max(locality_type) c5, max(locality) c6, 
+                          max(address) c7, max(street_type) c8, max(street) c9, max(home_type) c10, max(home) c11, 
                           max(homepart_type) c12, max(homepart) c13, max(room_type) c14, max(room) c15, max(territory_id) c16
                       for type_id in ('1', '2') )
        ) a
@@ -141,13 +133,4 @@ PROMPT *** Create  view V_EBKC_PRIVATE_ENT ***
    and c.rnk = p.rnk
    and c.rnk=a.rnk(+);
 
-PROMPT *** Create  grants  V_EBKC_PRIVATE_ENT ***
-grant SELECT                                                                 on V_EBKC_PRIVATE_ENT to BARSREADER_ROLE;
-grant SELECT                                                                 on V_EBKC_PRIVATE_ENT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_EBKC_PRIVATE_ENT to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_EBKC_PRIVATE_ENT.sql =========*** End
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.V_EBKC_PRIVATE_ENT TO BARS_ACCESS_DEFROLE;

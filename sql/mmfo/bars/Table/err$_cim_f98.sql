@@ -127,10 +127,6 @@ COMMENT ON COLUMN BARS.ERR$_CIM_F98.NOMPODSK IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIM_F98 ***
-grant SELECT                                                                 on ERR$_CIM_F98    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIM_F98    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

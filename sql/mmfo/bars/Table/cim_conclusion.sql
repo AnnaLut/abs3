@@ -71,10 +71,10 @@ COMMENT ON COLUMN BARS.CIM_CONCLUSION.DELETE_UID IS 'користувач, який видалив ви
 
 
 
-PROMPT *** Create  constraint CC_CIMCONCLUSION_CREATEUID_NN ***
+PROMPT *** Create  constraint CC_CIMCONCLUSION_CONTRID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_CONCLUSION MODIFY (CREATE_UID CONSTRAINT CC_CIMCONCLUSION_CREATEUID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_CONCLUSION MODIFY (CONTR_ID CONSTRAINT CC_CIMCONCLUSION_CONTRID_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -97,10 +97,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMCONCLUSION_CONTRID_NN ***
+PROMPT *** Create  constraint CC_CIMCONCLUSION_CREATEUID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_CONCLUSION MODIFY (CONTR_ID CONSTRAINT CC_CIMCONCLUSION_CONTRID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_CONCLUSION MODIFY (CREATE_UID CONSTRAINT CC_CIMCONCLUSION_CREATEUID_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -121,10 +121,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMCONCLUSION_KV_NN ***
+PROMPT *** Create  constraint CC_CIMCONCLUSION_CREATEDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_CONCLUSION MODIFY (KV CONSTRAINT CC_CIMCONCLUSION_KV_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_CONCLUSION MODIFY (CREATE_DATE CONSTRAINT CC_CIMCONCLUSION_CREATEDATE_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -169,10 +169,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMCONCLUSION_CREATEDATE_NN ***
+PROMPT *** Create  constraint CC_CIMCONCLUSION_KV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_CONCLUSION MODIFY (CREATE_DATE CONSTRAINT CC_CIMCONCLUSION_CREATEDATE_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_CONCLUSION MODIFY (KV CONSTRAINT CC_CIMCONCLUSION_KV_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -195,11 +195,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_CONCLUSION ***
-grant SELECT                                                                 on CIM_CONCLUSION  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONCLUSION  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_CONCLUSION  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONCLUSION  to CIM_ROLE;
-grant SELECT                                                                 on CIM_CONCLUSION  to UPLD;
 
 
 

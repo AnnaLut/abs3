@@ -17,9 +17,7 @@ PROMPT *** Create  view V_DOC_NOT_VISA ***
 ORDER BY 1, n.idchk, t.tt, oper.userid;
 
 PROMPT *** Create  grants  V_DOC_NOT_VISA ***
-grant SELECT                                                                 on V_DOC_NOT_VISA  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOC_NOT_VISA  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DOC_NOT_VISA  to UPLD;
 
 
 

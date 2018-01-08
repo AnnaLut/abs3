@@ -22,11 +22,9 @@ PROMPT *** Create  view V_SMS_CLIENT_SEND ***
        AND T3.VALUE = t5.phone;
 
 PROMPT *** Create  grants  V_SMS_CLIENT_SEND ***
-grant SELECT                                                                 on V_SMS_CLIENT_SEND to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SMS_CLIENT_SEND to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SMS_CLIENT_SEND to DPT_ADMIN;
 grant SELECT                                                                 on V_SMS_CLIENT_SEND to DPT_ROLE;
-grant SELECT                                                                 on V_SMS_CLIENT_SEND to UPLD;
 
 
 

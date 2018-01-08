@@ -114,9 +114,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TR_QT ***
-grant SELECT                                                                 on TR_QT           to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

@@ -105,10 +105,10 @@ COMMENT ON COLUMN BARS.CUSTOMER_REL_UPDATE.TRUST_REGNUM IS 'Номер регистрации до
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMERRELUPDATE_CHGACTION ***
+PROMPT *** Create  constraint CC_CUSTOMERRELUPD_GLOBALBD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_REL_UPDATE ADD CONSTRAINT CC_CUSTOMERRELUPDATE_CHGACTION CHECK (chgaction in (1,2,3)) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CUSTOMER_REL_UPDATE MODIFY (GLOBAL_BDATE CONSTRAINT CC_CUSTOMERRELUPD_GLOBALBD_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -131,10 +131,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMERRELUPD_GLOBALBD_NN ***
+PROMPT *** Create  constraint CC_CUSTOMERRELUPDATE_CHGACTION ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_REL_UPDATE MODIFY (GLOBAL_BDATE CONSTRAINT CC_CUSTOMERRELUPD_GLOBALBD_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CUSTOMER_REL_UPDATE ADD CONSTRAINT CC_CUSTOMERRELUPDATE_CHGACTION CHECK (chgaction in (1,2,3)) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -179,10 +179,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMERRELUPD_CHGACTION_NN ***
+PROMPT *** Create  constraint CC_CUSTOMERRELUPD_EFFECTDT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_REL_UPDATE MODIFY (CHGACTION CONSTRAINT CC_CUSTOMERRELUPD_CHGACTION_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CUSTOMER_REL_UPDATE MODIFY (EFFECTDATE CONSTRAINT CC_CUSTOMERRELUPD_EFFECTDT_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -251,10 +251,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMERRELUPD_EFFECTDT_NN ***
+PROMPT *** Create  constraint CC_CUSTOMERRELUPD_CHGACTION_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_REL_UPDATE MODIFY (EFFECTDATE CONSTRAINT CC_CUSTOMERRELUPD_EFFECTDT_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CUSTOMER_REL_UPDATE MODIFY (CHGACTION CONSTRAINT CC_CUSTOMERRELUPD_CHGACTION_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -305,7 +305,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUSTOMER_REL_UPDATE ***
-grant SELECT                                                                 on CUSTOMER_REL_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTOMER_REL_UPDATE to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_REL_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_REL_UPDATE to BARS_DM;

@@ -49,10 +49,10 @@ COMMENT ON COLUMN BARS.TMP_LOB.STRDATA IS 'Часть символьного объекта (вх/исх)';
 
 
 
-PROMPT *** Create  constraint PK_TMPLOB ***
+PROMPT *** Create  constraint CC_TMPLOB_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_LOB ADD CONSTRAINT PK_TMPLOB PRIMARY KEY (ID) ENABLE';
+  ALTER TABLE BARS.TMP_LOB MODIFY (ID CONSTRAINT CC_TMPLOB_ID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -61,10 +61,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPLOB_ID_NN ***
+PROMPT *** Create  constraint PK_TMPLOB ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_LOB MODIFY (ID CONSTRAINT CC_TMPLOB_ID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_LOB ADD CONSTRAINT PK_TMPLOB PRIMARY KEY (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -85,7 +85,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_LOB ***
-grant SELECT                                                                 on TMP_LOB         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_LOB         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT                                                   on TMP_LOB         to CC_DOC;
 grant DELETE,INSERT,SELECT                                                   on TMP_LOB         to CUST001;
@@ -95,7 +94,6 @@ grant DELETE                                                                 on 
 grant INSERT                                                                 on TMP_LOB         to PYOD001;
 grant DELETE,INSERT,SELECT                                                   on TMP_LOB         to RPBN001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_LOB         to START1;
-grant SELECT                                                                 on TMP_LOB         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_LOB         to WR_ALL_RIGHTS;
 
 

@@ -105,10 +105,6 @@ COMMENT ON COLUMN BARS.ERR$_CIN_KOM2.S3 IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIN_KOM2 ***
-grant SELECT                                                                 on ERR$_CIN_KOM2   to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIN_KOM2   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

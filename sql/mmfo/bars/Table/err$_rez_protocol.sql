@@ -69,10 +69,6 @@ COMMENT ON COLUMN BARS.ERR$_REZ_PROTOCOL.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_REZ_PROTOCOL ***
-grant SELECT                                                                 on ERR$_REZ_PROTOCOL to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_REZ_PROTOCOL to UPLD;
-
 
 
 PROMPT ===================================================================================== 

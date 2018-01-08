@@ -78,10 +78,8 @@ exception when others then
 
 PROMPT *** Create  grants  NOMINAL_CHECK ***
 grant SELECT                                                                 on NOMINAL_CHECK   to ABS_ADMIN;
-grant SELECT                                                                 on NOMINAL_CHECK   to BARSREADER_ROLE;
 grant SELECT                                                                 on NOMINAL_CHECK   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NOMINAL_CHECK   to BARS_DM;
-grant SELECT                                                                 on NOMINAL_CHECK   to UPLD;
 
 
 

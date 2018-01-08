@@ -67,10 +67,6 @@ COMMENT ON COLUMN BARS.ERR$_ESCR_REG_MAPPING.OPER_TYPE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ESCR_REG_MAPPING ***
-grant SELECT                                                                 on ERR$_ESCR_REG_MAPPING to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ESCR_REG_MAPPING to UPLD;
-
 
 
 PROMPT ===================================================================================== 

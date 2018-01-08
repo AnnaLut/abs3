@@ -53,11 +53,9 @@ COMMENT ON COLUMN BARS.FLAGS_BACKUP.OPT IS '';
 
 
 PROMPT *** Create  grants  FLAGS_BACKUP ***
-grant SELECT                                                                 on FLAGS_BACKUP    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FLAGS_BACKUP    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FLAGS_BACKUP    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FLAGS_BACKUP    to START1;
-grant SELECT                                                                 on FLAGS_BACKUP    to UPLD;
 
 
 

@@ -25,8 +25,6 @@ PROMPT *** Create  view V_MON0 ***
           AND NVL (f_mon_null (kod, TYPE, 'CENA_NBU_OTP'), 0) > 0;
 
 PROMPT *** Create  grants  V_MON0 ***
-grant SELECT                                                                 on V_MON0          to BARSREADER_ROLE;
-grant SELECT                                                                 on V_MON0          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_MON0          to WR_ALL_RIGHTS;
 
 

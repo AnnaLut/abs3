@@ -32,8 +32,7 @@ begin
 	FINISH_TIME TIMESTAMP (6), 
 	OBJECT_STATUS VARCHAR2(20), 
 	ROW_COUNT NUMBER(9,0), 
-	ERR_REC_ID NUMBER(38,0), 
-	VLD NUMBER(3,0) GENERATED ALWAYS AS (DECODE(OBJECT_STATUS,''FINISHED'',0,''BLOCKED'',0,VERSION_ID)) VIRTUAL VISIBLE 
+	ERR_REC_ID NUMBER(38,0)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -60,7 +59,6 @@ COMMENT ON COLUMN BARS.NBUR_LST_OBJECTS.FINISH_TIME IS 'Дата закiнчення завантаж
 COMMENT ON COLUMN BARS.NBUR_LST_OBJECTS.OBJECT_STATUS IS 'Статус об`екту';
 COMMENT ON COLUMN BARS.NBUR_LST_OBJECTS.ROW_COUNT IS 'Кiлькiсть записiв';
 COMMENT ON COLUMN BARS.NBUR_LST_OBJECTS.ERR_REC_ID IS 'Ід. запису про помилку в журналі подій АБС';
-COMMENT ON COLUMN BARS.NBUR_LST_OBJECTS.VLD IS 'Valid version';
 
 
 
@@ -113,10 +111,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_NBURLSTOBJECTS_STARTTM_NN ***
+PROMPT *** Create  constraint FK_NBURLSTOBJECTS_REFOBJECTS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_LST_OBJECTS MODIFY (START_TIME CONSTRAINT CC_NBURLSTOBJECTS_STARTTM_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_LST_OBJECTS ADD CONSTRAINT FK_NBURLSTOBJECTS_REFOBJECTS FOREIGN KEY (OBJECT_ID)
+	  REFERENCES BARS.NBUR_REF_OBJECTS (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -163,6 +162,31 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_NBURLSTOBJECTS_LSTVERSIONS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NBUR_LST_OBJECTS ADD CONSTRAINT FK_NBURLSTOBJECTS_LSTVERSIONS FOREIGN KEY (REPORT_DATE, KF, VERSION_ID)
+	  REFERENCES BARS.NBUR_LST_VERSIONS (REPORT_DATE, KF, VERSION_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NBURLSTOBJECTS_STARTTM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NBUR_LST_OBJECTS MODIFY (START_TIME CONSTRAINT CC_NBURLSTOBJECTS_STARTTM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index UK_NBURLSTOBJECTS ***
 begin   
  execute immediate '
@@ -180,7 +204,7 @@ exception when others then
 PROMPT *** Create  index UK_NBURLSTOBJECTS_OBJECTSTATUS ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.UK_NBURLSTOBJECTS_OBJECTSTATUS ON BARS.NBUR_LST_OBJECTS (REPORT_DATE, KF, OBJECT_ID, VLD) 
+  CREATE UNIQUE INDEX BARS.UK_NBURLSTOBJECTS_OBJECTSTATUS ON BARS.NBUR_LST_OBJECTS (REPORT_DATE, KF, OBJECT_ID, DECODE(OBJECT_STATUS,''FINISHED'',0,''BLOCKED'',0,VERSION_ID)) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS COMPRESS 3 
   TABLESPACE BRSMDLI ';
 exception when others then
@@ -191,11 +215,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_LST_OBJECTS ***
-grant SELECT                                                                 on NBUR_LST_OBJECTS to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_LST_OBJECTS to BARSUPL;
 grant SELECT                                                                 on NBUR_LST_OBJECTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_LST_OBJECTS to BARS_DM;
-grant SELECT                                                                 on NBUR_LST_OBJECTS to UPLD;
 
 
 

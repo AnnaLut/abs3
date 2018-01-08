@@ -125,9 +125,7 @@ SELECT q."ACC",
                  a.ostb) q;
 
 PROMPT *** Create  grants  V_DELTAMIL_CTRL ***
-grant SELECT                                                                 on V_DELTAMIL_CTRL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DELTAMIL_CTRL to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DELTAMIL_CTRL to UPLD;
 
 
 

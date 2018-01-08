@@ -66,9 +66,7 @@ COMMENT ON COLUMN BARS.ERR$_RNBU_IN_INF_RECORDS.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_RNBU_IN_INF_RECORDS ***
-grant SELECT                                                                 on ERR$_RNBU_IN_INF_RECORDS to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_RNBU_IN_INF_RECORDS to BARS_DM;
-grant SELECT                                                                 on ERR$_RNBU_IN_INF_RECORDS to UPLD;
 
 
 

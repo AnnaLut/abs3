@@ -64,9 +64,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CCK_AUTO_PROC_LIST ***
-grant SELECT                                                                 on CCK_AUTO_PROC_LIST to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on CCK_AUTO_PROC_LIST to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on CCK_AUTO_PROC_LIST to UPLD;
 
 
 

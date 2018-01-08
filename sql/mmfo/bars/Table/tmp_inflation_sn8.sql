@@ -74,9 +74,7 @@ COMMENT ON COLUMN BARS.TMP_INFLATION_SN8.ACC_SN8 IS '';
 
 
 PROMPT *** Create  grants  TMP_INFLATION_SN8 ***
-grant SELECT                                                                 on TMP_INFLATION_SN8 to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INFLATION_SN8 to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on TMP_INFLATION_SN8 to UPLD;
 
 
 

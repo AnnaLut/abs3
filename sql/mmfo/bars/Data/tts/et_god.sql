@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции GOD
-prompt Наименование операции: GOD Списання з клієнта (РУ)
+prompt Наименование операции: Списання з клієнта (РУ)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('GOD', 'GOD Списання з клієнта (РУ)', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, '#(get_zay_nls29(1))', '300465', 1, 1, 0, 0, null, null, null, null, null, null, '0301100000000000000000000000000000110000000000000000000000000000', null);
+    values ('GOD', 'Списання з клієнта (РУ)', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, '#(get_zay_nls29(1))', '300465', 1, 1, 0, 0, null, null, null, null, null, null, '0301100000000000000000000000000000110000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='GOD', name='GOD Списання з клієнта (РУ)', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb='#(get_zay_nls29(1))', mfob='300465', flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0301100000000000000000000000000000110000000000000000000000000000', nazn=null
+         set tt='GOD', name='Списання з клієнта (РУ)', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb='#(get_zay_nls29(1))', mfob='300465', flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0301100000000000000000000000000000110000000000000000000000000000', nazn=null
        where tt='GOD';
   end;
   --------------------------------
@@ -35,17 +35,6 @@ begin
   -------- Виды документов -------
   --------------------------------
   delete from tts_vob where tt='GOD';
-  begin
-    insert into tts_vob(vob, tt, ord)
-    values (6, 'GOD', null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (tts_vob: 6, ''GOD'', null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
   --------------------------------
   -------- Группы контроля -------
   --------------------------------

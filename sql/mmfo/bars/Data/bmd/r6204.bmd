@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,8 +58,7 @@ declare
 begin
 
   l_tabsemantic := 'Звiт про куп/про вал та результат';
-  l_tablinesdef := '100';
-  l_tabselect_statement := '';
+  l_tablinesdef := '';
   l_tabname     := 'R6204';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,23 +119,23 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Код~бранча', '2', null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'K6204', 'N', '6204~опер~купiвлi', '1.5', null, 13, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(K6204)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'KOLK', 'N', 'Кiл~опер~купiвлi', '.5', null, 10, 0, 0, 0, 0, '', '# ##0', 1, 0, 'Sum(KOLK)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KOLP', 'N', 'Кiл~опер~продажу', '.5', null, 20, 0, 0, 0, 0, '', '# ##0', 1, 0, 'Sum(KOLP)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KUPL', 'N', 'Сума вал~опер~купiвлi', '1.5', null, 11, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KV', 'N', 'Код~вал', '.3', null, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NAME', 'C', 'Наименование~бранча', '2', null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'P6204', 'N', '6204~опер~продажу', '1.5', null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(P6204)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'PROD', 'N', 'Сума вал~опер~продажу', '1.5', null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'S6204', 'N', '6204~опер~сальдо', '1.5', null, 35, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S6204)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'VYRU', 'N', 'Сума грн~опер~продажу', '1.5', null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(VYRU)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'ZATR', 'N', 'Сума грн~опер~купiвлi', '1.5', null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(ZATR)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'B', 'D', 'Поч.дата~перiоду', '1', null, 55, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'E', 'D', 'Кiн.дата~перiоду', '1', null, 56, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'KOL', 'N', 'Кiл~опер~загальна', '.5', null, 30, 0, 0, 0, 0, '', '# ##0', 0, 0, 'Sum(KOL)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'VAL', 'N', 'Сума вал~опер~загальна', '1.5', null, 31, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'GRN', 'N', 'Сума грн~опер~загальна', '1.5', null, 32, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(GRN)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Код~бранча', null, null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'K6204', 'N', '6204~опер~купiвлi', null, null, 13, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(K6204)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'KOLK', 'N', 'Кiл~опер~купiвлi', null, null, 10, 0, 0, 0, 0, '', '# ##0', 1, 0, 'Sum(KOLK)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'KOLP', 'N', 'Кiл~опер~продажу', null, null, 20, 0, 0, 0, 0, '', '# ##0', 1, 0, 'Sum(KOLP)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KUPL', 'N', 'Сума вал~опер~купiвлi', null, null, 11, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KV', 'N', 'Код~вал', null, null, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NAME', 'C', 'Наименование~бранча', null, null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'P6204', 'N', '6204~опер~продажу', null, null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(P6204)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'PROD', 'N', 'Сума вал~опер~продажу', null, null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'S6204', 'N', '6204~опер~сальдо', null, null, 35, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S6204)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'VYRU', 'N', 'Сума грн~опер~продажу', null, null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(VYRU)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'ZATR', 'N', 'Сума грн~опер~купiвлi', null, null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(ZATR)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'B', 'D', 'Поч.дата~перiоду', null, null, 55, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'E', 'D', 'Кiн.дата~перiоду', null, null, 56, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'KOL', 'N', 'Кiл~опер~загальна', null, null, 30, 0, 0, 0, 0, '', '# ##0', 0, 0, 'Sum(KOL)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'VAL', 'N', 'Сума вал~опер~загальна', null, null, 31, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'GRN', 'N', 'Сума грн~опер~загальна', null, null, 32, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(GRN)', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

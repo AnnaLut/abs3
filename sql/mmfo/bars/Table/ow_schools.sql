@@ -67,6 +67,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SCHOOLTYPES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_SCHOOLS ADD CONSTRAINT FK_SCHOOLTYPES FOREIGN KEY (SCHOOLTYPEID)
+	  REFERENCES BARS.OW_SCHOOLTYPES (SCHOOLTYPEID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C009368 ***
 begin   
  execute immediate '
@@ -117,10 +130,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_SCHOOLS ***
-grant SELECT                                                                 on OW_SCHOOLS      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_SCHOOLS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_SCHOOLS      to BARS_DM;
-grant SELECT                                                                 on OW_SCHOOLS      to UPLD;
 
 
 

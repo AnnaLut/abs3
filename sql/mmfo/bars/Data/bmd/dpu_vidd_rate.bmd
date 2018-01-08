@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Шкали процентних ставок по депозитах ЮО';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'DPU_VIDD_RATE';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,18 +119,18 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 0, 'ID', 'N', 'Ід~запису', '', 22, 0, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 1, 'KF', 'C', 'Код~філіалу', '', 6, 1, 1, 0, 0, 1, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'Код~валюти', '', 3, 3, 1, 0, 0, 1, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'LIMIT', 'N', 'Гран.~сума~(в коп.)', '', 11, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'MAX_RATE', 'N', 'Макс.~допустима~%-на ставка', '', 7, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'RATE', 'N', '%-на~ставка', '', 9, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'SUMM_INCLUDE', 'N', 'Гран.сума~входить в~діапазон (=1)', '', 1, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'TERM', 'N', 'Гран.~строк~(в міс.)', '', 2, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'TERM_DAYS', 'N', 'Гран.~строк~(в днях)', '', 4, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'TERM_INCLUDE', 'N', 'Гран.срок~входить в~діапазон (=1)', '', 1, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'TYPE_ID', 'N', 'Тип~договору~(продукт)', '', 22, 2, 1, 0, 0, 1, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'VIDD', 'N', 'Код~виду~договору', '', 22, 4, 1, 0, 0, 1, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 0, 'ID', 'N', 'Ід~запису', null, 22, 0, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'KF', 'C', 'Код~філіалу', null, 6, 1, 1, 0, 0, 1, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'Код~валюти', null, 3, 3, 1, 0, 0, 1, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'LIMIT', 'N', 'Гран.~сума~(в коп.)', null, 11, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'MAX_RATE', 'N', 'Макс.~допустима~%-на ставка', null, 7, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'RATE', 'N', '%-на~ставка', null, 9, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'SUMM_INCLUDE', 'N', 'Гран.сума~входить в~діапазон (=1)', null, 1, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'TERM', 'N', 'Гран.~строк~(в міс.)', null, 2, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'TERM_DAYS', 'N', 'Гран.~строк~(в днях)', null, 4, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'TERM_INCLUDE', 'N', 'Гран.срок~входить в~діапазон (=1)', null, 1, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'TYPE_ID', 'N', 'Тип~договору~(продукт)', null, 22, 2, 1, 0, 0, 1, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'VIDD', 'N', 'Код~виду~договору', null, 22, 4, 1, 0, 0, 1, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('BANKS_RU');
@@ -178,7 +173,7 @@ begin
   l_newcolid := bars_metabase.get_colid(l_newtabid, 'VIDD');
   l_varcolid := bars_metabase.get_colid(l_newtabid, 'BSD');
   if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_browsetbl(l_tabid, l_newtabid, 'D1', '11', l_newcolid, l_varcolid, 'Бал.~рахунок~деп.');
+    bars_metabase.add_browsetbl(l_tabid, l_newtabid, 'D1', '11', l_newcolid, l_varcolid, 'Бал.~счет~деп.');
   else
     dbms_output.put_line('В БМД не описана таблица DPU_VIDD для описания условий фильтра таблицы DPU_VIDD_RATE.');
   end if;

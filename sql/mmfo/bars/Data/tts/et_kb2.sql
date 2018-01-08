@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции KB2
-prompt Наименование операции: KB2 off Продаж ВАЛЮТИ
+prompt Наименование операции: off Продаж ВАЛЮТИ
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KB2', 'KB2 off Продаж ВАЛЮТИ', 0, '#( TOBOPACK.GetToboCASH)', null, '#( TOBOPACK.GetToboCASH)', 980, null, '#( TOBOPACK.GetToboCASH)', '#( TOBOPACK.GetToboCASH)', null, 0, 0, 1, 0, null, null, 30, null, '#(nbs_ob22 (''3800'',''10''))', null, '1001100001000000000000000000000000010000000000100000000000010000', null);
+    values ('KB2', 'off Продаж ВАЛЮТИ', 0, '#( TOBOPACK.GetToboCASH)', null, '#( TOBOPACK.GetToboCASH)', 980, null, '#( TOBOPACK.GetToboCASH)', '#( TOBOPACK.GetToboCASH)', null, 0, 0, 1, 0, null, null, 30, null, '#(nbs_ob22 (''3800'',''10''))', null, '1001100001000000000000000000000000010000000000100000000000010000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KB2', name='KB2 off Продаж ВАЛЮТИ', dk=0, nlsm='#( TOBOPACK.GetToboCASH)', kv=null, nlsk='#( TOBOPACK.GetToboCASH)', kvk=980, nlss=null, nlsa='#( TOBOPACK.GetToboCASH)', nlsb='#( TOBOPACK.GetToboCASH)', mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=30, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=null, flags='1001100001000000000000000000000000010000000000100000000000010000', nazn=null
+         set tt='KB2', name='off Продаж ВАЛЮТИ', dk=0, nlsm='#( TOBOPACK.GetToboCASH)', kv=null, nlsk='#( TOBOPACK.GetToboCASH)', kvk=980, nlss=null, nlsa='#( TOBOPACK.GetToboCASH)', nlsb='#( TOBOPACK.GetToboCASH)', mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=30, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=null, flags='1001100001000000000000000000000000010000000000100000000000010000', nazn=null
        where tt='KB2';
   end;
   --------------------------------

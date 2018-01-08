@@ -93,6 +93,19 @@ COMMENT ON COLUMN BARS.OBPC_TRAN_ARC.ARC_DATE IS 'Дата удаления записи в архив';
 
 
 
+PROMPT *** Create  constraint FK_OBPCTRANARC_OBPCFILES2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TRAN_ARC ADD CONSTRAINT FK_OBPCTRANARC_OBPCFILES2 FOREIGN KEY (ID)
+	  REFERENCES BARS.OBPC_FILES (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_OBPCTRANARC ***
 begin   
  execute immediate '
@@ -163,12 +176,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_TRAN_ARC ***
-grant SELECT                                                                 on OBPC_TRAN_ARC   to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on OBPC_TRAN_ARC   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_TRAN_ARC   to BARS_DM;
 grant INSERT,SELECT                                                          on OBPC_TRAN_ARC   to OBPC;
 grant SELECT                                                                 on OBPC_TRAN_ARC   to RPBN001;
-grant SELECT                                                                 on OBPC_TRAN_ARC   to UPLD;
 
 
 

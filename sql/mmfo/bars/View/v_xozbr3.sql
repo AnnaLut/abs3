@@ -12,10 +12,8 @@ PROMPT *** Create  view V_XOZBR3 ***
    from TMP_ARJK_OPER where ref = to_number ( pul.Get_Mas_Ini_Val('REF1' ) )  and  s2  = to_number ( pul.Get_Mas_Ini_Val('STMT1') );
 
 PROMPT *** Create  grants  V_XOZBR3 ***
-grant SELECT                                                                 on V_XOZBR3        to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_XOZBR3        to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_XOZBR3        to START1;
-grant SELECT                                                                 on V_XOZBR3        to UPLD;
 
 
 

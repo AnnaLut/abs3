@@ -25,8 +25,6 @@ PROMPT *** Create  view PROVODKIN2 ***
  ;
 
 PROMPT *** Create  grants  PROVODKIN2 ***
-grant SELECT                                                                 on PROVODKIN2      to BARSREADER_ROLE;
-grant SELECT                                                                 on PROVODKIN2      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PROVODKIN2      to WR_ALL_RIGHTS;
 
 

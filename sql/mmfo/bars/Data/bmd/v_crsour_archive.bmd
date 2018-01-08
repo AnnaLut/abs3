@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Архів угод кредитних ресурсів';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'V_CRSOUR_ARCHIVE';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,24 +119,24 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACCOUNT_REST', 'N', 'Залишок рахунку', '', 22, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CURRENCY_CODE', 'N', 'Валюта', '', 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DEAL_AMOUNT', 'N', 'Сума угоди', '', 22, 9, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DEAL_MFO', 'C', 'МФО власника угоди', '', 6, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DEAL_NUMBER', 'C', 'Номер угоди', '', 50, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'EXPIRY_DATE', 'D', 'Дата завершення', '', 10, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'INTEREST_ACCOUNT', 'C', 'Рахунок відсотків', '', 15, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'INTEREST_RATE', 'N', 'Відсоткова ставка', '', 22, 10, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'MAIN_ACCOUNT', 'C', 'Основний рахунок', '', 15, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'ND', 'N', 'Ідентифікатор', '', 22, 2, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/crsour/dealmonitor/CreditAgreement/?isReadOnly=1'||chr(38)||'nd=:ND', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'PARTY_ID', 'N', 'Ідентифкатор партнера', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'PARTY_INTEREST_ACCOUNT', 'C', 'Рахунок відсотків партнера', '', 34, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'PARTY_MAIN_ACCOUNT', 'C', 'Основний рахунок партнера', '', 34, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'PARTY_MFO', 'C', 'МФО партнера', '', 12, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'PARTY_NAME', 'C', 'Назва партнера', '', 70, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'START_DATE', 'D', 'Дата початку', '', 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'STATE_CODE', 'N', 'Код статуса', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'STATE_NAME', 'C', 'Назва статуса', '', 7, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACCOUNT_REST', 'N', 'Залишок рахунку', null, 22, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CURRENCY_CODE', 'N', 'Валюта', null, 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DEAL_AMOUNT', 'N', 'Сума угоди', null, 22, 9, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DEAL_MFO', 'C', 'МФО власника угоди', null, 6, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DEAL_NUMBER', 'C', 'Номер угоди', null, 50, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'EXPIRY_DATE', 'D', 'Дата завершення', null, 10, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'INTEREST_ACCOUNT', 'C', 'Рахунок відсотків', null, 15, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'INTEREST_RATE', 'N', 'Відсоткова ставка', null, 22, 10, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'MAIN_ACCOUNT', 'C', 'Основний рахунок', null, 15, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'ND', 'N', 'Ідентифікатор', null, 22, 2, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/crsour/dealmonitor/CreditAgreement/?isReadOnly=1'||chr(38)||'nd=:ND', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'PARTY_ID', 'N', 'Ідентифкатор партнера', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'PARTY_INTEREST_ACCOUNT', 'C', 'Рахунок відсотків партнера', null, 34, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'PARTY_MAIN_ACCOUNT', 'C', 'Основний рахунок партнера', null, 34, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'PARTY_MFO', 'C', 'МФО партнера', null, 12, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'PARTY_NAME', 'C', 'Назва партнера', null, 70, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'START_DATE', 'D', 'Дата початку', null, 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'STATE_CODE', 'N', 'Код статуса', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'STATE_NAME', 'C', 'Назва статуса', null, 7, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

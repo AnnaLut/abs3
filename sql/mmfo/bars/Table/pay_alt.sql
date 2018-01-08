@@ -111,9 +111,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  PAY_ALT ***
-grant SELECT                                                                 on PAY_ALT         to BARSREADER_ROLE;
 grant SELECT                                                                 on PAY_ALT         to BARS_DM;
-grant SELECT                                                                 on PAY_ALT         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PAY_ALT         to WR_ALL_RIGHTS;
 
 

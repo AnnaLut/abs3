@@ -49,10 +49,8 @@ COMMENT ON COLUMN BARS.KURS1.KURS IS '';
 
 
 PROMPT *** Create  grants  KURS1 ***
-grant SELECT                                                                 on KURS1           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KURS1           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KURS1           to START1;
-grant SELECT                                                                 on KURS1           to UPLD;
 
 
 

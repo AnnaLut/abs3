@@ -69,6 +69,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_PAYTTNO_TT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PAYTT_NO ADD CONSTRAINT FK_PAYTTNO_TT FOREIGN KEY (TT)
+	  REFERENCES BARS.TTS (TT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_PAYTTNO_ID_NN ***
 begin   
  execute immediate '
@@ -132,10 +145,8 @@ exception when others then
 
 PROMPT *** Create  grants  PAYTT_NO ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PAYTT_NO        to ABS_ADMIN;
-grant SELECT                                                                 on PAYTT_NO        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PAYTT_NO        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PAYTT_NO        to BARS_DM;
-grant SELECT                                                                 on PAYTT_NO        to UPLD;
 grant FLASHBACK,SELECT                                                       on PAYTT_NO        to WR_REFREAD;
 
 

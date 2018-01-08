@@ -46,10 +46,8 @@ COMMENT ON COLUMN BARS.DEBREG_TYPE_REF.TYPE IS '';
 
 
 PROMPT *** Create  grants  DEBREG_TYPE_REF ***
-grant SELECT                                                                 on DEBREG_TYPE_REF to BARSREADER_ROLE;
 grant SELECT                                                                 on DEBREG_TYPE_REF to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEBREG_TYPE_REF to DEB_REG;
-grant SELECT                                                                 on DEBREG_TYPE_REF to UPLD;
 
 
 

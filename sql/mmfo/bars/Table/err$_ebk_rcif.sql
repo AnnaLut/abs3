@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_EBK_RCIF.SEND IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_EBK_RCIF ***
-grant SELECT                                                                 on ERR$_EBK_RCIF   to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_EBK_RCIF   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

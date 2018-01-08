@@ -50,11 +50,9 @@ COMMENT ON COLUMN BARS.SP_S182.TXT IS '';
 
 PROMPT *** Create  grants  SP_S182 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SP_S182         to ABS_ADMIN;
-grant SELECT                                                                 on SP_S182         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SP_S182         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SP_S182         to BARS_DM;
 grant SELECT                                                                 on SP_S182         to START1;
-grant SELECT                                                                 on SP_S182         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SP_S182         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SP_S182         to WR_REFREAD;
 

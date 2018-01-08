@@ -61,10 +61,6 @@ COMMENT ON COLUMN BARS.ERR$_OTCN_LOG.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OTCN_LOG ***
-grant SELECT                                                                 on ERR$_OTCN_LOG   to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OTCN_LOG   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

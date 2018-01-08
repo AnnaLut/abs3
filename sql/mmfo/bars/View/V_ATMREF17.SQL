@@ -1,14 +1,29 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ATMREF17.sql =========*** Run *** ===
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_ATMREF17 ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_ATMREF17 ("ACC", "KV", "NLS", "NMS", "BRANCH", "TIP", "OB22", "OSTC", "DK", "REF1", "VDAT1", "S1", "NAZN1", "KOL", "S2", "DEL", "NLS_2909", "NAZN_PKR", "NAZN_015", "NAZN_310", "CHK") AS 
-  SELECT a.acc,
+CREATE OR REPLACE FORCE VIEW BARS.V_ATMREF17
+(
+   ACC,
+   KV,
+   NLS,
+   NMS,
+   BRANCH,
+   TIP,
+   OB22,
+   OSTC,
+   DK,
+   REF1,
+   VDAT1,
+   S1,
+   NAZN1,
+   KOL,
+   S2,
+   DEL,
+   NLS_2909,
+   NAZN_PKR,
+   NAZN_015,
+   NAZN_310,
+   CHK
+)
+AS
+   SELECT a.acc,
           a.kv,
           a.nls,
           a.nms,
@@ -71,12 +86,4 @@ PROMPT *** Create  view V_ATMREF17 ***
           AND r1.ref1 = r2.ref1(+)
           AND o1.sos = 5;
 
-PROMPT *** Create  grants  V_ATMREF17 ***
-grant SELECT                                                                 on V_ATMREF17      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ATMREF17      to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ATMREF17.sql =========*** End *** ===
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.V_ATMREF17 TO BARS_ACCESS_DEFROLE;

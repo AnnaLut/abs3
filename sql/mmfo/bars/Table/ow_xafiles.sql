@@ -69,6 +69,32 @@ COMMENT ON COLUMN BARS.OW_XAFILES.FILE_TYPE IS '';
 
 
 
+PROMPT *** Create  constraint FK_OWXAFILES_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_XAFILES ADD CONSTRAINT FK_OWXAFILES_STAFF FOREIGN KEY (UNFORM_USER)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OWXAFILES_OWCRVREQUEST ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_XAFILES ADD CONSTRAINT FK_OWXAFILES_OWCRVREQUEST FOREIGN KEY (FILE_TYPE)
+	  REFERENCES BARS.OW_CRV_REQUEST (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OWXAFILES_FILENAME_NN ***
 begin   
  execute immediate '
@@ -133,10 +159,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_XAFILES ***
-grant SELECT                                                                 on OW_XAFILES      to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on OW_XAFILES      to BARS_ACCESS_DEFROLE;
 grant INSERT,SELECT                                                          on OW_XAFILES      to OW;
-grant SELECT                                                                 on OW_XAFILES      to UPLD;
 
 
 

@@ -99,6 +99,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CINTK_RNK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIN_TK ADD CONSTRAINT FK_CINTK_RNK FOREIGN KEY (RNK)
+	  REFERENCES BARS.CIN_CUST (RNK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C006107 ***
 begin   
  execute immediate '
@@ -173,12 +186,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIN_TK ***
-grant SELECT                                                                 on CIN_TK          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CIN_TK          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIN_TK          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIN_TK          to PYOD001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIN_TK          to START1;
-grant SELECT                                                                 on CIN_TK          to UPLD;
 grant FLASHBACK,SELECT                                                       on CIN_TK          to WR_REFREAD;
 
 

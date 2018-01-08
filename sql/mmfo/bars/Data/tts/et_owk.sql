@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции OWK
-prompt Наименование операции: OWK OpenWay: Міжбанк( повернення компенсаційних коштів)
+prompt Наименование операции: OpenWay: Міжбанк( повернення компенсаційних коштів)
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('OWK', 'OWK OpenWay: Міжбанк( повернення компенсаційних коштів)', 1, '#(nbs_ob22_nls(''2906'',''16'',#(NLSA)))', null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 1, 1, 0, 0, null, null, null, null, null, null, '0201100000000000000000000000000000000000000000000000000000000000', null);
+    values ('OWK', 'OpenWay: Міжбанк( повернення компенсаційних коштів)', 1, '#(nbs_ob22_nls(''2906'',''16'',#(NLSA)))', null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 1, 1, 0, 0, null, null, null, null, null, null, '0201100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='OWK', name='OWK OpenWay: Міжбанк( повернення компенсаційних коштів)', dk=1, nlsm='#(nbs_ob22_nls(''2906'',''16'',#(NLSA)))', kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0201100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='OWK', name='OpenWay: Міжбанк( повернення компенсаційних коштів)', dk=1, nlsm='#(nbs_ob22_nls(''2906'',''16'',#(NLSA)))', kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0201100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='OWK';
   end;
   --------------------------------

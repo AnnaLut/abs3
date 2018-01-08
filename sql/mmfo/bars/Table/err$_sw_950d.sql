@@ -87,10 +87,6 @@ COMMENT ON COLUMN BARS.ERR$_SW_950D.THEIR_REF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SW_950D ***
-grant SELECT                                                                 on ERR$_SW_950D    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SW_950D    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

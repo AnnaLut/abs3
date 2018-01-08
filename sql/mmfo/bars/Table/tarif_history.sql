@@ -79,6 +79,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_TARIFHISTORY_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TARIF_HISTORY ADD CONSTRAINT FK_TARIFHISTORY_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C005565 ***
 begin   
  execute immediate '
@@ -154,11 +167,9 @@ exception when others then
 
 PROMPT *** Create  grants  TARIF_HISTORY ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TARIF_HISTORY   to ABS_ADMIN;
-grant SELECT                                                                 on TARIF_HISTORY   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TARIF_HISTORY   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TARIF_HISTORY   to BARS_DM;
 grant SELECT                                                                 on TARIF_HISTORY   to START1;
-grant SELECT                                                                 on TARIF_HISTORY   to UPLD;
 grant FLASHBACK,SELECT                                                       on TARIF_HISTORY   to WR_REFREAD;
 
 

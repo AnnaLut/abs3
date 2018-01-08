@@ -76,7 +76,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  ASYNC_EXCLUSION_MODE_TYPE ***
-grant SELECT                                                                 on ASYNC_EXCLUSION_MODE_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on ASYNC_EXCLUSION_MODE_TYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ASYNC_EXCLUSION_MODE_TYPE to BARS_DM;
 

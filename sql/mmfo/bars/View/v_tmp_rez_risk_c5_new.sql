@@ -46,10 +46,6 @@ PROMPT *** Create  view V_TMP_REZ_RISK_C5_NEW ***
             NVL (acc_rez_30, NVL (acc_rez, acc_rezn)), 
             dat_mi;
 
-PROMPT *** Create  grants  V_TMP_REZ_RISK_C5_NEW ***
-grant SELECT                                                                 on V_TMP_REZ_RISK_C5_NEW to BARSREADER_ROLE;
-grant SELECT                                                                 on V_TMP_REZ_RISK_C5_NEW to UPLD;
-
 
 
 PROMPT ===================================================================================== 

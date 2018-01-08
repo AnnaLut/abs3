@@ -26,9 +26,7 @@ PROMPT *** Create  view V_WCS_SCORING_QS_LIST ***
  order by sq.scoring_id, sq.question_id, qli.ord;
 
 PROMPT *** Create  grants  V_WCS_SCORING_QS_LIST ***
-grant SELECT                                                                 on V_WCS_SCORING_QS_LIST to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SCORING_QS_LIST to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_SCORING_QS_LIST to UPLD;
 
 
 

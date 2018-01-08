@@ -22,10 +22,8 @@ PROMPT *** Create  view SALB_GL ***
  ;
 
 PROMPT *** Create  grants  SALB_GL ***
-grant SELECT                                                                 on SALB_GL         to BARSREADER_ROLE;
 grant SELECT                                                                 on SALB_GL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALB_GL         to RPBN001;
-grant SELECT                                                                 on SALB_GL         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SALB_GL         to WR_ALL_RIGHTS;
 
 

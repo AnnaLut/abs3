@@ -219,10 +219,6 @@ COMMENT ON COLUMN BARS.ERR$_INV_CCK_FL_23.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_INV_CCK_FL_23 ***
-grant SELECT                                                                 on ERR$_INV_CCK_FL_23 to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_INV_CCK_FL_23 to UPLD;
-
 
 
 PROMPT ===================================================================================== 

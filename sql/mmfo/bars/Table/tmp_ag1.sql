@@ -92,9 +92,7 @@ COMMENT ON COLUMN BARS.TMP_AG1.ID IS '';
 
 
 PROMPT *** Create  grants  TMP_AG1 ***
-grant SELECT                                                                 on TMP_AG1         to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_AG1         to BARS_DM;
-grant SELECT                                                                 on TMP_AG1         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_AG1         to WR_ALL_RIGHTS;
 
 

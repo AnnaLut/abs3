@@ -77,10 +77,36 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_REZ5_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REZ_PROTOCOL ADD CONSTRAINT FK_REZ5_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_REZPROTOCOL_KF_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.REZ_PROTOCOL MODIFY (KF CONSTRAINT CC_REZPROTOCOL_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_REZPROTOCOL_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REZ_PROTOCOL ADD CONSTRAINT FK_REZPROTOCOL_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -115,12 +141,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_PROTOCOL ***
-grant SELECT                                                                 on REZ_PROTOCOL    to BARSREADER_ROLE;
 grant SELECT                                                                 on REZ_PROTOCOL    to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REZ_PROTOCOL    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ_PROTOCOL    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZ_PROTOCOL    to RCC_DEAL;
-grant SELECT                                                                 on REZ_PROTOCOL    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REZ_PROTOCOL    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on REZ_PROTOCOL    to WR_REFREAD;
 

@@ -14,10 +14,8 @@ PROMPT *** Create  view V_SOCIALTEMPLATE ***
  ;
 
 PROMPT *** Create  grants  V_SOCIALTEMPLATE ***
-grant SELECT                                                                 on V_SOCIALTEMPLATE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SOCIALTEMPLATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SOCIALTEMPLATE to DPT_ROLE;
-grant SELECT                                                                 on V_SOCIALTEMPLATE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SOCIALTEMPLATE to WR_ALL_RIGHTS;
 
 

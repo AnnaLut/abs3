@@ -101,10 +101,6 @@ COMMENT ON COLUMN BARS.ERR$_RKO_LST_UPDATE.SOS IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_RKO_LST_UPDATE ***
-grant SELECT                                                                 on ERR$_RKO_LST_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_RKO_LST_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

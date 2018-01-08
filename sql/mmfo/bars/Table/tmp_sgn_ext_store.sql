@@ -48,18 +48,6 @@ COMMENT ON COLUMN BARS.TMP_SGN_EXT_STORE.REC_ID IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C00119170 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_SGN_EXT_STORE MODIFY (REF NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C00119171 ***
 begin   
  execute immediate '
@@ -71,9 +59,17 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_SGN_EXT_STORE ***
-grant SELECT                                                                 on TMP_SGN_EXT_STORE to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_SGN_EXT_STORE to UPLD;
+
+PROMPT *** Create  constraint SYS_C00119170 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_SGN_EXT_STORE MODIFY (REF NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
 
 
 

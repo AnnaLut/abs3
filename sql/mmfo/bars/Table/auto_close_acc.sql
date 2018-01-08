@@ -91,11 +91,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  AUTO_CLOSE_ACC ***
-grant SELECT                                                                 on AUTO_CLOSE_ACC  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on AUTO_CLOSE_ACC  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AUTO_CLOSE_ACC  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on AUTO_CLOSE_ACC  to RCC_DEAL;
-grant SELECT                                                                 on AUTO_CLOSE_ACC  to UPLD;
 
 
 

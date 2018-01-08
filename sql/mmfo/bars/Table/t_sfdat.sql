@@ -51,10 +51,6 @@ COMMENT ON COLUMN BARS.T_SFDAT.Z IS '';
 
 
 
-PROMPT *** Create  grants  T_SFDAT ***
-grant SELECT                                                                 on T_SFDAT         to BARSREADER_ROLE;
-grant SELECT                                                                 on T_SFDAT         to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -73,10 +73,6 @@ COMMENT ON COLUMN BARS.ERR$_PAWN_ACC.SDATZ IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_PAWN_ACC ***
-grant SELECT                                                                 on ERR$_PAWN_ACC   to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_PAWN_ACC   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -105,11 +105,9 @@ COMMENT ON COLUMN BARS.CIN_TKR.S3 IS '';
 
 
 PROMPT *** Create  grants  CIN_TKR ***
-grant SELECT                                                                 on CIN_TKR         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIN_TKR         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIN_TKR         to PYOD001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIN_TKR         to START1;
-grant SELECT                                                                 on CIN_TKR         to UPLD;
 
 
 

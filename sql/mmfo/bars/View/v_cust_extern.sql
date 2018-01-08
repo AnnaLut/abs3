@@ -55,9 +55,7 @@ PROMPT *** Create  view V_CUST_EXTERN ***
  order by ce.id;
 
 PROMPT *** Create  grants  V_CUST_EXTERN ***
-grant SELECT                                                                 on V_CUST_EXTERN   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUST_EXTERN   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CUST_EXTERN   to UPLD;
 
 
 

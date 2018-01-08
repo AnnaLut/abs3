@@ -14,10 +14,8 @@ select id, 0 from customer_extern
  ;
 
 PROMPT *** Create  grants  CUSTOMER_INTEXT ***
-grant SELECT                                                                 on CUSTOMER_INTEXT to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTOMER_INTEXT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_INTEXT to CUST001;
-grant SELECT                                                                 on CUSTOMER_INTEXT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTOMER_INTEXT to WR_ALL_RIGHTS;
 
 

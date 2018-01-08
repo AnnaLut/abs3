@@ -22,10 +22,6 @@ SELECT C.RNK RNK1, (
  WHERE C.RNK = CW.RNK(+)
  AND CW.TAG(+) = 'DATVR');
 
-PROMPT *** Create  grants  V_MINDAOS_FM ***
-grant SELECT                                                                 on V_MINDAOS_FM    to BARSREADER_ROLE;
-grant SELECT                                                                 on V_MINDAOS_FM    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

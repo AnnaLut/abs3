@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := '2.Просмотр протокола расчета комисси (по Кл) ';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'CIN_KOM2';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,21 +119,21 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'Кільк.~ТК', '', null, 3, 0, 0, 0, 0, '', '', 1, 0, 'Sum(ID)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KA1', 'N', 'А1~СУМА комiс за~доставлену~готiвку', '', null, 11, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(KA1)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'KA2', 'N', 'А2~СУМА комiс за~виїзд по доставці~готівки', '', null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(KA2)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'REF', 'N', 'Кіл~докум А~сплач.~заявок ', '', null, 13, 0, 0, 0, 0, '', '', 1, 0, 'Sum(REF)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'RNK', 'N', 'Рег №~кл', '', null, 1, 0, 1, 0, 1, '', '', 1, 1, 'Count(*)', 0, 0, 0, 'sPar=CIN_KOM1[CONDITIONS=>CIN_KOM1.RNK=:RNK][ACCESSCODE=>0]', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'S', 'N', 'Сума~докум А~сплач.~заявок ', '', null, 14, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'DAT1', 'D', 'Початкова~дата~звiт.перiоду', '', null, 30, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'DAT2', 'D', 'Кiнцева~дата~звiт.перiоду', '', null, 31, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'KC0', 'N', 'B0~СУМА Аб.пл~за звiтний~перiод', '', null, 10, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(KC0)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'REC', 'N', 'Кiл~докум Б~відправл.~клiєнту ', '', null, 25, 0, 0, 0, 0, '', '', 1, 0, 'Sum(REC)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'SR', 'N', 'Сума~докум  Б~перерах~клiєнту ', '', null, 27, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SR)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'KB1', 'N', 'Б1~СУМА комiс~за вивiз~готiвки', '', null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(KB1)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'KB2', 'N', 'Б2~СУМА комiс за~виїзд по вивозу~готiвки', '', null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(KB2)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'KB3', 'N', 'Б3~СУМА штрафу~за хол/виїзд', '', null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(KB3)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'S3', 'N', 'Кіл~холостих~виїздів', '', null, 28, 0, 0, 0, 0, '', '', 1, 0, 'Sum(S3)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'Кільк.~ТК', null, null, 3, 0, 0, 0, 0, '', '', 1, 0, 'Sum(ID)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KA1', 'N', 'А1~СУМА комiс за~доставлену~готiвку', null, null, 11, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(KA1)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'KA2', 'N', 'А2~СУМА комiс за~виїзд по доставці~готівки', null, null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(KA2)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'REF', 'N', 'Кіл~докум А~сплач.~заявок ', null, null, 13, 0, 0, 0, 0, '', '', 1, 0, 'Sum(REF)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'RNK', 'N', 'Рег №~кл', null, null, 1, 0, 1, 0, 1, '', '', 1, 1, 'Count(*)', 0, 0, 0, 'sPar=CIN_KOM1[CONDITIONS=>CIN_KOM1.RNK=:RNK][ACCESSCODE=>0]', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'S', 'N', 'Сума~докум А~сплач.~заявок ', null, null, 14, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'DAT1', 'D', 'Початкова~дата~звiт.перiоду', null, null, 30, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'DAT2', 'D', 'Кiнцева~дата~звiт.перiоду', null, null, 31, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'KC0', 'N', 'B0~СУМА Аб.пл~за звiтний~перiод', null, null, 10, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(KC0)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'REC', 'N', 'Кiл~докум Б~відправл.~клiєнту ', null, null, 25, 0, 0, 0, 0, '', '', 1, 0, 'Sum(REC)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'SR', 'N', 'Сума~докум  Б~перерах~клiєнту ', null, null, 27, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SR)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'KB1', 'N', 'Б1~СУМА комiс~за вивiз~готiвки', null, null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(KB1)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'KB2', 'N', 'Б2~СУМА комiс за~виїзд по вивозу~готiвки', null, null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(KB2)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'KB3', 'N', 'Б3~СУМА штрафу~за хол/виїзд', null, null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(KB3)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'S3', 'N', 'Кіл~холостих~виїздів', null, null, 28, 0, 0, 0, 0, '', '', 1, 0, 'Sum(S3)', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

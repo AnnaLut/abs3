@@ -126,7 +126,6 @@ exception when others then
 
 PROMPT *** Create  grants  CC_PAWN ***
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CC_PAWN         to BARS009;
-grant SELECT                                                                 on CC_PAWN         to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_PAWN         to BARSUPL;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on CC_PAWN         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_PAWN         to BARS_DM;
@@ -134,7 +133,6 @@ grant SELECT                                                                 on 
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CC_PAWN         to RCC_DEAL;
 grant SELECT                                                                 on CC_PAWN         to RPBN001;
 grant INSERT,SELECT,UPDATE                                                   on CC_PAWN         to START1;
-grant SELECT                                                                 on CC_PAWN         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_PAWN         to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CC_PAWN         to WR_CREDIT;
 grant FLASHBACK,SELECT                                                       on CC_PAWN         to WR_REFREAD;

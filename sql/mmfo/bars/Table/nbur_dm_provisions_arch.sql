@@ -202,10 +202,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMPRVNSARCH_CUSTID_NN ***
+PROMPT *** Create  constraint CC_DMPRVNSARCH_PVUAH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_PROVISIONS_ARCH MODIFY (CUST_ID CONSTRAINT CC_DMPRVNSARCH_CUSTID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_PROVISIONS_ARCH MODIFY (PV_UAH CONSTRAINT CC_DMPRVNSARCH_PVUAH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -274,10 +274,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMPRVNSARCH_PVUAH_NN ***
+PROMPT *** Create  constraint CC_DMPRVNSARCH_CUSTID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_PROVISIONS_ARCH MODIFY (PV_UAH CONSTRAINT CC_DMPRVNSARCH_PVUAH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_PROVISIONS_ARCH MODIFY (CUST_ID CONSTRAINT CC_DMPRVNSARCH_CUSTID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -424,9 +424,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_DM_PROVISIONS_ARCH ***
-grant SELECT                                                                 on NBUR_DM_PROVISIONS_ARCH to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_DM_PROVISIONS_ARCH to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on NBUR_DM_PROVISIONS_ARCH to UPLD;
 
 
 

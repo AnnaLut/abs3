@@ -27,11 +27,9 @@ PROMPT *** Create  view V_SW300_HEADER ***
    and j.vdate between bankdate_g-7 and bankdate_g +7;
 
 PROMPT *** Create  grants  V_SW300_HEADER ***
-grant SELECT                                                                 on V_SW300_HEADER  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SW300_HEADER  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SW300_HEADER  to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_SW300_HEADER  to SWIFT001;
-grant SELECT                                                                 on V_SW300_HEADER  to UPLD;
 grant FLASHBACK,SELECT                                                       on V_SW300_HEADER  to WR_REFREAD;
 
 

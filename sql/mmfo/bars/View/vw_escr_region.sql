@@ -18,9 +18,7 @@ PROMPT *** Create  view VW_ESCR_REGION ***
    AND t2.region_id(+) = t1.region_id*/;
 
 PROMPT *** Create  grants  VW_ESCR_REGION ***
-grant SELECT                                                                 on VW_ESCR_REGION  to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_REGION  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on VW_ESCR_REGION  to UPLD;
 
 
 

@@ -83,6 +83,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CP_RAT_BYR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_RATES ADD CONSTRAINT FK_CP_RAT_BYR FOREIGN KEY (IDB)
+	  REFERENCES BARS.CP_BYR (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C008044 ***
 begin   
  execute immediate '
@@ -145,11 +158,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_RATES ***
-grant SELECT                                                                 on CP_RATES        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_RATES        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_RATES        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_RATES        to CP_ROLE;
-grant SELECT                                                                 on CP_RATES        to UPLD;
 grant FLASHBACK,SELECT                                                       on CP_RATES        to WR_REFREAD;
 
 

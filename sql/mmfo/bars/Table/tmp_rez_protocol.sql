@@ -68,9 +68,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_REZ_PROTOCOL ***
-grant SELECT                                                                 on TMP_REZ_PROTOCOL to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_REZ_PROTOCOL to BARS_DM;
-grant SELECT                                                                 on TMP_REZ_PROTOCOL to UPLD;
 
 
 

@@ -90,10 +90,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  REZ_XLS_REF ***
-grant SELECT                                                                 on REZ_XLS_REF     to BARSREADER_ROLE;
-grant SELECT                                                                 on REZ_XLS_REF     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

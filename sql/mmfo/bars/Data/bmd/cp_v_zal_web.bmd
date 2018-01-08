@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'ЦП (14*), що знаходяться в заставi (WEB)';
   l_tablinesdef := '100';
-  l_tabselect_statement := '';
   l_tabname     := 'CP_V_ZAL_WEB';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -122,27 +117,29 @@ begin
     bars_metabase.delete_metatables(l_tabid);
 
   end if;
+ 
+ -- добавляем описание полей
+  bars_metabase.add_column(l_tabid, 1, 'DAT_ZAL', 'D', '~Дата дiї~обтяження', null, null, 5, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 2, 'DIS_ZAL', 'N', 'Обтяжений~дисконт', null, null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 3, 'FDAT', 'D', 'Станом~на дату', null, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 4, 'ID', 'N', 'Внутр. Iд~ ЦП', null, null, 3, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 5, 'KOL_ALL', 'N', 'Загальна~кiлькiсть', null, null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 6, 'KOL_ZAL', 'N', '~Обтяжена~кiлькiсть', null, null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 7, 'KUK_ZAL', 'N', 'Обтяжений~купон~сплачений', null, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 8, 'KUN_ZAL', 'N', 'Обтяжений~купон~нарахований', null, null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 9, 'ND', 'C', '№~угоди ', null, null, 18, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 10, 'NOM_ALL', 'N', 'Загальний~номiнал', null, null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 11, 'NOM_ZAL', 'N', 'Обтяжений~номiнал', null, null, 7, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 12, 'PRC_ZAL', 'N', 'Обтяжена~переоцiнка', null, null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 13, 'PRE_ZAL', 'N', 'Обтяжена~премiя', null, null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 14, 'REF', 'N', 'Реф~угоди ', null, null, 2, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, 'sPar=V_CP_ZAL_WEB14[ACCESSCODE=>0][CONDITIONS=>V_CP_ZAL_WEB14.ref = :REF][PROC=> PUL.PUT( ''CP_REF'',  :REF ); PUL.PUT(''CP_ID'',:ID)][showDialogWindow=>false][EXEC=>BEFORE]', '', 0 );
+  bars_metabase.add_column(l_tabid, 15, 'VDAT', 'D', 'Дата~угоди ', null, null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 16, 'VIDD', 'C', 'Портфель~/Баланс~рах-к', null, null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 17, 'RYN', 'C', 'СубПортфель~/Особовий~рах-к', null, null, 16, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 18, 'ACC', 'N', 'Рах-к~номіналу~ACC', null, null, 18, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0 );
 
-  -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'DAT_ZAL', 'D', 'ВВОД~Дата дiї~обтяження', '', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DIS_ZAL', 'N', 'Обтяжений~дисконт', '', null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'FDAT', 'D', 'Станом~на дату', '', null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'ID', 'N', 'Внутр. Iд~ ЦП', '', null, 8, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KOL_ALL', 'N', 'Загальна~кiлькiсть', '', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KOL_ZAL', 'N', 'ВВОД~Обтяжена~кiлькiсть', '', null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'KUK_ZAL', 'N', 'Обтяжений~купон~сплачений', '', null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'KUN_ZAL', 'N', 'Обтяжений~купон~нарахований', '', null, 17, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'ND', 'C', '№~угоди ', '', null, 6, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NOM_ALL', 'N', 'Загальний~номiнал', '', null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NOM_ZAL', 'N', 'Обтяжений~номiнал', '', null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'PRC_ZAL', 'N', 'Обтяжена~переоцiнка', '', null, 18, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'PRE_ZAL', 'N', 'Обтяжена~премiя', '', null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'REF', 'N', 'Реф~угоди ', '', null, 5, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, 'sPar=V_CP_ZAL_WEB14[ACCESSCODE=>0][CONDITIONS=>V_CP_ZAL_WEB14.ref = :REF][PROC=> PUL.PUT( ''CP_REF'',  :REF ); PUL.PUT(''CP_ID'',:ID); PUL.PUT(''CP_ACC'',:ACC)][showDialogWindow=>false][EXEC=>BEFORE]', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'VDAT', 'D', 'Дата~угоди ', '', null, 7, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'VIDD', 'C', 'Портфель~/Баланс~рах-к', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'RYN', 'C', 'СубПортфель~/Особовий~рах-к', '', null, 2, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'ACC', 'N', 'Рах-к~номіналу~ACC', '', null, 18, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, 'sPar=ACCOUNTSPV[ACCESSCODE=>1][CONDITIONS=>accountspv.acc = :ACC and accountspv.parid=85][showDialogWindow=>false] ', '', 0);
 
+  
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CP_KOD');
   l_newcolid := bars_metabase.get_colid(l_newtabid, 'ID');
@@ -164,10 +161,10 @@ begin
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
 
-  -- добавляем описание раскраски
+   -- добавляем описание раскраски
   l_newcolid := bars_metabase.get_colid(l_tabid, 'REF');
   if (l_newcolid is not null) then
-    bars_metabase.add_tblcolor(l_tabid, 1, l_newcolid, ':REF in (select REF from CP_ZAL where ref = :REF and rnk is null)', 2, 'COLOR_Red');
+    bars_metabase.add_tblcolor(l_tabid, 1, l_newcolid, ':REF in (select REF from CP_ZAL where ref = :REF and rnk is null and NVL(TO_DATE(PUL.get(''DAT_ZAL''),''dd.mm.yyyy''), gl.bd) between datz_from and datz_to)', 2, 'COLOR_Red');
   end if;
 
   -- восстанавливаем ссылки сложных полей других таблиц

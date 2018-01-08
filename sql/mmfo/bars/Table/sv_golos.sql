@@ -99,106 +99,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SVGOLOS_TONM1_NN ***
+PROMPT *** Create  constraint CC_SVGOLOS_PROCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SV_GOLOS MODIFY (TO_NM1 CONSTRAINT CC_SVGOLOS_TONM1_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SVGOLOS_TONM2_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_GOLOS MODIFY (TO_NM2 CONSTRAINT CC_SVGOLOS_TONM2_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SVGOLOS_TOCOD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_GOLOS MODIFY (TO_COD CONSTRAINT CC_SVGOLOS_TOCOD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SVGOLOS_FROMNM1_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_GOLOS MODIFY (FROM_NM1 CONSTRAINT CC_SVGOLOS_FROMNM1_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SVGOLOS_FROMNM2_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_GOLOS MODIFY (FROM_NM2 CONSTRAINT CC_SVGOLOS_FROMNM2_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SVGOLOS_FROMCOD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_GOLOS MODIFY (FROM_COD CONSTRAINT CC_SVGOLOS_FROMCOD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SVGOLOS_VIDSOTOK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_GOLOS MODIFY (VIDSOTOK CONSTRAINT CC_SVGOLOS_VIDSOTOK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SVGOLOS_GOLOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_GOLOS MODIFY (GOLOS CONSTRAINT CC_SVGOLOS_GOLOS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SVGOLOS_NOMER_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_GOLOS MODIFY (NOMER CONSTRAINT CC_SVGOLOS_NOMER_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SV_GOLOS MODIFY (PRICH CONSTRAINT CC_SVGOLOS_PROCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -219,10 +123,106 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SVGOLOS_PROCH_NN ***
+PROMPT *** Create  constraint CC_SVGOLOS_NOMER_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SV_GOLOS MODIFY (PRICH CONSTRAINT CC_SVGOLOS_PROCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SV_GOLOS MODIFY (NOMER CONSTRAINT CC_SVGOLOS_NOMER_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SVGOLOS_GOLOS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_GOLOS MODIFY (GOLOS CONSTRAINT CC_SVGOLOS_GOLOS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SVGOLOS_VIDSOTOK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_GOLOS MODIFY (VIDSOTOK CONSTRAINT CC_SVGOLOS_VIDSOTOK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SVGOLOS_FROMCOD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_GOLOS MODIFY (FROM_COD CONSTRAINT CC_SVGOLOS_FROMCOD_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SVGOLOS_FROMNM2_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_GOLOS MODIFY (FROM_NM2 CONSTRAINT CC_SVGOLOS_FROMNM2_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SVGOLOS_FROMNM1_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_GOLOS MODIFY (FROM_NM1 CONSTRAINT CC_SVGOLOS_FROMNM1_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SVGOLOS_TOCOD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_GOLOS MODIFY (TO_COD CONSTRAINT CC_SVGOLOS_TOCOD_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SVGOLOS_TONM2_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_GOLOS MODIFY (TO_NM2 CONSTRAINT CC_SVGOLOS_TONM2_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SVGOLOS_TONM1_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_GOLOS MODIFY (TO_NM1 CONSTRAINT CC_SVGOLOS_TONM1_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -245,10 +245,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  SV_GOLOS ***
-grant SELECT                                                                 on SV_GOLOS        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_GOLOS        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_GOLOS        to RPBN002;
-grant SELECT                                                                 on SV_GOLOS        to UPLD;
 
 
 

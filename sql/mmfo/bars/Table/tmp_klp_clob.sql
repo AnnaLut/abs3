@@ -49,10 +49,8 @@ COMMENT ON COLUMN BARS.TMP_KLP_CLOB.C IS '';
 
 
 PROMPT *** Create  grants  TMP_KLP_CLOB ***
-grant SELECT                                                                 on TMP_KLP_CLOB    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_KLP_CLOB    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_KLP_CLOB    to TECH_MOM1;
-grant SELECT                                                                 on TMP_KLP_CLOB    to UPLD;
 
 
 

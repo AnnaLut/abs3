@@ -40,10 +40,8 @@ from priocom_documents d, oper o
 where d.ref is not null and d.ref=o.ref;
 
 PROMPT *** Create  grants  V_PRIOCOM_DOC_STATUS ***
-grant SELECT                                                                 on V_PRIOCOM_DOC_STATUS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PRIOCOM_DOC_STATUS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PRIOCOM_DOC_STATUS to START1;
-grant SELECT                                                                 on V_PRIOCOM_DOC_STATUS to UPLD;
 
 
 

@@ -11,10 +11,8 @@ PROMPT *** Create  view BRANCH2 ***
   SELECT "BRANCH","NAME","B040","DESCRIPTION","IDPDR","DATE_OPENED","DATE_CLOSED","DELETED","SAB","OBL","TOBO","NAME_ALT" from branch WHERE LENGTH (branch) = 15;
 
 PROMPT *** Create  grants  BRANCH2 ***
-grant SELECT                                                                 on BRANCH2         to BARSREADER_ROLE;
 grant SELECT                                                                 on BRANCH2         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH2         to START1;
-grant SELECT                                                                 on BRANCH2         to UPLD;
 
 
 

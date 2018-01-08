@@ -12,10 +12,8 @@ PROMPT *** Create  procedure P_GET_S080_S180 ***
    nd_ in number, vidd_ in number, rezid_ in number, comm_ in out varchar2,
    s080_ in out specparam.S080%type, s180_ in out specparam.S180%type)
    -------------------------------------------------
-   -- VERSION - 09/08/2017 (23/05/2017)
+   -- VERSION - 09/08/2016 (13/05/2016, 12/05/2016)
    --
-   -- 23/05/2017 для определения S180 дополнительно обрабатываем счета типа 
-   --            SS, SP при нулевых остатках и ненулевых Кт оборотах за месяц
    -- 09/08/2016 добавил условие  fost(a.acc, dat_) <> 0
    -- 08/08/2016 в одном из блоков для ACCOUNTS добавил условие
    --            and nvl(a.dazs, dat_+1) > dat_
@@ -56,7 +54,7 @@ begin
            and k.fdat = dat_
            and trim(k.tip) = 'SS'
            and nvl(s.s180,'0') not in ('0', '8', '9')
-           --and k.acc <> acc_
+           and k.acc <> acc_
            and k.kv = kv_
            and k.ost <> 0
            and k.acc = s.acc
@@ -72,7 +70,7 @@ begin
                and k.fdat = dat_
                and trim(k.tip) = 'SP'
                and nvl(s.s180,'0') not in ('0', '8', '9')
-               --and k.acc <> acc_
+               and k.acc <> acc_
                and k.kv = kv_
                and k.ost <> 0
                and k.acc = s.acc
@@ -87,7 +85,7 @@ begin
                    and n.acc = a.acc
                    and trim(a.tip) = 'SS'
                    and nvl(s.s180,'0') not in ('0', '8', '9')
-                   --and a.acc <> acc_
+                   and a.acc <> acc_
                    and a.acc = s.acc
                    and nvl(a.dazs, dat_+1) > dat_ 
                    and fost(a.acc, dat_) <> 0  
@@ -102,7 +100,7 @@ begin
                        and n.acc = a.acc
                        and trim(a.tip) = 'SP'
                        and nvl(s.s180,'0') not in ('0', '8', '9')
-                       --and a.acc <> acc_
+                       and a.acc <> acc_
                        and a.acc = s.acc
                        and nvl(a.dazs, dat_+1) > dat_ 
                        and fost(a.acc, dat_) <> 0 
@@ -117,51 +115,15 @@ begin
                            and n.acc = a.acc
                            and trim(a.tip) in ('SS','SP')
                            and nvl(s.s180,'0') not in ('0', '8', '9')
-                           --and a.acc <> acc_
+                           and a.acc <> acc_
                            and a.acc = s.acc
                            and fost(a.acc, dat_) <> 0
                            and nvl(a.dazs, dat_+1) > dat_
                            and rownum = 1;
                       EXCEPTION WHEN NO_DATA_FOUND THEN
-                          BEGIN
-                             select k.acc, nvl(s.s180,'0'), k.nls
-                                into acc2_, s180_k, nls2_
-                             from nd_acc n1, nd_acc n, sal k, specparam s
-                             where n1.acc = acc_
-                               and n1.nd = n.nd
-                               and n.acc = k.acc
-                               and k.fdat = dat_
-                               and trim(k.tip) = 'SS'
-                               and nvl(s.s180,'0') not in ('0', '8', '9')
-                               --and k.acc <> acc_
-                               and k.kv = kv_
-                               and k.ost = 0
-                               and FKOS(k.acc, trunc(dat_,'MM'), dat_) <> 0
-                               and k.acc = s.acc
-                               and rownum = 1;
-                          EXCEPTION WHEN NO_DATA_FOUND THEN
-                              BEGIN
-                                 select k.acc, nvl(s.s180,'0'), k.nls
-                                    into acc2_, s180_k, nls2_
-                                 from nd_acc n1, nd_acc n, sal k, specparam s
-                                 where n1.acc = acc_
-                                   and n1.nd = n.nd
-                                   and n.acc = k.acc
-                                   and k.fdat = dat_
-                                   and trim(k.tip) = 'SP'
-                                   and nvl(s.s180,'0') not in ('0', '8', '9')
-                                   --and k.acc <> acc_
-                                   and k.kv = kv_
-                                   and k.ost = 0
-                                   and FKOS(k.acc, trunc(dat_,'MM'), dat_) <> 0
-                                   and k.acc = s.acc
-                                   and rownum = 1;
-                              EXCEPTION WHEN NO_DATA_FOUND THEN
-                                 acc2_ := null;
-                                 nls2_ := null;
-                                 s180_k  := '0';
-                              END;
-                          END; 
+                         acc2_ := null;
+                         nls2_ := null;
+                         s180_k  := '0';
                       END;
                   end;
               end;
@@ -185,7 +147,7 @@ begin
    elsif nbs_ IN ('2607', '2627', '2657')  
    THEN
       BEGIN
-         SELECT max(i.acc)
+         SELECT i.acc
             INTO acco_
          FROM int_accn i, accounts a
          WHERE i.acra = acc_

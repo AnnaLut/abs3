@@ -13,17 +13,12 @@ ON BARS.V_NBUR_I89_EDIT
 REFERENCING NEW AS New OLD AS Old
 FOR EACH ROW
 DECLARE
-    lv_kodp varchar2(200);
-    lv_mfo  varchar2(20) := bc.current_mfo;
-    lv_nbuc varchar2(200);
-    lv_typ  number;
+lv_kodp varchar2(200);
 BEGIN
-   P_Proc_Set_int ('89', 'C', lv_nbuc, lv_typ);
-   
    lv_kodp := :new.SEG_01 || :new.SEG_02 ;
         
    insert into tmp_irep(KODP, DATF, KODF, ZNAP, NBUC, ERR_MSG, kf, FL_MOD)
-   values (lv_kodp, :new.datf, '89', :new.ZNAP, lv_nbuc, null, lv_mfo, 1);
+   values (lv_kodp, :new.datf, '89', :new.ZNAP, '300465', null, '300465', 1);
 
    EXCEPTION
      WHEN OTHERS THEN

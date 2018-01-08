@@ -55,10 +55,6 @@ COMMENT ON COLUMN BARS.ERR$_RKO_3570.ACC IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_RKO_3570 ***
-grant SELECT                                                                 on ERR$_RKO_3570   to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_RKO_3570   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

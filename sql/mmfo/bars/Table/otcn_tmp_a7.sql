@@ -80,18 +80,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010316 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OTCN_TMP_A7 MODIFY (KV NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C0010317 ***
 begin   
  execute immediate '
@@ -103,11 +91,21 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint SYS_C0010316 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OTCN_TMP_A7 MODIFY (KV NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  OTCN_TMP_A7 ***
-grant SELECT                                                                 on OTCN_TMP_A7     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_TMP_A7     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_TMP_A7     to START1;
-grant SELECT                                                                 on OTCN_TMP_A7     to UPLD;
 
 
 

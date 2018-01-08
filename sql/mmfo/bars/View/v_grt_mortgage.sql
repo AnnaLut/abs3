@@ -87,9 +87,7 @@ from v_grt_deals d, grt_mortgage v
 where d.deal_id = v.deal_id (+);
 
 PROMPT *** Create  grants  V_GRT_MORTGAGE ***
-grant SELECT                                                                 on V_GRT_MORTGAGE  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GRT_MORTGAGE  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_GRT_MORTGAGE  to UPLD;
 
 
 

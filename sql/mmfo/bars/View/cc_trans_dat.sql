@@ -41,10 +41,8 @@ PROMPT *** Create  view CC_TRANS_DAT ***
  where CHGACTION <> 'D';
 
 PROMPT *** Create  grants  CC_TRANS_DAT ***
-grant SELECT                                                                 on CC_TRANS_DAT    to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_TRANS_DAT    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_TRANS_DAT    to RCC_DEAL;
-grant SELECT                                                                 on CC_TRANS_DAT    to UPLD;
 
 
 

@@ -55,10 +55,6 @@ COMMENT ON COLUMN BARS.ERR$_PFU_EPP_KILL_STATE.NAME IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_PFU_EPP_KILL_STATE ***
-grant SELECT                                                                 on ERR$_PFU_EPP_KILL_STATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_PFU_EPP_KILL_STATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

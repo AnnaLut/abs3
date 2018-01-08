@@ -91,11 +91,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FP ***
-grant SELECT                                                                 on FP              to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FP              to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FP              to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FP              to FP;
-grant SELECT                                                                 on FP              to UPLD;
 grant FLASHBACK,SELECT                                                       on FP              to WR_REFREAD;
 
 

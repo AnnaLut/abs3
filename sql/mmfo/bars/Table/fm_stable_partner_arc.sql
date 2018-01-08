@@ -13,7 +13,6 @@ BEGIN
           'begin  
                bpa.alter_policy_info(''FM_STABLE_PARTNER_ARC'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''FM_STABLE_PARTNER_ARC'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
-               null;
            end; 
           '; 
 END; 
@@ -66,11 +65,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_STABLE_PARTNER_ARC ***
-grant SELECT                                                                 on FM_STABLE_PARTNER_ARC to BARSREADER_ROLE;
 grant SELECT                                                                 on FM_STABLE_PARTNER_ARC to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_STABLE_PARTNER_ARC to BARS_DM;
 grant SELECT                                                                 on FM_STABLE_PARTNER_ARC to START1;
-grant SELECT                                                                 on FM_STABLE_PARTNER_ARC to UPLD;
 
 
 

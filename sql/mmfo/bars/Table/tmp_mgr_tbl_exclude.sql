@@ -45,10 +45,6 @@ COMMENT ON COLUMN BARS.TMP_MGR_TBL_EXCLUDE.COMM IS '';
 
 
 
-PROMPT *** Create  grants  TMP_MGR_TBL_EXCLUDE ***
-grant SELECT                                                                 on TMP_MGR_TBL_EXCLUDE to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_MGR_TBL_EXCLUDE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -55,10 +55,6 @@ COMMENT ON COLUMN BARS.ERR$_CC_REFV.REF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CC_REFV ***
-grant SELECT                                                                 on ERR$_CC_REFV    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CC_REFV    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

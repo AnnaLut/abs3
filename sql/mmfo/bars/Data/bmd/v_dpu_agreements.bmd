@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'DPU.Перегляд  ДУ депозитних договорів ЮО';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'V_DPU_AGREEMENTS';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,18 +119,18 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 2, 'AGRMNT_BDATE', 'D', 'Дата~створення~ (банківська) ', '', 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'AGRMNT_CRDATE', 'D', 'Дата~створення~ (календарна) ', '3', 10, 6, 0, 0, 0, 0, '', 'dd.MM.yyyy hhhh:mm:ss', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'AGRMNT_CREATOR_NAME', 'C', 'Автор створення ', '4', 60, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'AGRMNT_DPU_ID', 'N', 'Ідентифікатор~депозитного~договору', '', 22, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'AGRMNT_DUE_DATE', 'D', 'Дата виконання', '', 10, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'AGRMNT_HANDLER_NAME', 'C', 'Автор обробки', '4', 60, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'AGRMNT_ID', 'N', 'Ідентифікатор~ДУ', '', 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/udeposit/dptprocessingagreement.aspx?mode=3'||chr(38)||'AGRMNT_ID=:AGRMNT_ID', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'AGRMNT_NUMBER', 'C', 'Номер ДУ', '', 35, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'AGRMNT_PRCDATE', 'D', 'Дата обробки', '3', 10, 9, 0, 0, 0, 0, '', 'dd.MM.yyyy hhhh:mm:ss', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'AGRMNT_STATE', 'N', 'Статус:~ 0- неактивна~1- активна~ -1- анульвана', '', 22, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'AGRMNT_TYPE_NAME', 'C', 'Назва ДУ', '4', 100, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'CNTRCT_BRANCH', 'C', 'Бранч~депозитного~договору', '', 30, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'AGRMNT_BDATE', 'D', 'Дата~створення~ (банківська) ', null, 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'AGRMNT_CRDATE', 'D', 'Дата~створення~ (календарна) ', 3, 10, 6, 0, 0, 0, 0, '', 'dd.MM.yyyy hhhh:mm:ss', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'AGRMNT_CREATOR_NAME', 'C', 'Автор створення ', 4, 60, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'AGRMNT_DPU_ID', 'N', 'Ідентифікатор~депозитного~договору', null, 22, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'AGRMNT_DUE_DATE', 'D', 'Дата виконання', null, 10, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'AGRMNT_HANDLER_NAME', 'C', 'Автор обробки', 4, 60, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'AGRMNT_ID', 'N', 'Ідентифікатор~ДУ', null, 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/udeposit/dptprocessingagreement.aspx?mode=3'||chr(38)||'AGRMNT_ID=:AGRMNT_ID', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'AGRMNT_NUMBER', 'C', 'Номер ДУ', null, 35, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'AGRMNT_PRCDATE', 'D', 'Дата обробки', 3, 10, 9, 0, 0, 0, 0, '', 'dd.MM.yyyy hhhh:mm:ss', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'AGRMNT_STATE', 'N', 'Статус:~ 0- неактивна~1- активна~ -1- анульвана', null, 22, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'AGRMNT_TYPE_NAME', 'C', 'Назва ДУ', 4, 100, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'CNTRCT_BRANCH', 'C', 'Бранч~депозитного~договору', null, 30, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

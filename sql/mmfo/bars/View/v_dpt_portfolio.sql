@@ -154,11 +154,9 @@ PROMPT *** Create  view V_DPT_PORTFOLIO ***
           and canilookclient(c.rnk) = 1--COBUSUPABS-4372 Забезпечити можливість обмеження доступу до перегляду/редагування інформації в картках клієнтів певної групи (згідно окремого переліку) для окремих користувачів АБС.;
 
 PROMPT *** Create  grants  V_DPT_PORTFOLIO ***
-grant SELECT                                                                 on V_DPT_PORTFOLIO to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_PORTFOLIO to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_PORTFOLIO to DPT_ADMIN;
 grant SELECT                                                                 on V_DPT_PORTFOLIO to DPT_ROLE;
-grant SELECT                                                                 on V_DPT_PORTFOLIO to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPT_PORTFOLIO to VKLAD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_PORTFOLIO to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_DPT_PORTFOLIO to WR_REFREAD;

@@ -67,10 +67,6 @@ COMMENT ON COLUMN BARS.ERR$_INS_PARTNER_TYPE_BRANCHES.APPLY_HIER IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_INS_PARTNER_TYPE_BRANCHES ***
-grant SELECT                                                                 on ERR$_INS_PARTNER_TYPE_BRANCHES to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_INS_PARTNER_TYPE_BRANCHES to UPLD;
-
 
 
 PROMPT ===================================================================================== 

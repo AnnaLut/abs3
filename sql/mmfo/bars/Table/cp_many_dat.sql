@@ -83,11 +83,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_MANY_DAT ***
-grant SELECT                                                                 on CP_MANY_DAT     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_MANY_DAT     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_MANY_DAT     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_MANY_DAT     to START1;
-grant SELECT                                                                 on CP_MANY_DAT     to UPLD;
 
 
 

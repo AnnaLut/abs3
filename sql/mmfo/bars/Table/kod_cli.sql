@@ -84,13 +84,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  KOD_CLI ***
-grant SELECT                                                                 on KOD_CLI         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KOD_CLI         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_CLI         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_CLI         to CORP_CLIENT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_CLI         to KOD_CLI;
 grant INSERT,SELECT,UPDATE                                                   on KOD_CLI         to RPBN001;
-grant SELECT                                                                 on KOD_CLI         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KOD_CLI         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KOD_CLI         to WR_REFREAD;
 

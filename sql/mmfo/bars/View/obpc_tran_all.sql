@@ -24,11 +24,9 @@ select id, card_acct, currency, ccy, tran_date, tran_type, card, slip_nr, batch_
   from obpc_tran_arc;
 
 PROMPT *** Create  grants  OBPC_TRAN_ALL ***
-grant SELECT                                                                 on OBPC_TRAN_ALL   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_TRAN_ALL   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_TRAN_ALL   to OBPC;
 grant SELECT                                                                 on OBPC_TRAN_ALL   to RPBN001;
-grant SELECT                                                                 on OBPC_TRAN_ALL   to UPLD;
 grant FLASHBACK,SELECT                                                       on OBPC_TRAN_ALL   to WR_REFREAD;
 
 

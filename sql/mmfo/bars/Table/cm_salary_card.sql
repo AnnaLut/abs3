@@ -69,6 +69,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CMSALARYCARD_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CM_SALARY_CARD ADD CONSTRAINT FK_CMSALARYCARD_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_CMSALARYCARD_KF_NN ***
 begin   
  execute immediate '
@@ -95,12 +108,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CM_SALARY_CARD ***
-grant SELECT                                                                 on CM_SALARY_CARD  to BARSREADER_ROLE;
 grant SELECT                                                                 on CM_SALARY_CARD  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CM_SALARY_CARD  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CM_SALARY_CARD  to CM_ACCESS_ROLE;
 grant SELECT                                                                 on CM_SALARY_CARD  to OW;
-grant SELECT                                                                 on CM_SALARY_CARD  to UPLD;
 
 
 

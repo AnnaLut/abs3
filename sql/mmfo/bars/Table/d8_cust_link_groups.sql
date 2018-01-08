@@ -54,23 +54,7 @@ COMMENT ON COLUMN BARS.D8_CUST_LINK_GROUPS.GROUPNAME IS 'Назва групи контрагенті
 
 
 
-
-PROMPT *** Create  index I1_D8_CUST_LINK_GROUPS ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.I1_D8_CUST_LINK_GROUPS ON BARS.D8_CUST_LINK_GROUPS (OKPO) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
 PROMPT *** Create  grants  D8_CUST_LINK_GROUPS ***
-grant SELECT                                                                 on D8_CUST_LINK_GROUPS to BARSREADER_ROLE;
-grant SELECT                                                                 on D8_CUST_LINK_GROUPS to UPLD;
 grant FLASHBACK,SELECT                                                       on D8_CUST_LINK_GROUPS to WR_REFREAD;
 
 

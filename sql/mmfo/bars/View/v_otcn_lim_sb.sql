@@ -14,9 +14,7 @@ join   accounts a on a.acc = t.acc and
                      a.dazs is null;
 
 PROMPT *** Create  grants  V_OTCN_LIM_SB ***
-grant SELECT                                                                 on V_OTCN_LIM_SB   to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_OTCN_LIM_SB   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_OTCN_LIM_SB   to UPLD;
 grant FLASHBACK,SELECT                                                       on V_OTCN_LIM_SB   to WR_REFREAD;
 
 

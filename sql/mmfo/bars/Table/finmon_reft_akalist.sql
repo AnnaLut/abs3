@@ -59,6 +59,19 @@ COMMENT ON COLUMN BARS.FINMON_REFT_AKALIST.NAME_HASH IS '';
 
 
 
+PROMPT *** Create  constraint FK_FINMON_REFT_AKALIST_C1 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FINMON_REFT_AKALIST ADD CONSTRAINT FK_FINMON_REFT_AKALIST_C1 FOREIGN KEY (C1)
+	  REFERENCES BARS.FINMON_REFT (C1) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_FINMON_REFT_AKALIST ***
 begin   
  execute immediate '
@@ -115,11 +128,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FINMON_REFT_AKALIST ***
-grant SELECT                                                                 on FINMON_REFT_AKALIST to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on FINMON_REFT_AKALIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FINMON_REFT_AKALIST to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on FINMON_REFT_AKALIST to FINMON;
-grant SELECT                                                                 on FINMON_REFT_AKALIST to UPLD;
 
 
 

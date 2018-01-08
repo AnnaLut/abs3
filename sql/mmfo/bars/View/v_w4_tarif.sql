@@ -191,10 +191,8 @@ PROMPT *** Create  view V_W4_TARIF ***
       FROM w4_tarif);
 
 PROMPT *** Create  grants  V_W4_TARIF ***
-grant SELECT                                                                 on V_W4_TARIF      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_TARIF      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_W4_TARIF      to START1;
-grant SELECT                                                                 on V_W4_TARIF      to UPLD;
 
 
 

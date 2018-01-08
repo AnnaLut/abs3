@@ -39,9 +39,7 @@ PROMPT *** Create  view V_WCS_CC_BIDS_ARCHIVE ***
        end;
 
 PROMPT *** Create  grants  V_WCS_CC_BIDS_ARCHIVE ***
-grant SELECT                                                                 on V_WCS_CC_BIDS_ARCHIVE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_CC_BIDS_ARCHIVE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_CC_BIDS_ARCHIVE to UPLD;
 
 
 

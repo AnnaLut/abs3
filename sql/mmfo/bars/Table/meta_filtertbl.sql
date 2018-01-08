@@ -87,6 +87,92 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_METAFILTERTBL_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.META_FILTERTBL MODIFY (BRANCH CONSTRAINT CC_METAFILTERTBL_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_METAFILTERTBL_FLTCODE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.META_FILTERTBL MODIFY (FILTER_CODE CONSTRAINT CC_METAFILTERTBL_FLTCODE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_METAFILTERTBL_FLTTABID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.META_FILTERTBL MODIFY (FILTER_TABID CONSTRAINT CC_METAFILTERTBL_FLTTABID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_METAFILTERTBL_COLID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.META_FILTERTBL MODIFY (COLID CONSTRAINT CC_METAFILTERTBL_COLID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_METAFILTERTBL_TABID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.META_FILTERTBL MODIFY (TABID CONSTRAINT CC_METAFILTERTBL_TABID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_METAFILTERTBL_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.META_FILTERTBL ADD CONSTRAINT FK_METAFILTERTBL_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_METAFILTERTBL_METAFLTCODES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.META_FILTERTBL ADD CONSTRAINT FK_METAFILTERTBL_METAFLTCODES FOREIGN KEY (FILTER_CODE)
+	  REFERENCES BARS.META_FILTERCODES (CODE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_METAFILTERTBL_FLAGDEL_NN ***
 begin   
  execute immediate '
@@ -147,10 +233,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_METAFILTERTBL_TABID_NN ***
+PROMPT *** Create  constraint FK_METAFILTERTBL_METACOLUMNS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.META_FILTERTBL MODIFY (TABID CONSTRAINT CC_METAFILTERTBL_TABID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.META_FILTERTBL ADD CONSTRAINT FK_METAFILTERTBL_METACOLUMNS FOREIGN KEY (TABID, COLID)
+	  REFERENCES BARS.META_COLUMNS (TABID, COLID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -159,46 +246,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_METAFILTERTBL_COLID_NN ***
+PROMPT *** Create  constraint FK_METAFILTERTBL_METATABLES ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.META_FILTERTBL MODIFY (COLID CONSTRAINT CC_METAFILTERTBL_COLID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_METAFILTERTBL_FLTTABID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_FILTERTBL MODIFY (FILTER_TABID CONSTRAINT CC_METAFILTERTBL_FLTTABID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_METAFILTERTBL_FLTCODE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_FILTERTBL MODIFY (FILTER_CODE CONSTRAINT CC_METAFILTERTBL_FLTCODE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_METAFILTERTBL_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_FILTERTBL MODIFY (BRANCH CONSTRAINT CC_METAFILTERTBL_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.META_FILTERTBL ADD CONSTRAINT FK_METAFILTERTBL_METATABLES FOREIGN KEY (FILTER_TABID)
+	  REFERENCES BARS.META_TABLES (TABID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -221,11 +273,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  META_FILTERTBL ***
-grant SELECT                                                                 on META_FILTERTBL  to BARSREADER_ROLE;
 grant SELECT                                                                 on META_FILTERTBL  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on META_FILTERTBL  to BARS_DM;
 grant SELECT                                                                 on META_FILTERTBL  to START1;
-grant SELECT                                                                 on META_FILTERTBL  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on META_FILTERTBL  to WR_ALL_RIGHTS;
 grant SELECT                                                                 on META_FILTERTBL  to WR_METATAB;
 

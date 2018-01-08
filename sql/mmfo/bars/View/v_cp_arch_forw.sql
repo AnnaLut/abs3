@@ -95,9 +95,7 @@ PROMPT *** Create  view V_CP_ARCH_FORW ***
           AND a.OP = -2 and a.DAT_ROZ <= gl.bd;
 
 PROMPT *** Create  grants  V_CP_ARCH_FORW ***
-grant SELECT                                                                 on V_CP_ARCH_FORW  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_ARCH_FORW  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CP_ARCH_FORW  to UPLD;
 
 
 

@@ -82,10 +82,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0035255 ***
+PROMPT *** Create  constraint PK_DOC_EXPORT2 ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.DOC_EXPORT2 MODIFY (TYPE_ID NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.DOC_EXPORT2 ADD CONSTRAINT PK_DOC_EXPORT2 PRIMARY KEY (DOC_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE AQTS  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -118,12 +120,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_DOC_EXPORT2 ***
+PROMPT *** Create  constraint SYS_C0035255 ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.DOC_EXPORT2 ADD CONSTRAINT PK_DOC_EXPORT2 PRIMARY KEY (DOC_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE AQTS  ENABLE';
+  ALTER TABLE BARSAQ.DOC_EXPORT2 MODIFY (TYPE_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -144,9 +144,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  DOC_EXPORT2 ***
-grant SELECT                                                                 on DOC_EXPORT2     to BARSREADER_ROLE;
 
 
 

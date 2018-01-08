@@ -187,10 +187,6 @@ COMMENT ON COLUMN BARS.ERR$_CIM_F503.P3000 IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIM_F503 ***
-grant SELECT                                                                 on ERR$_CIM_F503   to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIM_F503   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

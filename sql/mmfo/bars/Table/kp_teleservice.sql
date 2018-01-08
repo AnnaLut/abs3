@@ -106,11 +106,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  KP_TELESERVICE ***
-grant SELECT                                                                 on KP_TELESERVICE  to BARSREADER_ROLE;
 grant DELETE,INSERT,UPDATE                                                   on KP_TELESERVICE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KP_TELESERVICE  to BARS_DM;
 grant DELETE,INSERT,UPDATE                                                   on KP_TELESERVICE  to START1;
-grant SELECT                                                                 on KP_TELESERVICE  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KP_TELESERVICE  to WR_ALL_RIGHTS;
 
 

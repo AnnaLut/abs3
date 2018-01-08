@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_CUST_REQ_ACCESS.FLAGS IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CUST_REQ_ACCESS ***
-grant SELECT                                                                 on ERR$_CUST_REQ_ACCESS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CUST_REQ_ACCESS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

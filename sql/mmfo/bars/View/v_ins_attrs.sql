@@ -14,9 +14,7 @@ PROMPT *** Create  view V_INS_ATTRS ***
    ORDER BY att.id;
 
 PROMPT *** Create  grants  V_INS_ATTRS ***
-grant SELECT                                                                 on V_INS_ATTRS     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_ATTRS     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INS_ATTRS     to UPLD;
 
 
 

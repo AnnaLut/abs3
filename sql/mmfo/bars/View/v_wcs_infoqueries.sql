@@ -18,9 +18,7 @@ PROMPT *** Create  view V_WCS_INFOQUERIES ***
  order by i.id;
 
 PROMPT *** Create  grants  V_WCS_INFOQUERIES ***
-grant SELECT                                                                 on V_WCS_INFOQUERIES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_INFOQUERIES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_INFOQUERIES to UPLD;
 
 
 

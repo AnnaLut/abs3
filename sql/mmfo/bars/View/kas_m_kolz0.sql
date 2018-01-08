@@ -17,10 +17,8 @@ from kas_m m,
 where  m.idm=z.idm (+) ;
 
 PROMPT *** Create  grants  KAS_M_KOLZ0 ***
-grant SELECT                                                                 on KAS_M_KOLZ0     to BARSREADER_ROLE;
 grant SELECT                                                                 on KAS_M_KOLZ0     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KAS_M_KOLZ0     to PYOD001;
-grant SELECT                                                                 on KAS_M_KOLZ0     to UPLD;
 
 
 

@@ -14,10 +14,8 @@ PROMPT *** Create  view V_CLIENTS_UL ***
             AND (custtype = 2 OR (custtype = 3 AND sed IN ('34', '91')));
 
 PROMPT *** Create  grants  V_CLIENTS_UL ***
-grant SELECT                                                                 on V_CLIENTS_UL    to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_CLIENTS_UL    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CLIENTS_UL    to START1;
-grant SELECT                                                                 on V_CLIENTS_UL    to UPLD;
 grant FLASHBACK,SELECT                                                       on V_CLIENTS_UL    to WR_REFREAD;
 
 

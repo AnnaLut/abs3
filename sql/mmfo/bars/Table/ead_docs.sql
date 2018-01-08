@@ -103,6 +103,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_EADDOCS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.EAD_DOCS ADD CONSTRAINT FK_EADDOCS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_EADDOCS_EASTRCID_NN ***
 begin   
  execute immediate '
@@ -127,10 +140,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_EADDOCS_CRTD_NN ***
+PROMPT *** Create  constraint CC_EADDOCS_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.EAD_DOCS MODIFY (CRT_DATE CONSTRAINT CC_EADDOCS_CRTD_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.EAD_DOCS MODIFY (KF CONSTRAINT CC_EADDOCS_KF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -187,10 +200,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_EADDOCS_KF_NN ***
+PROMPT *** Create  constraint CC_EADDOCS_CRTD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.EAD_DOCS MODIFY (KF CONSTRAINT CC_EADDOCS_KF_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.EAD_DOCS MODIFY (CRT_DATE CONSTRAINT CC_EADDOCS_CRTD_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -213,10 +226,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  EAD_DOCS ***
-grant SELECT                                                                 on EAD_DOCS        to BARSREADER_ROLE;
 grant SELECT                                                                 on EAD_DOCS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EAD_DOCS        to BARS_DM;
-grant SELECT                                                                 on EAD_DOCS        to UPLD;
 
 
 

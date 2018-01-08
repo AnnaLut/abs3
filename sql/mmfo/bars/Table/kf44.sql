@@ -90,14 +90,12 @@ exception when others then
 
 PROMPT *** Create  grants  KF44 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KF44            to ABS_ADMIN;
-grant SELECT                                                                 on KF44            to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KF44            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KF44            to BARS_DM;
 grant SELECT                                                                 on KF44            to PYOD001;
 grant SELECT                                                                 on KF44            to RPBN002;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KF44            to SALGL;
 grant SELECT                                                                 on KF44            to START1;
-grant SELECT                                                                 on KF44            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KF44            to WR_ALL_RIGHTS;
 
 

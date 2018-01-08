@@ -91,58 +91,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_W4PRODUCT_KV ***
+PROMPT *** Create  constraint CC_W4PRODUCT_OB22_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_PRODUCT ADD CONSTRAINT CC_W4PRODUCT_KV CHECK (kv in (980, 840, 978)) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_W4PRODUCT_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_PRODUCT MODIFY (KF CONSTRAINT CC_W4PRODUCT_KF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_W4PRODUCT_CODE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_PRODUCT MODIFY (CODE CONSTRAINT CC_W4PRODUCT_CODE_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_W4PRODUCT_GRPCODE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_PRODUCT MODIFY (GRP_CODE CONSTRAINT CC_W4PRODUCT_GRPCODE_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_W4PRODUCT_KV_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_PRODUCT MODIFY (KV CONSTRAINT CC_W4PRODUCT_KV_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.W4_PRODUCT MODIFY (OB22 CONSTRAINT CC_W4PRODUCT_OB22_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -163,10 +115,97 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_W4PRODUCT_OB22_NN ***
+PROMPT *** Create  constraint CC_W4PRODUCT_KV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_PRODUCT MODIFY (OB22 CONSTRAINT CC_W4PRODUCT_OB22_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.W4_PRODUCT MODIFY (KV CONSTRAINT CC_W4PRODUCT_KV_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_W4PRODUCT_GRPCODE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_PRODUCT MODIFY (GRP_CODE CONSTRAINT CC_W4PRODUCT_GRPCODE_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_W4PRODUCT_CODE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_PRODUCT MODIFY (CODE CONSTRAINT CC_W4PRODUCT_CODE_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_W4PRODUCT_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_PRODUCT ADD CONSTRAINT FK_W4PRODUCT_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_W4PRODUCT_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_PRODUCT MODIFY (KF CONSTRAINT CC_W4PRODUCT_KF_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_W4PRODUCT_W4PRODUCTGROUPS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_PRODUCT ADD CONSTRAINT FK_W4PRODUCT_W4PRODUCTGROUPS FOREIGN KEY (GRP_CODE)
+	  REFERENCES BARS.W4_PRODUCT_GROUPS (CODE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_W4PRODUCT_W4NBSOB22 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_PRODUCT ADD CONSTRAINT FK_W4PRODUCT_W4NBSOB22 FOREIGN KEY (NBS, OB22, TIP)
+	  REFERENCES BARS.W4_NBS_OB22 (NBS, OB22, TIP) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_W4PRODUCT_KV ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_PRODUCT ADD CONSTRAINT CC_W4PRODUCT_KV CHECK (kv in (980, 840, 978)) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -189,7 +228,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  W4_PRODUCT ***
-grant SELECT                                                                 on W4_PRODUCT      to BARSREADER_ROLE;
 grant SELECT                                                                 on W4_PRODUCT      to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on W4_PRODUCT      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_PRODUCT      to BARS_DM;

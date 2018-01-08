@@ -1,14 +1,35 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_XOZREF.sql =========*** Run *** =====
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_XOZREF ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_XOZREF ("ACC", "REF1", "STMT1", "REFD", "KV", "NLS", "OB22", "NBS", "PROD", "BRANCH", "NMS", "OSTC", "VDAT", "S", "S0", "TXT", "NAZN", "MFOB", "NLSB", "NAM_B", "ID_B", "ND", "DATD", "MDATE", "DNI", "DNIP", "NOTP") AS 
-  SELECT x.ACC,
+CREATE OR REPLACE FORCE VIEW BARS.V_XOZREF
+(
+   ACC,
+   REF1,
+   STMT1,
+   REFD,
+   KV,
+   NLS,
+   OB22,
+   NBS,
+   PROD,
+   BRANCH,
+   NMS,
+   OSTC,
+   VDAT,
+   S,
+   S0,
+   TXT,
+   NAZN,
+   MFOB,
+   NLSB,
+   NAM_B,
+   ID_B,
+   ND,
+   DATD,
+   MDATE,
+   DNI,
+   DNIP,
+   NOTP
+)
+AS
+   SELECT x.ACC,
           x.ref1,
           x.stmt1,
           x.refD,
@@ -37,15 +58,4 @@ PROMPT *** Create  view V_XOZREF ***
           x.NOTP
      FROM xoz_ref x, accounts a, oper o
     WHERE x.s > 0 AND x.ref2 IS NULL AND x.acc = a.acc AND x.ref1 = o.REF;
-
-PROMPT *** Create  grants  V_XOZREF ***
-grant SELECT                                                                 on V_XOZREF        to BARSREADER_ROLE;
-grant INSERT,SELECT,UPDATE                                                   on V_XOZREF        to BARS_ACCESS_DEFROLE;
-grant INSERT,SELECT,UPDATE                                                   on V_XOZREF        to START1;
-grant SELECT                                                                 on V_XOZREF        to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_XOZREF.sql =========*** End *** =====
-PROMPT ===================================================================================== 
+/

@@ -150,9 +150,7 @@ COMMENT ON COLUMN BARS.ERR$_CUSTOMER_UPDATE.NREZID_CODE IS '';
 
 
 PROMPT *** Create  grants  ERR$_CUSTOMER_UPDATE ***
-grant SELECT                                                                 on ERR$_CUSTOMER_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CUSTOMER_UPDATE to BARS_DM;
-grant SELECT                                                                 on ERR$_CUSTOMER_UPDATE to UPLD;
 
 
 

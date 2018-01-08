@@ -151,10 +151,6 @@ COMMENT ON COLUMN BARS.ERR$_SKRYNKA_ND_UPDATE.FIO IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SKRYNKA_ND_UPDATE ***
-grant SELECT                                                                 on ERR$_SKRYNKA_ND_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SKRYNKA_ND_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

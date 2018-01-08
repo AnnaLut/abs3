@@ -53,10 +53,8 @@ COMMENT ON COLUMN BARS.P_OVR_ERR.ERR IS '';
 
 
 PROMPT *** Create  grants  P_OVR_ERR ***
-grant SELECT                                                                 on P_OVR_ERR       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on P_OVR_ERR       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on P_OVR_ERR       to START1;
-grant SELECT                                                                 on P_OVR_ERR       to UPLD;
 
 
 

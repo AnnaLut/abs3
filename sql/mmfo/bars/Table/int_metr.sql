@@ -103,14 +103,12 @@ exception when others then
 PROMPT *** Create  grants  INT_METR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_METR        to ABS_ADMIN;
 grant SELECT                                                                 on INT_METR        to BARS010;
-grant SELECT                                                                 on INT_METR        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_METR        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_METR        to BARS_DM;
 grant SELECT                                                                 on INT_METR        to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_METR        to DPT_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_METR        to INT_METR;
 grant SELECT                                                                 on INT_METR        to START1;
-grant SELECT                                                                 on INT_METR        to UPLD;
 grant SELECT                                                                 on INT_METR        to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_METR        to WR_ALL_RIGHTS;
 grant SELECT                                                                 on INT_METR        to WR_CREDIT;

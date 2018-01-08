@@ -90,10 +90,8 @@ exception when others then
 
 PROMPT *** Create  grants  STAFF_TIPS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_TIPS      to ABS_ADMIN;
-grant SELECT                                                                 on STAFF_TIPS      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_TIPS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF_TIPS      to BARS_DM;
-grant SELECT                                                                 on STAFF_TIPS      to UPLD;
 
 
 

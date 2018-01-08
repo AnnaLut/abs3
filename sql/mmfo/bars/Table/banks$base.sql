@@ -61,6 +61,19 @@ COMMENT ON COLUMN BARS.BANKS$BASE.NMO IS 'Номер модели';
 
 
 
+PROMPT *** Create  constraint FK_BANKS_BANKS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BANKS$BASE ADD CONSTRAINT FK_BANKS_BANKS2 FOREIGN KEY (MFOU)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_BANKS ***
 begin   
  execute immediate '
@@ -113,10 +126,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BANKS_SAB_NN ***
+PROMPT *** Create  constraint CC_BANKS_NB_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BANKS$BASE MODIFY (SAB CONSTRAINT CC_BANKS_SAB_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BANKS$BASE MODIFY (NB CONSTRAINT CC_BANKS_NB_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -125,10 +138,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BANKS_NB_NN ***
+PROMPT *** Create  constraint CC_BANKS_SAB_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BANKS$BASE MODIFY (NB CONSTRAINT CC_BANKS_NB_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BANKS$BASE MODIFY (SAB CONSTRAINT CC_BANKS_SAB_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -182,7 +195,6 @@ PROMPT *** Create  grants  BANKS$BASE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANKS$BASE      to ABS_ADMIN;
 grant FLASHBACK,REFERENCES,SELECT                                            on BANKS$BASE      to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on BANKS$BASE      to BARSAQ_ADM with grant option;
-grant SELECT                                                                 on BANKS$BASE      to BARSREADER_ROLE;
 grant SELECT                                                                 on BANKS$BASE      to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANKS$BASE      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BANKS$BASE      to BARS_DM;
@@ -194,7 +206,6 @@ grant SELECT,SELECT                                                          on 
 grant SELECT                                                                 on BANKS$BASE      to REFSYNC_USR;
 grant SELECT                                                                 on BANKS$BASE      to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANKS$BASE      to TECH005;
-grant SELECT                                                                 on BANKS$BASE      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BANKS$BASE      to WR_ALL_RIGHTS;
 grant SELECT                                                                 on BANKS$BASE      to WR_CREPORTS;
 grant SELECT                                                                 on BANKS$BASE      to WR_CUSTREG;

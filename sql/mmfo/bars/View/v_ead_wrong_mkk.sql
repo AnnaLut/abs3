@@ -29,9 +29,7 @@ SELECT c.rnk,
        and a.message not like '%' || t.ndbo ||'%';
 
 PROMPT *** Create  grants  V_EAD_WRONG_MKK ***
-grant SELECT                                                                 on V_EAD_WRONG_MKK to BARSREADER_ROLE;
 grant SELECT                                                                 on V_EAD_WRONG_MKK to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_EAD_WRONG_MKK to UPLD;
 
 
 

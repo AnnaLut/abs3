@@ -93,6 +93,92 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_STAFFKLF_A017_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF_KLF00 MODIFY (A017 CONSTRAINT CC_STAFFKLF_A017_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFFKLF_KODF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF_KLF00 MODIFY (KODF CONSTRAINT CC_STAFFKLF_KODF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFFKLF_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF_KLF00 MODIFY (ID CONSTRAINT CC_STAFFKLF_ID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFFKLF_GRANTOR_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF_KLF00 MODIFY (GRANTOR CONSTRAINT CC_STAFFKLF_GRANTOR_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STAFFKLF_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF_KLF00 ADD CONSTRAINT FK_STAFFKLF_STAFF FOREIGN KEY (ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STAFFKLF_STAFF2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF_KLF00 ADD CONSTRAINT FK_STAFFKLF_STAFF2 FOREIGN KEY (GRANTOR)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFFKLF_REVERSE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF_KLF00 ADD CONSTRAINT CC_STAFFKLF_REVERSE CHECK (reverse in (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_STAFFKLF_RDATE1 ***
 begin   
  execute immediate '
@@ -129,66 +215,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_STAFFKLF_REVERSE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_KLF00 ADD CONSTRAINT CC_STAFFKLF_REVERSE CHECK (reverse in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFFKLF_GRANTOR_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_KLF00 MODIFY (GRANTOR CONSTRAINT CC_STAFFKLF_GRANTOR_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFFKLF_ID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_KLF00 MODIFY (ID CONSTRAINT CC_STAFFKLF_ID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFFKLF_KODF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_KLF00 MODIFY (KODF CONSTRAINT CC_STAFFKLF_KODF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFFKLF_A017_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_KLF00 MODIFY (A017 CONSTRAINT CC_STAFFKLF_A017_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_STAFFKLF ***
 begin   
  execute immediate '
@@ -204,11 +230,9 @@ exception when others then
 
 PROMPT *** Create  grants  STAFF_KLF00 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_KLF00     to ABS_ADMIN;
-grant SELECT                                                                 on STAFF_KLF00     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_KLF00     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF_KLF00     to BARS_DM;
 grant SELECT                                                                 on STAFF_KLF00     to START1;
-grant SELECT                                                                 on STAFF_KLF00     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF_KLF00     to WR_ALL_RIGHTS;
 
 

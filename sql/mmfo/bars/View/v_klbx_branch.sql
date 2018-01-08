@@ -17,9 +17,7 @@ PROMPT *** Create  view V_KLBX_BRANCH ***
 PROMPT *** Create  grants  V_KLBX_BRANCH ***
 grant SELECT                                                                 on V_KLBX_BRANCH   to BARSAQ with grant option;
 grant SELECT                                                                 on V_KLBX_BRANCH   to BARSAQ_ADM;
-grant SELECT                                                                 on V_KLBX_BRANCH   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_KLBX_BRANCH   to KLBX;
-grant SELECT                                                                 on V_KLBX_BRANCH   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_KLBX_BRANCH   to WR_ALL_RIGHTS;
 
 

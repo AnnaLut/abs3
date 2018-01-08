@@ -50,6 +50,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint R_ZAPROS_DEFAULT_VALUE ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.ZAPROS_DEFAULT_VALUE ADD CONSTRAINT R_ZAPROS_DEFAULT_VALUE FOREIGN KEY (ZAPID)
+	  REFERENCES FINMON.REPORTS (ID) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint NK_ZAPR_DEFAULT_VAL_ZAPID ***
 begin   
  execute immediate '
@@ -122,9 +135,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  ZAPROS_DEFAULT_VALUE ***
-grant SELECT                                                                 on ZAPROS_DEFAULT_VALUE to BARSREADER_ROLE;
 
 
 

@@ -61,10 +61,6 @@ COMMENT ON COLUMN BARS.ERR$_DPT_DEPOSITW.DPT_ID IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPT_DEPOSITW ***
-grant SELECT                                                                 on ERR$_DPT_DEPOSITW to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPT_DEPOSITW to UPLD;
-
 
 
 PROMPT ===================================================================================== 

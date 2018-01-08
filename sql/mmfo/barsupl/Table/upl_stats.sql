@@ -84,10 +84,101 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_UPLSTATSGROUPID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_STATS ADD CONSTRAINT FK_UPLSTATSGROUPID FOREIGN KEY (GROUP_ID)
+	  REFERENCES BARSUPL.UPL_GROUPS (GROUP_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_UPLSTATSSQLID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_STATS ADD CONSTRAINT FK_UPLSTATSSQLID FOREIGN KEY (SQL_ID)
+	  REFERENCES BARSUPL.UPL_SQL (SQL_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_UPLSTATSFILEID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_STATS ADD CONSTRAINT FK_UPLSTATSFILEID FOREIGN KEY (FILE_ID)
+	  REFERENCES BARSUPL.UPL_FILES (FILE_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STATS_UPLREGIONS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_STATS ADD CONSTRAINT FK_STATS_UPLREGIONS FOREIGN KEY (KF)
+	  REFERENCES BARSUPL.UPL_REGIONS (KF) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_UPLSTATSPARENTID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_STATS ADD CONSTRAINT FK_UPLSTATSPARENTID FOREIGN KEY (PARENT_ID)
+	  REFERENCES BARSUPL.UPL_STATS (ID) ON DELETE CASCADE DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_UPLSTATSRECORDTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_STATS ADD CONSTRAINT FK_UPLSTATSRECORDTYPE FOREIGN KEY (REC_TYPE)
+	  REFERENCES BARSUPL.UPL_STATS_RECORDTYPE (REC_TYPE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C0033232 ***
 begin   
  execute immediate '
   ALTER TABLE BARSUPL.UPL_STATS MODIFY (KF NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_UPLSTATSSTATUSID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_STATS ADD CONSTRAINT FK_UPLSTATSSTATUSID FOREIGN KEY (STATUS_ID)
+	  REFERENCES BARSUPL.UPL_PROCESS_STATUS (STATUS_ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -111,7 +202,6 @@ exception when others then
 
 PROMPT *** Create  grants  UPL_STATS ***
 grant DELETE,INSERT,SELECT                                                   on UPL_STATS       to BARS;
-grant SELECT                                                                 on UPL_STATS       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on UPL_STATS       to UPLD;
 
 

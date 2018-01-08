@@ -14,9 +14,7 @@ from accounts  a1, accounts a, nd_acc n, OVR_TERM_TRZ t, cc_deal d , OVR_ZONE z
 where t.acc1 = a1.acc and t.acc = a.acc and d.vidd =10 and d.nd = n.nd and n.acc = t.acc1 and t.trz = z.id (+) ;
 
 PROMPT *** Create  grants  VT_OVRN ***
-grant SELECT                                                                 on VT_OVRN         to BARSREADER_ROLE;
 grant SELECT                                                                 on VT_OVRN         to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on VT_OVRN         to UPLD;
 
 
 

@@ -105,6 +105,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OWPKKHISTORY_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_PKK_HISTORY ADD CONSTRAINT FK_OWPKKHISTORY_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OWPKKHISTORY_IICFILES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_PKK_HISTORY ADD CONSTRAINT FK_OWPKKHISTORY_IICFILES FOREIGN KEY (F_N)
+	  REFERENCES BARS.OW_IICFILES (FILE_NAME) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OWPKKHISTORY_REF_NN ***
 begin   
  execute immediate '
@@ -183,11 +209,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_PKK_HISTORY ***
-grant SELECT                                                                 on OW_PKK_HISTORY  to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on OW_PKK_HISTORY  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_PKK_HISTORY  to BARS_DM;
 grant INSERT,SELECT                                                          on OW_PKK_HISTORY  to OW;
-grant SELECT                                                                 on OW_PKK_HISTORY  to UPLD;
 
 
 

@@ -1,197 +1,95 @@
+-- ======================================================================================
+-- Module : PRVN
+-- Author : BAA
+-- Date   : 19.04.2017
+-- ======================================================================================
+-- create table PRVN_FIN_DEB_ARCH
+-- ======================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET FEEDBACK     OFF
+SET TIMING       OFF
+SET DEFINE       OFF
+SET LINES        500
+SET PAGES        500
+SET TERMOUT      ON
+SET TRIMSPOOL    ON
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/PRVN_FIN_DEB_ARCH.sql =========*** Run
-PROMPT ===================================================================================== 
+prompt -- ======================================================
+prompt -- create table PRVN_FIN_DEB_ARCH
+prompt -- ======================================================
 
-
-PROMPT *** ALTER_POLICY_INFO to PRVN_FIN_DEB_ARCH ***
-
-
-BEGIN 
-        execute immediate  
-          'begin  
-               bpa.alter_policy_info(''PRVN_FIN_DEB_ARCH'', ''FILIAL'' , ''M'', ''M'', ''M'', ''E'');
-               bpa.alter_policy_info(''PRVN_FIN_DEB_ARCH'', ''WHOLE'' , null, null, null, ''E'');
-               null;
-           end; 
-          '; 
-END; 
+begin
+  bpa.alter_policy_info( 'PRVN_FIN_DEB_ARCH', 'WHOLE' , null, null, null, 'E' ); 
+  bpa.alter_policy_info( 'PRVN_FIN_DEB_ARCH', 'FILIAL',  'M',  'M',  'M', 'E' );
+end;
 /
 
-PROMPT *** Create  table PRVN_FIN_DEB_ARCH ***
-begin 
-  execute immediate '
-  CREATE TABLE BARS.PRVN_FIN_DEB_ARCH 
-   (	CHG_ID NUMBER(38,0), 
-	CHG_DT DATE, 
-	CLS_DT DATE, 
-	KF VARCHAR2(6), 
-	ACC_SS NUMBER(38,0), 
-	ACC_SP NUMBER(38,0), 
-	EFFECTDATE DATE, 
-	AGRM_ID NUMBER(38,0)
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSMDLD ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
-end; 
+declare
+  e_tab_exists exception;
+  pragma exception_init( e_tab_exists, -00955 );
+begin
+  execute immediate 'create table PRVN_FIN_DEB_ARCH
+( CHG_ID     number(38)  constraint CC_PRVNFINDEBARCH_CHGID_NN Not Null
+, CHG_DT     date        constraint CC_PRVNFINDEBARCH_CHGDT_NN Not Null
+, CLS_DT     date        constraint CC_PRVNFINDEBARCH_CLSDT_NN Not Null
+, KF         varchar2(6) constraint CC_PRVNFINDEBARCH_KF_NN    Not Null
+, ACC_SS     number(38)  constraint CC_PRVNFINDEBARCH_ACCSS_NN Not Null
+, ACC_SP     number(38)  constraint CC_PRVNFINDEBARCH_ACCSP_NN Not Null
+, EFFECTDATE date        constraint CC_PRVNFINDEBARCH_EFFDT_NN Not Null
+, AGRM_ID    number(38)
+, CONSTRAINT PK_PRVNFINDEBARCH primary key ( CHG_ID ) using index tablespace BRSMDLI
+) TABLESPACE BRSMDLD';
+  dbms_output.put_line( 'Table PRVN_FIN_DEB_ARCH created.' );
+exception
+  when e_tab_exists 
+  then dbms_output.put_line( 'Table PRVN_FIN_DEB_ARCH already exists.' );
+end;
 /
 
+prompt -- ======================================================
+prompt -- Indexes
+prompt -- ======================================================
 
-
-
-PROMPT *** ALTER_POLICIES to PRVN_FIN_DEB_ARCH ***
- exec bpa.alter_policies('PRVN_FIN_DEB_ARCH');
-
-
-COMMENT ON TABLE BARS.PRVN_FIN_DEB_ARCH IS 'Архів зв`язків рах. Фін.Деб.';
-COMMENT ON COLUMN BARS.PRVN_FIN_DEB_ARCH.CHG_ID IS '';
-COMMENT ON COLUMN BARS.PRVN_FIN_DEB_ARCH.CHG_DT IS 'Календарна дата/час перенесення в архів';
-COMMENT ON COLUMN BARS.PRVN_FIN_DEB_ARCH.CLS_DT IS 'Банківська дата закриття (перенесення в архів)';
-COMMENT ON COLUMN BARS.PRVN_FIN_DEB_ARCH.KF IS 'Код фiлiалу (МФО)';
-COMMENT ON COLUMN BARS.PRVN_FIN_DEB_ARCH.ACC_SS IS 'Рахунок нормального   тіла Фін.Деб.';
-COMMENT ON COLUMN BARS.PRVN_FIN_DEB_ARCH.ACC_SP IS 'Рахунок простроченого тіла Фін.Деб.';
-COMMENT ON COLUMN BARS.PRVN_FIN_DEB_ARCH.EFFECTDATE IS '';
-COMMENT ON COLUMN BARS.PRVN_FIN_DEB_ARCH.AGRM_ID IS 'Ід. кредитного договору';
-
-
-
-
-PROMPT *** Create  constraint CC_PRVNFINDEBARCH_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRVN_FIN_DEB_ARCH MODIFY (KF CONSTRAINT CC_PRVNFINDEBARCH_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+begin
+  execute immediate 'CREATE INDEX BARS.IDX_PRVNFINDEBARCH_CLSDT_KF ON PRVN_FIN_DEB_ARCH ( CLS_DT, KF )';
+  dbms_output.put_line('Index "IDX_PRVNFINDEBARCH_CLSDT_KF" created.');
+exception
+  when OTHERS then
+    case
+      when (sqlcode = -00955)
+      then dbms_output.put_line( 'Index "IDX_PRVNFINDEBARCH_CLSDT_KF" already exists in the table.' );
+      when (sqlcode = -01408)
+      then dbms_output.put_line( 'Such column list already indexed.' );
+      else raise;
+    end case;
+end;
 /
 
+SET FEEDBACK ON
 
+prompt -- ======================================================
+prompt -- Apply policies
+prompt -- ======================================================
 
+exec bars.bpa.alter_policies( 'PRVN_FIN_DEB_ARCH' ); 
 
-PROMPT *** Create  constraint CC_PRVNFINDEBARCH_ACCSS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRVN_FIN_DEB_ARCH MODIFY (ACC_SS CONSTRAINT CC_PRVNFINDEBARCH_ACCSS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
+prompt -- ======================================================
+prompt -- Comments
+prompt -- ======================================================
 
+COMMENT ON TABLE  PRVN_FIN_DEB_ARCH         IS 'Архів зв`язків рах. Фін.Деб.';
 
+COMMENT ON COLUMN PRVN_FIN_DEB_ARCH.CHG_DT  IS 'Календарна дата/час перенесення в архів';
+COMMENT ON COLUMN PRVN_FIN_DEB_ARCH.CLS_DT  IS 'Банківська дата закриття (перенесення в архів)';
+COMMENT ON COLUMN PRVN_FIN_DEB_ARCH.KF      IS 'Код фiлiалу (МФО)';
+COMMENT ON COLUMN PRVN_FIN_DEB_ARCH.ACC_SS  IS 'Рахунок нормального   тіла Фін.Деб.';
+COMMENT ON COLUMN PRVN_FIN_DEB_ARCH.ACC_SP  IS 'Рахунок простроченого тіла Фін.Деб.';
+COMMENT ON COLUMN PRVN_FIN_DEB_ARCH.AGRM_ID IS 'Ід. кредитного договору';
 
+prompt -- ======================================================
+prompt -- Grants
+prompt -- ======================================================
 
-PROMPT *** Create  constraint CC_PRVNFINDEBARCH_ACCSP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRVN_FIN_DEB_ARCH MODIFY (ACC_SP CONSTRAINT CC_PRVNFINDEBARCH_ACCSP_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRVNFINDEBARCH_EFFDT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRVN_FIN_DEB_ARCH MODIFY (EFFECTDATE CONSTRAINT CC_PRVNFINDEBARCH_EFFDT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint PK_PRVNFINDEBARCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRVN_FIN_DEB_ARCH ADD CONSTRAINT PK_PRVNFINDEBARCH PRIMARY KEY (CHG_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRVNFINDEBARCH_CHGID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRVN_FIN_DEB_ARCH MODIFY (CHG_ID CONSTRAINT CC_PRVNFINDEBARCH_CHGID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRVNFINDEBARCH_CHGDT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRVN_FIN_DEB_ARCH MODIFY (CHG_DT CONSTRAINT CC_PRVNFINDEBARCH_CHGDT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRVNFINDEBARCH_CLSDT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRVN_FIN_DEB_ARCH MODIFY (CLS_DT CONSTRAINT CC_PRVNFINDEBARCH_CLSDT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index PK_PRVNFINDEBARCH ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_PRVNFINDEBARCH ON BARS.PRVN_FIN_DEB_ARCH (CHG_ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index IDX_PRVNFINDEBARCH_CLSDT_KF ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.IDX_PRVNFINDEBARCH_CLSDT_KF ON BARS.PRVN_FIN_DEB_ARCH (CLS_DT, KF) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-PROMPT *** Create  grants  PRVN_FIN_DEB_ARCH ***
-grant SELECT                                                                 on PRVN_FIN_DEB_ARCH to BARSUPL;
-grant SELECT                                                                 on PRVN_FIN_DEB_ARCH to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on PRVN_FIN_DEB_ARCH to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/PRVN_FIN_DEB_ARCH.sql =========*** End
-PROMPT ===================================================================================== 
+grant select on PRVN_FIN_DEB_ARCH to BARSUPL, UPLD;
+grant select on PRVN_FIN_DEB_ARCH to BARS_ACCESS_DEFROLE;

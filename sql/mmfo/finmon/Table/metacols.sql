@@ -78,82 +78,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_METACOLS_TYPE ***
+PROMPT *** Create  constraint NK_METACOLS_EDITBL ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.METACOLS MODIFY (COLTYPE CONSTRAINT NK_METACOLS_TYPE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_METACOLS_WIDTH ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.METACOLS MODIFY (COLWIDTH CONSTRAINT NK_METACOLS_WIDTH NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_METACOLS_MAXC ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.METACOLS MODIFY (COLMAXCHAR CONSTRAINT NK_METACOLS_MAXC NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_METACOLS_VISIBL ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.METACOLS MODIFY (COLVISIBLE CONSTRAINT NK_METACOLS_VISIBL NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_METACOLS_PK ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.METACOLS MODIFY (COLPK CONSTRAINT NK_METACOLS_PK NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_METACOLS_ALIGN ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.METACOLS MODIFY (COLALIGN CONSTRAINT NK_METACOLS_ALIGN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_METACOLS_INMOD ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.METACOLS MODIFY (INMODAL CONSTRAINT NK_METACOLS_INMOD NOT NULL ENABLE)';
+  ALTER TABLE FINMON.METACOLS MODIFY (COLEDITABLE CONSTRAINT NK_METACOLS_EDITBL NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -174,10 +102,82 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_METACOLS_EDITBL ***
+PROMPT *** Create  constraint NK_METACOLS_INMOD ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.METACOLS MODIFY (COLEDITABLE CONSTRAINT NK_METACOLS_EDITBL NOT NULL ENABLE)';
+  ALTER TABLE FINMON.METACOLS MODIFY (INMODAL CONSTRAINT NK_METACOLS_INMOD NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_METACOLS_ALIGN ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.METACOLS MODIFY (COLALIGN CONSTRAINT NK_METACOLS_ALIGN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_METACOLS_PK ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.METACOLS MODIFY (COLPK CONSTRAINT NK_METACOLS_PK NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_METACOLS_VISIBL ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.METACOLS MODIFY (COLVISIBLE CONSTRAINT NK_METACOLS_VISIBL NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_METACOLS_MAXC ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.METACOLS MODIFY (COLMAXCHAR CONSTRAINT NK_METACOLS_MAXC NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_METACOLS_WIDTH ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.METACOLS MODIFY (COLWIDTH CONSTRAINT NK_METACOLS_WIDTH NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_METACOLS_TYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.METACOLS MODIFY (COLTYPE CONSTRAINT NK_METACOLS_TYPE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -198,9 +198,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  METACOLS ***
-grant SELECT                                                                 on METACOLS        to BARSREADER_ROLE;
 
 
 

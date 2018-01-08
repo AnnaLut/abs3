@@ -23,9 +23,7 @@ PROMPT *** Create  view V_STATIC_LAYOUT ***
    order by id desc;
 
 PROMPT *** Create  grants  V_STATIC_LAYOUT ***
-grant SELECT                                                                 on V_STATIC_LAYOUT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STATIC_LAYOUT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_STATIC_LAYOUT to UPLD;
 
 
 

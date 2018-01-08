@@ -28,10 +28,6 @@ PROMPT *** Create  view SALB_DRAPS ***
     WHERE     a.kv <> 980
           AND a.acc = s.acc;
 
-PROMPT *** Create  grants  SALB_DRAPS ***
-grant SELECT                                                                 on SALB_DRAPS      to BARSREADER_ROLE;
-grant SELECT                                                                 on SALB_DRAPS      to UPLD;
-
 
 
 PROMPT ===================================================================================== 

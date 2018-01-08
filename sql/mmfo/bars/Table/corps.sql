@@ -79,10 +79,74 @@ COMMENT ON COLUMN BARS.CORPS.NMK IS 'Наименование юр.лица';
 
 
 
+PROMPT *** Create  constraint FK_CORPS_BANKS3 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CORPS ADD CONSTRAINT FK_CORPS_BANKS3 FOREIGN KEY (MAINMFO)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CORPS_BANKS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CORPS ADD CONSTRAINT FK_CORPS_BANKS2 FOREIGN KEY (MFONEW)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CORPS_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CORPS ADD CONSTRAINT FK_CORPS_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CORPS_CUSTBINDATA ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CORPS ADD CONSTRAINT FK_CORPS_CUSTBINDATA FOREIGN KEY (SEAL_ID)
+	  REFERENCES BARS.CUSTOMER_BIN_DATA (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_CORPS_RNK_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.CORPS MODIFY (RNK CONSTRAINT CC_CORPS_RNK_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CORPS_EDOV ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CORPS ADD CONSTRAINT CC_CORPS_EDOV CHECK (edov = trunc(edov)) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -109,18 +173,6 @@ PROMPT *** Create  constraint CC_CORPS_BDOV ***
 begin   
  execute immediate '
   ALTER TABLE BARS.CORPS ADD CONSTRAINT CC_CORPS_BDOV CHECK (bdov = trunc(bdov)) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CORPS_EDOV ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CORPS ADD CONSTRAINT CC_CORPS_EDOV CHECK (edov = trunc(edov)) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -175,7 +227,6 @@ grant DELETE,INSERT,SELECT,UPDATE                                            on 
 grant REFERENCES,SELECT                                                      on CORPS           to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on CORPS           to BARSAQ_ADM with grant option;
 grant SELECT                                                                 on CORPS           to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on CORPS           to BARSREADER_ROLE;
 grant SELECT                                                                 on CORPS           to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CORPS           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CORPS           to BARS_DM;
@@ -186,7 +237,6 @@ grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,
 grant SELECT                                                                 on CORPS           to IBSADM_ROLE;
 grant SELECT                                                                 on CORPS           to RCC_DEAL;
 grant SELECT                                                                 on CORPS           to START1;
-grant SELECT                                                                 on CORPS           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CORPS           to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CORPS           to WR_CUSTLIST;
 grant SELECT,UPDATE                                                          on CORPS           to WR_CUSTREG;

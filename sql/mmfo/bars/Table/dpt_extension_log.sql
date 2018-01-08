@@ -65,6 +65,94 @@ COMMENT ON COLUMN BARS.DPT_EXTENSION_LOG.IDUPD IS '№ записи';
 
 
 
+PROMPT *** Create  constraint FK_DPTEXTLOG_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTENSION_LOG ADD CONSTRAINT FK_DPTEXTLOG_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTEXTLOG_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTENSION_LOG ADD CONSTRAINT FK_DPTEXTLOG_STAFF FOREIGN KEY (ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTEXTLOG_KOD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTENSION_LOG ADD CONSTRAINT CC_DPTEXTLOG_KOD CHECK (kod = 0) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_DPTEXTLOG ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTENSION_LOG ADD CONSTRAINT PK_DPTEXTLOG PRIMARY KEY (IDUPD)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTEXTLOG_IDUPD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTENSION_LOG MODIFY (IDUPD CONSTRAINT CC_DPTEXTLOG_IDUPD_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTEXTLOG_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTENSION_LOG MODIFY (BRANCH CONSTRAINT CC_DPTEXTLOG_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTEXTLOG_KOD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTENSION_LOG MODIFY (KOD CONSTRAINT CC_DPTEXTLOG_KOD_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DPTEXTLOG_ID_NN ***
 begin   
  execute immediate '
@@ -101,68 +189,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTEXTLOG_KOD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_EXTENSION_LOG MODIFY (KOD CONSTRAINT CC_DPTEXTLOG_KOD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTEXTLOG_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_EXTENSION_LOG MODIFY (BRANCH CONSTRAINT CC_DPTEXTLOG_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTEXTLOG_IDUPD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_EXTENSION_LOG MODIFY (IDUPD CONSTRAINT CC_DPTEXTLOG_IDUPD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint PK_DPTEXTLOG ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_EXTENSION_LOG ADD CONSTRAINT PK_DPTEXTLOG PRIMARY KEY (IDUPD)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTEXTLOG_KOD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_EXTENSION_LOG ADD CONSTRAINT CC_DPTEXTLOG_KOD CHECK (kod = 0) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_DPTEXTLOG ***
 begin   
  execute immediate '
@@ -178,12 +204,10 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_EXTENSION_LOG ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_EXTENSION_LOG to ABS_ADMIN;
-grant SELECT                                                                 on DPT_EXTENSION_LOG to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_EXTENSION_LOG to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_EXTENSION_LOG to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_EXTENSION_LOG to DPT_ADMIN;
 grant SELECT                                                                 on DPT_EXTENSION_LOG to START1;
-grant SELECT                                                                 on DPT_EXTENSION_LOG to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_EXTENSION_LOG to WR_ALL_RIGHTS;
 
 

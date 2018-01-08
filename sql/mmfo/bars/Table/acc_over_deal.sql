@@ -63,12 +63,10 @@ COMMENT ON COLUMN BARS.ACC_OVER_DEAL.DT_ACTION IS '';
 
 
 PROMPT *** Create  grants  ACC_OVER_DEAL ***
-grant SELECT                                                                 on ACC_OVER_DEAL   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_DEAL   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_OVER_DEAL   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_DEAL   to RPBN002;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_DEAL   to START1;
-grant SELECT                                                                 on ACC_OVER_DEAL   to UPLD;
 
 
 

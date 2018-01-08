@@ -13,10 +13,8 @@ from sw_journal j, sw_banks b1, sw_banks b2
 where b1.bic(+) = j.sender and b2.bic(+) = j.receiver;
 
 PROMPT *** Create  grants  V_DOCUMENTVIEW_SWIFT_BANKS ***
-grant SELECT                                                                 on V_DOCUMENTVIEW_SWIFT_BANKS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOCUMENTVIEW_SWIFT_BANKS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DOCUMENTVIEW_SWIFT_BANKS to START1;
-grant SELECT                                                                 on V_DOCUMENTVIEW_SWIFT_BANKS to UPLD;
 
 
 

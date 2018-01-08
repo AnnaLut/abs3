@@ -138,11 +138,9 @@ exception when others then
 
 PROMPT *** Create  grants  SH_TARIF_SCALE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SH_TARIF_SCALE  to ABS_ADMIN;
-grant SELECT                                                                 on SH_TARIF_SCALE  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SH_TARIF_SCALE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SH_TARIF_SCALE  to BARS_DM;
 grant SELECT                                                                 on SH_TARIF_SCALE  to START1;
-grant SELECT                                                                 on SH_TARIF_SCALE  to UPLD;
 grant FLASHBACK,SELECT                                                       on SH_TARIF_SCALE  to WR_REFREAD;
 
 

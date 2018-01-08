@@ -1,17 +1,6 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/REZERV_23.sql =========*** Run ***
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure REZERV_23 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.REZERV_23 (dat01_   in date) is
-/* Версия 3.2  05-10-2017  30-08-2017  14-07-2017  06-06-2017  11-04-2017  03-02-2017
+CREATE OR REPLACE PROCEDURE BARS.rezerv_23 (dat01_   in date) is
+/* Версия 3.1  30-08-2017  14-07-2017  06-06-2017  11-04-2017  03-02-2017
    Рівчачок з проміжними комітами
-
-14) 05-10-2017(3.2) - Разделение фин.дебиторки (номер договора из табдицы PRVN_FIN_DEB 
 13) 30-08-2017  -   Резерв брать по хоз.дебиторке  из REZ39 , если прислал FV
 12) 14-07-2017  -   tipa по хоз. дебиторки (21)
 11) 06-06-2017  -   При определении ND в prvn_fin_deb не учитывать EFFECTDATE;  COBUSUPABS-6044
@@ -52,7 +41,7 @@ IDR_       number;   ost_nal    number;   szn_       number;   sznq_      number
 ARJK_      number;   r013_      number;   rez_       number;   pv_        number;   pv_z       number;   pvz_       number;
 mfo_       NUMBER;   mfou_      NUMBER;   freq_      number;   l_rez      number;   l_rez_30   number;   l_rezq_30  number;
 l_rez_0    number;   l_rezq_0   number;   l_koef     number;   l_tipa     number;   l_diskont  number;   se1_       DECIMAL (24);
-l_xoz_fv   number := 1; 
+l_xoz_fv   number; 
 -- ДО 30 ДНЕЙ
 o_r013_1   VARCHAR2 (1); o_se_1     DECIMAL (24); o_comm_1   rnbu_trace.comm%TYPE;
 -- ПОСЛЕ 30 ДНЕЙ
@@ -232,7 +221,7 @@ begin
 
             if k.nbs in ('3570','3578','3579') THEN
                begin
-                  select nd into k.nd from nd_acc where acc=k.acc and rownum = 1;
+                  select nd into k.nd from nd_acc where acc=k.acc;
                EXCEPTION WHEN NO_DATA_FOUND THEN null;
                end;
             end if;
@@ -327,33 +316,31 @@ begin
                   EXCEPTION WHEN NO_DATA_FOUND THEN k.nd := k.acc; l_tipa := 17;
                   end;
                else
-                  begin
-                     select acc_ss into k.nd from prvn_fin_deb where k.acc in (acc_ss,acc_sp) and rownum=1; --acc_ss = k.nd ???
-                     --l_tipa := 17;
-                  EXCEPTION WHEN NO_DATA_FOUND THEN
-                     k.nd := k.acc;
-                     --begin
-                     --   select nd into k.nd from nd_acc where acc=k.acc and rownum=1;
-                     --   begin
-                     --      select nd into k.nd from acc_over where nd=k.nd and rownum=1;
-                     --      l_tipa := 10;
-                     --   EXCEPTION WHEN NO_DATA_FOUND THEN
-                     --      l_tipa := 3;
-                     --   end;
-                     --EXCEPTION WHEN NO_DATA_FOUND THEN
-                        --begin
-                        --   select nd into k.nd from rez_w4_bpk where acc= k.acc;
-                        --   l_tipa := 4;
-                        --EXCEPTION WHEN NO_DATA_FOUND THEN
-                           --l_tipa := 17;
-                           --begin
-                           --   select acc_ss into k.nd from prvn_fin_deb where acc_sp=k.acc;  --and EFFECTDATE < dat01_; COBUSUPABS-6044
-                           --EXCEPTION WHEN NO_DATA_FOUND THEN k.nd := k.acc;
-                           --end;
-                        --end;
-                    --end;
-                  end;
-                  l_tipa := 17;
+                  --begin
+                  --   select acc_ss into k.nd from prvn_fin_deb where k.acc in (acc_ss,acc_sp) and rownum=1; --acc_ss = k.nd ???
+                  --   l_tipa := 17;
+                  --EXCEPTION WHEN NO_DATA_FOUND THEN
+                     begin
+                        select nd into k.nd from nd_acc where acc=k.acc and rownum=1;
+                        begin
+                           select nd into k.nd from acc_over where nd=k.nd and rownum=1;
+                           l_tipa := 10;
+                        EXCEPTION WHEN NO_DATA_FOUND THEN
+                           l_tipa := 3;
+                        end;
+                     EXCEPTION WHEN NO_DATA_FOUND THEN
+
+                        begin
+                           select nd into k.nd from rez_w4_bpk where acc= k.acc;
+                           l_tipa := 4;
+                        EXCEPTION WHEN NO_DATA_FOUND THEN
+                           l_tipa := 17;
+                           begin
+                              select acc_ss into k.nd from prvn_fin_deb where acc_sp=k.acc;  --and EFFECTDATE < dat01_; COBUSUPABS-6044
+                           EXCEPTION WHEN NO_DATA_FOUND THEN k.nd := k.acc;
+                           end;
+                        end;
+                    end;
                end if;
             end if;
          else  szn_ := 0; sznq_:= 0;
@@ -446,14 +433,7 @@ begin
 end;
 /
 show err;
-
-PROMPT *** Create  grants  REZERV_23 ***
-grant EXECUTE                                                                on REZERV_23       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on REZERV_23       to RCC_DEAL;
-grant EXECUTE                                                                on REZERV_23       to START1;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/REZERV_23.sql =========*** End ***
-PROMPT ===================================================================================== 
+/
+grant EXECUTE  on rezerv_23  to BARS_ACCESS_DEFROLE;
+grant EXECUTE  on rezerv_23  to RCC_DEAL;
+grant EXECUTE  on rezerv_23  to START1;

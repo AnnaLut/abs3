@@ -50,11 +50,9 @@ COMMENT ON COLUMN BARS.CIM_CREDGRAPH_DELAY.I IS 'Вид погашення 0 - тіло, 1 - про
 
 
 PROMPT *** Create  grants  CIM_CREDGRAPH_DELAY ***
-grant SELECT                                                                 on CIM_CREDGRAPH_DELAY to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CREDGRAPH_DELAY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_CREDGRAPH_DELAY to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CREDGRAPH_DELAY to CIM_ROLE;
-grant SELECT                                                                 on CIM_CREDGRAPH_DELAY to UPLD;
 
 
 

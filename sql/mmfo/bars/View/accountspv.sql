@@ -12,11 +12,9 @@ PROMPT *** Create  view ACCOUNTSPV ***
   from accountsp;
 
 PROMPT *** Create  grants  ACCOUNTSPV ***
-grant SELECT                                                                 on ACCOUNTSPV      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCOUNTSPV      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCOUNTSPV      to CUST001;
 grant SELECT                                                                 on ACCOUNTSPV      to START1;
-grant SELECT                                                                 on ACCOUNTSPV      to UPLD;
 
 
 

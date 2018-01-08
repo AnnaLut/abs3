@@ -17,10 +17,8 @@ PROMPT *** Create  view V_NBSOB22 ***
 
 PROMPT *** Create  grants  V_NBSOB22 ***
 grant SELECT                                                                 on V_NBSOB22       to ABS_ADMIN;
-grant SELECT                                                                 on V_NBSOB22       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBSOB22       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBSOB22       to CUST001;
-grant SELECT                                                                 on V_NBSOB22       to UPLD;
 
 
 

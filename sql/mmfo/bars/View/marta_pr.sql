@@ -18,10 +18,8 @@ where i.acc=a.acc and i.acra=b.acc  and a.nbs='3901' and i.acrb=c.acc and b.nbs=
 order by substr(a.nls,7,3);
 
 PROMPT *** Create  grants  MARTA_PR ***
-grant SELECT                                                                 on MARTA_PR        to BARSREADER_ROLE;
 grant SELECT                                                                 on MARTA_PR        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MARTA_PR        to START1;
-grant SELECT                                                                 on MARTA_PR        to UPLD;
 
 
 

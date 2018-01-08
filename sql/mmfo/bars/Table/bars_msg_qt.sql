@@ -136,9 +136,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  BARS_MSG_QT ***
-grant SELECT                                                                 on BARS_MSG_QT     to BARSREADER_ROLE;
 grant SELECT                                                                 on BARS_MSG_QT     to BARS_DM;
-grant SELECT                                                                 on BARS_MSG_QT     to UPLD;
 
 
 

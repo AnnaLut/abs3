@@ -81,11 +81,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_RATES_SB ***
-grant SELECT                                                                 on CP_RATES_SB     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_RATES_SB     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_RATES_SB     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_RATES_SB     to START1;
-grant SELECT                                                                 on CP_RATES_SB     to UPLD;
 
 
 

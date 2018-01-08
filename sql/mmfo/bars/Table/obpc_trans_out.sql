@@ -83,6 +83,93 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_OBPCTRANSOUT_W4MSGCODE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TRANS_OUT MODIFY (W4_MSGCODE CONSTRAINT CC_OBPCTRANSOUT_W4MSGCODE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OBPCTRANSOUT_DK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TRANS_OUT MODIFY (DK CONSTRAINT CC_OBPCTRANSOUT_DK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OBPCTRANSOUT_TT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TRANS_OUT MODIFY (TT CONSTRAINT CC_OBPCTRANSOUT_TT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OBPCTRANSOUT_TRANTYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TRANS_OUT MODIFY (TRAN_TYPE CONSTRAINT CC_OBPCTRANSOUT_TRANTYPE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OBPCTRANSOUT_OWMSGCODE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TRANS_OUT ADD CONSTRAINT FK_OBPCTRANSOUT_OWMSGCODE FOREIGN KEY (W4_MSGCODE, DK)
+	  REFERENCES BARS.OW_MSGCODE (MSGCODE, DK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OBPCTRANSOUT_OBPCTRANS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TRANS_OUT ADD CONSTRAINT FK_OBPCTRANSOUT_OBPCTRANS FOREIGN KEY (TRAN_TYPE, DK)
+	  REFERENCES BARS.OBPC_TRANS (TRAN_TYPE, DK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OBPCTRANSOUT_DK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TRANS_OUT ADD CONSTRAINT FK_OBPCTRANSOUT_DK FOREIGN KEY (DK)
+	  REFERENCES BARS.DK (DK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OBPCTRANSOUT_PAYFLAG ***
 begin   
  execute immediate '
@@ -107,46 +194,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OBPCTRANSOUT_TRANTYPE_NN ***
+PROMPT *** Create  constraint FK_OBPCTRANSOUT_TTS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OBPC_TRANS_OUT MODIFY (TRAN_TYPE CONSTRAINT CC_OBPCTRANSOUT_TRANTYPE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OBPCTRANSOUT_TT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OBPC_TRANS_OUT MODIFY (TT CONSTRAINT CC_OBPCTRANSOUT_TT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OBPCTRANSOUT_DK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OBPC_TRANS_OUT MODIFY (DK CONSTRAINT CC_OBPCTRANSOUT_DK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OBPCTRANSOUT_W4MSGCODE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OBPC_TRANS_OUT MODIFY (W4_MSGCODE CONSTRAINT CC_OBPCTRANSOUT_W4MSGCODE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.OBPC_TRANS_OUT ADD CONSTRAINT FK_OBPCTRANSOUT_TTS FOREIGN KEY (TT)
+	  REFERENCES BARS.TTS (TT) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -183,11 +235,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_TRANS_OUT ***
-grant SELECT                                                                 on OBPC_TRANS_OUT  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_TRANS_OUT  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_TRANS_OUT  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_TRANS_OUT  to OBPC;
-grant SELECT                                                                 on OBPC_TRANS_OUT  to UPLD;
 grant FLASHBACK,SELECT                                                       on OBPC_TRANS_OUT  to WR_REFREAD;
 
 

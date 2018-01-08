@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_SW_STMT_INFO.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SW_STMT_INFO ***
-grant SELECT                                                                 on ERR$_SW_STMT_INFO to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SW_STMT_INFO to UPLD;
-
 
 
 PROMPT ===================================================================================== 

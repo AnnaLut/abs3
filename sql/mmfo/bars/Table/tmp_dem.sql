@@ -69,10 +69,8 @@ COMMENT ON COLUMN BARS.TMP_DEM.TEL IS '';
 
 
 PROMPT *** Create  grants  TMP_DEM ***
-grant SELECT                                                                 on TMP_DEM         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DEM         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DEM         to START1;
-grant SELECT                                                                 on TMP_DEM         to UPLD;
 
 
 

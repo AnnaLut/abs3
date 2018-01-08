@@ -77,11 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CONTRSETUP ***
-grant SELECT                                                                 on CONTRSETUP      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CONTRSETUP      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CONTRSETUP      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CONTRSETUP      to START1;
-grant SELECT                                                                 on CONTRSETUP      to UPLD;
 
 
 

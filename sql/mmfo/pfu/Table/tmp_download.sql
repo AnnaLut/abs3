@@ -31,10 +31,6 @@ COMMENT ON COLUMN PFU.TMP_DOWNLOAD.DATE_END IS '';
 
 
 
-PROMPT *** Create  grants  TMP_DOWNLOAD ***
-grant SELECT                                                                 on TMP_DOWNLOAD    to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_DOWNLOAD    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -53,10 +53,6 @@ COMMENT ON COLUMN BARS.ERR$_SW_NOSTRO_QUE.REF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SW_NOSTRO_QUE ***
-grant SELECT                                                                 on ERR$_SW_NOSTRO_QUE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SW_NOSTRO_QUE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

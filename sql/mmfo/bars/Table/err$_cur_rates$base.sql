@@ -75,10 +75,6 @@ COMMENT ON COLUMN BARS.ERR$_CUR_RATES$BASE.OFFICIAL IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CUR_RATES$BASE ***
-grant SELECT                                                                 on ERR$_CUR_RATES$BASE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CUR_RATES$BASE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

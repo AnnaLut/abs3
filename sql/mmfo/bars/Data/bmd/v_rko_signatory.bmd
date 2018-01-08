@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Довідник підписантів РКО';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'V_RKO_SIGNATORY';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,21 +119,21 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Код ~відділення', '3', 30, 13, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'ID', 'N', 'Ід.', '1', 22, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'ACTIVE_F', 'N', 'Використовувати для друку ~0-Ні,1-Так', '', 22, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'ATTORNEY_DT', 'D', 'Дата ~довіреності', '3', 20, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'ATTORNEY_NUM', 'C', '№ довіреності', '2', 22, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'DIVISION_PRSN_GEN', 'C', 'Підрозділ уповноваженої~особи від Банку (Р.В.)', '4', 60, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'DOC_NM_GEN', 'C', 'Назва док., на підставі~ якого діє уповн. ос (Р.В)', '4', 100, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'FULL_NM_GEN', 'C', 'ПІБ уповноваженої особи~від Банку повністю (Р.В.)', '4', 60, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'NOTARY_NM_GEN', 'C', 'ПІБ нотаріуса, який~посвідчив довіреність (Р.В.)', '4', 60, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'NOTARY_TP_GEN', 'C', 'Вид нотаріуса~ (приватний / державний) (Р.В.)', '2.5', 60, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'POSITION_PRSN_GEN', 'C', 'Посада уповноваженої~особи від Банку (Р.В.)', '4', 60, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'POSITION_PRSN_NOM', 'C', 'Посада уповноваженої~ особи від Банку (Н.В.)', '4', 60, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'SHORT_NM_NOM', 'C', 'ПІБ уповноваж.~ особи від Банку скорочено (Н.В.)', '4', 60, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'NOTARIAL_DISTRICT_GEN', 'C', 'Нотаріальний~округ (Р.В.)', '2', 60, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'FULL_NM_NOM', 'C', 'ПІБ уповноваженої особи~від Банку повністю (Н.В.)', '4', 60, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Код ~відділення', 3, 30, 13, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'ID', 'N', 'Ід.', 1, 22, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'ACTIVE_F', 'N', 'Використовувати для друку ~0-Ні,1-Так', null, 22, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'ATTORNEY_DT', 'D', 'Дата ~довіреності', 3, 20, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'ATTORNEY_NUM', 'C', '№ довіреності', 2, 22, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'DIVISION_PRSN_GEN', 'C', 'Підрозділ уповноваженої~особи від Банку (Р.В.)', 4, 60, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'DOC_NM_GEN', 'C', 'Назва док., на підставі~ якого діє уповн. ос (Р.В)', 4, 100, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'FULL_NM_GEN', 'C', 'ПІБ уповноваженої особи~від Банку повністю (Р.В.)', 4, 60, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'NOTARY_NM_GEN', 'C', 'ПІБ нотаріуса, який~посвідчив довіреність (Р.В.)', 4, 60, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'NOTARY_TP_GEN', 'C', 'Вид нотаріуса~ (приватний / державний) (Р.В.)', 2.5, 60, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'POSITION_PRSN_GEN', 'C', 'Посада уповноваженої~особи від Банку (Р.В.)', 4, 60, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'POSITION_PRSN_NOM', 'C', 'Посада уповноваженої~ особи від Банку (Н.В.)', 4, 60, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'SHORT_NM_NOM', 'C', 'ПІБ уповноваж.~ особи від Банку скорочено (Н.В.)', 4, 60, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'NOTARIAL_DISTRICT_GEN', 'C', 'Нотаріальний~округ (Р.В.)', 2, 60, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'FULL_NM_NOM', 'C', 'ПІБ уповноваженої особи~від Банку повністю (Н.В.)', 4, 60, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('BRANCH');

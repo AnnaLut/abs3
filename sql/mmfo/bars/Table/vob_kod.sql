@@ -89,10 +89,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  VOB_KOD ***
-grant SELECT                                                                 on VOB_KOD         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VOB_KOD         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VOB_KOD         to START1;
-grant SELECT                                                                 on VOB_KOD         to UPLD;
 
 
 

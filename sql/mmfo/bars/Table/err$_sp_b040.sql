@@ -55,10 +55,6 @@ COMMENT ON COLUMN BARS.ERR$_SP_B040.NAME IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SP_B040 ***
-grant SELECT                                                                 on ERR$_SP_B040    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SP_B040    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

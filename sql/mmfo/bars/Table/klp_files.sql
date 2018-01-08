@@ -65,6 +65,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_KLPFILES_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP_FILES ADD CONSTRAINT FK_KLPFILES_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C009294 ***
 begin   
  execute immediate '
@@ -103,11 +116,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  KLP_FILES ***
-grant SELECT                                                                 on KLP_FILES       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_FILES       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KLP_FILES       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_FILES       to TECH_MOM1;
-grant SELECT                                                                 on KLP_FILES       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLP_FILES       to WR_ALL_RIGHTS;
 
 

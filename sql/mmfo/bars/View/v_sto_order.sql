@@ -112,9 +112,7 @@ PROMPT *** Create  view V_STO_ORDER ***
 --          AND (o.stop_date IS NULL OR o.stop_date >= bankdate ());
 
 PROMPT *** Create  grants  V_STO_ORDER ***
-grant SELECT                                                                 on V_STO_ORDER     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STO_ORDER     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_STO_ORDER     to UPLD;
 
 
 

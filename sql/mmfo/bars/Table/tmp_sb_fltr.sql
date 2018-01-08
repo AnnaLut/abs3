@@ -63,11 +63,9 @@ COMMENT ON COLUMN BARS.TMP_SB_FLTR.ITEMVALUE3 IS '';
 
 
 PROMPT *** Create  grants  TMP_SB_FLTR ***
-grant SELECT                                                                 on TMP_SB_FLTR     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SB_FLTR     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_SB_FLTR     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SB_FLTR     to START1;
-grant SELECT                                                                 on TMP_SB_FLTR     to UPLD;
 
 
 

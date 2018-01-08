@@ -115,9 +115,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  KL_F00_INT_K ***
-grant SELECT                                                                 on KL_F00_INT_K    to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_F00_INT_K    to BARS_DM;
-grant SELECT                                                                 on KL_F00_INT_K    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F00_INT_K    to WR_ALL_RIGHTS;
 
 

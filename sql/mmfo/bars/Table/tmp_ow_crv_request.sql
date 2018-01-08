@@ -45,10 +45,6 @@ COMMENT ON COLUMN BARS.TMP_OW_CRV_REQUEST.NAME IS '';
 
 
 
-PROMPT *** Create  grants  TMP_OW_CRV_REQUEST ***
-grant SELECT                                                                 on TMP_OW_CRV_REQUEST to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_OW_CRV_REQUEST to UPLD;
-
 
 
 PROMPT ===================================================================================== 

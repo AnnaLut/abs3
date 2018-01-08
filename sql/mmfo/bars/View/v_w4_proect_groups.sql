@@ -15,9 +15,7 @@ where code in ('PENSION','SOCIAL','SALARY')
 order by code;
 
 PROMPT *** Create  grants  V_W4_PROECT_GROUPS ***
-grant SELECT                                                                 on V_W4_PROECT_GROUPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_PROECT_GROUPS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_W4_PROECT_GROUPS to UPLD;
 
 
 

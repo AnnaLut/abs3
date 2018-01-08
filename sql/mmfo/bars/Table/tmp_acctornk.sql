@@ -57,10 +57,8 @@ COMMENT ON COLUMN BARS.TMP_ACCTORNK.NEW_RNK IS '';
 
 
 PROMPT *** Create  grants  TMP_ACCTORNK ***
-grant SELECT                                                                 on TMP_ACCTORNK    to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_ACCTORNK    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_ACCTORNK    to CUST001;
-grant SELECT                                                                 on TMP_ACCTORNK    to UPLD;
 
 
 

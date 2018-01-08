@@ -69,10 +69,6 @@ COMMENT ON COLUMN BARS.ERR$_PRVN_LOSS_DELAY_DAYS.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_PRVN_LOSS_DELAY_DAYS ***
-grant SELECT                                                                 on ERR$_PRVN_LOSS_DELAY_DAYS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_PRVN_LOSS_DELAY_DAYS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

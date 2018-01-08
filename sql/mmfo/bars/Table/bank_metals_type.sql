@@ -101,7 +101,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  BANK_METALS_TYPE ***
-grant SELECT                                                                 on BANK_METALS_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on BANK_METALS_TYPE to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANK_METALS_TYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BANK_METALS_TYPE to BARS_DM;

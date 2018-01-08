@@ -11,9 +11,7 @@ PROMPT *** Create  view APPLIST0 ***
   select "CODEAPP","NAME","HOTKEY","FRONTEND","ID" from applist  WHERE FRONTEND = 0;
 
 PROMPT *** Create  grants  APPLIST0 ***
-grant SELECT                                                                 on APPLIST0        to BARSREADER_ROLE;
 grant SELECT                                                                 on APPLIST0        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on APPLIST0        to UPLD;
 
 
 

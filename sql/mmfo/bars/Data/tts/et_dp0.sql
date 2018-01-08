@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции DP!
-prompt Наименование операции: DP! +D: STOP-правило на поповнення вкладу
+prompt Наименование операции: +D: STOP-правило на поповнення вкладу
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DP!', 'DP! +D: STOP-правило на поповнення вкладу', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, '0', null, null, null, null, 0, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('DP!', '+D: STOP-правило на поповнення вкладу', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, '0', null, null, null, null, 0, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DP!', name='DP! +D: STOP-правило на поповнення вкладу', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='0', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='DP!', name='+D: STOP-правило на поповнення вкладу', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='0', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='DP!';
   end;
   --------------------------------
@@ -100,7 +100,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции DP0
-prompt Наименование операции: DP0 +Поповнення вкладу в нац.валюті готівкою
+prompt Наименование операции: +Поповнення вкладу в нац.валюті готівкою
 declare
   cnt_  number;
 begin
@@ -109,11 +109,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DP0', 'DP0 +Поповнення вкладу в нац.валюті готівкою', 0, null, 980, null, 980, null, null, '#(tobopack.GetToboCASH)', null, 1, 0, 0, 0, null, null, 16, null, null, 0, '0000100001000000000000000010000000010000000000000000000000000000', 'Поповнення згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DP0', '+Поповнення вкладу в нац.валюті готівкою', 0, null, 980, null, 980, null, null, '#(tobopack.GetToboCASH)', null, 1, 0, 0, 0, null, null, 16, null, null, 0, '0000100001000000000000000010000000010000000000000000000000000000', 'Поповнення згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DP0', name='DP0 +Поповнення вкладу в нац.валюті готівкою', dk=0, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb='#(tobopack.GetToboCASH)', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=16, proc=null, s3800=null, rang=0, flags='0000100001000000000000000010000000010000000000000000000000000000', nazn='Поповнення згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DP0', name='+Поповнення вкладу в нац.валюті готівкою', dk=0, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb='#(tobopack.GetToboCASH)', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=16, proc=null, s3800=null, rang=0, flags='0000100001000000000000000010000000010000000000000000000000000000', nazn='Поповнення згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DP0';
   end;
   --------------------------------

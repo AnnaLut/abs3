@@ -57,9 +57,7 @@ COMMENT ON COLUMN BARS.DFO.PDFOVZB IS '';
 
 
 PROMPT *** Create  grants  DFO ***
-grant SELECT                                                                 on DFO             to BARSREADER_ROLE;
 grant SELECT                                                                 on DFO             to BARS_DM;
-grant SELECT                                                                 on DFO             to UPLD;
 
 
 

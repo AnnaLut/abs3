@@ -13,10 +13,8 @@ PROMPT *** Create  view CC_W_LIM_ARC ***
 FROM CC_LIM_ARC a  WHERE mdat = (SELECT MAX (mdat) FROM CC_LIM_ARC WHERE nd = a.ND);
 
 PROMPT *** Create  grants  CC_W_LIM_ARC ***
-grant SELECT                                                                 on CC_W_LIM_ARC    to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_W_LIM_ARC    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_W_LIM_ARC    to RCC_DEAL;
-grant SELECT                                                                 on CC_W_LIM_ARC    to UPLD;
 
 
 

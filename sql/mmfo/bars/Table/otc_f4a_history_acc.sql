@@ -119,6 +119,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OTCF4AHISTORYACC_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OTC_F4A_HISTORY_ACC ADD CONSTRAINT FK_OTCF4AHISTORYACC_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C008334 ***
 begin   
  execute immediate '
@@ -209,9 +222,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  OTC_F4A_HISTORY_ACC ***
-grant SELECT                                                                 on OTC_F4A_HISTORY_ACC to BARSREADER_ROLE;
 grant SELECT                                                                 on OTC_F4A_HISTORY_ACC to BARS_DM;
-grant SELECT                                                                 on OTC_F4A_HISTORY_ACC to UPLD;
 
 
 

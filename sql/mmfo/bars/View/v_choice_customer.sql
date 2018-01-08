@@ -25,10 +25,8 @@ select decode(nvl(trim(c.sed),'00'),'91',10,9), c.rnk, c.nmk, c.okpo, decode(mod
 ;
 
 PROMPT *** Create  grants  V_CHOICE_CUSTOMER ***
-grant SELECT                                                                 on V_CHOICE_CUSTOMER to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CHOICE_CUSTOMER to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CHOICE_CUSTOMER to CUST001;
-grant SELECT                                                                 on V_CHOICE_CUSTOMER to UPLD;
 
 
 

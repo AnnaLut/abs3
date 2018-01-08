@@ -69,10 +69,6 @@ COMMENT ON COLUMN BARS.ERR$_CIM_1PB_OUT_DOC.KOD_N_CA IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIM_1PB_OUT_DOC ***
-grant SELECT                                                                 on ERR$_CIM_1PB_OUT_DOC to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIM_1PB_OUT_DOC to UPLD;
-
 
 
 PROMPT ===================================================================================== 

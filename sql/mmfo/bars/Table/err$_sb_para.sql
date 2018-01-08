@@ -113,10 +113,6 @@ COMMENT ON COLUMN BARS.ERR$_SB_PARA.R020_FA IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SB_PARA ***
-grant SELECT                                                                 on ERR$_SB_PARA    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SB_PARA    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

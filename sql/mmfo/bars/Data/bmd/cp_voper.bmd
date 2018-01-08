@@ -127,6 +127,7 @@ begin
   bars_metabase.add_column(l_tabid, 1, 'ID', 'C', 'ID', '2', null, 1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 2, 'TITLE', 'C', 'TITLE', '2', null, 1, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
+
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
 

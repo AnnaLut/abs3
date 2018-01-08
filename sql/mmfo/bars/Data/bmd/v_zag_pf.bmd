@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Реєстр боржникiв (iнф.про файли)';
   l_tablinesdef := '30';
-  l_tabselect_statement := '';
   l_tabname     := 'V_ZAG_PF';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,11 +119,11 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'FN', 'C', 'Ім''я файлу', '1.4', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=DEBREG_DETAILS[ACCESSCODE=>1][CONDITIONS=>DEBREG_DETAILS.FN= :FN and DEBREG_DETAILS.FN is not null]', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DAT', 'D', 'Дата створення', '1.5', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'N', 'N', 'Кількість~записів', '1.2', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'OTM', 'N', 'Стан~1-присвоєно ім''я~3-файл сформовано~5-файл сквитовано', '1.9', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DATK', 'D', 'Дата квитовки', '1.5', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'FN', 'C', 'Ім''я файлу', 1.4, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=DEBREG_DETAILS[ACCESSCODE=>1][CONDITIONS=>DEBREG_DETAILS.FN= :FN and DEBREG_DETAILS.FN is not null]', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DAT', 'D', 'Дата створення', 1.5, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'N', 'N', 'Кількість~записів', 1.2, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'OTM', 'N', 'Стан~1-присвоєно ім''я~3-файл сформовано~5-файл сквитовано', 1.9, null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DATK', 'D', 'Дата квитовки', 1.5, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

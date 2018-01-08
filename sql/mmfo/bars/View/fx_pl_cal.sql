@@ -17,10 +17,8 @@ from ( select V.B, V.E, dat_a DAT, kva KV, sum(suma)/100 SA, count(*) KA, 0     
 ) GROUP BY   B,  DAT  , KV;
 
 PROMPT *** Create  grants  FX_PL_CAL ***
-grant SELECT                                                                 on FX_PL_CAL       to BARSREADER_ROLE;
 grant SELECT                                                                 on FX_PL_CAL       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FX_PL_CAL       to START1;
-grant SELECT                                                                 on FX_PL_CAL       to UPLD;
 
 
 

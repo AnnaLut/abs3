@@ -38,7 +38,7 @@ PROMPT *** Create  procedure PAY_S36 ***
   l_sdi_acc   number;
   l_sdi_nls   varchar2(15);
   l_          int :=0;
-  l_nlskk   accounts.nls%type;
+  l_nlskk   accounts.nls%type; 
   l_kvkk    accounts.kv%type;
   L_3800    VARCHAR2 (155);
   F1_       VARCHAR2 (155);
@@ -60,54 +60,54 @@ begin
     elsif p_dk = 0 then  r_ss.nls := p_nlsk ; r_ss.kv := p_kvk ; r_ss.ostc := p_ss;
     else  RETURN;
     end if;
-
+    
 	/*
-	з метою уникнення порушення чинного валютного законодавства та застосування штрафних санкцій до АТ «Ощадбанк» (службова у вкладці),
+	з метою уникнення порушення чинного валютного законодавства та застосування штрафних санкцій до АТ «Ощадбанк» (службова у вкладці), 
     просимо зробити  заборону проведення в усіх кодах операцій в АБС БАРС (ЦА та РУ) за маскою рахунків:  Дт поточний рахунок клієнта (ЮО та ФО) Кт 3800 (OB22=03) в іноземній валюті або банківських металах:
     поточні рахунки клієнтів : 2600,2650,2541,2542,2544,2545,255,2560,2548,2520,2530,2620,2625 (прошу колег з департаменту бухгалтерського обліку доповнити перелік, якщо щось забула)
  	*/
-
-
-
-	if   (p_dk = 1 and regexp_like(p_nlsm, '^(2600)|^(2650)|^(2541)|^(2542)|^(2544)|^(2545)|^(255)|^(2560)|^(2548)|^(2520)|^(2530)|^(2620)|^(2625)') and p_kv  != 980)    or
-		 (p_dk = 0 and regexp_like(p_nlsk, '^(2600)|^(2650)|^(2541)|^(2542)|^(2544)|^(2545)|^(255)|^(2560)|^(2548)|^(2520)|^(2530)|^(2620)|^(2625)') and p_kvk != 980)
+	
+	
+	
+	if   (p_dk = 1 and regexp_like(p_nlsm, '^(2600)|^(2650)|^(2541)|^(2542)|^(2544)|^(2545)|^(255)|^(2560)|^(2548)|^(2520)|^(2530)|^(2620)|^(2625)') and p_kv  != 980)    or  
+		 (p_dk = 0 and regexp_like(p_nlsk, '^(2600)|^(2650)|^(2541)|^(2542)|^(2544)|^(2545)|^(255)|^(2560)|^(2548)|^(2520)|^(2530)|^(2620)|^(2625)') and p_kvk != 980) 
 	    then
-
-	      if p_kv = p_kvk
-		      then   l_nlskk  := case p_dk when 1 then p_nlsk else p_nlsm end; l_kvkk   := case p_dk when 1 then p_kvk  else p_kv   end;
-		  else
-
-				 begin
+	    
+	      if p_kv = p_kvk  
+		      then   l_nlskk  := case p_dk when 1 then p_nlsk else p_nlsm end; l_kvkk   := case p_dk when 1 then p_kvk  else p_kv   end; 
+		  else 
+		
+				 begin		
 						  SELECT TRIM (s3800) INTO L_3800 FROM tts WHERE tt = p_tt AND s3800 IS NOT NULL;
-				  EXCEPTION WHEN NO_DATA_FOUND THEN null;
+				  EXCEPTION WHEN NO_DATA_FOUND THEN null; 
 				 end;
-
-				 l_nlskk := gl.dyn_nls ( f       => SUBSTR (L_3800, 3, LENGTH (L_3800) - 3),
+				  
+				 l_nlskk := gl.dyn_nls ( f       => SUBSTR (L_3800, 3, LENGTH (L_3800) - 3), 
 				                         REF     => gl.aREF, tt     => p_tt,    vdat    => p_vdat,
 								         dk      => p_dk,   mfoa    => gl.aMFO, nlsa    => p_nlsm,  kva     => p_kv,
 								         s       => p_sa,   mfob    => gl.aMFO, nlsb    => p_nlsk,  kvb     => p_kvk,
 								         s2      => p_ss);
 				 l_kvkk :=  case p_dk when 0 then p_kvk  else p_kv   end;
-	      end if;
-
-	 -- Рах Б   3800/03  заборонено
-	 begin
+	      end if; 	 
+	   
+	 -- Рах Б   3800/03  заборонено 	
+	 begin 	
 	    Select 1
 		  into l_
 		  from accounts
 		 where nls = l_nlskk
            and kv  = l_kvkk
 		   and nbs = '3800' and ob22 = '03';
-
-        -- Erorr
+		   
+        -- Erorr	 
 		  raise_application_error (- (20203), '\9999 - Заборонено кореспонденцію рахунків Дт'|| case p_dk when 1 then p_nlsm||'('||p_kv||')' else p_nlsk||'('||p_kvk||')' end||' Кт'||l_nlskk||' Об22=03');
- 		exception when no_data_found then  null;
-	 end;
-
+ 		exception when no_data_found then  null;  
+	 end;	
+	 
 	end if;
-
-
-
+	 
+    
+  	  
     -- Проверка на новый ссудный счет ЮЛ, Фл
     If substr(r_ss.nls,1,2) not in ('20', '22') or substr(r_ss.nls,4,1) > '4'  then
        RETURN;

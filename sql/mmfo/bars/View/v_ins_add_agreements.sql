@@ -25,9 +25,7 @@ PROMPT *** Create  view V_INS_ADD_AGREEMENTS ***
    ORDER BY aa.deal_id, aa.sdate;
 
 PROMPT *** Create  grants  V_INS_ADD_AGREEMENTS ***
-grant SELECT                                                                 on V_INS_ADD_AGREEMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_ADD_AGREEMENTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INS_ADD_AGREEMENTS to UPLD;
 
 
 

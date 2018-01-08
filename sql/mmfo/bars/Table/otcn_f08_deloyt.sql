@@ -73,6 +73,19 @@ COMMENT ON COLUMN BARS.OTCN_F08_DELOYT.TOBO IS '';
 
 
 
+PROMPT *** Create  constraint FK_OTCNF08DELOYT_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OTCN_F08_DELOYT ADD CONSTRAINT FK_OTCNF08DELOYT_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OTCNF08DELOYT_KF_NN ***
 begin   
  execute immediate '
@@ -85,10 +98,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  OTCN_F08_DELOYT ***
-grant SELECT                                                                 on OTCN_F08_DELOYT to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F08_DELOYT to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F08_DELOYT to START1;
-grant SELECT                                                                 on OTCN_F08_DELOYT to UPLD;
 
 
 

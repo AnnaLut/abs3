@@ -277,9 +277,7 @@ PROMPT *** Create  view V_ZAY ***
           AND f_ourmfo_g = SYS_CONTEXT ('bars_context', 'user_mfo');
 
 PROMPT *** Create  grants  V_ZAY ***
-grant SELECT                                                                 on V_ZAY           to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY           to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ZAY           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ZAY           to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_ZAY           to ZAY;
 

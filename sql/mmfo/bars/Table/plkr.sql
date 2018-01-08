@@ -59,10 +59,8 @@ COMMENT ON COLUMN BARS.PLKR.PSP IS '';
 
 
 PROMPT *** Create  grants  PLKR ***
-grant SELECT                                                                 on PLKR            to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PLKR            to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PLKR            to START1;
-grant SELECT                                                                 on PLKR            to UPLD;
 
 
 

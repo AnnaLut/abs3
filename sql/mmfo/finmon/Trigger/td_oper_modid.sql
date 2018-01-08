@@ -21,7 +21,7 @@ begin
 
 end;
 /
-ALTER TRIGGER FINMON.TD_OPER_MODID ENABLE;
+ALTER TRIGGER FINMON.TD_OPER_MODID DISABLE;
 
 
 PROMPT ===================================================================================== 

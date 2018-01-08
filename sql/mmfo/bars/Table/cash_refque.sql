@@ -77,7 +77,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  CASH_REFQUE ***
-grant SELECT                                                                 on CASH_REFQUE     to BARSREADER_ROLE;
 grant SELECT                                                                 on CASH_REFQUE     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CASH_REFQUE     to BARS_DM;
 grant SELECT                                                                 on CASH_REFQUE     to RPBN001;

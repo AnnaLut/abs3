@@ -17,10 +17,8 @@ PROMPT *** Create  view V_BPK_BRANCH_FILIALES ***
    and b.branch like sys_context ('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  V_BPK_BRANCH_FILIALES ***
-grant SELECT                                                                 on V_BPK_BRANCH_FILIALES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BPK_BRANCH_FILIALES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BPK_BRANCH_FILIALES to OBPC;
-grant SELECT                                                                 on V_BPK_BRANCH_FILIALES to UPLD;
 
 
 

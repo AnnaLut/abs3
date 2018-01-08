@@ -51,6 +51,19 @@ COMMENT ON COLUMN BARS.SKRYNKA_ETALON_TARIFF_VALUE.TARIFF_AMOUNT IS 'Сума тарифу
 
 
 
+PROMPT *** Create  constraint FK_SKRYN_TAR_HIST_REF_ETAL_TAR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_ETALON_TARIFF_VALUE ADD CONSTRAINT FK_SKRYN_TAR_HIST_REF_ETAL_TAR FOREIGN KEY (TARIFF_ID)
+	  REFERENCES BARS.SKRYNKA_ETALON_TARIFF (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SKRETALTARIFFVAL_ID_NN ***
 begin   
  execute immediate '
@@ -99,10 +112,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  SKRYNKA_ETALON_TARIFF_VALUE ***
-grant SELECT                                                                 on SKRYNKA_ETALON_TARIFF_VALUE to BARSREADER_ROLE;
-grant SELECT                                                                 on SKRYNKA_ETALON_TARIFF_VALUE to UPLD;
 
 
 

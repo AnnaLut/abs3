@@ -99,11 +99,9 @@ where  nvl(c.date_off,to_date('01014000','ddmmyyyy')) > bankdate and
  ;
 
 PROMPT *** Create  grants  V_CHECK_CUSTOMER_PARAMS_ROW ***
-grant SELECT                                                                 on V_CHECK_CUSTOMER_PARAMS_ROW to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CHECK_CUSTOMER_PARAMS_ROW to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CHECK_CUSTOMER_PARAMS_ROW to RPBN002;
 grant SELECT                                                                 on V_CHECK_CUSTOMER_PARAMS_ROW to TECH005;
-grant SELECT                                                                 on V_CHECK_CUSTOMER_PARAMS_ROW to UPLD;
 
 
 

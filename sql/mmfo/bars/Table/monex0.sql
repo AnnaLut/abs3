@@ -91,12 +91,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  MONEX0 ***
-grant SELECT                                                                 on MONEX0          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MONEX0          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MONEX0          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MONEX0          to PYOD001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MONEX0          to START1;
-grant SELECT                                                                 on MONEX0          to UPLD;
 grant FLASHBACK,SELECT                                                       on MONEX0          to WR_REFREAD;
 
 

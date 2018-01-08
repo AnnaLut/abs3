@@ -90,46 +90,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_WCSSYNCQUEUE_CRTD_NN ***
+PROMPT *** Create  constraint PK_WCSSYNCQUEUE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_SYNC_QUEUE MODIFY (CRT_DATE CONSTRAINT CC_WCSSYNCQUEUE_CRTD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_WCSSYNCQUEUE_CRTSID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SYNC_QUEUE MODIFY (CRT_STAFF_ID CONSTRAINT CC_WCSSYNCQUEUE_CRTSID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_WCSSYNCQUEUE_DSID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SYNC_QUEUE MODIFY (DS_ID CONSTRAINT CC_WCSSYNCQUEUE_DSID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_WCSSYNCQUEUE_FLRS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SYNC_QUEUE MODIFY (FAILURES CONSTRAINT CC_WCSSYNCQUEUE_FLRS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_SYNC_QUEUE ADD CONSTRAINT PK_WCSSYNCQUEUE PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -150,12 +116,46 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_WCSSYNCQUEUE ***
+PROMPT *** Create  constraint CC_WCSSYNCQUEUE_FLRS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_SYNC_QUEUE ADD CONSTRAINT PK_WCSSYNCQUEUE PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
+  ALTER TABLE BARS.WCS_SYNC_QUEUE MODIFY (FAILURES CONSTRAINT CC_WCSSYNCQUEUE_FLRS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_WCSSYNCQUEUE_DSID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_SYNC_QUEUE MODIFY (DS_ID CONSTRAINT CC_WCSSYNCQUEUE_DSID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_WCSSYNCQUEUE_CRTSID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_SYNC_QUEUE MODIFY (CRT_STAFF_ID CONSTRAINT CC_WCSSYNCQUEUE_CRTSID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_WCSSYNCQUEUE_CRTD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_SYNC_QUEUE MODIFY (CRT_DATE CONSTRAINT CC_WCSSYNCQUEUE_CRTD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -178,8 +178,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SYNC_QUEUE ***
-grant SELECT                                                                 on WCS_SYNC_QUEUE  to BARSREADER_ROLE;
-grant SELECT                                                                 on WCS_SYNC_QUEUE  to UPLD;
 grant INSERT,SELECT,UPDATE                                                   on WCS_SYNC_QUEUE  to WCS_SYNC_USER;
 
 

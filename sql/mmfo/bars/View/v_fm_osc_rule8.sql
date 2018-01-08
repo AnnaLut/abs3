@@ -26,11 +26,9 @@ PROMPT *** Create  view V_FM_OSC_RULE8 ***
 ;
 
 PROMPT *** Create  grants  V_FM_OSC_RULE8 ***
-grant SELECT                                                                 on V_FM_OSC_RULE8  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FM_OSC_RULE8  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FM_OSC_RULE8  to FINMON01;
 grant SELECT                                                                 on V_FM_OSC_RULE8  to START1;
-grant SELECT                                                                 on V_FM_OSC_RULE8  to UPLD;
 
 
 

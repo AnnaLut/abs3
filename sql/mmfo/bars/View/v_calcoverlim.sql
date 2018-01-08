@@ -52,8 +52,6 @@ where o.ref  = d1.ref
 
 PROMPT *** Create  grants  V_CALCOVERLIM ***
 grant SELECT                                                                 on V_CALCOVERLIM   to BARS009;
-grant SELECT                                                                 on V_CALCOVERLIM   to BARSREADER_ROLE;
-grant SELECT                                                                 on V_CALCOVERLIM   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CALCOVERLIM   to WR_ALL_RIGHTS;
 
 

@@ -97,6 +97,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SPRREG_SPROBL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SPR_REG ADD CONSTRAINT FK_SPRREG_SPROBL FOREIGN KEY (C_REG)
+	  REFERENCES BARS.SPR_OBL (C_REG) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SPRREG_CREG_NN ***
 begin   
  execute immediate '
@@ -109,10 +122,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SPRREG_CDST_NN ***
+PROMPT *** Create  constraint CC_SPRREG_INUSE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SPR_REG MODIFY (C_DST CONSTRAINT CC_SPRREG_CDST_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SPR_REG MODIFY (INUSE CONSTRAINT CC_SPRREG_INUSE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -121,10 +134,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SPRREG_INUSE_NN ***
+PROMPT *** Create  constraint CC_SPRREG_CDST_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SPR_REG MODIFY (INUSE CONSTRAINT CC_SPRREG_INUSE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SPR_REG MODIFY (C_DST CONSTRAINT CC_SPRREG_CDST_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -148,13 +161,11 @@ exception when others then
 
 PROMPT *** Create  grants  SPR_REG ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPR_REG         to ABS_ADMIN;
-grant SELECT                                                                 on SPR_REG         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPR_REG         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SPR_REG         to BARS_DM;
 grant SELECT                                                                 on SPR_REG         to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPR_REG         to SPR_REG;
 grant SELECT                                                                 on SPR_REG         to START1;
-grant SELECT                                                                 on SPR_REG         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPR_REG         to WR_ALL_RIGHTS;
 grant SELECT                                                                 on SPR_REG         to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on SPR_REG         to WR_REFREAD;

@@ -15,10 +15,8 @@ where l.acc = a.acc
   and l.acc = NVL( to_number( pul.Get_Mas_Ini_Val('ACC') ), a.acc) ;
 
 PROMPT *** Create  grants  V3_OVRN ***
-grant SELECT                                                                 on V3_OVRN         to BARSREADER_ROLE;
 grant SELECT                                                                 on V3_OVRN         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V3_OVRN         to START1;
-grant SELECT                                                                 on V3_OVRN         to UPLD;
 
 
 

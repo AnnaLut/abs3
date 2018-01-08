@@ -13,9 +13,7 @@ PROMPT *** Create  view V_WCS_SUBPRODUCTS ***
  where sbp.product_id in (select product_id from v_wcs_products);
 
 PROMPT *** Create  grants  V_WCS_SUBPRODUCTS ***
-grant SELECT                                                                 on V_WCS_SUBPRODUCTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SUBPRODUCTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_SUBPRODUCTS to UPLD;
 
 
 

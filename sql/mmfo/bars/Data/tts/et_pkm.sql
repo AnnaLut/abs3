@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции PKM
-prompt Наименование операции: PKM p) PKM -Плата за користування карткою в НВ (безготів)
+prompt Наименование операции: p) PKM -Плата за користування карткою в НВ (безготів)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('PKM', 'PKM p) PKM -Плата за користування карткою в НВ (безготів)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000010000000000000000000000000000', 'Плата за користування карткою ');
+    values ('PKM', 'p) PKM -Плата за користування карткою в НВ (безготів)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000010000000000000000000000000000', 'Плата за користування карткою ');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='PKM', name='PKM p) PKM -Плата за користування карткою в НВ (безготів)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn='Плата за користування карткою '
+         set tt='PKM', name='p) PKM -Плата за користування карткою в НВ (безготів)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn='Плата за користування карткою '
        where tt='PKM';
   end;
   --------------------------------
@@ -154,67 +154,67 @@ begin
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6510', 'PKM', 1);
+    values ('6110', 'PKM', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''PKM'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''PKM'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6510', 'PKM', 1);
+    values ('6110', 'PKM', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''PKM'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''PKM'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6510', 'PKM', 1);
+    values ('6110', 'PKM', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''PKM'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''PKM'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6510', 'PKM', 1);
+    values ('6110', 'PKM', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''PKM'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''PKM'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6510', 'PKM', 1);
+    values ('6110', 'PKM', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''PKM'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''PKM'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6510', 'PKM', 1);
+    values ('6110', 'PKM', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''PKM'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''PKM'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;

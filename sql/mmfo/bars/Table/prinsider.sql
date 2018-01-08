@@ -69,6 +69,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_PRINSIDER_PRINSIDER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRINSIDER ADD CONSTRAINT FK_PRINSIDER_PRINSIDER FOREIGN KEY (PRINSIDERLV1)
+	  REFERENCES BARS.PRINSIDER (PRINSIDER) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C005228 ***
 begin   
  execute immediate '
@@ -109,14 +122,12 @@ exception when others then
 PROMPT *** Create  grants  PRINSIDER ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PRINSIDER       to ABS_ADMIN;
 grant SELECT                                                                 on PRINSIDER       to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on PRINSIDER       to BARSREADER_ROLE;
 grant SELECT                                                                 on PRINSIDER       to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PRINSIDER       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRINSIDER       to BARS_DM;
 grant SELECT                                                                 on PRINSIDER       to CUST001;
 grant SELECT                                                                 on PRINSIDER       to RPBN002;
 grant SELECT                                                                 on PRINSIDER       to START1;
-grant SELECT                                                                 on PRINSIDER       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PRINSIDER       to WR_ALL_RIGHTS;
 grant SELECT                                                                 on PRINSIDER       to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on PRINSIDER       to WR_REFREAD;

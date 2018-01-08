@@ -1,10 +1,5 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS_DM/package/dm_import.sql =========*** Run **
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS_DM.DM_IMPORT 
+prompt PACKAGE bars_dm.dm_import
+create or replace package dm_import
 is
     --
     -- for import from BARS scheme
@@ -176,7 +171,7 @@ is
                             p_rows       out number,
                             p_rows_err   out number,
                             p_state      out varchar2);
-
+							
     --
     -- выгрузка поручителей / залогодателей по кредитам
     --     МФО;
@@ -186,10 +181,10 @@ is
     --     Тип зв’язку (застоводавець/поручитель);
     --     Сума.
     --
-    procedure credits_zal_imp ( p_dat in date default trunc(sysdate),
-                                p_periodtype in varchar2 default C_FULLIMP,
-                                p_rows out number,
-                                p_rows_err out number,
+    procedure credits_zal_imp ( p_dat in date default trunc(sysdate), 
+                                p_periodtype in varchar2 default C_FULLIMP, 
+                                p_rows out number, 
+                                p_rows_err out number, 
                                 p_state out varchar2);
     --
     -- clear old data
@@ -214,7 +209,7 @@ is
 
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT 
+create or replace package body DM_IMPORT
  is
 
     g_body_version constant varchar2(64) := 'Version 3.3.3 21/12/2017';
@@ -5523,7 +5518,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
               l_row.TELD := c.TELD;
               l_row.TELADD := c.TELADD;
               l_row.EMAIL := c.EMAIL;
-
+			  
               l_row.ADR_POST_COUNTRY := c.ap_contry;
               l_row.ADR_POST_DOMAIN := c.ap_domain;
               l_row.ADR_POST_REGION := c.ap_region;
@@ -5543,7 +5538,7 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
               l_row.ADR_WORK_LOC := c.au_locality;
               l_row.ADR_WORK_ADR := c.au_adress;
               l_row.ADR_WORK_ZIP := c.au_zip;
-
+			  
               l_row.NEGATIV_STATUS := null;
               l_row.REESTR_MOB_BANK := null;
               l_row.REESTR_INET_BANK := null;
@@ -6116,14 +6111,8 @@ CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
 
 end;
 /
- show err;
+ 
+show err;
  
 PROMPT *** Create  grants  DM_IMPORT ***
 grant EXECUTE                                                                on DM_IMPORT       to BARSUPL;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS_DM/package/dm_import.sql =========*** End **
- PROMPT ===================================================================================== 
- 

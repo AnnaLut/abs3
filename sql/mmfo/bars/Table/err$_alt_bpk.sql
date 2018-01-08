@@ -75,10 +75,6 @@ COMMENT ON COLUMN BARS.ERR$_ALT_BPK.NAZN IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ALT_BPK ***
-grant SELECT                                                                 on ERR$_ALT_BPK    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ALT_BPK    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_DPU_DEALW.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPU_DEALW ***
-grant SELECT                                                                 on ERR$_DPU_DEALW  to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPU_DEALW  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

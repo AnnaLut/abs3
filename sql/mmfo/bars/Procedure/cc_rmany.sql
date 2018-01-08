@@ -519,7 +519,6 @@ bars_audit.info('=======> Provodki 1');
       bars_audit.trace('%s 17.Закончили: GL.PAY => OK!',  l_title, null);
 
    end if;
-
    update int_accn SET ACR_DAT = DAT_ where acc = ACC_ and id=-2;
 
 
@@ -527,10 +526,7 @@ bars_audit.info('=======> Provodki 1');
    <<nextrec>> null;
 
 END LOOP;
-    exception when others then
-     LOGGER.ERROR(' ORA-20000='||substr(sqlerrm || chr(10) 
-               ||dbms_utility.format_error_backtrace||
-                 dbms_utility.format_call_stack(), 0, 4000));
+
 end CC_Rmany;
 /
 show err;

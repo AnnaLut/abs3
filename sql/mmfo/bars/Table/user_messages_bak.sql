@@ -90,70 +90,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_USERMESSAGES_USERID_NN ***
+PROMPT *** Create  constraint CC_USERMESSAGES_MSGDONE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.USER_MESSAGES_BAK MODIFY (USER_ID CONSTRAINT CC_USERMESSAGES_USERID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_USERMESSAGES_MSGTYPEID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.USER_MESSAGES_BAK MODIFY (MSG_TYPE_ID CONSTRAINT CC_USERMESSAGES_MSGTYPEID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_USERMESSAGES_MSGSENDERID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.USER_MESSAGES_BAK MODIFY (MSG_SENDER_ID CONSTRAINT CC_USERMESSAGES_MSGSENDERID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_USERMESSAGES_MSGSUBJ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.USER_MESSAGES_BAK MODIFY (MSG_SUBJECT CONSTRAINT CC_USERMESSAGES_MSGSUBJ_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_USERMESSAGES_MSGTEXT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.USER_MESSAGES_BAK MODIFY (MSG_TEXT CONSTRAINT CC_USERMESSAGES_MSGTEXT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_USERMESSAGES_MSGDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.USER_MESSAGES_BAK MODIFY (MSG_DATE CONSTRAINT CC_USERMESSAGES_MSGDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.USER_MESSAGES_BAK MODIFY (MSG_DONE CONSTRAINT CC_USERMESSAGES_MSGDONE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -174,10 +114,70 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_USERMESSAGES_MSGDONE_NN ***
+PROMPT *** Create  constraint CC_USERMESSAGES_MSGDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.USER_MESSAGES_BAK MODIFY (MSG_DONE CONSTRAINT CC_USERMESSAGES_MSGDONE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.USER_MESSAGES_BAK MODIFY (MSG_DATE CONSTRAINT CC_USERMESSAGES_MSGDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_USERMESSAGES_MSGTEXT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.USER_MESSAGES_BAK MODIFY (MSG_TEXT CONSTRAINT CC_USERMESSAGES_MSGTEXT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_USERMESSAGES_MSGSUBJ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.USER_MESSAGES_BAK MODIFY (MSG_SUBJECT CONSTRAINT CC_USERMESSAGES_MSGSUBJ_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_USERMESSAGES_MSGSENDERID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.USER_MESSAGES_BAK MODIFY (MSG_SENDER_ID CONSTRAINT CC_USERMESSAGES_MSGSENDERID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_USERMESSAGES_MSGTYPEID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.USER_MESSAGES_BAK MODIFY (MSG_TYPE_ID CONSTRAINT CC_USERMESSAGES_MSGTYPEID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_USERMESSAGES_USERID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.USER_MESSAGES_BAK MODIFY (USER_ID CONSTRAINT CC_USERMESSAGES_USERID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -200,11 +200,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  USER_MESSAGES_BAK ***
-grant SELECT                                                                 on USER_MESSAGES_BAK to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on USER_MESSAGES_BAK to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on USER_MESSAGES_BAK to DPT_ADMIN;
 grant SELECT                                                                 on USER_MESSAGES_BAK to START1;
-grant SELECT                                                                 on USER_MESSAGES_BAK to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on USER_MESSAGES_BAK to WR_ALL_RIGHTS;
 
 

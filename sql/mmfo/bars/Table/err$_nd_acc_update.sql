@@ -67,10 +67,6 @@ COMMENT ON COLUMN BARS.ERR$_ND_ACC_UPDATE.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ND_ACC_UPDATE ***
-grant SELECT                                                                 on ERR$_ND_ACC_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ND_ACC_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

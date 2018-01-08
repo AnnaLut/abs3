@@ -11,10 +11,8 @@ PROMPT *** Create  view V_FXANI_4V ***
   select B, E, KOD3K, sos, Sum(s) S     from V_FXANI_0P group by B, E, KOD3K, sos;
 
 PROMPT *** Create  grants  V_FXANI_4V ***
-grant SELECT                                                                 on V_FXANI_4V      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FXANI_4V      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FXANI_4V      to START1;
-grant SELECT                                                                 on V_FXANI_4V      to UPLD;
 
 
 

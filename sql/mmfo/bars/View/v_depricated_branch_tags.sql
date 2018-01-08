@@ -25,9 +25,7 @@ select ba.attribute_code tag, ba.attribute_desc name, null, null
  where  ba.attribute_code not in (select tag from t);
 
 PROMPT *** Create  grants  V_DEPRICATED_BRANCH_TAGS ***
-grant SELECT                                                                 on V_DEPRICATED_BRANCH_TAGS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DEPRICATED_BRANCH_TAGS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DEPRICATED_BRANCH_TAGS to UPLD;
 
 
 

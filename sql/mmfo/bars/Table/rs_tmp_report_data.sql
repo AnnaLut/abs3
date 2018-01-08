@@ -722,10 +722,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  RS_TMP_REPORT_DATA ***
-grant SELECT                                                                 on RS_TMP_REPORT_DATA to BARSREADER_ROLE;
 grant SELECT                                                                 on RS_TMP_REPORT_DATA to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RS_TMP_REPORT_DATA to RS;
-grant SELECT                                                                 on RS_TMP_REPORT_DATA to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RS_TMP_REPORT_DATA to WR_ALL_RIGHTS;
 
 

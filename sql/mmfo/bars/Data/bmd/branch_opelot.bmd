@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Розрахунки з фiлiями операторiв лотерей';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'BRANCH_OPELOT';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,28 +119,28 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Бранч~Ощад~Банку', '', null, 4, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'BS1', 'C', 'Розщ~1~БР', '', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'BS2', 'C', 'Розщ~2~БР', '', null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'BS3', 'C', 'Розщ~3~БР', '', null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DATP', 'D', 'Дата~поперед~розрахунку', '', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'MFO', 'C', 'МФО~банку~фiлiї~Оператора', '', null, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NAME', 'C', 'Назва~фiлiї~Оператора', '', null, 6, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=[PROC=>P_LOT1(:BRANCH,:OB22,:DAT2)][PAR=>:DAT2(SEM=Дата ПО,TYPE=D)][EXEC=>BEFORE][QST=> Виконати розрахунок з :NAME ?][MSG=>OK. Перегляньте останній документ !]', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NAZN1', 'C', 'Авто~Призначення пл.~ для док-1~розщепдення', '', 160, 90, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NAZN2', 'C', 'Автo~Призначення пл.~ для док-2~перерах~коштiв', '', 160, 91, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NLS', 'C', 'Рахунок~в МФО~фiлiї~Оператора', '', null, 41, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'OB1', 'C', 'Розщ~1~ОБ22', '', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'OB2', 'C', 'Розщ~2~ОБ22', '', null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'OB22', 'C', 'Код~Опер~ОБ22', '', null, 5, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'OB3', 'C', 'Розщ~3~ОБ22', '', null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'OKPO', 'C', 'Iден.~код~фiлiї~Оператора', '', null, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'PR1', 'N', 'Розщ~1~%', '', null, 10, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'PR2', 'N', 'Розщ~2~%', '', null, 20, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'PR3', 'N', 'Розщ~3~%', '', null, 30, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'REZ_OB22', 'C', 'об22 для~2905 по~несниж~залиш', '', null, 60, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'REZ_SUM', 'N', 'сумма~незниж~залишку', '', null, 61, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'REF1', 'N', 'Референс~останньої~акум+розщ.', '', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF1', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'REF2', 'N', 'Референс~останнього~перерахування', '', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF2', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Бранч~Ощад~Банку', null, null, 4, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BS1', 'C', 'Розщ~1~БР', null, null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'BS2', 'C', 'Розщ~2~БР', null, null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'BS3', 'C', 'Розщ~3~БР', null, null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DATP', 'D', 'Дата~поперед~розрахунку', null, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'MFO', 'C', 'МФО~банку~фiлiї~Оператора', null, null, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NAME', 'C', 'Назва~фiлiї~Оператора', null, null, 6, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=[PROC=>P_LOT1(:BRANCH,:OB22,:DAT2)][PAR=>:DAT2(SEM=Дата ПО,TYPE=D)][EXEC=>BEFORE][QST=> Виконати розрахунок з :NAME ?][MSG=>OK. Перегляньте останній документ !]', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NAZN1', 'C', 'Авто~Призначення пл.~ для док-1~розщепдення', null, 160, 90, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NAZN2', 'C', 'Автo~Призначення пл.~ для док-2~перерах~коштiв', null, 160, 91, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NLS', 'C', 'Рахунок~в МФО~фiлiї~Оператора', null, null, 41, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'OB1', 'C', 'Розщ~1~ОБ22', null, null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'OB2', 'C', 'Розщ~2~ОБ22', null, null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'OB22', 'C', 'Код~Опер~ОБ22', null, null, 5, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'OB3', 'C', 'Розщ~3~ОБ22', null, null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'OKPO', 'C', 'Iден.~код~фiлiї~Оператора', null, null, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'PR1', 'N', 'Розщ~1~%', null, null, 10, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'PR2', 'N', 'Розщ~2~%', null, null, 20, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'PR3', 'N', 'Розщ~3~%', null, null, 30, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'REZ_OB22', 'C', 'об22 для~2905 по~несниж~залиш', null, null, 60, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'REZ_SUM', 'N', 'сумма~незниж~залишку', null, null, 61, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'REF1', 'N', 'Референс~останньої~акум+розщ.', null, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF1', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'REF2', 'N', 'Референс~останнього~перерахування', null, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF2', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

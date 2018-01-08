@@ -52,9 +52,7 @@ COMMENT ON COLUMN BARS.KL_K160.D_MODE IS '';
 
 
 PROMPT *** Create  grants  KL_K160 ***
-grant SELECT                                                                 on KL_K160         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_K160         to BARS_DM;
-grant SELECT                                                                 on KL_K160         to UPLD;
 
 
 

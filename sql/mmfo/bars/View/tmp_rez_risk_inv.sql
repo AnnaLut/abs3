@@ -11,10 +11,8 @@ PROMPT *** Create  view TMP_REZ_RISK_INV ***
   select distinct fdat from fdat where fdat>add_months(bankdate,-1);
 
 PROMPT *** Create  grants  TMP_REZ_RISK_INV ***
-grant SELECT                                                                 on TMP_REZ_RISK_INV to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_REZ_RISK_INV to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_REZ_RISK_INV to RCC_DEAL;
-grant SELECT                                                                 on TMP_REZ_RISK_INV to UPLD;
 
 
 

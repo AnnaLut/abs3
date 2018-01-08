@@ -69,6 +69,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OWCNGFILES_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_CNG_FILES ADD CONSTRAINT FK_OWCNGFILES_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OWCNGFILES_ID_NN ***
 begin   
  execute immediate '
@@ -133,11 +146,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_CNG_FILES ***
-grant SELECT                                                                 on OW_CNG_FILES    to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on OW_CNG_FILES    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_CNG_FILES    to BARS_DM;
 grant INSERT,SELECT                                                          on OW_CNG_FILES    to OW;
-grant SELECT                                                                 on OW_CNG_FILES    to UPLD;
 
 
 

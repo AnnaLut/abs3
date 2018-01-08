@@ -69,10 +69,6 @@ COMMENT ON COLUMN BARS.ERR$_CC_MANY.P_SN IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CC_MANY ***
-grant SELECT                                                                 on ERR$_CC_MANY    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CC_MANY    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

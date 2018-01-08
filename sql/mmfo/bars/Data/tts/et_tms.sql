@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции TMS
-prompt Наименование операции: TMS 5) # TMK/STOP-правило для прод/пок БМ
+prompt Наименование операции: 5) # TMK/STOP-правило для прод/пок БМ
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('TMS', 'TMS 5) # TMK/STOP-правило для прод/пок БМ', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_BMK(#(REF),#(S),#(KVA)) ', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('TMS', '5) # TMK/STOP-правило для прод/пок БМ', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_BMK(#(REF),#(S),#(KVA)) ', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='TMS', name='TMS 5) # TMK/STOP-правило для прод/пок БМ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_BMK(#(REF),#(S),#(KVA)) ', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='TMS', name='5) # TMK/STOP-правило для прод/пок БМ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_BMK(#(REF),#(S),#(KVA)) ', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='TMS';
   end;
   --------------------------------

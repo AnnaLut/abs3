@@ -91,10 +91,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  CBIREP_PARAMS ***
-grant SELECT                                                                 on CBIREP_PARAMS   to BARSREADER_ROLE;
 grant SELECT                                                                 on CBIREP_PARAMS   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CBIREP_PARAMS   to BARS_DM;
-grant SELECT                                                                 on CBIREP_PARAMS   to UPLD;
 
 
 

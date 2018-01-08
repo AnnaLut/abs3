@@ -260,7 +260,7 @@ BEGIN
           a.ost_nom, a.ost_eqv,
           DECODE(SIGN(a.ost_nom),-1, 1, 2) ap, a.r012,
           a.ddd, a.r020, a.r013, null, 0, a.k060, a.rnk, nvl(null, a.rnk), okpo
-    FROM (SELECT  /*+ parallel(8) leading(k) */ 
+    FROM (SELECT  /*+ parallel leading(k) */ 
                  b.acc_id acc, a.acc_num nls, a.kv, b.report_date FDAT, a.nbs,
                  b.ost ost_nom, b.ostq ost_eqv, 
                  c.cust_id rnk, k.r012, k.ddd, k.r020, a.r013, 

@@ -126,6 +126,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_WCSBCKREPORTS_WCSBCK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_BCK_REPORTS ADD CONSTRAINT FK_WCSBCKREPORTS_WCSBCK FOREIGN KEY (BCK_ID)
+	  REFERENCES BARS.WCS_BCK (BCK_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_WCSBCKREPS_REPTYPE ***
 begin   
  execute immediate '
@@ -180,11 +193,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_BCK_REPORTS ***
-grant SELECT                                                                 on WCS_BCK_REPORTS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_BCK_REPORTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_BCK_REPORTS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_BCK_REPORTS to START1;
-grant SELECT                                                                 on WCS_BCK_REPORTS to UPLD;
 
 
 

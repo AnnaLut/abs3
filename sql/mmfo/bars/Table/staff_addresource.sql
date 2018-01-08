@@ -157,9 +157,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  STAFF_ADDRESOURCE ***
-grant SELECT                                                                 on STAFF_ADDRESOURCE to BARSREADER_ROLE;
 grant SELECT                                                                 on STAFF_ADDRESOURCE to BARS_DM;
-grant SELECT                                                                 on STAFF_ADDRESOURCE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF_ADDRESOURCE to WR_ALL_RIGHTS;
 
 

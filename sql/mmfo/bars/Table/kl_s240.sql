@@ -24,9 +24,8 @@ PROMPT *** Create  table KL_S240 ***
 begin 
   execute immediate '
   CREATE TABLE BARS.KL_S240 
-   (	S240 VARCHAR2(1), 
-	S242 VARCHAR2(1), 
-	S245 VARCHAR2(1), 
+   (	S240 CHAR(1), 
+	S242 CHAR(1), 
 	TXT VARCHAR2(48), 
 	DATA_O DATE, 
 	DATA_C DATE, 
@@ -50,13 +49,21 @@ PROMPT *** ALTER_POLICIES to KL_S240 ***
 COMMENT ON TABLE BARS.KL_S240 IS '';
 COMMENT ON COLUMN BARS.KL_S240.S240 IS '';
 COMMENT ON COLUMN BARS.KL_S240.S242 IS '';
-COMMENT ON COLUMN BARS.KL_S240.S245 IS '';
 COMMENT ON COLUMN BARS.KL_S240.TXT IS '';
 COMMENT ON COLUMN BARS.KL_S240.DATA_O IS '';
 COMMENT ON COLUMN BARS.KL_S240.DATA_C IS '';
 COMMENT ON COLUMN BARS.KL_S240.DATA_M IS '';
 
 
+
+PROMPT *** Create  grants  KL_S240 ***
+grant DELETE,INSERT,SELECT,UPDATE                                            on KL_S240         to ABS_ADMIN;
+grant SELECT                                                                 on KL_S240         to BARSUPL;
+grant DELETE,INSERT,SELECT,UPDATE                                            on KL_S240         to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on KL_S240         to BARS_DM;
+grant DELETE,INSERT,SELECT,UPDATE                                            on KL_S240         to KL_S240;
+grant SELECT                                                                 on KL_S240         to START1;
+grant SELECT                                                                 on KL_S240         to UPLD;
 
 
 

@@ -50,6 +50,19 @@ COMMENT ON COLUMN BARS.POLICY_RESPONSIBLE.ADMIN_VALIDATED IS '';
 
 
 
+PROMPT *** Create  constraint FK_POLICYRESP_DEVELOPERS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.POLICY_RESPONSIBLE ADD CONSTRAINT FK_POLICYRESP_DEVELOPERS FOREIGN KEY (RESPONSIBLE_DEVELOPER)
+	  REFERENCES BARS.DEVELOPERS (DEVELOPER_NICK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_POLICYRESP_TABLENAME_NN ***
 begin   
  execute immediate '
@@ -88,10 +101,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_POLICYRESP_VALIDATED_CC ***
+PROMPT *** Create  constraint CC_POLICYRESP_ADMVALIDATED_CC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.POLICY_RESPONSIBLE ADD CONSTRAINT CC_POLICYRESP_VALIDATED_CC CHECK (validated=''Y'') ENABLE';
+  ALTER TABLE BARS.POLICY_RESPONSIBLE ADD CONSTRAINT CC_POLICYRESP_ADMVALIDATED_CC CHECK (admin_validated=''Y'') ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -100,10 +113,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_POLICYRESP_ADMVALIDATED_CC ***
+PROMPT *** Create  constraint CC_POLICYRESP_VALIDATED_CC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.POLICY_RESPONSIBLE ADD CONSTRAINT CC_POLICYRESP_ADMVALIDATED_CC CHECK (admin_validated=''Y'') ENABLE';
+  ALTER TABLE BARS.POLICY_RESPONSIBLE ADD CONSTRAINT CC_POLICYRESP_VALIDATED_CC CHECK (validated=''Y'') ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -126,7 +139,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  POLICY_RESPONSIBLE ***
-grant SELECT                                                                 on POLICY_RESPONSIBLE to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on POLICY_RESPONSIBLE to WR_ALL_RIGHTS;
 
 

@@ -120,10 +120,8 @@ COMMENT ON COLUMN BARS.TOAD_PLAN_TABLE.DEPTH IS '';
 
 
 PROMPT *** Create  grants  TOAD_PLAN_TABLE ***
-grant SELECT                                                                 on TOAD_PLAN_TABLE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TOAD_PLAN_TABLE to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TOAD_PLAN_TABLE to START1;
-grant SELECT                                                                 on TOAD_PLAN_TABLE to UPLD;
 
 
 

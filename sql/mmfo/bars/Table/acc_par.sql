@@ -77,6 +77,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_ACCPAR_METACOLUMNS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_PAR ADD CONSTRAINT FK_ACCPAR_METACOLUMNS FOREIGN KEY (TABID, COLID)
+	  REFERENCES BARS.META_COLUMNS (TABID, COLID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_ACCPAR_TABID_NN ***
 begin   
  execute immediate '
@@ -128,12 +141,10 @@ exception when others then
 
 PROMPT *** Create  grants  ACC_PAR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_PAR         to ABS_ADMIN;
-grant SELECT                                                                 on ACC_PAR         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_PAR         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_PAR         to BARS_DM;
 grant SELECT                                                                 on ACC_PAR         to CUST001;
 grant SELECT                                                                 on ACC_PAR         to START1;
-grant SELECT                                                                 on ACC_PAR         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_PAR         to WR_ALL_RIGHTS;
 grant SELECT                                                                 on ACC_PAR         to WR_CUSTLIST;
 grant FLASHBACK,SELECT                                                       on ACC_PAR         to WR_REFREAD;

@@ -67,10 +67,8 @@ PROMPT *** Create  view CHECK_73A ***
           AND aux1.REF = o.REF;
 
 PROMPT *** Create  grants  CHECK_73A ***
-grant SELECT                                                                 on CHECK_73A       to BARSREADER_ROLE;
 grant SELECT                                                                 on CHECK_73A       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHECK_73A       to START1;
-grant SELECT                                                                 on CHECK_73A       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CHECK_73A       to WR_ALL_RIGHTS;
 
 

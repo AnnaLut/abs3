@@ -120,18 +120,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010405 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OTCN_SALDO MODIFY (FDAT NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C0010406 ***
 begin   
  execute immediate '
@@ -144,47 +132,21 @@ exception when others then
 
 
 
-PROMPT *** Create  index I2_OTCN_SALDO ***
+PROMPT *** Create  constraint SYS_C0010405 ***
 begin   
  execute immediate '
-  CREATE INDEX BARS.I2_OTCN_SALDO ON BARS.OTCN_SALDO (RNK, ACC) ';
+  ALTER TABLE BARS.OTCN_SALDO MODIFY (FDAT NOT NULL ENABLE)';
 exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index I3_OTCN_SALDO ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.I3_OTCN_SALDO ON BARS.OTCN_SALDO (NLS, KV) ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index I1_OTCN_SALDO ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.I1_OTCN_SALDO ON BARS.OTCN_SALDO (ACC, FDAT) ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
 
 PROMPT *** Create  grants  OTCN_SALDO ***
-grant SELECT                                                                 on OTCN_SALDO      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_SALDO      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_SALDO      to RPBN001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_SALDO      to RPBN002;
-grant SELECT                                                                 on OTCN_SALDO      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_SALDO      to WR_ALL_RIGHTS;
 
 

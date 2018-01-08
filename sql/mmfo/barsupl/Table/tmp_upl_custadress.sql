@@ -64,10 +64,6 @@ COMMENT ON COLUMN BARSUPL.TMP_UPL_CUSTADRESS.AP_LOCALITY IS '';
 
 
 
-PROMPT *** Create  grants  TMP_UPL_CUSTADRESS ***
-grant SELECT                                                                 on TMP_UPL_CUSTADRESS to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_UPL_CUSTADRESS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

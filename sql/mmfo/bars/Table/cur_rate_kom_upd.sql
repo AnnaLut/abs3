@@ -81,10 +81,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CURRATEKOMUPD_KV_NN ***
+PROMPT *** Create  constraint FK_CURRATEKOMUPD_BRANCH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUR_RATE_KOM_UPD MODIFY (KV CONSTRAINT CC_CURRATEKOMUPD_KV_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CUR_RATE_KOM_UPD ADD CONSTRAINT FK_CURRATEKOMUPD_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -93,46 +94,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CURRATEKOMUPD_VDATE_NN ***
+PROMPT *** Create  constraint CC_CURRATEKOMUPD_RECID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUR_RATE_KOM_UPD MODIFY (VDATE CONSTRAINT CC_CURRATEKOMUPD_VDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CURRATEKOMUPD_BSUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUR_RATE_KOM_UPD MODIFY (BSUM CONSTRAINT CC_CURRATEKOMUPD_BSUM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CURRATEKOMUPD_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUR_RATE_KOM_UPD MODIFY (BRANCH CONSTRAINT CC_CURRATEKOMUPD_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CURRATEKOMUPD_ISP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUR_RATE_KOM_UPD MODIFY (ISP CONSTRAINT CC_CURRATEKOMUPD_ISP_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CUR_RATE_KOM_UPD MODIFY (RECID CONSTRAINT CC_CURRATEKOMUPD_RECID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -153,10 +118,58 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CURRATEKOMUPD_RECID_NN ***
+PROMPT *** Create  constraint CC_CURRATEKOMUPD_ISP_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUR_RATE_KOM_UPD MODIFY (RECID CONSTRAINT CC_CURRATEKOMUPD_RECID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CUR_RATE_KOM_UPD MODIFY (ISP CONSTRAINT CC_CURRATEKOMUPD_ISP_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CURRATEKOMUPD_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUR_RATE_KOM_UPD MODIFY (BRANCH CONSTRAINT CC_CURRATEKOMUPD_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CURRATEKOMUPD_BSUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUR_RATE_KOM_UPD MODIFY (BSUM CONSTRAINT CC_CURRATEKOMUPD_BSUM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CURRATEKOMUPD_VDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUR_RATE_KOM_UPD MODIFY (VDATE CONSTRAINT CC_CURRATEKOMUPD_VDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CURRATEKOMUPD_KV_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUR_RATE_KOM_UPD MODIFY (KV CONSTRAINT CC_CURRATEKOMUPD_KV_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -179,11 +192,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUR_RATE_KOM_UPD ***
-grant SELECT                                                                 on CUR_RATE_KOM_UPD to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUR_RATE_KOM_UPD to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUR_RATE_KOM_UPD to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUR_RATE_KOM_UPD to PYOD001;
-grant SELECT                                                                 on CUR_RATE_KOM_UPD to UPLD;
 grant FLASHBACK,SELECT                                                       on CUR_RATE_KOM_UPD to WR_REFREAD;
 
 

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции PK%
-prompt Наименование операции: PK% p) П-Дебет картрахунку (коміс.)
+prompt Наименование операции: p) П-Дебет картрахунку (коміс.)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('PK%', 'PK% p) П-Дебет картрахунку (коміс.)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000110000000000010000000000000', null);
+    values ('PK%', 'p) П-Дебет картрахунку (коміс.)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000110000000000010000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='PK%', name='PK% p) П-Дебет картрахунку (коміс.)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000110000000000010000000000000', nazn=null
+         set tt='PK%', name='p) П-Дебет картрахунку (коміс.)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000110000000000010000000000000', nazn=null
        where tt='PK%';
   end;
   --------------------------------

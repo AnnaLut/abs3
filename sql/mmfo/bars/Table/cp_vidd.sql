@@ -75,10 +75,62 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint R_DOX_CPVIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_VIDD ADD CONSTRAINT R_DOX_CPVIDD FOREIGN KEY (DOX)
+	  REFERENCES BARS.CP_DOX (DOX) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_PF_CPVIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_VIDD ADD CONSTRAINT R_PF_CPVIDD FOREIGN KEY (PF)
+	  REFERENCES BARS.CP_PF (PF) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_CCTIPD_CPVIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_VIDD ADD CONSTRAINT R_CCTIPD_CPVIDD FOREIGN KEY (TIPD)
+	  REFERENCES BARS.CC_TIPD (TIPD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C008366 ***
 begin   
  execute immediate '
   ALTER TABLE BARS.CP_VIDD MODIFY (VIDD NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_EMI_CPVIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_VIDD ADD CONSTRAINT R_EMI_CPVIDD FOREIGN KEY (EMI)
+	  REFERENCES BARS.CP_EMI (EMI) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -101,11 +153,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_VIDD ***
-grant SELECT                                                                 on CP_VIDD         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_VIDD         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_VIDD         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_VIDD         to CP_ROLE;
-grant SELECT                                                                 on CP_VIDD         to UPLD;
 grant FLASHBACK,SELECT                                                       on CP_VIDD         to WR_REFREAD;
 
 

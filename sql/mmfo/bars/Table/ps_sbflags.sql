@@ -77,11 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  PS_SBFLAGS ***
-grant SELECT                                                                 on PS_SBFLAGS      to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on PS_SBFLAGS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PS_SBFLAGS      to BARS_DM;
 grant SELECT                                                                 on PS_SBFLAGS      to START1;
-grant SELECT                                                                 on PS_SBFLAGS      to UPLD;
 grant FLASHBACK,SELECT                                                       on PS_SBFLAGS      to WR_REFREAD;
 
 

@@ -13,9 +13,7 @@ FROM OPER
 ;
 
 PROMPT *** Create  grants  V_WEB_OPER ***
-grant SELECT                                                                 on V_WEB_OPER      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WEB_OPER      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WEB_OPER      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_WEB_OPER      to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_WEB_OPER      to WR_DOCVIEW;
 

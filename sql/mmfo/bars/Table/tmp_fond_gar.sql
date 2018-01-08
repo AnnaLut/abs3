@@ -109,11 +109,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_FOND_GAR ***
-grant SELECT                                                                 on TMP_FOND_GAR    to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_FOND_GAR    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_FOND_GAR    to BARS_DM;
 grant SELECT                                                                 on TMP_FOND_GAR    to RPBN001;
-grant SELECT                                                                 on TMP_FOND_GAR    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_FOND_GAR    to WR_ALL_RIGHTS;
 
 

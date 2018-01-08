@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/GET_XML_RI.sql =========*** Run **
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure GET_XML_RI ***
-
-  CREATE OR REPLACE PROCEDURE BARS.GET_XML_RI (
+create or replace procedure get_xml_ri(
     p_filexml  in  varchar2,
     p_filekvt  in  varchar2,
     p_ku       in  varchar2,
@@ -263,7 +254,7 @@ begin
 
         begin
             insert into customer_ri
-             values (bars_sqnc.get_nextval('s_customer_ri'),        -- id        number
+             values (bars_sqnc.get_nextval('s_customer_ri'),        -- id        number 
                      l_idcode,                                      -- idcode    varchar2(10)   Код за ЄДРПОУ/ДРФО
                      l_doct,                                        -- doct      number(2)      Тип документа
                      l_docs,                                        -- docs      varchar2(10)   Серія документа
@@ -322,13 +313,3 @@ begin
 end;
 /
 show err;
-
-PROMPT *** Create  grants  GET_XML_RI ***
-grant EXECUTE                                                                on GET_XML_RI      to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on GET_XML_RI      to TECH005;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/GET_XML_RI.sql =========*** End **
-PROMPT ===================================================================================== 

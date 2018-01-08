@@ -45,10 +45,8 @@ PROMPT *** Create  view V_2909 ***
       AND n.d_close IS NULL;
 
 PROMPT *** Create  grants  V_2909 ***
-grant SELECT                                                                 on V_2909          to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_2909          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_2909          to PYOD001;
-grant SELECT                                                                 on V_2909          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_2909          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_2909          to WR_REFREAD;
 

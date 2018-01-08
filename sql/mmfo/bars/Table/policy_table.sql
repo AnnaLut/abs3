@@ -133,10 +133,8 @@ exception when others then
 
 PROMPT *** Create  grants  POLICY_TABLE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on POLICY_TABLE    to ABS_ADMIN;
-grant SELECT                                                                 on POLICY_TABLE    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on POLICY_TABLE    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on POLICY_TABLE    to BARS_DM;
-grant SELECT                                                                 on POLICY_TABLE    to UPLD;
 
 
 

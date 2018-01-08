@@ -176,9 +176,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TTS_RU ***
-grant SELECT                                                                 on TTS_RU          to BARSREADER_ROLE;
 grant SELECT                                                                 on TTS_RU          to BARS_DM;
-grant SELECT                                                                 on TTS_RU          to UPLD;
 
 
 

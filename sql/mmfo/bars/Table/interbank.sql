@@ -102,12 +102,10 @@ exception when others then
 
 PROMPT *** Create  grants  INTERBANK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on INTERBANK       to ABS_ADMIN;
-grant SELECT                                                                 on INTERBANK       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INTERBANK       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INTERBANK       to BARS_DM;
 grant SELECT                                                                 on INTERBANK       to START1;
 grant SELECT                                                                 on INTERBANK       to TECH005;
-grant SELECT                                                                 on INTERBANK       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INTERBANK       to WR_ALL_RIGHTS;
 
 

@@ -74,11 +74,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  REFERENCES_RU ***
-grant SELECT                                                                 on REFERENCES_RU   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REFERENCES_RU   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REFERENCES_RU   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REFERENCES_RU   to START1;
-grant SELECT                                                                 on REFERENCES_RU   to UPLD;
 
 
 

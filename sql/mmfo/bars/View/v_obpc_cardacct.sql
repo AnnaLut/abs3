@@ -14,10 +14,8 @@ where a.acc = c.acc and c.rnk = r.rnk
  ;
 
 PROMPT *** Create  grants  V_OBPC_CARDACCT ***
-grant SELECT                                                                 on V_OBPC_CARDACCT to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_CARDACCT to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OBPC_CARDACCT to OBPC;
-grant SELECT                                                                 on V_OBPC_CARDACCT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_CARDACCT to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_OBPC_CARDACCT to WR_REFREAD;
 

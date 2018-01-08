@@ -18,10 +18,8 @@ from oper o where o.ref in (select ref4  from kob where ref4 is not null)
 ;
 
 PROMPT *** Create  grants  V_KOB ***
-grant SELECT                                                                 on V_KOB           to BARSREADER_ROLE;
 grant SELECT                                                                 on V_KOB           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_KOB           to START1;
-grant SELECT                                                                 on V_KOB           to UPLD;
 
 
 

@@ -102,11 +102,9 @@ exception when others then
 
 PROMPT *** Create  grants  SW_TT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_TT           to BARS013;
-grant SELECT                                                                 on SW_TT           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_TT           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_TT           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_TT           to SW_TT;
-grant SELECT                                                                 on SW_TT           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_TT           to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SW_TT           to WR_REFREAD;
 

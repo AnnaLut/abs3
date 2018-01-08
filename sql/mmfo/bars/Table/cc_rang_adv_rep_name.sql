@@ -77,11 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_RANG_ADV_REP_NAME ***
-grant SELECT                                                                 on CC_RANG_ADV_REP_NAME to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_RANG_ADV_REP_NAME to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_RANG_ADV_REP_NAME to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_RANG_ADV_REP_NAME to START1;
-grant SELECT                                                                 on CC_RANG_ADV_REP_NAME to UPLD;
 
 
 

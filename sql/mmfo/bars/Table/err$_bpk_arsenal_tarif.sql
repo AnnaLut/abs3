@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_BPK_ARSENAL_TARIF.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_BPK_ARSENAL_TARIF ***
-grant SELECT                                                                 on ERR$_BPK_ARSENAL_TARIF to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_BPK_ARSENAL_TARIF to UPLD;
-
 
 
 PROMPT ===================================================================================== 

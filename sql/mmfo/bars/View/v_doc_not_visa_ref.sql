@@ -36,9 +36,7 @@ PROMPT *** Create  view V_DOC_NOT_VISA_REF ***
             oper.userid;
 
 PROMPT *** Create  grants  V_DOC_NOT_VISA_REF ***
-grant SELECT                                                                 on V_DOC_NOT_VISA_REF to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOC_NOT_VISA_REF to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DOC_NOT_VISA_REF to UPLD;
 
 
 

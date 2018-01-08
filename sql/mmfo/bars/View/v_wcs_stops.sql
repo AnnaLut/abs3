@@ -19,9 +19,7 @@ PROMPT *** Create  view V_WCS_STOPS ***
  order by s.type_id, s.id;
 
 PROMPT *** Create  grants  V_WCS_STOPS ***
-grant SELECT                                                                 on V_WCS_STOPS     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_STOPS     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_STOPS     to UPLD;
 
 
 

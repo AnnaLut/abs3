@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.TMP_MONEX3.ID IS '';
 
 
 
-PROMPT *** Create  grants  TMP_MONEX3 ***
-grant SELECT                                                                 on TMP_MONEX3      to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_MONEX3      to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -144,11 +144,9 @@ exception when others then
 
 PROMPT *** Create  grants  META_MONTH ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_MONTH      to ABS_ADMIN;
-grant SELECT                                                                 on META_MONTH      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_MONTH      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on META_MONTH      to BARS_DM;
 grant SELECT                                                                 on META_MONTH      to START1;
-grant SELECT                                                                 on META_MONTH      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on META_MONTH      to WR_ALL_RIGHTS;
 
 

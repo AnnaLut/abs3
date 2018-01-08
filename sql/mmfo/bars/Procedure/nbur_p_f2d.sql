@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_F2D ***
 
-  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F2D (p_kod_filii        varchar2,
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F2D (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -142,7 +142,7 @@ BEGIN
            on ( t.REPORT_DATE = c.report_date and
                 t.KF          = c.kf          and
                 t.CUST_ID_DB  = c.cust_id     )
-         left outer
+         left outer 
          join RCUKRU u
            on ( u.IKOD = c.CUST_CODE )
          join OPER o
@@ -161,9 +161,9 @@ BEGIN
                     or
                     t.kf = '300465' and t.r020_db in ('2600', '2620') and t.r020_cr in ('1919','2909','3739')
                     or
-                    o.nlsa like '1500%' and (o.nlsb like '7100%' or o.nlsb like '7500%') and
+                    o.nlsa like '1500%' and (o.nlsb like '7100%' or o.nlsb like '7500%') and 
                     o.dk = 0 and round(t.bal_uah / l_kurs_840, 0) < 100000
-                  )
+                  ) 
       );
 
    commit;

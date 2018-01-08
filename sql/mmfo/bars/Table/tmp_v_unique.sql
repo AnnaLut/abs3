@@ -74,10 +74,8 @@ COMMENT ON COLUMN BARS.TMP_V_UNIQUE.REF_A IS '';
 
 
 PROMPT *** Create  grants  TMP_V_UNIQUE ***
-grant SELECT                                                                 on TMP_V_UNIQUE    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_V_UNIQUE    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_V_UNIQUE    to START1;
-grant SELECT                                                                 on TMP_V_UNIQUE    to UPLD;
 
 
 

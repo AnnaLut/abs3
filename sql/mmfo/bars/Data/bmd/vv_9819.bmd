@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := '1.Ручна корекцiя Стартової Iнвентаризацiї';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'VV_9819';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,18 +119,18 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'SDATE', 'D', 'Дата КД', '', null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'CC_ID', 'C', '№  КД', '', null, 5, 1, 0, 0, 0, '', '', 1, 0, 'Count(*)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'ISP', 'N', 'Iнспектор КД', '', null, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'ND', 'N', 'Реф КД', '', null, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'RNK', 'N', 'Реєстр № ~позичальника', '', null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'K_02', 'N', 'Кредитнi~Угоди~02', '', null, 12, 1, 0, 0, 0, '', '', 1, 0, 'Sum(K_02)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'K_03', 'N', 'Страховi~Угоди~03', '', null, 13, 1, 0, 0, 0, '', '', 1, 0, 'Sum(K_03)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'NMK', 'C', 'Клiєнт-позичальник', '', null, 4, 1, 0, 1, 0, '', '', 1, 0, '''Разом''', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'BRANCH', 'C', 'Бранч', '', null, 0, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'K_79', 'N', 'Iншi~Угоди~79', '', null, 27, 1, 0, 0, 0, '', '', 1, 0, 'Sum(K_79)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'K_83', 'N', 'Iпотечнi~Угоди~83', '', null, 23, 1, 0, 0, 0, '', '', 1, 0, 'Sum(K_83)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'PRIM', 'C', 'Примітка', '', null, 28, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'SDATE', 'D', 'Дата КД', null, null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'CC_ID', 'C', '№  КД', null, null, 5, 1, 0, 0, 0, '', '', 1, 0, 'Count(*)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'ISP', 'N', 'Iнспектор КД', null, null, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'ND', 'N', 'Реф КД', null, null, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'RNK', 'N', 'Реєстр № ~позичальника', null, null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'K_02', 'N', 'Кредитнi~Угоди~02', null, null, 12, 1, 0, 0, 0, '', '', 1, 0, 'Sum(K_02)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'K_03', 'N', 'Страховi~Угоди~03', null, null, 13, 1, 0, 0, 0, '', '', 1, 0, 'Sum(K_03)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'NMK', 'C', 'Клiєнт-позичальник', null, null, 4, 1, 0, 1, 0, '', '', 1, 0, '''Разом''', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'BRANCH', 'C', 'Бранч', null, null, 0, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'K_79', 'N', 'Iншi~Угоди~79', null, null, 27, 1, 0, 0, 0, '', '', 1, 0, 'Sum(K_79)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'K_83', 'N', 'Iпотечнi~Угоди~83', null, null, 23, 1, 0, 0, 0, '', '', 1, 0, 'Sum(K_83)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'PRIM', 'C', 'Примітка', null, null, 28, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

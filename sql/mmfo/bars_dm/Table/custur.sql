@@ -150,6 +150,19 @@ COMMENT ON COLUMN BARS_DM.CUSTUR.AU_LOCALITY IS '';
 
 
 
+PROMPT *** Create  constraint FK_CUSTUR_PERID_PERIOD_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS_DM.CUSTUR ADD CONSTRAINT FK_CUSTUR_PERID_PERIOD_ID FOREIGN KEY (PER_ID)
+	  REFERENCES BARS_DM.PERIODS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index I_CUSTUR_PERID ***
 begin   
  execute immediate '
@@ -165,9 +178,7 @@ exception when others then
 
 PROMPT *** Create  grants  CUSTUR ***
 grant SELECT                                                                 on CUSTUR          to BARS;
-grant SELECT                                                                 on CUSTUR          to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTUR          to BARSUPL;
-grant SELECT                                                                 on CUSTUR          to UPLD;
 
 
 

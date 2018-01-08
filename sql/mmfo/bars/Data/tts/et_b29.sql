@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции BP4
-prompt Наименование операции: BP4 d Оприбуткування інв.монет на суму ном.вартості ТВБВ ІІІ рівня
+prompt Наименование операции: d Оприбуткування інв.монет на суму ном.вартості ТВБВ ІІІ рівня
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('BP4', 'BP4 d Оприбуткування інв.монет на суму ном.вартості ТВБВ ІІІ рівня', 0, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH7'',0))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', 39, null, null, null, '0000100001000001000000000000000000010000000000000000000000000000', null);
+    values ('BP4', 'd Оприбуткування інв.монет на суму ном.вартості ТВБВ ІІІ рівня', 0, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH7'',0))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', 39, null, null, null, '0000100001000001000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='BP4', name='BP4 d Оприбуткування інв.монет на суму ном.вартості ТВБВ ІІІ рівня', dk=0, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH7'',0))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', s2='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', sk=39, proc=null, s3800=null, rang=null, flags='0000100001000001000000000000000000010000000000000000000000000000', nazn=null
+         set tt='BP4', name='d Оприбуткування інв.монет на суму ном.вартості ТВБВ ІІІ рівня', dk=0, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH7'',0))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', s2='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', sk=39, proc=null, s3800=null, rang=null, flags='0000100001000001000000000000000000010000000000000000000000000000', nazn=null
        where tt='BP4';
   end;
   --------------------------------

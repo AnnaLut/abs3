@@ -52,10 +52,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111492 ***
+PROMPT *** Create  constraint SYS_C00111494 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_SESSION_TYPE MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_SESSION_TYPE MODIFY (SESSION_TYPE_NAME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -76,10 +76,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111494 ***
+PROMPT *** Create  constraint SYS_C00111492 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_SESSION_TYPE MODIFY (SESSION_TYPE_NAME NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_SESSION_TYPE MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -100,10 +100,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  PFU_SESSION_TYPE ***
-grant SELECT                                                                 on PFU_SESSION_TYPE to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_SESSION_TYPE to UPLD;
 
 
 

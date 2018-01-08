@@ -55,10 +55,6 @@ COMMENT ON COLUMN BARS.ERR$_MBD_K_R.REF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_MBD_K_R ***
-grant SELECT                                                                 on ERR$_MBD_K_R    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_MBD_K_R    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

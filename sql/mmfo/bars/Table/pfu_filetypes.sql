@@ -89,10 +89,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  PFU_FILETYPES ***
-grant SELECT                                                                 on PFU_FILETYPES   to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_FILETYPES   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

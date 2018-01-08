@@ -68,9 +68,7 @@ COMMENT ON COLUMN BARS.CCK_SUM_POG_WEB.REC_ID IS '';
 
 
 PROMPT *** Create  grants  CCK_SUM_POG_WEB ***
-grant SELECT                                                                 on CCK_SUM_POG_WEB to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on CCK_SUM_POG_WEB to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on CCK_SUM_POG_WEB to UPLD;
 
 
 

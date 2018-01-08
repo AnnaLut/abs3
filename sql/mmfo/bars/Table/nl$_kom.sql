@@ -77,10 +77,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  NL$_KOM ***
-grant SELECT                                                                 on NL$_KOM         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NL$_KOM         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NL$_KOM         to RCH_1;
-grant SELECT                                                                 on NL$_KOM         to UPLD;
 grant FLASHBACK,SELECT                                                       on NL$_KOM         to WR_REFREAD;
 
 

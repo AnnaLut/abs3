@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции PSK
-prompt Наименование операции: PSK Д/PS3 КОМИСИЯ
+prompt Наименование операции: Д/PS3 КОМИСИЯ
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('PSK', 'PSK Д/PS3 КОМИСИЯ', 1, null, null, '#(nbs_ob22 (''6510'',''06''))', null, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(46, #(KVA),#(NLSA), #(S))', null, null, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', null);
+    values ('PSK', 'Д/PS3 КОМИСИЯ', 1, null, null, '#(nbs_ob22 (''6110'',''06''))', null, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(46, #(KVA),#(NLSA), #(S))', null, null, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='PSK', name='PSK Д/PS3 КОМИСИЯ', dk=1, nlsm=null, kv=null, nlsk='#(nbs_ob22 (''6510'',''06''))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(46, #(KVA),#(NLSA), #(S))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='PSK', name='Д/PS3 КОМИСИЯ', dk=1, nlsm=null, kv=null, nlsk='#(nbs_ob22 (''6110'',''06''))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(46, #(KVA),#(NLSA), #(S))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='PSK';
   end;
   --------------------------------

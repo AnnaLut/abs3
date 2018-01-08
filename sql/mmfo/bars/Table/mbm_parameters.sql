@@ -78,9 +78,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  MBM_PARAMETERS ***
-grant SELECT                                                                 on MBM_PARAMETERS  to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MBM_PARAMETERS  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on MBM_PARAMETERS  to UPLD;
 
 
 

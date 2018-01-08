@@ -50,10 +50,8 @@ COMMENT ON COLUMN BARS.KOD_DZ.N2 IS '';
 
 PROMPT *** Create  grants  KOD_DZ ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_DZ          to ABS_ADMIN;
-grant SELECT                                                                 on KOD_DZ          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KOD_DZ          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_DZ          to START1;
-grant SELECT                                                                 on KOD_DZ          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KOD_DZ          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KOD_DZ          to WR_REFREAD;
 

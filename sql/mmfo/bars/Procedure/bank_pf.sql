@@ -52,7 +52,7 @@ IS
    ob74_      CHAR (2);
    MFOP_      VARCHAR2 (6);
    z_         INT;
--- nTmp_      INT;
+   nTmp_      INT;
    sDet_      VARCHAR2 (30);
    sMes_      VARCHAR2 (30);
    sSql_      VARCHAR2 (2000);
@@ -79,10 +79,14 @@ BEGIN
       --Перекриття, перерахування сум ПДФО до бюджету по Бранчам (3522/29,3622/37)
       --Перекриття, перерахування сум ВЗ   до бюджету по Бранчам (3522/30,3622/36+38)
 
-      SELECT ' за ' || NAME_PLAIN || ' ' || to_char( extract( year from l_dat3 ) )
+-- якщо задали 01-06-2016, то pul.Get_Mas_Ini_Val ('mFdat1') = 01-05-2016
+
+      nTmp_ := TO_NUMBER (SUBSTR (pul.Get_Mas_Ini_Val ('mFdat1'), 4, 2));
+
+      SELECT    ' за ' || NAME_PLAIN || ' ' || SUBSTR (pul.Get_Mas_Ini_Val ('mFdat1'), 7, 4)
         INTO sMes_
         FROM META_MONTH
-       WHERE N = extract( month from l_dat3 );
+       WHERE N = nTmp_;
 
       oo.id_a := gl.aOkpo;
       oo.dk   := 1;

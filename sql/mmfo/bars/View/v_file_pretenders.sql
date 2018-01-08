@@ -71,10 +71,8 @@ PROMPT *** Create  view V_FILE_PRETENDERS ***
  ;
 
 PROMPT *** Create  grants  V_FILE_PRETENDERS ***
-grant SELECT                                                                 on V_FILE_PRETENDERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FILE_PRETENDERS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FILE_PRETENDERS to DPT_ROLE;
-grant SELECT                                                                 on V_FILE_PRETENDERS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_FILE_PRETENDERS to WR_ALL_RIGHTS;
 
 

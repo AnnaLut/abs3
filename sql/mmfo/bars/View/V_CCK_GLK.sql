@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CCK_GLK.sql =========*** Run *** ====
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_CCK_GLK ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_GLK ("ND", "FDAT", "LIM2", "OST", "DEL2", "FDAT1", "LIM1", "D9129", "DAYSN", "ACC", "NOT_9129") AS 
-  SELECT x.nd
+CREATE OR REPLACE VIEW V_CCK_GLK AS
+SELECT x.nd
       ,x.fdat
       ,x.lim2
       ,nvl(x.ost, 0) ost
@@ -42,14 +33,3 @@ PROMPT *** Create  view V_CCK_GLK ***
               ,l.acc
           FROM cc_lim l
          ) x;
-
-PROMPT *** Create  grants  V_CCK_GLK ***
-grant SELECT                                                                 on V_CCK_GLK       to BARSREADER_ROLE;
-grant SELECT                                                                 on V_CCK_GLK       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CCK_GLK       to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CCK_GLK.sql =========*** End *** ====
-PROMPT ===================================================================================== 

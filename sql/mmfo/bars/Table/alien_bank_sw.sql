@@ -97,11 +97,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ALIEN_BANK_SW ***
-grant SELECT                                                                 on ALIEN_BANK_SW   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ALIEN_BANK_SW   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ALIEN_BANK_SW   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ALIEN_BANK_SW   to START1;
-grant SELECT                                                                 on ALIEN_BANK_SW   to UPLD;
 
 
 

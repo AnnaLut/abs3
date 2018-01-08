@@ -63,12 +63,10 @@ COMMENT ON COLUMN BARS.CIM_JOURNAL_NUM.PHONE IS 'Номер контактного телефону';
 
 
 
-PROMPT *** Create  constraint CC_CIMJOURNALNUM_BRANCH_UK ***
+PROMPT *** Create  constraint CC_CIMJOURNALNUM_N1_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_JOURNAL_NUM ADD CONSTRAINT CC_CIMJOURNALNUM_BRANCH_UK UNIQUE (BRANCH)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD  ENABLE';
+  ALTER TABLE BARS.CIM_JOURNAL_NUM MODIFY (N1 CONSTRAINT CC_CIMJOURNALNUM_N1_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -89,10 +87,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMJOURNALNUM_N1_NN ***
+PROMPT *** Create  constraint CC_CIMJOURNALNUM_BRANCH_UK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_JOURNAL_NUM MODIFY (N1 CONSTRAINT CC_CIMJOURNALNUM_N1_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CIM_JOURNAL_NUM ADD CONSTRAINT CC_CIMJOURNALNUM_BRANCH_UK UNIQUE (BRANCH)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -113,10 +113,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMJOURNALNUM_N3_NN ***
+PROMPT *** Create  constraint SYS_C005578 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_JOURNAL_NUM MODIFY (N3 CONSTRAINT CC_CIMJOURNALNUM_N3_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CIM_JOURNAL_NUM MODIFY (PHONE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -173,10 +173,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005578 ***
+PROMPT *** Create  constraint CC_CIMJOURNALNUM_N3_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_JOURNAL_NUM MODIFY (PHONE NOT NULL ENABLE)';
+  ALTER TABLE BARS.CIM_JOURNAL_NUM MODIFY (N3 CONSTRAINT CC_CIMJOURNALNUM_N3_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -199,11 +199,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_JOURNAL_NUM ***
-grant SELECT                                                                 on CIM_JOURNAL_NUM to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_JOURNAL_NUM to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_JOURNAL_NUM to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_JOURNAL_NUM to CIM_ROLE;
-grant SELECT                                                                 on CIM_JOURNAL_NUM to UPLD;
 
 
 

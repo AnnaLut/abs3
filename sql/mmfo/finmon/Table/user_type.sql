@@ -67,9 +67,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  USER_TYPE ***
-grant SELECT                                                                 on USER_TYPE       to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  sequence MBM_REL_CUST_SEQ ***
 
-   CREATE SEQUENCE  BARS.MBM_REL_CUST_SEQ  MINVALUE 0 MAXVALUE 9999999999 INCREMENT BY 1 START WITH 2328 CACHE 20 NOORDER  NOCYCLE ;
+   CREATE SEQUENCE  BARS.MBM_REL_CUST_SEQ  MINVALUE 0 MAXVALUE 9999999999 INCREMENT BY 1 START WITH 102 CACHE 20 NOORDER  NOCYCLE ;
 
 PROMPT *** Create  grants  MBM_REL_CUST_SEQ ***
 grant SELECT                                                                 on MBM_REL_CUST_SEQ to BARS_ACCESS_DEFROLE;

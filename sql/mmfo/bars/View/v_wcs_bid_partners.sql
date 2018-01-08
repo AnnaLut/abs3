@@ -23,9 +23,7 @@ PROMPT *** Create  view V_WCS_BID_PARTNERS ***
    ORDER BY b.id, sp.ptr_type_id, p.id;
 
 PROMPT *** Create  grants  V_WCS_BID_PARTNERS ***
-grant SELECT                                                                 on V_WCS_BID_PARTNERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_BID_PARTNERS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_BID_PARTNERS to UPLD;
 
 
 

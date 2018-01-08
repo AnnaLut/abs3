@@ -79,10 +79,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  WEB_PROFILE_TAGS ***
-grant SELECT                                                                 on WEB_PROFILE_TAGS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_PROFILE_TAGS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WEB_PROFILE_TAGS to BARS_DM;
-grant SELECT                                                                 on WEB_PROFILE_TAGS to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WEB_PROFILE_TAGS to WEB_PROFILE_TAGS;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_PROFILE_TAGS to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on WEB_PROFILE_TAGS to WR_REFREAD;

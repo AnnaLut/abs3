@@ -33,8 +33,6 @@ WHERE o.sos   = 5
  ;
 
 PROMPT *** Create  grants  V_FM_AUTO ***
-grant SELECT                                                                 on V_FM_AUTO       to BARSREADER_ROLE;
-grant SELECT                                                                 on V_FM_AUTO       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_FM_AUTO       to WR_ALL_RIGHTS;
 
 

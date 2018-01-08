@@ -49,9 +49,7 @@ COMMENT ON COLUMN BARS.NBS_D.PR IS '';
 
 
 PROMPT *** Create  grants  NBS_D ***
-grant SELECT                                                                 on NBS_D           to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on NBS_D           to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on NBS_D           to UPLD;
 
 
 

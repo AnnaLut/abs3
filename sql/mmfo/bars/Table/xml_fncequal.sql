@@ -77,9 +77,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_FNCEQUAL ***
-grant SELECT                                                                 on XML_FNCEQUAL    to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_FNCEQUAL    to BARS_DM;
-grant SELECT                                                                 on XML_FNCEQUAL    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_FNCEQUAL    to WR_ALL_RIGHTS;
 
 

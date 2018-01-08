@@ -79,10 +79,6 @@ COMMENT ON COLUMN BARS.ERR$_BPK_CREDIT_DEAL_VAR.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_BPK_CREDIT_DEAL_VAR ***
-grant SELECT                                                                 on ERR$_BPK_CREDIT_DEAL_VAR to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_BPK_CREDIT_DEAL_VAR to UPLD;
-
 
 
 PROMPT ===================================================================================== 

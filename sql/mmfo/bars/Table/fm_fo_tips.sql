@@ -77,12 +77,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_FO_TIPS ***
-grant SELECT                                                                 on FM_FO_TIPS      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FM_FO_TIPS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_FO_TIPS      to BARS_DM;
 grant SELECT                                                                 on FM_FO_TIPS      to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FM_FO_TIPS      to FINMON01;
-grant SELECT                                                                 on FM_FO_TIPS      to UPLD;
 grant FLASHBACK,SELECT                                                       on FM_FO_TIPS      to WR_REFREAD;
 
 

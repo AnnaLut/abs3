@@ -48,10 +48,8 @@ PROMPT *** Create  view V_CC_989917 ***
             VA_KC;
 
 PROMPT *** Create  grants  V_CC_989917 ***
-grant SELECT                                                                 on V_CC_989917     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,SELECT,UPDATE                                         on V_CC_989917     to BARS_ACCESS_DEFROLE;
 grant DELETE,FLASHBACK,SELECT,UPDATE                                         on V_CC_989917     to RCC_DEAL;
-grant SELECT                                                                 on V_CC_989917     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CC_989917     to WR_ALL_RIGHTS;
 
 

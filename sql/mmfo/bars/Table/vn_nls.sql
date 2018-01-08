@@ -47,10 +47,8 @@ COMMENT ON COLUMN BARS.VN_NLS.NLS IS '';
 
 
 PROMPT *** Create  grants  VN_NLS ***
-grant SELECT                                                                 on VN_NLS          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VN_NLS          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VN_NLS          to START1;
-grant SELECT                                                                 on VN_NLS          to UPLD;
 
 
 

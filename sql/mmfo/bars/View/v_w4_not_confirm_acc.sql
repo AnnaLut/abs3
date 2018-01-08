@@ -18,9 +18,7 @@ PROMPT *** Create  view V_W4_NOT_CONFIRM_ACC ***
  where t.state = 1;
 
 PROMPT *** Create  grants  V_W4_NOT_CONFIRM_ACC ***
-grant SELECT                                                                 on V_W4_NOT_CONFIRM_ACC to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_NOT_CONFIRM_ACC to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_W4_NOT_CONFIRM_ACC to UPLD;
 
 
 

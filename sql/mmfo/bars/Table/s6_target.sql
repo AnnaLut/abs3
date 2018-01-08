@@ -86,9 +86,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  S6_Target ***
-grant SELECT                                                                 on S6_Target       to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

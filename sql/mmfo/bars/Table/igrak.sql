@@ -65,11 +65,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  IGRAK ***
-grant SELECT                                                                 on IGRAK           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on IGRAK           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on IGRAK           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on IGRAK           to START1;
-grant SELECT                                                                 on IGRAK           to UPLD;
 
 
 

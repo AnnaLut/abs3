@@ -80,10 +80,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CCDOCS_ID_NN ***
+PROMPT *** Create  constraint FK_CCDOCS_DOCSCHEME ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_DOCS MODIFY (ID CONSTRAINT CC_CCDOCS_ID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_DOCS ADD CONSTRAINT FK_CCDOCS_DOCSCHEME FOREIGN KEY (ID)
+	  REFERENCES BARS.DOC_SCHEME (ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -92,10 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CCDOCS_ND_NN ***
+PROMPT *** Create  constraint CC_CCDOCS_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_DOCS MODIFY (ND CONSTRAINT CC_CCDOCS_ND_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_DOCS MODIFY (KF CONSTRAINT CC_CCDOCS_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -116,10 +117,48 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CCDOCS_KF_NN ***
+PROMPT *** Create  constraint CC_CCDOCS_ND_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_DOCS MODIFY (KF CONSTRAINT CC_CCDOCS_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_DOCS MODIFY (ND CONSTRAINT CC_CCDOCS_ND_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CCDOCS_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_DOCS MODIFY (ID CONSTRAINT CC_CCDOCS_ID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CCDOCS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_DOCS ADD CONSTRAINT FK_CCDOCS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CCDOCS_CCDOCSTATES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_DOCS ADD CONSTRAINT FK_CCDOCS_CCDOCSTATES FOREIGN KEY (STATE)
+	  REFERENCES BARS.CC_DOC_STATES (STATE) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -142,7 +181,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_DOCS ***
-grant SELECT                                                                 on CC_DOCS         to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CC_DOCS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_DOCS         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_DOCS         to CC_DOC;
@@ -151,7 +189,6 @@ grant DELETE,INSERT,SELECT,UPDATE                                            on 
 grant INSERT,SELECT                                                          on CC_DOCS         to DPT_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CC_DOCS         to FOREX;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CC_DOCS         to RCC_DEAL;
-grant SELECT                                                                 on CC_DOCS         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_DOCS         to WR_ALL_RIGHTS;
 
 

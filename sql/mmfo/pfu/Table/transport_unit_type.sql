@@ -32,10 +32,12 @@ COMMENT ON COLUMN PFU.TRANSPORT_UNIT_TYPE.DIRECTION IS '1 - OneWay, 2 - TwoWay';
 
 
 
-PROMPT *** Create  constraint SYS_C00111464 ***
+PROMPT *** Create  constraint PK_TRANSPORT_UNIT_TYPE ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.TRANSPORT_UNIT_TYPE MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE PFU.TRANSPORT_UNIT_TYPE ADD CONSTRAINT PK_TRANSPORT_UNIT_TYPE PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -44,12 +46,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_TRANSPORT_UNIT_TYPE ***
+PROMPT *** Create  constraint SYS_C00111464 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.TRANSPORT_UNIT_TYPE ADD CONSTRAINT PK_TRANSPORT_UNIT_TYPE PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGD  ENABLE';
+  ALTER TABLE PFU.TRANSPORT_UNIT_TYPE MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -70,10 +70,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  TRANSPORT_UNIT_TYPE ***
-grant SELECT                                                                 on TRANSPORT_UNIT_TYPE to BARSREADER_ROLE;
-grant SELECT                                                                 on TRANSPORT_UNIT_TYPE to UPLD;
 
 
 

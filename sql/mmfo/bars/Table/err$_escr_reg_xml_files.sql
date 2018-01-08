@@ -65,10 +65,6 @@ COMMENT ON COLUMN BARS.ERR$_ESCR_REG_XML_FILES.ERR_TEXT IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ESCR_REG_XML_FILES ***
-grant SELECT                                                                 on ERR$_ESCR_REG_XML_FILES to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ESCR_REG_XML_FILES to UPLD;
-
 
 
 PROMPT ===================================================================================== 

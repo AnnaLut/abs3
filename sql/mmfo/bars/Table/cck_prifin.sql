@@ -89,7 +89,6 @@ exception when others then
 
 PROMPT *** Create  grants  CCK_PRIFIN ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_PRIFIN      to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on CCK_PRIFIN      to BARSREADER_ROLE;
 grant SELECT                                                                 on CCK_PRIFIN      to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_PRIFIN      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_PRIFIN      to BARS_DM;

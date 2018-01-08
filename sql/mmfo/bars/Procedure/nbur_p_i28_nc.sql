@@ -20,10 +20,9 @@ PROMPT *** Create  procedure NBUR_P_I28_NC ***
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 begin
-   --p_F28SB(p_report_date);
+   --NBUR_P_I28 (p_kod_filii, p_report_date, p_form_id, 'C');
    
-   NBUR_P_I28 (p_kod_filii, p_report_date, p_form_id, 'C');
-   
+   p_F28SB(p_report_date);
    p_nbu_save_rezult( p_report_date, p_kod_filii, '@28' );
 
 end;

@@ -63,12 +63,10 @@ COMMENT ON COLUMN BARS.DPU_DEALW_UPDATE.KF IS '';
 
 
 
-PROMPT *** Create  constraint PK_DPUDEALWUPDATE ***
+PROMPT *** Create  constraint CC_DPUDEALWUPDATE_CHGACTION_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_DEALW_UPDATE ADD CONSTRAINT PK_DPUDEALWUPDATE PRIMARY KEY (IDUPD)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.DPU_DEALW_UPDATE MODIFY (CHGACTION CONSTRAINT CC_DPUDEALWUPDATE_CHGACTION_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -89,10 +87,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUDEALWUPDATE_CHGACTION_NN ***
+PROMPT *** Create  constraint PK_DPUDEALWUPDATE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_DEALW_UPDATE MODIFY (CHGACTION CONSTRAINT CC_DPUDEALWUPDATE_CHGACTION_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPU_DEALW_UPDATE ADD CONSTRAINT PK_DPUDEALWUPDATE PRIMARY KEY (IDUPD)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -113,10 +113,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUDEALWUPDATE_BDATE_NN ***
+PROMPT *** Create  constraint CC_DPUDEALWUPDATE_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_DEALW_UPDATE MODIFY (BDATE CONSTRAINT CC_DPUDEALWUPDATE_BDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPU_DEALW_UPDATE MODIFY (KF CONSTRAINT CC_DPUDEALWUPDATE_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -161,10 +161,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUDEALWUPDATE_KF_NN ***
+PROMPT *** Create  constraint CC_DPUDEALWUPDATE_BDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_DEALW_UPDATE MODIFY (KF CONSTRAINT CC_DPUDEALWUPDATE_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPU_DEALW_UPDATE MODIFY (BDATE CONSTRAINT CC_DPUDEALWUPDATE_BDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -202,12 +202,10 @@ exception when others then
 
 PROMPT *** Create  grants  DPU_DEALW_UPDATE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_DEALW_UPDATE to ABS_ADMIN;
-grant SELECT                                                                 on DPU_DEALW_UPDATE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_DEALW_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_DEALW_UPDATE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_DEALW_UPDATE to DPT_ADMIN;
 grant SELECT                                                                 on DPU_DEALW_UPDATE to START1;
-grant SELECT                                                                 on DPU_DEALW_UPDATE to UPLD;
 
 
 

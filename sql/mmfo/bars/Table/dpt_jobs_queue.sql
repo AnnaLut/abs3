@@ -55,6 +55,19 @@ COMMENT ON COLUMN BARS.DPT_JOBS_QUEUE.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_DPTJOBSQUEUE_DPTJOBSJRNL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_JOBS_QUEUE ADD CONSTRAINT FK_DPTJOBSQUEUE_DPTJOBSJRNL FOREIGN KEY (RUN_ID)
+	  REFERENCES BARS.DPT_JOBS_JRNL (RUN_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_DPTJOBSQUEUE ***
 begin   
  execute immediate '
@@ -69,34 +82,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTJOBSQUEUE_RUNID_NN ***
+PROMPT *** Create  constraint CC_DPTJOBSQUEUE_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_JOBS_QUEUE MODIFY (RUN_ID CONSTRAINT CC_DPTJOBSQUEUE_RUNID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTJOBSQUEUE_JOBID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_JOBS_QUEUE MODIFY (JOB_ID CONSTRAINT CC_DPTJOBSQUEUE_JOBID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTJOBSQUEUE_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_JOBS_QUEUE MODIFY (BRANCH CONSTRAINT CC_DPTJOBSQUEUE_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_JOBS_QUEUE MODIFY (KF CONSTRAINT CC_DPTJOBSQUEUE_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -117,10 +106,73 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTJOBSQUEUE_KF_NN ***
+PROMPT *** Create  constraint CC_DPTJOBSQUEUE_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_JOBS_QUEUE MODIFY (KF CONSTRAINT CC_DPTJOBSQUEUE_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_JOBS_QUEUE MODIFY (BRANCH CONSTRAINT CC_DPTJOBSQUEUE_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTJOBSQUEUE_JOBID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_JOBS_QUEUE MODIFY (JOB_ID CONSTRAINT CC_DPTJOBSQUEUE_JOBID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTJOBSQUEUE_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_JOBS_QUEUE ADD CONSTRAINT FK_DPTJOBSQUEUE_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTJOBSQUEUE_DPTJOBSLIST ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_JOBS_QUEUE ADD CONSTRAINT FK_DPTJOBSQUEUE_DPTJOBSLIST FOREIGN KEY (JOB_ID)
+	  REFERENCES BARS.DPT_JOBS_LIST (JOB_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTJOBSQUEUE_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_JOBS_QUEUE ADD CONSTRAINT FK_DPTJOBSQUEUE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTJOBSQUEUE_RUNID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_JOBS_QUEUE MODIFY (RUN_ID CONSTRAINT CC_DPTJOBSQUEUE_RUNID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -143,11 +195,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_JOBS_QUEUE ***
-grant SELECT                                                                 on DPT_JOBS_QUEUE  to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_JOBS_QUEUE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_JOBS_QUEUE  to BARS_DM;
 grant SELECT                                                                 on DPT_JOBS_QUEUE  to DPT_ADMIN;
-grant SELECT                                                                 on DPT_JOBS_QUEUE  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_JOBS_QUEUE  to WR_ALL_RIGHTS;
 
 

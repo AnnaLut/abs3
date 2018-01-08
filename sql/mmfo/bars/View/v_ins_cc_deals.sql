@@ -24,9 +24,7 @@ PROMPT *** Create  view V_INS_CC_DEALS ***
    and cd.rnk = p.rnk;
 
 PROMPT *** Create  grants  V_INS_CC_DEALS ***
-grant SELECT                                                                 on V_INS_CC_DEALS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_CC_DEALS  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INS_CC_DEALS  to UPLD;
 
 
 

@@ -47,10 +47,6 @@ COMMENT ON COLUMN BARS.TMS_TASK_EXCLUSION.KF IS '';
 
 
 
-PROMPT *** Create  grants  TMS_TASK_EXCLUSION ***
-grant SELECT                                                                 on TMS_TASK_EXCLUSION to BARSREADER_ROLE;
-grant SELECT                                                                 on TMS_TASK_EXCLUSION to UPLD;
-
 
 
 PROMPT ===================================================================================== 

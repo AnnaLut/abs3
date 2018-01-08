@@ -34,9 +34,7 @@ PROMPT *** Create  view V_FOREX_DEAL_DOCUMENTS ***
    ORDER BY REF DESC;
 
 PROMPT *** Create  grants  V_FOREX_DEAL_DOCUMENTS ***
-grant SELECT                                                                 on V_FOREX_DEAL_DOCUMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FOREX_DEAL_DOCUMENTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_FOREX_DEAL_DOCUMENTS to UPLD;
 
 
 

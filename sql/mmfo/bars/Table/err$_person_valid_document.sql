@@ -55,10 +55,6 @@ COMMENT ON COLUMN BARS.ERR$_PERSON_VALID_DOCUMENT.DOC_STATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_PERSON_VALID_DOCUMENT ***
-grant SELECT                                                                 on ERR$_PERSON_VALID_DOCUMENT to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_PERSON_VALID_DOCUMENT to UPLD;
-
 
 
 PROMPT ===================================================================================== 

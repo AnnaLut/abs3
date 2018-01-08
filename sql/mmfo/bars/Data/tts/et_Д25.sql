@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции Д25
-prompt Наименование операции: Д25 БЕЗГОТІВКОВІ. Перерахування з транзиту на міжбанк
+prompt Наименование операции: БЕЗГОТІВКОВІ. Перерахування з транзиту на міжбанк
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('Д25', 'Д25 БЕЗГОТІВКОВІ. Перерахування з транзиту на міжбанк', 1, null, 980, '#(get_proc_nls(''T00'',#(KVA)))', 980, null, null, null, null, 0, 1, 0, 0, null, null, null, null, null, null, '1301100000000000000000000000000000110000000000000000000000000000', null);
+    values ('Д25', 'БЕЗГОТІВКОВІ. Перерахування з транзиту на міжбанк', 1, null, 980, '#(get_proc_nls(''T00'',#(KVA)))', 980, null, null, null, null, 0, 1, 0, 0, null, null, null, null, null, null, '1301100000000000000000000000000000110000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='Д25', name='Д25 БЕЗГОТІВКОВІ. Перерахування з транзиту на міжбанк', dk=1, nlsm=null, kv=980, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1301100000000000000000000000000000110000000000000000000000000000', nazn=null
+         set tt='Д25', name='БЕЗГОТІВКОВІ. Перерахування з транзиту на міжбанк', dk=1, nlsm=null, kv=980, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1301100000000000000000000000000000110000000000000000000000000000', nazn=null
        where tt='Д25';
   end;
   --------------------------------

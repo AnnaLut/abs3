@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cim_reports.sql =========*** Run ***
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.CIM_REPORTS 
+CREATE OR REPLACE PACKAGE CIM_REPORTS
 is
    --
    --  CIM_REPORTS
@@ -97,7 +97,7 @@ function p_f531(p_date in date :=bankdate, p_error out varchar2) return clob;
 
 END cim_reports;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CIM_REPORTS 
+CREATE OR REPLACE PACKAGE BODY CIM_REPORTS
 is
    --
    --  CIM_REPORTS
@@ -1107,7 +1107,7 @@ end  p_f531;
            ||cur.m||'184'||l_zn0yvt||cur.p184||chr(13)||chr(10)
            ||cur.m||'020'||l_zn0yvt||cur.p020||chr(13)||chr(10)
            ||cur.m||'310'||l_zn0yvt||to_char(cur.p310,'DDMMYYYY')||chr(13)||chr(10)
-
+           
            ||cur.m||'320'||l_zn0yvt||cur.p320||chr(13)||chr(10);
        l_n:=l_n+8+1+6+1;
 
@@ -2331,7 +2331,7 @@ end  p_f531;
                          substr(c.num, 1, 16) as p050_vk,                                                    f.p050 as p050_r,
                          c.open_date as p060_vk,                                                             f.p060 as p060_r,
                          c.s as p090_vk,                                                                     f.p090 as p090_r,
-                         c.borrower_id as p010_vk,                                                           f.p010 as p010_r
+                         c.borrower_id as p010_vk,                                                           f.p010 as p010_r                         
                   from v_cim_credit_contracts c, cim_f504 f where c.contr_id = f.contr_id
                    and f.kf = sys_context('bars_context','user_mfo'))
       loop

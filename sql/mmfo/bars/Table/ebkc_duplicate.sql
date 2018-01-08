@@ -68,6 +68,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_EBKCDUPL_CUSTTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.EBKC_DUPLICATE ADD CONSTRAINT FK_EBKCDUPL_CUSTTYPE FOREIGN KEY (CUST_TYPE)
+	  REFERENCES BARS.EBKC_CUST_TYPES (CUST_TYPE) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index U1_EBKC_DUPL ***
 begin   
  execute immediate '
@@ -82,10 +95,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBKC_DUPLICATE ***
-grant SELECT                                                                 on EBKC_DUPLICATE  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBKC_DUPLICATE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBKC_DUPLICATE  to BARS_DM;
-grant SELECT                                                                 on EBKC_DUPLICATE  to UPLD;
 
 
 

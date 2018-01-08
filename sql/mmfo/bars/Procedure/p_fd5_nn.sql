@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_FD5_NN ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
+CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
                                            sheme_ VARCHAR2 DEFAULT 'G',
                                            prnk_   number   DEFAULT null) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -117,7 +117,7 @@ r011_2_   CHAR(1);
 r011_new_ CHAR(1);
 r012_     CHAR(1);
 k071_     CHAR(1);
-k072_     CHAR(2);
+k072_     CHAR(1);
 k081_     CHAR(1);
 k140_     CHAR(1);
 k111_     CHAR(2);
@@ -186,7 +186,7 @@ is_bpk      integer;
 product_    w4_product.grp_code%TYPE;
 kol_351_    NUMBER;
 
-acc_type_   varchar2(3);
+acc_type_   varchar2(3);  
 
 CURSOR SALDO IS
    SELECT  a.rnk, a.acc, a.nls, a.kv, a.fdat, a.nbs, a.ost, a.ostq,
@@ -260,7 +260,7 @@ END;
 
 PROCEDURE p_obrab_data(p_type_ IN NUMBER) IS
    acco_        number;
-   s080r_       varchar2(1);
+   s080r_       varchar2(1);  
 BEGIN
    if p_type_ = 1 then
       comm_ := '';
@@ -286,7 +286,7 @@ BEGIN
 
    nd_ := null;
    acc2_ := null;
-
+   
    if nbs_ in ('2600', '2607', '2620', '2627') or
       nbs_ = '3600' and acc_ <> accr_
    then --מגונהנאפעû
@@ -988,14 +988,14 @@ BEGIN
        FETCH SALDO INTO rnk_, acc_, nls_, kv_, data_, nbs_, Ostn_, Ostq_,
                         Dos96_, Kos96_, Dosq96_, Kosq96_, isp_, accr_, tips_;
        EXIT WHEN SALDO%NOTFOUND;
-
+       
        select nvl(max(acc_type), 'ZZZ')
        into acc_type_
-       from nbur_lnk_type_r020
-       where acc_r020 = nbs_ and
-              start_date <= dat_ and
-              nvl(finish_date, dat_ + 1) > dat_;
-
+       from nbur_lnk_type_r020 
+       where acc_r020 = nbs_ and 
+              start_date <= dat_ and 
+              nvl(finish_date, dat_ + 1) > dat_;  
+              
        if nbs_ not in ('1590', '1592', '2400', '2401', '3690') and
           acc_type_ not like 'RZ%'
        then
@@ -1036,12 +1036,12 @@ BEGIN
 
                 select nvl(max(acc_type), 'ZZZ')
                 into acc_type_
-                from nbur_lnk_type_r020
-                where acc_r020 = nbs_ and
-                      start_date <= dat_ and
-                      nvl(finish_date, dat_ + 1) > dat_;
+                from nbur_lnk_type_r020 
+                where acc_r020 = nbs_ and 
+                      start_date <= dat_ and 
+                      nvl(finish_date, dat_ + 1) > dat_;  
 
-                if nbs_ in ('1590', '1592', '2400', '2401', '3690')
+                if nbs_ in ('1590', '1592', '2400', '2401', '3690') 
                    or acc_type_ like 'RZ%'
                 then
                    IF kv_ <> 980 THEN
@@ -1064,7 +1064,7 @@ BEGIN
                     from v_tmp_rez_risk t, rnbu_trace r, specparam s, agg_monbals m
                     where t.dat=Dat23_
                       and t.acc = r.acc
-                      and not (substr(r.kodp,3,3) = '159' or substr(r.kodp,3,4) like '2__9')
+                      and not (substr(r.kodp,3,3) = '159' or substr(r.kodp,3,4) like '2__9') 
                       and substr(r.kodp,3,4) not in ('2607', '2627')
                       and t.nls = r.nls
                       and r.kodp like '1%' || (case when dat_ > dat_izm3 then '2' else '' end) || (case when dat_ >= dat_izm4 then '_' else '' end)
@@ -1162,7 +1162,7 @@ BEGIN
                            sum(a.Dos96) dos96, sum(a.Kos96) Kos96,
                            sum(a.Dosq96) Dosq96, sum(a.Kosq96) kosq96
                     from otcn_saldo a, customer c, specparam s
-                    where (a.nbs in ('1590', '1592', '3690') or a.nbs like '2__9')
+                    where (a.nbs in ('1590', '1592', '3690') or a.nbs like '2__9') 
                       and a.rnk = c.rnk
                       and a.acc = s.acc(+)
                       and (a.Ost-a.Dos96+a.Kos96 <> 0  or a.Ostq-a.Dosq96+a.Kosq96<>0)
@@ -1910,18 +1910,17 @@ BEGIN
 
           for k in (select fdat, ref, acc, nls, kv, sq, nbs, acca,
                            sum(sq) over (partition by acc) sum_all
-                    from (select /*+ ordered */
+                    from (select /*+ leading(a) */
                                  o.fdat, o.ref, o.acc, a.nls, a.kv,
                                  decode(o.dk, 0, 1, -1) * gl.p_icurval(a.kv, o.s, dat_) sq,
                                  a.nbs, z.acc acca
-                          from accounts a, opldok o, opldok z, accounts x, oper p
+                          from opldok o, accounts a, opldok z, accounts x, oper p
                           where o.fdat = any (select fdat from fdat where fdat between dat1_ and dat_) and
                             o.acc = a.acc and
                             (a.nls like '1590%' or
                              a.nls like '1592%' or
                              a.nls like '2__9%' or
-                             a.nls like '3690%' or
-                             a.nls like '3692%'
+                             a.nls like '3690%'                             
                             )
                             and o.tt not like 'AR%'
                             and o.ref = z.ref

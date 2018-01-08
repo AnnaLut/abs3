@@ -134,10 +134,24 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_GROUPSSTAFF_IDU_NN ***
+PROMPT *** Create  constraint FK_GROUPSSTAFF_GROUPS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GROUPS_STAFF MODIFY (IDU CONSTRAINT CC_GROUPSSTAFF_IDU_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.GROUPS_STAFF ADD CONSTRAINT FK_GROUPSSTAFF_GROUPS FOREIGN KEY (IDG)
+	  REFERENCES BARS.GROUPS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_GROUPSSTAFF_STAFF2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GROUPS_STAFF ADD CONSTRAINT FK_GROUPSSTAFF_STAFF2 FOREIGN KEY (GRANTOR)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -150,6 +164,31 @@ PROMPT *** Create  constraint CC_GROUPSSTAFF_IDG_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.GROUPS_STAFF MODIFY (IDG CONSTRAINT CC_GROUPSSTAFF_IDG_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GROUPSSTAFF_IDU_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GROUPS_STAFF MODIFY (IDU CONSTRAINT CC_GROUPSSTAFF_IDU_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_GROUPSSTAFF_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GROUPS_STAFF ADD CONSTRAINT FK_GROUPSSTAFF_STAFF FOREIGN KEY (IDU)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -173,13 +212,11 @@ exception when others then
 
 PROMPT *** Create  grants  GROUPS_STAFF ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on GROUPS_STAFF    to ABS_ADMIN;
-grant SELECT                                                                 on GROUPS_STAFF    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on GROUPS_STAFF    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GROUPS_STAFF    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GROUPS_STAFF    to GROUPS_STAFF;
 grant SELECT                                                                 on GROUPS_STAFF    to KLBX;
 grant SELECT                                                                 on GROUPS_STAFF    to START1;
-grant SELECT                                                                 on GROUPS_STAFF    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on GROUPS_STAFF    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on GROUPS_STAFF    to WR_REFREAD;
 

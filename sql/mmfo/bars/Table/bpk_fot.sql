@@ -65,12 +65,10 @@ COMMENT ON COLUMN BARS.BPK_FOT.PKRED IS '';
 
 
 PROMPT *** Create  grants  BPK_FOT ***
-grant SELECT                                                                 on BPK_FOT         to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_FOT         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_FOT         to BARS_DM;
 grant SELECT                                                                 on BPK_FOT         to RPBN001;
 grant SELECT                                                                 on BPK_FOT         to START1;
-grant SELECT                                                                 on BPK_FOT         to UPLD;
 
 
 

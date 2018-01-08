@@ -78,10 +78,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119184 ***
+PROMPT *** Create  constraint SYS_C00119186 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_OW_KEYS MODIFY (START_DATE NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_OW_KEYS MODIFY (IS_ACTIVE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -102,20 +102,16 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119186 ***
+PROMPT *** Create  constraint SYS_C00119184 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_OW_KEYS MODIFY (IS_ACTIVE NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_OW_KEYS MODIFY (START_DATE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-
-PROMPT *** Create  grants  TMP_OW_KEYS ***
-grant SELECT                                                                 on TMP_OW_KEYS     to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_OW_KEYS     to UPLD;
 
 
 

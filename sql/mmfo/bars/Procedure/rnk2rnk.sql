@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/RNK2RNK.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure RNK2RNK ***
-
-  CREATE OR REPLACE PROCEDURE BARS.RNK2RNK -- передача данных одного клиента другому
+CREATE OR REPLACE PROCEDURE rnk2rnk -- передача данных одного клиента другому
   (p_rnkfrom varchar2, -- от кого
    p_rnkto   varchar2  -- кому
 -- p_dateoff date default trunc(sysdate)
@@ -340,7 +331,7 @@ begin
             begin
                   execute immediate 'update accounts
                                      set    rnk='||p_rnkto||'
-                                     where  acc='||to_char(acc_);
+                                     where  acc='||to_char(acc_);  
               if nbs_ = '2625' then
                   for cur2 in -- и неважно, открыт или закрыт deal. Все равно забираем счет и присоединяем к другому, ведь счет открыт
                          (select d.id from attribute_values avs
@@ -603,15 +594,3 @@ begin
 
 end rnk2rnk;
 /
-show err;
-
-PROMPT *** Create  grants  RNK2RNK ***
-grant EXECUTE                                                                on RNK2RNK         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on RNK2RNK         to RCC_DEAL;
-grant EXECUTE                                                                on RNK2RNK         to START1;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/RNK2RNK.sql =========*** End *** =
-PROMPT ===================================================================================== 

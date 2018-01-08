@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  KF83 ***
-grant SELECT                                                                 on KF83            to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KF83            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KF83            to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KF83            to START1;
-grant SELECT                                                                 on KF83            to UPLD;
 
 
 

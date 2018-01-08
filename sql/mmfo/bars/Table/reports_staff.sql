@@ -49,11 +49,9 @@ COMMENT ON COLUMN BARS.REPORTS_STAFF.ID_R IS '';
 
 
 PROMPT *** Create  grants  REPORTS_STAFF ***
-grant SELECT                                                                 on REPORTS_STAFF   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPORTS_STAFF   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REPORTS_STAFF   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPORTS_STAFF   to START1;
-grant SELECT                                                                 on REPORTS_STAFF   to UPLD;
 
 
 

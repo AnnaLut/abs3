@@ -69,11 +69,9 @@ COMMENT ON COLUMN BARS.TMP_POVID.BOSS IS '';
 
 
 PROMPT *** Create  grants  TMP_POVID ***
-grant SELECT                                                                 on TMP_POVID       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_POVID       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_POVID       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_POVID       to RPBN001;
-grant SELECT                                                                 on TMP_POVID       to UPLD;
 
 
 

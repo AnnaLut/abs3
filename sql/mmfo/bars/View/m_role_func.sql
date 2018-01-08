@@ -17,10 +17,8 @@ from (select * from operlist where nvl(frontend,0) = 0)  a,
 where b.RESOURCE_ID = a.codeoper (+);
 
 PROMPT *** Create  grants  M_ROLE_FUNC ***
-grant SELECT                                                                 on M_ROLE_FUNC     to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_FUNC     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on M_ROLE_FUNC     to START1;
-grant SELECT                                                                 on M_ROLE_FUNC     to UPLD;
 
 
 

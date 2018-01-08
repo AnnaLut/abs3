@@ -87,22 +87,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTRATERISE_VIDD_NN ***
+PROMPT *** Create  constraint CC_DPTRATERISE_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_RATE_RISE MODIFY (VIDD CONSTRAINT CC_DPTRATERISE_VIDD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTRATERISE_DURATIONM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_RATE_RISE MODIFY (DURATION_M CONSTRAINT CC_DPTRATERISE_DURATIONM_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_RATE_RISE MODIFY (ID CONSTRAINT CC_DPTRATERISE_ID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -123,10 +111,61 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTRATERISE_ID_NN ***
+PROMPT *** Create  constraint CC_DPTRATERISE_DURATIONM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_RATE_RISE MODIFY (ID CONSTRAINT CC_DPTRATERISE_ID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_RATE_RISE MODIFY (DURATION_M CONSTRAINT CC_DPTRATERISE_DURATIONM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTRATERISE_VIDD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_RATE_RISE MODIFY (VIDD CONSTRAINT CC_DPTRATERISE_VIDD_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTRATERISE_INTOP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_RATE_RISE ADD CONSTRAINT FK_DPTRATERISE_INTOP FOREIGN KEY (OP)
+	  REFERENCES BARS.INT_OP (OP) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTRATERISE_DPTVIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_RATE_RISE ADD CONSTRAINT FK_DPTRATERISE_DPTVIDD FOREIGN KEY (VIDD)
+	  REFERENCES BARS.DPT_VIDD (VIDD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTRATERISE_INTIDN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_RATE_RISE ADD CONSTRAINT FK_DPTRATERISE_INTIDN FOREIGN KEY (ID)
+	  REFERENCES BARS.INT_IDN (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -151,14 +190,12 @@ exception when others then
 PROMPT *** Create  grants  DPT_RATE_RISE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_RATE_RISE   to ABS_ADMIN;
 grant SELECT                                                                 on DPT_RATE_RISE   to BARSAQ;
-grant SELECT                                                                 on DPT_RATE_RISE   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_RATE_RISE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_RATE_RISE   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_RATE_RISE   to DPT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_RATE_RISE   to DPT_ADMIN;
 grant SELECT                                                                 on DPT_RATE_RISE   to KLBX;
 grant SELECT                                                                 on DPT_RATE_RISE   to START1;
-grant SELECT                                                                 on DPT_RATE_RISE   to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_RATE_RISE   to VKLAD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_RATE_RISE   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_RATE_RISE   to WR_REFREAD;

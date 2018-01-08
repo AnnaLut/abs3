@@ -59,6 +59,19 @@ COMMENT ON COLUMN BARS.ZAY_DEBT.SALE_TP IS '';
 
 
 
+PROMPT *** Create  constraint FK_ZAYDEBT_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ZAY_DEBT ADD CONSTRAINT FK_ZAYDEBT_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_ZAYDEBT_KF_NN ***
 begin   
  execute immediate '
@@ -71,10 +84,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ZAYDEBT_SOS ***
+PROMPT *** Create  constraint XPK_ZAY_DEBT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAY_DEBT ADD CONSTRAINT CC_ZAYDEBT_SOS CHECK (sos in (0, 1, 2)) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.ZAY_DEBT ADD CONSTRAINT XPK_ZAY_DEBT UNIQUE (REF, REFD)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYNI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -95,12 +110,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint XPK_ZAY_DEBT ***
+PROMPT *** Create  constraint CC_ZAYDEBT_SOS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAY_DEBT ADD CONSTRAINT XPK_ZAY_DEBT UNIQUE (REF, REFD)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.ZAY_DEBT ADD CONSTRAINT CC_ZAYDEBT_SOS CHECK (sos in (0, 1, 2)) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -137,10 +150,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAY_DEBT ***
-grant SELECT                                                                 on ZAY_DEBT        to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on ZAY_DEBT        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAY_DEBT        to BARS_DM;
-grant SELECT                                                                 on ZAY_DEBT        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAY_DEBT        to WR_ALL_RIGHTS;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on ZAY_DEBT        to ZAY;
 

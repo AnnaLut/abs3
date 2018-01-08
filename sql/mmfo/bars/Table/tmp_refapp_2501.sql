@@ -76,18 +76,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00109343 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_REFAPP_2501 MODIFY (CODEAPP NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C00109344 ***
 begin   
  execute immediate '
@@ -99,9 +87,17 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_REFAPP_2501 ***
-grant SELECT                                                                 on TMP_REFAPP_2501 to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_REFAPP_2501 to UPLD;
+
+PROMPT *** Create  constraint SYS_C00109343 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_REFAPP_2501 MODIFY (CODEAPP NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
 
 
 

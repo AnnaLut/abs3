@@ -223,6 +223,19 @@ COMMENT ON COLUMN BARS.CM_CLIENT_QUE_ARC.EDDR_ID IS '';
 
 
 
+PROMPT *** Create  constraint FK_CMCLIENTQUEARC_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CM_CLIENT_QUE_ARC ADD CONSTRAINT FK_CMCLIENTQUEARC_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_CMLIENTQUEARC_IDUPD_NN ***
 begin   
  execute immediate '
@@ -365,11 +378,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CM_CLIENT_QUE_ARC ***
-grant SELECT                                                                 on CM_CLIENT_QUE_ARC to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on CM_CLIENT_QUE_ARC to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CM_CLIENT_QUE_ARC to BARS_DM;
 grant INSERT,SELECT                                                          on CM_CLIENT_QUE_ARC to OW;
-grant SELECT                                                                 on CM_CLIENT_QUE_ARC to UPLD;
 
 
 

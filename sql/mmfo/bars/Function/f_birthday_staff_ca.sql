@@ -12,11 +12,11 @@
 -- 12/04/2017
 -- =============================================================================*/
 IS
-  Result VARCHAR2(4000);
+  Result VARCHAR2(1000);
   CRLF   CONSTANT CHAR(2) := CHR(13)||CHR(10); -- Carriage Return+Line Feed
 BEGIN
   Result:='';
-  FOR i IN (SELECT '* ' || to_char(birthday,'DD/MM/YYYY') || ' * ' || RPAD( fio, 50,' ') || ' * ' || trim(to_char(age,'99')) || ' *' as msg
+  FOR i IN (SELECT '* ' || birthday || ' * ' || RPAD( fio, 50,' ') || ' * ' || trim(to_char(age,'99')) || ' *' as msg
               FROM V_BIRTHDAY_STAFF_CA
              ORDER BY age DESC)
   LOOP

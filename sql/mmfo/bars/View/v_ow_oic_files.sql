@@ -33,10 +33,8 @@ select f.id, f.file_type, f.file_name, f.file_date, f.file_status, f.err_text, f
  where f.file_type = 'DOCUMENTS' );
 
 PROMPT *** Create  grants  V_OW_OIC_FILES ***
-grant SELECT                                                                 on V_OW_OIC_FILES  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_OIC_FILES  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_OIC_FILES  to OW;
-grant SELECT                                                                 on V_OW_OIC_FILES  to UPLD;
 
 
 

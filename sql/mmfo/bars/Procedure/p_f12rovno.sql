@@ -20,7 +20,7 @@ PROMPT *** Create  procedure P_F12ROVNO ***
                Dat_ -  конечная дата
                sheme_ - схема формирования
 04.03.2008 будем формировать за заданный период
-18.02.2009 в RNBU_TRACE1 в поле ACC заносим ACC счета кассы
+18.02.2009 в RNBU_TRACE в поле ACC заносим ACC счета кассы
 21.12.2007 Доп.параметры SK_P, SK_V будем обрабатывать для всех банков
            если имеются данные доп.реквизиты в операциях
            (ранее было только для УПБ, пожелало ОПЕРУ СБ)
@@ -104,19 +104,15 @@ CURSOR SALDO2 IS
 
 CURSOR BaseL IS
    SELECT kodp,nbuc, SUM (znap)
-   FROM RNBU_TRACE1
-   where userid = userid_
+   FROM RNBU_TRACE
+   WHERE userid=userid_
    GROUP BY kodp,nbuc
    ORDER BY kodp;
 
 BEGIN
 -------------------------------------------------------------------
-userid_ := user_id;
---EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE1';
-
-delete 
-FROM RNBU_TRACE1
-where USERID = userid_;
+SELECT id INTO userid_ FROM STAFF WHERE UPPER(logname)=UPPER(USER);
+EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 -------------------------------------------------------------------
 nbu_:= Isnbubank();
 
@@ -127,7 +123,7 @@ where trim(tag) in ('SK_P','SK_V');
 -- определение начальных параметров
 P_Proc_Set(kodf_,sheme_,nbuc1_,typ_);
 
-dat1_ := Datn_;  
+dat1_ := Datn_;  --TO_DATE(Datn_,'ddmmyyyy');
 
 OPEN OPERA;
 LOOP
@@ -209,8 +205,8 @@ LOOP
       kodp_:= LPAD(TO_CHAR(sk_),2,'0');
       znap_:= TO_CHAR(s_) ;
 
-      INSERT INTO RNBU_TRACE1 (fdat, nls, kv, odate, kodp, znap, nbuc, acc, userid) VALUES
-                              (data_, nls_, kv_, data_, kodp_, znap_, nbuc_, acc_, userid_);
+      INSERT INTO RNBU_TRACE (nls, kv, odate, kodp, znap, nbuc, acc) VALUES
+                             (nls_, kv_, data_, kodp_, znap_, nbuc_, acc_);
    END IF;
 END LOOP;
 CLOSE OPERA;
@@ -235,8 +231,8 @@ LOOP
       END IF;
 
       znap_:= TO_CHAR(ABS(s_));
-      INSERT INTO RNBU_TRACE1 (fdat, nls, kv, odate, kodp, znap, nbuc, acc, userid) VALUES
-                              (data_, nls_, kv_, data_, kodp_, znap_, nbuc_, acc_, userid_);
+      INSERT INTO RNBU_TRACE (nls, kv, odate, kodp, znap, nbuc, acc) VALUES
+                             (nls_, kv_, data_, kodp_, znap_, nbuc_, acc_);
    END IF;
 END LOOP;
 CLOSE SALDO;
@@ -261,14 +257,26 @@ LOOP
       END IF;
 
       znap_:= TO_CHAR(ABS(s_)) ;
-      INSERT INTO RNBU_TRACE1 (fdat, nls, kv, odate, kodp, znap, nbuc, acc, userid) VALUES
-                              (data_, nls_, kv_, data_, kodp_, znap_, nbuc_, acc_, userid_);
+      INSERT INTO RNBU_TRACE (nls, kv, odate, kodp, znap, nbuc, acc) VALUES
+                             (nls_, kv_, data_, kodp_, znap_, nbuc_, acc_);
    END IF;
 
 END LOOP;
 CLOSE SALDO2;
+---------------------------------------------------
+--DELETE FROM TMP_NBU WHERE datf=Dat_ AND kodf=p_kodf_ ;
+---------------------------------------------------
+--OPEN BaseL;
+--LOOP
+--   FETCH BaseL INTO  kodp_, nbuc_, znap_;
+--   EXIT WHEN BaseL%NOTFOUND;
 
-commit;
+--   INSERT INTO TMP_NBU
+--        (kodf, datf, kodp, znap, nbuc)
+--   VALUES
+--        (p_kodf_, Dat_, kodp_, znap_, nbuc_);
+--END LOOP;
+--CLOSE BaseL;
 ----------------------------------------
 END P_F12rovno;
 /

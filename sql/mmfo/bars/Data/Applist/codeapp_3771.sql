@@ -1,5 +1,7 @@
+SET SERVEROUTPUT ON 
+SET DEFINE OFF 
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_3771.sql =========*** R
+PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_3771.sql =========*
 PROMPT ===================================================================================== 
 
 
@@ -16,65 +18,45 @@ PROMPT *** Create/replace  ARM  3771 ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-	d integer := 0;
+    d integer := 0;
 begin
-     DBMS_OUTPUT.PUT_LINE(' 3771 створюємо (або оновлюємо) АРМ АРМ Відшкодування комісійної винагороди банку ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
-                             P_ARM_NAME              => l_application_name,
+     DBMS_OUTPUT.PUT_LINE(' 3771 створюємо (або оновлюємо) АРМ Відшкодування комісійної винагороди банку');
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
+                             P_ARM_NAME              => l_application_name, 
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
      l_application_id := user_menu_utl.get_arm_id(l_application_code); 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Акти на відшкодування комісійної винагороди банку ********** ');
+
+     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Акти на відшкодування комісійної винагороди банку ********** ');
           --  Створюємо функцію Акти на відшкодування комісійної винагороди банку
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
+     l := l +1;
+     l_function_ids.extend(l);      
+     l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Акти на відшкодування комісійної винагороди банку',
                                                   p_funcname => '/barsroot/accpreport/accpreport/index',
-                                                  p_rolename => '' ,
+                                                  p_rolename => null,    
                                                   p_frontend => l_application_type_id
                                                   );
-
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Друк звітів ********** ');
-          --  Створюємо функцію Друк звітів
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Друк звітів',
-                                                  p_funcname => '/barsroot/cbirep/rep_list.aspx?codeapp=\S*',
-                                                  p_rolename => '' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
-
-      --  Створюємо дочірню функцію Друк звітів
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Друк звітів',
-															  p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
-
-      --  Створюємо дочірню функцію Друк звітів
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Друк звітів',
-															  p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довідники NEW ********** ');
+      
+      DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довідники NEW ********** ');
           --  Створюємо функцію Довідники NEW
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Довідники NEW',
                                                   p_funcname => '/barsroot/referencebook/referencelist/',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
+      DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Друк звітів ********** ');
+          --  Створюємо функцію Друк звітів
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Друк звітів',
+                                                  p_funcname => '/barsroot/cbirep/rep_list.aspx?codeapp=\S*',
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
 
@@ -85,8 +67,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-
-
+     
+     
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -100,15 +82,100 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
-umu.add_report2arm(5010,'3771');
-umu.add_report2arm(5011,'3771');
-umu.add_report2arm(5012,'3771');
-umu.add_report2arm(5013,'3771');
-commit;
+end;
+/
+
+prompt -- 2. Добавление справочников
+
+declare
+  l_id   meta_tables.tabid%type;
+  l_name meta_tables.tabname%type := 'ACCP_ORGS';
+begin
+  begin
+     select tabid into l_id from meta_tables where tabname = l_name;
+  exception when no_data_found then l_id := null;
+  end;
+
+  if l_id is not null then
+     begin
+      INSERT INTO REFERENCES ( TABID,  TYPE, DLGNAME, ROLE2EDIT ) 
+      VALUES (                 l_id, 12, '',    'START1'); 
+      EXCEPTION WHEN DUP_VAL_ON_INDEX THEN 
+         DBMS_OUTPUT.PUT_LINE('- Такой справочник уже есть ' || l_name);
+     end;
+  end if;
+
+  if l_id is not null then
+     begin
+        insert into refapp (codeapp, tabid, acode, approve)
+        values ('3771', l_id, 'RW', 1);
+     exception when dup_val_on_index then null;
+     end;
+  end if;
+end;
+/
+
+declare
+  l_id   meta_tables.tabid%type;
+  l_name meta_tables.tabname%type := 'ACCP_ACCOUNTS';
+begin
+  begin
+     select tabid into l_id from meta_tables where tabname = l_name;
+  exception when no_data_found then l_id := null;
+  end;
+
+  if l_id is not null then
+     begin
+      INSERT INTO REFERENCES ( TABID,  TYPE, DLGNAME, ROLE2EDIT ) 
+      VALUES (                 l_id, 12, '',    'START1'); 
+      EXCEPTION WHEN DUP_VAL_ON_INDEX THEN 
+         DBMS_OUTPUT.PUT_LINE('- Такой справочник уже есть  '||l_name);
+     end;
+  end if;
+
+  if l_id is not null then
+     begin
+        insert into refapp (codeapp, tabid, acode, approve)
+        values ('3771', l_id, 'RW', 1);
+     exception when dup_val_on_index then null;
+     end;
+  end if;
+end;
+/
+
+declare
+  l_id   meta_tables.tabid%type;
+  l_name meta_tables.tabname%type := 'TARIF';
+begin
+  begin
+     select tabid into l_id from meta_tables where tabname = l_name;
+  exception when no_data_found then l_id := null;
+  end;
+  if l_id is not null then
+     begin
+        insert into refapp (codeapp, tabid, acode, approve)
+        values ('3771', l_id, 'RW', 1);
+     exception when dup_val_on_index then null;
+     end;
+  end if;
 end;
 /
 
 
+/*
+prompt -- 3. Добавление отчетов
+*/
+
+commit;
+
+begin
+  for k in ( select id from applist_staff where codeapp = '3771')
+  loop 
+     bars_useradm.change_user_privs(k.id);
+  end loop;
+end;
+/
+
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/Bars/Data/Applist/codeapp3771.sql =========*** En
+PROMPT *** End *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_3771.sql =========**
 PROMPT ===================================================================================== 

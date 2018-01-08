@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('413', '413-Інші доходи від операцій з фізичними особами 6110/28', 0, '#(nbs_ob22 (''6510'',''28''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(nbs_ob22 (''6510'',''28''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, null, null, 5, null, null, null, '1100100001000000000000000000000000010000000000000000000000000000', ' Інші доходи від операцій з фізичними особами');
+    values ('413', '413-Інші доходи від операцій з фізичними особами 6110/28', 0, '#(nbs_ob22 (''6110'',''28''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(nbs_ob22 (''6110'',''28''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, null, null, 5, null, null, null, '1100100001000000000000000000000000010000000000000000000000000000', ' Інші доходи від операцій з фізичними особами');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='413', name='413-Інші доходи від операцій з фізичними особами 6110/28', dk=0, nlsm='#(nbs_ob22 (''6510'',''28''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''6510'',''28''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=5, proc=null, s3800=null, rang=null, flags='1100100001000000000000000000000000010000000000000000000000000000', nazn=' Інші доходи від операцій з фізичними особами'
+         set tt='413', name='413-Інші доходи від операцій з фізичними особами 6110/28', dk=0, nlsm='#(nbs_ob22 (''6110'',''28''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''6110'',''28''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=5, proc=null, s3800=null, rang=null, flags='1100100001000000000000000000000000010000000000000000000000000000', nazn=' Інші доходи від операцій з фізичними особами'
        where tt='413';
   end;
   --------------------------------
@@ -121,12 +121,12 @@ begin
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6510', '413', 1);
+    values ('6110', '413', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''413'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''413'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;

@@ -1,16 +1,10 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/mbdk_2700_dat.sql =========*** Run 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.MBDK_2700_DAT (p_nd integer, Mode_ integer) RETURN date is
+CREATE OR REPLACE function BARS.MBDK_2700_dat (p_nd integer, Mode_ integer) RETURN date is
 
 /* Версия 2.0 08-08-2017
    Определение переодичноть погашения % для 2700
 
 1) 08-08-2017  mode_ = 0 - старт (последняя с которой начислено)
-                       1 - дата по которую % начислены
+                       1 - дата по которую % начислены 
 */
 l_dat       date;
 l_dat_start date;
@@ -30,15 +24,7 @@ begin
    end if;
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  MBDK_2700_DAT ***
-grant EXECUTE                                                                on MBDK_2700_DAT   to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on MBDK_2700_DAT   to START1;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/mbdk_2700_dat.sql =========*** End 
- PROMPT ===================================================================================== 
- 
+grant execute on MBDK_2700_dat to bars_access_defrole;
+grant execute on MBDK_2700_dat to start1;
+                              

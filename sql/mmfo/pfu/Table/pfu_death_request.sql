@@ -70,10 +70,25 @@ COMMENT ON COLUMN PFU.PFU_DEATH_REQUEST.USERID IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C00111526 ***
+PROMPT *** Create  constraint FK_DEATH_REQ_REF_REQUEST ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_DEATH_REQUEST MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_DEATH_REQUEST ADD CONSTRAINT FK_DEATH_REQ_REF_REQUEST FOREIGN KEY (ID)
+	  REFERENCES PFU.PFU_REQUEST (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_PFU_DEATH_REQUEST ***
+begin   
+ execute immediate '
+  ALTER TABLE PFU.PFU_DEATH_REQUEST ADD CONSTRAINT PK_PFU_DEATH_REQUEST PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -94,12 +109,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_PFU_DEATH_REQUEST ***
+PROMPT *** Create  constraint SYS_C00111526 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_DEATH_REQUEST ADD CONSTRAINT PK_PFU_DEATH_REQUEST PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGD  ENABLE';
+  ALTER TABLE PFU.PFU_DEATH_REQUEST MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -123,8 +136,6 @@ exception when others then
 
 PROMPT *** Create  grants  PFU_DEATH_REQUEST ***
 grant SELECT                                                                 on PFU_DEATH_REQUEST to BARS;
-grant SELECT                                                                 on PFU_DEATH_REQUEST to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_DEATH_REQUEST to UPLD;
 
 
 

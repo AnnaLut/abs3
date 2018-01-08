@@ -22,9 +22,7 @@ PROMPT *** Create  view V_OW_REBRANCH_FILE ***
  where t.file_type = 'REBRANCH';
 
 PROMPT *** Create  grants  V_OW_REBRANCH_FILE ***
-grant SELECT                                                                 on V_OW_REBRANCH_FILE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_REBRANCH_FILE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_OW_REBRANCH_FILE to UPLD;
 
 
 

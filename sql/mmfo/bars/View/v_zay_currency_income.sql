@@ -47,10 +47,8 @@ PROMPT *** Create  view V_ZAY_CURRENCY_INCOME ***
       and z.mfo = SYS_CONTEXT ('bars_context', 'user_mfo');
 
 PROMPT *** Create  grants  V_ZAY_CURRENCY_INCOME ***
-grant SELECT                                                                 on V_ZAY_CURRENCY_INCOME to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY_CURRENCY_INCOME to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ZAY_CURRENCY_INCOME to START1;
-grant SELECT                                                                 on V_ZAY_CURRENCY_INCOME to UPLD;
 
 
 

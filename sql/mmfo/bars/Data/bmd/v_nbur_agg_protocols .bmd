@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Показники файлу звітності';
   l_tablinesdef := '10';
-  l_tabselect_statement := '';
   l_tabname     := 'V_NBUR_AGG_PROTOCOLS ';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,15 +119,15 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ADJ_IND', 'N', 'Ознака редагування (0 - Ні, 1 - Так)', '', 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ERROR_MSG', 'C', 'Текст помилки', '', 1000, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 1, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'FIELD_CODE', 'C', 'Код показника', '', 35, 5, 1, 1, 0, 0, '', '', 1, 0, '', 0, 1, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'FIELD_VALUE', 'C', 'Значення показника', '', 70, 6, 1, 0, 1, 0, '', '', 1, 0, '', 0, 1, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KF', 'C', 'Код філії', '', 6, 1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NBUC', 'C', 'Код області/МФО', '', 20, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 1, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'REPORT_CODE', 'C', 'Код файлу', '', 3, 4, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'REPORT_DATE', 'D', 'Звітна дата', '', 10, 2, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'VERSION_ID', 'N', 'Номер версії', '', 22, 3, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ADJ_IND', 'N', 'Ознака редагування (0 - Ні, 1 - Так)', null, 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ERROR_MSG', 'C', 'Текст помилки', null, 1000, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 1, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'FIELD_CODE', 'C', 'Код показника', null, 35, 5, 1, 1, 0, 0, '', '', 1, 0, '', 0, 1, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'FIELD_VALUE', 'C', 'Значення показника', null, 70, 6, 1, 0, 1, 0, '', '', 1, 0, '', 0, 1, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KF', 'C', 'Код філії', null, 6, 1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NBUC', 'C', 'Код області/МФО', null, 20, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 1, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'REPORT_CODE', 'C', 'Код файлу', null, 3, 4, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'REPORT_DATE', 'D', 'Звітна дата', null, 10, 2, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'VERSION_ID', 'N', 'Номер версії', null, 22, 3, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

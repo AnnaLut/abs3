@@ -101,12 +101,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SURVEY_OPT_LIST ***
-grant SELECT                                                                 on SURVEY_OPT_LIST to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SURVEY_OPT_LIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SURVEY_OPT_LIST to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY_OPT_LIST to DPT_ADMIN;
 grant SELECT                                                                 on SURVEY_OPT_LIST to START1;
-grant SELECT                                                                 on SURVEY_OPT_LIST to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SURVEY_OPT_LIST to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SURVEY_OPT_LIST to WR_REFREAD;
 

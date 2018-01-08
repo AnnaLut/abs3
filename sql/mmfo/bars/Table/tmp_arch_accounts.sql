@@ -154,226 +154,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C006979 ***
+PROMPT *** Create  constraint SYS_C006976 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (KOS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006980 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (DOSQ NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006981 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (KOSQ NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006982 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (VID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006983 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (TRCN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006984 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (BLKD NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006985 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (BLKK NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006986 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (POS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006987 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (RNK NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006988 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (TOBO NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006966 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (ACC NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006967 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (KF NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006968 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (NLS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006969 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (KV NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006970 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (BRANCH NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006971 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (DAOS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006972 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (NMS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006973 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (LIM NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006974 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (OSTB NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (OSTF NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -394,10 +178,226 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C006976 ***
+PROMPT *** Create  constraint SYS_C006974 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (OSTF NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (OSTB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006973 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (LIM NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006972 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (NMS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006971 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (DAOS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006970 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (BRANCH NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006969 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (KV NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006968 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (NLS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006967 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (KF NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006966 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (ACC NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006988 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (TOBO NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006987 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (RNK NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006986 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (POS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006985 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (BLKK NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006984 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (BLKD NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006983 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (TRCN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006982 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (VID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006981 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (KOSQ NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006980 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (DOSQ NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006979 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_ARCH_ACCOUNTS MODIFY (KOS NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -406,9 +406,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_ARCH_ACCOUNTS ***
-grant SELECT                                                                 on TMP_ARCH_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_ARCH_ACCOUNTS to BARS_DM;
-grant SELECT                                                                 on TMP_ARCH_ACCOUNTS to UPLD;
 
 
 

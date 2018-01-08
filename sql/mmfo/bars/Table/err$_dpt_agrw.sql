@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_DPT_AGRW.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPT_AGRW ***
-grant SELECT                                                                 on ERR$_DPT_AGRW   to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPT_AGRW   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

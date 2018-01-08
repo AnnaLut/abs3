@@ -89,9 +89,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPA_ERR_CODES ***
-grant SELECT                                                                 on DPA_ERR_CODES   to BARSREADER_ROLE;
 grant SELECT                                                                 on DPA_ERR_CODES   to BARS_DM;
-grant SELECT                                                                 on DPA_ERR_CODES   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPA_ERR_CODES   to WR_ALL_RIGHTS;
 
 

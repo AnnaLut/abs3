@@ -57,11 +57,9 @@ COMMENT ON COLUMN BARS.L_NAL.P080 IS '';
 
 
 PROMPT *** Create  grants  L_NAL ***
-grant SELECT                                                                 on L_NAL           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on L_NAL           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on L_NAL           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on L_NAL           to L_NAL;
-grant SELECT                                                                 on L_NAL           to UPLD;
 grant FLASHBACK,SELECT                                                       on L_NAL           to WR_REFREAD;
 
 

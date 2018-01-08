@@ -1,3 +1,4 @@
+set define       off
 set serveroutput on
 
 declare
@@ -50,7 +51,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +60,6 @@ begin
 
   l_tabsemantic := 'Види депозитних договорів юр.осіб';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'V_DPU_VIDD';
 
   -- получаем код таблицы
@@ -73,7 +72,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +82,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,36 +120,36 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'AMNT_ADD', 'N', 'Min. сума~поповнення', '1', 10, 18, 0, 0, 0, 0, '', '#0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'AMNT_MAX', 'N', 'Max. сума~депозиту', '1', 10, 16, 0, 0, 0, 0, '', '#0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'AMNT_MIN', 'N', 'Min. сума~депозиту', '1', 10, 15, 0, 0, 0, 0, '', '#0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'BR_ID', 'N', 'Код~базової~ставки', '1', 7, 28, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'BR_NM', 'C', 'Назва~базової~ставки', '3', 35, 29, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'R020_DEP', 'C', 'Бал.~рах.~договору', '1', 4, 7, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'CCY_ID', 'N', 'Код~валюти', '1', 3, 6, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'COMPROC', 'B', 'Ознака~капиталізації %%', '.7', 1, 23, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'DEAL_QTY', 'N', 'К-ть діючих депозитних договорів', '1', 5, 30, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'FREQ_ID', 'N', 'Код~періодичності~виплати %%', '.5', 3, 19, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'FREQ_NM', 'C', 'Назва~періодичності~ виплати %%', '2', 35, 20, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'IRREVOCABLE', 'B', 'Ознака~безвідкличності', '.7', 1, 27, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'IS_ACTIVE', 'B', 'Ознака~активності', '1', 1, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'IS_LINE', 'B', 'Ознака~деп.лінії', '.7', 1, 24, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'PROLONGABLE', 'B', 'Ознака~автопереоформления', '.7', 1, 26, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'REPLENISHABLE', 'N', 'Ознака~поповнення', '.7', 1, 17, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'STOP_ID', 'N', 'Код~штрафу', '.7', 5, 21, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'STOP_NM', 'C', 'Назва~штрафу', '2', 50, 22, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'TEMPLATE_ID', 'C', 'Шаблон~договору', '1.5', 35, 25, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'TERM_ADD', 'N', 'Термін~поповнення~депозиту', '1', 4, 14, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'TERM_MAX_MO', 'N', 'Max. термін~дії депозиту~(в міс.)', '1', 4, 13, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'TERM_MIN_DY', 'N', 'Min. термін~дії депозиту~(в днях)', '1', 4, 11, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'TERM_TP', 'N', 'Тип терміну(~1 - фікований,~2 - діапазон)', '1', 1, 8, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'TYPE_ID', 'N', 'Код~типу~договору', '1', 5, 4, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'TYPE_NM', 'C', 'Назва~типу~договору', '3', 100, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'VIDD_ID', 'N', 'Числовий~Код~Виду', '1', 5, 2, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'VIDD_NM', 'C', 'Назва~виду~договору', '3', 50, 3, 0, 0, 1, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 34, 'TERM_MAX_DY', 'N', 'Max. термін~дії депозиту~(в днях)', '1', 4, 12, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'TERM_MIN_MO', 'N', 'Min. термін~дії депозиту~(в міс.)', '1', 4, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 36, 'VIDD_CODE', 'C', 'Символьний~код', '', null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'AMNT_ADD', 'N', 'Min. сума~поповнення', 1, 10, 18, 0, 0, 0, 0, '', '#0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'AMNT_MAX', 'N', 'Max. сума~депозиту', 1, 10, 16, 0, 0, 0, 0, '', '#0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'AMNT_MIN', 'N', 'Min. сума~депозиту', 1, 10, 15, 0, 0, 0, 0, '', '#0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'BR_ID', 'N', 'Код~базової~ставки', 1, 7, 28, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'BR_NM', 'C', 'Назва~базової~ставки', 3, 35, 29, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'R020_DEP', 'C', 'Бал.~рах.~договору', 1, 4, 7, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'CCY_ID', 'N', 'Код~валюти', 1, 3, 6, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'COMPROC', 'B', 'Ознака~капиталізації %%', .7, 1, 23, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'DEAL_QTY', 'N', 'К-ть діючих депозитних договорів', 1, 5, 30, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'FREQ_ID', 'N', 'Код~періодичності~виплати %%', .5, 3, 19, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'FREQ_NM', 'C', 'Назва~періодичності~ виплати %%', 2, 35, 20, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'IRREVOCABLE', 'B', 'Ознака~безвідкличності', .7, 1, 27, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'IS_ACTIVE', 'B', 'Ознака~активності', 1, 1, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'IS_LINE', 'B', 'Ознака~деп.лінії', .7, 1, 24, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'PROLONGABLE', 'B', 'Ознака~автопереоформления', .7, 1, 26, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'REPLENISHABLE', 'N', 'Ознака~поповнення', .7, 1, 17, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'STOP_ID', 'N', 'Код~штрафу', .7, 5, 21, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'STOP_NM', 'C', 'Назва~штрафу', 2, 50, 22, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'TEMPLATE_ID', 'C', 'Шаблон~договору', 1.5, 35, 25, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'TERM_ADD', 'N', 'Термін~поповнення~депозиту', 1, 4, 14, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'TERM_MAX_MO', 'N', 'Max. термін~дії депозиту~(в міс.)', 1, 4, 13, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'TERM_MIN_DY', 'N', 'Min. термін~дії депозиту~(в днях)', 1, 4, 11, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'TERM_TP', 'N', 'Тип терміну(~1 - фікований,~2 - діапазон)', 1, 1, 8, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'TYPE_ID', 'N', 'Код~типу~договору', 1, 5, 4, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'TYPE_NM', 'C', 'Назва~типу~договору', 3, 100, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'VIDD_ID', 'N', 'Числовий~Код~Виду', 1, 5, 2, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'VIDD_NM', 'C', 'Назва~виду~договору', 3, 50, 3, 0, 0, 1, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'TERM_MAX_DY', 'N', 'Max. термін~дії депозиту~(в днях)', 1, 4, 12, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'TERM_MIN_MO', 'N', 'Min. термін~дії депозиту~(в міс.)', 1, 4, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'VIDD_CODE', 'C', 'Символьний~код', null, null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 2, 1, 'DESC');
@@ -165,16 +161,16 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Додати новий вид депозиту', '', '', 'ONCE', 'Створити новий вид депозиту?', '', '', '', '/barsroot/udeposit_admin/dpuvidddetails.aspx?mode=1', 4);
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Додати новий вид депозиту', '', '', 'ONCE', 'Створити новий вид депозиту?', '', '', '', '/barsroot/udeposit_admin/dpuvidddetails.aspx?mode=1', 4 );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 2, 'Перегляд/Редагування видуу депозиту', '', '', 'ONCE', '', '', '', '', '/barsroot/udeposit_admin/dpuvidddetails.aspx?mode=1'||chr(38)||'vidd=:VIDD_ID', 8);
+  bars_metabase.add_nsifunction(l_tabid, 2, 'Перегляд/Редагування видуу депозиту', '', '', 'ONCE', '', '', '', '', '/barsroot/udeposit_admin/dpuvidddetails.aspx?mode=1&vidd=:VIDD_ID', 8 );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 3, 'Видалити вид депозиту', 'DPU_UTILS.DEL_SUBTYPE(:VIDD_ID)', '', 'EACH', 'Видалити вид депозиту?', '', '', '', '', 5);
+  bars_metabase.add_nsifunction(l_tabid, 3, 'Видалити вид депозиту', 'DPU_UTILS.DEL_SUBTYPE(:VIDD_ID)', '', 'EACH', 'Видалити вид депозиту?', '', '', '', '', 5 );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 4, 'Експорт вид депозиту в SQL-сценарій', '', '', '', 'Експортувати вид депозиту в SQL-сценарій?', 'Done!', '', '', 'sPar=[EXEC=>SELECTED_ONE][PROC=>DPU_UTILS.EXPRT_SUBTYPE( :VIDD_ID, :p_script, :p_file_nm )][OUT_PARAMS=>:p_script(SEM=ФАЙЛ,TYPE=CLOB),:p_file_nm(SEM=Назва файлу,TYPE=fileName)]', 156);
+  bars_metabase.add_nsifunction(l_tabid, 4, 'Експорт вид депозиту в SQL-сценарій', '', '', '', 'Експортувати вид депозиту в SQL-сценарій?', 'Done!', '', '', 'sPar=[EXEC=>SELECTED_ONE][PROC=>DPU_UTILS.EXPRT_SUBTYPE( :VIDD_ID, :p_script, :p_file_nm )][OUT_PARAMS=>:p_script(SEM=ФАЙЛ,TYPE=CLOB),:p_file_nm(SEM=Назва файлу,TYPE=fileName)]', 156 );
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop

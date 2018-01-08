@@ -78,9 +78,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  OVR_ZONE ***
-grant SELECT                                                                 on OVR_ZONE        to BARSREADER_ROLE;
 grant SELECT                                                                 on OVR_ZONE        to START1;
-grant SELECT                                                                 on OVR_ZONE        to UPLD;
 
 
 

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции TPP
-prompt Наименование операции: TPP d Продаж інвестиційних монет
+prompt Наименование операции: d Продаж інвестиційних монет
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('TPP', 'TPP d Продаж інвестиційних монет', 1, '#(NBS_OB22(''2900'',''03''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 1, 0, '#(BM__K)*#(BM__R)*100', '#(BM__K)*#(BM__R)*100', 32, null, null, null, '0000100001000001000000000000000000010000000000000000000000000000', null);
+    values ('TPP', 'd Продаж інвестиційних монет', 1, '#(NBS_OB22(''2900'',''03''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 1, 0, '#(BM__K)*#(BM__R)*100', '#(BM__K)*#(BM__R)*100', 32, null, null, null, '0000100001000001000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='TPP', name='TPP d Продаж інвестиційних монет', dk=1, nlsm='#(NBS_OB22(''2900'',''03''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='#(BM__K)*#(BM__R)*100', s2='#(BM__K)*#(BM__R)*100', sk=32, proc=null, s3800=null, rang=null, flags='0000100001000001000000000000000000010000000000000000000000000000', nazn=null
+         set tt='TPP', name='d Продаж інвестиційних монет', dk=1, nlsm='#(NBS_OB22(''2900'',''03''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='#(BM__K)*#(BM__R)*100', s2='#(BM__K)*#(BM__R)*100', sk=32, proc=null, s3800=null, rang=null, flags='0000100001000001000000000000000000010000000000000000000000000000', nazn=null
        where tt='TPP';
   end;
   --------------------------------

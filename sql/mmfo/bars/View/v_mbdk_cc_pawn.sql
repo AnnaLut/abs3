@@ -29,9 +29,7 @@ PROMPT *** Create  view V_MBDK_CC_PAWN ***
 FROM cc_pawn;
 
 PROMPT *** Create  grants  V_MBDK_CC_PAWN ***
-grant SELECT                                                                 on V_MBDK_CC_PAWN  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBDK_CC_PAWN  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_MBDK_CC_PAWN  to UPLD;
 
 
 

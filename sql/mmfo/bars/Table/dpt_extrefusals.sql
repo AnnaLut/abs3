@@ -71,10 +71,11 @@ COMMENT ON COLUMN BARS.DPT_EXTREFUSALS.KF IS '';
 
 
 
-PROMPT *** Create  constraint CC_DPTEXTREFUSALS_DPTID_NN ***
+PROMPT *** Create  constraint FK_DPTEXTREFUSALS_DPTDPTALL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_EXTREFUSALS MODIFY (DPTID CONSTRAINT CC_DPTEXTREFUSALS_DPTID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_EXTREFUSALS ADD CONSTRAINT FK_DPTEXTREFUSALS_DPTDPTALL FOREIGN KEY (DPTID)
+	  REFERENCES BARS.DPT_DEPOSIT_ALL (DEPOSIT_ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -83,10 +84,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTEXTREFUSALS_BRANCH_NN ***
+PROMPT *** Create  constraint FK_DPTEXTREFUSALS_BRANCH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_EXTREFUSALS MODIFY (BRANCH CONSTRAINT CC_DPTEXTREFUSALS_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_EXTREFUSALS ADD CONSTRAINT FK_DPTEXTREFUSALS_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -95,46 +97,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTEXTREFUSALS_REQUSERID_NN ***
+PROMPT *** Create  constraint CC_DPTEXTREFUSALS_REQSTATE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_EXTREFUSALS MODIFY (REQ_USERID CONSTRAINT CC_DPTEXTREFUSALS_REQUSERID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTEXTREFUSALS_REQBNKDAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_EXTREFUSALS MODIFY (REQ_BNKDAT CONSTRAINT CC_DPTEXTREFUSALS_REQBNKDAT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTEXTREFUSALS_REQSYSDAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_EXTREFUSALS MODIFY (REQ_SYSDAT CONSTRAINT CC_DPTEXTREFUSALS_REQSYSDAT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPT_EXTREFUSALS_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_EXTREFUSALS MODIFY (KF CONSTRAINT CC_DPT_EXTREFUSALS_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_EXTREFUSALS ADD CONSTRAINT CC_DPTEXTREFUSALS_REQSTATE CHECK (req_state in (1,-1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -157,10 +123,96 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTEXTREFUSALS_REQSTATE ***
+PROMPT *** Create  constraint CC_DPT_EXTREFUSALS_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_EXTREFUSALS ADD CONSTRAINT CC_DPTEXTREFUSALS_REQSTATE CHECK (req_state in (1,-1)) ENABLE';
+  ALTER TABLE BARS.DPT_EXTREFUSALS MODIFY (KF CONSTRAINT CC_DPT_EXTREFUSALS_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTEXTREFUSALS_REQSYSDAT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTREFUSALS MODIFY (REQ_SYSDAT CONSTRAINT CC_DPTEXTREFUSALS_REQSYSDAT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTEXTREFUSALS_REQBNKDAT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTREFUSALS MODIFY (REQ_BNKDAT CONSTRAINT CC_DPTEXTREFUSALS_REQBNKDAT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTEXTREFUSALS_REQUSERID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTREFUSALS MODIFY (REQ_USERID CONSTRAINT CC_DPTEXTREFUSALS_REQUSERID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTEXTREFUSALS_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTREFUSALS MODIFY (BRANCH CONSTRAINT CC_DPTEXTREFUSALS_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTEXTREFUSALS_DPTID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTREFUSALS MODIFY (DPTID CONSTRAINT CC_DPTEXTREFUSALS_DPTID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTEXTREFUSALS_STAFF2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTREFUSALS ADD CONSTRAINT FK_DPTEXTREFUSALS_STAFF2 FOREIGN KEY (VRF_USERID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTEXTREFUSALS_STAFF1 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTREFUSALS ADD CONSTRAINT FK_DPTEXTREFUSALS_STAFF1 FOREIGN KEY (REQ_USERID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -211,11 +263,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_EXTREFUSALS ***
-grant SELECT                                                                 on DPT_EXTREFUSALS to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_EXTREFUSALS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_EXTREFUSALS to BARS_DM;
 grant SELECT                                                                 on DPT_EXTREFUSALS to RPBN001;
-grant SELECT                                                                 on DPT_EXTREFUSALS to UPLD;
 
 
 

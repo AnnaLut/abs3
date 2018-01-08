@@ -18,9 +18,7 @@ PROMPT *** Create  view V_DWH_PAR ***
    ORDER BY g.GROUP_ID;
 
 PROMPT *** Create  grants  V_DWH_PAR ***
-grant SELECT                                                                 on V_DWH_PAR       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DWH_PAR       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DWH_PAR       to UPLD;
 
 
 

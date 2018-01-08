@@ -57,6 +57,19 @@ COMMENT ON COLUMN BARS.OW_KEYS.TYPE IS '';
 
 
 
+PROMPT *** Create  constraint FK_KEYSTOKEYTYPES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_KEYS ADD CONSTRAINT FK_KEYSTOKEYTYPES FOREIGN KEY (TYPE)
+	  REFERENCES BARS.KEYTYPES (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_OW_KEYS ***
 begin   
  execute immediate '
@@ -145,9 +158,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_KEYS ***
-grant SELECT                                                                 on OW_KEYS         to BARSREADER_ROLE;
 grant SELECT                                                                 on OW_KEYS         to BARS_DM;
-grant SELECT                                                                 on OW_KEYS         to UPLD;
 
 
 

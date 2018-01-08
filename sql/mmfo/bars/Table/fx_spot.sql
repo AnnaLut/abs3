@@ -75,6 +75,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_FXSPOT_CODCAGENT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FX_SPOT ADD CONSTRAINT FK_FXSPOT_CODCAGENT FOREIGN KEY (CODCAGENT)
+	  REFERENCES BARS.CODCAGENT (CODCAGENT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_FXSPOT_CODCAGENT_NN ***
 begin   
  execute immediate '
@@ -113,11 +126,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FX_SPOT ***
-grant SELECT                                                                 on FX_SPOT         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FX_SPOT         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FX_SPOT         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FX_SPOT         to START1;
-grant SELECT                                                                 on FX_SPOT         to UPLD;
 grant FLASHBACK,SELECT                                                       on FX_SPOT         to WR_REFREAD;
 
 

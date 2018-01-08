@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/gerc_payments.sql =========*** Run *
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.GERC_PAYMENTS 
+CREATE OR REPLACE PACKAGE GERC_PAYMENTS
 IS
    G_HEADER_VERSION   CONSTANT VARCHAR2 (64) := 'v.3.4 15.06.2017';
 
@@ -109,7 +103,7 @@ IS
 PROCEDURE doc_visa (p_ref      IN oper.REF%TYPE,
                     p_idoper   IN VARCHAR2,
                     p_sign     IN oper.SIGN%TYPE);
-
+                    
 PROCEDURE SearchClient (p_in_RNK            IN     NUMBER DEFAULT NULL,
                         p_in_OKPO           IN     VARCHAR2 DEFAULT NULL,
                         p_in_NMK            IN     VARCHAR2 DEFAULT NULL,
@@ -150,7 +144,7 @@ PROCEDURE SearchClient (p_in_RNK            IN     NUMBER DEFAULT NULL,
                         p_NUMDOC               OUT VARCHAR2,
                         p_OperationResult      OUT INTEGER,
                         p_ErrorMessage         OUT VARCHAR2);
-
+                        
 PROCEDURE RegisterRefreshNonClient (p_isnew             IN     INTEGER DEFAULT 0,
                                     p_in_RNK            IN     NUMBER DEFAULT NULL,
                                     p_in_OKPO           IN     VARCHAR2 DEFAULT NULL,
@@ -191,11 +185,11 @@ PROCEDURE RegisterRefreshNonClient (p_isnew             IN     INTEGER DEFAULT 0
                                     p_SER               IN OUT VARCHAR2,
                                     p_NUMDOC            IN OUT VARCHAR2,
                                     p_OperationResult   IN OUT INTEGER,
-                                    p_ErrorMessage      IN OUT VARCHAR2);
-
+                                    p_ErrorMessage      IN OUT VARCHAR2);                        
+                    
 END GERC_PAYMENTS;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.GERC_PAYMENTS IS
+CREATE OR REPLACE PACKAGE BODY GERC_PAYMENTS IS
 
     G_BODY_VERSION      constant varchar2(64) := 'v.2.4 13.09.2017';
     TYPE t_cursor   IS REF CURSOR;
@@ -607,9 +601,9 @@ IS
        exception
          when others then
            p_errorMessage :=substr(sqlerrm,1,1070); p_statecode := null;
-           bars_audit.error(title||' '||p_errorMessage);
+           bars_audit.error(title||' '||p_errorMessage);           
            return;
-     end;
+     end;  
 
 
      if l_ref is not null
@@ -634,7 +628,7 @@ IS
                where ExternalDocumentId = p_ExternalDocumentId and ref = p_ref;
             exception when others then bars_audit.info(title||':'||sqlcode||'/'||sqlerrm);
             end;
-           exception when others then
+           exception when others then 
              p_errorMessage :=substr(sqlerrm,1,1070); p_statecode := null;
              bars_audit.error(title||' '||p_errorMessage);
            end;
@@ -1284,14 +1278,7 @@ end;
 
 END GERC_PAYMENTS;
 /
+
  show err;
  
-PROMPT *** Create  grants  GERC_PAYMENTS ***
-grant EXECUTE                                                                on GERC_PAYMENTS   to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/gerc_payments.sql =========*** End *
- PROMPT ===================================================================================== 
- 
+grant EXECUTE                                                                on GERC_PAYMENTS           to BARS_ACCESS_DEFROLE;

@@ -120,9 +120,7 @@ COMMENT ON COLUMN BARS.ERR$_STAFF$BASE.CURRENT_BRANCH IS '';
 
 
 PROMPT *** Create  grants  ERR$_STAFF$BASE ***
-grant SELECT                                                                 on ERR$_STAFF$BASE to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_STAFF$BASE to BARS_DM;
-grant SELECT                                                                 on ERR$_STAFF$BASE to UPLD;
 
 
 

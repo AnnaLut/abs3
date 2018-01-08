@@ -69,6 +69,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_BR_SKRYN_TIP_REF_ETALON ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_TIP_BRANCH ADD CONSTRAINT FK_BR_SKRYN_TIP_REF_ETALON FOREIGN KEY (ETALON_ID)
+	  REFERENCES BARS.SKRYNKA_TIP_ETALON (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C0010124 ***
 begin   
  execute immediate '
@@ -143,9 +156,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_TIP_BRANCH ***
-grant SELECT                                                                 on SKRYNKA_TIP_BRANCH to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_TIP_BRANCH to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on SKRYNKA_TIP_BRANCH to UPLD;
 
 
 

@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F6B_NN.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F6B_NN ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_F6B_NN (Dat_ DATE, sheme_ Varchar2 DEFAULT 'G' )
+CREATE OR REPLACE PROCEDURE BARS.P_F6B_NN (Dat_ DATE, sheme_ Varchar2 DEFAULT 'G' )
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  % DESCRIPTION : процедура #6B
@@ -200,7 +191,7 @@ BEGIN
 
        if k.codcagent in (1, 2)               -- банки
        then
-          N_ := '3';
+          N_ := '3';                          
        elsif k.codcagent in (3, 4)            -- юр.лица
        then
 
@@ -223,7 +214,7 @@ BEGIN
              if k.nls like '21%'    or
                 k.nls like '236%'   or
                 k.nls like '237%'   or
-                k.nls like '238%'
+                k.nls like '238%'   
              then
                      is_budg_ := 1;
              else    is_budg_ := 0;
@@ -322,20 +313,20 @@ BEGIN
        end if;
 
        if    k.pd_0 =1  and
-             k.nbs in ('1400','1401','1402','1405','1408',
+             k.nbs in ('1400','1401','1402','1405','1408', 
                        '1410','1411','1412','1415','1418',
                        '1420','1421','1422','1428',
                        '3002','3007','3008','3102','3107','3108')
-       then
-           ddd_ :='130';
+       then  
+           ddd_ :='130';   
            H_ := '0';
 
        end if;
 
 -- отдельная обработка  счетов 3-го класса -могут быть в ggg=130
-
+ 
        if  ddd_ in('133','135','138') and k.nbs like '3%'   then
-
+                 
           select count(*)  into pr_
             from nbu23_rez
            where fdat = z.fdat1
@@ -344,7 +335,7 @@ BEGIN
 
           if pr_ !=0  then
 
-              ddd_ :='130';
+              ddd_ :='130';   
               H_ := '0';
           else
 
@@ -383,7 +374,7 @@ BEGIN
              VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
 
              if ddd_ = '121' and k.pd_0 =1 then
-
+     
                 INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc)
                 VALUES (k.nls, k.kv, dat_, '120'||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
              end if;
@@ -580,10 +571,5 @@ BEGIN
   logger.info ('P_F6B_NN: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END p_f6b_nn;
 /
-show err;
 
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F6B_NN.sql =========*** End *** 
-PROMPT ===================================================================================== 

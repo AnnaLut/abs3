@@ -85,10 +85,6 @@ COMMENT ON COLUMN BARS.ERR$_DPT_BONUS_REQUESTS.BRANCH IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPT_BONUS_REQUESTS ***
-grant SELECT                                                                 on ERR$_DPT_BONUS_REQUESTS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPT_BONUS_REQUESTS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_TARIF_SCHEME_ACCBRANCH.DAT_END IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_TARIF_SCHEME_ACCBRANCH ***
-grant SELECT                                                                 on ERR$_TARIF_SCHEME_ACCBRANCH to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_TARIF_SCHEME_ACCBRANCH to UPLD;
-
 
 
 PROMPT ===================================================================================== 

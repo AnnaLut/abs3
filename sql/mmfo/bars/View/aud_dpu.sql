@@ -41,10 +41,8 @@ PROMPT *** Create  view AUD_DPU ***
           );
 
 PROMPT *** Create  grants  AUD_DPU ***
-grant SELECT                                                                 on AUD_DPU         to BARSREADER_ROLE;
 grant SELECT                                                                 on AUD_DPU         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AUD_DPU         to SALGL;
-grant SELECT                                                                 on AUD_DPU         to UPLD;
 
 
 

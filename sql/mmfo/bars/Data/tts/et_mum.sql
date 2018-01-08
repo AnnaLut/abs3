@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции !MU
-prompt Наименование операции: !MU STOP-правило на суму виплати переказу (екв <50000грн.)
+prompt Наименование операции: STOP-правило на суму виплати переказу (екв <50000грн.)
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!MU', '!MU STOP-правило на суму виплати переказу (екв <50000грн.)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(102,#(KVA),'''',#(S), #(REF))', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('!MU', 'STOP-правило на суму виплати переказу (екв <50000грн.)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(102,#(KVA),'''',#(S), #(REF))', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!MU', name='!MU STOP-правило на суму виплати переказу (екв <50000грн.)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(102,#(KVA),'''',#(S), #(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='!MU', name='STOP-правило на суму виплати переказу (екв <50000грн.)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(102,#(KVA),'''',#(S), #(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='!MU';
   end;
   --------------------------------
@@ -89,7 +89,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции VPF
-prompt Наименование операции: VPF d: Викуп нерозмiнної частини (S) валюти по курсу купiвлi
+prompt Наименование операции: d: Викуп нерозмiнної частини (S) валюти по курсу купiвлi
 declare
   cnt_  number;
 begin
@@ -98,11 +98,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('VPF', 'VPF d: Викуп нерозмiнної частини (S) валюти по курсу купiвлi', 1, null, null, null, 980, null, '#(tobopack.GetToboCASH)', '#(tobopack.GetToboCASH)', null, 0, 0, 1, 0, 'case when #(KVA)=980 then 0 when #(KVA)=978 then MOD(#(S),500) when #(KVA)=643 then MOD(#(S),500) when #(KVA)=826 then MOD(#(S),500) when #(KVA)=124 then MOD(#(S),500) when #(KVA)=756 then MOD(#(S),1000) else MOD(#(S),100) end', 'eqv_obs(#(KVA),case when #(KVA)=980 then 0 when #(KVA)=978 then MOD(#(S),500) when #(KVA)=643 then MOD(#(S),500) when #(KVA)=826 then MOD(#(S),500) when #(KVA)=124 then MOD(#(S),500) when #(KVA)=756 then MOD(#(S),1000) else MOD(#(S),100) end ,SYSDATE,1)', 56, null, '#(nbs_ob22 (''3800'',''10''))', null, '0000110000000000000010000000000000000100000000000000000000000000', 'Викуп нерозмiнної частини валюти по курсу купiвлi');
+    values ('VPF', 'd: Викуп нерозмiнної частини (S) валюти по курсу купiвлi', 1, null, null, null, 980, null, '#(tobopack.GetToboCASH)', '#(tobopack.GetToboCASH)', null, 0, 0, 1, 0, 'case when #(KVA)=980 then 0 when #(KVA)=978 then MOD(#(S),500) when #(KVA)=643 then MOD(#(S),500) when #(KVA)=826 then MOD(#(S),500) when #(KVA)=124 then MOD(#(S),500) when #(KVA)=756 then MOD(#(S),1000) else MOD(#(S),100) end', 'eqv_obs(#(KVA),case when #(KVA)=980 then 0 when #(KVA)=978 then MOD(#(S),500) when #(KVA)=643 then MOD(#(S),500) when #(KVA)=826 then MOD(#(S),500) when #(KVA)=124 then MOD(#(S),500) when #(KVA)=756 then MOD(#(S),1000) else MOD(#(S),100) end ,SYSDATE,1)', 56, null, '#(nbs_ob22 (''3800'',''10''))', null, '0000110000000000000010000000000000000100000000000000000000000000', 'Викуп нерозмiнної частини валюти по курсу купiвлi');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='VPF', name='VPF d: Викуп нерозмiнної частини (S) валюти по курсу купiвлi', dk=1, nlsm=null, kv=null, nlsk=null, kvk=980, nlss=null, nlsa='#(tobopack.GetToboCASH)', nlsb='#(tobopack.GetToboCASH)', mfob=null, flc=0, fli=0, flv=1, flr=0, s='case when #(KVA)=980 then 0 when #(KVA)=978 then MOD(#(S),500) when #(KVA)=643 then MOD(#(S),500) when #(KVA)=826 then MOD(#(S),500) when #(KVA)=124 then MOD(#(S),500) when #(KVA)=756 then MOD(#(S),1000) else MOD(#(S),100) end', s2='eqv_obs(#(KVA),case when #(KVA)=980 then 0 when #(KVA)=978 then MOD(#(S),500) when #(KVA)=643 then MOD(#(S),500) when #(KVA)=826 then MOD(#(S),500) when #(KVA)=124 then MOD(#(S),500) when #(KVA)=756 then MOD(#(S),1000) else MOD(#(S),100) end ,SYSDATE,1)', sk=56, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=null, flags='0000110000000000000010000000000000000100000000000000000000000000', nazn='Викуп нерозмiнної частини валюти по курсу купiвлi'
+         set tt='VPF', name='d: Викуп нерозмiнної частини (S) валюти по курсу купiвлi', dk=1, nlsm=null, kv=null, nlsk=null, kvk=980, nlss=null, nlsa='#(tobopack.GetToboCASH)', nlsb='#(tobopack.GetToboCASH)', mfob=null, flc=0, fli=0, flv=1, flr=0, s='case when #(KVA)=980 then 0 when #(KVA)=978 then MOD(#(S),500) when #(KVA)=643 then MOD(#(S),500) when #(KVA)=826 then MOD(#(S),500) when #(KVA)=124 then MOD(#(S),500) when #(KVA)=756 then MOD(#(S),1000) else MOD(#(S),100) end', s2='eqv_obs(#(KVA),case when #(KVA)=980 then 0 when #(KVA)=978 then MOD(#(S),500) when #(KVA)=643 then MOD(#(S),500) when #(KVA)=826 then MOD(#(S),500) when #(KVA)=124 then MOD(#(S),500) when #(KVA)=756 then MOD(#(S),1000) else MOD(#(S),100) end ,SYSDATE,1)', sk=56, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=null, flags='0000110000000000000010000000000000000100000000000000000000000000', nazn='Викуп нерозмiнної частини валюти по курсу купiвлi'
        where tt='VPF';
   end;
   --------------------------------

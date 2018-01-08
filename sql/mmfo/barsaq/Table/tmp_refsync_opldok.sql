@@ -56,7 +56,6 @@ COMMENT ON COLUMN BARSAQ.TMP_REFSYNC_OPLDOK.SYSTEM_CHANGE_NUMBER IS '';
 
 PROMPT *** Create  grants  TMP_REFSYNC_OPLDOK ***
 grant DELETE,INSERT,SELECT                                                   on TMP_REFSYNC_OPLDOK to BARS;
-grant SELECT                                                                 on TMP_REFSYNC_OPLDOK to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on TMP_REFSYNC_OPLDOK to KLBX;
 grant SELECT                                                                 on TMP_REFSYNC_OPLDOK to REFSYNC_USR;
 

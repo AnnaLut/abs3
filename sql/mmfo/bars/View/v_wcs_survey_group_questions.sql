@@ -30,9 +30,7 @@ PROMPT *** Create  view V_WCS_SURVEY_GROUP_QUESTIONS ***
  order by sgq.survey_id, sgq.sgroup_id, sgq.ord;
 
 PROMPT *** Create  grants  V_WCS_SURVEY_GROUP_QUESTIONS ***
-grant SELECT                                                                 on V_WCS_SURVEY_GROUP_QUESTIONS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SURVEY_GROUP_QUESTIONS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_SURVEY_GROUP_QUESTIONS to UPLD;
 
 
 

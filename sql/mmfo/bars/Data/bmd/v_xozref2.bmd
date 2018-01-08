@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := '15.06.17.V_XOZREF2. Деб.заборг за госп діяльністю банку. Архiв.';
   l_tablinesdef := '20';
-  l_tabselect_statement := '';
   l_tabname     := 'V_XOZREF2';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,27 +119,27 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ID_B', 'C', 'Iд.код~партнера', '.8', null, 18, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'FDAT2', 'D', 'Дата-2~опл', '1.3', null, 24, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NAZN1', 'C', 'Призначення~пл-1', '1.5', 160, 20, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NLSA', 'C', 'Рахунок~закриття', '1.3', null, 26, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NAZN2', 'C', 'Призначення~пл-2', '1.5', 160, 28, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'REF2', 'N', 'Реф-2~Крд~ДОКУМЕНТ', '1', null, 22, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF2', 'DocViewContentsEx(hWndForm, :REF2)', 0);
-  bars_metabase.add_column(l_tabid, 8, 'S', 'N', '*Сума-2~До погашення', '.8', null, 12, 0, 0, 0, 0, '', '0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'ACC', 'N', 'ACC', '.3', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'REF1', 'N', 'Реф-1~Деб~ДОКУМЕНТ', '1', null, 6, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF1', 'DocViewContentsEx(hWndForm, :REF1)', 0);
-  bars_metabase.add_column(l_tabid, 11, 'MDATE', 'D', '*План-дата~погашення', '1.3', null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'S0', 'N', 'Сума-1~Дб.', '.8', null, 10, 0, 0, 0, 0, '', '0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'FDAT1', 'D', 'Дата-1~опл', '1.3', null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'NAM_B', 'C', 'Назва~партнера', '1', null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'NLS', 'C', 'Рахунок~Деб.заб~IСТОРIЯ', '1.3', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=1', 'Show_Sal_Day_P(:ACC, STRING_Null, NUMBER_Null, GetBankDate()-10, GetBankDate())', 0);
-  bars_metabase.add_column(l_tabid, 17, 'NMS', 'C', 'Назва рах~КАРТКА', '1', null, 4, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/viewaccounts/accountform.aspx?type=2'||chr(38)||'acc=:ACC'||chr(38)||'rnk='||chr(38)||'accessmode=1', 'OperWithAccountNN(AVIEW_CUST, :ACC, :RNK, ACCESS_READONLY, hWndForm, "", FALSE)', 0);
-  bars_metabase.add_column(l_tabid, 18, 'OB22', 'C', 'Ан.22', '.3', null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'RNK', 'N', 'RNK', '1', null, 90, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'STMT1', 'N', 'STMT1', '.3', null, 98, 0, 1, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'PRG', 'N', 'ID-926~Код~проекту', '.3', null, 90, 0, 0, 0, 1, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'BU', 'C', 'ID-926~Код~бюд/од.', '.3', null, 91, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'NOTP', 'B', 'Без~угоди', '.3', null, 62, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ID_B', 'C', 'Iд.код~партнера', .8, null, 18, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'FDAT2', 'D', 'Дата-2~опл', 1.3, null, 24, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NAZN1', 'C', 'Призначення~пл-1', 1.5, 160, 20, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NLSA', 'C', 'Рахунок~закриття', 1.3, null, 26, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NAZN2', 'C', 'Призначення~пл-2', 1.5, 160, 28, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'REF2', 'N', 'Реф-2~Крд~ДОКУМЕНТ', 1, null, 22, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF2', 'DocViewContentsEx(hWndForm, :REF2)', 0);
+  bars_metabase.add_column(l_tabid, 8, 'S', 'N', '*Сума-2~До погашення', .8, null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'ACC', 'N', 'ACC', .3, null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'REF1', 'N', 'Реф-1~Деб~ДОКУМЕНТ', 1, null, 6, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF1', 'DocViewContentsEx(hWndForm, :REF1)', 0);
+  bars_metabase.add_column(l_tabid, 11, 'MDATE', 'D', '*План-дата~погашення', 1.3, null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'S0', 'N', 'Сума-1~Дб.', .8, null, 10, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'FDAT1', 'D', 'Дата-1~опл', 1.3, null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'NAM_B', 'C', 'Назва~партнера', 1, null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'NLS', 'C', 'Рахунок~Деб.заб~IСТОРIЯ', 1.3, null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=1', 'Show_Sal_Day_P(:ACC, STRING_Null, NUMBER_Null, GetBankDate()-10, GetBankDate())', 0);
+  bars_metabase.add_column(l_tabid, 17, 'NMS', 'C', 'Назва рах~КАРТКА', 1, null, 4, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/viewaccounts/accountform.aspx?type=2'||chr(38)||'acc=:ACC'||chr(38)||'rnk='||chr(38)||'accessmode=1', 'OperWithAccountNN(AVIEW_CUST, :ACC, :RNK, ACCESS_READONLY, hWndForm, "", FALSE)', 0);
+  bars_metabase.add_column(l_tabid, 18, 'OB22', 'C', 'Ан.22', .3, null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'RNK', 'N', 'RNK', 1, null, 90, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'STMT1', 'N', 'STMT1', .3, null, 98, 0, 1, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'PRG', 'N', 'ID-926~Код~проекту', .3, null, 90, 0, 0, 0, 1, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'BU', 'C', 'ID-926~Код~бюд/од.', .3, null, 91, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'NOTP', 'B', 'Без~угоди', .3, null, 62, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('XOZ_PRG');

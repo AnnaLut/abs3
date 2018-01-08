@@ -49,9 +49,7 @@ COMMENT ON COLUMN BARS.SP_S230.TXT IS '';
 
 
 PROMPT *** Create  grants  SP_S230 ***
-grant SELECT                                                                 on SP_S230         to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on SP_S230         to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on SP_S230         to UPLD;
 grant FLASHBACK,SELECT                                                       on SP_S230         to WR_REFREAD;
 
 

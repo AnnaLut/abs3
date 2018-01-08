@@ -20,10 +20,8 @@ and s.ostf-s.dos+s.kos<0
 group by s.fdat, spi.ob22, a.kv, a.nbs;
 
 PROMPT *** Create  grants  V_PRIOCOM_FUNDED_DEBT ***
-grant SELECT                                                                 on V_PRIOCOM_FUNDED_DEBT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PRIOCOM_FUNDED_DEBT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PRIOCOM_FUNDED_DEBT to START1;
-grant SELECT                                                                 on V_PRIOCOM_FUNDED_DEBT to UPLD;
 
 
 

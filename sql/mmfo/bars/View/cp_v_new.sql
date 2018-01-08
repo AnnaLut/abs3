@@ -268,11 +268,9 @@ PROMPT *** Create  view CP_V_NEW ***
                   AND CR.QUALITY = -1);
 
 PROMPT *** Create  grants  CP_V_NEW ***
-grant SELECT                                                                 on CP_V_NEW        to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_V_NEW        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_V_NEW        to CP_ROLE;
 grant SELECT                                                                 on CP_V_NEW        to START1;
-grant SELECT                                                                 on CP_V_NEW        to UPLD;
 
 
 

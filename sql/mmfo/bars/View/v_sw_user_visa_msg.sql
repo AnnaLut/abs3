@@ -18,9 +18,7 @@ PROMPT *** Create  view V_SW_USER_VISA_MSG ***
 
 PROMPT *** Create  grants  V_SW_USER_VISA_MSG ***
 grant SELECT                                                                 on V_SW_USER_VISA_MSG to BARS013;
-grant SELECT                                                                 on V_SW_USER_VISA_MSG to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW_USER_VISA_MSG to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_SW_USER_VISA_MSG to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SW_USER_VISA_MSG to WR_ALL_RIGHTS;
 
 

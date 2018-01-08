@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Оплата по альтернативним рахункам';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'VPAY_ALT';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,18 +119,18 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 5, 'NAZN', 'C', 'Призначення платежу', '', null, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NLSA', 'C', 'Реальний рах.~ДЕБЕТ', '', null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NLSB', 'C', 'Реальний рах.~КРЕДИТ', '', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NLSB_ALT', 'C', '№ рах(АСВО)~КРЕДИТ', '', null, 3, 0, 0, 0, 0, '', '', 1, 0, 'count(VPAY_ALT.S)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NMSA', 'C', 'Назва по ~ДЕБЕТУ', '', null, 90, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'NMSB', 'C', 'ПIБ по ~КРЕДИТУ', '', null, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'S', 'N', 'Сума док', '', null, 4, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(VPAY_ALT.S)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'SOS', 'N', 'Вiдм~опл', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'ID', 'N', '№ пп', '', null, 0, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'SK_ZB', 'N', 'Поз~симв', '', null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'NLS6', 'C', 'Рах.~комiсiї', '', null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'IR', 'N', '%~ком', '', null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NAZN', 'C', 'Призначення платежу', null, null, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NLSA', 'C', 'Реальний рах.~ДЕБЕТ', null, null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NLSB', 'C', 'Реальний рах.~КРЕДИТ', null, null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NLSB_ALT', 'C', '№ рах(АСВО)~КРЕДИТ', null, null, 3, 0, 0, 0, 0, '', '', 1, 0, 'count(VPAY_ALT.S)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NMSA', 'C', 'Назва по ~ДЕБЕТУ', null, null, 90, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'NMSB', 'C', 'ПIБ по ~КРЕДИТУ', null, null, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'S', 'N', 'Сума док', null, null, 4, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(VPAY_ALT.S)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'SOS', 'N', 'Вiдм~опл', null, null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'ID', 'N', '№ пп', null, null, 0, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'SK_ZB', 'N', 'Поз~симв', null, null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'NLS6', 'C', 'Рах.~комiсiї', null, null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'IR', 'N', '%~ком', null, null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 18, 1, 'DESC');

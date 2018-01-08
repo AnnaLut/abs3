@@ -37,10 +37,8 @@ PROMPT *** Create  view CC_W ***
  ;
 
 PROMPT *** Create  grants  CC_W ***
-grant SELECT                                                                 on CC_W            to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_W            to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_W            to RCC_DEAL;
-grant SELECT                                                                 on CC_W            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_W            to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CC_W            to WR_CREDIT;
 grant FLASHBACK,SELECT                                                       on CC_W            to WR_REFREAD;

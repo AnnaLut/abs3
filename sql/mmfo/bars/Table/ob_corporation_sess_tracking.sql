@@ -85,10 +85,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00109865 ***
+PROMPT *** Create  constraint PK_CORP_SESS_TRACKING ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OB_CORPORATION_SESS_TRACKING MODIFY (STATE_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.OB_CORPORATION_SESS_TRACKING ADD CONSTRAINT PK_CORP_SESS_TRACKING PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -121,12 +123,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_CORP_SESS_TRACKING ***
+PROMPT *** Create  constraint SYS_C00109865 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OB_CORPORATION_SESS_TRACKING ADD CONSTRAINT PK_CORP_SESS_TRACKING PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.OB_CORPORATION_SESS_TRACKING MODIFY (STATE_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -163,9 +163,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  OB_CORPORATION_SESS_TRACKING ***
-grant SELECT                                                                 on OB_CORPORATION_SESS_TRACKING to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on OB_CORPORATION_SESS_TRACKING to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on OB_CORPORATION_SESS_TRACKING to UPLD;
 
 
 

@@ -95,70 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CBIREPQUERIES_BRANCH_NN ***
+PROMPT *** Create  constraint CC_CBIREPQUERIES_STSDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CBIREP_QUERIES MODIFY (BRANCH CONSTRAINT CC_CBIREPQUERIES_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CBIREPQUERIES_USERID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CBIREP_QUERIES MODIFY (USERID CONSTRAINT CC_CBIREPQUERIES_USERID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CBIREPQUERIES_REPID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CBIREP_QUERIES MODIFY (REP_ID CONSTRAINT CC_CBIREPQUERIES_REPID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CBIREPQUERIES_KEYPARS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CBIREP_QUERIES MODIFY (KEY_PARAMS CONSTRAINT CC_CBIREPQUERIES_KEYPARS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CBIREPQUERIES_XMLPARS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CBIREP_QUERIES MODIFY (XML_PARAMS CONSTRAINT CC_CBIREPQUERIES_XMLPARS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CBIREPQUERIES_CRTTIME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CBIREP_QUERIES MODIFY (CREATION_TIME CONSTRAINT CC_CBIREPQUERIES_CRTTIME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CBIREP_QUERIES MODIFY (STATUS_DATE CONSTRAINT CC_CBIREPQUERIES_STSDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -179,10 +119,109 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CBIREPQUERIES_STSDATE_NN ***
+PROMPT *** Create  constraint CC_CBIREPQUERIES_CRTTIME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CBIREP_QUERIES MODIFY (STATUS_DATE CONSTRAINT CC_CBIREPQUERIES_STSDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CBIREP_QUERIES MODIFY (CREATION_TIME CONSTRAINT CC_CBIREPQUERIES_CRTTIME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CBIREPQUERIES_XMLPARS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CBIREP_QUERIES MODIFY (XML_PARAMS CONSTRAINT CC_CBIREPQUERIES_XMLPARS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CBIREPQUERIES_KEYPARS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CBIREP_QUERIES MODIFY (KEY_PARAMS CONSTRAINT CC_CBIREPQUERIES_KEYPARS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CBIREPQUERIES_REPID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CBIREP_QUERIES MODIFY (REP_ID CONSTRAINT CC_CBIREPQUERIES_REPID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CBIREPQUERIES_USERID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CBIREP_QUERIES MODIFY (USERID CONSTRAINT CC_CBIREPQUERIES_USERID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CBIREPQS_STAFF_USERID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CBIREP_QUERIES ADD CONSTRAINT FK_CBIREPQS_STAFF_USERID FOREIGN KEY (USERID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CBIREPQS_REPORTS_REPID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CBIREP_QUERIES ADD CONSTRAINT FK_CBIREPQS_REPORTS_REPID FOREIGN KEY (REP_ID)
+	  REFERENCES BARS.REPORTS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CBIREPQS_CBIREPQSTATS_STSID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CBIREP_QUERIES ADD CONSTRAINT FK_CBIREPQS_CBIREPQSTATS_STSID FOREIGN KEY (STATUS_ID)
+	  REFERENCES BARS.CBIREP_QUERY_STATUSES (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CBIREPQUERIES_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CBIREP_QUERIES MODIFY (BRANCH CONSTRAINT CC_CBIREPQUERIES_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -247,11 +286,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CBIREP_QUERIES ***
-grant SELECT                                                                 on CBIREP_QUERIES  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CBIREP_QUERIES  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CBIREP_QUERIES  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CBIREP_QUERIES  to START1;
-grant SELECT                                                                 on CBIREP_QUERIES  to UPLD;
 
 
 

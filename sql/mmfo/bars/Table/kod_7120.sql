@@ -51,10 +51,8 @@ COMMENT ON COLUMN BARS.KOD_7120.K030 IS '';
 
 
 PROMPT *** Create  grants  KOD_7120 ***
-grant SELECT                                                                 on KOD_7120        to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on KOD_7120        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_7120        to BARS_DM;
-grant SELECT                                                                 on KOD_7120        to UPLD;
 grant FLASHBACK,SELECT                                                       on KOD_7120        to WR_REFREAD;
 
 

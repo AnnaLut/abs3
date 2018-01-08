@@ -47,10 +47,8 @@ COMMENT ON COLUMN BARS.TMP_BPK_SALARY.S IS '';
 
 
 PROMPT *** Create  grants  TMP_BPK_SALARY ***
-grant SELECT                                                                 on TMP_BPK_SALARY  to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_BPK_SALARY  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_BPK_SALARY  to OBPC;
-grant SELECT                                                                 on TMP_BPK_SALARY  to UPLD;
 
 
 

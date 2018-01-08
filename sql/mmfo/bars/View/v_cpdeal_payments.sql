@@ -34,9 +34,7 @@ PROMPT *** Create  view V_CPDEAL_PAYMENTS ***
 order by 1,2;
 
 PROMPT *** Create  grants  V_CPDEAL_PAYMENTS ***
-grant SELECT                                                                 on V_CPDEAL_PAYMENTS to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_CPDEAL_PAYMENTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CPDEAL_PAYMENTS to UPLD;
 
 
 

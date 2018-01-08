@@ -71,6 +71,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_DPT_DICT_PENSION ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DICT_PENSION ADD CONSTRAINT FK_DPT_DICT_PENSION FOREIGN KEY (SEX)
+	  REFERENCES BARS.SEX (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C008143 ***
 begin   
  execute immediate '
@@ -97,10 +110,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_DICT_PENSION ***
-grant SELECT                                                                 on DPT_DICT_PENSION to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DPT_DICT_PENSION to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_DICT_PENSION to BARS_DM;
-grant SELECT                                                                 on DPT_DICT_PENSION to UPLD;
 
 
 

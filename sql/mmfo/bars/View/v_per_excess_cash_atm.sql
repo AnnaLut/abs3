@@ -45,10 +45,8 @@ PROMPT *** Create  view V_PER_EXCESS_CASH_ATM ***
   ;
 
 PROMPT *** Create  grants  V_PER_EXCESS_CASH_ATM ***
-grant SELECT                                                                 on V_PER_EXCESS_CASH_ATM to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,SELECT                                                on V_PER_EXCESS_CASH_ATM to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PER_EXCESS_CASH_ATM to RCC_DEAL;
-grant SELECT                                                                 on V_PER_EXCESS_CASH_ATM to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_PER_EXCESS_CASH_ATM to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_PER_EXCESS_CASH_ATM to WR_REFREAD;
 

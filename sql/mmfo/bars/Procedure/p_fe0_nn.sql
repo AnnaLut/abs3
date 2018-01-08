@@ -11,7 +11,7 @@ PROMPT *** Create  procedure P_FE0_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирование файла #E0 для КБ (универсальная)
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    22.05.2017 (09/09/2016)
+% VERSION     : 09/09/2016 (22/08/2016, 11/08/2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,7 +97,7 @@ dat_izm1 date := to_date('31/12/2014','dd/mm/yyyy');
 
 CURSOR OPL_DOK IS
    SELECT a.tt, a.accd, a.nlsd, a.kv, a.acck, a.nlsk, a.ref, a.fdat,
-          a.s, a.isp, a.nazn
+          a.s*100, a.isp, a.nazn
    FROM tmp_file03 a
    WHERE a.kv = 980
 ORDER BY 10, 8, 7;
@@ -130,103 +130,262 @@ BEGIN
    Datp_ := calc_pdat(dat_);
    Dat1_:= TRUNC(Dat_,'MM');
 
+   -- с 01.01.2015 показатели 118,119,218 не должны формироваться
+   if Dat_ <= dat_izm1 then
+
+      -- код 118
+      insert into tmp_file03
+                  (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
+     select * from
+     (
+      select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, 118
+      from provodki_otc
+      where fdat between Dat1_ and Dat_
+        and kv=980
+        and nbsd like '3640%' and nbsk like '2900%'
+     ) ;
+
+      insert into tmp_file03
+                  (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
+     select * from
+     (
+      select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, 118
+      from provodki_otc
+      where fdat between Dat1_ and Dat_
+        and kv=980
+        and nbsd like '3801%' and nbsk  like '1819%'
+        and LOWER(nazn) like '%куп_вля%'
+        and LOWER(nazn) not like '%swap%'
+     ) ;
+
+      insert into tmp_file03
+                  (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
+      select * from
+      (
+      select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, 118
+      from provodki_otc t
+      where  fdat between Dat1_ and dat_
+         and kv=980
+         and nbsd like '3801%' and nbsk  like '2900%'
+         and LOWER(nazn) like '%куп_вля за рахунок%'
+      ) ;
+
+      if mfou_ = 300465 then
+         -- код 119
+          insert into tmp_file03
+                      (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
+         select * from
+         (
+          select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, 119
+          from provodki_otc
+          where fdat between Dat1_ and dat_
+            and kv=980
+            and nbsd like '2900%' and nbsk like '3739%'
+            and ( LOWER(nazn) like '%для куп_вл_%' or
+                  LOWER(nazn) like '%на куп_вл_%' or
+                  LOWER(nazn) like '%куп_вл_ валюти%' or
+                  LOWER(nazn) like '%куп_вл_ _ноземно_ валюти%'
+                )
+            and ob22d='01'
+            and tt='310'
+         ) ;
+      end if;
+
+   end if;
+   -- окончание блока c 01.01.2015 коды 118,119,218 не будут формироваться
+
    -- код 218
    -- сначала выполняем наполнение без исключения (закомментировано)
    -- а затем удаляем из TMP_FILE03 ISP=218 и закомментированное условие 
    insert into tmp_file03
                 (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
-   select /*+leading(ad)*/
-          OD.ACC accd, od.tt, od.ref, ad.kv, ad.nls nlsd, od.s, od.sq, od.fdat, p.nazn, ok.acc acck, AK.NLS nlsk, 218
-    from opldok od, accounts ad, opldok ok, accounts ak, oper p
-    where od.fdat = any(select fdat from fdat where fdat between Dat1_ and Dat_) and
-        od.dk = 0 and
-        od.acc = ad.acc and
-        ad.nls like '3801%' and
-        ad.kv = 980 and
-        od.ref = ok.ref and
-        od.stmt = ok.stmt and
-        OK.DK = 1 and
-        ok.acc = ak.acc and
-        ak.nls like '100%' and
-        od.ref = p.ref;
+   select * from
+   (
+    select /* NOPARALLEL */ 
+       t.ACCD, t.TT, t.REF, t.KV, t.NLSD, t.S, t.SQ, t.FDAT, t.NAZN, t.ACCK, t.NLSK, 218
+    from provodki_otc t
+    where t.fdat between Dat1_ and Dat_
+      and t.kv=980
+      and t.nbsd like '3801%' and t.nbsk like '100%'
+      --and not exists ( select 1
+      --                 from provodki_otc o
+      --                 where o.ref = t.ref
+      --                   and o.fdat = t.fdat 
+      --                   and o.kv <> 980
+      --                   and o.nbsd like '2909%'
+      --                   and o.nbsk like '3800%' 
+      --               )
+   ) ;
    commit;
    
    -- код 219
-   insert into tmp_file03
+    insert into tmp_file03
                 (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
-   select /*+leading(ad)*/
-           OD.ACC accd, od.tt, od.ref, ad.kv, ad.nls nlsd, od.s, od.sq, od.fdat, p.nazn, ok.acc acck, AK.NLS nlsk, 219
-    from opldok od, accounts ad, opldok ok, accounts ak, oper p
-    where od.fdat = any(select fdat from fdat where fdat between Dat1_ and Dat_) and
-        od.dk = 0 and
-        od.acc = ad.acc and
-        ad.nls like '100%' and
-        ad.kv = 980 and
-        od.tt not in ('AAL','AAE') and
-        od.ref = ok.ref and
-        od.stmt = ok.stmt and
-        OK.DK = 1 and
-        ok.acc = ak.acc and
-        ak.nls like '3801%' and
-        od.ref = p.ref;
+   select * from
+   (
+    select /* NOPARALLEL */ 
+       ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, 219
+    from provodki_otc
+    where fdat between Dat1_ and Dat_
+      and kv=980
+      and nbsd like '100%'  and nbsk  like '3801%'
+      and tt not in ('AAL','AAE')
+   ) ;
    commit;
 
-   insert into tmp_file03
-                (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
-   select /*+leading(ad)*/
-          OD.ACC accd, od.tt, od.ref, ad.kv, ad.nls nlsd, od.s, od.sq, od.fdat, p.nazn, ok.acc acck, AK.NLS nlsk, 318
-    from opldok od, accounts ad, opldok ok, accounts ak, oper p
-    where od.fdat = any(select fdat from fdat where fdat between Dat1_ and Dat_) and
-        od.dk = 0 and
-        od.acc = ad.acc and
-        ad.nls like '100%' and
-        ad.kv = 980 and
-        od.ref = ok.ref and
-        od.stmt = ok.stmt and
-        OK.DK = 1 and
-        ok.acc = ak.acc and
-        ak.nls like '2902%' and
-        ak.ob22 in ('09','15') and
-        od.ref = p.ref;
-   commit;
+   -- код 318
+   if mfou_ not in (300465) 
+   then
+       insert into tmp_file03
+                   (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
+      select * from
+      (
+       select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, 318
+       from provodki_otc
+       where fdat between Dat1_ and Dat_
+         and kv=980
+         and (nbsd like '3522%' or nbsd like '7419%') and nbsk  like '3622%'
+         and ( lower(nazn) like '%пф%'                            or
+               lower(nazn) like '%пфу%'                           or
+               lower(nazn) like '%в пенс.фонд%'                   or
+               lower(nazn) like '%в_драхування збору на обов%'    or
+               lower(nazn) like '%нарахування суми збору до пенс_йного фонду%'    or
+               lower(nazn) like '%зб_р на обовяз.пенс.страх%'     or
+               lower(nazn) like '%сбор%от покупки валют_%'        or
+               lower(nazn) like '%сбор%от конвертации валют_%'    or
+               lower(nazn) like '%зб_р%в_д куп_вл_%'              or
+               lower(nazn) like '%обов_язкове%пенс. страхування%' or
+               lower(nazn) like '%обов_язкове%пенс_йне страхування%'
+             )
+      ) ;
+   end if;
 
-   insert into tmp_file03
-                (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
-   select /*+leading(ad)*/
-          OD.ACC accd, od.tt, od.ref, ad.kv, ad.nls nlsd, od.s, od.sq, od.fdat, p.nazn, ok.acc acck, AK.NLS nlsk, 319
-    from opldok od, accounts ad, opldok ok, accounts ak, oper p
-    where od.fdat = any(select fdat from fdat where fdat between Dat1_ and Dat_) and
-        od.dk = 0 and
-        od.acc = ad.acc and
-        ad.nls like '2902%' and
-        ad.ob22 in ('09','15') and
-        ad.kv = 980 and
-        od.ref = ok.ref and
-        od.stmt = ok.stmt and
-        OK.DK = 1 and
-        ok.acc = ak.acc and
-        ak.nls like '3739%' and
-        od.ref = p.ref;
-   commit;
+   -- код 318
+   if mfou_ not in (300465) 
+   then
+       insert into tmp_file03
+                   (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
+      select * from
+      (
+       select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, 318
+       from provodki_otc
+       where fdat between Dat1_ and Dat_
+         and kv=980
+         and (nbsd like '100%' or nbsd like '2900%')  and nbsk  like '2902%'
+         and ( lower(nazn) like '%пф%'                            or
+               lower(nazn) like '%пфу%'                           or
+               lower(nazn) like '%0.5%в пенс.фонд%'               or
+               lower(nazn) like '%0.5%в пенс_йний фонд%'          or
+               lower(nazn) like '%2%в пенс.фонд%'                 or
+               lower(nazn) like '%в_драхування збору на обов%'    or
+               lower(nazn) like '%зб_р на обовяз.пенс.страх%'     or
+               lower(nazn) like '%сбор%от покупки валют_%'        or
+               lower(nazn) like '%сбор%от конвертации валют_%'    or
+               lower(nazn) like '%зб_р%в_д куп_вл_%'              or
+               lower(nazn) like '%обов_язкове%пенс. страхування%' or
+               lower(nazn) like '%обов_язкове%пенс_йне страхування%'
+             )
+      ) ;
+   end if;
 
-   insert into tmp_file03
-                (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
-   select /*+leading(ad)*/
-          OD.ACC accd, od.tt, od.ref, ad.kv, ad.nls nlsd, od.s, od.sq, od.fdat, p.nazn, ok.acc acck, AK.NLS nlsk, 319
-    from opldok od, accounts ad, opldok ok, accounts ak, oper p
-    where od.fdat = any(select fdat from fdat where fdat between Dat1_ and Dat_) and
-        od.dk = 0 and
-        od.acc = ad.acc and
-        ad.nls like '3622%' and
-        ad.ob22 in ('12','35') and
-        ad.kv = 980 and
-        od.ref = ok.ref and
-        od.stmt = ok.stmt and
-        OK.DK = 1 and
-        ok.acc = ak.acc and
-        ak.nls like '3739%' and
-        od.ref = p.ref;
-   commit;
+   if mfou_ = 300465 
+   then
+      if dat_ <= to_date('31122014','ddmmyyyy') 
+      then
+          insert into tmp_file03
+                      (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
+         select * from
+         (
+          select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, 318
+          from provodki_otc
+          where fdat between Dat1_ and Dat_
+            and kv=980
+            and nbsd like '7419%' and nbsk  like '3622%'
+            and ob22k in ('12','35')
+          UNION
+          select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, 318
+          from provodki_otc
+          where fdat between Dat_ and Dat_ + 25
+            and kv=980
+            and vob = 96
+            and nbsd like '7419%' and nbsk  like '3622%'
+            and ob22k in ('12','35')
+         ) ;
+
+          insert into tmp_file03
+                      (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
+         select * from
+         ( 
+          select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, 318
+          from provodki_otc
+          where fdat between Dat1_ and Dat_
+            and kv=980
+            and ( nbsd like '100%' or nbsd like '26%' or nbsd like '2900%' or
+                  nbsd like '3541%' or nbsd like '3739%' or nbsd like '7399%'
+                )
+            and nbsk  like '2902%'
+            and ob22k in ('09','15')
+         ) ;
+      end if;
+
+      if Dat_ > to_date('31122014','ddmmyyyy') 
+      then
+          insert into tmp_file03
+                      (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
+         select * from
+         (
+          select /* NOPARALLEL */ 
+             ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, 318
+          from provodki_otc
+          where fdat between Dat1_ and Dat_
+            and kv=980
+            and nbsd like '100%'
+            and nbsk  like '2902%'
+            and ob22k in ('09','15')
+         ) ;
+      end if;
+   end if;
+
+   -- код 319
+   if mfou_ not in (300465) 
+   then
+       insert into tmp_file03
+                   (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
+      select * from
+      (
+       select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, 319
+       from provodki_otc
+       where fdat between Dat1_ and Dat_
+         and kv=980
+         and (nbsd like '2902%' or nbsd like '3622%') and nbsk  like '3739%'
+         and ( lower(nazn) like '%зб_р на обов.держ.пенс.страх%'              or
+               lower(nazn) like '%зб_р на обов_язк. держ. пенс. страх%'       or
+               lower(nazn) like '%з куп_вл_ безгот_вково_ _ноземно_ валюти%'  or
+               lower(nazn) like '%05%ком_с_я при куп_вл_ валют_%'             or
+               lower(nazn) like '%з куп_вл_ гот_вково_ _ноземно_ валюти%'     or
+               lower(nazn) like '%пенс_йний зб_р%'                            or
+               lower(nazn) like '%зб_р%в пф%'                                 or
+               lower(nazn) like '%зб_р%в пфу%'
+             )
+      ) ;
+   end if;
+
+   if mfou_ = 300465 
+   then
+       insert into tmp_file03
+                   (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
+      select * from
+      (
+       select /* NOPARALLEL */ 
+          ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, 319
+       from provodki_otc
+       where fdat between Dat1_ and Dat_
+         and kv = 980
+         and ( (nbsd like '2902%' and nbsk  like '3739%' and ob22d in ('09','15')) or
+               (nbsd like '3622%' and nbsk  like '3739%' and ob22d in ('12','35'))
+             )
+      ) ;
+   end if;
 
    -- удаление проводок Дт 2900 Кт 2900 и определенные назначения платежа
    delete from tmp_file03
@@ -261,7 +420,7 @@ BEGIN
    WHERE ( (t.nlsd like '100%' and t.nlsk like '3801%') or
            (t.nlsd like '3801%' and t.nlsk like '100%')
          )
-     and exists ( select /*+ NOPARALLEL*/ 1
+     and exists ( select 1
                   from provodki_otc o
                   where o.fdat between Dat1_ and Dat_
                     and o.ref = t.ref
@@ -284,27 +443,30 @@ BEGIN
      and lower (t.nazn) not like '%в_куп%'
      and lower (t.nazn) not like '%продано валюту%';
 
-    -- удаление проводок по металлах
-    DELETE FROM tmp_file03 t
-    WHERE ( (t.nlsd like '100%' and t.nlsk like '3801%') or
-          (t.nlsd like '3801%' and t.nlsk like '100%')
-        )
-     and exists ( select 1
-                  from provodki_otc o
-                  where o.fdat between Dat1_ and Dat_
-                    and o.ref = t.ref
-                    and (o.nbsd like '3801%' or o.nbsk like '3801%')
-                    and (o.ob22d ='09' or o.ob22k = '09')
-                );
+   if mfou_ = 300465 
+   then
+      -- удаление проводок по металлах
+      DELETE FROM tmp_file03 t
+      WHERE ( (t.nlsd like '100%' and t.nlsk like '3801%') or
+              (t.nlsd like '3801%' and t.nlsk like '100%')
+            )
+         and exists ( select 1
+                      from provodki_otc o
+                      where o.fdat between Dat1_ and Dat_
+                        and o.ref = t.ref
+                        and (o.nbsd like '3801%' or o.nbsk like '3801%')
+                        and (o.ob22d ='09' or o.ob22k = '09')
+                    );
 
-    -- удаление проводок Дт 100 Кт 3801 операции I02, I03
-    -- 22/08/2016 добавлена операция "AA0"
-    -- 09/09/2016 убираем операцию "AA0" (по указанию Демкович М.С.) 
-    DELETE FROM tmp_file03
-    WHERE ( (nlsd like '3801%' and nlsk like '100%') or
-          (nlsd like '100%' and nlsk like '3801%')
-        )
-    and tt in ('I02','I03');  
+      -- удаление проводок Дт 100 Кт 3801 операции I02, I03
+      -- 22/08/2016 добавлена операция "AA0"
+      -- 09/09/2016 убираем операцию "AA0" (по указанию Демкович М.С.) 
+      DELETE FROM tmp_file03
+      WHERE ( (nlsd like '3801%' and nlsk like '100%') or
+              (nlsd like '100%' and nlsk like '3801%')
+            )
+        and tt in ('I02','I03');  --,'AA0');
+   end if;
 
    -- удаление сторнированных проводок
    DELETE FROM tmp_file03

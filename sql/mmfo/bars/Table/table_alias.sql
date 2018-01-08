@@ -101,9 +101,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TABLE_ALIAS ***
-grant SELECT                                                                 on TABLE_ALIAS     to BARSREADER_ROLE;
 grant SELECT                                                                 on TABLE_ALIAS     to BARS_DM;
-grant SELECT                                                                 on TABLE_ALIAS     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TABLE_ALIAS     to WR_ALL_RIGHTS;
 
 

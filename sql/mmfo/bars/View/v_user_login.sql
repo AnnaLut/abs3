@@ -19,9 +19,7 @@ PROMPT *** Create  view V_USER_LOGIN ***
 
 PROMPT *** Create  grants  V_USER_LOGIN ***
 grant SELECT                                                                 on V_USER_LOGIN    to ABS_ADMIN;
-grant SELECT                                                                 on V_USER_LOGIN    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USER_LOGIN    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_USER_LOGIN    to UPLD;
 
 
 

@@ -13,9 +13,7 @@ PROMPT *** Create  view V_CIM_BANK_CODE ***
    select null, null, null from dual;
 
 PROMPT *** Create  grants  V_CIM_BANK_CODE ***
-grant SELECT                                                                 on V_CIM_BANK_CODE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_BANK_CODE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_BANK_CODE to UPLD;
 
 
 

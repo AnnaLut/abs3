@@ -59,22 +59,8 @@ COMMENT ON COLUMN BARS.OTCN_FA7_REZ1.SUMP IS '';
 
 
 
-
-PROMPT *** Create  index I1_OTCN_FA7_REZ1 ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.I1_OTCN_FA7_REZ1 ON BARS.OTCN_FA7_REZ1 (ND, KV) ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
 PROMPT *** Create  grants  OTCN_FA7_REZ1 ***
-grant SELECT                                                                 on OTCN_FA7_REZ1   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_FA7_REZ1   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on OTCN_FA7_REZ1   to UPLD;
 
 
 

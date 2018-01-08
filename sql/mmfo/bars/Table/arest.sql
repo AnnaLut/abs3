@@ -113,11 +113,9 @@ COMMENT ON COLUMN BARS.AREST.KORG IS '';
 
 
 PROMPT *** Create  grants  AREST ***
-grant SELECT                                                                 on AREST           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on AREST           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AREST           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on AREST           to START1;
-grant SELECT                                                                 on AREST           to UPLD;
 
 
 

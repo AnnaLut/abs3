@@ -64,10 +64,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SALDOHO_FDAT_OSTF ***
+PROMPT *** Create  constraint CC_SALDOHO_FDAT_KOS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SALDOHO MODIFY (OSTF CONSTRAINT CC_SALDOHO_FDAT_OSTF NOT NULL ENABLE)';
+  ALTER TABLE BARS.SALDOHO MODIFY (KOS CONSTRAINT CC_SALDOHO_FDAT_KOS NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -88,10 +88,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SALDOHO_FDAT_KOS ***
+PROMPT *** Create  constraint CC_SALDOHO_FDAT_OSTF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SALDOHO MODIFY (KOS CONSTRAINT CC_SALDOHO_FDAT_KOS NOT NULL ENABLE)';
+  ALTER TABLE BARS.SALDOHO MODIFY (OSTF CONSTRAINT CC_SALDOHO_FDAT_OSTF NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -112,10 +112,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  SALDOHO ***
-grant SELECT                                                                 on SALDOHO         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDOHO         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDOHO         to START1;
-grant SELECT                                                                 on SALDOHO         to UPLD;
 
 
 

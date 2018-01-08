@@ -55,10 +55,6 @@ COMMENT ON COLUMN BARS.ERR$_CIM_CUSTOMER_UPD.MODIFY_DATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIM_CUSTOMER_UPD ***
-grant SELECT                                                                 on ERR$_CIM_CUSTOMER_UPD to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIM_CUSTOMER_UPD to UPLD;
-
 
 
 PROMPT ===================================================================================== 

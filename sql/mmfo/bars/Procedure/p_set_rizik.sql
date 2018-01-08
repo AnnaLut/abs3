@@ -4,10 +4,7 @@ PROMPT =========================================================================
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_SET_RIZIK.sql =========*** Run *
 PROMPT ===================================================================================== 
 
-
-PROMPT *** Create  procedure P_SET_RIZIK ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_SET_RIZIK (p_rnk number, p_rizik varchar2)
+CREATE OR REPLACE PROCEDURE "P_SET_RIZIK" (p_rnk number, p_rizik varchar2)
 is
 /*author: lanbina
 ФМ. Подтверждение уровня риска клиента

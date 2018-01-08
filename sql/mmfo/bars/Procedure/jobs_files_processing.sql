@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/JOBS_FILES_PROCESSING.sql ========
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure JOBS_FILES_PROCESSING ***
-
-  CREATE OR REPLACE PROCEDURE BARS.JOBS_FILES_PROCESSING 
+create or replace procedure jobs_files_processing
 is
 
     l_job  varchar2(400):='FILES_PROCESSING_';
@@ -34,7 +25,7 @@ is
     end running;
 begin
    -- Шукаємо технічого користувач від якого будемо працювати
-
+   
    begin
      select t.user_id
        into l_userid
@@ -69,10 +60,3 @@ begin
 
 end;
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/JOBS_FILES_PROCESSING.sql ========
-PROMPT ===================================================================================== 

@@ -14,10 +14,8 @@ WHERE LENGTH(BRANCH)=8
  ;
 
 PROMPT *** Create  grants  BRANCH_MFO ***
-grant SELECT                                                                 on BRANCH_MFO      to BARSREADER_ROLE;
 grant SELECT                                                                 on BRANCH_MFO      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH_MFO      to START1;
-grant SELECT                                                                 on BRANCH_MFO      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRANCH_MFO      to WR_ALL_RIGHTS;
 
 

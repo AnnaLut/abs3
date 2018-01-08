@@ -14,10 +14,8 @@ PROMPT *** Create  view V_STOGROUPS ***
     or tobo is null;
 
 PROMPT *** Create  grants  V_STOGROUPS ***
-grant SELECT                                                                 on V_STOGROUPS     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_STOGROUPS     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_STOGROUPS     to STO;
-grant SELECT                                                                 on V_STOGROUPS     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_STOGROUPS     to WR_ALL_RIGHTS;
 
 

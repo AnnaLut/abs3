@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'MSFZ9. КП ЮО. Розподіл складних КД на прості.';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'V_MSFZ9';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,33 +119,33 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'CC_ID', 'C', '№~КД', '1', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ISG', 'N', 'Кіл~ISG', '.3', null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>(ACCOUNT1.KV=:KV and ACCOUNT1.TIP=''ISG'' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''ISG'' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
-  bars_metabase.add_column(l_tabid, 3, 'KOL', 'N', 'Кіл~рах', '.3', null, 27, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Вал~SS', '.3', null, 5, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Реф~КД', '1', null, 1, 0, 1, 0, 0, '', '', 0, 0, 'Count(*) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'RNK', 'N', 'РНК~позич', '1', null, 4, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'S36', 'N', 'Кіл~S36', '.3', null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''S36'' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''S36'' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
-  bars_metabase.add_column(l_tabid, 8, 'SDATE', 'D', 'Дата поч~КД', '1.5', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'SDI', 'N', 'Кіл~SDI', '.3', null, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SDI'' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SDI'' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
-  bars_metabase.add_column(l_tabid, 10, 'SG', 'N', 'Кіл~SG', '.3', null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SG '' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SG '' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
-  bars_metabase.add_column(l_tabid, 11, 'SN', 'N', 'Кіл~SN', '.3', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SN '' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SN '' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
-  bars_metabase.add_column(l_tabid, 12, 'SNA', 'N', 'Кіл~SNA', '.3', null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SNA'' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SNA'' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SNO', 'N', 'Кіл~SNO', '.3', null, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SNO'' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SNO'' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SOS', 'N', 'Стан~КД', '.3', null, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'SP', 'N', 'Кіл~SP', '.3', null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SP '' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SP '' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
-  bars_metabase.add_column(l_tabid, 16, 'SPN', 'N', 'Кіл~SPN', '.3', null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SPN'' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SPN'' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
-  bars_metabase.add_column(l_tabid, 17, 'SS', 'N', 'Кіл~SS', '.3', null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SS '' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SS '' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
-  bars_metabase.add_column(l_tabid, 18, 'VIDD', 'N', 'Вид~КД', '.3', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'WDATE', 'D', 'Дата завер~КД', '1.5', null, 60, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'SS1', 'N', 'Сума~SS', '1.5', null, 8, 0, 0, 0, 1, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'SN1', 'N', 'Сума~SN', '.8', null, 12, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'SP1', 'N', 'Сума~SP', '1', null, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'SPN1', 'N', 'Сума~SPN', '.8', null, 14, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'SNA1', 'N', 'Сума~SNA', '.8', null, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'SNO1', 'N', 'Сума~SNO', '.8', null, 18, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'SDI1', 'N', 'Сума~SDI', '.8', null, 20, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'S361', 'N', 'Сума~S36', '.8', null, 22, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'CC_ID', 'C', '№~КД', 1, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ISG', 'N', 'Кіл~ISG', .3, null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>(ACCOUNT1.KV=:KV and ACCOUNT1.TIP=''ISG'' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''ISG'' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
+  bars_metabase.add_column(l_tabid, 3, 'KOL', 'N', 'Кіл~рах', .3, null, 27, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Вал~SS', .3, null, 5, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Реф~КД', 1, null, 1, 0, 1, 0, 0, '', '', 0, 0, 'Count(*) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'RNK', 'N', 'РНК~позич', 1, null, 4, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'S36', 'N', 'Кіл~S36', .3, null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''S36'' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''S36'' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
+  bars_metabase.add_column(l_tabid, 8, 'SDATE', 'D', 'Дата поч~КД', 1.5, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'SDI', 'N', 'Кіл~SDI', .3, null, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SDI'' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SDI'' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
+  bars_metabase.add_column(l_tabid, 10, 'SG', 'N', 'Кіл~SG', .3, null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SG '' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SG '' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
+  bars_metabase.add_column(l_tabid, 11, 'SN', 'N', 'Кіл~SN', .3, null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SN '' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SN '' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
+  bars_metabase.add_column(l_tabid, 12, 'SNA', 'N', 'Кіл~SNA', .3, null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SNA'' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SNA'' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SNO', 'N', 'Кіл~SNO', .3, null, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SNO'' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SNO'' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SOS', 'N', 'Стан~КД', .3, null, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'SP', 'N', 'Кіл~SP', .3, null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SP '' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SP '' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
+  bars_metabase.add_column(l_tabid, 16, 'SPN', 'N', 'Кіл~SPN', .3, null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SPN'' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SPN'' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
+  bars_metabase.add_column(l_tabid, 17, 'SS', 'N', 'Кіл~SS', .3, null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SS '' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SS '' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
+  bars_metabase.add_column(l_tabid, 18, 'VIDD', 'N', 'Вид~КД', .3, null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'WDATE', 'D', 'Дата завер~КД', 1.5, null, 60, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'SS1', 'N', 'Сума~SS', 1.5, null, 8, 0, 0, 0, 1, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'SN1', 'N', 'Сума~SN', .8, null, 12, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'SP1', 'N', 'Сума~SP', 1, null, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'SPN1', 'N', 'Сума~SPN', .8, null, 14, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'SNA1', 'N', 'Сума~SNA', .8, null, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'SNO1', 'N', 'Сума~SNO', .8, null, 18, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'SDI1', 'N', 'Сума~SDI', .8, null, 20, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'S361', 'N', 'Сума~S36', .8, null, 22, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

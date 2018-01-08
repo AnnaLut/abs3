@@ -86,11 +86,9 @@ COMMENT ON COLUMN BARS.TMP_VOB96.K7 IS 'Общая сумма по КТ 7 кл  по исп';
 
 
 PROMPT *** Create  grants  TMP_VOB96 ***
-grant SELECT                                                                 on TMP_VOB96       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_VOB96       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_VOB96       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_VOB96       to RPBN001;
-grant SELECT                                                                 on TMP_VOB96       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_VOB96       to WR_ALL_RIGHTS;
 
 

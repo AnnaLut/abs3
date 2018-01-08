@@ -24,9 +24,7 @@ PROMPT *** Create  view V_FINMON_QUE_WEB ***
    and a.userid = user_id;
 
 PROMPT *** Create  grants  V_FINMON_QUE_WEB ***
-grant SELECT                                                                 on V_FINMON_QUE_WEB to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FINMON_QUE_WEB to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_FINMON_QUE_WEB to UPLD;
 
 
 

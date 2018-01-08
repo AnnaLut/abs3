@@ -27,7 +27,6 @@ IS
    -- Ver 6.1.0 â³ä 2010/10/04
 
    n1_     INT := 1;
-   D1_     NUMBER;
    l_dat   DATE;
    sTmp_   VARCHAR2 (64);
 BEGIN
@@ -267,7 +266,7 @@ BEGIN
       ELSIF tag_ LIKE 'S_DZ_'
       THEN
          BEGIN
-            D1_ := TO_NUMBER (val_);
+            n1_ := TO_NUMBER (val_);
          EXCEPTION
             WHEN OTHERS
             THEN

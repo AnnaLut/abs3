@@ -67,10 +67,6 @@ COMMENT ON COLUMN BARS.ERR$_ESCR_REG_OBJ_STATE.SET_DATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ESCR_REG_OBJ_STATE ***
-grant SELECT                                                                 on ERR$_ESCR_REG_OBJ_STATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ESCR_REG_OBJ_STATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

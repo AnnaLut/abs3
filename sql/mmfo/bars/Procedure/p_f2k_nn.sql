@@ -1,19 +1,10 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F2K_NN.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F2K_NN ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
+CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
                                       sheme_ varchar2 default 'С')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.17.009     29.12.2017
+% VERSION     : v.18.001     05.01.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -27,6 +18,10 @@ PROMPT *** Create  procedure P_F2K_NN ***
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+ 05.01.2018  добавлено формирование DDD=351
+ 04.01.2018  исключены операции по счетам КТ=65__
+             формирование значений показателей в копейках
+             новый список значений K021 (сегмент A)
  29.12.2017  уточнение в алгоритме отбора клиентов по доп.параметрам
  12.12.2017  условие на счета входящие в выборку только по дате закрытия
  05.12.2017  расширение OKPO до 10-ти знаков нулями
@@ -70,8 +65,12 @@ p_310          varchar2(1);
 p_330          varchar2(20);
 p_340          varchar2(70);
 p_350          varchar2(10);
+p_351          varchar2(1);
 p_360          varchar2(70);
 p_391          varchar2(10);
+
+ ise_          varchar2(5);
+ cod_c         integer;
 
 --    операции DDD начинающиеся с 0..
 procedure p_ins_0( p_rnk number, p_kodp varchar2,
@@ -89,7 +88,7 @@ begin
                  ( rnk, kodp, znap )
           values ( p_rnk, '020'||p_kodp, p_adr );
 
---    030  примiтка
+--    030  примiтка    
        if p_prim is not null  then
 
           insert into rnbu_trace
@@ -114,7 +113,7 @@ begin
 --    120  номер указу
           insert into rnbu_trace
                     ( rnk, kodp, znap )
-             values ( p_rnk, '120'||p_kodp,
+             values ( p_rnk, '120'||p_kodp, 
                      (case when p_rnbou is null  then 'немае даних'
                           else p_rnbou end)
                     );
@@ -132,7 +131,7 @@ end;
 --    операции DDD начинающиеся с 2..
 procedure p_ins_2( p_rnk number, p_kodp varchar2,
                    p_210 number, p_nls varchar2, p_kv number,
-                   p_daos varchar2, p_dazs varchar2,
+                   p_daos varchar2, p_dazs varchar2, 
                    p_260 varchar2, p_270 varchar2, p_280 varchar2 )
    is
 begin
@@ -184,7 +183,7 @@ end;
 --    операции DDD начинающиеся с 3..
 procedure p_ins_3( p_rnk number, p_kodp varchar2,
                    p_310 varchar2, p_320 varchar2, p_330 varchar2,
-                   p_340 varchar2, p_350 varchar2, p_360 varchar2,
+                   p_340 varchar2, p_350 varchar2, p_351 varchar2, p_360 varchar2, 
                    p_ostf number, p_kv number, p_390 varchar2, p_391 varchar2 )
    is
 begin
@@ -203,7 +202,7 @@ begin
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '330'||p_kodp, p_330 );
-
+                                                
 --    340  наiменування отримувача/платника
           insert into rnbu_trace
                     ( rnk, kodp, znap )
@@ -213,6 +212,11 @@ begin
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '350'||p_kodp, p_350 );
+
+--    351  ознака iдентифікаційного коду
+          insert into rnbu_trace
+                    ( rnk, kodp, znap )
+             values ( p_rnk, '351'||p_kodp, p_351 );
 
 --    360  наiменування банку отримувача/платника
           insert into rnbu_trace
@@ -270,8 +274,8 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
    nnno_ := nnnn_;
 
    dats_ := trunc(dat_, 'mm');
-
-   for k in ( select c.okpo, max(c.codcagent) codcagent,
+   
+   for k in ( select c.okpo, max(c.codcagent) codcagent, max(ise) ise,
                              max(c.nmk) nmk, max(c.adr) adr, max(c.rnk) rnk,
                              max(re.rnbor) rnbor, max(re.rnbou) rnbou,
                              max(re.rnbos) rnbos, max(re.rnbod) rnbod
@@ -283,7 +287,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                                                 where p.tag like 'RNBOS'
        and instr(p.value,'01')+instr(p.value,'02')+instr(p.value,'03')+
            instr(p.value,'04')+instr(p.value,'05')+instr(p.value,'99') >0
-                                                  and p.rnk=u.rnk)
+                                                  and p.rnk=u.rnk) 
                               ) pivot
                               ( max(trim(value))
                                 for tag in ('RNBOR' as RNBOR, 'RNBOU' as RNBOU,
@@ -295,14 +299,13 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                group by c.okpo
             )
    loop
-       if     k.codcagent =1   then    segm_a :='3';
-       elsif  k.codcagent =2   then    segm_a :='4';
-       elsif  k.codcagent =3   then    segm_a :='1';
-       elsif  k.codcagent =5   then    segm_a :='2';
+       if     k.ise like '13%'             then    segm_a :='G';
+       elsif  k.ise in ('ZZZZZ','YYYYY')   then    segm_a :='D';
+       elsif  k.codcagent =5               then    segm_a :='2';
        else
-             segm_a := '9';
+             segm_a := '1';
        end if;
-       segm_z := lpad(k.okpo,10);
+       segm_z := lpad(k.okpo,10,'0');
 
        is_dat_exist_ := 0;
        begin
@@ -318,8 +321,8 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                            dat_rnbo_ :=dat_;
               end;
        end;
-
---  правильная дата в dat_rnbo_
+       
+--  правильная дата в dat_rnbo_ 
     if is_dat_exist_ =1  then
 
        flag_acc_ := 0;
@@ -329,25 +332,24 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
        for u in ( select a.acc, a.kv, a.nbs, a.nls, a.daos, a.dazs,
                          to_char(a.daos,'ddmmyyyy') c_daos,
                          decode(a.dazs,null,null,to_char(a.dazs,'ddmmyyyy') ) c_dazs,
-                         to_char( round(0.01*fost(a.acc,dat_rnbo_)) ) p_270,
-                         to_char( round(0.01*fost(a.acc,dat_)) ) p_280,
+                         to_char( fostq(a.acc,dat_rnbo_) ) p_270,
+                         to_char( fostq(a.acc,dat_) ) p_280,
                          nvl(a.blkd,0)+nvl(a.blkk,0) acc_blk
                     from accounts a
-                   where a.rnk = k.rnk
+                   where a.rnk = k.rnk 
                      and a.nbs in (
             '2512', '2513', '2520', '2523', '2525', '2530', '2541', '2542',
             '2544', '2545', '2546', '2550', '2551', '2553', '2555', '2556',
             '2560', '2561', '2562', '2565', '2600', '2604', '2605', '2610',
-            '2620', '2625', '2630', '2650', '2651', '2655', '3320' )
-                     and a.daos < dat_rnbo_
-                     and a.daos < dat_rnbo_
+            '2615', '2620', '2625', '2630', '2635', '2650', '2651', '2652',
+            '2655', '3320', '3330', '3340' )
                      and ( a.dazs is null
                         or a.dazs is not null and
-                           a.dazs > to_date('20150922','yyyymmdd') )
+                           a.dazs > dat_rnbo_ )
                 )
        loop
           flag_acc_ := 1;
-
+          
           p_210 := 1;
           if u.dazs is not null and u.dazs<dat_  then
               p_210 :=2;
@@ -395,7 +397,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                                      accounts ad, accounts ak,
                                      (SELECT o1.fdat, o1.REF, o1.stmt, o1.tt, o1.s,
                                              o1.sq, o1.txt,
-                                             (case when o1.dk = 0 then o1.acc else o2.acc end) accd,
+                                             (case when o1.dk = 0 then o1.acc else o2.acc end) accd, 
                                              (case when o1.dk = 1 then o1.acc else o2.acc end) acck
                                       FROM opldok o1
                                       JOIN opldok o2
@@ -404,19 +406,20 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                                               AND o1.stmt= o2.stmt
                                               AND o1.dk <> o2.dk)
                                       WHERE o1.fdat between dats_ and dat_ AND
-                                            o1.acc = u.acc
+                                            o1.acc = u.acc 
                                        ) o
                                WHERE p.REF = o.REF
                                  AND t.tt = o.tt
                                  AND o.accd = ad.acc
                                  AND o.acck = ak.acc
+                                 and nvl(ak.nbs,substr(ak.nls,1,4)) not like '65%'
                             ) p
                       where p.mfoa = r1.mfo
                         and p.mfob = r2.mfo
                    )
           loop
              flag_opp_ := 1;
-
+             
              nnnn_ :=nnnn_+1;
 
              if u.acc = v.accd  then
@@ -424,22 +427,78 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                 p_330 := v.nlsk;
                 p_340 := substr(trim(v.nam_b),1,70);
                 p_350 := lpad(v.okpo_b,10,'0');
+                p_351 := '1';
                 p_360 := substr(trim(v.namb_b),1,70);
+
+                begin
+                    select ise, codcagent  into ise_, cod_c
+                      from customer
+                     where okpo = v.okpo_b;
+
+                    if     ise_ like '13%'             then    p_351 :='G';
+                    elsif  ise_ in ('ZZZZZ','YYYYY')   then    p_351 :='D';
+                    elsif  cod_c =5
+                       and regexp_instr(v.okpo_b,'[^[:digit:]]')=0
+                                                       then    p_351 :='2';
+                    elsif  cod_c =5                    then    p_351 :='6';
+                    else
+                         p_351 := '1';
+                    end if;
+                exception
+                   when others  then
+                     if    length(trim(v.okpo_b))=10
+                       and regexp_instr(v.okpo_b,'[^[:digit:]]')=0
+                                                       then    p_351 :='2';
+                     elsif length(trim(v.okpo_b))=10
+                                                       then    p_351 :='6';
+                     else
+                         p_351 := '1';
+                     end if;
+                end;
+
              else
                 p_310 :='2';
                 p_330 := v.nlsd;
                 p_340 := substr(trim(v.nam_a),1,70);
                 p_350 := lpad(v.okpo_a,10,'0');
+                p_351 := '1';
                 p_360 := substr(trim(v.namb_a),1,70);
-             end if;
 
+                begin
+                    select ise, codcagent  into ise_, cod_c
+                      from customer
+                     where okpo = v.okpo_a;
+
+                    if     ise_ like '13%'             then    p_351 :='G';
+                    elsif  ise_ in ('ZZZZZ','YYYYY')   then    p_351 :='D';
+                    elsif  cod_c =5
+                       and regexp_instr(v.okpo_a,'[^[:digit:]]')=0
+                                                       then    p_351 :='2';
+                    elsif  cod_c =5                    then    p_351 :='6';
+                    else
+                         p_351 := '1';
+                    end if;
+                exception
+                   when others  then
+                     if    length(trim(v.okpo_a))=10
+                       and regexp_instr(v.okpo_a,'[^[:digit:]]')=0
+                                                       then    p_351 :='2';
+                     elsif length(trim(v.okpo_a))=10
+                                                       then    p_351 :='6';
+                     else
+                         p_351 := '1';
+                     end if;
+                end;
+
+             end if;
+             
              p_391 := p_260;
 
              segm_n := lpad(to_char(nnnn_),4,'0');
              kodp_ := segm_z||segm_a||segm_n;
 
              p_ins_0( k.rnk, kodp_, k.nmk, k.adr, p_030 );
-
+   
              p_ins_1( k.rnk, kodp_, k.rnbor, k.rnbou, k.rnbos );
 
              p_ins_2( k.rnk, kodp_, p_210, u.nls, u.kv,
@@ -447,7 +506,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                       p_260, u.p_270, u.p_280 );
 
              p_ins_3( k.rnk, kodp_, p_310, v.pdat, p_330, p_340,
-                      p_350, p_360, v.ostq, v.kv, substr(v.nazn,1,70), p_391 );
+                      p_350, p_351, p_360, v.ostq, v.kv, substr(v.nazn,1,70), p_391 );
 
           end loop;                --цикл по операциям
 
@@ -459,7 +518,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
              kodp_ := segm_z||segm_a||segm_n;
 
              p_ins_0( k.rnk, kodp_, k.nmk, k.adr, p_030 );
-
+   
              p_ins_1( k.rnk, kodp_, k.rnbor, k.rnbou, k.rnbos );
 
              p_ins_2( k.rnk, kodp_, p_210, u.nls, u.kv,
@@ -482,7 +541,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
           kodp_ := segm_z||segm_a||segm_n;
 
           p_ins_0( k.rnk, kodp_, k.nmk, k.adr, p_030 );
-
+    
           p_ins_1( k.rnk, kodp_, k.rnbor, k.rnbou, k.rnbos );
        end if;
 
@@ -503,10 +562,3 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
 
 END P_F2K_NN;
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F2K_NN.sql =========*** End *** 
-PROMPT ===================================================================================== 

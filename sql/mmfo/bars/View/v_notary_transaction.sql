@@ -18,9 +18,7 @@ PROMPT *** Create  view V_NOTARY_TRANSACTION ***
   FROM   NOTARY_PROFIT;
 
 PROMPT *** Create  grants  V_NOTARY_TRANSACTION ***
-grant SELECT                                                                 on V_NOTARY_TRANSACTION to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NOTARY_TRANSACTION to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_NOTARY_TRANSACTION to UPLD;
 
 
 

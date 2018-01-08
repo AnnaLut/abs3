@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции V29
-prompt Наименование операции: V29 Виплати МО,МВС,СБУ,ДПА,ДДзВП + СК+Фонди
+prompt Наименование операции: Виплати МО,МВС,СБУ,ДПА,ДДзВП + СК+Фонди
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('V29', 'V29 Виплати МО,МВС,СБУ,ДПА,ДДзВП + СК+Фонди', 1, null, 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, '#(tobopack.GetTOBOParam(''CASH''))', null, 0, 0, 0, 0, null, null, 50, null, null, null, '0000100001000001000000000000000000010000000000000000000000000000', 'Виплата згiдно заяви');
+    values ('V29', 'Виплати МО,МВС,СБУ,ДПА,ДДзВП + СК+Фонди', 1, null, 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, '#(tobopack.GetTOBOParam(''CASH''))', null, 0, 0, 0, 0, null, null, 50, null, null, null, '0000100001000001000000000000000000010000000000000000000000000000', 'Виплата згiдно заяви');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='V29', name='V29 Виплати МО,МВС,СБУ,ДПА,ДДзВП + СК+Фонди', dk=1, nlsm=null, kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb='#(tobopack.GetTOBOParam(''CASH''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=50, proc=null, s3800=null, rang=null, flags='0000100001000001000000000000000000010000000000000000000000000000', nazn='Виплата згiдно заяви'
+         set tt='V29', name='Виплати МО,МВС,СБУ,ДПА,ДДзВП + СК+Фонди', dk=1, nlsm=null, kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb='#(tobopack.GetTOBOParam(''CASH''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=50, proc=null, s3800=null, rang=null, flags='0000100001000001000000000000000000010000000000000000000000000000', nazn='Виплата згiдно заяви'
        where tt='V29';
   end;
   --------------------------------

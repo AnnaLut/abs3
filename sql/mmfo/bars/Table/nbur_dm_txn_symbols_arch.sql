@@ -116,10 +116,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMTXNSYMBOLSARCH_VRSN_NN ***
+PROMPT *** Create  constraint CC_DMTXNSYMBOLSARCH_KV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_TXN_SYMBOLS_ARCH MODIFY (VERSION_ID CONSTRAINT CC_DMTXNSYMBOLSARCH_VRSN_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_TXN_SYMBOLS_ARCH MODIFY (SYMB_TP CONSTRAINT CC_DMTXNSYMBOLSARCH_KV_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -152,10 +152,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMTXNSYMBOLSARCH_KV_NN ***
+PROMPT *** Create  constraint CC_DMTXNSYMBOLSARCH_VRSN_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_TXN_SYMBOLS_ARCH MODIFY (SYMB_TP CONSTRAINT CC_DMTXNSYMBOLSARCH_KV_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_TXN_SYMBOLS_ARCH MODIFY (VERSION_ID CONSTRAINT CC_DMTXNSYMBOLSARCH_VRSN_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -233,11 +233,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_DM_TXN_SYMBOLS_ARCH ***
-grant SELECT                                                                 on NBUR_DM_TXN_SYMBOLS_ARCH to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_DM_TXN_SYMBOLS_ARCH to BARSUPL;
 grant SELECT                                                                 on NBUR_DM_TXN_SYMBOLS_ARCH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_DM_TXN_SYMBOLS_ARCH to BARS_DM;
-grant SELECT                                                                 on NBUR_DM_TXN_SYMBOLS_ARCH to UPLD;
 
 
 

@@ -13,11 +13,9 @@ PROMPT *** Create  view PODOTW ***
 
 PROMPT *** Create  grants  PODOTW ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PODOTW          to ABS_ADMIN;
-grant SELECT                                                                 on PODOTW          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PODOTW          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PODOTW          to PYOD001;
 grant SELECT                                                                 on PODOTW          to START1;
-grant SELECT                                                                 on PODOTW          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PODOTW          to WR_ALL_RIGHTS;
 
 

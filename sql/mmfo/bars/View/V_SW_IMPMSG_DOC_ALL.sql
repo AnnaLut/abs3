@@ -1,14 +1,24 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_SW_IMPMSG_DOC_ALL.sql =========*** Ru
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_SW_IMPMSG_DOC_ALL ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_SW_IMPMSG_DOC_ALL ("REF", "VDAT", "NLSA", "NLSB", "AMOUNT", "LCV", "DIG", "DK", "NAZN", "ACCD", "ACCK", "S", "FDAT", "TAG20", "TT", "NEXTVISAGRP") AS 
-  SELECT p.REF,
+CREATE OR REPLACE FORCE VIEW BARS.V_SW_IMPMSG_DOC_ALL
+(
+   REF,
+   VDAT,
+   NLSA,
+   NLSB,
+   AMOUNT,
+   LCV,
+   DIG,
+   DK,
+   NAZN,
+   ACCD,
+   ACCK,
+   S,
+   FDAT,
+   TAG20,
+   TT,
+   NEXTVISAGRP
+)
+AS
+     SELECT p.REF,
             p.vdat,
             p.nlsa,
             p.nlsb,
@@ -51,14 +61,12 @@ PROMPT *** Create  view V_SW_IMPMSG_DOC_ALL ***
    ORDER BY p.vdat DESC
    WITH READ ONLY;
 
-PROMPT *** Create  grants  V_SW_IMPMSG_DOC_ALL ***
-grant SELECT                                                                 on V_SW_IMPMSG_DOC_ALL to BARS013;
-grant SELECT                                                                 on V_SW_IMPMSG_DOC_ALL to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_SW_IMPMSG_DOC_ALL to START1;
-grant SELECT                                                                 on V_SW_IMPMSG_DOC_ALL to UPLD;
+
+CREATE OR REPLACE PUBLIC SYNONYM V_SW_IMPMSG_DOC_ALL FOR BARS.V_SW_IMPMSG_DOC_ALL;
 
 
+GRANT SELECT ON BARS.V_SW_IMPMSG_DOC_ALL TO BARS013;
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_SW_IMPMSG_DOC_ALL.sql =========*** En
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.V_SW_IMPMSG_DOC_ALL TO BARS_ACCESS_DEFROLE;
+
+GRANT SELECT ON BARS.V_SW_IMPMSG_DOC_ALL TO START1;

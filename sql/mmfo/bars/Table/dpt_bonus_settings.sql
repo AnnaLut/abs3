@@ -56,6 +56,19 @@ COMMENT ON COLUMN BARS.DPT_BONUS_SETTINGS.BONUS_ID IS 'Код бонусу';
 
 
 
+PROMPT *** Create  constraint FK_DPT_BONUS_SETTINGS_BID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_SETTINGS ADD CONSTRAINT FK_DPT_BONUS_SETTINGS_BID FOREIGN KEY (BONUS_ID)
+	  REFERENCES BARS.DPT_BONUSES (BONUS_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint UK_DPT_BONUS_SETTINGS ***
 begin   
  execute immediate '
@@ -84,9 +97,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_BONUS_SETTINGS ***
-grant SELECT                                                                 on DPT_BONUS_SETTINGS to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DPT_BONUS_SETTINGS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on DPT_BONUS_SETTINGS to UPLD;
 
 
 

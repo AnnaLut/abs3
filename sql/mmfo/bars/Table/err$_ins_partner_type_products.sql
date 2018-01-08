@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_INS_PARTNER_TYPE_PRODUCTS.TYPE_ID IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_INS_PARTNER_TYPE_PRODUCTS ***
-grant SELECT                                                                 on ERR$_INS_PARTNER_TYPE_PRODUCTS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_INS_PARTNER_TYPE_PRODUCTS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

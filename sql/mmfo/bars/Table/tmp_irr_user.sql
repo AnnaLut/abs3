@@ -49,10 +49,6 @@ COMMENT ON COLUMN BARS.TMP_IRR_USER.USERID IS '';
 
 
 
-PROMPT *** Create  grants  TMP_IRR_USER ***
-grant SELECT                                                                 on TMP_IRR_USER    to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_IRR_USER    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

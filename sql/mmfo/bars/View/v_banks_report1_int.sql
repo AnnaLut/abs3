@@ -23,11 +23,9 @@ PROMPT *** Create  view V_BANKS_REPORT1_INT ***
             s.kodp;
 
 PROMPT *** Create  grants  V_BANKS_REPORT1_INT ***
-grant SELECT                                                                 on V_BANKS_REPORT1_INT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BANKS_REPORT1_INT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BANKS_REPORT1_INT to RPBN002;
 grant SELECT                                                                 on V_BANKS_REPORT1_INT to START1;
-grant SELECT                                                                 on V_BANKS_REPORT1_INT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BANKS_REPORT1_INT to WR_ALL_RIGHTS;
 
 

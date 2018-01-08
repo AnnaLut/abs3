@@ -25,11 +25,9 @@ where (a.nbs  ='2600' or
 PROMPT *** Create  grants  V_OVERCL ***
 grant INSERT                                                                 on V_OVERCL        to ABS_ADMIN;
 grant INSERT,SELECT                                                          on V_OVERCL        to BARS009;
-grant SELECT                                                                 on V_OVERCL        to BARSREADER_ROLE;
 grant INSERT                                                                 on V_OVERCL        to BARS_ACCESS_DEFROLE;
 grant INSERT                                                                 on V_OVERCL        to TECH005;
 grant INSERT                                                                 on V_OVERCL        to TECH006;
-grant SELECT                                                                 on V_OVERCL        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OVERCL        to WR_ALL_RIGHTS;
 
 

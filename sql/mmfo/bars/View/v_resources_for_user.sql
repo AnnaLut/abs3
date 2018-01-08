@@ -93,9 +93,7 @@ PROMPT *** Create  view V_RESOURCES_FOR_USER ***
                    left join operlist o on o.codeoper = ra3.resource_id));
 
 PROMPT *** Create  grants  V_RESOURCES_FOR_USER ***
-grant SELECT                                                                 on V_RESOURCES_FOR_USER to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RESOURCES_FOR_USER to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_RESOURCES_FOR_USER to UPLD;
 
 
 

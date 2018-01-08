@@ -67,6 +67,45 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_REFERS_METATABLES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REFERENCES ADD CONSTRAINT FK_REFERS_METATABLES FOREIGN KEY (TABID)
+	  REFERENCES BARS.META_TABLES (TABID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_REFERS_TYPEREF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REFERENCES ADD CONSTRAINT FK_REFERS_TYPEREF FOREIGN KEY (TYPE)
+	  REFERENCES BARS.TYPEREF (TYPE) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_REFERS_ROLES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REFERENCES ADD CONSTRAINT FK_REFERS_ROLES FOREIGN KEY (ROLE2EDIT)
+	  REFERENCES BARS.ROLES$BASE (ROLE_NAME) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C006028 ***
 begin   
  execute immediate '
@@ -106,13 +145,11 @@ exception when others then
 
 PROMPT *** Create  grants  REFERENCES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on REFERENCES      to ABS_ADMIN;
-grant SELECT                                                                 on REFERENCES      to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on REFERENCES      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REFERENCES      to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on REFERENCES      to REF0000;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REFERENCES      to REFER_1;
 grant SELECT                                                                 on REFERENCES      to START1;
-grant SELECT                                                                 on REFERENCES      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REFERENCES      to WR_ALL_RIGHTS;
 grant SELECT                                                                 on REFERENCES      to WR_METATAB;
 grant FLASHBACK,SELECT                                                       on REFERENCES      to WR_REFREAD;

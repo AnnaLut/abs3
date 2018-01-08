@@ -25,11 +25,9 @@ from (select
 ;
 
 PROMPT *** Create  grants  CIN_OPERW ***
-grant SELECT                                                                 on CIN_OPERW       to BARSREADER_ROLE;
 grant SELECT                                                                 on CIN_OPERW       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIN_OPERW       to PYOD001;
 grant SELECT                                                                 on CIN_OPERW       to START1;
-grant SELECT                                                                 on CIN_OPERW       to UPLD;
 
 
 

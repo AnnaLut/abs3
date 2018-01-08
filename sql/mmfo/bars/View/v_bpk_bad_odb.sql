@@ -28,10 +28,8 @@ PROMPT *** Create  view V_BPK_BAD_ODB ***
    and not exists (select 1 from obpc_acct where acc = v.acc);
 
 PROMPT *** Create  grants  V_BPK_BAD_ODB ***
-grant SELECT                                                                 on V_BPK_BAD_ODB   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BPK_BAD_ODB   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BPK_BAD_ODB   to OBPC;
-grant SELECT                                                                 on V_BPK_BAD_ODB   to UPLD;
 grant FLASHBACK,SELECT                                                       on V_BPK_BAD_ODB   to WR_REFREAD;
 
 

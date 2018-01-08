@@ -21,9 +21,7 @@ PROMPT *** Create  view V_CIM_CREDGRAPH_PERIOD ***
      order by p.end_date;
 
 PROMPT *** Create  grants  V_CIM_CREDGRAPH_PERIOD ***
-grant SELECT                                                                 on V_CIM_CREDGRAPH_PERIOD to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_CREDGRAPH_PERIOD to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_CREDGRAPH_PERIOD to UPLD;
 
 
 

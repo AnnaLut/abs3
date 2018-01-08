@@ -78,6 +78,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_BANKDATE_BANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.BANKDATES ADD CONSTRAINT FK_BANKDATE_BANKS FOREIGN KEY (BANK_ID)
+	  REFERENCES BARS.BANKS$BASE (MFO) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_BANKDATES ***
 begin   
  execute immediate '
@@ -90,9 +103,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  BANKDATES ***
-grant SELECT                                                                 on BANKDATES       to BARSREADER_ROLE;
 
 
 

@@ -57,6 +57,22 @@ COMMENT ON COLUMN BARS.SKRYNKA_TIP.ETALON_ID IS '';
 COMMENT ON COLUMN BARS.SKRYNKA_TIP.CELL_COUNT IS '';
 
 
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.SKRYNKA_TIP DROP CONSTRAINT PK_SKRYNKATIP';
+exception when others then 
+  if sqlcode=-2443 then null; else raise; end if;
+end;
+/
+
+begin 
+  execute immediate 
+    ' DROP INDEX BARS.PK_SKRYNKATIP';
+exception when others then 
+  if sqlcode=-1418 then null; else raise; end if;
+end;
+/
+ 
 
 
 PROMPT *** Create  constraint UK_SKRYNKATIP ***
@@ -101,10 +117,49 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SKRYNKATIP_OSK_NN ***
+PROMPT *** Create  constraint FK_SKRYN_TIP_REF_ETALON ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_TIP MODIFY (O_SK CONSTRAINT CC_SKRYNKATIP_OSK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SKRYNKA_TIP ADD CONSTRAINT FK_SKRYN_TIP_REF_ETALON FOREIGN KEY (ETALON_ID)
+	  REFERENCES BARS.SKRYNKA_TIP_ETALON (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKA_TIP_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_TIP ADD CONSTRAINT FK_SKRYNKA_TIP_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKATIP_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_TIP ADD CONSTRAINT FK_SKRYNKATIP_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SKRYNKATIP_CELLCOUNT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_TIP MODIFY (CELL_COUNT CONSTRAINT CC_SKRYNKATIP_CELLCOUNT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -173,10 +228,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SKRYNKATIP_CELLCOUNT_NN ***
+PROMPT *** Create  constraint CC_SKRYNKATIP_OSK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_TIP MODIFY (CELL_COUNT CONSTRAINT CC_SKRYNKATIP_CELLCOUNT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SKRYNKA_TIP MODIFY (O_SK CONSTRAINT CC_SKRYNKATIP_OSK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -227,13 +282,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_TIP ***
-grant SELECT                                                                 on SKRYNKA_TIP     to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_TIP     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SKRYNKA_TIP     to BARS_DM;
 grant SELECT                                                                 on SKRYNKA_TIP     to CC_DOC;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_TIP     to DEP_SKRN;
 grant SELECT                                                                 on SKRYNKA_TIP     to START1;
-grant SELECT                                                                 on SKRYNKA_TIP     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_TIP     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SKRYNKA_TIP     to WR_REFREAD;
 

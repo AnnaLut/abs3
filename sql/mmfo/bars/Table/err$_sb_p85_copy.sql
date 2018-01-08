@@ -75,10 +75,6 @@ COMMENT ON COLUMN BARS.ERR$_SB_P85_COPY.GR_IN IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SB_P85_COPY ***
-grant SELECT                                                                 on ERR$_SB_P85_COPY to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SB_P85_COPY to UPLD;
-
 
 
 PROMPT ===================================================================================== 

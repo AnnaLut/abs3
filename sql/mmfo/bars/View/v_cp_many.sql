@@ -47,10 +47,8 @@ PROMPT *** Create  view V_CP_MANY ***
      FROM V_CP_MANY1;
 
 PROMPT *** Create  grants  V_CP_MANY ***
-grant SELECT                                                                 on V_CP_MANY       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_MANY       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_MANY       to START1;
-grant SELECT                                                                 on V_CP_MANY       to UPLD;
 
 
 

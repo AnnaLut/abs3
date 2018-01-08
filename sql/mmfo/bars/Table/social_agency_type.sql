@@ -91,13 +91,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SOCIAL_AGENCY_TYPE ***
-grant SELECT                                                                 on SOCIAL_AGENCY_TYPE to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SOCIAL_AGENCY_TYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SOCIAL_AGENCY_TYPE to BARS_CONNECT;
 grant SELECT                                                                 on SOCIAL_AGENCY_TYPE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SOCIAL_AGENCY_TYPE to DPT_ADMIN;
 grant SELECT                                                                 on SOCIAL_AGENCY_TYPE to DPT_ROLE;
-grant SELECT                                                                 on SOCIAL_AGENCY_TYPE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SOCIAL_AGENCY_TYPE to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SOCIAL_AGENCY_TYPE to WR_REFREAD;
 

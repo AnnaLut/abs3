@@ -78,10 +78,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  PASSPT ***
-grant SELECT                                                                 on PASSPT          to BARSREADER_ROLE;
 grant SELECT                                                                 on PASSPT          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PASSPT          to BARS_DM;
-grant SELECT                                                                 on PASSPT          to UPLD;
 
 
 

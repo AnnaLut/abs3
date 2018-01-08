@@ -89,58 +89,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_INTACRDATUPD_INTID_NN ***
+PROMPT *** Create  constraint CC_INTACRDATUPD_MACHINE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_ACRDAT_UPD MODIFY (INTID CONSTRAINT CC_INTACRDATUPD_INTID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INTACRDATUPD_RECID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_ACRDAT_UPD MODIFY (REC_ID CONSTRAINT CC_INTACRDATUPD_RECID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INTACRDATUPD_RECTYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_ACRDAT_UPD MODIFY (REC_TYPE CONSTRAINT CC_INTACRDATUPD_RECTYPE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INTACRDATUPD_RECUID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_ACRDAT_UPD MODIFY (REC_UID CONSTRAINT CC_INTACRDATUPD_RECUID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INTACRDATUPD_RECUNAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_ACRDAT_UPD MODIFY (REC_UNAME CONSTRAINT CC_INTACRDATUPD_RECUNAME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.INT_ACRDAT_UPD MODIFY (MACHINE CONSTRAINT CC_INTACRDATUPD_MACHINE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -161,10 +113,58 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_INTACRDATUPD_MACHINE_NN ***
+PROMPT *** Create  constraint CC_INTACRDATUPD_RECUNAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_ACRDAT_UPD MODIFY (MACHINE CONSTRAINT CC_INTACRDATUPD_MACHINE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.INT_ACRDAT_UPD MODIFY (REC_UNAME CONSTRAINT CC_INTACRDATUPD_RECUNAME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INTACRDATUPD_RECUID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACRDAT_UPD MODIFY (REC_UID CONSTRAINT CC_INTACRDATUPD_RECUID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INTACRDATUPD_RECTYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACRDAT_UPD MODIFY (REC_TYPE CONSTRAINT CC_INTACRDATUPD_RECTYPE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INTACRDATUPD_RECID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACRDAT_UPD MODIFY (REC_ID CONSTRAINT CC_INTACRDATUPD_RECID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INTACRDATUPD_INTID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACRDAT_UPD MODIFY (INTID CONSTRAINT CC_INTACRDATUPD_INTID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -187,11 +187,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  INT_ACRDAT_UPD ***
-grant SELECT                                                                 on INT_ACRDAT_UPD  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_ACRDAT_UPD  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_ACRDAT_UPD  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_ACRDAT_UPD  to START1;
-grant SELECT                                                                 on INT_ACRDAT_UPD  to UPLD;
 
 
 

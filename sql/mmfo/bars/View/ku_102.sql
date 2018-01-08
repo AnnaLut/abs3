@@ -22,10 +22,8 @@ WHERE s.acc=d.accs  AND
       c.custtype<>3;
 
 PROMPT *** Create  grants  KU_102 ***
-grant SELECT                                                                 on KU_102          to BARSREADER_ROLE;
 grant SELECT                                                                 on KU_102          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KU_102          to START1;
-grant SELECT                                                                 on KU_102          to UPLD;
 
 
 

@@ -67,11 +67,9 @@ COMMENT ON COLUMN BARS.SB_S0806.XNOMROW IS '';
 
 
 PROMPT *** Create  grants  SB_S0806 ***
-grant SELECT                                                                 on SB_S0806        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_S0806        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SB_S0806        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_S0806        to START1;
-grant SELECT                                                                 on SB_S0806        to UPLD;
 
 
 

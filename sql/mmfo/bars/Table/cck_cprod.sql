@@ -90,7 +90,6 @@ exception when others then
 
 PROMPT *** Create  grants  CCK_CPROD ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_CPROD       to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on CCK_CPROD       to BARSREADER_ROLE;
 grant SELECT                                                                 on CCK_CPROD       to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_CPROD       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_CPROD       to BARS_DM;

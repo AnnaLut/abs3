@@ -33,10 +33,8 @@ PROMPT *** Create  view V_KLI_BANK ***
             AND a.acc = a3.acc(+);
 
 PROMPT *** Create  grants  V_KLI_BANK ***
-grant SELECT                                                                 on V_KLI_BANK      to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_KLI_BANK      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_KLI_BANK      to START1;
-grant SELECT                                                                 on V_KLI_BANK      to UPLD;
 grant FLASHBACK,SELECT                                                       on V_KLI_BANK      to WR_REFREAD;
 
 

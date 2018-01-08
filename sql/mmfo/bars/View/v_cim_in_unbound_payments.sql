@@ -43,9 +43,7 @@ union all
          and fb.delete_date is null and fb.direct=0 and fb.contr_id is null;
 
 PROMPT *** Create  grants  V_CIM_IN_UNBOUND_PAYMENTS ***
-grant SELECT                                                                 on V_CIM_IN_UNBOUND_PAYMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_IN_UNBOUND_PAYMENTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_IN_UNBOUND_PAYMENTS to UPLD;
 
 
 

@@ -1,3 +1,5 @@
+SET SERVEROUTPUT ON 
+SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_DROB.sql =========*
 PROMPT ===================================================================================== 
@@ -16,11 +18,11 @@ PROMPT *** Create/replace  ARM  $RM_DROB ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-	d integer := 0;
+    d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_DROB створюємо (або оновлюємо) АРМ АРМ Реєстр позичальникiв ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
-                             P_ARM_NAME              => l_application_name,
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
+                             P_ARM_NAME              => l_application_name, 
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -28,98 +30,98 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 3. Запити/Вiдповiдi до ЦБД ********** ');
           --  Створюємо функцію 3. Запити/Вiдповiдi до ЦБД
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '3. Запити/Вiдповiдi до ЦБД',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0&sPar=V_DEBREG_QUERY_C',
-                                                  p_rolename => 'DEB_REG' ,
+                                                  p_rolename => 'DEB_REG' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 4. Всi вiдповiдi з ЦБД ********** ');
           --  Створюємо функцію 4. Всi вiдповiдi з ЦБД
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '4. Всi вiдповiдi з ЦБД',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_DEBREG_RES',
-                                                  p_rolename => 'DEB_REG' ,
+                                                  p_rolename => 'DEB_REG' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 5. Реєстр боржникiв (iнф.про файли) ********** ');
           --  Створюємо функцію 5. Реєстр боржникiв (iнф.про файли)
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '5. Реєстр боржникiв (iнф.про файли)',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_ZAG_PF[NSIFUNCTION]',
-                                                  p_rolename => 'DEB_REG' ,
+                                                  p_rolename => 'DEB_REG' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 6. Заблокованi клiєнти (по файлах PF) ********** ');
           --  Створюємо функцію 6. Заблокованi клiєнти (по файлах PF)
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '6. Заблокованi клiєнти (по файлах PF)',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=6&sPar=DEBREG_BLK',
-                                                  p_rolename => 'DEB_REG' ,
+                                                  p_rolename => 'DEB_REG' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 2. Дзеркало Реєстру ********** ');
           --  Створюємо функцію 2. Дзеркало Реєстру
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '2. Дзеркало Реєстру',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_DEBREG_RES_S&accessCode=1&sPar=[NSIFUNCTION][PROC=>dr_ch.pop_v_debreg_res_s(:id)][PAR=>:id(SEM=Виберіть тип клієнтів,TYPE=C,REF=DEBREG_CUSTTYPE)][EXEC=>BEFORE][CONDITIONS=>CUSTTYPE in (select id from  debreg_custtype_tmp)]',
-                                                  p_rolename => 'DEB_REG' ,
+                                                  p_rolename => 'DEB_REG' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 7. Ручне введення інформації в ЦБД ********** ');
           --  Створюємо функцію 7. Ручне введення інформації в ЦБД
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '7. Ручне введення інформації в ЦБД',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_DEB_REG_MAN&accessCode=0&sPar=[NSIFUNCTION]',
-                                                  p_rolename => 'DEB_REG' ,
+                                                  p_rolename => 'DEB_REG' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 1. Монiторинг/Поставка iнформацiї в ЦБД ********** ');
           --  Створюємо функцію 1. Монiторинг/Поставка iнформацiї в ЦБД
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '1. Монiторинг/Поставка iнформацiї в ЦБД',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_DEB_REG_TMP&accessCode=6&sPar=[NSIFUNCTION][PROC=>dr_ch.pop_v_debreg_res_s(:id)][PAR=>:id(SEM=Виберіть тип клієнтів,TYPE=C,REF=DEBREG_CUSTTYPE)][EXEC=>BEFORE][CONDITIONS=>CUSTTYPE in (select id from  debreg_custtype_tmp)]',
-                                                  p_rolename => 'DEB_REG' ,
+                                                  p_rolename => 'DEB_REG' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довідники NEW ********** ');
           --  Створюємо функцію Довідники NEW
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Довідники NEW',
                                                   p_funcname => '/barsroot/referencebook/referencelist/',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_DROB) - АРМ Реєстр позичальникiв  ');
     l := l_function_ids.first;
@@ -127,8 +129,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-
-
+     
+     
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -142,7 +144,6 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
-commit;
 end;
 /
 

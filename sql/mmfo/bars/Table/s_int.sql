@@ -69,10 +69,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  S_INT ***
-grant SELECT                                                                 on S_INT           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S_INT           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S_INT           to START1;
-grant SELECT                                                                 on S_INT           to UPLD;
 
 
 

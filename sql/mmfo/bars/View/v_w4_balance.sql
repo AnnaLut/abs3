@@ -49,10 +49,8 @@ PROMPT *** Create  view V_W4_BALANCE ***
     or pk_ost < w4_sec_ost;
 
 PROMPT *** Create  grants  V_W4_BALANCE ***
-grant SELECT                                                                 on V_W4_BALANCE    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_BALANCE    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_W4_BALANCE    to OW;
-grant SELECT                                                                 on V_W4_BALANCE    to UPLD;
 
 
 

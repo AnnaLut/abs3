@@ -114,12 +114,10 @@ COMMENT ON COLUMN BARS.TMP_CRD.ID IS '';
 
 
 PROMPT *** Create  grants  TMP_CRD ***
-grant SELECT                                                                 on TMP_CRD         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CRD         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_CRD         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CRD         to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CRD         to RPBN001;
-grant SELECT                                                                 on TMP_CRD         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_CRD         to WR_ALL_RIGHTS;
 
 

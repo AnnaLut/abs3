@@ -67,12 +67,10 @@ COMMENT ON COLUMN BARS.NAL_TMP.BUH IS '';
 
 
 PROMPT *** Create  grants  NAL_TMP ***
-grant SELECT                                                                 on NAL_TMP         to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on NAL_TMP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NAL_TMP         to BARS_DM;
 grant SELECT                                                                 on NAL_TMP         to NALOG;
 grant INSERT,SELECT,UPDATE                                                   on NAL_TMP         to START1;
-grant SELECT                                                                 on NAL_TMP         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NAL_TMP         to WR_ALL_RIGHTS;
 
 

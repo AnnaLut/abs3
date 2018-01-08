@@ -83,10 +83,6 @@ COMMENT ON COLUMN BARS.ERR$_OTCN_F08_HISTORY.VOB IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OTCN_F08_HISTORY ***
-grant SELECT                                                                 on ERR$_OTCN_F08_HISTORY to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OTCN_F08_HISTORY to UPLD;
-
 
 
 PROMPT ===================================================================================== 

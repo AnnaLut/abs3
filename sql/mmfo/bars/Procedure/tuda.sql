@@ -20,7 +20,6 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on TUDA            to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on TUDA            to BARS_DM;
 grant EXECUTE                                                                on TUDA            to FINMON01;
-grant EXECUTE                                                                on TUDA            to UPLD;
 
 
 

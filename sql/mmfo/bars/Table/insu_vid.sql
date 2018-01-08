@@ -79,11 +79,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  INSU_VID ***
-grant SELECT                                                                 on INSU_VID        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INSU_VID        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INSU_VID        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INSU_VID        to RCC_DEAL;
-grant SELECT                                                                 on INSU_VID        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INSU_VID        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on INSU_VID        to WR_REFREAD;
 

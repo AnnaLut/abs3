@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_F75SB ***
 % DESCRIPTION :    Процедура формирование файла @75 для СБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 2009.All Rights Reserved.
 %                                                 Версия для Сбербанка
-% VERSION     :    14/06/2017 (01/06/2017)  
+% VERSION     :    19.01.2017  (23/02/2016, 19/02/2016)  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 19.01.2017 - заполнение tmp_file03 разбито на два периода: отчетный месяц
              и период корректирующих
@@ -107,8 +107,9 @@ CURSOR Saldo IS
 CURSOR OBOROTY IS
    SELECT t.fdat, t.ref, t.accd, t.nlsd, t.kv, substr(t.nlsd,1,4) nbs, t.acck, 
           t.nlsk, substr(t.nlsk,1,4) nbsk, 
-          t.s, 
-          t.sq, 
+          t.s*100, 
+         --DECODE(t.s*100, 0, t.sq*100, gl.p_icurval (t.kv, t.s*100, o.vdat)),
+          t.sq*100, 
           t.nazn, 
           NVL(sb.f_75,'0') pr_d, NVL(sb1.f_75,'0') pr_k, 
           NVL(sp.ob22,'00') ob22_d, NVL(sp1.ob22,'00') ob22_k
@@ -123,8 +124,9 @@ CURSOR OBOROTY IS
    UNION 
    SELECT t.fdat, t.ref, t.accd, t.nlsd, t.kv, substr(t.nlsd,1,4) nbs, t.acck, 
           t.nlsk, substr(t.nlsk,1,4) nbsk, 
-          t.s, 
-          t.sq,
+          t.s*100, 
+          --DECODE(t.s*100, 0, t.sq*100, gl.p_icurval (t.kv, t.s*100, r.vdat/*t.fdat*/)), 
+          t.sq*100,
           nazn, 
           NVL(sb.f_75,'0') pr_d, NVL(sb1.f_75,'0') pr_k, 
           NVL(sp.ob22,'00') ob22_d, NVL(sp1.ob22,'00') ob22_k
@@ -140,8 +142,9 @@ CURSOR OBOROTY IS
    UNION 
    SELECT t.fdat, t.ref, t.accd, t.nlsd, t.kv, substr(t.nlsd,1,4) nbs, t.acck, 
           t.nlsk, substr(t.nlsk,1,4) nbsk, 
-          t.s, 
-          t.sq,
+          t.s*100, 
+          --DECODE(t.s*100, 0, t.sq*100, gl.p_icurval (t.kv, t.s*100, o.vdat)), 
+          t.sq*100,
           t.nazn, 
           NVL(sb.f_75,'0') pr_d, NVL(sb1.f_75,'0') pr_k, 
           NVL(sp.ob22,'00') ob22_d, NVL(sp1.ob22,'00') ob11_k
@@ -156,8 +159,9 @@ CURSOR OBOROTY IS
    UNION 
    SELECT t.fdat, t.ref, t.accd, t.nlsd, t.kv, substr(t.nlsd,1,4) nbs, t.acck, 
           t.nlsk, substr(t.nlsk,1,4) nbsk, 
-          t.s, 
-          t.sq,
+          t.s*100, 
+          --DECODE(t.s*100, 0, t.sq*100, gl.p_icurval (t.kv, t.s*100, r.vdat/*t.fdat*/)), 
+          t.sq*100,
           nazn, 
           NVL(sb.f_75,'0') pr_d, NVL(sb1.f_75,'0') pr_k, 
           NVL(sp.ob22,'00') ob22_d, NVL(sp1.ob22,'00') ob11_k
@@ -214,66 +218,41 @@ end if;
     
 -- наполняем все Дт и Кт проводки за месяц для счетов файла @75
 insert into tmp_file03(ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
-SELECT  /*+ parallel(4) leading(a) */
-   (case when o.dk = 0 then o.acc else o1.acc end) accd, 
-   o.tt, 
-   o.ref, 
-   a.kv, 
-   (case when o.dk = 0 then a.nls else a1.nls end) nlsd, 
-   o.s, o.sq, 
-   o.fdat,
-   p.nazn,
-   (case when o.dk = 1 then o.acc else o1.acc end) acck, 
-   (case when o.dk = 1 then a.nls else a1.nls end) nlsk, 
-   p.userid isp
-FROM opldok o,
-   accounts a,
-   opldok o1,
-   accounts a1,
-   oper p
-WHERE     o.fdat = any(select fdat from fdat where fdat BETWEEN datb_ AND dat_)
-   AND o.acc = a.acc
-   AND a.nbs in (select r020 from sb_r020 where f_75 = '1')
-   AND o.REF = o1.REF
-   AND o.stmt = o1.stmt
-   AND o.dk <> o1.dk
-   AND o1.acc = a1.acc
-   and o.ref = p.ref
-   and p.vob not in (96, 99)
-   and p.sos = 5;
-commit;
-   
-insert into tmp_file03(ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
-SELECT  /*+ parallel(4) leading(a) */
-   (case when o.dk = 0 then o.acc else o1.acc end) accd, 
-   o.tt, 
-   o.ref, 
-   a.kv, 
-   (case when o.dk = 0 then a.nls else a1.nls end) nlsd, 
-   o.s, o.sq, 
-   o.fdat,
-   p.nazn,
-   (case when o.dk = 1 then o.acc else o1.acc end) acck, 
-   (case when o.dk = 1 then a.nls else a1.nls end) nlsk, 
-   p.userid isp
-FROM opldok o,
-   accounts a,
-   opldok o1,
-   accounts a1,
-   oper p
-WHERE     o.fdat = any(select fdat from fdat where fdat BETWEEN dat_+1 AND dat_+28)
-   AND o.acc = a.acc
-   AND a.nbs in (select r020 from sb_r020 where f_75 = '1')
-   AND o.REF = o1.REF
-   AND o.stmt = o1.stmt
-   AND o.dk <> o1.dk
-   AND o1.acc = a1.acc
-   and o.ref = p.ref
-   and p.vob in (96, 99)
-   --and p.vdat <> dat_
-   and p.sos = 5;                       
+   select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP
+   from provodki_otc p, sb_r020 sb 
+   where p.fdat between datb_ and Dat_ 
+     and p.nbsd = sb.r020 
+     and sb.f_75 = '1' 
+UNION  
+   select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP
+   from provodki_otc p, sb_r020 sb 
+   where p.fdat between datb_ and Dat_ 
+     and p.nbsk = sb.r020 
+     and sb.f_75 = '1'
+UNION                              --  период корректирующих проводок ДТ
+   select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP
+   from provodki_otc p, sb_r020 sb 
+   where p.fdat between Dat_+1 and trunc(Dat_+days_) 
+     and p.vob in (96,99) 
+     and p.nbsd = sb.r020 
+     and sb.f_75 = '1'
+UNION                              --  период корректирующих проводок КТ
+   select ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP
+   from provodki_otc p, sb_r020 sb 
+   where p.fdat between Dat_+1 and trunc(Dat_+days_) 
+     and p.vob in (96,99) 
+     and p.nbsk = sb.r020 
+     and sb.f_75 = '1';
 
-commit;
+if dat_ = to_date('31052011','ddmmyyyy') then
+   delete from ref_kor;
+   INSERT INTO ref_kor (REF, VOB, VDAT) 
+      SELECT ref, vob, vdat  
+      FROM oper 
+      WHERE vdat between to_date('31122010','ddmmyyyy') and dat_+28
+        and vob in (96, 99)
+        and sos = 5; 
+end if;
 
 -- удаляем проводки перекрытия года и кореектирующие проводки перекрытия
 delete from tmp_file03 
@@ -283,6 +262,15 @@ where fdat >= vdatr_
               (nlsk LIKE '5040%' OR nlsk LIKE '5041%')) OR
              ((nlsd LIKE '5040%' OR nlsd LIKE '5041%') AND
               (nlsk LIKE '6%' OR nlsk LIKE '7%')))); 
+
+delete from tmp_file03 
+where ref in (select t.ref 
+              from tmp_file03 t, oper o
+              where t.ref = o.ref and
+                    (o.vob = 96 and
+                     o.vdat <> dat_/* or
+                     o.vob = 99 and
+                     o.vdat <> vdatr_*/));
 
 OPEN Saldo;
    LOOP

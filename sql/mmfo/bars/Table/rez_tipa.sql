@@ -76,10 +76,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_TIPA ***
-grant SELECT                                                                 on REZ_TIPA        to BARSREADER_ROLE;
 grant SELECT                                                                 on REZ_TIPA        to RCC_DEAL;
 grant SELECT                                                                 on REZ_TIPA        to START1;
-grant SELECT                                                                 on REZ_TIPA        to UPLD;
 
 
 

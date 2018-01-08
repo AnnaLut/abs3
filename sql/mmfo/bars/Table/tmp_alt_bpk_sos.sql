@@ -45,10 +45,6 @@ COMMENT ON COLUMN BARS.TMP_ALT_BPK_SOS.NAME IS '';
 
 
 
-PROMPT *** Create  grants  TMP_ALT_BPK_SOS ***
-grant SELECT                                                                 on TMP_ALT_BPK_SOS to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_ALT_BPK_SOS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

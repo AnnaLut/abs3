@@ -99,10 +99,10 @@ COMMENT ON COLUMN BARS.SNAP_BALANCES.CALDT_ID IS 'Ід. дати балансу';
 
 
 
-PROMPT *** Create  constraint CC_SNAP_BALANCES_OSTQ_NN ***
+PROMPT *** Create  constraint CC_SNAP_BALANCES_KOSQ_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SNAP_BALANCES MODIFY (OSTQ CONSTRAINT CC_SNAP_BALANCES_OSTQ_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SNAP_BALANCES MODIFY (KOSQ CONSTRAINT CC_SNAP_BALANCES_KOSQ_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -123,10 +123,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SNAP_BALANCES_KOSQ_NN ***
+PROMPT *** Create  constraint CC_SNAP_BALANCES_OSTQ_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SNAP_BALANCES MODIFY (KOSQ CONSTRAINT CC_SNAP_BALANCES_KOSQ_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SNAP_BALANCES MODIFY (OSTQ CONSTRAINT CC_SNAP_BALANCES_OSTQ_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -147,10 +147,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SNAP_BALANCES_KF_NN ***
+PROMPT *** Create  constraint CC_SNAP_BALANCES_KOS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SNAP_BALANCES MODIFY (KF CONSTRAINT CC_SNAP_BALANCES_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SNAP_BALANCES MODIFY (KOS CONSTRAINT CC_SNAP_BALANCES_KOS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -207,10 +207,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SNAP_BALANCES_KOS_NN ***
+PROMPT *** Create  constraint CC_SNAP_BALANCES_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SNAP_BALANCES MODIFY (KOS CONSTRAINT CC_SNAP_BALANCES_KOS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SNAP_BALANCES MODIFY (KF CONSTRAINT CC_SNAP_BALANCES_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -288,12 +288,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SNAP_BALANCES ***
-grant SELECT                                                                 on SNAP_BALANCES   to BARSREADER_ROLE;
 grant SELECT                                                                 on SNAP_BALANCES   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SNAP_BALANCES   to BARS_DM;
 grant ALTER,SELECT                                                           on SNAP_BALANCES   to DM;
 grant SELECT                                                                 on SNAP_BALANCES   to START1;
-grant SELECT                                                                 on SNAP_BALANCES   to UPLD;
 
 
 

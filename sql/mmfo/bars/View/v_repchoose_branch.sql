@@ -20,10 +20,8 @@ and length(sys_context('bars_context','user_branch')) < 22
  ;
 
 PROMPT *** Create  grants  V_REPCHOOSE_BRANCH ***
-grant SELECT                                                                 on V_REPCHOOSE_BRANCH to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REPCHOOSE_BRANCH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_REPCHOOSE_BRANCH to RPBN001;
-grant SELECT                                                                 on V_REPCHOOSE_BRANCH to UPLD;
 
 
 

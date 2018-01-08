@@ -59,10 +59,8 @@ COMMENT ON COLUMN BARS.V_BANKS_REPORT91.FL_MOD IS '';
 
 
 PROMPT *** Create  grants  V_BANKS_REPORT91 ***
-grant SELECT                                                                 on V_BANKS_REPORT91 to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BANKS_REPORT91 to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BANKS_REPORT91 to START1;
-grant SELECT                                                                 on V_BANKS_REPORT91 to UPLD;
 
 
 

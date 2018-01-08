@@ -13,10 +13,8 @@ from branch
  ;
 
 PROMPT *** Create  grants  V_BRANCH_OWN ***
-grant SELECT                                                                 on V_BRANCH_OWN    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BRANCH_OWN    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BRANCH_OWN    to RPBN001;
-grant SELECT                                                                 on V_BRANCH_OWN    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BRANCH_OWN    to WR_ALL_RIGHTS;
 
 

@@ -56,11 +56,9 @@ COMMENT ON COLUMN BARS.ERR$_FOLDERS_TTS.TT IS '';
 
 
 PROMPT *** Create  grants  ERR$_FOLDERS_TTS ***
-grant SELECT                                                                 on ERR$_FOLDERS_TTS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_FOLDERS_TTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ERR$_FOLDERS_TTS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_FOLDERS_TTS to START1;
-grant SELECT                                                                 on ERR$_FOLDERS_TTS to UPLD;
 
 
 

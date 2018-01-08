@@ -13,10 +13,8 @@ PROMPT *** Create  view V_PF3800 ***
 from CCK_AN_TMP T, V_SFDAT  D ;
 
 PROMPT *** Create  grants  V_PF3800 ***
-grant SELECT                                                                 on V_PF3800        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PF3800        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PF3800        to START1;
-grant SELECT                                                                 on V_PF3800        to UPLD;
 
 
 

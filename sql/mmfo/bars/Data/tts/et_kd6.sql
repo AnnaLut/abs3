@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции KD6
-prompt Наименование операции: KD6 Сплата комісії готівкою за відкриття поточного рахунку
+prompt Наименование операции: Сплата комісії готівкою за відкриття поточного рахунку
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KD6', 'KD6 Сплата комісії готівкою за відкриття поточного рахунку', 1, '#(tobopack.GetTOBOParam(''CASH''))', 980, '#(nbs_ob22 (''6510'',''F0''))', 980, null, '#(tobopack.GetTOBOParam(''CASH''))', '#(nbs_ob22 (''6510'',''F0''))', null, 0, 0, 0, 0, null, null, 5, null, null, null, '0000100000000000000000000000000000010000000000000000000000000000', 'Сплата комісії готівкою за відкриття поточного рахунку');
+    values ('KD6', 'Сплата комісії готівкою за відкриття поточного рахунку', 1, '#(tobopack.GetTOBOParam(''CASH''))', 980, '#(nbs_ob22 (''6110'',''F0''))', 980, null, '#(tobopack.GetTOBOParam(''CASH''))', '#(nbs_ob22 (''6110'',''F0''))', null, 0, 0, 0, 0, null, null, 5, null, null, null, '0000100000000000000000000000000000010000000000000000000000000000', 'Сплата комісії готівкою за відкриття поточного рахунку');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KD6', name='KD6 Сплата комісії готівкою за відкриття поточного рахунку', dk=1, nlsm='#(tobopack.GetTOBOParam(''CASH''))', kv=980, nlsk='#(nbs_ob22 (''6510'',''F0''))', kvk=980, nlss=null, nlsa='#(tobopack.GetTOBOParam(''CASH''))', nlsb='#(nbs_ob22 (''6510'',''F0''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn='Сплата комісії готівкою за відкриття поточного рахунку'
+         set tt='KD6', name='Сплата комісії готівкою за відкриття поточного рахунку', dk=1, nlsm='#(tobopack.GetTOBOParam(''CASH''))', kv=980, nlsk='#(nbs_ob22 (''6110'',''F0''))', kvk=980, nlss=null, nlsa='#(tobopack.GetTOBOParam(''CASH''))', nlsb='#(nbs_ob22 (''6110'',''F0''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn='Сплата комісії готівкою за відкриття поточного рахунку'
        where tt='KD6';
   end;
   --------------------------------

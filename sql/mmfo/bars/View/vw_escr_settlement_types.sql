@@ -15,9 +15,7 @@ PROMPT *** Create  view VW_ESCR_SETTLEMENT_TYPES ***
   FROM adr_settlement_types t;
 
 PROMPT *** Create  grants  VW_ESCR_SETTLEMENT_TYPES ***
-grant SELECT                                                                 on VW_ESCR_SETTLEMENT_TYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_SETTLEMENT_TYPES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on VW_ESCR_SETTLEMENT_TYPES to UPLD;
 
 
 

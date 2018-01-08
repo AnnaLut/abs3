@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/CP_UCENKA.sql =========*** Run ***
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure CP_UCENKA ***
-
-  CREATE OR REPLACE PROCEDURE BARS.CP_UCENKA ( p_dat01 date ) IS
+CREATE OR REPLACE PROCEDURE BARS.cp_ucenka ( p_dat01 date ) IS 
 
 /*   Списание с капитала уценки по ЦБ, если есть резерв
      -----------------------------------------
@@ -23,12 +14,12 @@ begin
    l_rez_pay   := nvl(F_Get_Params('REZ_PAY', 0) ,0); -- Формирование  резерва по факту (1 - ФАКТ)
    if l_rez_pay = 1 THEN  l_pay := 1;   else  l_pay := 0;  end if;
 
-   for p in ( select nd,nvl(sum(rezb),0) from prvn_osaq
-              where  tip = 9 and  rezb <> 0 and
-                     nd in (select nd from nbu23_rez
+   for p in ( select nd,nvl(sum(rezb),0) from prvn_osaq    
+              where  tip = 9 and  rezb <> 0 and  
+                     nd in (select nd from nbu23_rez 
                             where fdat = p_dat01 and nbs in ('1405','1415','1435','3007','3015','3107','3115') and bv < 0)
               group by nd
-             )
+             ) 
    Loop
 
       begin
@@ -80,13 +71,6 @@ end;
 /
 show err;
 
-PROMPT *** Create  grants  CP_UCENKA ***
-grant EXECUTE                                                                on CP_UCENKA       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on CP_UCENKA       to RCC_DEAL;
-grant EXECUTE                                                                on CP_UCENKA       to START1;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/CP_UCENKA.sql =========*** End ***
-PROMPT ===================================================================================== 
+grant EXECUTE  on cp_ucenka to BARS_ACCESS_DEFROLE;
+grant EXECUTE  on cp_ucenka to RCC_DEAL;
+grant EXECUTE  on cp_ucenka to START1;

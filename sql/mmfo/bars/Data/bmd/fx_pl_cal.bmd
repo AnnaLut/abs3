@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Платіжний календар по всім Форекс-угодам';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'FX_PL_CAL';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,14 +119,14 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'B', 'D', 'Дата "З"', '', null, 10, 0, 0, 0, 0, '', '', 0, 0, 'Min (DAT)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DAT', 'D', 'Платіжна~дата', '', null, 1, 1, 1, 0, 0, '', '', 1, 1, 'Max (DAT)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Код~вал', '', null, 2, 1, 1, 0, 1, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'S', 'N', '* Сальдо~дня', '', null, 7, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'SA', 'N', '+ Сума~надходження', '', null, 5, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'SB', 'N', '- Сума~відправлення', '', null, 6, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'KA', 'N', '+ Кількість~надходжень', '', null, 7, 0, 0, 0, 0, '', '', 1, 0, 'Sum(KA)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'KB', 'N', '- Кількість~відправлень', '', null, 8, 0, 0, 0, 0, '', '', 1, 0, 'Sum(KB)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'B', 'D', 'Дата "З"', null, null, 10, 0, 0, 0, 0, '', '', 0, 0, 'Min (DAT)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DAT', 'D', 'Платіжна~дата', null, null, 1, 1, 1, 0, 0, '', '', 1, 1, 'Max (DAT)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Код~вал', null, null, 2, 1, 1, 0, 1, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'S', 'N', '* Сальдо~дня', null, null, 7, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'SA', 'N', '+ Сума~надходження', null, null, 5, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'SB', 'N', '- Сума~відправлення', null, null, 6, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'KA', 'N', '+ Кількість~надходжень', null, null, 7, 0, 0, 0, 0, '', '', 1, 0, 'Sum(KA)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'KB', 'N', '- Кількість~відправлень', null, null, 8, 0, 0, 0, 0, '', '', 1, 0, 'Sum(KB)', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('TABVAL');

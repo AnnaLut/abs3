@@ -93,10 +93,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_KORDATAF70_V20_NN ***
+PROMPT *** Create  constraint PK_KORDATAF70 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_KOR_DATA_F70 MODIFY (VAR_20 CONSTRAINT CC_KORDATAF70_V20_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_KOR_DATA_F70 ADD CONSTRAINT PK_KORDATAF70 PRIMARY KEY (REPORT_DATE, KF, VAR_10, VAR_63, VAR_71)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -129,12 +131,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_KORDATAF70 ***
+PROMPT *** Create  constraint CC_KORDATAF70_V20_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_KOR_DATA_F70 ADD CONSTRAINT PK_KORDATAF70 PRIMARY KEY (REPORT_DATE, KF, VAR_10, VAR_63, VAR_71)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.NBUR_KOR_DATA_F70 MODIFY (VAR_20 CONSTRAINT CC_KORDATAF70_V20_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -157,11 +157,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_KOR_DATA_F70 ***
-grant SELECT                                                                 on NBUR_KOR_DATA_F70 to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_KOR_DATA_F70 to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBUR_KOR_DATA_F70 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_KOR_DATA_F70 to RPBN002;
-grant SELECT                                                                 on NBUR_KOR_DATA_F70 to UPLD;
 
 
 

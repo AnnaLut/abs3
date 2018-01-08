@@ -107,10 +107,6 @@ COMMENT ON COLUMN BARS.ERR$_BPK_ACC_UPDATE.GLOBAL_BDATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_BPK_ACC_UPDATE ***
-grant SELECT                                                                 on ERR$_BPK_ACC_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_BPK_ACC_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

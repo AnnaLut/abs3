@@ -54,12 +54,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_PFUSYNCRUPROTOCOL ***
+PROMPT *** Create  constraint FK_PFUSYNCRUPROTOCOL_TRTYPE ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_SYNCRU_PROTOCOL ADD CONSTRAINT PK_PFUSYNCRUPROTOCOL PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGD  ENABLE';
+  ALTER TABLE PFU.PFU_SYNCRU_PROTOCOL ADD CONSTRAINT FK_PFUSYNCRUPROTOCOL_TRTYPE FOREIGN KEY (TRANSFER_TYPE)
+	  REFERENCES PFU.PFU_SYNCRU_TRANSTYPE (TRANSFER_TYPE) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -72,6 +71,20 @@ PROMPT *** Create  constraint CC_PFUSYNCRUPROT_TRDSTART_NN ***
 begin   
  execute immediate '
   ALTER TABLE PFU.PFU_SYNCRU_PROTOCOL ADD CONSTRAINT CC_PFUSYNCRUPROT_TRDSTART_NN CHECK (TRANSFER_DATE_START IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_PFUSYNCRUPROTOCOL ***
+begin   
+ execute immediate '
+  ALTER TABLE PFU.PFU_SYNCRU_PROTOCOL ADD CONSTRAINT PK_PFUSYNCRUPROTOCOL PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -108,9 +121,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  PFU_SYNCRU_PROTOCOL ***
-grant SELECT                                                                 on PFU_SYNCRU_PROTOCOL to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PFU_SYNCRU_PROTOCOL to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on PFU_SYNCRU_PROTOCOL to UPLD;
 
 
 

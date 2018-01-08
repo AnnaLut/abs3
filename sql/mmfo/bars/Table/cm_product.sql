@@ -67,6 +67,19 @@ COMMENT ON COLUMN BARS.CM_PRODUCT.MM_MAX IS 'Максимальное количество месяцев дей
 
 
 
+PROMPT *** Create  constraint FK_CMPRODUCT_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CM_PRODUCT ADD CONSTRAINT FK_CMPRODUCT_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_CMPRODUCT_KF_NN ***
 begin   
  execute immediate '
@@ -79,12 +92,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CM_PRODUCT ***
-grant SELECT                                                                 on CM_PRODUCT      to BARSREADER_ROLE;
 grant SELECT                                                                 on CM_PRODUCT      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CM_PRODUCT      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CM_PRODUCT      to CM_ACCESS_ROLE;
 grant SELECT                                                                 on CM_PRODUCT      to OW;
-grant SELECT                                                                 on CM_PRODUCT      to UPLD;
 
 
 

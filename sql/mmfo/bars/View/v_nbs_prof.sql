@@ -14,11 +14,9 @@ WHERE p.pr=v.pr and p.id=v.id
  ;
 
 PROMPT *** Create  grants  V_NBS_PROF ***
-grant SELECT                                                                 on V_NBS_PROF      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_NBS_PROF      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBS_PROF      to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_NBS_PROF      to START1;
-grant SELECT                                                                 on V_NBS_PROF      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_NBS_PROF      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_NBS_PROF      to WR_REFREAD;
 

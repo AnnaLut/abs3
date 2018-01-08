@@ -35,10 +35,8 @@ PROMPT *** Create  view V_COUNT_TT_FM ***
       having count (op.dk) >= 30);
 
 PROMPT *** Create  grants  V_COUNT_TT_FM ***
-grant SELECT                                                                 on V_COUNT_TT_FM   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_COUNT_TT_FM   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_COUNT_TT_FM   to CUST001;
-grant SELECT                                                                 on V_COUNT_TT_FM   to UPLD;
 
 
 

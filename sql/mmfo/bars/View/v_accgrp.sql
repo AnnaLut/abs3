@@ -13,10 +13,8 @@ from accounts a, table(sec.getAgrp(a.acc)) b
  ;
 
 PROMPT *** Create  grants  V_ACCGRP ***
-grant SELECT                                                                 on V_ACCGRP        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACCGRP        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ACCGRP        to START1;
-grant SELECT                                                                 on V_ACCGRP        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ACCGRP        to WR_ALL_RIGHTS;
 
 

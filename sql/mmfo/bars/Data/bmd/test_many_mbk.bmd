@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Грошовi потоки по МБК';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'TEST_MANY_MBK';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,12 +119,12 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'FDAT', 'D', 'Дата руху ~коштiв ~ гр.А', '', null, 1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ND', 'N', 'Реф.в АБС~угоди МБК ~ гр.Б', '', null, 0, 0, 1, 0, 0, '', '', 0, 0, 'Count(*)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'S/100', 'N', 'Сума боргу~основногo ~ гр.1', '', null, 2, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(S) / 100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'S1/100', 'N', 'Сума боргу~за вiдсотками ~ гр.2', '', null, 3, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(S1) / 100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'SK/100', 'N', 'Сума для~розрахунку~гр.3 = (гр.1 +гр.2) х (1-К)', '', null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'SR/100', 'N', 'Сума для~розрахунку PV~ гр.4 = гр.3 / (1+I)*~(эф.)', '', null, 5, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(SR) / 100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'FDAT', 'D', 'Дата руху ~коштiв ~ гр.А', null, null, 1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ND', 'N', 'Реф.в АБС~угоди МБК ~ гр.Б', null, null, 0, 0, 1, 0, 0, '', '', 0, 0, 'Count(*)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'S/100', 'N', 'Сума боргу~основногo ~ гр.1', null, null, 2, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(S) / 100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'S1/100', 'N', 'Сума боргу~за вiдсотками ~ гр.2', null, null, 3, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(S1) / 100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'SK/100', 'N', 'Сума для~розрахунку~гр.3 = (гр.1 +гр.2) х (1-К)', null, null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'SR/100', 'N', 'Сума для~розрахунку PV~ гр.4 = гр.3 / (1+I)*~(эф.)', null, null, 5, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(SR) / 100', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 2, 'ASC ');

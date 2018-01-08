@@ -93,9 +93,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CRNV_QUE ***
-grant SELECT                                                                 on CRNV_QUE        to BARSREADER_ROLE;
 grant SELECT                                                                 on CRNV_QUE        to BARS_DM;
-grant SELECT                                                                 on CRNV_QUE        to UPLD;
 
 
 

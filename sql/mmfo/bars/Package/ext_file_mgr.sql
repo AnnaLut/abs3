@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ext_file_mgr.sql =========*** Run **
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.EXT_FILE_MGR is
+create or replace package ext_file_mgr is
 
     function list_folders(
         p_folder_path in varchar2,
@@ -65,10 +59,75 @@
         p_file_path in varchar2);
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.EXT_FILE_MGR as
+create or replace package body ext_file_mgr as
 
     g_service_name constant varchar2(30 char) := 'ExternalFileManager.asmx';
     g_service_namespace constant varchar2(30 char) := 'http://ws.unity-bars.com.ua/';
+
+    function encode_base64(
+        p_blob in blob)
+    return clob
+    is
+        l_clob clob;
+        l_result clob;
+        l_offset integer;
+        l_chunk_size binary_integer := (48 / 4) * 3;
+        l_buffer_varchar varchar2(48);
+        l_buffer_raw raw(48);
+    begin
+        if (p_blob is null) then
+            return null;
+        end if;
+
+        dbms_lob.createtemporary(l_clob, true);
+
+        l_offset := 1;
+        for i in 1 .. ceil(dbms_lob.getlength(p_blob) / l_chunk_size) loop
+            dbms_lob.read(p_blob, l_chunk_size, l_offset, l_buffer_raw);
+            l_buffer_raw := utl_encode.base64_encode(l_buffer_raw);
+            l_buffer_varchar := utl_raw.cast_to_varchar2(l_buffer_raw);
+            dbms_lob.writeappend(l_clob, length(l_buffer_varchar), l_buffer_varchar);
+            l_offset := l_offset + l_chunk_size;
+        end loop;
+
+        l_result := l_clob;
+        dbms_lob.freetemporary(l_clob);
+
+        return l_result;
+    end;
+
+
+    function decode_base64(
+        p_clob_in in clob)
+    return blob
+    is
+        l_blob blob;
+        l_result blob;
+        l_offset integer;
+        l_buffer_size binary_integer := 48;
+        l_buffer_varchar varchar2(48);
+        l_buffer_raw raw(48);
+    begin
+        if p_clob_in is null then
+            return null;
+        end if;
+
+        dbms_lob.createtemporary(l_blob, true);
+        l_offset := 1;
+
+        for i in 1 .. ceil(dbms_lob.getlength(p_clob_in) / l_buffer_size) loop
+            dbms_lob.read(p_clob_in, l_buffer_size, l_offset, l_buffer_varchar);
+            l_buffer_raw := utl_raw.cast_to_raw(l_buffer_varchar);
+            l_buffer_raw := utl_encode.base64_decode(l_buffer_raw);
+            dbms_lob.writeappend(l_blob, utl_raw.length(l_buffer_raw), l_buffer_raw);
+            l_offset := l_offset + l_buffer_size;
+        end loop;
+
+        l_result := l_blob;
+        dbms_lob.freetemporary(l_blob);
+
+        return l_result;
+    end;
 
     function list_folders(
         p_folder_path in varchar2,
@@ -248,7 +307,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EXT_FILE_MGR as
 
                 l_base64_clob := l_xml.extract('/GetFileResponse/GetFileResult/FileBody/text()').GetClobVal();
 
-                l_compressed_blob := lob_utl.decode_base64(l_base64_clob);
+                l_compressed_blob := decode_base64(l_base64_clob);
 
                 l_file_body := utl_compress.lz_uncompress(l_compressed_blob);
             else
@@ -355,7 +414,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EXT_FILE_MGR as
 
         dbms_lob.createtemporary(l_compressed_blob, false);
         utl_compress.lz_compress(p_file, l_compressed_blob);
-        l_base64_clob := lob_utl.encode_base64(l_compressed_blob);
+        l_base64_clob := encode_base64(l_compressed_blob);
 
         wsm_mgr.add_parameter(p_name => 'FileBody', p_value => l_base64_clob);
         wsm_mgr.add_parameter(p_name => 'FilePath', p_value => p_file_path);
@@ -431,7 +490,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.EXT_FILE_MGR as
 
     procedure append_file_text(
         p_file in clob,
-
         p_file_path in varchar2,
         p_overwrite in integer default 1)
     is
@@ -501,14 +559,3 @@ CREATE OR REPLACE PACKAGE BODY BARS.EXT_FILE_MGR as
     end;
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  EXT_FILE_MGR ***
-grant EXECUTE                                                                on EXT_FILE_MGR    to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/ext_file_mgr.sql =========*** End **
- PROMPT ===================================================================================== 
- 

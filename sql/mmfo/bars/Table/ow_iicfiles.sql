@@ -91,6 +91,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OWIICFILES_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_IICFILES ADD CONSTRAINT FK_OWIICFILES_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OWIICFILES_FILENAME_NN ***
 begin   
  execute immediate '
@@ -129,11 +142,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_IICFILES ***
-grant SELECT                                                                 on OW_IICFILES     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_IICFILES     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_IICFILES     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_IICFILES     to OW;
-grant SELECT                                                                 on OW_IICFILES     to UPLD;
 
 
 

@@ -84,12 +84,11 @@ COMMENT ON COLUMN BARS.OPER_VISA.PASSIVE_REASONID IS 'Код причины отката визы';
 
 
 
-PROMPT *** Create  constraint PK_OPERVISA ***
+PROMPT *** Create  constraint FK_OPERVISA_CHKLIST ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPER_VISA ADD CONSTRAINT PK_OPERVISA PRIMARY KEY (SQNC)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.OPER_VISA ADD CONSTRAINT FK_OPERVISA_CHKLIST FOREIGN KEY (GROUPID)
+	  REFERENCES BARS.CHKLIST (IDCHK) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -98,10 +97,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OPERVISA_PASSIVE ***
+PROMPT *** Create  constraint FK_OPERVISA_KF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPER_VISA ADD CONSTRAINT CC_OPERVISA_PASSIVE CHECK (passive = 1) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.OPER_VISA ADD CONSTRAINT FK_OPERVISA_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -110,58 +110,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OPERVISA_REF_NN ***
+PROMPT *** Create  constraint CC_OPERVISA_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPER_VISA MODIFY (REF CONSTRAINT CC_OPERVISA_REF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPERVISA_DAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPER_VISA MODIFY (DAT CONSTRAINT CC_OPERVISA_DAT_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPERVISA_USERID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPER_VISA MODIFY (USERID CONSTRAINT CC_OPERVISA_USERID_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPERVISA_STATUS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPER_VISA MODIFY (STATUS CONSTRAINT CC_OPERVISA_STATUS_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPERVISA_SQNC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPER_VISA MODIFY (SQNC CONSTRAINT CC_OPERVISA_SQNC_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.OPER_VISA MODIFY (KF CONSTRAINT CC_OPERVISA_KF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -182,10 +134,123 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OPERVISA_KF_NN ***
+PROMPT *** Create  constraint CC_OPERVISA_SQNC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPER_VISA MODIFY (KF CONSTRAINT CC_OPERVISA_KF_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.OPER_VISA MODIFY (SQNC CONSTRAINT CC_OPERVISA_SQNC_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OPERVISA_STATUS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPER_VISA MODIFY (STATUS CONSTRAINT CC_OPERVISA_STATUS_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OPERVISA_USERID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPER_VISA MODIFY (USERID CONSTRAINT CC_OPERVISA_USERID_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OPERVISA_DAT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPER_VISA MODIFY (DAT CONSTRAINT CC_OPERVISA_DAT_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OPERVISA_REF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPER_VISA MODIFY (REF CONSTRAINT CC_OPERVISA_REF_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OPERVISA_PASSIVE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPER_VISA ADD CONSTRAINT CC_OPERVISA_PASSIVE CHECK (passive = 1) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_OPERVISA ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPER_VISA ADD CONSTRAINT PK_OPERVISA PRIMARY KEY (SQNC)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OPERVISA_STAFF$BASE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPER_VISA ADD CONSTRAINT FK_OPERVISA_STAFF$BASE FOREIGN KEY (USERID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OPERVISA_INCHARGELIST ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPER_VISA ADD CONSTRAINT FK_OPERVISA_INCHARGELIST FOREIGN KEY (F_IN_CHARGE)
+	  REFERENCES BARS.IN_CHARGE_LIST (IN_CHARGE) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OPERVISA_BPREASON ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPER_VISA ADD CONSTRAINT FK_OPERVISA_BPREASON FOREIGN KEY (PASSIVE_REASONID)
+	  REFERENCES BARS.BP_REASON (ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -224,7 +289,6 @@ exception when others then
 PROMPT *** Create  grants  OPER_VISA ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPER_VISA       to ABS_ADMIN;
 grant FLASHBACK,REFERENCES,SELECT                                            on OPER_VISA       to BARSAQ with grant option;
-grant SELECT                                                                 on OPER_VISA       to BARSREADER_ROLE;
 grant SELECT                                                                 on OPER_VISA       to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPER_VISA       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OPER_VISA       to BARS_DM;

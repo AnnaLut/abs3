@@ -44,10 +44,6 @@ COMMENT ON COLUMN BARS.NOTPORTFOLIO_KD888.NBS IS '';
 
 
 
-PROMPT *** Create  grants  NOTPORTFOLIO_KD888 ***
-grant SELECT                                                                 on NOTPORTFOLIO_KD888 to BARSREADER_ROLE;
-grant SELECT                                                                 on NOTPORTFOLIO_KD888 to UPLD;
-
 
 
 PROMPT ===================================================================================== 

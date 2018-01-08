@@ -43,10 +43,8 @@ PROMPT *** Create  view V_PER_NLY ***
   ;
 
 PROMPT *** Create  grants  V_PER_NLY ***
-grant SELECT                                                                 on V_PER_NLY       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,SELECT                                                on V_PER_NLY       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PER_NLY       to RCC_DEAL;
-grant SELECT                                                                 on V_PER_NLY       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_PER_NLY       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_PER_NLY       to WR_REFREAD;
 

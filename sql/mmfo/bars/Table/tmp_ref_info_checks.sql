@@ -69,10 +69,8 @@ COMMENT ON COLUMN BARS.TMP_REF_INFO_CHECKS.R_TYPE IS '';
 
 
 PROMPT *** Create  grants  TMP_REF_INFO_CHECKS ***
-grant SELECT                                                                 on TMP_REF_INFO_CHECKS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_REF_INFO_CHECKS to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_REF_INFO_CHECKS to START1;
-grant SELECT                                                                 on TMP_REF_INFO_CHECKS to UPLD;
 
 
 

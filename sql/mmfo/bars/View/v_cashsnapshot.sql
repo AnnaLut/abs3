@@ -19,11 +19,9 @@ PROMPT *** Create  view V_CASHSNAPSHOT ***
  ;
 
 PROMPT *** Create  grants  V_CASHSNAPSHOT ***
-grant SELECT                                                                 on V_CASHSNAPSHOT  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CASHSNAPSHOT  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CASHSNAPSHOT  to OPER000;
 grant SELECT                                                                 on V_CASHSNAPSHOT  to RPBN001;
-grant SELECT                                                                 on V_CASHSNAPSHOT  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CASHSNAPSHOT  to WR_ALL_RIGHTS;
 
 

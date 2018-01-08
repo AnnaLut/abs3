@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_xmlklb.sql =========*** Run ***
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.BARS_XMLKLB is
+CREATE OR REPLACE package BARS.bars_xmlklb  is
 
 --***************************************************************--
 --                         XML - gate
@@ -772,7 +772,7 @@
 
 END;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB is
+CREATE OR REPLACE package body BARS.bars_xmlklb is
 
    ---------------------------------------------------------
    --

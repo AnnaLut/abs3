@@ -79,9 +79,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CREATE$JAVA$LOB$TABLE ***
-grant SELECT                                                                 on CREATE$JAVA$LOB$TABLE to BARSREADER_ROLE;
 grant SELECT                                                                 on CREATE$JAVA$LOB$TABLE to BARS_DM;
-grant SELECT                                                                 on CREATE$JAVA$LOB$TABLE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CREATE$JAVA$LOB$TABLE to WR_ALL_RIGHTS;
 
 

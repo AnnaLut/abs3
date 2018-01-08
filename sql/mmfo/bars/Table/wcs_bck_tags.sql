@@ -55,6 +55,19 @@ COMMENT ON COLUMN BARS.WCS_BCK_TAGS.TAG_MANDATORY IS 'обязательность поля';
 
 
 
+PROMPT *** Create  constraint FK_WCSBCKTAGS_WCSBCKXMLBLK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_BCK_TAGS ADD CONSTRAINT FK_WCSBCKTAGS_WCSBCKXMLBLK FOREIGN KEY (TAG_BLOCK)
+	  REFERENCES BARS.WCS_BCK_XMLBLOCKS (BLOCK_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_WCSBCKTAGS_TAGDBLOCK_NN ***
 begin   
  execute immediate '
@@ -119,11 +132,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_BCK_TAGS ***
-grant SELECT                                                                 on WCS_BCK_TAGS    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_BCK_TAGS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_BCK_TAGS    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_BCK_TAGS    to START1;
-grant SELECT                                                                 on WCS_BCK_TAGS    to UPLD;
 
 
 

@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure AUTO_CLOSE_ACCOUNTS ***
 
-  CREATE OR REPLACE PROCEDURE BARS.AUTO_CLOSE_ACCOUNTS 
+CREATE OR REPLACE PROCEDURE BARS.auto_close_accounts
 ( p_numb number
 )
   is

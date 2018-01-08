@@ -49,10 +49,8 @@ COMMENT ON COLUMN BARS.T383.NLS IS '';
 
 
 PROMPT *** Create  grants  T383 ***
-grant SELECT                                                                 on T383            to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on T383            to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on T383            to START1;
-grant SELECT                                                                 on T383            to UPLD;
 
 
 

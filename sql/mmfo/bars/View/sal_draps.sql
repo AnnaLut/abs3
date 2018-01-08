@@ -35,10 +35,6 @@ PROMPT *** Create  view SAL_DRAPS ***
      FROM accounts a, snap_balances s
     WHERE a.acc = s.acc;
 
-PROMPT *** Create  grants  SAL_DRAPS ***
-grant SELECT                                                                 on SAL_DRAPS       to BARSREADER_ROLE;
-grant SELECT                                                                 on SAL_DRAPS       to UPLD;
-
 
 
 PROMPT ===================================================================================== 

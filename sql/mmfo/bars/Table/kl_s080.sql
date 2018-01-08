@@ -61,7 +61,6 @@ COMMENT ON COLUMN BARS.KL_S080.DATA_M IS '';
 
 
 PROMPT *** Create  grants  KL_S080 ***
-grant SELECT                                                                 on KL_S080         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_S080         to BARSUPL;
 grant SELECT                                                                 on KL_S080         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_S080         to BARS_DM;

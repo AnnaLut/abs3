@@ -18,9 +18,7 @@ PROMPT *** Create  view V_CIM_BORG_MESSAGE ***
     WHERE b.branch = m.branch AND c.rnk = m.rnk AND m.delete_date IS NULL;
 
 PROMPT *** Create  grants  V_CIM_BORG_MESSAGE ***
-grant SELECT                                                                 on V_CIM_BORG_MESSAGE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_BORG_MESSAGE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_BORG_MESSAGE to UPLD;
 
 
 

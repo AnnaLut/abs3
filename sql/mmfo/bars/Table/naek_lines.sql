@@ -121,300 +121,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_NAEKLINES ***
+PROMPT *** Create  constraint CC_NAEKLINES_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NAEK_LINES ADD CONSTRAINT PK_NAEKLINES PRIMARY KEY (KF, FILE_YEAR, FILE_NAME, LINE_NO)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_FILEYEAR_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (FILE_YEAR CONSTRAINT CC_NAEKLINES_FILEYEAR_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_FILENAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (FILE_NAME CONSTRAINT CC_NAEKLINES_FILENAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_LINENO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (LINE_NO CONSTRAINT CC_NAEKLINES_LINENO_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_VISAFLAG_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (VISA_FLAG CONSTRAINT CC_NAEKLINES_VISAFLAG_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_DOCNUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (DOC_NUM CONSTRAINT CC_NAEKLINES_DOCNUM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_DOCDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (DOC_DATE CONSTRAINT CC_NAEKLINES_DOCDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_DOCVDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (DOC_VALUE_DATE CONSTRAINT CC_NAEKLINES_DOCVDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_PAYERNAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYER_NAME CONSTRAINT CC_NAEKLINES_PAYERNAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_PAYERID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYER_ID CONSTRAINT CC_NAEKLINES_PAYERID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_PAYERBN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYER_BANK_NAME CONSTRAINT CC_NAEKLINES_PAYERBN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_PAYERBC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYER_BANK_CODE CONSTRAINT CC_NAEKLINES_PAYERBC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_PAYERACC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYER_ACCOUNT CONSTRAINT CC_NAEKLINES_PAYERACC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_PAYEENAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYEE_NAME CONSTRAINT CC_NAEKLINES_PAYEENAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_PAYEEID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYEE_ID CONSTRAINT CC_NAEKLINES_PAYEEID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_PAYEEBN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYEE_BANK_NAME CONSTRAINT CC_NAEKLINES_PAYEEBN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_PAYEEBC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYEE_BANK_CODE CONSTRAINT CC_NAEKLINES_PAYEEBC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_PAYEEACC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYEE_ACCOUNT CONSTRAINT CC_NAEKLINES_PAYEEACC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_CURRENCY_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (CURRENCY CONSTRAINT CC_NAEKLINES_CURRENCY_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_SUMMA_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (SUMMA CONSTRAINT CC_NAEKLINES_SUMMA_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_CURRATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (CURRENCY_RATE CONSTRAINT CC_NAEKLINES_CURRATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_NARRATIVE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (NARRATIVE CONSTRAINT CC_NAEKLINES_NARRATIVE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_DK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (DK CONSTRAINT CC_NAEKLINES_DK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_REF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (REF CONSTRAINT CC_NAEKLINES_REF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NAEKLINES_ORD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (ORD CONSTRAINT CC_NAEKLINES_ORD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NAEK_LINES MODIFY (KF CONSTRAINT CC_NAEKLINES_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -435,10 +145,378 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_NAEKLINES_KF_NN ***
+PROMPT *** Create  constraint CC_NAEKLINES_ORD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NAEK_LINES MODIFY (KF CONSTRAINT CC_NAEKLINES_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NAEK_LINES MODIFY (ORD CONSTRAINT CC_NAEKLINES_ORD_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_REF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (REF CONSTRAINT CC_NAEKLINES_REF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_DK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (DK CONSTRAINT CC_NAEKLINES_DK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_NARRATIVE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (NARRATIVE CONSTRAINT CC_NAEKLINES_NARRATIVE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_CURRATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (CURRENCY_RATE CONSTRAINT CC_NAEKLINES_CURRATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_SUMMA_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (SUMMA CONSTRAINT CC_NAEKLINES_SUMMA_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_CURRENCY_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (CURRENCY CONSTRAINT CC_NAEKLINES_CURRENCY_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_PAYEEACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYEE_ACCOUNT CONSTRAINT CC_NAEKLINES_PAYEEACC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_PAYEEBC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYEE_BANK_CODE CONSTRAINT CC_NAEKLINES_PAYEEBC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_PAYEEBN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYEE_BANK_NAME CONSTRAINT CC_NAEKLINES_PAYEEBN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_PAYEEID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYEE_ID CONSTRAINT CC_NAEKLINES_PAYEEID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_PAYEENAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYEE_NAME CONSTRAINT CC_NAEKLINES_PAYEENAME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_PAYERACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYER_ACCOUNT CONSTRAINT CC_NAEKLINES_PAYERACC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_PAYERBC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYER_BANK_CODE CONSTRAINT CC_NAEKLINES_PAYERBC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_PAYERBN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYER_BANK_NAME CONSTRAINT CC_NAEKLINES_PAYERBN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_PAYERID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYER_ID CONSTRAINT CC_NAEKLINES_PAYERID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_PAYERNAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (PAYER_NAME CONSTRAINT CC_NAEKLINES_PAYERNAME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_DOCVDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (DOC_VALUE_DATE CONSTRAINT CC_NAEKLINES_DOCVDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_DOCDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (DOC_DATE CONSTRAINT CC_NAEKLINES_DOCDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_DOCNUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (DOC_NUM CONSTRAINT CC_NAEKLINES_DOCNUM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_VISAFLAG_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (VISA_FLAG CONSTRAINT CC_NAEKLINES_VISAFLAG_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_LINENO_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (LINE_NO CONSTRAINT CC_NAEKLINES_LINENO_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_FILENAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (FILE_NAME CONSTRAINT CC_NAEKLINES_FILENAME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_NAEKLINES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES ADD CONSTRAINT PK_NAEKLINES PRIMARY KEY (KF, FILE_YEAR, FILE_NAME, LINE_NO)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_NAEKLINES_DK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES ADD CONSTRAINT FK_NAEKLINES_DK FOREIGN KEY (DK)
+	  REFERENCES BARS.DK (DK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_NAEKLINES_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES ADD CONSTRAINT FK_NAEKLINES_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_NAEKLINES_NAEKHEADERS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES ADD CONSTRAINT FK_NAEKLINES_NAEKHEADERS FOREIGN KEY (KF, FILE_YEAR, FILE_NAME)
+	  REFERENCES BARS.NAEK_HEADERS (KF, FILE_YEAR, FILE_NAME) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_NAEKLINES_BANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES ADD CONSTRAINT FK_NAEKLINES_BANKS FOREIGN KEY (PAYER_BANK_CODE)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_NAEKLINES_BANKS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES ADD CONSTRAINT FK_NAEKLINES_BANKS2 FOREIGN KEY (PAYEE_BANK_CODE)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_NAEKLINES_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES ADD CONSTRAINT FK_NAEKLINES_TABVAL FOREIGN KEY (CURRENCY)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NAEKLINES_FILEYEAR_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_LINES MODIFY (FILE_YEAR CONSTRAINT CC_NAEKLINES_FILEYEAR_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -475,9 +553,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NAEK_LINES ***
-grant SELECT                                                                 on NAEK_LINES      to BARSREADER_ROLE;
 grant SELECT                                                                 on NAEK_LINES      to BARS_DM;
-grant SELECT                                                                 on NAEK_LINES      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NAEK_LINES      to WR_ALL_RIGHTS;
 
 

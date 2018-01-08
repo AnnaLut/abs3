@@ -36,9 +36,7 @@ PROMPT *** Create  view V_SEC_AUDIT_UI ***
    ORDER BY rec_id DESC;
 
 PROMPT *** Create  grants  V_SEC_AUDIT_UI ***
-grant SELECT                                                                 on V_SEC_AUDIT_UI  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SEC_AUDIT_UI  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_SEC_AUDIT_UI  to UPLD;
 
 
 

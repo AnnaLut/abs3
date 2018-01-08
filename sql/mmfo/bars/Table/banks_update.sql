@@ -97,6 +97,45 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_BANKSUPD_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BANKS_UPDATE ADD CONSTRAINT FK_BANKSUPD_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_BANKSUPD_BANKSUPDHDR2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BANKS_UPDATE ADD CONSTRAINT FK_BANKSUPD_BANKSUPDHDR2 FOREIGN KEY (KF, HEADER)
+	  REFERENCES BARS.BANKS_UPDATE_HDR (KF, ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_BNKUPDHD_BNKUPD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BANKS_UPDATE ADD CONSTRAINT R_BNKUPDHD_BNKUPD FOREIGN KEY (HEADER)
+	  REFERENCES BARS.BANKS_UPDATE_HDR (ID) ON DELETE CASCADE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_BANKSUPD_HEADER_NN ***
 begin   
  execute immediate '
@@ -109,10 +148,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BANKSUPD_ORD_NN ***
+PROMPT *** Create  constraint CC_BANKSUPD_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BANKS_UPDATE MODIFY (ORD CONSTRAINT CC_BANKSUPD_ORD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BANKS_UPDATE MODIFY (KF CONSTRAINT CC_BANKSUPD_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -121,10 +160,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BANKSUPD_KF_NN ***
+PROMPT *** Create  constraint CC_BANKSUPD_ORD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BANKS_UPDATE MODIFY (KF CONSTRAINT CC_BANKSUPD_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BANKS_UPDATE MODIFY (ORD CONSTRAINT CC_BANKSUPD_ORD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -148,13 +187,11 @@ exception when others then
 
 PROMPT *** Create  grants  BANKS_UPDATE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANKS_UPDATE    to ABS_ADMIN;
-grant SELECT                                                                 on BANKS_UPDATE    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANKS_UPDATE    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BANKS_UPDATE    to BARS_DM;
 grant SELECT                                                                 on BANKS_UPDATE    to START1;
 grant INSERT                                                                 on BANKS_UPDATE    to TECH020;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANKS_UPDATE    to TOSS;
-grant SELECT                                                                 on BANKS_UPDATE    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BANKS_UPDATE    to WR_ALL_RIGHTS;
 
 

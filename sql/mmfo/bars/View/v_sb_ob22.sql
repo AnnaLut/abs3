@@ -13,10 +13,8 @@ PROMPT *** Create  view V_SB_OB22 ***
 ;
 
 PROMPT *** Create  grants  V_SB_OB22 ***
-grant SELECT                                                                 on V_SB_OB22       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SB_OB22       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SB_OB22       to START1;
-grant SELECT                                                                 on V_SB_OB22       to UPLD;
 
 
 

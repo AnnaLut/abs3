@@ -65,6 +65,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_STAFFTABN_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF_TABN ADD CONSTRAINT FK_STAFFTABN_STAFF FOREIGN KEY (ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STAFFTABN_STAFF2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF_TABN ADD CONSTRAINT FK_STAFFTABN_STAFF2 FOREIGN KEY (GRANTOR)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_STAFFTABN_ID_NN ***
 begin   
  execute immediate '
@@ -92,10 +118,8 @@ exception when others then
 
 PROMPT *** Create  grants  STAFF_TABN ***
 grant SELECT                                                                 on STAFF_TABN      to ABS_ADMIN;
-grant SELECT                                                                 on STAFF_TABN      to BARSREADER_ROLE;
 grant SELECT                                                                 on STAFF_TABN      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF_TABN      to BARS_DM;
-grant SELECT                                                                 on STAFF_TABN      to UPLD;
 
 
 

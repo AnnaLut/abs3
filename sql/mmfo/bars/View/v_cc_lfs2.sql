@@ -15,10 +15,8 @@ PROMPT *** Create  view V_CC_LFS2 ***
    and j.kv = l.kv;
 
 PROMPT *** Create  grants  V_CC_LFS2 ***
-grant SELECT                                                                 on V_CC_LFS2       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CC_LFS2       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CC_LFS2       to RCC_DEAL;
-grant SELECT                                                                 on V_CC_LFS2       to UPLD;
 
 
 

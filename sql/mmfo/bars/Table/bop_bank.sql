@@ -55,9 +55,7 @@ COMMENT ON COLUMN BARS.BOP_BANK.EDKPO IS '';
 
 
 PROMPT *** Create  grants  BOP_BANK ***
-grant SELECT                                                                 on BOP_BANK        to BARSREADER_ROLE;
 grant SELECT                                                                 on BOP_BANK        to BARS_DM;
-grant SELECT                                                                 on BOP_BANK        to UPLD;
 
 
 

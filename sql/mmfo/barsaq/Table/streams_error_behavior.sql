@@ -92,10 +92,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_STREAMSERRORBHR_ERRNUM_NN ***
+PROMPT *** Create  constraint CC_STREAMSERRORBHR_ENP_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.STREAMS_ERROR_BEHAVIOR MODIFY (ERROR_NUMBER CONSTRAINT CC_STREAMSERRORBHR_ERRNUM_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.STREAMS_ERROR_BEHAVIOR MODIFY (ENABLED_PERIOD CONSTRAINT CC_STREAMSERRORBHR_ENP_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -152,10 +152,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_STREAMSERRORBHR_ENP_NN ***
+PROMPT *** Create  constraint CC_STREAMSERRORBHR_ERRNUM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.STREAMS_ERROR_BEHAVIOR MODIFY (ENABLED_PERIOD CONSTRAINT CC_STREAMSERRORBHR_ENP_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.STREAMS_ERROR_BEHAVIOR MODIFY (ERROR_NUMBER CONSTRAINT CC_STREAMSERRORBHR_ERRNUM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -176,9 +176,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  STREAMS_ERROR_BEHAVIOR ***
-grant SELECT                                                                 on STREAMS_ERROR_BEHAVIOR to BARSREADER_ROLE;
 
 
 

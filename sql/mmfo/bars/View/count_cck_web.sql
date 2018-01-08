@@ -27,10 +27,8 @@ PROMPT *** Create  view COUNT_CCK_WEB ***
    ORDER BY pr, prs, kv;
 
 PROMPT *** Create  grants  COUNT_CCK_WEB ***
-grant SELECT                                                                 on COUNT_CCK_WEB   to BARSREADER_ROLE;
 grant SELECT                                                                 on COUNT_CCK_WEB   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on COUNT_CCK_WEB   to START1;
-grant SELECT                                                                 on COUNT_CCK_WEB   to UPLD;
 
 
 

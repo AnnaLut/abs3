@@ -36,9 +36,7 @@ where a.idchk=c.chkid
 
 PROMPT *** Create  grants  V_USERADM_USER_CHKGRPS ***
 grant SELECT                                                                 on V_USERADM_USER_CHKGRPS to ABS_ADMIN;
-grant SELECT                                                                 on V_USERADM_USER_CHKGRPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USERADM_USER_CHKGRPS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_USERADM_USER_CHKGRPS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USERADM_USER_CHKGRPS to WR_ALL_RIGHTS;
 
 

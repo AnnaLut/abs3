@@ -56,9 +56,7 @@ PROMPT *** Create  view V_CUSTOMER_ACTIVE ***
  WHERE t.date_off IS NULL;
 
 PROMPT *** Create  grants  V_CUSTOMER_ACTIVE ***
-grant SELECT                                                                 on V_CUSTOMER_ACTIVE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTOMER_ACTIVE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CUSTOMER_ACTIVE to UPLD;
 
 
 

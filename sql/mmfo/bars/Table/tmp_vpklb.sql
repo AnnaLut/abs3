@@ -109,9 +109,7 @@ COMMENT ON COLUMN BARS.TMP_VPKLB.BRANCH IS '';
 
 
 PROMPT *** Create  grants  TMP_VPKLB ***
-grant SELECT                                                                 on TMP_VPKLB       to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_VPKLB       to KLBX;
-grant SELECT                                                                 on TMP_VPKLB       to UPLD;
 
 
 

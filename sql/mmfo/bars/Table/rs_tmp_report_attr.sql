@@ -65,6 +65,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_RS_TMP_REPORT_ATTR_SID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.RS_TMP_REPORT_ATTR ADD CONSTRAINT FK_RS_TMP_REPORT_ATTR_SID FOREIGN KEY (SESSION_ID)
+	  REFERENCES BARS.RS_TMP_SESSION_DATA (SESSION_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_RS_TMP_REPORT_ATTR_ATTR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.RS_TMP_REPORT_ATTR ADD CONSTRAINT FK_RS_TMP_REPORT_ATTR_ATTR FOREIGN KEY (ATTR_NAME)
+	  REFERENCES BARS.ZAPROS_ATTR (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_RS_TMP_REPORT_ATTR_NAME_NN ***
 begin   
  execute immediate '
@@ -91,11 +117,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  RS_TMP_REPORT_ATTR ***
-grant SELECT                                                                 on RS_TMP_REPORT_ATTR to BARSREADER_ROLE;
 grant SELECT                                                                 on RS_TMP_REPORT_ATTR to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RS_TMP_REPORT_ATTR to BARS_DM;
 grant SELECT                                                                 on RS_TMP_REPORT_ATTR to RS;
-grant SELECT                                                                 on RS_TMP_REPORT_ATTR to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RS_TMP_REPORT_ATTR to WR_ALL_RIGHTS;
 
 

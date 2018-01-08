@@ -46,6 +46,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_UPLCONSCOLUMNS_FILEID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_CONS_COLUMNS ADD CONSTRAINT FK_UPLCONSCOLUMNS_FILEID FOREIGN KEY (FILE_ID, CONSTR_NAME)
+	  REFERENCES BARSUPL.UPL_CONSTRAINTS (FILE_ID, CONSTR_NAME) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_UPLCONSCOLUMNS_FILEIDCOLN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_CONS_COLUMNS ADD CONSTRAINT FK_UPLCONSCOLUMNS_FILEIDCOLN FOREIGN KEY (FILE_ID, FK_COLNAME)
+	  REFERENCES BARSUPL.UPL_COLUMNS (FILE_ID, COL_NAME) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_UPLCONSCOLUMNS ***
 begin   
  execute immediate '
@@ -58,10 +84,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  UPL_CONS_COLUMNS ***
-grant SELECT                                                                 on UPL_CONS_COLUMNS to BARSREADER_ROLE;
-grant SELECT                                                                 on UPL_CONS_COLUMNS to UPLD;
 
 
 

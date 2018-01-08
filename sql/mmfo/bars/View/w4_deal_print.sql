@@ -84,9 +84,7 @@ PROMPT *** Create  view W4_DEAL_PRINT ***
                          SYS_CONTEXT ('bars_context', 'user_branch_mask'));
 
 PROMPT *** Create  grants  W4_DEAL_PRINT ***
-grant SELECT                                                                 on W4_DEAL_PRINT   to BARSREADER_ROLE;
 grant SELECT                                                                 on W4_DEAL_PRINT   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on W4_DEAL_PRINT   to UPLD;
 
 
 

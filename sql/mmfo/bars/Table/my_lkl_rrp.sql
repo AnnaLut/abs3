@@ -113,10 +113,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  MY_LKL_RRP ***
-grant SELECT                                                                 on MY_LKL_RRP      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MY_LKL_RRP      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MY_LKL_RRP      to START1;
-grant SELECT                                                                 on MY_LKL_RRP      to UPLD;
 
 
 

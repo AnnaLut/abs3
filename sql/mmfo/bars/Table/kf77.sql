@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''KF77'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''KF77'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''KF77'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''KF77'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -47,6 +47,19 @@ COMMENT ON TABLE BARS.KF77 IS 'Контрагенти ФО, якi НЕ будуть виключенi до Фонду 
 COMMENT ON COLUMN BARS.KF77.KF IS '';
 COMMENT ON COLUMN BARS.KF77.RNK IS '';
 COMMENT ON COLUMN BARS.KF77.NMK IS '';
+
+
+
+
+PROMPT *** Create  constraint FK_KF77_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KF77 ADD CONSTRAINT FK_KF77_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 
@@ -104,7 +117,6 @@ exception when others then
 
 PROMPT *** Create  grants  KF77 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KF77            to ABS_ADMIN;
-grant SELECT                                                                 on KF77            to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KF77            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KF77            to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KF77            to KF77;
@@ -112,7 +124,6 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on KF77            to RPBN002;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KF77            to SALGL;
 grant SELECT                                                                 on KF77            to START1;
-grant SELECT                                                                 on KF77            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KF77            to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KF77            to WR_REFREAD;
 

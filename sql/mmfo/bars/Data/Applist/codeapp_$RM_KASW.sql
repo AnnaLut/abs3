@@ -19,8 +19,8 @@ PROMPT *** Create/replace  ARM  $RM_KASW ***
 	d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_KASW створюємо (або оновлюємо) АРМ Контроль за пiдкрiпленням кас ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
-                             P_ARM_NAME              => l_application_name,
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
+                             P_ARM_NAME              => l_application_name, 
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -28,38 +28,38 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Касовi Заявки: Ввод,Перегляд,Корр ********** ');
           --  Створюємо функцію Касовi Заявки: Ввод,Перегляд,Корр
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Касовi Заявки: Ввод,Перегляд,Корр',
                                                   p_funcname => '/barsroot/barsweb/references/refbook.aspx?tabid=4114&mode=RO&force=1',
-                                                  p_rolename => 'PYOD001' ,
+                                                  p_rolename => 'PYOD001' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Прийняти пiдкрiплення каси з дороги ********** ');
           --  Створюємо функцію Прийняти пiдкрiплення каси з дороги
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Прийняти пiдкрiплення каси з дороги',
                                                   p_funcname => '/barsroot/barsweb/references/refbook.aspx?tabid=4117&mode=RO&force=1',
-                                                  p_rolename => 'PYOD001' ,
+                                                  p_rolename => 'PYOD001' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію *Касовi Заявки: Ввод,Перегляд,Корр ********** ');
           --  Створюємо функцію *Касовi Заявки: Ввод,Перегляд,Корр
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '*Касовi Заявки: Ввод,Перегляд,Корр',
                                                   p_funcname => '/barsroot/barsweb/references/refbook.aspx?tabname=KAS_V0N&mode=RO&force=1',
-                                                  p_rolename => 'PYOD001' ,
+                                                  p_rolename => 'PYOD001' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_KASW) - Контроль за пiдкрiпленням кас  ');
     l := l_function_ids.first;
@@ -67,8 +67,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-
-
+     
+     
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -82,9 +82,6 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
-umu.add_report2arm(500,'$RM_KASW');
-umu.add_report2arm(501,'$RM_KASW');
-umu.add_report2arm(503,'$RM_KASW');
 commit;
 end;
 /

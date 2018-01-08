@@ -1,3 +1,5 @@
+SET SERVEROUTPUT ON 
+SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_IADM.sql =========*
 PROMPT ===================================================================================== 
@@ -16,11 +18,11 @@ PROMPT *** Create/replace  ARM  $RM_IADM ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-	d integer := 0;
+    d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_IADM створюємо (або оновлюємо) АРМ АРМ Адміністрування інтернет банкінгу ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
-                             P_ARM_NAME              => l_application_name,
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
+                             P_ARM_NAME              => l_application_name, 
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -28,68 +30,68 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довідники NEW ********** ');
           --  Створюємо функцію Довідники NEW
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Довідники NEW',
                                                   p_funcname => '/barsroot/referencebook/referencelist/',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Синхронізація ********** ');
           --  Створюємо функцію Синхронізація
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Синхронізація',
                                                   p_funcname => '/barsroot/sync/admin_sync.aspx',
-                                                  p_rolename => 'IBANK_ADMIN' ,
+                                                  p_rolename => 'IBANK_ADMIN' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Експорт клієнтів (фіз. осіб) та рахунків в інтернет банкінг ********** ');
           --  Створюємо функцію Експорт клієнтів (фіз. осіб) та рахунків в інтернет банкінг
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Експорт клієнтів (фіз. осіб) та рахунків в інтернет банкінг',
                                                   p_funcname => '/barsroot/sync/import_clients.aspx',
-                                                  p_rolename => 'IBANK_ADMIN' ,
+                                                  p_rolename => 'IBANK_ADMIN' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Сторінка /barsroot/sync/bind_client.aspx
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сторінка /barsroot/sync/bind_client.aspx',
-															  p_funcname => '/barsroot/sync/bind_client.aspx\S*',
-															  p_rolename => 'IBANK_ADMIN' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Сторінка /barsroot/sync/bind_client.aspx',
+                                                              p_funcname => '/barsroot/sync/bind_client.aspx\S*',
+                                                              p_rolename => 'IBANK_ADMIN' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Експорт клієнтів (юр. осіб) та рахунків в інтернет банкінг ********** ');
           --  Створюємо функцію Експорт клієнтів (юр. осіб) та рахунків в інтернет банкінг
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Експорт клієнтів (юр. осіб) та рахунків в інтернет банкінг',
                                                   p_funcname => '/barsroot/sync/import_corps.aspx',
-                                                  p_rolename => 'IBANK_ADMIN' ,
+                                                  p_rolename => 'IBANK_ADMIN' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Сторінка /barsroot/sync/bind_client.aspx
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сторінка /barsroot/sync/bind_client.aspx',
-															  p_funcname => '/barsroot/sync/bind_client.aspx\S*',
-															  p_rolename => 'IBANK_ADMIN' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Сторінка /barsroot/sync/bind_client.aspx',
+                                                              p_funcname => '/barsroot/sync/bind_client.aspx\S*',
+                                                              p_rolename => 'IBANK_ADMIN' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_IADM) - АРМ Адміністрування інтернет банкінгу  ');
     l := l_function_ids.first;
@@ -97,8 +99,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-
-
+     
+     
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -112,7 +114,6 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
-commit;
 end;
 /
 

@@ -86,10 +86,8 @@ select    -- дата предыдущего движения относительно отчетной
       and a.bdat = s.bdat(+);
 
 PROMPT *** Create  grants  SALNC ***
-grant SELECT                                                                 on SALNC           to BARSREADER_ROLE;
 grant SELECT                                                                 on SALNC           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALNC           to START1;
-grant SELECT                                                                 on SALNC           to UPLD;
 
 
 

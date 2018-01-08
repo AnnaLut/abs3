@@ -78,9 +78,7 @@ PROMPT *** Create  view V_WCS_SBP_MAC_BRANCHES ***
  order by subproduct_id, mac_id, branch;
 
 PROMPT *** Create  grants  V_WCS_SBP_MAC_BRANCHES ***
-grant SELECT                                                                 on V_WCS_SBP_MAC_BRANCHES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SBP_MAC_BRANCHES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_SBP_MAC_BRANCHES to UPLD;
 
 
 

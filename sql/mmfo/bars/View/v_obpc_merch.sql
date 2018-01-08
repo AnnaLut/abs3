@@ -19,10 +19,8 @@ select m.merch, m.kv, d.name, d.city, m.card_system, a.nls
  and m.kv=840 and m.merch = d.client_0(+);
 
 PROMPT *** Create  grants  V_OBPC_MERCH ***
-grant SELECT                                                                 on V_OBPC_MERCH    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_MERCH    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OBPC_MERCH    to OBPC;
-grant SELECT                                                                 on V_OBPC_MERCH    to UPLD;
 grant FLASHBACK,SELECT                                                       on V_OBPC_MERCH    to WR_REFREAD;
 
 

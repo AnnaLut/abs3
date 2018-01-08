@@ -91,10 +91,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  KOB_ACC ***
-grant SELECT                                                                 on KOB_ACC         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOB_ACC         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOB_ACC         to START1;
-grant SELECT                                                                 on KOB_ACC         to UPLD;
 
 
 

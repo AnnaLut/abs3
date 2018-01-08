@@ -130,12 +130,10 @@ exception when others then
 
 PROMPT *** Create  grants  ROLES$BASE ***
 grant SELECT                                                                 on ROLES$BASE      to ABS_ADMIN;
-grant SELECT                                                                 on ROLES$BASE      to BARSREADER_ROLE;
 grant SELECT                                                                 on ROLES$BASE      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ROLES$BASE      to BARS_CONNECT;
 grant SELECT                                                                 on ROLES$BASE      to BARS_DM;
 grant SELECT                                                                 on ROLES$BASE      to PUBLIC;
-grant SELECT                                                                 on ROLES$BASE      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ROLES$BASE      to WR_ALL_RIGHTS;
 
 

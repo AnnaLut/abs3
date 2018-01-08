@@ -54,6 +54,19 @@ COMMENT ON COLUMN BARS.S6_USERMAP.LOGNAME IS '';
 
 
 
+PROMPT *** Create  constraint FK_S6_USERMAP_BANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_USERMAP ADD CONSTRAINT FK_S6_USERMAP_BANKS FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C009628 ***
 begin   
  execute immediate '
@@ -105,9 +118,7 @@ exception when others then
 
 PROMPT *** Create  grants  S6_USERMAP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_USERMAP      to ABS_ADMIN;
-grant SELECT                                                                 on S6_USERMAP      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on S6_USERMAP      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on S6_USERMAP      to UPLD;
 grant FLASHBACK,SELECT                                                       on S6_USERMAP      to WR_REFREAD;
 
 

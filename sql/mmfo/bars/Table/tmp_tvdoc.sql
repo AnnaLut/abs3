@@ -108,10 +108,8 @@ COMMENT ON COLUMN BARS.TMP_TVDOC.MFOA IS '';
 
 
 PROMPT *** Create  grants  TMP_TVDOC ***
-grant SELECT                                                                 on TMP_TVDOC       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_TVDOC       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_TVDOC       to START1;
-grant SELECT                                                                 on TMP_TVDOC       to UPLD;
 
 
 

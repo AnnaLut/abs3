@@ -101,9 +101,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAY_TYPE ***
-grant SELECT                                                                 on ZAY_TYPE        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_TYPE        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on ZAY_TYPE        to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_TYPE        to ZAY;
 
 

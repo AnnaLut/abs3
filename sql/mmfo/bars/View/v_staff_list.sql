@@ -28,10 +28,6 @@ PROMPT *** Create  view V_STAFF_LIST ***
    and b2.idls_s = b6.idl(+)
 order by 1,3,5,7,9;
 
-PROMPT *** Create  grants  V_STAFF_LIST ***
-grant SELECT                                                                 on V_STAFF_LIST    to BARSREADER_ROLE;
-grant SELECT                                                                 on V_STAFF_LIST    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

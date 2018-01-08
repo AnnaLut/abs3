@@ -77,11 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  REKLAMA ***
-grant SELECT                                                                 on REKLAMA         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REKLAMA         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REKLAMA         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REKLAMA         to START1;
-grant SELECT                                                                 on REKLAMA         to UPLD;
 grant FLASHBACK,SELECT                                                       on REKLAMA         to WR_REFREAD;
 
 

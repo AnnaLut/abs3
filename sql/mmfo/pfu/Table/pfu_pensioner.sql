@@ -33,8 +33,7 @@ begin
 	LAST_RU_CHGDATE DATE, 
 	BLOCK_DATE DATE, 
 	BLOCK_TYPE NUMBER(1,0), 
-	TYPE_PENSIONER NUMBER(1,0), 
-	IS_OKPO_WELL NUMBER(1,0)
+	TYPE_PENSIONER NUMBER(1,0)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -46,7 +45,6 @@ end;
 
 
 COMMENT ON TABLE PFU.PFU_PENSIONER IS 'ЄБП - пенсіонери';
-COMMENT ON COLUMN PFU.PFU_PENSIONER.IS_OKPO_WELL IS 'Результат проверки ОКПО по дате рожения (0 - ОКПО не совпадает с датой рождения, 1- ОКПО совпадает с датой рождения )';
 COMMENT ON COLUMN PFU.PFU_PENSIONER.ID IS '';
 COMMENT ON COLUMN PFU.PFU_PENSIONER.KF IS '';
 COMMENT ON COLUMN PFU.PFU_PENSIONER.BRANCH IS '';
@@ -72,6 +70,19 @@ COMMENT ON COLUMN PFU.PFU_PENSIONER.LAST_RU_CHGDATE IS '';
 COMMENT ON COLUMN PFU.PFU_PENSIONER.BLOCK_DATE IS '';
 COMMENT ON COLUMN PFU.PFU_PENSIONER.BLOCK_TYPE IS '';
 COMMENT ON COLUMN PFU.PFU_PENSIONER.TYPE_PENSIONER IS '';
+
+
+
+
+PROMPT *** Create  constraint FK_PFUPENSIONER_BLKT ***
+begin   
+ execute immediate '
+  ALTER TABLE PFU.PFU_PENSIONER ADD CONSTRAINT FK_PFUPENSIONER_BLKT FOREIGN KEY (BLOCK_TYPE)
+	  REFERENCES PFU.PFU_PENS_BLOCK_TYPE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 
@@ -114,10 +125,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PFUPENSIONER_DATEON_NN ***
+PROMPT *** Create  constraint CC_PFUPENSIONER_RNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_PENSIONER ADD CONSTRAINT CC_PFUPENSIONER_DATEON_NN CHECK (DATE_ON IS NOT NULL) ENABLE';
+  ALTER TABLE PFU.PFU_PENSIONER ADD CONSTRAINT CC_PFUPENSIONER_RNK_NN CHECK (RNK IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -174,10 +185,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PFUPENSIONER_RNK_NN ***
+PROMPT *** Create  constraint CC_PFUPENSIONER_DATEON_NN ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_PENSIONER ADD CONSTRAINT CC_PFUPENSIONER_RNK_NN CHECK (RNK IS NOT NULL) ENABLE';
+  ALTER TABLE PFU.PFU_PENSIONER ADD CONSTRAINT CC_PFUPENSIONER_DATEON_NN CHECK (DATE_ON IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -239,13 +250,20 @@ exception when others then
  end;
 /
 
+PROMPT *** ADD field is_okpo_well ***
+begin
+    execute immediate 'alter table PFU.PFU_PENSIONER add is_okpo_well NUMBER(1)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
 
+comment on column PFU.PFU_PENSIONER.is_okpo_well is 'Результат проверки ОКПО по дате рожения (0 - ОКПО не совпадает с датой рождения, 1- ОКПО совпадает с датой рождения )';
 
 PROMPT *** Create  grants  PFU_PENSIONER ***
 grant SELECT                                                                 on PFU_PENSIONER   to BARS;
-grant SELECT                                                                 on PFU_PENSIONER   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PFU_PENSIONER   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on PFU_PENSIONER   to UPLD;
 
 
 

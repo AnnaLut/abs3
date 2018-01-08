@@ -12,10 +12,8 @@ PROMPT *** Create  view V_351_FDAT ***
 where fdat =  NVL (TO_DATE (pul.Get_Mas_Ini_Val ('sFdat1'),'dd-mm-yyyy'),trunc(gl.BD,'MM'));
 
 PROMPT *** Create  grants  V_351_FDAT ***
-grant SELECT                                                                 on V_351_FDAT      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_351_FDAT      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_351_FDAT      to START1;
-grant SELECT                                                                 on V_351_FDAT      to UPLD;
 
 
 

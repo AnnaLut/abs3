@@ -89,10 +89,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  META_ACTIONCODES ***
-grant SELECT                                                                 on META_ACTIONCODES to BARSREADER_ROLE;
 grant SELECT                                                                 on META_ACTIONCODES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on META_ACTIONCODES to BARS_DM;
-grant SELECT                                                                 on META_ACTIONCODES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on META_ACTIONCODES to WR_ALL_RIGHTS;
 
 

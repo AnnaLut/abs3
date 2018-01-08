@@ -121,7 +121,6 @@ exception when others then
 PROMPT *** Create  grants  TICKETS_PAR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TICKETS_PAR     to ABS_ADMIN;
 grant SELECT                                                                 on TICKETS_PAR     to BARS014;
-grant SELECT                                                                 on TICKETS_PAR     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TICKETS_PAR     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TICKETS_PAR     to BARS_DM;
 grant SELECT                                                                 on TICKETS_PAR     to CHCK002;
@@ -130,7 +129,6 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on TICKETS_PAR     to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TICKETS_PAR     to TECH005;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TICKETS_PAR     to TICKETS_PAR;
-grant SELECT                                                                 on TICKETS_PAR     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TICKETS_PAR     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on TICKETS_PAR     to WR_REFREAD;
 

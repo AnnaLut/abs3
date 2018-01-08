@@ -57,9 +57,7 @@ SELECT 14,'Ознака операції (#2C)', 'Признак операции (# 2C)', 'V_P12_2C', 'CODE'
   FROM dual;
 
 PROMPT *** Create  grants  V_ZAY_DOC_DTLS ***
-grant SELECT                                                                 on V_ZAY_DOC_DTLS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY_DOC_DTLS  to START1;
-grant SELECT                                                                 on V_ZAY_DOC_DTLS  to UPLD;
 grant SELECT                                                                 on V_ZAY_DOC_DTLS  to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_ZAY_DOC_DTLS  to ZAY;
 

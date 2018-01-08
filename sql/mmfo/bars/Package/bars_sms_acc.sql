@@ -81,7 +81,7 @@ procedure set_acc_phones(p_acc in accounts.acc%type,
 
 end bars_sms_acc;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_SMS_ACC 
+CREATE OR REPLACE PACKAGE BODY BARS.bars_sms_acc
 IS
    ----
    --  Package BARS_SMS_ACC - пакет процедур для подготовки SMS-сообщений по факту изменения остатков по счетам

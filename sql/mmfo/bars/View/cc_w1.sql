@@ -89,10 +89,8 @@ PROMPT *** Create  view CC_W1 ***
           AND d.vidd IN (1, 2, 3);
 
 PROMPT *** Create  grants  CC_W1 ***
-grant SELECT                                                                 on CC_W1           to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on CC_W1           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_W1           to RCC_DEAL;
-grant SELECT                                                                 on CC_W1           to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_W1           to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CC_W1           to WR_REFREAD;
 

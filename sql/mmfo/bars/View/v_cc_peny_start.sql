@@ -80,10 +80,8 @@ PROMPT *** Create  view V_CC_PENY_START ***
     WHERE numb_nd = 1;
 
 PROMPT *** Create  grants  V_CC_PENY_START ***
-grant SELECT                                                                 on V_CC_PENY_START to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CC_PENY_START to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_CC_PENY_START to RCC_DEAL;
-grant SELECT                                                                 on V_CC_PENY_START to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CC_PENY_START to WR_ALL_RIGHTS;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_CC_PENY_START to WR_CREDIT;
 grant FLASHBACK,SELECT                                                       on V_CC_PENY_START to WR_REFREAD;

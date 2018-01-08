@@ -26,9 +26,7 @@ PROMPT *** Create  view V_NONRESID_PARTNERS ***
    ORDER BY c.rnk;
 
 PROMPT *** Create  grants  V_NONRESID_PARTNERS ***
-grant SELECT                                                                 on V_NONRESID_PARTNERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NONRESID_PARTNERS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_NONRESID_PARTNERS to UPLD;
 
 
 

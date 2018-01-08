@@ -73,10 +73,21 @@ COMMENT ON COLUMN BARS.DPT_TYPES_PARAM.EMPLOYEE IS 'ќзнака сегменту (прац≥вникам
 
 
 
+
+PROMPT *** Create  constraint FK_DPTTYPESPARAM_DPTTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TYPES_PARAM ADD CONSTRAINT FK_DPTTYPESPARAM_DPTTYPE FOREIGN KEY (TYPE_ID)
+	  REFERENCES BARS.DPT_TYPES (TYPE_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  DPT_TYPES_PARAM ***
-grant SELECT                                                                 on DPT_TYPES_PARAM to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DPT_TYPES_PARAM to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on DPT_TYPES_PARAM to UPLD;
 
 
 

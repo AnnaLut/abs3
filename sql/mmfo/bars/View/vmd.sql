@@ -52,10 +52,8 @@ PROMPT *** Create  view VMD ***
      FROM customs_decl;
 
 PROMPT *** Create  grants  VMD ***
-grant SELECT                                                                 on VMD             to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VMD             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VMD             to RPBN001;
-grant SELECT                                                                 on VMD             to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VMD             to VMD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VMD             to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on VMD             to WR_REFREAD;

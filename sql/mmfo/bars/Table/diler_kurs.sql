@@ -75,6 +75,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_DILERKURS_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DILER_KURS ADD CONSTRAINT FK_DILERKURS_STAFF FOREIGN KEY (ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DILERKURS_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DILER_KURS ADD CONSTRAINT FK_DILERKURS_TABVAL FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint XPK_DILER_KURS ***
 begin   
  execute immediate '
@@ -117,11 +143,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DILER_KURS ***
-grant SELECT                                                                 on DILER_KURS      to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on DILER_KURS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DILER_KURS      to BARS_DM;
 grant SELECT                                                                 on DILER_KURS      to TECH_MOM1;
-grant SELECT                                                                 on DILER_KURS      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DILER_KURS      to WR_ALL_RIGHTS;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on DILER_KURS      to ZAY;
 

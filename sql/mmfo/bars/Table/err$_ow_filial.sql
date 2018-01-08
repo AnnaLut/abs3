@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_OW_FILIAL.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OW_FILIAL ***
-grant SELECT                                                                 on ERR$_OW_FILIAL  to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OW_FILIAL  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

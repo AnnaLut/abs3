@@ -95,10 +95,8 @@ PROMPT *** Create  view V_KASM ***
                     a.idz);
 
 PROMPT *** Create  grants  V_KASM ***
-grant SELECT                                                                 on V_KASM          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_KASM          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_KASM          to PYOD001;
-grant SELECT                                                                 on V_KASM          to UPLD;
 
 
 

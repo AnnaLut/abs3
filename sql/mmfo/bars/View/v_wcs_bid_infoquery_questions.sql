@@ -31,9 +31,7 @@ PROMPT *** Create  view V_WCS_BID_INFOQUERY_QUESTIONS ***
  order by b.id, iq.iquery_id, iq.ord;
 
 PROMPT *** Create  grants  V_WCS_BID_INFOQUERY_QUESTIONS ***
-grant SELECT                                                                 on V_WCS_BID_INFOQUERY_QUESTIONS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_BID_INFOQUERY_QUESTIONS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_BID_INFOQUERY_QUESTIONS to UPLD;
 
 
 

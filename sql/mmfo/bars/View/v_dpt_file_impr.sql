@@ -1,14 +1,28 @@
+-- ======================================================================================
+-- Module : SOC
+-- Author : BAA
+-- Date   : 14.07.2016
+-- ======================================================================================
+-- create view V_DPT_FILE_IMPR
+-- ======================================================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET ECHO         OFF
+SET LINES        500
+SET PAGES        500
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_DPT_FILE_IMPR.sql =========*** Run **
-PROMPT ===================================================================================== 
+prompt -- ======================================================
+prompt -- create view V_DPT_FILE_IMPR
+prompt -- ======================================================
 
-
-PROMPT *** Create  view V_DPT_FILE_IMPR ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_DPT_FILE_IMPR ("KF", "FILE_DT", "FILE_TP", "FILE_QTY", "USR_ID") AS 
-  select fh.KF
+create or replace view V_DPT_FILE_IMPR
+( KF
+, FILE_DT
+, FILE_TP
+, FILE_QTY
+, USR_ID
+) as
+select fh.KF
      , fh.DAT              as FILE_DT
      , fh.TYPE_ID          as FILE_TP
      , count(fh.HEADER_ID) as FILE_QTY
@@ -20,12 +34,6 @@ PROMPT *** Create  view V_DPT_FILE_IMPR ***
    and fh.USR_ID = USER_ID
  group by fh.KF, fh.DAT, fh.USR_ID, fh.TYPE_ID;
 
-PROMPT *** Create  grants  V_DPT_FILE_IMPR ***
-grant SELECT                                                                 on V_DPT_FILE_IMPR to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DPT_FILE_IMPR to UPLD;
+show errors
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_DPT_FILE_IMPR.sql =========*** End **
-PROMPT ===================================================================================== 
+grant select on V_DPT_FILE_IMPR to BARS_ACCESS_DEFROLE;

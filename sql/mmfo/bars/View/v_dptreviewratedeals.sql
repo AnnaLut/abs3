@@ -34,10 +34,8 @@ PROMPT *** Create  view V_DPTREVIEWRATEDEALS ***
  ;
 
 PROMPT *** Create  grants  V_DPTREVIEWRATEDEALS ***
-grant SELECT                                                                 on V_DPTREVIEWRATEDEALS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPTREVIEWRATEDEALS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPTREVIEWRATEDEALS to DPT_ADMIN;
-grant SELECT                                                                 on V_DPTREVIEWRATEDEALS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPTREVIEWRATEDEALS to WR_ALL_RIGHTS;
 
 

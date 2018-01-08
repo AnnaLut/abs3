@@ -42,10 +42,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111503 ***
+PROMPT *** Create  constraint PK_PFU_SESSION_STATE ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_SESSION_STATE MODIFY (STATE_CODE NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_SESSION_STATE ADD CONSTRAINT PK_PFU_SESSION_STATE PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -66,12 +68,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_PFU_SESSION_STATE ***
+PROMPT *** Create  constraint SYS_C00111503 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_SESSION_STATE ADD CONSTRAINT PK_PFU_SESSION_STATE PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGD  ENABLE';
+  ALTER TABLE PFU.PFU_SESSION_STATE MODIFY (STATE_CODE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -92,10 +92,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  PFU_SESSION_STATE ***
-grant SELECT                                                                 on PFU_SESSION_STATE to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_SESSION_STATE to UPLD;
 
 
 

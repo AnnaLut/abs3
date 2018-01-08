@@ -59,11 +59,9 @@ COMMENT ON COLUMN BARS.BARS_VERSION.TIMESTAMP IS '';
 
 
 PROMPT *** Create  grants  BARS_VERSION ***
-grant SELECT                                                                 on BARS_VERSION    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BARS_VERSION    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BARS_VERSION    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BARS_VERSION    to START1;
-grant SELECT                                                                 on BARS_VERSION    to UPLD;
 
 
 

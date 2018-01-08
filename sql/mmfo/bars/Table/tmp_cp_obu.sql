@@ -311,11 +311,9 @@ COMMENT ON COLUMN BARS.TMP_CP_OBU.KL4 IS '';
 
 
 PROMPT *** Create  grants  TMP_CP_OBU ***
-grant SELECT                                                                 on TMP_CP_OBU      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CP_OBU      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_CP_OBU      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CP_OBU      to START1;
-grant SELECT                                                                 on TMP_CP_OBU      to UPLD;
 
 
 

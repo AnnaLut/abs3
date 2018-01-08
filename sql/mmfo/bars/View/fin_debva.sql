@@ -47,10 +47,8 @@ PROMPT *** Create  view FIN_DEBVA ***
                     a.kv);
 
 PROMPT *** Create  grants  FIN_DEBVA ***
-grant SELECT                                                                 on FIN_DEBVA       to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_DEBVA       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_DEBVA       to START1;
-grant SELECT                                                                 on FIN_DEBVA       to UPLD;
 
 
 

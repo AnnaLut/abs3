@@ -71,10 +71,6 @@ COMMENT ON COLUMN BARS.ERR$_CC_SOB.FACT_DATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CC_SOB ***
-grant SELECT                                                                 on ERR$_CC_SOB     to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CC_SOB     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

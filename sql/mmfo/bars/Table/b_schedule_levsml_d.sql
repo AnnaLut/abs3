@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  B_SCHEDULE_LEVSML_D ***
-grant SELECT                                                                 on B_SCHEDULE_LEVSML_D to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on B_SCHEDULE_LEVSML_D to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on B_SCHEDULE_LEVSML_D to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on B_SCHEDULE_LEVSML_D to START1;
-grant SELECT                                                                 on B_SCHEDULE_LEVSML_D to UPLD;
 grant FLASHBACK,SELECT                                                       on B_SCHEDULE_LEVSML_D to WR_REFREAD;
 
 

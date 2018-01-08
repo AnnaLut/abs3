@@ -2,8 +2,8 @@ set lines 1000
 set trimspool on
 set serveroutput on size 1000000
 
-prompt Создание / Обновление операции K79
-prompt Наименование операции: K79 Комісія за виплату переказів від "Claims conference ceef"
+prompt Создание / Обновление операции !DP
+prompt Наименование операции: STOP-правило. Обмеження виплати валюти, еквівалент 15000грн
 declare
   cnt_  number;
 begin
@@ -12,11 +12,119 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K79', 'K79 Комісія за виплату переказів від "Claims conference ceef"', 0, '#(nbs_ob22 (''6514'',''26''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'GL.P_ICURVAL(#(KVA),F_TARIF(79,#(KVA),#(NLSA),#(S)),SYSDATE)', null, 5, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', 'Комісія за виплату переказів із-за кордону в ІВ готівкою');
+    values ('!DP', 'STOP-правило. Обмеження виплати валюти, еквівалент 15000грн', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(414,#(KVA),#(NLSA),#(S),#(REF))', null, null, null, null, 0, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K79', name='K79 Комісія за виплату переказів від "Claims conference ceef"', dk=0, nlsm='#(nbs_ob22 (''6514'',''26''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='GL.P_ICURVAL(#(KVA),F_TARIF(79,#(KVA),#(NLSA),#(S)),SYSDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='Комісія за виплату переказів із-за кордону в ІВ готівкою'
+         set tt='!DP', name='STOP-правило. Обмеження виплати валюти, еквівалент 15000грн', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(414,#(KVA),#(NLSA),#(S),#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+       where tt='!DP';
+  end;
+  --------------------------------
+  ----------- Реквизиты ----------
+  --------------------------------
+  delete from op_rules where tt='!DP';
+  --------------------------------
+  ------ Связанные операции ------
+  --------------------------------
+  delete from ttsap where tt='!DP';
+  --------------------------------
+  ------- Балансовые счета -------
+  --------------------------------
+  delete from ps_tts where tt='!DP';
+  --------------------------------
+  -------- Виды документов -------
+  --------------------------------
+  delete from tts_vob where tt='!DP';
+  --------------------------------
+  -------- Группы контроля -------
+  --------------------------------
+  delete from chklist_tts where tt='!DP';
+  --------------------------------
+  ------------- Папки ------------
+  --------------------------------
+  delete from folders_tts where tt='!DP';
+  begin
+    insert into folders_tts(idfo, tt)
+    values (1, '!DP');
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (folders_tts: 1, ''!DP'') - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+end;
+/
+prompt Создание / Обновление операции !DV
+prompt Наименование операции: !Стоп-правило пост.160  03 березня 2015 р (15 тис в екв для вал. опер)
+declare
+  cnt_  number;
+begin
+  --------------------------------
+  -- Основные свойства операции --
+  --------------------------------
+  begin
+    insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
+    values ('!DV', '!Стоп-правило пост.160  03 березня 2015 р (15 тис в екв для вал. опер)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(160,#(KVA),#(NLSA),#(S), #(REF))', null, null, null, null, 0, '0000100000000000000000000000000000000100000000000000000000000000', null);
+  exception
+    when dup_val_on_index then 
+      update tts
+         set tt='!DV', name='!Стоп-правило пост.160  03 березня 2015 р (15 тис в екв для вал. опер)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(160,#(KVA),#(NLSA),#(S), #(REF))', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+       where tt='!DV';
+  end;
+  --------------------------------
+  ----------- Реквизиты ----------
+  --------------------------------
+  delete from op_rules where tt='!DV';
+  --------------------------------
+  ------ Связанные операции ------
+  --------------------------------
+  delete from ttsap where tt='!DV';
+  --------------------------------
+  ------- Балансовые счета -------
+  --------------------------------
+  delete from ps_tts where tt='!DV';
+  --------------------------------
+  -------- Виды документов -------
+  --------------------------------
+  delete from tts_vob where tt='!DV';
+  --------------------------------
+  -------- Группы контроля -------
+  --------------------------------
+  delete from chklist_tts where tt='!DV';
+  --------------------------------
+  ------------- Папки ------------
+  --------------------------------
+  delete from folders_tts where tt='!DV';
+  begin
+    insert into folders_tts(idfo, tt)
+    values (1, '!DV');
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (folders_tts: 1, ''!DV'') - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+end;
+/
+prompt Создание / Обновление операции K79
+prompt Наименование операции: Комісія за виплату переказів від "Claims conference ceef"
+declare
+  cnt_  number;
+begin
+  --------------------------------
+  -- Основные свойства операции --
+  --------------------------------
+  begin
+    insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
+    values ('K79', 'Комісія за виплату переказів від "Claims conference ceef"', 0, '#(nbs_ob22 (''6114'',''26''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'GL.P_ICURVAL(#(KVA),F_TARIF(79,#(KVA),#(NLSA),#(S)),SYSDATE)', null, 5, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', 'Комісія за виплату переказів із-за кордону в ІВ готівкою');
+  exception
+    when dup_val_on_index then 
+      update tts
+         set tt='K79', name='Комісія за виплату переказів від "Claims conference ceef"', dk=0, nlsm='#(nbs_ob22 (''6114'',''26''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='GL.P_ICURVAL(#(KVA),F_TARIF(79,#(KVA),#(NLSA),#(S)),SYSDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='Комісія за виплату переказів із-за кордону в ІВ готівкою'
        where tt='K79';
   end;
   --------------------------------
@@ -246,6 +354,28 @@ begin
   ------ Связанные операции ------
   --------------------------------
   delete from ttsap where tt='DP9';
+  begin
+    insert into ttsap(ttap, tt, dk)
+    values ('!DP', 'DP9', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ttsap: ''!DP'', ''DP9'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ttsap(ttap, tt, dk)
+    values ('!DV', 'DP9', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ttsap: ''!DV'', ''DP9'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
   begin
     insert into ttsap(ttap, tt, dk)
     values ('K79', 'DP9', 1);

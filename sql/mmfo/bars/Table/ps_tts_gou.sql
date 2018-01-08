@@ -86,9 +86,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  PS_TTS_GOU ***
-grant SELECT                                                                 on PS_TTS_GOU      to BARSREADER_ROLE;
 grant SELECT                                                                 on PS_TTS_GOU      to BARS_DM;
-grant SELECT                                                                 on PS_TTS_GOU      to UPLD;
 
 
 

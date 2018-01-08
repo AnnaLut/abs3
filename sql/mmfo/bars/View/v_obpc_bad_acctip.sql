@@ -24,10 +24,8 @@ PROMPT *** Create  view V_OBPC_BAD_ACCTIP ***
    and b.nbs in ('2625','2605');
 
 PROMPT *** Create  grants  V_OBPC_BAD_ACCTIP ***
-grant SELECT                                                                 on V_OBPC_BAD_ACCTIP to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_BAD_ACCTIP to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OBPC_BAD_ACCTIP to OBPC;
-grant SELECT                                                                 on V_OBPC_BAD_ACCTIP to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_BAD_ACCTIP to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_OBPC_BAD_ACCTIP to WR_REFREAD;
 

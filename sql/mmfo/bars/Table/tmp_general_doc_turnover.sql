@@ -66,10 +66,8 @@ COMMENT ON COLUMN BARS.TMP_GENERAL_DOC_TURNOVER.FOLDER_UAH_SUMMA IS '';
 
 
 PROMPT *** Create  grants  TMP_GENERAL_DOC_TURNOVER ***
-grant SELECT                                                                 on TMP_GENERAL_DOC_TURNOVER to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_GENERAL_DOC_TURNOVER to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_GENERAL_DOC_TURNOVER to START1;
-grant SELECT                                                                 on TMP_GENERAL_DOC_TURNOVER to UPLD;
 
 
 

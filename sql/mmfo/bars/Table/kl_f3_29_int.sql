@@ -60,12 +60,10 @@ COMMENT ON COLUMN BARS.KL_F3_29_INT.S240 IS '';
 
 PROMPT *** Create  grants  KL_F3_29_INT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F3_29_INT    to ABS_ADMIN;
-grant SELECT                                                                 on KL_F3_29_INT    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F3_29_INT    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_F3_29_INT    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F3_29_INT    to KL_F3_29;
 grant SELECT                                                                 on KL_F3_29_INT    to START1;
-grant SELECT                                                                 on KL_F3_29_INT    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F3_29_INT    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KL_F3_29_INT    to WR_REFREAD;
 

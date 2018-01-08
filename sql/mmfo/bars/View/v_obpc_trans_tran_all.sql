@@ -53,11 +53,9 @@ select b.branch, g.tran_type, t.tip, null, null, null, null, null, null, null, n
    and length(b.branch) = 15;
 
 PROMPT *** Create  grants  V_OBPC_TRANS_TRAN_ALL ***
-grant SELECT                                                                 on V_OBPC_TRANS_TRAN_ALL to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_TRANS_TRAN_ALL to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OBPC_TRANS_TRAN_ALL to OBPC;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OBPC_TRANS_TRAN_ALL to OBPC_TRANS_TRAN;
-grant SELECT                                                                 on V_OBPC_TRANS_TRAN_ALL to UPLD;
 grant FLASHBACK,SELECT                                                       on V_OBPC_TRANS_TRAN_ALL to WR_REFREAD;
 
 

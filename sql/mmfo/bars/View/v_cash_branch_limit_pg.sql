@@ -38,10 +38,8 @@ from (select l.BRANCH, l.kv, l.L_T, l.LIM_P, l.LIM_M, l.DAT_LIM,a.DATM, a.DATX, 
      );
 
 PROMPT *** Create  grants  V_CASH_BRANCH_LIMIT_PG ***
-grant SELECT                                                                 on V_CASH_BRANCH_LIMIT_PG to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CASH_BRANCH_LIMIT_PG to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CASH_BRANCH_LIMIT_PG to RPBN001;
-grant SELECT                                                                 on V_CASH_BRANCH_LIMIT_PG to UPLD;
 
 
 

@@ -72,9 +72,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TTS_VOB_BARSDB ***
-grant SELECT                                                                 on TTS_VOB_BARSDB  to BARSREADER_ROLE;
 grant SELECT                                                                 on TTS_VOB_BARSDB  to BARS_DM;
-grant SELECT                                                                 on TTS_VOB_BARSDB  to UPLD;
 
 
 

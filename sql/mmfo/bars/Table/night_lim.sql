@@ -93,10 +93,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  NIGHT_LIM ***
-grant SELECT                                                                 on NIGHT_LIM       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NIGHT_LIM       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NIGHT_LIM       to PYOD001;
-grant SELECT                                                                 on NIGHT_LIM       to UPLD;
 grant FLASHBACK,SELECT                                                       on NIGHT_LIM       to WR_REFREAD;
 
 

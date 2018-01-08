@@ -57,10 +57,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_OW_NAZN_MASK ***
-grant SELECT                                                                 on TMP_OW_NAZN_MASK to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_OW_NAZN_MASK to UPLD;
-
 
 
 PROMPT ===================================================================================== 

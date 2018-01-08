@@ -72,10 +72,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_RI_CUST ***
-grant SELECT                                                                 on TMP_RI_CUST     to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_RI_CUST     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

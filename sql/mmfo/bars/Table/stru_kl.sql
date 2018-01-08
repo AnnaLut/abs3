@@ -57,7 +57,7 @@ COMMENT ON COLUMN BARS.STRU_KL.TXT IS '';
 
 
 PROMPT *** Create  grants  STRU_KL ***
-grant SELECT                                                                 on STRU_KL         to UPLD;
+grant SELECT                                                                 on STRU_KL         to BARS_DM;
 
 
 

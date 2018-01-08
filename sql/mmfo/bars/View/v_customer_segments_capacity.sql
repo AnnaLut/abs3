@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CUSTOMER_SEGMENTS_CAPACITY.sql ======
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_CUSTOMER_SEGMENTS_CAPACITY ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_CUSTOMER_SEGMENTS_CAPACITY ("RNK", "PRODUCT_AMOUNT", "DEPOSIT_AMOUNT", "CREDITS_AMOUNT", "CARDCREDITS_AMOUNT", "GARANT_CREDITS_AMOUNT", "ENERGYCREDITS_AMOUNT", "CARDS_AMOUNT", "ACCOUNTS_AMOUNT", "INDIVIDUAL_SAFES_AMOUNT", "CASHLOANS_AMOUNT", "BPK_CREDITLINE_AMOUNT", "INSURANCE_AVTOCIVILKA_AMOUNT", "INSURANCE_AVTOCIVILKAPLUS_AMNT", "INSURANCE_OBERIG_AMOUNT", "INSURANCE_CASH_AMOUNT") AS 
-  select c.rnk     as rnk,
+create or replace view bars.v_customer_segments_capacity as
+select c.rnk     as rnk,
        T2.NUMBER_VALUE  as product_amount,
        T3.NUMBER_VALUE  as deposit_amount,
        T4.NUMBER_VALUE  as credits_amount,
@@ -27,7 +18,7 @@ PROMPT *** Create  view V_CUSTOMER_SEGMENTS_CAPACITY ***
   from customer c
   left join (select OBJECT_ID, min(NUMBER_VALUE) keep (dense_rank last order by VALUE_DATE) as NUMBER_VALUE
              from BARS.ATTRIBUTE_VALUE_BY_DATE where attribute_id in (select id from attribute_kind where attribute_code = 'CUSTOMER_SEGMENT_PRODUCTS_AMNT')
-               group by OBJECT_ID) t2 on (c.RNK =  T2.OBJECT_ID)
+               group by OBJECT_ID) t2 on (c.RNK =  T2.OBJECT_ID) 
 
   left join BARS.ATTRIBUTE_VALUE  t3 on (c.RNK =  T3.OBJECT_ID) and  T3.attribute_id in (select id from attribute_kind where attribute_code = 'CUSTOMER_PRDCT_AMNT_DPT')
   left join BARS.ATTRIBUTE_VALUE  t4 on (c.RNK =  T4.OBJECT_ID) and  T4.attribute_id in (select id from attribute_kind where attribute_code = 'CUSTOMER_PRDCT_AMNT_CREDITS')
@@ -43,15 +34,6 @@ PROMPT *** Create  view V_CUSTOMER_SEGMENTS_CAPACITY ***
   left join BARS.ATTRIBUTE_VALUE t14 on (c.RNK = T14.OBJECT_ID) and T14.attribute_id in (select id from attribute_kind where attribute_code = 'CUSTOMER_PRDCT_AMNT_INSURANCE_AVTOCIVILKA+')
   left join BARS.ATTRIBUTE_VALUE t15 on (c.RNK = T15.OBJECT_ID) and T15.attribute_id in (select id from attribute_kind where attribute_code = 'CUSTOMER_PRDCT_AMNT_INSURANCE_OBERIG')
   left join BARS.ATTRIBUTE_VALUE t16 on (c.RNK = T16.OBJECT_ID) and T16.attribute_id in (select id from attribute_kind where attribute_code = 'CUSTOMER_PRDCT_AMNT_INSURANCE_CASH')
- where T2.NUMBER_VALUE is not null;
-
-PROMPT *** Create  grants  V_CUSTOMER_SEGMENTS_CAPACITY ***
-grant SELECT                                                                 on V_CUSTOMER_SEGMENTS_CAPACITY to BARSREADER_ROLE;
-grant SELECT                                                                 on V_CUSTOMER_SEGMENTS_CAPACITY to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CUSTOMER_SEGMENTS_CAPACITY to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CUSTOMER_SEGMENTS_CAPACITY.sql ======
-PROMPT ===================================================================================== 
+ where T2.NUMBER_VALUE is not null
+/
+show errors

@@ -80,10 +80,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  FINMON_PUBLIC_RELS ***
-grant SELECT                                                                 on FINMON_PUBLIC_RELS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FINMON_PUBLIC_RELS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FINMON_PUBLIC_RELS to BARS_DM;
-grant SELECT                                                                 on FINMON_PUBLIC_RELS to UPLD;
 
 
 

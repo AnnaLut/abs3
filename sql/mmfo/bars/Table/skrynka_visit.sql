@@ -71,10 +71,49 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NN_SKRYNKA_VISIT_DATIN ***
+PROMPT *** Create  constraint FK_SKRYNKAVISIT_BRANCH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_VISIT MODIFY (DATIN CONSTRAINT NN_SKRYNKA_VISIT_DATIN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SKRYNKA_VISIT ADD CONSTRAINT FK_SKRYNKAVISIT_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKAVISIT_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_VISIT ADD CONSTRAINT FK_SKRYNKAVISIT_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKAVISIT_SKRYNKAND ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_VISIT ADD CONSTRAINT FK_SKRYNKAVISIT_SKRYNKAND FOREIGN KEY (KF, ND)
+	  REFERENCES BARS.SKRYNKA_ND (KF, ND) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SKRYNKAVISIT_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_VISIT MODIFY (KF CONSTRAINT CC_SKRYNKAVISIT_KF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -119,10 +158,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SKRYNKAVISIT_KF_NN ***
+PROMPT *** Create  constraint NN_SKRYNKA_VISIT_DATIN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_VISIT MODIFY (KF CONSTRAINT CC_SKRYNKAVISIT_KF_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SKRYNKA_VISIT MODIFY (DATIN CONSTRAINT NN_SKRYNKA_VISIT_DATIN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -145,12 +184,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_VISIT ***
-grant SELECT                                                                 on SKRYNKA_VISIT   to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_VISIT   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SKRYNKA_VISIT   to BARS_DM;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_VISIT   to DEP_SKRN;
 grant SELECT                                                                 on SKRYNKA_VISIT   to START1;
-grant SELECT                                                                 on SKRYNKA_VISIT   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_VISIT   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SKRYNKA_VISIT   to WR_REFREAD;
 

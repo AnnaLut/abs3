@@ -19,10 +19,8 @@ where (b.dos<>0 or b.kos<>0 or b.ostf<>0)
   );
 
 PROMPT *** Create  grants  VESH ***
-grant SELECT                                                                 on VESH            to BARSREADER_ROLE;
 grant SELECT                                                                 on VESH            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VESH            to START1;
-grant SELECT                                                                 on VESH            to UPLD;
 
 
 

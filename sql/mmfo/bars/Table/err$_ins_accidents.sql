@@ -69,10 +69,6 @@ COMMENT ON COLUMN BARS.ERR$_INS_ACCIDENTS.REFUND_DATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_INS_ACCIDENTS ***
-grant SELECT                                                                 on ERR$_INS_ACCIDENTS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_INS_ACCIDENTS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

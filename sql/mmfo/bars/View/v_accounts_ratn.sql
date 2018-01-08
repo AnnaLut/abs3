@@ -138,10 +138,8 @@ PROMPT *** Create  view V_ACCOUNTS_RATN ***
           AND a.acc = n.acc(+);
 
 PROMPT *** Create  grants  V_ACCOUNTS_RATN ***
-grant SELECT                                                                 on V_ACCOUNTS_RATN to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACCOUNTS_RATN to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ACCOUNTS_RATN to START1;
-grant SELECT                                                                 on V_ACCOUNTS_RATN to UPLD;
 
 
 

@@ -90,10 +90,8 @@ PROMPT *** Create  view V_NERUXOMI ***
                                        AND ob22 IN ('13', '14','15','16')))) a;
 
 PROMPT *** Create  grants  V_NERUXOMI ***
-grant SELECT                                                                 on V_NERUXOMI      to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_NERUXOMI      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NERUXOMI      to PYOD001;
-grant SELECT                                                                 on V_NERUXOMI      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_NERUXOMI      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_NERUXOMI      to WR_REFREAD;
 

@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_dpa.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.BARS_DPA is
+CREATE OR REPLACE PACKAGE "BARS"."BARS_DPA" is
 
 g_head_version constant varchar2(64)  := 'Version 1.32 09/11/2017';
 g_head_defs    constant varchar2(512) := '';
@@ -87,7 +87,7 @@ procedure ins_ticket(p_filename varchar2, p_filedata clob);
 
 procedure ins_r0(p_filename varchar2, p_filedata clob, p_tickname OUT varchar2);
 
-    -- процедура на для отправки данных в дпа по нотариусам COBUMMFO-4028
+    -- процедура на для отправки данных в дпа по нотариусам COBUMMFO-4028 
   PROCEDURE accounts_tax(p_acc     accounts.acc%TYPE
                         ,p_daos    accounts.daos%TYPE
                         ,p_dazs    accounts.dazs%TYPE
@@ -99,11 +99,15 @@ procedure ins_r0(p_filename varchar2, p_filedata clob, p_tickname OUT varchar2);
                         ,p_vid     accounts.vid%TYPE
                         ,p_rnk     accounts.rnk%TYPE
                         );
-  FUNCTION dpa_nbs(p_nbs  varchar2
-                 ,p_ob22 accounts.OB22%TYPE DEFAULT NULL) RETURN NUMBER;
+  FUNCTION dpa_nbs(p_nbs  varchar2 
+                 ,p_ob22 accounts.OB22%TYPE DEFAULT NULL) RETURN NUMBER; 						  
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_DPA is
+  GRANT EXECUTE ON "BARS"."BARS_DPA" TO "RPBN002";
+  GRANT EXECUTE ON "BARS"."BARS_DPA" TO "BARS_ACCESS_DEFROLE";
+/
+
+CREATE OR REPLACE PACKAGE BODY "BARS"."BARS_DPA" is
 
 g_body_version constant varchar2(64)  := 'Version 1.25 09/11/2017';
 g_body_defs    constant varchar2(512) := '';
@@ -160,7 +164,7 @@ is
 begin
 
   bars_audit.trace(p || 'Start.');
-
+  
   l_dps := getglobaloption('DPA_REG');
   if l_dps is null then
      raise_application_error(-20000, 'Не вказано код органу ДПС регіонального рівня!', true);
@@ -1038,9 +1042,9 @@ begin
            l_reason in (0, 5) and
            --  0000-без помилок
            l_err = '0000' then
-           --
-           bars_audit.info('DPI info ' || l_account || ' - l_account '
-                                        || l_currency || ' - l_currency '
+           -- 
+           bars_audit.info('DPI info ' || l_account || ' - l_account ' 
+                                        || l_currency || ' - l_currency ' 
                                         || l_dpablk || ' - l_dpablk ' );
            update accounts
               set blkd = 0
@@ -1049,12 +1053,12 @@ begin
               and dazs is null
               and blkd = l_dpablk
            returning acc into l_acc;
-
+        
          -- если біла изменена строка - сохраняем информаци
-          if sql%rowcount != 0 then
+          if sql%rowcount != 0 then 
             bars_audit.info('DPI rowcount' || sql%rowcount || ' l_account - ' ||l_account || 'acc - '  );
-          end if;
-
+          end if;  
+          
            select count(*)
              into l_tmpn
              from w4_acc_instant
@@ -1561,11 +1565,11 @@ procedure insert_data_to_temp(p_mfo varchar2, p_okpo varchar2, p_rp number, p_ot
 is
 begin
  bars_audit.trace('insert_data_to_temp starts');
-
+ 
      if LENGTH(p_nmk) > 38 then
-        raise_application_error(-20000, 'Длина имени клиента должна быть в рамках 38-х символов');
+        raise_application_error(-20000, 'Длина имени клиента должна быть в рамках 38-х символов');      
      end if;
-
+	 
      insert into dpa_acc_userid (mfo, okpo, rt, ot, odat, nls, kv, c_ag, nmk, adr, c_reg, c_dst, bic, country, userid)
      values(p_mfo, p_okpo, p_rp, p_ot, p_odat, p_nls, p_kv, p_c_ag, p_nmk, p_adr, p_c_reg, p_c_dst, p_bic, p_country, user_id);
 
@@ -1808,7 +1812,7 @@ begin
  select max(fn)
    into l_filename
    from zag_f
-  where
+  where 
      substr(fn,1) = substr(p_filename,1)
     /*
 
@@ -1819,7 +1823,7 @@ begin
     || т.к. при поиске файла (біл он загружен ранее или нет) мог уже отбраться
     || файл @F, хотя должен біл біть загружен файл @R
     -- оригинальное условие substr(fn,4) = substr(p_filename,4)
-
+    
     */
     and dat > sysdate-364;
  exception when no_data_found then null;
@@ -1853,8 +1857,8 @@ begin
  end if;
  bars_audit.trace(p|| 'ins_ticket finished with mess:' ||sqlcode);
 end;
-
-    -- процедура на для отправки данных в дпа по нотариусам COBUMMFO-4028
+    
+    -- процедура на для отправки данных в дпа по нотариусам COBUMMFO-4028 
      -- в дополнению триггеру tai_accounts_tax. не вставленно в триггер т.к. какая-то процедура затирает параметр ob22
     PROCEDURE accounts_tax(p_acc     accounts.acc%TYPE
                           ,p_daos    accounts.daos%TYPE
@@ -1900,7 +1904,7 @@ end;
           RETURN;
        END IF;
 
-       -- если счёт отностися к ДПА, то продолжам с ним работать
+       -- если счёт отностися к ДПА, то продолжам с ним работать        
        IF  bars_dpa.dpa_nbs(p_nbs, p_ob22) = 1 THEN
          NULL;
        ELSE
@@ -1998,8 +2002,8 @@ end;
       IF SQL%rowcount > 0 THEN
         UPDATE accounts a
            SET a.blkd = nvl(trim(getglobaloption('DPA_BLK')), 0)
-         WHERE a.acc = p_acc;
-      END IF;
+         WHERE a.acc = p_acc; 
+      END IF;           
     EXCEPTION
        WHEN NO_DATA_FOUND THEN
           RETURN;
@@ -2035,6 +2039,7 @@ end;
 
 end bars_dpa;
 /
+  
  show err;
  
 PROMPT *** Create  grants  BARS_DPA ***

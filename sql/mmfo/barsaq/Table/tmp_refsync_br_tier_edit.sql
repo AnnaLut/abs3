@@ -65,10 +65,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010395 ***
+PROMPT *** Create  constraint SYS_C0010397 ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.TMP_REFSYNC_BR_TIER_EDIT MODIFY (KV NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.TMP_REFSYNC_BR_TIER_EDIT MODIFY (BRANCH NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -89,10 +89,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010397 ***
+PROMPT *** Create  constraint SYS_C0010395 ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.TMP_REFSYNC_BR_TIER_EDIT MODIFY (BRANCH NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.TMP_REFSYNC_BR_TIER_EDIT MODIFY (KV NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -102,7 +102,6 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_REFSYNC_BR_TIER_EDIT ***
 grant DELETE,INSERT,SELECT                                                   on TMP_REFSYNC_BR_TIER_EDIT to BARS;
-grant SELECT                                                                 on TMP_REFSYNC_BR_TIER_EDIT to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on TMP_REFSYNC_BR_TIER_EDIT to KLBX;
 grant SELECT                                                                 on TMP_REFSYNC_BR_TIER_EDIT to REFSYNC_USR;
 

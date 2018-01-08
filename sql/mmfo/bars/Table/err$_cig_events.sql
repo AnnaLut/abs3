@@ -73,10 +73,6 @@ COMMENT ON COLUMN BARS.ERR$_CIG_EVENTS.EVT_CUSTTYPE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIG_EVENTS ***
-grant SELECT                                                                 on ERR$_CIG_EVENTS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIG_EVENTS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

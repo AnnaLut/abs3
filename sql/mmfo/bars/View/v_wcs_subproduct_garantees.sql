@@ -18,9 +18,7 @@ PROMPT *** Create  view V_WCS_SUBPRODUCT_GARANTEES ***
  order by sg.subproduct_id, sg.ord;
 
 PROMPT *** Create  grants  V_WCS_SUBPRODUCT_GARANTEES ***
-grant SELECT                                                                 on V_WCS_SUBPRODUCT_GARANTEES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SUBPRODUCT_GARANTEES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_SUBPRODUCT_GARANTEES to UPLD;
 
 
 

@@ -117,10 +117,23 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CCKRESTRUPD_IDUPD_NN ***
+PROMPT *** Create  constraint FK_CCKRESTRUPDATE_KF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CCK_RESTR_UPDATE MODIFY (IDUPD CONSTRAINT CC_CCKRESTRUPD_IDUPD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CCK_RESTR_UPDATE ADD CONSTRAINT FK_CCKRESTRUPDATE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CCKRESTRUPD_RESTRID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CCK_RESTR_UPDATE MODIFY (RESTR_ID CONSTRAINT CC_CCKRESTRUPD_RESTRID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -165,10 +178,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CCKRESTRUPD_RESTRID_NN ***
+PROMPT *** Create  constraint CC_CCKRESTRUPD_IDUPD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CCK_RESTR_UPDATE MODIFY (RESTR_ID CONSTRAINT CC_CCKRESTRUPD_RESTRID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CCK_RESTR_UPDATE MODIFY (IDUPD CONSTRAINT CC_CCKRESTRUPD_IDUPD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -233,7 +246,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  CCK_RESTR_UPDATE ***
-grant SELECT                                                                 on CCK_RESTR_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on CCK_RESTR_UPDATE to BARSUPL;
 grant SELECT                                                                 on CCK_RESTR_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_RESTR_UPDATE to BARS_DM;

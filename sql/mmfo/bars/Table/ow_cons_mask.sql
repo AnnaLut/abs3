@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_CONS_MASK ***
-grant SELECT                                                                 on OW_CONS_MASK    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_CONS_MASK    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_CONS_MASK    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_CONS_MASK    to OW;
-grant SELECT                                                                 on OW_CONS_MASK    to UPLD;
 
 
 

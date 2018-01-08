@@ -217,6 +217,18 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_SVOWNER_OZN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_OWNER MODIFY (OZN CONSTRAINT CC_SVOWNER_OZN_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SVOWNER_NM2_NN ***
 begin   
  execute immediate '
@@ -241,18 +253,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SVOWNER_OZN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_OWNER MODIFY (OZN CONSTRAINT CC_SVOWNER_OZN_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_SVOWNER ***
 begin   
  execute immediate '
@@ -267,11 +267,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SV_OWNER ***
-grant SELECT                                                                 on SV_OWNER        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_OWNER        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SV_OWNER        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_OWNER        to RPBN002;
-grant SELECT                                                                 on SV_OWNER        to UPLD;
 
 
 

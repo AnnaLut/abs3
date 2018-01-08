@@ -15,11 +15,9 @@ PROMPT *** Create  view V_TOBO_OPEN ***
 ;
 
 PROMPT *** Create  grants  V_TOBO_OPEN ***
-grant SELECT                                                                 on V_TOBO_OPEN     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TOBO_OPEN     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TOBO_OPEN     to RCC_DEAL;
 grant SELECT                                                                 on V_TOBO_OPEN     to START1;
-grant SELECT                                                                 on V_TOBO_OPEN     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_TOBO_OPEN     to WR_ALL_RIGHTS;
 
 

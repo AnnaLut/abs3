@@ -24,38 +24,37 @@ PROMPT *** Create  table OW_OIC_ATRANSFERS_DATA ***
 begin 
   execute immediate '
   CREATE TABLE BARS.OW_OIC_ATRANSFERS_DATA 
-   (	ID NUMBER(22,0), 
-	IDN NUMBER(22,0), 
-	ANL_SYNTHREFN VARCHAR2(100), 
-	ANL_SYNTHCODE VARCHAR2(100), 
-	ANL_TRNDESCR VARCHAR2(254), 
-	ANL_ANALYTICREFN VARCHAR2(100), 
-	CREDIT_ANLACCOUNT VARCHAR2(30), 
-	CREDIT_SYNTACCOUNT VARCHAR2(30), 
-	CREDIT_AMOUNT NUMBER(20,2), 
-	CREDIT_CURRENCY NUMBER(3,0), 
-	DEBIT_ANLACCOUNT VARCHAR2(30), 
-	DEBIT_SYNTACCOUNT VARCHAR2(30), 
-	DEBIT_AMOUNT NUMBER(20,2), 
-	DEBIT_CURRENCY NUMBER(3,0), 
-	ANL_POSTINGDATE DATE, 
-	DOC_DRN NUMBER(18,0), 
-	DOC_LOCALDATE DATE, 
-	DOC_DESCR VARCHAR2(160), 
-	DOC_AMOUNT NUMBER(20,2), 
-	DOC_CURRENCY NUMBER(3,0), 
-	ERR_TEXT VARCHAR2(254), 
-	NLSA VARCHAR2(14), 
-	NAM_A VARCHAR2(38), 
-	ID_A VARCHAR2(14), 
-	NLSB VARCHAR2(14), 
-	NAM_B VARCHAR2(38), 
-	ID_B VARCHAR2(14), 
-	BRANCH VARCHAR2(30), 
-	DOC_ORN NUMBER(22,0), 
-	ACCOUNT_2924_016 VARCHAR2(14), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
-	TRANS_INFO VARCHAR2(4000)
+   (    ID NUMBER(22,0), 
+    IDN NUMBER(22,0), 
+    ANL_SYNTHREFN VARCHAR2(100), 
+    ANL_SYNTHCODE VARCHAR2(100), 
+    ANL_TRNDESCR VARCHAR2(254), 
+    ANL_ANALYTICREFN VARCHAR2(100), 
+    CREDIT_ANLACCOUNT VARCHAR2(30), 
+    CREDIT_SYNTACCOUNT VARCHAR2(30), 
+    CREDIT_AMOUNT NUMBER(20,2), 
+    CREDIT_CURRENCY NUMBER(3,0), 
+    DEBIT_ANLACCOUNT VARCHAR2(30), 
+    DEBIT_SYNTACCOUNT VARCHAR2(30), 
+    DEBIT_AMOUNT NUMBER(20,2), 
+    DEBIT_CURRENCY NUMBER(3,0), 
+    ANL_POSTINGDATE DATE, 
+    DOC_DRN NUMBER(18,0), 
+    DOC_LOCALDATE DATE, 
+    DOC_DESCR VARCHAR2(160), 
+    DOC_AMOUNT NUMBER(20,2), 
+    DOC_CURRENCY NUMBER(3,0), 
+    ERR_TEXT VARCHAR2(254), 
+    NLSA VARCHAR2(14), 
+    NAM_A VARCHAR2(38), 
+    ID_A VARCHAR2(14), 
+    NLSB VARCHAR2(14), 
+    NAM_B VARCHAR2(38), 
+    ID_B VARCHAR2(14), 
+    BRANCH VARCHAR2(30), 
+    DOC_ORN NUMBER(22,0), 
+    ACCOUNT_2924_016 VARCHAR2(14), 
+    KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -74,7 +73,6 @@ PROMPT *** ALTER_POLICIES to OW_OIC_ATRANSFERS_DATA ***
 
 COMMENT ON TABLE BARS.OW_OIC_ATRANSFERS_DATA IS 'OpenWay. Імпортовані файли atransfers';
 COMMENT ON COLUMN BARS.OW_OIC_ATRANSFERS_DATA.KF IS '';
-COMMENT ON COLUMN BARS.OW_OIC_ATRANSFERS_DATA.TRANS_INFO IS '';
 COMMENT ON COLUMN BARS.OW_OIC_ATRANSFERS_DATA.ID IS '';
 COMMENT ON COLUMN BARS.OW_OIC_ATRANSFERS_DATA.IDN IS '';
 COMMENT ON COLUMN BARS.OW_OIC_ATRANSFERS_DATA.ANL_SYNTHREFN IS '';
@@ -113,6 +111,19 @@ PROMPT *** Create  constraint CC_OWOICATRANSFERSDATA_KF_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.OW_OIC_ATRANSFERS_DATA MODIFY (KF CONSTRAINT CC_OWOICATRANSFERSDATA_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OWOICATRNDATA_OWFILES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_OIC_ATRANSFERS_DATA ADD CONSTRAINT FK_OWOICATRNDATA_OWFILES FOREIGN KEY (ID)
+      REFERENCES BARS.OW_FILES (ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -198,14 +209,37 @@ exception when others then
  end;
 /
 
+-- Add/modify columns 
+begin
+    execute immediate 'alter table OW_OIC_ATRANSFERS_DATA add trans_info VARCHAR2(254)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
 
+declare
+  l_dl number;
+begin 
+
+    select data_length into l_dl from all_tab_columns
+    where owner='BARS' 
+    and   table_name='OW_OIC_ATRANSFERS_DATA'
+    and   column_name='TRANS_INFO';
+    
+if   l_dl<>4000
+ then 
+      execute immediate 'alter table OW_OIC_ATRANSFERS_DATA drop column trans_info '; -- на данные колонки не используются 
+      execute immediate 'alter table OW_OIC_ATRANSFERS_DATA add trans_info VARCHAR2(4000)';
+end if;
+ 
+end; 
+/
 
 PROMPT *** Create  grants  OW_OIC_ATRANSFERS_DATA ***
-grant SELECT                                                                 on OW_OIC_ATRANSFERS_DATA to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on OW_OIC_ATRANSFERS_DATA to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_OIC_ATRANSFERS_DATA to BARS_DM;
 grant SELECT,UPDATE                                                          on OW_OIC_ATRANSFERS_DATA to OW;
-grant SELECT                                                                 on OW_OIC_ATRANSFERS_DATA to UPLD;
 
 
 

@@ -33,10 +33,6 @@ COMMENT ON COLUMN PFU.PFU_EPP_BRANCH.DATE_CLOSED IS '';
 
 
 
-PROMPT *** Create  grants  PFU_EPP_BRANCH ***
-grant SELECT                                                                 on PFU_EPP_BRANCH  to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_EPP_BRANCH  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

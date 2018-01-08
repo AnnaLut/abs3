@@ -154,226 +154,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C008272 ***
+PROMPT *** Create  constraint SYS_C008292 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (NLS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008273 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (KV NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008274 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (BRANCH NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008275 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (DAOS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008276 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (NMS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008277 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (LIM NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008278 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (OSTB NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008279 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (OSTC NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008280 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (OSTF NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008281 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (OSTQ NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008282 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (DOS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008283 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (KOS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008284 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (DOSQ NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008285 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (KOSQ NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008286 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (VID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008287 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (TRCN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008288 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (BLKD NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008289 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (BLKK NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008290 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (POS NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (TOBO NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -394,10 +178,226 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C008292 ***
+PROMPT *** Create  constraint SYS_C008290 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (TOBO NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (POS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008289 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (BLKK NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008288 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (BLKD NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008287 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (TRCN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008286 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (VID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008285 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (KOSQ NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008284 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (DOSQ NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008283 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (KOS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008282 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (DOS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008281 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (OSTQ NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008280 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (OSTF NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008279 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (OSTC NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008278 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (OSTB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008277 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (LIM NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008276 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (NMS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008275 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (DAOS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008274 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (BRANCH NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008273 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (KV NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008272 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS_AFTER_IMP MODIFY (NLS NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -406,9 +406,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACCOUNTS_AFTER_IMP ***
-grant SELECT                                                                 on ACCOUNTS_AFTER_IMP to BARSREADER_ROLE;
 grant SELECT                                                                 on ACCOUNTS_AFTER_IMP to BARS_DM;
-grant SELECT                                                                 on ACCOUNTS_AFTER_IMP to UPLD;
 
 
 

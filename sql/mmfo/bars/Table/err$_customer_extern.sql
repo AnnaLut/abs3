@@ -100,9 +100,7 @@ COMMENT ON COLUMN BARS.ERR$_CUSTOMER_EXTERN.ID IS '';
 
 
 PROMPT *** Create  grants  ERR$_CUSTOMER_EXTERN ***
-grant SELECT                                                                 on ERR$_CUSTOMER_EXTERN to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CUSTOMER_EXTERN to BARS_DM;
-grant SELECT                                                                 on ERR$_CUSTOMER_EXTERN to UPLD;
 
 
 

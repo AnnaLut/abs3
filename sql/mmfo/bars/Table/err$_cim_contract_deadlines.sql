@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_CIM_CONTRACT_DEADLINES.DELETE_DATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIM_CONTRACT_DEADLINES ***
-grant SELECT                                                                 on ERR$_CIM_CONTRACT_DEADLINES to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIM_CONTRACT_DEADLINES to UPLD;
-
 
 
 PROMPT ===================================================================================== 

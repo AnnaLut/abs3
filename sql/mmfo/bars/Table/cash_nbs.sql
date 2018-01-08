@@ -49,6 +49,19 @@ COMMENT ON COLUMN BARS.CASH_NBS.OB22 IS '';
 
 
 
+PROMPT *** Create  constraint XFK_CASHNBS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CASH_NBS ADD CONSTRAINT XFK_CASHNBS FOREIGN KEY (NBS)
+	  REFERENCES BARS.PS (NBS) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint XUK_CASHNBS ***
 begin   
  execute immediate '
@@ -78,12 +91,10 @@ exception when others then
 
 PROMPT *** Create  grants  CASH_NBS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CASH_NBS        to ABS_ADMIN;
-grant SELECT                                                                 on CASH_NBS        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CASH_NBS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CASH_NBS        to BARS_DM;
 grant SELECT                                                                 on CASH_NBS        to OPER000;
 grant SELECT                                                                 on CASH_NBS        to RPBN001;
-grant SELECT                                                                 on CASH_NBS        to UPLD;
 
 
 

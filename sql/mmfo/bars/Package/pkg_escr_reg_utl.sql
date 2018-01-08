@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/pkg_escr_reg_utl.sql =========*** Ru
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.PKG_ESCR_REG_UTL IS
+CREATE OR REPLACE PACKAGE pkg_escr_reg_utl IS
   c_branch VARCHAR2(4000) := sys_context(bars_context.context_ctx,
                                          bars_context.ctxpar_userbranch);
   /**********************************************
@@ -197,7 +191,7 @@
   PROCEDURE p_reg_repay(in_reg_list number_list);
 END pkg_escr_reg_utl;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
+CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
 
   g_body_version   CONSTANT VARCHAR2(64) := 'VERSION 8.7.4 19/12/2017';
   g_header_version CONSTANT VARCHAR2(64) := 'VERSION 8.7.2 18/12/2017';
@@ -255,7 +249,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
       WHEN OTHERS THEN
         out_user_name := 'НЕ ВИЗНАЧЕНО';
     END;
-
+  
   END p_get_user_name;
   /***************************************************************
      PROCEDURE   P_GET_NEW_ID
@@ -285,9 +279,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   **************************************************************/
   PROCEDURE p_get_type_id(in_type_code escr_reg_types.code%TYPE,
                           out_type_id  OUT escr_reg_types.id%TYPE
-
+                          
                           )
-
+  
    IS
   BEGIN
     BEGIN
@@ -306,7 +300,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   **************************************************************/
   PROCEDURE p_get_kind_id(in_kind_code escr_reg_kind.code%TYPE,
                           out_kind_id  OUT escr_reg_kind.id%TYPE
-
+                          
                           ) IS
   BEGIN
     BEGIN
@@ -325,7 +319,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   **************************************************************/
   PROCEDURE p_check_kind_id(in_kind_code escr_reg_kind.code%TYPE,
                             out_flag     OUT escr_reg_kind.valid_until%TYPE
-
+                            
                             ) IS
   BEGIN
     BEGIN
@@ -344,7 +338,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   **************************************************************/
   PROCEDURE p_get_status_id(in_status_code escr_reg_status.code%TYPE,
                             out_status_id  OUT escr_reg_status.id%TYPE
-
+                            
                             ) IS
   BEGIN
     BEGIN
@@ -363,7 +357,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   **************************************************************/
   PROCEDURE p_get_status_code(in_status_id    escr_reg_status.id%TYPE,
                               out_status_code OUT escr_reg_status.code%TYPE
-
+                              
                               ) IS
   BEGIN
     BEGIN
@@ -382,7 +376,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   **************************************************************/
   PROCEDURE p_get_status_name(in_status_code  escr_reg_status.code%TYPE,
                               out_status_name OUT escr_reg_status.name%TYPE
-
+                              
                               ) IS
   BEGIN
     BEGIN
@@ -401,7 +395,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   *********************************************/
   PROCEDURE p_get_reg_union_flag(in_reg_id          escr_register.id%TYPE,
                                  out_reg_union_flag OUT escr_register.reg_union_flag%TYPE) IS
-
+  
   BEGIN
     BEGIN
       SELECT t.reg_union_flag
@@ -412,7 +406,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
       WHEN no_data_found THEN
         NULL;
     END;
-
+  
   END p_get_reg_union_flag;
   /**********************************************
      PROCEDURE P_get_reg_register
@@ -420,10 +414,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   *********************************************/
   PROCEDURE p_get_reg_register(in_reg_id    escr_register.id%TYPE,
                                out_reg_list OUT number_list) IS
-
+  
     out_reg_list1 number_list := number_list();
   BEGIN
-
+  
     BEGIN
       SELECT t.out_doc_id
         BULK COLLECT
@@ -435,7 +429,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
       WHEN no_data_found THEN
         NULL;
     END;
-
+  
     out_reg_list := out_reg_list1;
   END p_get_reg_register;
   /**********************************************
@@ -446,13 +440,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                             in_check_flag NUMBER DEFAULT 0 -- перевіряємо чи ні статуси КД
                            ,
                             out_deal_list OUT number_list) IS
-
+  
     all_deal_list   number_list := number_list();
     valid_deal_list number_list := number_list();
     --final_deal_list number_list := number_list();
-
+  
   BEGIN
-
+  
     BEGIN
       SELECT t.out_doc_id
         BULK COLLECT
@@ -468,7 +462,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     то важливо не перезатерти по ним статуси при оплаті і виключити їх зі списку для оплати*/
     IF in_check_flag IN (7, 11) THEN
       BEGIN
-
+      
         SELECT t.deal_id
           BULK COLLECT
           INTO valid_deal_list
@@ -482,7 +476,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
       END;
       out_deal_list := valid_deal_list;
     ELSE
-
+    
       out_deal_list := all_deal_list;
     END IF;
   END p_get_reg_deals;
@@ -515,7 +509,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     UPDATE escr_reg_header t
        SET t.credit_status_id = l_status_id
      WHERE t.deal_id = in_obj_id;
-
+  
   END p_set_credit_status;
 
   /**********************************************
@@ -531,7 +525,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                              in_oper_level     NUMBER DEFAULT 0,
                              in_repay_flag     number DEFAULT 0 -- на ЦБД статус 11 може бут змінено на 7 для переплати
                              )
-
+  
    IS
     l_obj_status_id escr_reg_status.id%TYPE;
     l_max_status_id NUMBER;
@@ -541,7 +535,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     --   _escrRegister.SetComment(deals.deals.deal[i].deal_id, String.Empty, status_code, 0, 1, cmd);
     p_get_status_id(in_status_code => in_status_code,
                     out_status_id  => l_status_id);
-
+  
     -- Перевіряємо попередній статус об*єкта.Перевірку не виконуємо для помилки валідації.Вона може щоразу мат різні коментарі
     IF l_status_id <> 16 THEN
       BEGIN
@@ -560,7 +554,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     if l_max_status_id = 11 and in_repay_flag = 0 then
       return;
     end if;
-
+  
     IF l_max_status_id <> l_status_id OR l_max_status_id IS NULL or
        (l_max_status_id = 11 and in_repay_flag = 1) THEN
       --ОТРИМУЄМО НОВИЙ ID
@@ -638,10 +632,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
         p_get_reg_union_flag(in_reg_id          => in_obj_id,
                              out_reg_union_flag => l_reg_union_flag);
       END IF;
-
+    
       --Якщо тип об*єкта 1 і рєєстр немає пов*язаних реєстрів, то оновлюємо статуси лише кредитам в цьому реєстрі
       IF in_obj_type = 1 AND in_obj_check = 1 AND l_reg_union_flag = 0 THEN
-
+      
         UPDATE escr_register t
            SET t.status_id = l_status_id,
                t.user_id   = user_id,
@@ -650,7 +644,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
         p_get_reg_deals(in_reg_id     => in_obj_id,
                         in_check_flag => l_status_id,
                         out_deal_list => l_credit_list);
-
+      
         FOR i IN 1 .. l_credit_list.count LOOP
           INSERT INTO escr_reg_obj_state
             (id,
@@ -712,7 +706,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
           p_get_reg_deals(in_reg_id     => l_reg_list(i),
                           in_check_flag => l_status_id,
                           out_deal_list => l_credit_list);
-
+        
           FOR i IN 1 .. l_credit_list.count LOOP
             INSERT INTO escr_reg_obj_state
               (id,
@@ -749,9 +743,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   PROCEDURE p_get_obj_status(in_obj_id   escr_register.id%TYPE,
                              in_obj_type escr_reg_obj_state.obj_type%TYPE,
                              out_status  OUT escr_reg_status.id%TYPE) IS
-
+  
   BEGIN
-
+  
     BEGIN
       SELECT t.status_id
         INTO out_status
@@ -770,13 +764,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
      DESCRIPTION: Встановлює признак, що реєстр об*єднано з кількох реєстрів того ж виду і типу
   *********************************************/
   PROCEDURE p_set_reg_union_flag(in_reg_id escr_register.id%TYPE) IS
-
+  
   BEGIN
     UPDATE escr_register t
        SET t.reg_union_flag = 1,
            t.inner_number   = t.inner_number || ' об''єднаний'
      WHERE t.id = in_reg_id;
-
+  
   END p_set_reg_union_flag;
   /***************************************************************
      PROCEDURE   p_deal_in_reg
@@ -910,14 +904,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                                   in_out_doc_type escr_reg_mapping.out_doc_type%TYPE,
                                   in_oper_type    escr_reg_mapping.oper_type %TYPE,
                                   in_oper_date    DATE DEFAULT SYSDATE) IS
-
+  
   BEGIN
     -- DOC_TYPE МОЖЕ ПРИЙМАТИ ЗНАЧЕННЯ 1 -РЕЄСТР,0-КРЕДИТ
     -- OPER_TYPE 0-РЕЄСТР-КРЕДИТ,1- РЕЄСТР-РЕЄСТР
     ---!!!!ДОДАТИ перевірку на статус
-
+  
     FORALL i IN in_out_doc_id.first .. in_out_doc_id.last
-
+    
       INSERT INTO escr_reg_mapping
         (id,
          in_doc_id,
@@ -952,7 +946,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     l_material_count number_list;
     l_customer_okpo  number_list;
     l_deal_id        number_list;
-
+  
   BEGIN
     BEGIN
       SELECT COUNT(CASE
@@ -973,7 +967,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
        GROUP BY t.customer_okpo
       HAVING COUNT(*) > 1;
     END;
-
+  
     IF l_material_count.count > 0 THEN
       BEGIN
         SELECT t.deal_id
@@ -1020,9 +1014,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                            in_oper_level     => 1);
         END LOOP;
       END IF;
-
+    
     END IF;
-
+  
   END p_check_after_create;
   /************************************************************
      PROCEDURE   p_check_before_create
@@ -1035,9 +1029,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     l_deal_id  number_list;
     l_multiset number_list;
     l_improved number_list;
-
+  
   BEGIN
-
+  
     out_check_flag := 0;
     l_deal_id      := number_list();
     l_invalid      := number_list();
@@ -1062,12 +1056,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     IF out_check_flag <> 0 THEN
       out_check_flag := -999;
     END IF;
-
+  
     --
-
+  
     --При нагоді переписати vw_escr_invalid_credits -вона дуже важка
     IF out_check_flag = 0 THEN
-
+    
       FOR c IN (SELECT t.deal_id,
                        listagg(t.rn || '.' || t.description || chr(13) ||
                                chr(10)) within GROUP(ORDER BY t.rn, t.deal_id, t.description) reg_errors
@@ -1078,7 +1072,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                                bars.escr_errors_types       t2
                          WHERE t1.error_id = t2.id) t
                  GROUP BY t.deal_id) LOOP
-
+      
         /* pkg_escr_reg_utl.p_set_credit_status(in_obj_id         => c.deal_id
         ,in_status_code    => 'VALID_ERROR'
         ,in_status_comment => substr(c.reg_errors
@@ -1151,7 +1145,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
            err$_escr_reg_mapping('update') reject LIMIT unlimited;
           l_in_out_doc_id.delete(i);
         END IF;
-
+      
       END LOOP;
     END IF;
     --FORALL i IN in_out_doc_id.first .. in_out_doc_id.last
@@ -1186,7 +1180,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   **************************************************************/
   PROCEDURE p_unmapping(in_doc_id    number_list,
                         in_oper_type escr_reg_mapping.oper_type %TYPE
-
+                        
                         ) IS
   BEGIN
     -- OPER_TYPE 0-РЕЄСТР-КРЕДИТ,1- РЕЄСТР-РЕЄСТР
@@ -1231,10 +1225,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     l_inner_number escr_register.inner_number%TYPE;
     l_create_date  escr_register.create_date%TYPE := SYSDATE;
     l_check_flag   NUMBER;
-
+  
   BEGIN
     -- in_reg_level може приймати значення 1-ЦА,0-РУ
-
+  
     p_get_user_name(out_user_name => user_name);
     --Визначаємо ID типу, виду реєстру та статусу
     p_get_status_id(in_status_code => 'ADD_TO_REGISTER',
@@ -1251,7 +1245,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
       l_check_flag := 0;
     END IF;
     --ДОДАЄМО НОВИЙ ЗАПИС В РЕЄСТР
-
+  
     IF l_check_flag <> -999 THEN
       IF out_reg_id IS NULL THEN
         --ГЕНЕРУЄМО НОВИЙ ID
@@ -1404,7 +1398,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
      WHERE id = in_reg_id;
     --cck_app.set_nd_txt(in_obj_id, 'ES007', in_status_comment);
     BEGIN
-
+    
       pkg_escr_reg_utl.p_set_obj_status(in_obj_id         => in_reg_id,
                                         in_obj_type       => 1,
                                         in_status_code    => 'CONFIRMED_GVI',
@@ -1413,7 +1407,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                                         in_set_date       => SYSDATE,
                                         in_oper_level     => 1);
     END;
-
+  
   END p_set_reg_out_number;
   /**********************************************
      PROCEDURE   f_convert_to_number
@@ -1463,19 +1457,19 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
 
   PROCEDURE p_reg_ins_xml(in_dom_doc IN xmldom.domdocument,
                           in_file_id NUMBER DEFAULT NULL) IS
-
+  
     l_escrparamlist dbms_xmldom.domnodelist;
     l_escrparam     dbms_xmldom.domnode;
-
+  
     h     VARCHAR2(100) := 'bars.pkg_escr_reg_utls.p_reg_ins_xml.';
     l_str VARCHAR2(2000);
-
+  
     l_reg_rec            t_register := t_register();
     l_reg_count          NUMBER;
     l_error_count_before NUMBER;
     l_error_count_after  NUMBER;
   BEGIN
-
+  
     bars_audit.trace(h || 'Started');
     begin
       select count(t.id)
@@ -1490,61 +1484,61 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                                                         'EscrParam');
     FOR i IN 0 .. dbms_xmldom.getlength(l_escrparamlist) - 1 LOOP
       l_escrparam := dbms_xmldom.item(l_escrparamlist, i);
-
+    
       l_reg_rec.extend;
-
+    
       dbms_xslprocessor.valueof(l_escrparam, 'register/ID/text()', l_str);
       l_reg_rec(l_reg_rec.last).id := f_convert_to_number(l_str);
-
+    
       dbms_xslprocessor.valueof(l_escrparam,
                                 'register/INNER_NUMBER/text()',
                                 l_str);
       l_reg_rec(l_reg_rec.last).inner_number := TRIM(l_str);
-
+    
       dbms_xslprocessor.valueof(l_escrparam,
                                 'register/OUTER_NUMBER/text()',
                                 l_str);
       l_reg_rec(l_reg_rec.last).outer_number := TRIM(l_str);
-
+    
       l_reg_rec(l_reg_rec.last).create_date := SYSDATE;
-
+    
       dbms_xslprocessor.valueof(l_escrparam,
                                 'register/DATE_FROM/text()',
                                 l_str);
       l_reg_rec(l_reg_rec.last).date_from := to_date(substr(l_str, 1, 10),
                                                      'yyyy-mm-dd');
-
+    
       dbms_xslprocessor.valueof(l_escrparam,
                                 'register/DATE_TO/text()',
                                 l_str);
       l_reg_rec(l_reg_rec.last).date_to := to_date(substr(l_str, 1, 10),
                                                    'yyyy-mm-dd');
-
+    
       dbms_xslprocessor.valueof(l_escrparam,
                                 'register/REG_TYPE_ID/text()',
                                 l_str);
       l_reg_rec(l_reg_rec.last).reg_type_id := f_convert_to_number(l_str);
-
+    
       dbms_xslprocessor.valueof(l_escrparam,
                                 'register/REG_KIND_ID/text()',
                                 l_str);
       l_reg_rec(l_reg_rec.last).reg_kind_id := f_convert_to_number(l_str);
-
+    
       dbms_xslprocessor.valueof(l_escrparam,
                                 'register/BRANCH/text()',
                                 l_str);
       l_reg_rec(l_reg_rec.last).branch := TRIM(l_str);
-
+    
       dbms_xslprocessor.valueof(l_escrparam,
                                 'register/REG_LEVEL/text()',
                                 l_str);
       l_reg_rec(l_reg_rec.last).reg_level := f_convert_to_number(l_str);
-
+    
       dbms_xslprocessor.valueof(l_escrparam,
                                 'register/USER_ID/text()',
                                 l_str);
       l_reg_rec(l_reg_rec.last).user_id := f_convert_to_number(l_str);
-
+    
       dbms_xslprocessor.valueof(l_escrparam,
                                 'register/USER_NAME/text()',
                                 l_str);
@@ -1553,12 +1547,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
       /*,'CL8MSWIN1251'
                                                                                                                                                                                                                                                          ,'UTF8'))*/
         ;
-
+    
       dbms_xslprocessor.valueof(l_escrparam,
                                 'register/STATUS_ID/text()',
                                 l_str);
       l_reg_rec(l_reg_rec.last).status_id := f_convert_to_number(l_str);
-
+    
       dbms_xslprocessor.valueof(l_escrparam,
                                 'register/REG_UNION_FLAG/text()',
                                 l_str);
@@ -1566,7 +1560,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
       l_reg_rec(l_reg_rec.last).file_id := in_file_id;
       -- dbms_xmldom.freedocument(in_dom_doc);
     END LOOP;
-
+  
     --Вставка в таблицю  escr_register всіх реєстрів з коелкції
     BEGIN
       FORALL j IN l_reg_rec.first .. l_reg_rec.last
@@ -1598,7 +1592,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                        in_status_code => 'RECEIVED',
                        in_obj_check   => 1 /*0*/);
     END LOOP;
-
+  
     --очистка,якщо виникли помилки
     l_reg_rec.delete();
     l_reg_rec := NULL;
@@ -1611,11 +1605,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
 
   PROCEDURE p_reg_header_ins_xml(in_dom_doc IN xmldom.domdocument,
                                  in_file_id NUMBER DEFAULT 0) IS
-
+  
     h                   VARCHAR2(100) := 'bars.pkg_escr_reg_utls.p_reg_header_ins_xml.';
     l_escrdealparamlist dbms_xmldom.domnodelist;
     l_escrdealparam     dbms_xmldom.domnode;
-
+  
     l_reg_header         t_reg_header := t_reg_header();
     l_reg_mapping        t_reg_mapping := t_reg_mapping();
     l_str                VARCHAR(4000);
@@ -1625,7 +1619,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     l_error_count_before_1 NUMBER;
     l_error_count_after_1   NUMBER;
   BEGIN
-
+  
     bars_audit.trace(h || 'Started');
     begin
       select count(t.id)
@@ -1646,60 +1640,60 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     --Формуємо колекцію кредитів ,а також мапінг між кредитами та реєстрами
     l_escrdealparamlist := dbms_xmldom.getelementsbytagname(in_dom_doc,
                                                             'EscrDealParam');
-
+  
     dbms_output.put_line(dbms_xmldom.getlength(l_escrdealparamlist));
     FOR i IN 0 .. dbms_xmldom.getlength(l_escrdealparamlist) - 1 LOOP
       l_escrdealparam := dbms_xmldom.item(l_escrdealparamlist, i);
-
+    
       l_reg_header.extend;
       l_reg_header(l_reg_header.last).id := s_escr.nextval;
       dbms_xslprocessor.valueof(l_escrdealparam,
                                 'credit/CUSTOMER_ID/text()',
                                 l_str);
       l_reg_header(l_reg_header.last).customer_id := f_convert_to_number(l_str);
-
+    
       dbms_xslprocessor.valueof(l_escrdealparam,
                                 'credit/CUSTOMER_NAME/text()',
                                 l_str);
-
+    
       l_reg_header(l_reg_header.last).customer_name := l_str;
-
+    
       dbms_xslprocessor.valueof(l_escrdealparam,
                                 'credit/CUSTOMER_OKPO/text()',
                                 l_str);
       l_reg_header(l_reg_header.last).customer_okpo := l_str;
-
+    
       dbms_xslprocessor.valueof(l_escrdealparam,
                                 'credit/CUSTOMER_REGION/text()',
                                 l_str);
-
+    
       l_reg_header(l_reg_header.last).customer_region := l_str;
-
+    
       dbms_xslprocessor.valueof(l_escrdealparam,
                                 'credit/CUSTOMER_FULL_ADDRESS/text()',
                                 l_str);
-
+    
       l_reg_header(l_reg_header.last).customer_full_address := l_str;
-
+    
       dbms_xslprocessor.valueof(l_escrdealparam,
                                 'credit/SUBS_NUMB/text()',
                                 l_str);
-
+    
       l_reg_header(l_reg_header.last).subs_numb := l_str;
-
+    
       dbms_xslprocessor.valueof(l_escrdealparam,
                                 'credit/SUBS_DATE/text()',
                                 l_str);
-
+    
       l_reg_header(l_reg_header.last).subs_date := to_date(substr(l_str,
                                                                   1,
                                                                   10),
                                                            'yyyy-mm-dd');
-
+    
       dbms_xslprocessor.valueof(l_escrdealparam,
                                 'credit/SUBS_DOC_TYPE/text()',
                                 l_str);
-
+    
       l_reg_header(l_reg_header.last).subs_doc_type := l_str;
       l_reg_mapping.extend;
       dbms_xslprocessor.valueof(l_escrdealparam,
@@ -1741,7 +1735,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                                 'credit/DEAL_STATE/text()',
                                 l_str);
       l_reg_header(l_reg_header.last).deal_state := l_str;
-
+    
       dbms_xslprocessor.valueof(l_escrdealparam,
                                 'credit/DEAL_TYPE_NAME/text()',
                                 l_str);
@@ -1760,7 +1754,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                                 'credit/NLS/text()',
                                 l_str);
       l_reg_header(l_reg_header.last).nls := l_str;
-
+    
       dbms_xslprocessor.valueof(l_escrdealparam,
                                 'credit/DOC_DATE/text()',
                                 l_str);
@@ -1796,9 +1790,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                                 'credit/USER_NAME/text()',
                                 l_str);
       l_reg_header(l_reg_header.last).user_name := l_str;
-
+    
       --заповнюємо колекцію мапінгу
-
+    
       l_reg_mapping(l_reg_mapping.last).id := s_escr.nextval;
       dbms_xslprocessor.valueof(l_escrdealparam,
                                 'credit/REG_ID/text()',
@@ -1809,9 +1803,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
       l_reg_mapping(l_reg_mapping.last).branch := c_branch;
       l_reg_mapping(l_reg_mapping.last).oper_date := SYSDATE;
       l_reg_mapping(l_reg_mapping.last).oper_type := 0;
-
+    
     END LOOP;
-
+  
     /*    --очищаємо таблиці,що містять помилкові записи
     BEGIN
       EXECUTE IMMEDIATE ' truncate table  ERR$_escr_reg_header';
@@ -1824,7 +1818,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
           ('INSERT') reject LIMIT unlimited;
       -- l_reg_header.delete;
     END;
-
+  
     BEGIN
       FORALL j IN l_reg_mapping.first .. l_reg_mapping.last
         INSERT INTO escr_reg_mapping t
@@ -1877,7 +1871,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     l_reg_header := NULL;
     l_reg_mapping.delete();
     l_reg_mapping := NULL;
-
+  
     -- dbms_xmldom.freedocument(in_dom_doc);
   END p_reg_header_ins_xml;
   /**********************************************
@@ -1887,18 +1881,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
 
   PROCEDURE p_reg_body_ins_xml(in_dom_doc IN xmldom.domdocument,
                                in_file_id NUMBER DEFAULT 0) IS
-
+  
     h                     VARCHAR2(100) := 'bars.pkg_escr_reg_utls.p_reg_body_ins_xml.';
     l_escreventsparamlist dbms_xmldom.domnodelist;
     l_escreventsparam     dbms_xmldom.domnode;
-
+  
     l_reg_body       t_reg_body := t_reg_body();
     l_str            VARCHAR(4000);
     l_reg_body_count NUMBER;
     l_error_count_before NUMBER;
     l_error_count_after  NUMBER;
   BEGIN
-
+  
     bars_audit.trace(h || 'Started');
     begin
       select count(t.id)
@@ -1911,11 +1905,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     --Формуємо колекцію кредитів ,а також мапінг між кредитами та реєстрами
     l_escreventsparamlist := dbms_xmldom.getelementsbytagname(in_dom_doc,
                                                               'EscrHeaderEvents');
-
+  
     dbms_output.put_line(dbms_xmldom.getlength(l_escreventsparamlist));
     FOR i IN 0 .. dbms_xmldom.getlength(l_escreventsparamlist) - 1 LOOP
       l_escreventsparam := dbms_xmldom.item(l_escreventsparamlist, i);
-
+    
       l_reg_body.extend;
       l_reg_body(l_reg_body.last).id := s_escr.nextval;
       dbms_xslprocessor.valueof(l_escreventsparam, 'DEAL_ID/text()', l_str);
@@ -1940,7 +1934,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                                 'DEAL_EVENT_ID/text()',
                                 l_str);
       l_reg_body(l_reg_body.last).deal_event_id := f_convert_to_number(l_str);
-
+    
     END LOOP;
     --очищаємо таблиці,що містять помилкові записи
     /* BEGIN
@@ -1973,7 +1967,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     --очистка,якщо виникли помилки
     l_reg_body.delete();
     l_reg_body := NULL;
-
+  
     -- dbms_xmldom.freedocument(in_dom_doc);
   END p_reg_body_ins_xml;
   /**********************************************
@@ -2006,10 +2000,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     l_parser := dbms_xmlparser.newparser;
     dbms_xmlparser.parseclob(l_parser, l_reg_xml);
     bars_audit.trace(h || 'clob loaded');
-
+  
     l_doc := dbms_xmlparser.getdocument(l_parser);
     bars_audit.trace(h || 'getdocument done');
-
+  
     p_reg_ins_xml(l_doc, in_file_id);
     p_reg_header_ins_xml(l_doc, in_file_id);
     p_reg_body_ins_xml(l_doc, in_file_id);
@@ -2036,14 +2030,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                           in_new_good_cost NUMBER,
                           in_new_deal_sum  NUMBER,
                           in_new_comp_sum  NUMBER) IS
-
+  
   BEGIN
     logger.info('ESCR.p_set_new_sum in_deal_id=' || in_deal_id ||
                 ' ,in_new_good_cost=' || in_new_good_cost);
     cck_app.set_nd_txt(in_deal_id, 'ES010', in_new_good_cost);
     cck_app.set_nd_txt(in_deal_id, 'ES011', in_new_deal_sum);
     cck_app.set_nd_txt(in_deal_id, 'ES012', in_new_comp_sum);
-
+  
   END p_set_new_sum;
   /***************************************************************
      PROCEDURE   p_change_comp_sum
@@ -2060,7 +2054,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     UPDATE bars.escr_reg_header t
        SET t.new_deal_sum = t.deal_sum * (t.new_good_cost / t.good_cost)
      WHERE t.deal_id = in_deal_id;
-
+  
     FOR rez IN (SELECT *
                   FROM bars.vw_escr_reg_header_ca t
                  WHERE t.deal_id = in_deal_id) LOOP
@@ -2171,7 +2165,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                              out_deal_sum   out number,
                              out_good_cost  out number,
                              out_comp_sum   out number) is
-
+  
     l_deal_count number;
     l_deal_sum   number;
     l_good_cost  number;
@@ -2195,7 +2189,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                        where t1.in_doc_id = in_reg_id
                          and t1.out_doc_id = t.id) r,
                     escr_reg_mapping em,
-                       escr_register reg
+                       escr_register reg 
                  where em.in_doc_id = r.id
                    and er.deal_id = em.out_doc_id
                    and reg.id=r.in_doc_id
@@ -2301,7 +2295,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
       bars.bars_context.subst_branch@' || l_dblink ||
                       '(''/'' || l_g_mfo || ''/'');
     end;';
-
+  
     BEGIN
       EXECUTE IMMEDIATE 'select acc,
        kf,
@@ -2366,7 +2360,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     oo.mfoa  := aa.kf;
     oo.kv    := aa.kv;
     FOR i IN 1 .. in_reg_list.count LOOP
-
+    
       FOR k IN (select er.id,
                        er.customer_name,
                        er.customer_okpo,
@@ -2388,7 +2382,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                          where t1.in_doc_id = in_reg_list(i)
                            and t1.out_doc_id = t.id) r,
                        escr_reg_mapping em,
-                       escr_register reg
+                       escr_register reg 
                  where em.in_doc_id = r.id
                    and er.deal_id = em.out_doc_id
                    and reg.id=r.in_doc_id
@@ -2425,7 +2419,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
         oo.nlsb := vkrzn(substr(k.mfo, 1, 5), '3739005');
         oo.nd   := substr(k.deal_number, 1, 10);
         oo.mfob := k.mfo;
-
+      
         BEGIN
           SELECT mfo INTO oo.id_b FROM banks WHERE mfo = k.mfo;
         EXCEPTION
@@ -2434,7 +2428,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                                     '\ не знайдено в banks_RU MFO=' ||
                                     k.mfo);
         END;
-
+      
         BEGIN
           EXECUTE IMMEDIATE 'select OKPO
                                  from bars.banks_ru@' ||
@@ -2445,7 +2439,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
           WHEN no_data_found THEN
             oo.id_a := NULL;
         END;
-
+      
         BEGIN
           EXECUTE IMMEDIATE 'select OKPO
                                  from bars.banks_ru@' ||
@@ -2458,7 +2452,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
         END;
         --   oo.id_b := k.G03 ;
         ---  oo.nazn := ND;SDATE;CC_ID;OKPO;NMK
-
+      
         IF /*instr(k.customer_okpo, 'Відмітка про відсутність')>0  and*/
          length(TRIM(k.customer_okpo)) > 10 THEN
           oo.nazn := substr(k.reg_n || ';' || k.deal_id || ';' ||
@@ -2541,7 +2535,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
            AND customer_okpo = k.customer_okpo;
       END LOOP;
     END LOOP;
-
+  
     FOR i IN 1 .. in_reg_list.count LOOP
       p_set_obj_status(in_reg_list(i),
                        1,
@@ -2550,7 +2544,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                        1,
                        SYSDATE);
     END LOOP;
-
+  
   END p_gen_pay;
   /**********************************************
      FUNCTION   p_sync_state
@@ -2565,14 +2559,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   BEGIN
     l_len := dbms_lob.getlength(p_clob);
     dbms_lob.createtemporary(l_clob, TRUE);
-
+  
     WHILE l_pos <= l_len LOOP
       dbms_lob.read(p_clob, l_amount, l_pos, l_buf);
       l_buf := utl_encode.text_decode(l_buf, encoding => utl_encode.base64);
       l_pos := l_pos + l_amount;
       dbms_lob.writeappend(l_clob, length(l_buf), l_buf);
     END LOOP;
-
+  
     RETURN l_clob;
   END;
 
@@ -2586,11 +2580,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     l_deals       t_vw_escr_list_for_sync;
     l_id          staff$base.id%TYPE;
     l_branch      staff$base.branch%TYPE;
-
+  
     -- Для теста
     --l_url := BRANCH_ATTRIBUTE_UTL.GET_VALUE ('/300465/','ESCR_URL_RU');
   BEGIN
-
+  
     BEGIN
       BEGIN
         SELECT branch INTO l_branch FROM staff$base WHERE id = user_id;
@@ -2621,21 +2615,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
         EXECUTE IMMEDIATE 'alter session set current_schema=BARS';
         bars.bars_login.login_user(sys_guid, l_id, NULL, NULL);
     END;
-
+  
     BEGIN
       SELECT MAX(val)
         INTO l_wallet_path
         FROM web_barsconfig
        WHERE key = 'SMPP.Wallet_dir';
     END;
-
+  
     BEGIN
       SELECT MAX(val)
         INTO l_wallet_pwd
         FROM web_barsconfig
        WHERE key = 'SMPP.Wallet_pass';
     END;
-
+  
     OPEN l_cursor FOR
     /*      SELECT rm.* \*DEAL_ID,
                                                  decode(rm.credit_status_id, 11, rm.credit_status_id, null) as state_id,
@@ -2684,7 +2678,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
         SELECT appendchildxml(l_root, 'root', l_dealsxml)
           INTO l_root
           FROM dual;
-
+      
         UPDATE tmp_klp_clob
            SET c = l_root.getclobval()
          WHERE namef = 'EWA';
@@ -2698,7 +2692,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                                 p_wallet_pwd  => l_wallet_pwd,
                                 p_body        => '<?xml version="1.0"?>' ||
                                                  l_root.getclobval());
-
+      
         wsm_mgr.add_header(p_name  => 'Content-Type',
                            p_value => 'application/xml;charset=utf-8');
         -- iicaaou iaoia aaa-na?aena
@@ -2711,7 +2705,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
       END;
       EXIT WHEN l_cursor%NOTFOUND;
     END LOOP;
-
+  
     /*wsm_mgr.prepare_request(p_url         => l_url ||
                                              'createregister/syncstate'
                            ,p_action      => NULL
@@ -2719,12 +2713,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                            ,p_wallet_path => l_wallet_path
                            ,p_wallet_pwd  => l_wallet_pwd
                            ,p_body        => 'sync states');
-
+    
     wsm_mgr.add_header(p_name  => 'Content-Type'
                       ,p_value => 'text/plain; charset=utf-8');
     -- iicaaou iaoia aaa-na?aena
     wsm_mgr.execute_api(l_response);
-
+    
     l_response.cdoc := decodeclobfrombase64(dbms_lob.substr(l_response.cdoc
                                                            ,length(l_response.cdoc) - 2
                                                            ,2));*/
@@ -2732,14 +2726,3 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   END p_sync_state;
 END pkg_escr_reg_utl;
 /
- show err;
- 
-PROMPT *** Create  grants  PKG_ESCR_REG_UTL ***
-grant EXECUTE                                                                on PKG_ESCR_REG_UTL to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/pkg_escr_reg_utl.sql =========*** En
- PROMPT ===================================================================================== 
- 

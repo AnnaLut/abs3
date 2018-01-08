@@ -101,11 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  META_MANDATORY_FLAGS ***
-grant SELECT                                                                 on META_MANDATORY_FLAGS to BARSREADER_ROLE;
 grant SELECT                                                                 on META_MANDATORY_FLAGS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on META_MANDATORY_FLAGS to BARS_DM;
 grant SELECT                                                                 on META_MANDATORY_FLAGS to START1;
-grant SELECT                                                                 on META_MANDATORY_FLAGS to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_MANDATORY_FLAGS to WR_ALL_RIGHTS;
 
 

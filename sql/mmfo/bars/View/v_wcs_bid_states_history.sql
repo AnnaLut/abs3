@@ -34,9 +34,7 @@ PROMPT *** Create  view V_WCS_BID_STATES_HISTORY ***
  order by bsh.bid_id desc, bsh.id desc;
 
 PROMPT *** Create  grants  V_WCS_BID_STATES_HISTORY ***
-grant SELECT                                                                 on V_WCS_BID_STATES_HISTORY to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_BID_STATES_HISTORY to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_BID_STATES_HISTORY to UPLD;
 
 
 

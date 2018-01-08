@@ -1,3 +1,5 @@
+SET SERVEROUTPUT ON 
+SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_KODZ.sql =========*
 PROMPT ===================================================================================== 
@@ -16,11 +18,11 @@ PROMPT *** Create/replace  ARM  $RM_KODZ ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-	d integer := 0;
+    d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_KODZ створюємо (або оновлюємо) АРМ АРМ Державна Закупiвля ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
-                             P_ARM_NAME              => l_application_name,
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
+                             P_ARM_NAME              => l_application_name, 
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -28,78 +30,78 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію  Коди Державної Закупiвлi ********** ');
           --  Створюємо функцію  Коди Державної Закупiвлi
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => ' Коди Державної Закупiвлi',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0&sPar=KOD_DZ',
-                                                  p_rolename => 'START1' ,
+                                                  p_rolename => 'START1' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перегляд Держ.закупiвлi з документами ********** ');
           --  Створюємо функцію Перегляд Держ.закупiвлi з документами
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Перегляд Держ.закупiвлi з документами',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=KOD_DZR[PROC=>BARS.P_KODDZ(:Par0)][PAR=>:Par0(SEM=0-Поточний 1-Минулий рiк,TYPE=N)][EXEC=>BEFORE]',
-                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,
+                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Документи з кодами Держ.Закупівлі ********** ');
           --  Створюємо функцію Документи з кодами Держ.Закупівлі
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Документи з кодами Держ.Закупівлі',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=OPER_OPERW_KODDZ&accessCode=1',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Наповнення довідника перекриття (параметри підрозділу)
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Наповнення довідника перекриття (параметри підрозділу)',
-															  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=[PROC=>DFO_BP(''2'')]
+                                                              p_name     => 'Наповнення довідника перекриття (параметри підрозділу)',
+                                                              p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=[PROC=>DFO_BP(''2'')]
   [EXEC=>BEFORE][QST=>Зробити наповнення довідника параметри перекриття (%15)?][MSG=>Виконано!]',
-															  p_rolename => 'BARS_ACCESS_DEFROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_rolename => 'BARS_ACCESS_DEFROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Курси банківських металів
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Курси банківських металів',
-															  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_CENTR_KUBM_2013',
-															  p_rolename => 'BARS_ACCESS_DEFROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Курси банківських металів',
+                                                              p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_CENTR_KUBM_2013',
+                                                              p_rolename => 'BARS_ACCESS_DEFROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Виконання списку функцій при відкритті та закритті дня
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Виконання списку функцій при відкритті та закритті дня',
-															  p_funcname => '/barsroot/opencloseday/closeday/funclist',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Виконання списку функцій при відкритті та закритті дня',
+                                                              p_funcname => '/barsroot/opencloseday/closeday/funclist',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довідники NEW ********** ');
           --  Створюємо функцію Довідники NEW
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Довідники NEW',
                                                   p_funcname => '/barsroot/referencebook/referencelist/',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_KODZ) - АРМ Державна Закупiвля  ');
     l := l_function_ids.first;
@@ -107,8 +109,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-
-
+     
+     
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -122,7 +124,6 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
-commit;
 end;
 /
 

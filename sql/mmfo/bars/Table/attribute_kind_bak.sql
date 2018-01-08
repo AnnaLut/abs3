@@ -80,9 +80,7 @@ COMMENT ON COLUMN BARS.ATTRIBUTE_KIND_BAK.HISTORY_SAVING_MODE_ID IS 'Режим збере
 
 
 PROMPT *** Create  grants  ATTRIBUTE_KIND_BAK ***
-grant SELECT                                                                 on ATTRIBUTE_KIND_BAK to BARSREADER_ROLE;
 grant SELECT                                                                 on ATTRIBUTE_KIND_BAK to BARS_DM;
-grant SELECT                                                                 on ATTRIBUTE_KIND_BAK to UPLD;
 
 
 

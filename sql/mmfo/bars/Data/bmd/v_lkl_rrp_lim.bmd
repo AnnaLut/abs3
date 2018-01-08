@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Встановлення лімітів прямим участникам';
   l_tablinesdef := '400';
-  l_tabselect_statement := '';
   l_tabname     := 'V_LKL_RRP_LIM';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,19 +119,19 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC рах', '', 22, null, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CLDOS', 'N', 'Обороти Дебет~3', '', 22, 4, 0, 0, 0, 0, '', '', 0, 0, 'Sum (CLDOS)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'CLKOS', 'N', 'Обороти Кредит~4', '', 22, 5, 0, 0, 0, 0, '', '', 0, 0, 'Sum (CLKOS)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'CLLCV', 'C', 'Валюта', '', 3, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'CLLNO', 'N', 'Ліміт~початкових~7', '', 22, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'CLLTK', 'N', 'Ліміт~7', '', 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'CLMFO', 'C', 'МФО~1', '', 12, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=V_LKL_RRP_LIM_UPD[NSIFUNCTION][ACCESSCODE=>1][PROC=>PUL.Set_Mas_Ini(''DMFO'',:CLMFO, ''DMFO'' )][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'CLNAM', 'C', 'Найменування~2', '3', 70, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'CLOST', 'N', 'Залишок~5', '', 22, 6, 0, 0, 0, 0, '', '', 0, 0, 'Sum (CLOST)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'CLOSTN', 'N', 'Залишок +~Незаквитований~6', '', 22, 7, 0, 0, 0, 0, '', '', 0, 0, 'Sum (CLOSTN)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'CLOSTNL', 'N', 'Залишок +~Незаквитований -~Ліміт(6-7)', '', 22, 8, 0, 0, 0, 0, '', '', 0, 0, 'Sum (CLOSTNL)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'KV', 'N', 'Код валюти', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'MFOP', 'C', 'MFOP', '', 12, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC рах', null, 22, null, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CLDOS', 'N', 'Обороти Дебет~3', null, 22, 4, 0, 0, 0, 0, '', '', 0, 0, 'Sum (CLDOS)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'CLKOS', 'N', 'Обороти Кредит~4', null, 22, 5, 0, 0, 0, 0, '', '', 0, 0, 'Sum (CLKOS)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'CLLCV', 'C', 'Валюта', null, 3, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'CLLNO', 'N', 'Ліміт~початкових~7', null, 22, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'CLLTK', 'N', 'Ліміт~7', null, 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'CLMFO', 'C', 'МФО~1', null, 12, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=V_LKL_RRP_LIM_UPD[NSIFUNCTION][ACCESSCODE=>1][PROC=>PUL.Set_Mas_Ini(''DMFO'',:CLMFO, ''DMFO'' )][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'CLNAM', 'C', 'Найменування~2', 3, 70, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'CLOST', 'N', 'Залишок~5', null, 22, 6, 0, 0, 0, 0, '', '', 0, 0, 'Sum (CLOST)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'CLOSTN', 'N', 'Залишок +~Незаквитований~6', null, 22, 7, 0, 0, 0, 0, '', '', 0, 0, 'Sum (CLOSTN)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'CLOSTNL', 'N', 'Залишок +~Незаквитований -~Ліміт(6-7)', null, 22, 8, 0, 0, 0, 0, '', '', 0, 0, 'Sum (CLOSTNL)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'KV', 'N', 'Код валюти', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'MFOP', 'C', 'MFOP', null, 12, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
 
   -- добавляем описание процедур
   bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'p_update_lkl_rrp(:CLMFO,:KV,:CLLTK,:CLLNO)');

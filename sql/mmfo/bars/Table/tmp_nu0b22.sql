@@ -51,10 +51,8 @@ COMMENT ON COLUMN BARS.TMP_NU0B22.NMS IS '';
 
 
 PROMPT *** Create  grants  TMP_NU0B22 ***
-grant SELECT                                                                 on TMP_NU0B22      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_NU0B22      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_NU0B22      to START1;
-grant SELECT                                                                 on TMP_NU0B22      to UPLD;
 
 
 

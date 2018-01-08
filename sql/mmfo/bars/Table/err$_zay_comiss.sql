@@ -73,10 +73,6 @@ COMMENT ON COLUMN BARS.ERR$_ZAY_COMISS.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ZAY_COMISS ***
-grant SELECT                                                                 on ERR$_ZAY_COMISS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ZAY_COMISS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

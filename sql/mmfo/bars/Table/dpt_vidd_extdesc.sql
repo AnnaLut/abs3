@@ -87,6 +87,42 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_DPTVIDDEXTDESC_TERMDAYS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_EXTDESC MODIFY (TERM_DAYS CONSTRAINT CC_DPTVIDDEXTDESC_TERMDAYS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTVIDDEXTDESC_TERMMNTH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_EXTDESC MODIFY (TERM_MNTH CONSTRAINT CC_DPTVIDDEXTDESC_TERMMNTH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTVIDDEXTDESC_EXTNUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_EXTDESC MODIFY (EXT_NUM CONSTRAINT CC_DPTVIDDEXTDESC_EXTNUM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DPTVIDDEXTDESC_TERMS ***
 begin   
  execute immediate '
@@ -137,46 +173,49 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_DPTVIDDEXTDESC_DPTVIDEXTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_EXTDESC ADD CONSTRAINT FK_DPTVIDDEXTDESC_DPTVIDEXTYPE FOREIGN KEY (TYPE_ID)
+	  REFERENCES BARS.DPT_VIDD_EXTYPES (ID) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTVIDDEXTDESC_DPTEXTMETHOD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_EXTDESC ADD CONSTRAINT FK_DPTVIDDEXTDESC_DPTEXTMETHOD FOREIGN KEY (METHOD_ID)
+	  REFERENCES BARS.DPT_EXTENSION_METHOD (METHOD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTVIDDEXTDESC_INTOP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_EXTDESC ADD CONSTRAINT FK_DPTVIDDEXTDESC_INTOP FOREIGN KEY (OPER_ID)
+	  REFERENCES BARS.INT_OP (OP) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DPTVIDDEXTDESC_TYPEID_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.DPT_VIDD_EXTDESC MODIFY (TYPE_ID CONSTRAINT CC_DPTVIDDEXTDESC_TYPEID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTVIDDEXTDESC_EXTNUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_EXTDESC MODIFY (EXT_NUM CONSTRAINT CC_DPTVIDDEXTDESC_EXTNUM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTVIDDEXTDESC_TERMMNTH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_EXTDESC MODIFY (TERM_MNTH CONSTRAINT CC_DPTVIDDEXTDESC_TERMMNTH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTVIDDEXTDESC_TERMDAYS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_EXTDESC MODIFY (TERM_DAYS CONSTRAINT CC_DPTVIDDEXTDESC_TERMDAYS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -199,11 +238,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_VIDD_EXTDESC ***
-grant SELECT                                                                 on DPT_VIDD_EXTDESC to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VIDD_EXTDESC to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VIDD_EXTDESC to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_EXTDESC to DPT_ADMIN;
-grant SELECT                                                                 on DPT_VIDD_EXTDESC to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_EXTDESC to VKLAD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VIDD_EXTDESC to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_VIDD_EXTDESC to WR_REFREAD;

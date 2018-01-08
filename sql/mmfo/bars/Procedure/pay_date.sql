@@ -109,10 +109,6 @@ BEGIN
       IF sum_ = 0 THEN     -- Check if the document acknowleged
 
          chk.doc_ack ( c.ref,c.tt,c.chk,ack_);
-         /*
-         if c.ref = 91675022411 then
-         ack_ := 1;
-         end if;*/
 
          IF ack_ = 1 THEN
 
@@ -221,6 +217,7 @@ END IF;
    END LOOP;
 
 END pay_date;
+ 
 /
 show err;
 

@@ -13,16 +13,16 @@ PROMPT *** Create  procedure P_F26SB ***
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 % VERSION     : 13/11/2017 (26/05/2012) для Сбербанка
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 13.11.2017 - удалил ненужные строки и изменил некоторые блоки формирования
+% 13.11.2017 - удалил ненужные строки и изменил некоторые блоки формирования 
 % 26.05.2012 - формируем в разрезе кодов территорий
 % 11.05.2011 - включаем корректирующие проводки
 % 30.04.2011 - добавил acc,tobo в протокол
 % 26.02.2011 - в поле комментарий вносим код TOBO и название счета
-% 17.03.2009 - обороти включались тiльки за один день а потрiбно за
-%              мiсяць. Виправлено.
+% 17.03.2009 - обороти включались тiльки за один день а потрiбно за 
+%              мiсяць. Виправлено.       
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-kodf_    varchar2(2) := '26';
-sheme_   varchar2(1) := 'С';
+kodf_    varchar2(2) := '26'; 
+sheme_   varchar2(1) := 'С';    
 acc_     Number;
 Dos_     DECIMAL(24);
 Dosq_    DECIMAL(24);
@@ -76,7 +76,7 @@ comm_    rnbu_trace.comm%TYPE;
 sql_acc_ varchar2(2000):='';
 sql_doda_ varchar2(200):='';
 ret_	 number;
-typ_     Number;
+typ_     Number; 
 nbuc1_   VARCHAR2(12);
 nbuc_    VARCHAR2(12);
 
@@ -88,10 +88,10 @@ CURSOR SaldoASeekOstf IS
           s.dos96, s.dosq96, s.kos96, s.kosq96,
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
-          a.tobo, a.nms, NVL(trim(sp.ob22),'00')
+          a.tobo, a.nms, NVL(trim(sp.ob22),'00') 
    FROM  otcn_saldo s, otcn_acc a, specparam_int sp
-   WHERE s.acc=a.acc
-     and s.kv=980
+   WHERE s.acc=a.acc      
+     and s.kv=980 
      and a.acc=sp.acc(+);
 
 CURSOR KOL_NLS IS
@@ -133,14 +133,14 @@ LOOP
 
    comm_ := '';
 
-   IF typ_ > 0
+   IF typ_ > 0 
    THEN
       nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
    ELSE
       nbuc_ := nbuc1_;
    END IF;
 
-   IF Ostn_ <> 0
+   IF Ostn_ <> 0 
    THEN
       comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
       dk_ := IIF_N(Ostn_,0,'1','2','2');
@@ -151,10 +151,10 @@ LOOP
         VALUES  (nls_, kv_, data_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
    END IF;
 
-   IF Dos_ > 0 OR Kos_ > 0
+   IF Dos_ > 0 OR Kos_ > 0 
    THEN
       comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
-      IF Dos_ > 0
+      IF Dos_ > 0 
       THEN
          kodp_ := '5' || Nbs_ || ob22_ ;
          znap_ := TO_CHAR(Dos_);
@@ -162,7 +162,7 @@ LOOP
          VALUES  (nls_, kv_, dat_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
       END IF;
 
-      IF Kos_ > 0
+      IF Kos_ > 0 
       THEN
          kodp_ := '6' || Nbs_ || ob22_ ;
          znap_ := TO_CHAR(Kos_) ;
@@ -179,7 +179,7 @@ OPEN KOL_NLS;
 LOOP
    FETCH KOL_NLS INTO  acc_, nls_, kv_, nbuc_, kodp_, Ostn_, comm_, tobo_;
    EXIT WHEN KOL_NLS%NOTFOUND;
-   IF Ostn_ > 0
+   IF Ostn_ > 0 
    THEN
       kodp_ := '3' || substr(nls_,1,4) || substr(kodp_,5,2) ;
       znap_ := TO_CHAR(Ostn_);

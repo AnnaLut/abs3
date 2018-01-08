@@ -20,9 +20,7 @@ where c.DATE_OFF is null
     and c.codcagent in (1,2);
 
 PROMPT *** Create  grants  V_MBDK_PARTNER ***
-grant SELECT                                                                 on V_MBDK_PARTNER  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBDK_PARTNER  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_MBDK_PARTNER  to UPLD;
 
 
 

@@ -48,10 +48,8 @@ where c.custtype=3  -- физлица
 and c.rnk=p.rnk(+);
 
 PROMPT *** Create  grants  V_PRIOCOM_CLIENT_PERSON ***
-grant SELECT                                                                 on V_PRIOCOM_CLIENT_PERSON to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PRIOCOM_CLIENT_PERSON to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PRIOCOM_CLIENT_PERSON to START1;
-grant SELECT                                                                 on V_PRIOCOM_CLIENT_PERSON to UPLD;
 
 
 

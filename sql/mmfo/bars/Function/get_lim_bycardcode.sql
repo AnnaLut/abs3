@@ -6,8 +6,8 @@
  
   CREATE OR REPLACE FUNCTION BARS.GET_LIM_BYCARDCODE (p_code in w4_card.code%type)
 /*
- 2017-05-30 Skal
- SC-0036102
+ 2015-10-07 inga
+ http://jira.unity-bars.com.ua:11000/browse/COBUSUPABS-3745
  ѕо 2. пункту за€вки "ѕри пакетному друц≥ поле (ћаксимальний (бажаний) розм≥р  редиту) повинно заповнюватись в≥дпов≥дно до таблиц≥: єп/п    “арифний пакет    максимальний розм≥р кредиту "
 
  1) ќписание тарифных пакетов ведетс€ в ѕ÷, в Ѕј–—е тарифные пакеты не администрируютс€.
@@ -15,14 +15,13 @@
 
     ECONOMЕ                 ≈кономний           5000
     STNDЕ                   —тандартний         5000
-    PENS_SOCЕ               ѕенс≥йний           15000
-    PENS_ARSЕ               ѕенс≥йний "јрсенал" 30000
+    PENS_SOCЕ               ѕенс≥йний           2148
+    PENS_ARSЕ               ѕенс≥йний "јрсенал" 50000
     SAL_STUDЕ               —тудентський        5000
-    SALЕ кр≥м (SAL_STUDЕ)   «арплатний          100000
-    BUDG_LOYAL_             Ѕюджетний           100000
+    SALЕ кр≥м (SAL_STUDЕ)   «арплатний          45000
     OBU_SALЕ     «арплатний —п≥вроб≥тники       60000
     PREMЕ                   ѕрем≥ум             120000
-    SOCЕ                    —оц≥альний          5000
+    SOCЕ                    —оц≥альний          0
 
 */
 return number
@@ -31,17 +30,15 @@ is
 begin
  select
  case
-  when p_code like 'ECONOM%'    then 50000
-  when p_code like 'STND%'      then 50000
-  when p_code like 'PENS_SOC%'  then 15000
-  when p_code like 'PENS_ARS%'  then 30000
-  when p_code like 'SAL_STUD%'  then 50000
+  when p_code like 'ECONOM%'    then 5000
+  when p_code like 'STND%'      then 5000
+  when p_code like 'PENS_SOC%'  then 2148
+  when p_code like 'PENS_ARS%'  then 50000
+  when p_code like 'SAL_STUD%'  then 5000
   when p_code like 'SAL_%' and p_code not like 'SAL_STUD%' then 100000
-  when p_code like 'BUDG_LOYAL%' then 100000
-  when p_code like 'OBU_SAL%'   then 250000
-  when p_code like 'SAL_NBU%'   then 250000
+  when p_code like 'OBU_SAL%'   then 60000
   when p_code like 'PREM%'      then 120000
-  when p_code like 'SOC%'       then 50000
+  when p_code like 'SOC%'       then 5000
   else 0
  end
  into l_lim

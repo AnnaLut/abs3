@@ -15,10 +15,8 @@ PROMPT *** Create  view V_USERADM_USER_BRNREPS ***
    and b.id_u = sys_context('bars_useradm', 'user_id');
 
 PROMPT *** Create  grants  V_USERADM_USER_BRNREPS ***
-grant SELECT                                                                 on V_USERADM_USER_BRNREPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USERADM_USER_BRNREPS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_USERADM_USER_BRNREPS to START1;
-grant SELECT                                                                 on V_USERADM_USER_BRNREPS to UPLD;
 
 
 

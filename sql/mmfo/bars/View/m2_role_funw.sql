@@ -15,9 +15,7 @@ where GRANTEE_TYPE_ID = bars.resource_utl.get_resource_type_id('ARM_WEB'     )
  and a.id =  r.GRANTEE_ID and o.codeoper = r.RESOURCE_ID;
 
 PROMPT *** Create  grants  M2_ROLE_FUNW ***
-grant SELECT                                                                 on M2_ROLE_FUNW    to BARSREADER_ROLE;
 grant SELECT                                                                 on M2_ROLE_FUNW    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on M2_ROLE_FUNW    to UPLD;
 
 
 

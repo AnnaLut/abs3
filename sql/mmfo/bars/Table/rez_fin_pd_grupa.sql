@@ -54,11 +54,9 @@ COMMENT ON COLUMN BARS.REZ_FIN_PD_GRUPA.PDV IS '';
 
 
 PROMPT *** Create  grants  REZ_FIN_PD_GRUPA ***
-grant SELECT                                                                 on REZ_FIN_PD_GRUPA to BARSREADER_ROLE;
 grant SELECT                                                                 on REZ_FIN_PD_GRUPA to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ_FIN_PD_GRUPA to RCC_DEAL;
 grant SELECT                                                                 on REZ_FIN_PD_GRUPA to START1;
-grant SELECT                                                                 on REZ_FIN_PD_GRUPA to UPLD;
 
 
 

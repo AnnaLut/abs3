@@ -17,10 +17,8 @@ where o.acc = a.acc and a.kv = t.kv
 order by o.fdat, a.kv, o.stmt, o.tt, o.dk;
 
 PROMPT *** Create  grants  V_DOCUMENTVIEW_BUHMODEL ***
-grant SELECT                                                                 on V_DOCUMENTVIEW_BUHMODEL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOCUMENTVIEW_BUHMODEL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DOCUMENTVIEW_BUHMODEL to START1;
-grant SELECT                                                                 on V_DOCUMENTVIEW_BUHMODEL to UPLD;
 
 
 

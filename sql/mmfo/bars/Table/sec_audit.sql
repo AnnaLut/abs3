@@ -79,10 +79,24 @@ COMMENT ON COLUMN BARS.SEC_AUDIT.CLIENT_IDENTIFIER IS 'Клиентский идентификатор(
 
 
 
-PROMPT *** Create  constraint CC_SECAUDIT_RECID_NN ***
+PROMPT *** Create  constraint FK_SECAUDIT_BRANCH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_AUDIT MODIFY (REC_ID CONSTRAINT CC_SECAUDIT_RECID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEC_AUDIT ADD CONSTRAINT FK_SECAUDIT_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SECAUDIT_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEC_AUDIT ADD CONSTRAINT FK_SECAUDIT_STAFF FOREIGN KEY (REC_UID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -102,9 +116,33 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint CC_SECAUDIT_RECID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEC_AUDIT MODIFY (REC_ID CONSTRAINT CC_SECAUDIT_RECID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SECAUDIT_SECRECTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEC_AUDIT ADD CONSTRAINT FK_SECAUDIT_SECRECTYPE FOREIGN KEY (REC_TYPE)
+	  REFERENCES BARS.SEC_RECTYPE (SEC_RECTYPE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  SEC_AUDIT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEC_AUDIT       to ABS_ADMIN;
-grant SELECT                                                                 on SEC_AUDIT       to BARSREADER_ROLE;
 grant SELECT                                                                 on SEC_AUDIT       to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEC_AUDIT       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEC_AUDIT       to START1;

@@ -77,10 +77,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0035201 ***
+PROMPT *** Create  constraint PK_TMP_EXP ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.TMP_EXP MODIFY (STATUS_CHANGE_TIME NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.TMP_EXP ADD CONSTRAINT PK_TMP_EXP PRIMARY KEY (DOC_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE AQTS  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -113,12 +115,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_TMP_EXP ***
+PROMPT *** Create  constraint SYS_C0035201 ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.TMP_EXP ADD CONSTRAINT PK_TMP_EXP PRIMARY KEY (DOC_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE AQTS  ENABLE';
+  ALTER TABLE BARSAQ.TMP_EXP MODIFY (STATUS_CHANGE_TIME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -139,9 +139,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  TMP_EXP ***
-grant SELECT                                                                 on TMP_EXP         to BARSREADER_ROLE;
 
 
 

@@ -41,9 +41,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_STAFF_KEYS ***
-grant SELECT                                                                 on TMP_STAFF_KEYS  to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

@@ -43,10 +43,6 @@ COMMENT ON COLUMN BARS.TMP_USER.USER_NAME IS '';
 
 
 
-PROMPT *** Create  grants  TMP_USER ***
-grant SELECT                                                                 on TMP_USER        to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_USER        to UPLD;
-
 
 
 PROMPT ===================================================================================== 

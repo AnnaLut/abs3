@@ -57,10 +57,11 @@ COMMENT ON COLUMN BARS.ACR_DOCS.KF IS '';
 
 
 
-PROMPT *** Create  constraint CC_ACRDOCS_ACC_NN ***
+PROMPT *** Create  constraint FK_ACRDOCS_KF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACR_DOCS MODIFY (ACC CONSTRAINT CC_ACRDOCS_ACC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACR_DOCS ADD CONSTRAINT FK_ACRDOCS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -69,10 +70,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACRDOCS_ID_NN ***
+PROMPT *** Create  constraint FK_ACRDOCS_INTACCN2 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACR_DOCS MODIFY (ID CONSTRAINT CC_ACRDOCS_ID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACR_DOCS ADD CONSTRAINT FK_ACRDOCS_INTACCN2 FOREIGN KEY (KF, ACC, ID)
+	  REFERENCES BARS.INT_ACCN (KF, ACC, ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -81,10 +83,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACRDOCS_INTREF_NN ***
+PROMPT *** Create  constraint PK_ACRDOCS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACR_DOCS MODIFY (INT_REF CONSTRAINT CC_ACRDOCS_INTREF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACR_DOCS ADD CONSTRAINT PK_ACRDOCS PRIMARY KEY (INT_REF)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -105,12 +109,47 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_ACRDOCS ***
+PROMPT *** Create  constraint CC_ACRDOCS_INTREF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACR_DOCS ADD CONSTRAINT PK_ACRDOCS PRIMARY KEY (INT_REF)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
+  ALTER TABLE BARS.ACR_DOCS MODIFY (INT_REF CONSTRAINT CC_ACRDOCS_INTREF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACRDOCS_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACR_DOCS MODIFY (ID CONSTRAINT CC_ACRDOCS_ID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACRDOCS_ACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACR_DOCS MODIFY (ACC CONSTRAINT CC_ACRDOCS_ACC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACRDOCS_INTACCN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACR_DOCS ADD CONSTRAINT FK_ACRDOCS_INTACCN FOREIGN KEY (ACC, ID)
+	  REFERENCES BARS.INT_ACCN (ACC, ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -147,9 +186,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACR_DOCS ***
-grant SELECT                                                                 on ACR_DOCS        to BARSREADER_ROLE;
 grant SELECT                                                                 on ACR_DOCS        to BARS_DM;
-grant SELECT                                                                 on ACR_DOCS        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACR_DOCS        to WR_ALL_RIGHTS;
 
 

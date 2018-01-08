@@ -77,11 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CASH_USER ***
-grant SELECT                                                                 on CASH_USER       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CASH_USER       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CASH_USER       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CASH_USER       to PYOD001;
-grant SELECT                                                                 on CASH_USER       to UPLD;
 grant FLASHBACK,SELECT                                                       on CASH_USER       to WR_REFREAD;
 
 

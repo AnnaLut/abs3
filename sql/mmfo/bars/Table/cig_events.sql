@@ -143,10 +143,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_EVENTS ***
-grant SELECT                                                                 on CIG_EVENTS      to BARSREADER_ROLE;
 grant SELECT                                                                 on CIG_EVENTS      to BARS_DM;
 grant SELECT                                                                 on CIG_EVENTS      to CIG_LOADER;
-grant SELECT                                                                 on CIG_EVENTS      to UPLD;
 
 
 

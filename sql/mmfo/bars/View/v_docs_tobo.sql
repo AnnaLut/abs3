@@ -88,9 +88,7 @@ PROMPT *** Create  view V_DOCS_TOBO ***
           AND op.branch = SYS_CONTEXT ('bars_context', 'user_branch');
 
 PROMPT *** Create  grants  V_DOCS_TOBO ***
-grant SELECT                                                                 on V_DOCS_TOBO     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DOCS_TOBO     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DOCS_TOBO     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DOCS_TOBO     to WR_ALL_RIGHTS;
 
 

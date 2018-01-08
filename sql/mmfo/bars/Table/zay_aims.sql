@@ -95,10 +95,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAY_AIMS ***
-grant SELECT                                                                 on ZAY_AIMS        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAY_AIMS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAY_AIMS        to BARS_DM;
-grant SELECT                                                                 on ZAY_AIMS        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAY_AIMS        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on ZAY_AIMS        to WR_REFREAD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_AIMS        to ZAY;

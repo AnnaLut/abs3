@@ -191,11 +191,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_CUSTOMERS ***
-grant SELECT                                                                 on CIG_CUSTOMERS   to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on CIG_CUSTOMERS   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_CUSTOMERS   to BARS_DM;
 grant SELECT,UPDATE                                                          on CIG_CUSTOMERS   to CIG_ROLE;
-grant SELECT                                                                 on CIG_CUSTOMERS   to UPLD;
 
 
 

@@ -71,10 +71,6 @@ COMMENT ON COLUMN BARS.ERR$_CIM_CONCLUSION_LINK.DELETE_UID IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIM_CONCLUSION_LINK ***
-grant SELECT                                                                 on ERR$_CIM_CONCLUSION_LINK to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIM_CONCLUSION_LINK to UPLD;
-
 
 
 PROMPT ===================================================================================== 

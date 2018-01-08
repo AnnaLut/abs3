@@ -61,10 +61,8 @@ COMMENT ON COLUMN BARS.VID_PL.R013 IS '';
 
 
 PROMPT *** Create  grants  VID_PL ***
-grant SELECT                                                                 on VID_PL          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VID_PL          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VID_PL          to BARS_DM;
-grant SELECT                                                                 on VID_PL          to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VID_PL          to VID_PL;
 grant FLASHBACK,SELECT                                                       on VID_PL          to WR_REFREAD;
 

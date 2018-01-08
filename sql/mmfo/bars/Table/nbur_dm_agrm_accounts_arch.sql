@@ -439,10 +439,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMAGRMACCARCH_AGRMID_NN ***
+PROMPT *** Create  constraint FK_DMAGRMACCARC_REFAGRMPRTFLTP ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_AGRM_ACCOUNTS_ARCH MODIFY (AGRM_ID CONSTRAINT CC_DMAGRMACCARCH_AGRMID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_AGRM_ACCOUNTS_ARCH ADD CONSTRAINT FK_DMAGRMACCARC_REFAGRMPRTFLTP FOREIGN KEY (PRTFL_TP)
+	  REFERENCES BARS.NBUR_REF_AGRM_PRTFL_TP (PRTFL_TP_ID) RELY ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -681,6 +682,18 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_DMAGRMACCARCH_AGRMID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NBUR_DM_AGRM_ACCOUNTS_ARCH MODIFY (AGRM_ID CONSTRAINT CC_DMAGRMACCARCH_AGRMID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_DMAGRMACCARCH ***
 begin   
  execute immediate '
@@ -888,7 +901,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_DM_AGRM_ACCOUNTS_ARCH ***
-grant SELECT                                                                 on NBUR_DM_AGRM_ACCOUNTS_ARCH to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_DM_AGRM_ACCOUNTS_ARCH to BARSUPL;
 grant SELECT                                                                 on NBUR_DM_AGRM_ACCOUNTS_ARCH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_DM_AGRM_ACCOUNTS_ARCH to BARS_DM;

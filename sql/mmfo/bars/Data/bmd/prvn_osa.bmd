@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Вітрина "Резерв-МСФЗ"';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'PRVN_OSA';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,19 +119,19 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 2, 'TIP', 'N', 'UNIQUE_BARS_IS~Ключ/*~в АБС', '', null, 2, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'COMM', 'C', 'COMM~Протокол обр~NBU23_REZ', '', 100, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', 'FunNSIEditFFiltered("PRVN_NBU",2,"nd="||Str(:ND)||" and kv="||Str(:KV)|| " and rnk="|| Str(:RNK) )', 0);
-  bars_metabase.add_column(l_tabid, 7, 'KV', 'N', 'ID_CURRENCY~Код~вал', '', null, 4, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'ID_PROV_TYPE', 'C', 'ID_PROV_TYPE~Кол/Инд~основа', '', null, 51, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'IS_DEFAULT', 'B', 'Метка~дефолта', '', null, 50, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'REZB', 'N', 'PROV_BALANCE_CCY~Резерв по~бал.акт', '', null, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'REZ9', 'N', 'PROV_OFFBALANCE_CCY~Резерв по~вне/бал.акт', '', null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'RNK', 'N', 'RNK_CLIENT~РНК~клиента', '', null, 1, 0, 1, 0, 1, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'ND', 'N', 'UNIQUE_BARS_IS~*/Ключ~в АБС', '', null, 3, 0, 1, 1, 0, '', '', 1, 0, '', 1, 0, 1, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"(:TIP=3 and a.acc in (select acc from nd_acc where nd=:ND) OR :TIP=9 and exists (select 1 from cp_deal where ref=:ND and a.acc in (acc,accd,accp,accr,accs,accr2,ACCEXPN,ACCEXPR,ACCR3,ACCUNREC)))" )', 0);
-  bars_metabase.add_column(l_tabid, 21, 'AIRC_CCY', 'N', 'AIRC_CCY~Итого~НЕприз.дох', '', null, 32, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'IRC_CCY', 'N', 'IRC_CCY~Дельта~НЕприз.дох', '', null, 33, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'REZ9_R', 'N', 'Ручной~Резерв по~вне/бал.акт', '', null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'REZB_R', 'N', 'Ручной~Резерв по~бал.акт', '', null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'TIP', 'N', 'UNIQUE_BARS_IS~Ключ/*~в АБС', null, null, 2, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'COMM', 'C', 'COMM~Протокол обр~NBU23_REZ', null, 100, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', 'FunNSIEditFFiltered("PRVN_NBU",2,"nd="||Str(:ND)||" and kv="||Str(:KV)|| " and rnk="|| Str(:RNK) )', 0);
+  bars_metabase.add_column(l_tabid, 7, 'KV', 'N', 'ID_CURRENCY~Код~вал', null, null, 4, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'ID_PROV_TYPE', 'C', 'ID_PROV_TYPE~Кол/Инд~основа', null, null, 51, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'IS_DEFAULT', 'B', 'Метка~дефолта', null, null, 50, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'REZB', 'N', 'PROV_BALANCE_CCY~Резерв по~бал.акт', null, null, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'REZ9', 'N', 'PROV_OFFBALANCE_CCY~Резерв по~вне/бал.акт', null, null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'RNK', 'N', 'RNK_CLIENT~РНК~клиента', null, null, 1, 0, 1, 0, 1, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'ND', 'N', 'UNIQUE_BARS_IS~*/Ключ~в АБС', null, null, 3, 0, 1, 1, 0, '', '', 1, 0, '', 1, 0, 1, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"(:TIP=3 and a.acc in (select acc from nd_acc where nd=:ND) OR :TIP=9 and exists (select 1 from cp_deal where ref=:ND and a.acc in (acc,accd,accp,accr,accs,accr2,ACCEXPN,ACCEXPR,ACCR3,ACCUNREC)))" )', 0);
+  bars_metabase.add_column(l_tabid, 21, 'AIRC_CCY', 'N', 'AIRC_CCY~Итого~НЕприз.дох', null, null, 32, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'IRC_CCY', 'N', 'IRC_CCY~Дельта~НЕприз.дох', null, null, 33, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'REZ9_R', 'N', 'Ручной~Резерв по~вне/бал.акт', null, null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'REZB_R', 'N', 'Ручной~Резерв по~бал.акт', null, null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

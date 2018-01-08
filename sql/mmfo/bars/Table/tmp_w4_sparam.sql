@@ -51,10 +51,6 @@ COMMENT ON COLUMN BARS.TMP_W4_SPARAM.VALUE IS '';
 
 
 
-PROMPT *** Create  grants  TMP_W4_SPARAM ***
-grant SELECT                                                                 on TMP_W4_SPARAM   to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_W4_SPARAM   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

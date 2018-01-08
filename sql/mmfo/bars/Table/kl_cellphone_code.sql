@@ -73,10 +73,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  KL_CELLPHONE_CODE ***
-grant SELECT                                                                 on KL_CELLPHONE_CODE to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on KL_CELLPHONE_CODE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_CELLPHONE_CODE to BARS_DM;
-grant SELECT                                                                 on KL_CELLPHONE_CODE to UPLD;
 
 
 

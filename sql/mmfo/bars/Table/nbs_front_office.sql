@@ -74,9 +74,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBS_FRONT_OFFICE ***
-grant SELECT                                                                 on NBS_FRONT_OFFICE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on NBS_FRONT_OFFICE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on NBS_FRONT_OFFICE to UPLD;
 
 
 

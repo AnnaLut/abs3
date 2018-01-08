@@ -57,11 +57,9 @@ COMMENT ON COLUMN BARS.CP_REZ_LOG.DT IS '';
 
 
 PROMPT *** Create  grants  CP_REZ_LOG ***
-grant SELECT                                                                 on CP_REZ_LOG      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_REZ_LOG      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_REZ_LOG      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_REZ_LOG      to RCC_DEAL;
-grant SELECT                                                                 on CP_REZ_LOG      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_REZ_LOG      to WR_ALL_RIGHTS;
 
 

@@ -1,359 +1,186 @@
+-- ======================================================================================
+-- Module   : SOC - Вклады пенсионеров и безработных
+-- Author   : INNA
+-- Modifier : BAA
+-- Date     : 25.05.2015
+-- ======================================================================================
+-- create table DPT_FILE_ROW
+-- ======================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET FEEDBACK     OFF
+SET TIMING       OFF
+SET DEFINE       OFF
+SET LINES        500
+SET PAGES        500
+SET TERMOUT      ON
+SET TRIMSPOOL    ON
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/DPT_FILE_ROW.sql =========*** Run *** 
-PROMPT ===================================================================================== 
+prompt -- ======================================================
+prompt -- create table DPT_FILE_ROW
+prompt -- ======================================================
 
-
-PROMPT *** ALTER_POLICY_INFO to DPT_FILE_ROW ***
-
-
-BEGIN 
-        execute immediate  
-          'begin  
-               bpa.alter_policy_info(''DPT_FILE_ROW'', ''CENTER'' , null, ''E'', ''E'', ''E'');
-               bpa.alter_policy_info(''DPT_FILE_ROW'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
-               bpa.alter_policy_info(''DPT_FILE_ROW'', ''WHOLE'' , null, null, null, null);
-               null;
-           end; 
-          '; 
-END; 
+begin
+  BPA.ALTER_POLICY_INFO( 'DPT_FILE_ROW', 'WHOLE',  Null, Null, Null, Null );
+  BPA.ALTER_POLICY_INFO( 'DPT_FILE_ROW', 'FILIAL',  'M',  'M',  'M',  'M' );
+  BPA.ALTER_POLICY_INFO( 'DPT_FILE_ROW', 'CENTER' , Null, 'E',  'E',  'E' );
+end;
 /
 
-PROMPT *** Create  table DPT_FILE_ROW ***
-begin 
-  execute immediate '
-  CREATE TABLE BARS.DPT_FILE_ROW 
-   (	INFO_ID NUMBER(18,0), 
-	FILENAME VARCHAR2(16), 
-	DAT DATE, 
-	NLS VARCHAR2(19), 
-	BRANCH_CODE NUMBER(5,0), 
-	DPT_CODE NUMBER(3,0), 
-	SUM NUMBER(19,0), 
-	FIO VARCHAR2(100), 
-	PASP VARCHAR2(16), 
-	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch''), 
-	REF NUMBER(38,0), 
-	INCORRECT NUMBER(1,0) DEFAULT 0, 
-	CLOSED NUMBER(1,0) DEFAULT 0, 
-	EXCLUDED NUMBER(1,0) DEFAULT 0, 
-	HEADER_ID NUMBER(38,0), 
-	AGENCY_ID NUMBER(38,0), 
-	AGENCY_NAME VARCHAR2(100), 
-	ID_CODE VARCHAR2(10), 
-	FILE_PAYOFF_DATE VARCHAR2(2), 
-	PAYOFF_DATE DATE, 
-	MARKED4PAYMENT NUMBER(1,0) DEFAULT 0, 
-	DEAL_CREATED NUMBER(1,0) DEFAULT 0, 
-	ACC_TYPE CHAR(3), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
-	ERR_MSG VARCHAR2(256)
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSDYND ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
-end; 
+declare
+  e_tab_exists           exception;
+  pragma exception_init( e_tab_exists, -00955 );
+begin
+  execute immediate q'[create table DPT_FILE_ROW
+( INFO_ID           number(18)    constraint CC_DPTFILEROW_INFOID_NN      NOT NULL
+, KF                varchar2(6)   default SYS_CONTEXT('BARS_CONTEXT','USER_MFO')
+                                  CONSTRAINT CC_DPTFILEROW_KF_NN          NOT NULL
+, HEADER_ID         number(38)    CONSTRAINT CC_DPTFILEROW_HDRID_NN       NOT NULL
+, FILENAME          varchar2(16)  CONSTRAINT CC_DPTFILEROW_FILENAME_NN    NOT NULL
+, DAT               date          CONSTRAINT CC_DPTFILEROW_DAT_NN         NOT NULL
+, NLS               varchar2(19)  CONSTRAINT CC_DPTFILEROW_NLS_NN         NOT NULL
+, BRANCH_CODE       number(5)     CONSTRAINT CC_DPTFILEROW_BRANCHCODE_NN  NOT NULL
+, DPT_CODE          number(3)     CONSTRAINT CC_DPTFILEROW_DPTCODE_NN     NOT NULL
+, SUM               number(19)
+, FIO               varchar2(100) CONSTRAINT CC_DPTFILEROW_FIO_NN         NOT NULL
+, PASP              varchar2(16)
+, BRANCH            varchar2(30)  DEFAULT sys_context('bars_context','user_branch')
+                                  CONSTRAINT CC_DPTFILEROW_BRANCH_NN      NOT NULL
+, REF               number(38)
+, INCORRECT         number(1)     default 0
+                                  CONSTRAINT CC_DPTFILEROW_INCORRECT_NN   NOT NULL
+, CLOSED            number(1)     default 0
+                                  CONSTRAINT CC_DPTFILEROW_CLOSED_NN      NOT NULL
+, EXCLUDED          number(1)     default 0
+                                  CONSTRAINT CC_DPTFILEROW_EXCLUDED_NN    NOT NULL
+, AGENCY_ID         number(38)
+, AGENCY_NAME       varchar2(100)
+, ID_CODE           varchar2(10)
+, FILE_PAYOFF_DATE  varchar2(2)
+, PAYOFF_DATE       date
+, MARKED4PAYMENT    number(1)     default 0
+                                  CONSTRAINT CC_DPTFILEROW_MARKED4PYMT_NN NOT NULL
+, DEAL_CREATED      number(1)     default 0
+                                  CONSTRAINT CC_DPTFILEROW_DEALCREATED_NN NOT NULL
+, ACC_TYPE          char(3)
+, ERR_MSG           varchar2(256)
+, constraint CC_DPTFILEROW_DEALCREATED    check ( DEAL_CREATED   in ( 0, 1 ) )
+, constraint CC_DPTFILEROW_MARKED4PAYMENT check ( MARKED4PAYMENT in ( 0, 1 ) )
+, constraint PK_DPTFILEROW               primary key ( INFO_ID   ) using index tablespace BRSBIGI
+, constraint FK_DPTFILEROW_AGENCYID      foreign key ( AGENCY_ID ) references SOCIAL_AGENCY (AGENCY_ID)
+, constraint FK_DPTFILEROW_BRANCH        foreign key ( BRANCH    ) references BRANCH (BRANCH) deferrable initially immediate
+, constraint FK_DPTFILEROW_DPTFILEHEADER foreign key ( HEADER_ID ) references DPT_FILE_HEADER (HEADER_ID)
+, constraint FK_DPTFILEROW_OPER          foreign key ( REF       ) references OPER (REF)
+, constraint FK_DPTFILEROW_TIPS          foreign key ( ACC_TYPE  ) references TIPS (TIP)
+) tablespace BRSBIGD ]';
+  
+  dbms_output.put_line( 'Table "DPT_FILE_ROW" created.' );
+  
+exception
+  when e_tab_exists then
+    dbms_output.put_line( 'Table "DPT_FILE_ROW" already exists.' );
+end;
 /
 
+prompt -- ======================================================
+prompt -- Indexes
+prompt -- ======================================================
 
-
-
-PROMPT *** ALTER_POLICIES to DPT_FILE_ROW ***
- exec bpa.alter_policies('DPT_FILE_ROW');
-
-
-COMMENT ON TABLE BARS.DPT_FILE_ROW IS 'Структура тела файла зачисления пенсий и мат.помощи';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.KF IS 'Код фiлiалу (МФО)';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.ERR_MSG IS 'Повідомлення про помилку';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.INFO_ID IS 'Код рядка';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.FILENAME IS 'Найменування файлу';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.DAT IS 'Дата створення файлу';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.NLS IS 'Номер рахунку вкладника';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.BRANCH_CODE IS 'Номер філії';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.DPT_CODE IS 'Код вкладу';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.SUM IS 'Сума (в коп.)';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.FIO IS 'Прiзвище,iм`я, по батьковi';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.PASP IS 'Серiя та номер паспорта';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.BRANCH IS 'Філія';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.REF IS 'Референс породженого документа';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.INCORRECT IS '0 - коректный; 1 - некоректный';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.CLOSED IS '0 - діючий; 1 - закритий';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.EXCLUDED IS '0 - не исключенный; 1 - исключенный';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.HEADER_ID IS '';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.AGENCY_ID IS '';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.AGENCY_NAME IS '';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.ID_CODE IS 'Ідентифікаційний код (для перевірок НЕ використовується)';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.FILE_PAYOFF_DATE IS 'Дата проплати з файла (2 символи)';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.PAYOFF_DATE IS 'Дата проплати фактична';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.MARKED4PAYMENT IS 'Відмічений до оплати ( 0 - ні, 1 - так)';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.DEAL_CREATED IS 'Ознака того, що при прийомі стрічки було створеного нового клієнта та новий договір (1 - так, 0 - ні)';
-COMMENT ON COLUMN BARS.DPT_FILE_ROW.ACC_TYPE IS '';
-
-
-
-
-PROMPT *** Create  constraint CK_DPTFILEROW_DEALCREATED ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW ADD CONSTRAINT CK_DPTFILEROW_DEALCREATED CHECK (deal_created in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+begin
+  execute immediate q'[create unique index UK_DPTFILEROW ON DPT_FILE_ROW ( KF, INFO_ID )
+  tablespace BRSBIGI ]';
+  dbms_output.put_line( 'Index "UK_DPTFILEROW" created.' );
+exception
+  when OTHERS then
+    case
+      when (sqlcode = -00955)
+      then dbms_output.put_line( 'Index "UK_DPTFILEROW" already exists in the table.' );
+      when (sqlcode = -01408)
+      then dbms_output.put_line( 'Column "KF", "INFO_ID" already indexed.' );
+      else raise;
+    end case;
+end;
 /
 
-
-
-
-PROMPT *** Create  constraint PK_DPTFILEROW ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW ADD CONSTRAINT PK_DPTFILEROW PRIMARY KEY (INFO_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+begin
+  execute immediate q'[create index IDX_DPTFILEROW_KF_HDRID on DPT_FILE_ROW ( HEADER_ID, KF ) tablespace BRSBIGI]';
+  dbms_output.put_line( 'Index "IDX_DPTFILEROW_KF_HDRID" created.' );
+exception
+  when OTHERS then
+    case
+      when (sqlcode = -00955)
+      then dbms_output.put_line( 'Index "IDX_DPTFILEROW_KF_HDRID" already exists in the table.' );
+      when (sqlcode = -01408)
+      then dbms_output.put_line( 'Column(s) "HEADER_ID", "KF" already indexed.' );
+      else raise;
+    end case;
+end;
 /
 
-
-
-
-PROMPT *** Create  constraint CK_DPTFILEROW_MARKED4PAYMENT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW ADD CONSTRAINT CK_DPTFILEROW_MARKED4PAYMENT CHECK (marked4payment in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+begin
+  execute immediate q'[create unique index UK_DPTFILEROW_REF ON DPT_FILE_ROW ( REF )
+  tablespace BRSBIGI ]';
+  dbms_output.put_line( 'Index "UK_DPTFILEROW_REF" created.' );
+exception
+  when OTHERS then
+    case
+      when (sqlcode = -00955)
+      then dbms_output.put_line( 'Index "UK_DPTFILEROW_REF" already exists in the table.' );
+      when (sqlcode = -01408)
+      then dbms_output.put_line( 'Column "REF" already indexed.' );
+      else raise;
+    end case;
+end;
 /
 
+SET FEEDBACK ON
 
+prompt -- ======================================================
+prompt -- Apply policies
+prompt -- ======================================================
 
-
-PROMPT *** Create  constraint CC_DPTFILEROW_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW MODIFY (KF CONSTRAINT CC_DPTFILEROW_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+begin
+  BPA.ALTER_POLICIES( 'DPT_FILE_ROW' );
+end;
 /
 
-
-
-
-PROMPT *** Create  constraint CC_DPTFILEROW_EXCLUDED_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW MODIFY (EXCLUDED CONSTRAINT CC_DPTFILEROW_EXCLUDED_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006131 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW MODIFY (MARKED4PAYMENT NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NN_DPTFILEROW_DEALCREATED ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW MODIFY (DEAL_CREATED CONSTRAINT NN_DPTFILEROW_DEALCREATED NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTFILEROW_INFOID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW MODIFY (INFO_ID CONSTRAINT CC_DPTFILEROW_INFOID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTFILEROW_FILENAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW MODIFY (FILENAME CONSTRAINT CC_DPTFILEROW_FILENAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTFILEROW_DAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW MODIFY (DAT CONSTRAINT CC_DPTFILEROW_DAT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006123 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW MODIFY (NLS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006124 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW MODIFY (BRANCH_CODE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006125 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW MODIFY (DPT_CODE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006126 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW MODIFY (FIO NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTFILEROW_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW MODIFY (BRANCH CONSTRAINT CC_DPTFILEROW_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTFILEROW_INCORRECT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW MODIFY (INCORRECT CONSTRAINT CC_DPTFILEROW_INCORRECT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTFILEROW_CLOSED_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_FILE_ROW MODIFY (CLOSED CONSTRAINT CC_DPTFILEROW_CLOSED_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index IDX_DPTFILEROW_HDRID_KF ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.IDX_DPTFILEROW_HDRID_KF ON BARS.DPT_FILE_ROW (HEADER_ID, KF) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index PK_DPTFILEROW ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_DPTFILEROW ON BARS.DPT_FILE_ROW (INFO_ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index UK_DPTFILEROW ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.UK_DPTFILEROW ON BARS.DPT_FILE_ROW (REF) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-PROMPT *** Create  grants  DPT_FILE_ROW ***
-grant SELECT                                                                 on DPT_FILE_ROW    to BARSREADER_ROLE;
-grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_FILE_ROW    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on DPT_FILE_ROW    to BARS_DM;
-grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_FILE_ROW    to DPT_ROLE;
-grant SELECT                                                                 on DPT_FILE_ROW    to RPBN001;
-grant SELECT                                                                 on DPT_FILE_ROW    to UPLD;
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_FILE_ROW    to WR_ALL_RIGHTS;
-grant SELECT                                                                 on DPT_FILE_ROW    to WR_CBIREP;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/DPT_FILE_ROW.sql =========*** End *** 
-PROMPT ===================================================================================== 
+commit;
+
+prompt -- ======================================================
+prompt -- Comments
+prompt -- ======================================================
+
+comment on table  DPT_FILE_ROW                  is 'Структура тела файла зачисления пенсий и мат.помощи';
+
+comment on column DPT_FILE_ROW.KF               is 'Код фiлiалу (МФО)';
+comment on column DPT_FILE_ROW.INFO_ID          is 'Код рядка';
+comment on column DPT_FILE_ROW.REF              is 'Референс породженого документа';
+comment on column DPT_FILE_ROW.INCORRECT        is '0 - коректный; 1 - некоректный';
+comment on column DPT_FILE_ROW.CLOSED           is '0 - діючий; 1 - закритий';
+comment on column DPT_FILE_ROW.EXCLUDED         is '0 - не исключенный; 1 - исключенный';
+comment on column DPT_FILE_ROW.FILENAME         is 'Найменування файлу';
+comment on column DPT_FILE_ROW.DAT              is 'Дата створення файлу';
+comment on column DPT_FILE_ROW.NLS              is 'Номер рахунку вкладника';
+comment on column DPT_FILE_ROW.BRANCH_CODE      is 'Номер філії';
+comment on column DPT_FILE_ROW.DPT_CODE         is 'Код вкладу';
+comment on column DPT_FILE_ROW.SUM              is 'Сума (в коп.)';
+comment on column DPT_FILE_ROW.FIO              is 'Прiзвище,iм`я, по батьковi';
+comment on column DPT_FILE_ROW.PASP             is 'Серiя та номер паспорта';
+comment on column DPT_FILE_ROW.ID_CODE          is 'Ідентифікаційний код (для перевірок НЕ використовується)';
+comment on column DPT_FILE_ROW.FILE_PAYOFF_DATE is 'Дата проплати з файла (2 символи)';
+comment on column DPT_FILE_ROW.PAYOFF_DATE      is 'Дата проплати фактична';
+comment on column DPT_FILE_ROW.MARKED4PAYMENT   is 'Відмічений до оплати ( 0 - ні, 1 - так)';
+comment on column DPT_FILE_ROW.DEAL_CREATED     is 'Ознака того, що при прийомі стрічки було створеного нового клієнта та новий договір (1 - так, 0 - ні)';
+comment on column DPT_FILE_ROW.ERR_MSG          is 'Повідомлення про помилку';
+
+prompt -- ======================================================
+prompt -- Grants
+prompt -- ======================================================
+
+GRANT DELETE, INSERT, SELECT, UPDATE ON DPT_FILE_ROW TO BARS_ACCESS_DEFROLE;
+GRANT                 SELECT         ON DPT_FILE_ROW TO BARS_DM;
+GRANT DELETE, INSERT, SELECT, UPDATE ON DPT_FILE_ROW TO DPT_ROLE;
+
+prompt -- ======================================================
+prompt -- FINISH
+prompt -- ======================================================

@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  GSP ***
-grant SELECT                                                                 on GSP             to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GSP             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GSP             to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GSP             to START1;
-grant SELECT                                                                 on GSP             to UPLD;
 
 
 

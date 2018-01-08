@@ -52,10 +52,8 @@ PROMPT *** Create  view NBU23_CP ***
     WHERE k.id = x.id AND k.id = y.id(+);
 
 PROMPT *** Create  grants  NBU23_CP ***
-grant SELECT                                                                 on NBU23_CP        to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on NBU23_CP        to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on NBU23_CP        to START1;
-grant SELECT                                                                 on NBU23_CP        to UPLD;
 
 
 

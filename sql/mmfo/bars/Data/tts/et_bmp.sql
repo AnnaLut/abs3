@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции BM3
-prompt Наименование операции: d на суму ПДВ 
+prompt Наименование операции: d на суму ПДВ
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('BM3', 'd на суму ПДВ ', 1, '#(NBS_OB22(''2909'',''23''))', 980, '#(NBS_OB22(''3622'',''51''))', 980, null, null, null, null, 0, 0, 0, 0, 'BMY ( 3 )', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('BM3', 'd на суму ПДВ', 1, '#(NBS_OB22(''2909'',''23''))', 980, '36229005', 980, null, null, null, null, 0, 0, 0, 0, 'BMY ( 3 )', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='BM3', name='d на суму ПДВ ', dk=1, nlsm='#(NBS_OB22(''2909'',''23''))', kv=980, nlsk='#(NBS_OB22(''3622'',''51''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='BMY ( 3 )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='BM3', name='d на суму ПДВ', dk=1, nlsm='#(NBS_OB22(''2909'',''23''))', kv=980, nlsk='36229005', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='BMY ( 3 )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='BM3';
   end;
   --------------------------------
@@ -155,7 +155,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции BMP
-prompt Наименование операции: BMP --5) # BMP/Продаж злитків БМ
+prompt Наименование операции: --5) # BMP/Продаж злитків БМ
 declare
   cnt_  number;
 begin
@@ -164,11 +164,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('BMP', 'BMP --5) # BMP/Продаж злитків БМ', 0, null, null, null, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', '#(tobopack.GetTOBOParam(''VP_09''))', null, 1, 0, 0, 0, null, null, 32, null, null, null, '0000100001000000000000000000000000010300000000000000000000000000', null);
+    values ('BMP', '--5) # BMP/Продаж злитків БМ', 0, null, null, null, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', '#(tobopack.GetTOBOParam(''VP_09''))', null, 1, 0, 0, 0, null, null, 32, null, null, null, '0000100001000000000000000000000000010300000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='BMP', name='BMP --5) # BMP/Продаж злитків БМ', dk=0, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa='#(tobopack.GetTOBOParam(''CASH11''))', nlsb='#(tobopack.GetTOBOParam(''VP_09''))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=32, proc=null, s3800=null, rang=null, flags='0000100001000000000000000000000000010300000000000000000000000000', nazn=null
+         set tt='BMP', name='--5) # BMP/Продаж злитків БМ', dk=0, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa='#(tobopack.GetTOBOParam(''CASH11''))', nlsb='#(tobopack.GetTOBOParam(''VP_09''))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=32, proc=null, s3800=null, rang=null, flags='0000100001000000000000000000000000010300000000000000000000000000', nazn=null
        where tt='BMP';
   end;
   --------------------------------

@@ -84,9 +84,7 @@ COMMENT ON COLUMN BARS.ERR$_CORPS_ACC.ORA_ERR_MESG$ IS '';
 
 
 PROMPT *** Create  grants  ERR$_CORPS_ACC ***
-grant SELECT                                                                 on ERR$_CORPS_ACC  to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CORPS_ACC  to BARS_DM;
-grant SELECT                                                                 on ERR$_CORPS_ACC  to UPLD;
 
 
 

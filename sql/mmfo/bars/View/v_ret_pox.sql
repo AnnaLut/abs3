@@ -66,10 +66,8 @@ PROMPT *** Create  view V_RET_POX ***
                                                                                                 );
 
 PROMPT *** Create  grants  V_RET_POX ***
-grant SELECT                                                                 on V_RET_POX       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RET_POX       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_RET_POX       to PYOD001;
-grant SELECT                                                                 on V_RET_POX       to UPLD;
 
 
 

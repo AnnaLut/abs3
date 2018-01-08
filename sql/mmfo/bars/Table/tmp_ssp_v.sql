@@ -105,18 +105,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMP_SSP_V_TRANS_LN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_SSP_V MODIFY (TRANS_LN CONSTRAINT CC_TMP_SSP_V_TRANS_LN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_TMP_SSP_V_SRC_NN ***
 begin   
  execute immediate '
@@ -128,12 +116,22 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint CC_TMP_SSP_V_TRANS_LN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_SSP_V MODIFY (TRANS_LN CONSTRAINT CC_TMP_SSP_V_TRANS_LN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  TMP_SSP_V ***
-grant SELECT                                                                 on TMP_SSP_V       to BARSREADER_ROLE;
 grant INSERT                                                                 on TMP_SSP_V       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_SSP_V       to BARS_DM;
 grant INSERT                                                                 on TMP_SSP_V       to TOSS;
-grant SELECT                                                                 on TMP_SSP_V       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_SSP_V       to WR_ALL_RIGHTS;
 
 

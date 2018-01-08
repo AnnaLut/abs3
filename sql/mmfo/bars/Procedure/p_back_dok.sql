@@ -401,7 +401,7 @@ BEGIN
              FROM oper WHERE ref=refH_;
 
            UPDATE opldok SET ref=refN_ WHERE ref=refH_ AND tt='BAK';
- -- COBUSUPABS-6165
+ -- COBUSUPABS-6165 
              begin
                 insert into operw (ref, tag, value)
                 values (refN_, 'REF92', refH_);

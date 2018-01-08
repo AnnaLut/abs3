@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TAUD_CIM_PARAMS.sql =========*** Run
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  trigger TAUD_CIM_PARAMS ***
-
-  CREATE OR REPLACE TRIGGER BARS.TAUD_CIM_PARAMS 
+CREATE OR REPLACE TRIGGER BARS.Taud_cim_params
 after update or delete
    on BARS.cim_params for each row
 declare
@@ -19,12 +10,6 @@ begin
              values(:old.par_name,
                     :old.par_value,
                     :old.global,
-                    :old.kf);
+                    :old.kf);                   
 end;
 /
-ALTER TRIGGER BARS.TAUD_CIM_PARAMS ENABLE;
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TAUD_CIM_PARAMS.sql =========*** End
-PROMPT ===================================================================================== 

@@ -100,9 +100,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  INS_ATTR_TYPES ***
-grant SELECT                                                                 on INS_ATTR_TYPES  to BARSREADER_ROLE;
 grant SELECT                                                                 on INS_ATTR_TYPES  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on INS_ATTR_TYPES  to UPLD;
 
 
 

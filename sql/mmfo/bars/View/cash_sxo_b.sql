@@ -18,10 +18,8 @@ from branch2 b,
 where b.branch = x.branch(+);
 
 PROMPT *** Create  grants  CASH_SXO_B ***
-grant SELECT                                                                 on CASH_SXO_B      to BARSREADER_ROLE;
 grant SELECT                                                                 on CASH_SXO_B      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CASH_SXO_B      to START1;
-grant SELECT                                                                 on CASH_SXO_B      to UPLD;
 
 
 

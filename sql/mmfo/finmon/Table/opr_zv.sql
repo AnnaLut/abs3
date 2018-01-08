@@ -83,7 +83,6 @@ exception when others then
 
 PROMPT *** Create  grants  OPR_ZV ***
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on OPR_ZV          to BARS;
-grant SELECT                                                                 on OPR_ZV          to BARSREADER_ROLE;
 
 
 

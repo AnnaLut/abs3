@@ -37,12 +37,10 @@ PROMPT *** Create  view V_OPERAPP ***
 
 PROMPT *** Create  grants  V_OPERAPP ***
 grant SELECT                                                                 on V_OPERAPP       to ABS_ADMIN;
-grant SELECT                                                                 on V_OPERAPP       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OPERAPP       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OPERAPP       to BASIC_INFO;
 grant SELECT                                                                 on V_OPERAPP       to MENU_READER;
 grant SELECT                                                                 on V_OPERAPP       to START1;
-grant SELECT                                                                 on V_OPERAPP       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OPERAPP       to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_OPERAPP       to WR_DIAGNOSTICS;
 

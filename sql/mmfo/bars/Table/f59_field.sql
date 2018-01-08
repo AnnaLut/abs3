@@ -46,11 +46,9 @@ COMMENT ON COLUMN BARS.F59_FIELD.NMK IS '';
 
 
 PROMPT *** Create  grants  F59_FIELD ***
-grant SELECT                                                                 on F59_FIELD       to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on F59_FIELD       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on F59_FIELD       to BARS_DM;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on F59_FIELD       to PYOD001;
-grant SELECT                                                                 on F59_FIELD       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on F59_FIELD       to WR_ALL_RIGHTS;
 
 

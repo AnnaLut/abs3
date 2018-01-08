@@ -77,6 +77,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_DPTLETTERS_DOCSCHEME ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_LETTERS ADD CONSTRAINT FK_DPTLETTERS_DOCSCHEME FOREIGN KEY (DOC_SCHEME_ID)
+	  REFERENCES BARS.DOC_SCHEME (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DPTLETTERS_DOCSCHEMEID_NN ***
 begin   
  execute immediate '
@@ -115,13 +128,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_LETTERS ***
-grant SELECT                                                                 on DPT_LETTERS     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_LETTERS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_LETTERS     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_LETTERS     to DPT_ADMIN;
 grant SELECT                                                                 on DPT_LETTERS     to DPT_ROLE;
 grant SELECT                                                                 on DPT_LETTERS     to START1;
-grant SELECT                                                                 on DPT_LETTERS     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_LETTERS     to WR_ALL_RIGHTS;
 
 

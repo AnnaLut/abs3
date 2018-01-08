@@ -51,6 +51,19 @@ COMMENT ON COLUMN BARS.NODES_COMPOSER.URI_LINK IS '';
 
 
 
+PROMPT *** Create  constraint FK_NODES_COMPOSER_SQL_STORAGE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NODES_COMPOSER ADD CONSTRAINT FK_NODES_COMPOSER_SQL_STORAGE FOREIGN KEY (URI_LINK)
+	  REFERENCES BARS.SQL_STORAGE (URI) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint XPK_NODES_COMPOSER ***
 begin   
  execute immediate '
@@ -79,10 +92,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  NODES_COMPOSER ***
-grant SELECT                                                                 on NODES_COMPOSER  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NODES_COMPOSER  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NODES_COMPOSER  to START1;
-grant SELECT                                                                 on NODES_COMPOSER  to UPLD;
 
 
 

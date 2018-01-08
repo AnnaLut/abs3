@@ -29,10 +29,8 @@ select ' â ÏÔ',nls,fdat,'ãðí',to_char(kos/100,'99999999.99'),'',0,
 where acc in (select acc from specparam where idg=1) and kos+dos>0;
 
 PROMPT *** Create  grants  MARSH ***
-grant SELECT                                                                 on MARSH           to BARSREADER_ROLE;
 grant SELECT                                                                 on MARSH           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MARSH           to START1;
-grant SELECT                                                                 on MARSH           to UPLD;
 
 
 

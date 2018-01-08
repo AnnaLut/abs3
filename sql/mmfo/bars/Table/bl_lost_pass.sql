@@ -85,6 +85,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint BL_LOST_BASE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BL_LOST_PASS ADD CONSTRAINT BL_LOST_BASE FOREIGN KEY (BASE_ID)
+	  REFERENCES BARS.BL_BASE_DICT (BASE_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint NN_BL_LOST_PASS_SER ***
 begin   
  execute immediate '
@@ -161,10 +174,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  BL_LOST_PASS ***
-grant SELECT                                                                 on BL_LOST_PASS    to BARSREADER_ROLE;
 grant SELECT                                                                 on BL_LOST_PASS    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BL_LOST_PASS    to RBL;
-grant SELECT                                                                 on BL_LOST_PASS    to UPLD;
 
 
 

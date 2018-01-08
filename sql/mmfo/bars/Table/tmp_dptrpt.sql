@@ -136,10 +136,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPDPTRPT_DPTNUM_NN ***
+PROMPT *** Create  constraint CC_TMPDPTRPT_DPTID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_DPTRPT MODIFY (DPTNUM CONSTRAINT CC_TMPDPTRPT_DPTNUM_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_DPTRPT MODIFY (DPTID CONSTRAINT CC_TMPDPTRPT_DPTID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -340,10 +340,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPDPTRPT_DPTID_NN ***
+PROMPT *** Create  constraint CC_TMPDPTRPT_DPTNUM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_DPTRPT MODIFY (DPTID CONSTRAINT CC_TMPDPTRPT_DPTID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_DPTRPT MODIFY (DPTNUM CONSTRAINT CC_TMPDPTRPT_DPTNUM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -364,10 +364,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_DPTRPT ***
-grant SELECT                                                                 on TMP_DPTRPT      to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on TMP_DPTRPT      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_DPTRPT      to RPBN001;
-grant SELECT                                                                 on TMP_DPTRPT      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_DPTRPT      to WR_ALL_RIGHTS;
 grant SELECT                                                                 on TMP_DPTRPT      to WR_CREPORTS;
 

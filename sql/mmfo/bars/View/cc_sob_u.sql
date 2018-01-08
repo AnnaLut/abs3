@@ -13,10 +13,8 @@ PROMPT *** Create  view CC_SOB_U ***
     WHERE psys is not null;
 
 PROMPT *** Create  grants  CC_SOB_U ***
-grant SELECT                                                                 on CC_SOB_U        to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_SOB_U        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_SOB_U        to START1;
-grant SELECT                                                                 on CC_SOB_U        to UPLD;
 
 
 

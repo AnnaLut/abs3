@@ -119,10 +119,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  BL_PERSON_UPDATE ***
-grant SELECT                                                                 on BL_PERSON_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on BL_PERSON_UPDATE to BARS_DM;
 grant INSERT,SELECT                                                          on BL_PERSON_UPDATE to RBL;
-grant SELECT                                                                 on BL_PERSON_UPDATE to UPLD;
 
 
 

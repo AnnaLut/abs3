@@ -157,11 +157,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  META_TBLCOLOR ***
-grant SELECT                                                                 on META_TBLCOLOR   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_TBLCOLOR   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on META_TBLCOLOR   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_TBLCOLOR   to START1;
-grant SELECT                                                                 on META_TBLCOLOR   to UPLD;
 
 
 

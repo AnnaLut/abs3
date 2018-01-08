@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Портфель угод на ел. постуги';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'E_DEAL_META';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,33 +119,33 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC_26', 'N', 'ACC рахунку 2600', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'AVANS', 'N', 'Розр-ва~абонплата', '', 22, 18, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'BRANCH', 'C', '(ТВБВ)', '2.4', 30, 23, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'CC_ID', 'C', 'Ідент.~угоди', '4', 20, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DAT1', 'D', 'Дата угоди', '', 10, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'DAT4', 'D', 'Дата~поререднього~розрахунку', '', 10, 13, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'KV26', 'N', 'Код~вал.', '.3', 22, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'ND', 'N', 'Реф. угоди', '', 22, 6, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=V_E_DEAL_TARIF_ND[ACCESSCODE=>2][NSIFUNCTION][PROC=>PUL.PUT(''DEAL_ND'', TO_CHAR(:ND))][EXEC=>BEFORE]', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NLS26', 'C', 'Рах.~для якого~нарах-ся плата', '', 15, 9, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=V_E_DEAL_ACC26[ACCESSCODE=>2][PROC=>PUL.PUT(''DEAL_ND'', TO_CHAR(:ND))][EXEC=>BEFORE]', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NLS36', 'C', 'Рахунок~для сплати~абонплати', '', 15, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NLS_D', 'C', 'Рахунок боргу~абонплати~(3578/3579)', '', 15, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'NLS_P', 'C', 'Рахунок-платник~(NLS_P)', '', 15, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'NMK', 'C', 'Назва клієнта', '3', 70, 3, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'OSTP36', 'N', 'План. зал.~на рахунку~абонплати', '', 22, 17, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'OSTS26', 'N', 'Залишок на рахунку', '', 22, 14, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'OSTS36', 'N', 'Факт. зал.~на рахунку~абонплати', '', 22, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'OST_D', 'N', 'Залишок~боргу', '', 22, 20, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'OST_P', 'N', 'Залишок на~рахунку~NLS_P', '', 22, 22, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'PRZ', 'N', 'Ознака блокування~рахунку абонплати', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'RNK', 'N', 'РНК', '2', 22, 1, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'SAB', 'C', 'Ел. адреса', '1', 6, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'SOS', 'N', 'Стан договору', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'TYP', 'N', 'Тип~кл.', '.5', 22, 2, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'USER_ID', 'N', 'Вик.', '', 22, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'AVTO', 'B', 'Авт.', '.3', 22, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'ACCS', 'C', 'Рахунки~угоди', '', 11, 7, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '/barsroot/customerlist/custacc.aspx?type=10'||chr(38)||'e_deal_nd=:ND'||chr(38)||'mod=ro', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'TARIF_CHECK', 'N', 'Ознака~підключення~тарифу', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC_26', 'N', 'ACC рахунку 2600', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'AVANS', 'N', 'Розр-ва~абонплата', null, 22, 18, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'BRANCH', 'C', '(ТВБВ)', 2.4, 30, 23, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'CC_ID', 'C', 'Ідент.~угоди', 4, 20, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DAT1', 'D', 'Дата угоди', null, 10, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'DAT4', 'D', 'Дата~поререднього~розрахунку', null, 10, 13, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'KV26', 'N', 'Код~вал.', .3, 22, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'ND', 'N', 'Реф. угоди', null, 22, 6, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=V_E_DEAL_TARIF_ND[ACCESSCODE=>2][NSIFUNCTION][PROC=>PUL.PUT(''DEAL_ND'', TO_CHAR(:ND))][EXEC=>BEFORE]', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NLS26', 'C', 'Рах.~для якого~нарах-ся плата', null, 15, 9, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=V_E_DEAL_ACC26[ACCESSCODE=>2][PROC=>PUL.PUT(''DEAL_ND'', TO_CHAR(:ND))][EXEC=>BEFORE]', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NLS36', 'C', 'Рахунок~для сплати~абонплати', null, 15, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NLS_D', 'C', 'Рахунок боргу~абонплати~(3578/3579)', null, 15, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'NLS_P', 'C', 'Рахунок-платник~(NLS_P)', null, 15, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'NMK', 'C', 'Назва клієнта', 3, 70, 3, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'OSTP36', 'N', 'План. зал.~на рахунку~абонплати', null, 22, 17, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'OSTS26', 'N', 'Залишок на рахунку', null, 22, 14, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'OSTS36', 'N', 'Факт. зал.~на рахунку~абонплати', null, 22, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'OST_D', 'N', 'Залишок~боргу', null, 22, 20, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'OST_P', 'N', 'Залишок на~рахунку~NLS_P', null, 22, 22, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'PRZ', 'N', 'Ознака блокування~рахунку абонплати', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'RNK', 'N', 'РНК', 2, 22, 1, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'SAB', 'C', 'Ел. адреса', 1, 6, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'SOS', 'N', 'Стан договору', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'TYP', 'N', 'Тип~кл.', .5, 22, 2, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'USER_ID', 'N', 'Вик.', null, 22, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'AVTO', 'B', 'Авт.', .3, 22, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'ACCS', 'C', 'Рахунки~угоди', null, 11, 7, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '/barsroot/customerlist/custacc.aspx?type=10'||chr(38)||'e_deal_nd=:ND'||chr(38)||'mod=ro', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'TARIF_CHECK', 'N', 'Ознака~підключення~тарифу', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

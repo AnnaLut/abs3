@@ -45,11 +45,9 @@ PROMPT *** Create  view V_DPT_APPLICANTS2IMMOBILE ***
           AND a.blkD = 0;
 
 PROMPT *** Create  grants  V_DPT_APPLICANTS2IMMOBILE ***
-grant SELECT                                                                 on V_DPT_APPLICANTS2IMMOBILE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_APPLICANTS2IMMOBILE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_APPLICANTS2IMMOBILE to DPT_ADMIN;
 grant SELECT                                                                 on V_DPT_APPLICANTS2IMMOBILE to START1;
-grant SELECT                                                                 on V_DPT_APPLICANTS2IMMOBILE to UPLD;
 grant SELECT                                                                 on V_DPT_APPLICANTS2IMMOBILE to WR_ALL_RIGHTS;
 
 

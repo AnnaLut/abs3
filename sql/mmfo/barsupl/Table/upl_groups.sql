@@ -57,8 +57,6 @@ exception when others then
 
 PROMPT *** Create  grants  UPL_GROUPS ***
 grant SELECT                                                                 on UPL_GROUPS      to BARS with grant option;
-grant SELECT                                                                 on UPL_GROUPS      to BARSREADER_ROLE;
-grant SELECT                                                                 on UPL_GROUPS      to UPLD;
 
 
 

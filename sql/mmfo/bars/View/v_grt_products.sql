@@ -74,9 +74,7 @@ from v_grt_deals d, grt_products v
 where d.deal_id = v.deal_id (+);
 
 PROMPT *** Create  grants  V_GRT_PRODUCTS ***
-grant SELECT                                                                 on V_GRT_PRODUCTS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GRT_PRODUCTS  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_GRT_PRODUCTS  to UPLD;
 
 
 

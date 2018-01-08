@@ -59,11 +59,9 @@ COMMENT ON COLUMN BARS.KL_K052.K052_OLD IS '';
 
 
 PROMPT *** Create  grants  KL_K052 ***
-grant SELECT                                                                 on KL_K052         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_K052         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_K052         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_K052         to START1;
-grant SELECT                                                                 on KL_K052         to UPLD;
 
 
 

@@ -50,10 +50,6 @@ COMMENT ON COLUMN BARS.T2603.SR IS '';
 
 
 
-PROMPT *** Create  grants  T2603 ***
-grant SELECT                                                                 on T2603           to BARSREADER_ROLE;
-grant SELECT                                                                 on T2603           to UPLD;
-
 
 
 PROMPT ===================================================================================== 

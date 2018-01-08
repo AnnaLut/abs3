@@ -13,10 +13,8 @@ PROMPT *** Create  view PSG ***
  ;
 
 PROMPT *** Create  grants  PSG ***
-grant SELECT                                                                 on PSG             to BARSREADER_ROLE;
 grant SELECT                                                                 on PSG             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PSG             to START1;
-grant SELECT                                                                 on PSG             to UPLD;
 
 
 

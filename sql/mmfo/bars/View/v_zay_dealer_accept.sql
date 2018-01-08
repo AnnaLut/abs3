@@ -1,14 +1,14 @@
 
 
-PROMPT ===================================================================================== 
+PROMPT =====================================================================================
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ZAY_DEALER_ACCEPT.sql =========*** Ru
-PROMPT ===================================================================================== 
+PROMPT =====================================================================================
 
 
 PROMPT *** Create  view V_ZAY_DEALER_ACCEPT ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_ZAY_DEALER_ACCEPT ("ID", "Z_TYPE", "STATE", "MFO", "MFO_NAME", "RNK", "NMK", "LCV", "LCV_CONV", "KURS_KL", "KURS_F", "S2S", "SQ", "CHANGE_TIME") AS 
-  SELECT z.id,
+  CREATE OR REPLACE FORCE VIEW BARS.V_ZAY_DEALER_ACCEPT ("ID", "Z_TYPE", "STATE", "MFO", "MFO_NAME", "RNK", "NMK", "LCV", "LCV_CONV", "KURS_KL", "KURS_F", "S2S", "SQ", "CHANGE_TIME") AS
+   SELECT z.id,
           DECODE (z.dk,
                   1, 'Купівля',
                   2, 'Продаж',
@@ -36,14 +36,12 @@ PROMPT *** Create  view V_ZAY_DEALER_ACCEPT ***
       AND t.new_sos = 0.5;
 
 PROMPT *** Create  grants  V_ZAY_DEALER_ACCEPT ***
-grant SELECT                                                                 on V_ZAY_DEALER_ACCEPT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY_DEALER_ACCEPT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ZAY_DEALER_ACCEPT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ZAY_DEALER_ACCEPT to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_ZAY_DEALER_ACCEPT to ZAY;
 
 
 
-PROMPT ===================================================================================== 
+PROMPT =====================================================================================
 PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ZAY_DEALER_ACCEPT.sql =========*** En
-PROMPT ===================================================================================== 
+PROMPT =====================================================================================

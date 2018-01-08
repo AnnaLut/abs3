@@ -27,14 +27,12 @@ PROMPT *** Create  view OPL ***
 
 PROMPT *** Create  grants  OPL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPL             to ABS_ADMIN;
-grant SELECT                                                                 on OPL             to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPL             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OPL             to INSPECTOR;
 grant SELECT                                                                 on OPL             to PYOD001;
 grant SELECT                                                                 on OPL             to RPBN001;
 grant SELECT                                                                 on OPL             to START1;
 grant SELECT                                                                 on OPL             to TEST;
-grant SELECT                                                                 on OPL             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OPL             to WR_ALL_RIGHTS;
 
 

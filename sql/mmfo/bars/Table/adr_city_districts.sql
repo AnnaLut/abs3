@@ -102,7 +102,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  ADR_CITY_DISTRICTS ***
-grant SELECT                                                                 on ADR_CITY_DISTRICTS to BARSREADER_ROLE;
 grant SELECT                                                                 on ADR_CITY_DISTRICTS to BARSUPL;
 grant SELECT                                                                 on ADR_CITY_DISTRICTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ADR_CITY_DISTRICTS to START1;

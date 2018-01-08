@@ -76,10 +76,8 @@ exception when others then
 
 PROMPT *** Create  grants  REBRANCH_DEPOSIT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on REBRANCH_DEPOSIT to ABS_ADMIN;
-grant SELECT                                                                 on REBRANCH_DEPOSIT to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REBRANCH_DEPOSIT to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REBRANCH_DEPOSIT to DPT_ADMIN;
-grant SELECT                                                                 on REBRANCH_DEPOSIT to UPLD;
 grant FLASHBACK,SELECT                                                       on REBRANCH_DEPOSIT to WR_REFREAD;
 
 

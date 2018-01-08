@@ -17,10 +17,8 @@ PROMPT *** Create  view V_DPT_AGREEMENTS_DECREPITNOTES ***
  ;
 
 PROMPT *** Create  grants  V_DPT_AGREEMENTS_DECREPITNOTES ***
-grant SELECT                                                                 on V_DPT_AGREEMENTS_DECREPITNOTES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_AGREEMENTS_DECREPITNOTES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_AGREEMENTS_DECREPITNOTES to DPT_ROLE;
-grant SELECT                                                                 on V_DPT_AGREEMENTS_DECREPITNOTES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_AGREEMENTS_DECREPITNOTES to WR_ALL_RIGHTS;
 
 

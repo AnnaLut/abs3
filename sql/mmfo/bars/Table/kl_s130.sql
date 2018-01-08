@@ -52,11 +52,9 @@ COMMENT ON COLUMN BARS.KL_S130.D_MODE IS '';
 
 
 PROMPT *** Create  grants  KL_S130 ***
-grant SELECT                                                                 on KL_S130         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_S130         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_S130         to BARS_DM;
 grant SELECT                                                                 on KL_S130         to START1;
-grant SELECT                                                                 on KL_S130         to UPLD;
 
 
 

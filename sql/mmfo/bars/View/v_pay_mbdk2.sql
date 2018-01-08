@@ -12,9 +12,7 @@ PROMPT *** Create  view V_PAY_MBDK2 ***
 from   table(mbk.make_docinput(to_number(pul.get_mas_ini_val('ND'))));
 
 PROMPT *** Create  grants  V_PAY_MBDK2 ***
-grant SELECT                                                                 on V_PAY_MBDK2     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PAY_MBDK2     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_PAY_MBDK2     to UPLD;
 
 
 

@@ -79,9 +79,7 @@ PROMPT *** Create  view V_DPT_CHECK_BONUSES ***
 ORDER BY dc.dat_begin;
 
 PROMPT *** Create  grants  V_DPT_CHECK_BONUSES ***
-grant SELECT                                                                 on V_DPT_CHECK_BONUSES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_CHECK_BONUSES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DPT_CHECK_BONUSES to UPLD;
 
 
 

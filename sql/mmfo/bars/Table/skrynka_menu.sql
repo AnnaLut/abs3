@@ -38,8 +38,7 @@ begin
 	VOB3 NUMBER, 
 	NUMPARNAME VARCHAR2(30), 
 	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch''), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
-	STRPARNAME VARCHAR2(30)
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -51,13 +50,19 @@ end;
 
 
 
+begin 
+  execute immediate 'ALTER TABLE BARS.SKRYNKA_MENU ADD (STRPARNAME VARCHAR2(30))';
+exception when others then       
+  if sqlcode=-1430  then null; else raise; end if; 
+end;
+/ 
+
 
 PROMPT *** ALTER_POLICIES to SKRYNKA_MENU ***
  exec bpa.alter_policies('SKRYNKA_MENU');
 
 
 COMMENT ON TABLE BARS.SKRYNKA_MENU IS '';
-COMMENT ON COLUMN BARS.SKRYNKA_MENU.STRPARNAME IS '';
 COMMENT ON COLUMN BARS.SKRYNKA_MENU.ITEM IS '';
 COMMENT ON COLUMN BARS.SKRYNKA_MENU.NAME IS '';
 COMMENT ON COLUMN BARS.SKRYNKA_MENU.TYPE IS '';
@@ -77,12 +82,100 @@ COMMENT ON COLUMN BARS.SKRYNKA_MENU.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_SKRYNKA_MENU_VOB ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_MENU ADD CONSTRAINT FK_SKRYNKA_MENU_VOB FOREIGN KEY (VOB)
+	  REFERENCES BARS.VOB (VOB) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint XUK_SKRYNKA_MENU_NAME ***
 begin   
  execute immediate '
   ALTER TABLE BARS.SKRYNKA_MENU ADD CONSTRAINT XUK_SKRYNKA_MENU_NAME UNIQUE (NAME, KF)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SKRYNKAMENU_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_MENU MODIFY (KF CONSTRAINT CC_SKRYNKAMENU_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SKRYNKAMENU_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_MENU MODIFY (BRANCH CONSTRAINT CC_SKRYNKAMENU_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SKRYNKAMENU_ITEM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_MENU MODIFY (ITEM CONSTRAINT CC_SKRYNKAMENU_ITEM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKA_MENU_VOB3 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_MENU ADD CONSTRAINT FK_SKRYNKA_MENU_VOB3 FOREIGN KEY (VOB3)
+	  REFERENCES BARS.VOB (VOB) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKA_MENU_VOB2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_MENU ADD CONSTRAINT FK_SKRYNKA_MENU_VOB2 FOREIGN KEY (VOB2)
+	  REFERENCES BARS.VOB (VOB) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKAMENU_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_MENU ADD CONSTRAINT FK_SKRYNKAMENU_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -105,10 +198,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SKRYNKAMENU_ITEM_NN ***
+PROMPT *** Create  constraint FK_SKRYNKA_MENU_BRANCH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_MENU MODIFY (ITEM CONSTRAINT CC_SKRYNKAMENU_ITEM_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SKRYNKA_MENU ADD CONSTRAINT FK_SKRYNKA_MENU_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -117,10 +211,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SKRYNKAMENU_BRANCH_NN ***
+PROMPT *** Create  constraint FK_SKRYNKA_MENU_TT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_MENU MODIFY (BRANCH CONSTRAINT CC_SKRYNKAMENU_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SKRYNKA_MENU ADD CONSTRAINT FK_SKRYNKA_MENU_TT FOREIGN KEY (TT)
+	  REFERENCES BARS.TTS (TT) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -129,10 +224,24 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SKRYNKAMENU_KF_NN ***
+PROMPT *** Create  constraint FK_SKRYNKA_MENU_TT2 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_MENU MODIFY (KF CONSTRAINT CC_SKRYNKAMENU_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SKRYNKA_MENU ADD CONSTRAINT FK_SKRYNKA_MENU_TT2 FOREIGN KEY (TT2)
+	  REFERENCES BARS.TTS (TT) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKA_MENU_TT3 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_MENU ADD CONSTRAINT FK_SKRYNKA_MENU_TT3 FOREIGN KEY (TT3)
+	  REFERENCES BARS.TTS (TT) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -169,12 +278,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_MENU ***
-grant SELECT                                                                 on SKRYNKA_MENU    to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_MENU    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SKRYNKA_MENU    to BARS_DM;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_MENU    to DEP_SKRN;
 grant SELECT                                                                 on SKRYNKA_MENU    to START1;
-grant SELECT                                                                 on SKRYNKA_MENU    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_MENU    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SKRYNKA_MENU    to WR_REFREAD;
 

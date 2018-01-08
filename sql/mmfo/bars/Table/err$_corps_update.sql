@@ -96,9 +96,7 @@ COMMENT ON COLUMN BARS.ERR$_CORPS_UPDATE.NMK IS '';
 
 
 PROMPT *** Create  grants  ERR$_CORPS_UPDATE ***
-grant SELECT                                                                 on ERR$_CORPS_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CORPS_UPDATE to BARS_DM;
-grant SELECT                                                                 on ERR$_CORPS_UPDATE to UPLD;
 
 
 

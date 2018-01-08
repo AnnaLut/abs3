@@ -131,10 +131,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010248 ***
+PROMPT *** Create  constraint SYS_C0010253 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_REFSYNC_OPLDOK MODIFY (S NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_REFSYNC_OPLDOK MODIFY (KF NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -191,10 +191,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010253 ***
+PROMPT *** Create  constraint SYS_C0010248 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_REFSYNC_OPLDOK MODIFY (KF NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_REFSYNC_OPLDOK MODIFY (S NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -203,8 +203,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_REFSYNC_OPLDOK ***
-grant SELECT                                                                 on TMP_REFSYNC_OPLDOK to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_REFSYNC_OPLDOK to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_REFSYNC_OPLDOK to WR_ALL_RIGHTS;
 
 

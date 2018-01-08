@@ -18,10 +18,8 @@ where  ca.acc=a.acc     and ca.rnk=c.rnk          and
 group by a.fdat, c.rnk, c.nmk;
 
 PROMPT *** Create  grants  CHECK_42A ***
-grant SELECT                                                                 on CHECK_42A       to BARSREADER_ROLE;
 grant SELECT                                                                 on CHECK_42A       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHECK_42A       to START1;
-grant SELECT                                                                 on CHECK_42A       to UPLD;
 
 
 

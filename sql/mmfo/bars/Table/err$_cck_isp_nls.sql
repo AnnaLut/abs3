@@ -61,10 +61,6 @@ COMMENT ON COLUMN BARS.ERR$_CCK_ISP_NLS.BRANCH IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CCK_ISP_NLS ***
-grant SELECT                                                                 on ERR$_CCK_ISP_NLS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CCK_ISP_NLS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

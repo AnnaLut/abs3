@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_SW_DOCMSG_ERR.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SW_DOCMSG_ERR ***
-grant SELECT                                                                 on ERR$_SW_DOCMSG_ERR to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SW_DOCMSG_ERR to UPLD;
-
 
 
 PROMPT ===================================================================================== 

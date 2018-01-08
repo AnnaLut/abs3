@@ -15,10 +15,8 @@ WHERE d.acc=a.acc AND d.acc=c.acc AND nvl(d.dat_end, bankdate+1) > bankdate
 
 PROMPT *** Create  grants  DPT_ZAL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_ZAL         to ABS_ADMIN;
-grant SELECT                                                                 on DPT_ZAL         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_ZAL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_ZAL         to START1;
-grant SELECT                                                                 on DPT_ZAL         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_ZAL         to WR_ALL_RIGHTS;
 
 

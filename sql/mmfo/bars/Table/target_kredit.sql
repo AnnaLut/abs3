@@ -49,11 +49,9 @@ COMMENT ON COLUMN BARS.TARGET_KREDIT.TXT IS '';
 
 
 PROMPT *** Create  grants  TARGET_KREDIT ***
-grant SELECT                                                                 on TARGET_KREDIT   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TARGET_KREDIT   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TARGET_KREDIT   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TARGET_KREDIT   to START1;
-grant SELECT                                                                 on TARGET_KREDIT   to UPLD;
 
 
 

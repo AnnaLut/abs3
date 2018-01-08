@@ -115,11 +115,9 @@ COMMENT ON COLUMN BARS.CIM_F98_LOAD.DATA_M IS '';
 
 
 PROMPT *** Create  grants  CIM_F98_LOAD ***
-grant SELECT                                                                 on CIM_F98_LOAD    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F98_LOAD    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_F98_LOAD    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F98_LOAD    to CIM_ROLE;
-grant SELECT                                                                 on CIM_F98_LOAD    to UPLD;
 
 
 

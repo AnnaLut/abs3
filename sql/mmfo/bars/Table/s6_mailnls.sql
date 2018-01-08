@@ -151,9 +151,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  S6_MailNLS ***
-grant SELECT                                                                 on S6_MailNLS      to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

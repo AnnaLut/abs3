@@ -2,8 +2,8 @@ set lines 1000
 set trimspool on
 set serveroutput on size 1000000
 
-prompt Создание / Обновление операции !!N
-prompt Наименование операции: STOP правило на перевірку ліміта на поповнення в рамках одного РУ
+prompt Создание / Обновление операции !!K
+prompt Наименование операции: STOP правило, ідент. клієнтів без відкртих рахунків (150000)
 declare
   cnt_  number;
 begin
@@ -12,37 +12,37 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!!N', 'STOP правило на перевірку ліміта на поповнення в рамках одного РУ', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(8888,#(KVA),#(NLSA),#(S), 2000000)', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('!!K', 'STOP правило, ідент. клієнтів без відкртих рахунків (150000)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'f_stop(80015,#(REF),'''',0)', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!!N', name='STOP правило на перевірку ліміта на поповнення в рамках одного РУ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(8888,#(KVA),#(NLSA),#(S), 2000000)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
-       where tt='!!N';
+         set tt='!!K', name='STOP правило, ідент. клієнтів без відкртих рахунків (150000)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='f_stop(80015,#(REF),'''',0)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+       where tt='!!K';
   end;
   --------------------------------
   ----------- Реквизиты ----------
   --------------------------------
-  delete from op_rules where tt='!!N';
+  delete from op_rules where tt='!!K';
   --------------------------------
   ------ Связанные операции ------
   --------------------------------
-  delete from ttsap where tt='!!N';
+  delete from ttsap where tt='!!K';
   --------------------------------
   ------- Балансовые счета -------
   --------------------------------
-  delete from ps_tts where tt='!!N';
+  delete from ps_tts where tt='!!K';
   --------------------------------
   -------- Виды документов -------
   --------------------------------
-  delete from tts_vob where tt='!!N';
+  delete from tts_vob where tt='!!K';
   --------------------------------
   -------- Группы контроля -------
   --------------------------------
-  delete from chklist_tts where tt='!!N';
+  delete from chklist_tts where tt='!!K';
   --------------------------------
   ------------- Папки ------------
   --------------------------------
-  delete from folders_tts where tt='!!N';
+  delete from folders_tts where tt='!!K';
 end;
 /
 prompt Создание / Обновление операции !DJ
@@ -390,12 +390,12 @@ begin
   delete from ttsap where tt='PNB';
   begin
     insert into ttsap(ttap, tt, dk)
-    values ('!!N', 'PNB', 0);
+    values ('!!K', 'PNB', 0);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ttsap: ''!!N'', ''PNB'', 0) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ttsap: ''!!K'', ''PNB'', 0) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -596,3 +596,24 @@ begin
 end;
 /
 commit;
+
+begin
+Insert into BARS.OW_MSGCODE
+   (MSGCODE, DK, SYNTHCODE)
+ Values
+   ('PAYACC2', 1, 'POBACA');
+   exception when dup_val_on_index then null;
+end;   
+/
+COMMIT;
+
+
+begin
+Insert into BARS.OBPC_TRANS_OUT
+   (TRAN_TYPE, TT, DK, W4_MSGCODE, PAY_FLAG)
+ Values
+   ('18', 'PNB', 1, 'PAYACC2', 0);
+    exception when dup_val_on_index then null;
+end; 
+/  
+COMMIT;

@@ -25,8 +25,6 @@ group by o.ref
  ;
 
 PROMPT *** Create  grants  V_BLKDOCS ***
-grant SELECT                                                                 on V_BLKDOCS       to BARSREADER_ROLE;
-grant SELECT                                                                 on V_BLKDOCS       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BLKDOCS       to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_BLKDOCS       to WR_BLKDOCS;
 

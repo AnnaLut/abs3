@@ -26,9 +26,7 @@ PROMPT *** Create  view V_INS_PARTNER_BRANCH_RNK ***
  order by pbr.partner_id, pbr.branch;
 
 PROMPT *** Create  grants  V_INS_PARTNER_BRANCH_RNK ***
-grant SELECT                                                                 on V_INS_PARTNER_BRANCH_RNK to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_PARTNER_BRANCH_RNK to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INS_PARTNER_BRANCH_RNK to UPLD;
 
 
 

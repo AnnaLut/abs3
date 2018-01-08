@@ -120,6 +120,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_PTNTYPEATTRS_AID_ATTRS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_PARTNER_TYPE_ATTRS ADD CONSTRAINT FK_PTNTYPEATTRS_AID_ATTRS FOREIGN KEY (ATTR_ID)
+	  REFERENCES BARS.INS_ATTRS (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_PTNTYPEATTRS_TID_TYPES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_PARTNER_TYPE_ATTRS ADD CONSTRAINT FK_PTNTYPEATTRS_TID_TYPES FOREIGN KEY (TYPE_ID)
+	  REFERENCES BARS.INS_TYPES (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_PTNTYPEATTRS_ISREQ ***
 begin   
  execute immediate '
@@ -158,10 +184,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  INS_PARTNER_TYPE_ATTRS ***
-grant SELECT                                                                 on INS_PARTNER_TYPE_ATTRS to BARSREADER_ROLE;
-grant SELECT                                                                 on INS_PARTNER_TYPE_ATTRS to UPLD;
 
 
 

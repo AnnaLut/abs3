@@ -20,10 +20,8 @@ PROMPT *** Create  view V_BANKS_REPORT22 ***
        GROUP BY s.nbuc, s.kodf, s.datf, s.kodp;
 
 PROMPT *** Create  grants  V_BANKS_REPORT22 ***
-grant SELECT                                                                 on V_BANKS_REPORT22 to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BANKS_REPORT22 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BANKS_REPORT22 to START1;
-grant SELECT                                                                 on V_BANKS_REPORT22 to UPLD;
 
 
 

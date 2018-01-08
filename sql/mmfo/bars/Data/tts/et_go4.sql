@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции GO4
-prompt Наименование операции: GO4 БО: Комисионные доходы по операциям на М/Б ринке
+prompt Наименование операции: БО: Комисионные доходы по операциям на М/Б ринке
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('GO4', 'GO4 БО: Комисионные доходы по операциям на М/Б ринке', 1, null, null, '#(get_nls_tt(''GO4'',''NLSK''))', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', null);
+    values ('GO4', 'БО: Комисионные доходы по операциям на М/Б ринке', 1, null, null, '62048', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='GO4', name='GO4 БО: Комисионные доходы по операциям на М/Б ринке', dk=1, nlsm=null, kv=null, nlsk='#(get_nls_tt(''GO4'',''NLSK''))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='GO4', name='БО: Комисионные доходы по операциям на М/Б ринке', dk=1, nlsm=null, kv=null, nlsk='62048', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='GO4';
   end;
   --------------------------------

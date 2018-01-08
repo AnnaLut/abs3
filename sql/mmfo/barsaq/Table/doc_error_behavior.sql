@@ -93,9 +93,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  DOC_ERROR_BEHAVIOR ***
-grant SELECT                                                                 on DOC_ERROR_BEHAVIOR to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

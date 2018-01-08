@@ -101,9 +101,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  STO_TYPE ***
-grant SELECT                                                                 on STO_TYPE        to BARSREADER_ROLE;
 grant SELECT                                                                 on STO_TYPE        to BARS_DM;
-grant SELECT                                                                 on STO_TYPE        to UPLD;
 
 
 

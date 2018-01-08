@@ -33,10 +33,21 @@ COMMENT ON COLUMN BARS_DM.IMP_SHEDULER.COMM IS '';
 
 
 
+
+PROMPT *** Create  constraint FK_IMP_SHEDULER_IMPTYPE_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS_DM.IMP_SHEDULER ADD CONSTRAINT FK_IMP_SHEDULER_IMPTYPE_ID FOREIGN KEY (IMP_TYPEID)
+	  REFERENCES BARS_DM.IMP_TYPES (ID) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  IMP_SHEDULER ***
-grant SELECT                                                                 on IMP_SHEDULER    to BARSREADER_ROLE;
 grant SELECT                                                                 on IMP_SHEDULER    to BARSUPL;
-grant SELECT                                                                 on IMP_SHEDULER    to UPLD;
 
 
 

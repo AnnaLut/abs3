@@ -103,12 +103,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_W4SUBPRODUCT ***
+PROMPT *** Create  constraint CC_W4SUBPRODUCT_CODE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_SUBPRODUCT ADD CONSTRAINT PK_W4SUBPRODUCT PRIMARY KEY (CODE)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.W4_SUBPRODUCT MODIFY (CODE CONSTRAINT CC_W4SUBPRODUCT_CODE_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -117,10 +115,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_W4SUBPRODUCT_CODE_NN ***
+PROMPT *** Create  constraint PK_W4SUBPRODUCT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_SUBPRODUCT MODIFY (CODE CONSTRAINT CC_W4SUBPRODUCT_CODE_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.W4_SUBPRODUCT ADD CONSTRAINT PK_W4SUBPRODUCT PRIMARY KEY (CODE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -143,7 +143,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  W4_SUBPRODUCT ***
-grant SELECT                                                                 on W4_SUBPRODUCT   to BARSREADER_ROLE;
 grant SELECT                                                                 on W4_SUBPRODUCT   to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on W4_SUBPRODUCT   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_SUBPRODUCT   to BARS_DM;

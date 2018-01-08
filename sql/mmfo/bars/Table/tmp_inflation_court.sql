@@ -70,11 +70,9 @@ COMMENT ON COLUMN BARS.TMP_INFLATION_COURT.TYP_KOD IS '';
 
 
 PROMPT *** Create  grants  TMP_INFLATION_COURT ***
-grant SELECT                                                                 on TMP_INFLATION_COURT to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INFLATION_COURT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_INFLATION_COURT to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INFLATION_COURT to RCC_DEAL;
-grant SELECT                                                                 on TMP_INFLATION_COURT to UPLD;
 
 
 

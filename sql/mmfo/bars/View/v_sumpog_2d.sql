@@ -25,9 +25,7 @@ PROMPT *** Create  view V_SUMPOG_2D ***
    ORDER BY TO_DATE (g.CC_ID, 'dd/mm/yyyy'), g.KV;
 
 PROMPT *** Create  grants  V_SUMPOG_2D ***
-grant SELECT                                                                 on V_SUMPOG_2D     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SUMPOG_2D     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_SUMPOG_2D     to UPLD;
 
 
 

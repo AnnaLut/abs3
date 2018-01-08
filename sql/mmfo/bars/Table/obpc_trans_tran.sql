@@ -77,6 +77,45 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OBPCTRANSTR_TRANS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TRANS_TRAN ADD CONSTRAINT FK_OBPCTRANSTR_TRANS FOREIGN KEY (TRAN_TYPE)
+	  REFERENCES BARS.OBPC_TRANS (TRAN_TYPE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OBPCTRANSTR_TIP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TRANS_TRAN ADD CONSTRAINT FK_OBPCTRANSTR_TIP FOREIGN KEY (TIP)
+	  REFERENCES BARS.TIPS (TIP) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OBPCTRANSTR_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TRANS_TRAN ADD CONSTRAINT FK_OBPCTRANSTR_TABVAL FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OBPCTRANSTRAN_TRANTYPE_NN ***
 begin   
  execute immediate '
@@ -101,10 +140,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OBPCTRANSTRAN_KV_NN ***
+PROMPT *** Create  constraint CC_OBPCTRANSTRAN_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OBPC_TRANS_TRAN MODIFY (KV CONSTRAINT CC_OBPCTRANSTRAN_KV_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.OBPC_TRANS_TRAN MODIFY (BRANCH CONSTRAINT CC_OBPCTRANSTRAN_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -113,10 +152,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OBPCTRANSTRAN_BRANCH_NN ***
+PROMPT *** Create  constraint CC_OBPCTRANSTRAN_KV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OBPC_TRANS_TRAN MODIFY (BRANCH CONSTRAINT CC_OBPCTRANSTRAN_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.OBPC_TRANS_TRAN MODIFY (KV CONSTRAINT CC_OBPCTRANSTRAN_KV_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -139,11 +178,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_TRANS_TRAN ***
-grant SELECT                                                                 on OBPC_TRANS_TRAN to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_TRANS_TRAN to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_TRANS_TRAN to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_TRANS_TRAN to OBPC;
-grant SELECT                                                                 on OBPC_TRANS_TRAN to UPLD;
 
 
 

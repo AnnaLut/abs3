@@ -16,9 +16,7 @@ PROMPT *** Create  view V_BIC_ACC ***
                          where t1.kvc = to_number (pul.get ('CHKVC'))));
 
 PROMPT *** Create  grants  V_BIC_ACC ***
-grant SELECT                                                                 on V_BIC_ACC       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BIC_ACC       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_BIC_ACC       to UPLD;
 
 
 

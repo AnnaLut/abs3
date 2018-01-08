@@ -79,10 +79,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010301 ***
+PROMPT *** Create  constraint SYS_C0010304 ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.TMP_REFSYNC_DPT_VIDD_RATE MODIFY (TERM_D NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.TMP_REFSYNC_DPT_VIDD_RATE MODIFY (DAT NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -115,10 +115,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010304 ***
+PROMPT *** Create  constraint SYS_C0010301 ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.TMP_REFSYNC_DPT_VIDD_RATE MODIFY (DAT NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.TMP_REFSYNC_DPT_VIDD_RATE MODIFY (TERM_D NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -128,7 +128,6 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_REFSYNC_DPT_VIDD_RATE ***
 grant DELETE,INSERT,SELECT                                                   on TMP_REFSYNC_DPT_VIDD_RATE to BARS;
-grant SELECT                                                                 on TMP_REFSYNC_DPT_VIDD_RATE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on TMP_REFSYNC_DPT_VIDD_RATE to KLBX;
 grant SELECT                                                                 on TMP_REFSYNC_DPT_VIDD_RATE to REFSYNC_USR;
 

@@ -14,10 +14,8 @@ PROMPT *** Create  view ACCOUNTS_RNK ***
       AND u.rnk=c.rnk --AND a.dazs IS NULL;;
 
 PROMPT *** Create  grants  ACCOUNTS_RNK ***
-grant SELECT                                                                 on ACCOUNTS_RNK    to BARSREADER_ROLE;
 grant SELECT                                                                 on ACCOUNTS_RNK    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCOUNTS_RNK    to START1;
-grant SELECT                                                                 on ACCOUNTS_RNK    to UPLD;
 
 
 

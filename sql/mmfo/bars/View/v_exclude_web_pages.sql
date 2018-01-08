@@ -34,8 +34,6 @@ UNION ALL
  ;
 
 PROMPT *** Create  grants  V_EXCLUDE_WEB_PAGES ***
-grant SELECT                                                                 on V_EXCLUDE_WEB_PAGES to BARSREADER_ROLE;
-grant SELECT                                                                 on V_EXCLUDE_WEB_PAGES to UPLD;
 grant SELECT                                                                 on V_EXCLUDE_WEB_PAGES to WR_ALL_RIGHTS;
 
 

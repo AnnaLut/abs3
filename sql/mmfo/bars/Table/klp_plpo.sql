@@ -119,11 +119,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  KLP_PLPO ***
-grant SELECT                                                                 on KLP_PLPO        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on KLP_PLPO        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KLP_PLPO        to BARS_DM;
 grant DELETE,INSERT,SELECT                                                   on KLP_PLPO        to TECH_MOM1;
-grant SELECT                                                                 on KLP_PLPO        to UPLD;
 
 
 

@@ -79,10 +79,62 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_ALIEN_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ALIEN ADD CONSTRAINT FK_ALIEN_TABVAL FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ALIEN_STANFIN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ALIEN ADD CONSTRAINT FK_ALIEN_STANFIN FOREIGN KEY (CRISK)
+	  REFERENCES BARS.STAN_FIN (FIN) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ALIEN_BANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ALIEN ADD CONSTRAINT FK_ALIEN_BANKS FOREIGN KEY (MFO)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_ALIEN_RECID_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.ALIEN MODIFY (REC_ID CONSTRAINT CC_ALIEN_RECID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ALIEN_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ALIEN ADD CONSTRAINT FK_ALIEN_STAFF FOREIGN KEY (ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -137,13 +189,11 @@ grant DELETE,INSERT,SELECT,UPDATE                                            on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on ALIEN           to ALIEN;
 grant SELECT                                                                 on ALIEN           to BARSAQ with grant option;
 grant SELECT                                                                 on ALIEN           to BARSAQ_ADM with grant option;
-grant SELECT                                                                 on ALIEN           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ALIEN           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ALIEN           to BARS_DM;
 grant DELETE,INSERT,UPDATE                                                   on ALIEN           to FOREX;
 grant DELETE,INSERT,UPDATE                                                   on ALIEN           to PYOD001;
 grant SELECT                                                                 on ALIEN           to START1;
-grant SELECT                                                                 on ALIEN           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ALIEN           to WR_ALL_RIGHTS;
 grant INSERT,SELECT,UPDATE                                                   on ALIEN           to WR_DOC_INPUT;
 grant FLASHBACK,SELECT                                                       on ALIEN           to WR_REFREAD;

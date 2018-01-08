@@ -75,10 +75,6 @@ COMMENT ON COLUMN BARS.ERR$_ACC_BALANCE_CHANGES_UPDAT.ORA_ERR_ROWID$ IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ACC_BALANCE_CHANGES_UPDAT ***
-grant SELECT                                                                 on ERR$_ACC_BALANCE_CHANGES_UPDAT to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ACC_BALANCE_CHANGES_UPDAT to UPLD;
-
 
 
 PROMPT ===================================================================================== 

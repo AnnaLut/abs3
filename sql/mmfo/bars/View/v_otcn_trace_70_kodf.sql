@@ -12,10 +12,8 @@ PROMPT *** Create  view V_OTCN_TRACE_70_KODF ***
      FROM OTCN_TRACE_70;
 
 PROMPT *** Create  grants  V_OTCN_TRACE_70_KODF ***
-grant SELECT                                                                 on V_OTCN_TRACE_70_KODF to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OTCN_TRACE_70_KODF to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OTCN_TRACE_70_KODF to START1;
-grant SELECT                                                                 on V_OTCN_TRACE_70_KODF to UPLD;
 
 
 

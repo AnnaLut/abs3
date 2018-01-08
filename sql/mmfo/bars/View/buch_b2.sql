@@ -15,10 +15,8 @@ where
 ;
 
 PROMPT *** Create  grants  BUCH_B2 ***
-grant SELECT                                                                 on BUCH_B2         to BARSREADER_ROLE;
 grant SELECT                                                                 on BUCH_B2         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BUCH_B2         to START1;
-grant SELECT                                                                 on BUCH_B2         to UPLD;
 
 
 

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции Д39
-prompt Наименование операции: Д39 ПОЗАБАЛАНС. Ідентифікація вкладів в ЦР
+prompt Наименование операции: ПОЗАБАЛАНС. Ідентифікація вкладів в ЦР
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('Д39', 'Д39 ПОЗАБАЛАНС. Ідентифікація вкладів в ЦР', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1100100000000000000000000000000000000000000000000000000000000000', 'Внесено компенсацію до Центрального реєстру');
+    values ('Д39', 'ПОЗАБАЛАНС. Ідентифікація вкладів в ЦР', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1100100000000000000000000000000000000000000000000000000000000000', 'Внесено компенсацію до Центрального реєстру');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='Д39', name='Д39 ПОЗАБАЛАНС. Ідентифікація вкладів в ЦР', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1100100000000000000000000000000000000000000000000000000000000000', nazn='Внесено компенсацію до Центрального реєстру'
+         set tt='Д39', name='ПОЗАБАЛАНС. Ідентифікація вкладів в ЦР', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1100100000000000000000000000000000000000000000000000000000000000', nazn='Внесено компенсацію до Центрального реєстру'
        where tt='Д39';
   end;
   --------------------------------

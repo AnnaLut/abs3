@@ -117,10 +117,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  ADR_STREETS ***
-grant SELECT                                                                 on ADR_STREETS     to BARSREADER_ROLE;
-grant SELECT                                                                 on ADR_STREETS     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

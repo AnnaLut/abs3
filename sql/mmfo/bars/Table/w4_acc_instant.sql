@@ -85,6 +85,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_W4ACCINSTANT_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_ACC_INSTANT ADD CONSTRAINT FK_W4ACCINSTANT_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_W4ACCINSTANT_ACC_NN ***
 begin   
  execute immediate '
@@ -123,11 +136,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  W4_ACC_INSTANT ***
-grant SELECT                                                                 on W4_ACC_INSTANT  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on W4_ACC_INSTANT  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_ACC_INSTANT  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on W4_ACC_INSTANT  to OW;
-grant SELECT                                                                 on W4_ACC_INSTANT  to UPLD;
 
 
 

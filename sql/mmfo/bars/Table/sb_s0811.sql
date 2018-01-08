@@ -61,11 +61,9 @@ COMMENT ON COLUMN BARS.SB_S0811.D_CLOSE IS '';
 
 
 PROMPT *** Create  grants  SB_S0811 ***
-grant SELECT                                                                 on SB_S0811        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_S0811        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SB_S0811        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_S0811        to START1;
-grant SELECT                                                                 on SB_S0811        to UPLD;
 
 
 

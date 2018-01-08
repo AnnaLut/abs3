@@ -65,6 +65,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CODCAGENT_REZID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CODCAGENT ADD CONSTRAINT FK_CODCAGENT_REZID FOREIGN KEY (REZID)
+	  REFERENCES BARS.REZID (REZID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_CODCAGENT_CODCAGENT_NN ***
 begin   
  execute immediate '
@@ -117,7 +130,6 @@ exception when others then
 PROMPT *** Create  grants  CODCAGENT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CODCAGENT       to ABS_ADMIN;
 grant SELECT                                                                 on CODCAGENT       to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on CODCAGENT       to BARSREADER_ROLE;
 grant SELECT                                                                 on CODCAGENT       to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CODCAGENT       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CODCAGENT       to BARS_DM;
@@ -125,7 +137,6 @@ grant DELETE,INSERT,SELECT,UPDATE                                            on 
 grant SELECT                                                                 on CODCAGENT       to CUST001;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on CODCAGENT       to FINMON;
 grant SELECT                                                                 on CODCAGENT       to START1;
-grant SELECT                                                                 on CODCAGENT       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CODCAGENT       to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CODCAGENT       to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on CODCAGENT       to WR_REFREAD;

@@ -69,10 +69,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00110724 ***
+PROMPT *** Create  constraint CC_OB_CORPNBSREPORT_YN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OB_CORPORATION_NBS_REPORT MODIFY (NBS NOT NULL ENABLE)';
+  ALTER TABLE BARS.OB_CORPORATION_NBS_REPORT ADD CONSTRAINT CC_OB_CORPNBSREPORT_YN CHECK (REPORT_IN in (''Y'',''N'')) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -95,10 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OB_CORPNBSREPORT_YN ***
+PROMPT *** Create  constraint SYS_C00110724 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OB_CORPORATION_NBS_REPORT ADD CONSTRAINT CC_OB_CORPNBSREPORT_YN CHECK (REPORT_IN in (''Y'',''N'')) ENABLE';
+  ALTER TABLE BARS.OB_CORPORATION_NBS_REPORT MODIFY (NBS NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -121,9 +121,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  OB_CORPORATION_NBS_REPORT ***
-grant SELECT                                                                 on OB_CORPORATION_NBS_REPORT to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on OB_CORPORATION_NBS_REPORT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on OB_CORPORATION_NBS_REPORT to UPLD;
 
 
 

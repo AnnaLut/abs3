@@ -48,10 +48,12 @@ COMMENT ON COLUMN BARS.DWH_CBIREP_QUERY_STATUSES.NAME IS 'наименование';
 
 
 
-PROMPT *** Create  constraint CC_DWHCBIREPQSTATS_NAME_NN ***
+PROMPT *** Create  constraint PK_DWHCBIREPQSTATS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DWH_CBIREP_QUERY_STATUSES MODIFY (NAME CONSTRAINT CC_DWHCBIREPQSTATS_NAME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DWH_CBIREP_QUERY_STATUSES ADD CONSTRAINT PK_DWHCBIREPQSTATS PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -60,12 +62,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_DWHCBIREPQSTATS ***
+PROMPT *** Create  constraint CC_DWHCBIREPQSTATS_NAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DWH_CBIREP_QUERY_STATUSES ADD CONSTRAINT PK_DWHCBIREPQSTATS PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.DWH_CBIREP_QUERY_STATUSES MODIFY (NAME CONSTRAINT CC_DWHCBIREPQSTATS_NAME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -88,9 +88,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DWH_CBIREP_QUERY_STATUSES ***
-grant SELECT                                                                 on DWH_CBIREP_QUERY_STATUSES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DWH_CBIREP_QUERY_STATUSES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on DWH_CBIREP_QUERY_STATUSES to UPLD;
 
 
 

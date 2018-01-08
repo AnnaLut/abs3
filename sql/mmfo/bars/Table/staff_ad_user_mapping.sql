@@ -75,10 +75,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BARS_LOGIN_NO_SPACES ***
+PROMPT *** Create  constraint CC_AD_LOGIN_IN_UPPER_CASE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STAFF_AD_USER_MAPPING ADD CONSTRAINT CC_BARS_LOGIN_NO_SPACES CHECK (bars_login = replace(bars_login, '' '')) ENABLE';
+  ALTER TABLE BARS.STAFF_AD_USER_MAPPING ADD CONSTRAINT CC_AD_LOGIN_IN_UPPER_CASE CHECK (ad_login = upper(ad_login)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -111,10 +111,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_AD_LOGIN_IN_UPPER_CASE ***
+PROMPT *** Create  constraint CC_BARS_LOGIN_NO_SPACES ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STAFF_AD_USER_MAPPING ADD CONSTRAINT CC_AD_LOGIN_IN_UPPER_CASE CHECK (ad_login = upper(ad_login)) ENABLE';
+  ALTER TABLE BARS.STAFF_AD_USER_MAPPING ADD CONSTRAINT CC_BARS_LOGIN_NO_SPACES CHECK (bars_login = replace(bars_login, '' '')) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -149,10 +149,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  STAFF_AD_USER_MAPPING ***
-grant SELECT                                                                 on STAFF_AD_USER_MAPPING to BARSREADER_ROLE;
-grant SELECT                                                                 on STAFF_AD_USER_MAPPING to UPLD;
 
 
 

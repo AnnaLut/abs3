@@ -13,10 +13,8 @@ PROMPT *** Create  view V_OW_CRV_REQUEST ***
  where id > 2;
 
 PROMPT *** Create  grants  V_OW_CRV_REQUEST ***
-grant SELECT                                                                 on V_OW_CRV_REQUEST to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_CRV_REQUEST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_CRV_REQUEST to OW;
-grant SELECT                                                                 on V_OW_CRV_REQUEST to UPLD;
 
 
 

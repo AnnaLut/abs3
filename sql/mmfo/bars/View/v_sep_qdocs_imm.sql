@@ -48,9 +48,7 @@ PROMPT *** Create  view V_SEP_QDOCS_IMM ***
           AND accounts.ob22 = '48';
 
 PROMPT *** Create  grants  V_SEP_QDOCS_IMM ***
-grant SELECT                                                                 on V_SEP_QDOCS_IMM to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SEP_QDOCS_IMM to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_SEP_QDOCS_IMM to UPLD;
 
 
 

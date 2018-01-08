@@ -134,11 +134,9 @@ COMMENT ON COLUMN BARS.TMP_CP_SB_.A46 IS '';
 
 
 PROMPT *** Create  grants  TMP_CP_SB_ ***
-grant SELECT                                                                 on TMP_CP_SB_      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CP_SB_      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_CP_SB_      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CP_SB_      to START1;
-grant SELECT                                                                 on TMP_CP_SB_      to UPLD;
 
 
 

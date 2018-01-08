@@ -77,6 +77,32 @@ COMMENT ON COLUMN BARS.W4_NBS_OB22.OB_6110 IS '';
 
 
 
+PROMPT *** Create  constraint FK_W4NBSOB22_W4TIPS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_NBS_OB22 ADD CONSTRAINT FK_W4NBSOB22_W4TIPS FOREIGN KEY (TIP)
+	  REFERENCES BARS.W4_TIPS (TIP) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_W4NBSOB22_SBOB22 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_NBS_OB22 ADD CONSTRAINT FK_W4NBSOB22_SBOB22 FOREIGN KEY (NBS, OB22)
+	  REFERENCES BARS.SB_OB22 (R020, OB22) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_W4NBSOB22_NBS_NN ***
 begin   
  execute immediate '
@@ -141,11 +167,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  W4_NBS_OB22 ***
-grant SELECT                                                                 on W4_NBS_OB22     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on W4_NBS_OB22     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_NBS_OB22     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on W4_NBS_OB22     to OW;
-grant SELECT                                                                 on W4_NBS_OB22     to UPLD;
 grant FLASHBACK,SELECT                                                       on W4_NBS_OB22     to WR_REFREAD;
 
 

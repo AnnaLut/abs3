@@ -65,10 +65,6 @@ COMMENT ON COLUMN BARS.ERR$_CC_OVERDUE_DATES.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CC_OVERDUE_DATES ***
-grant SELECT                                                                 on ERR$_CC_OVERDUE_DATES to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CC_OVERDUE_DATES to UPLD;
-
 
 
 PROMPT ===================================================================================== 

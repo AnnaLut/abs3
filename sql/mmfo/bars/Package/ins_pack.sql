@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ins_pack.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.INS_PACK is
+ CREATE OR REPLACE PACKAGE BARS.ins_pack is
 
   -- Author  : TVSUKHOV
   -- Created : 09.02.2011 15:35:02
@@ -403,10 +403,10 @@
   procedure set_w4_ins_id(p_nd in number, p_ins_id in number, p_tmp_id in number);
 
   function get_ins_w4_deal(p_nd in number) return ins_w4_deals%rowtype;
-  procedure ins_w4_deal_to_arc(p_ns_w4_deals in ins_w4_deals%rowtype);
+  procedure ins_w4_deal_to_arc(p_ns_w4_deals in ins_w4_deals%rowtype);  
 end ins_pack;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.INS_PACK is
+CREATE OR REPLACE PACKAGE BODY BARS.ins_pack is
 
   -- Private constant declarations
   g_body_version  constant varchar2(64) := 'version 3.0 07/07/2017';
@@ -689,7 +689,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_PACK is
            p.active    = p_active,
            p.custtype  = p_custid
      where p.id = l_partner_id;
-
+ 
 
     if (sql%rowcount = 0) then
 
@@ -2268,13 +2268,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_PACK is
   begin
     select t.* into l_ins_w4_deal from ins_w4_deals t where t.nd = p_nd;
     return l_ins_w4_deal;
-
+  
   exception
     when no_data_found then
       l_ins_w4_deal := null;
       return l_ins_w4_deal;
   end;
-
+  
   procedure ins_w4_deal_to_arc(p_ns_w4_deals in ins_w4_deals%rowtype) is
   begin
     insert into ins_w4_deals_arc values p_ns_w4_deals;

@@ -37,10 +37,8 @@ FROM sb_ob22 o,
 WHERE (k.iost <> 0 OR k.vost <> 0) AND k.ob22 = o.ob22(+) AND k.nbs = o.r020(+);
 
 PROMPT *** Create  grants  VAL_1 ***
-grant SELECT                                                                 on VAL_1           to BARSREADER_ROLE;
 grant SELECT                                                                 on VAL_1           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VAL_1           to SALGL;
-grant SELECT                                                                 on VAL_1           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VAL_1           to WR_ALL_RIGHTS;
 
 

@@ -69,6 +69,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_FIN_TXT_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FIN_TXT ADD CONSTRAINT FK_FIN_TXT_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_FIN_TXT_BRANCH_NN ***
 begin   
  execute immediate '
@@ -96,11 +109,9 @@ exception when others then
 
 PROMPT *** Create  grants  FIN_TXT ***
 grant SELECT                                                                 on FIN_TXT         to BARS009;
-grant SELECT                                                                 on FIN_TXT         to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on FIN_TXT         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_TXT         to BARS_DM;
 grant INSERT,SELECT,UPDATE                                                   on FIN_TXT         to R_FIN2;
-grant SELECT                                                                 on FIN_TXT         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_TXT         to WR_ALL_RIGHTS;
 
 

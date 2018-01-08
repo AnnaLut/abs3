@@ -49,10 +49,8 @@ COMMENT ON COLUMN BARS.REC_QUE_BAK.OTM IS '';
 
 
 PROMPT *** Create  grants  REC_QUE_BAK ***
-grant SELECT                                                                 on REC_QUE_BAK     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REC_QUE_BAK     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REC_QUE_BAK     to START1;
-grant SELECT                                                                 on REC_QUE_BAK     to UPLD;
 
 
 

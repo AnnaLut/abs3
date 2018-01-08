@@ -91,10 +91,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBK_CARD_ATTRIBUTES ***
-grant SELECT                                                                 on EBK_CARD_ATTRIBUTES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBK_CARD_ATTRIBUTES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBK_CARD_ATTRIBUTES to BARS_DM;
-grant SELECT                                                                 on EBK_CARD_ATTRIBUTES to UPLD;
 
 
 

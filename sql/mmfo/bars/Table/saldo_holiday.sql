@@ -76,10 +76,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SALDOHOLIDAY_CDAT_NN ***
+PROMPT *** Create  constraint CC_SALDOHOLIDAY_KOS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SALDO_HOLIDAY MODIFY (CDAT CONSTRAINT CC_SALDOHOLIDAY_CDAT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SALDO_HOLIDAY MODIFY (KOS CONSTRAINT CC_SALDOHOLIDAY_KOS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -112,10 +112,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SALDOHOLIDAY_KOS_NN ***
+PROMPT *** Create  constraint CC_SALDOHOLIDAY_CDAT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SALDO_HOLIDAY MODIFY (KOS CONSTRAINT CC_SALDOHOLIDAY_KOS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SALDO_HOLIDAY MODIFY (CDAT CONSTRAINT CC_SALDOHOLIDAY_CDAT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -160,11 +160,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SALDO_HOLIDAY ***
-grant SELECT                                                                 on SALDO_HOLIDAY   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDO_HOLIDAY   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALDO_HOLIDAY   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDO_HOLIDAY   to START1;
-grant SELECT                                                                 on SALDO_HOLIDAY   to UPLD;
 
 
 

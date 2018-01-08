@@ -79,10 +79,6 @@ COMMENT ON COLUMN BARS.ERR$_PROC_DR$BASE.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_PROC_DR$BASE ***
-grant SELECT                                                                 on ERR$_PROC_DR$BASE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_PROC_DR$BASE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

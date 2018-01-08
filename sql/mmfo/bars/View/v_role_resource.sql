@@ -50,9 +50,7 @@ from   (select r.id role_id,
 ;
 
 PROMPT *** Create  grants  V_ROLE_RESOURCE ***
-grant SELECT                                                                 on V_ROLE_RESOURCE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ROLE_RESOURCE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ROLE_RESOURCE to UPLD;
 
 
 

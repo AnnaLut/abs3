@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'RNBU_TRACE_ARCH';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'RNBU_TRACE_ARCH_26';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,24 +119,24 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'COL_P3', 'C', 'D5-Бал.~рах.', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'COL_P12', 'C', 'D5-Код~валюти~(R030)', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'COL_P4', 'C', 'D5-Параметр~R011', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'COL_P5', 'C', 'D5-Код виду~економiчної~дiяльностi~(K111)', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'COL_P6', 'C', 'D5-Код сектора~економiки~(K072)', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'COL_P7', 'C', 'D5-Код~`9`', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'COL_P8', 'C', 'D5-Початковий~строк~погашення~(S183)', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'COL_P9', 'C', 'D5-Резиден~тнiсть~(K030)', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'COL_P10', 'C', 'D5-Орг.-правова~форма~господар.~(K051)', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'COL_P11', 'C', 'D5-Узагальнений~вид забеспеч.~(S032)', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'COL_P13', 'C', 'D5-Код~країни~(K040)', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'COL_P14', 'C', 'D5-Категорiя~ризику~(S080)', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'COL_P15', 'C', 'D5-Код цiлi~споживання~(S260)', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'COL_P2', 'C', 'D5-Тип залишку~чи обороту~(1-ДтЗ,2-КтЗ,6-КтО)', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'COL_P1', 'C', 'D5-1-сума~2-%% ставка', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'COL_P16', 'C', 'D5-Сегмент N~(2-залишок~3-середній зал~4-проц.доходи)', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'COL_P17', 'C', 'D5-Код областi~безбаланс.вiд', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'COL_P18', 'C', 'D5-Значення~показника', '1.2', 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'COL_P3', 'C', 'D5-Бал.~рах.', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'COL_P12', 'C', 'D5-Код~валюти~(R030)', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'COL_P4', 'C', 'D5-Параметр~R011', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'COL_P5', 'C', 'D5-Код виду~економiчної~дiяльностi~(K111)', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'COL_P6', 'C', 'D5-Код сектора~економiки~(K072)', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'COL_P7', 'C', 'D5-Код~`9`', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'COL_P8', 'C', 'D5-Початковий~строк~погашення~(S183)', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'COL_P9', 'C', 'D5-Резиден~тнiсть~(K030)', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'COL_P10', 'C', 'D5-Орг.-правова~форма~господар.~(K051)', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'COL_P11', 'C', 'D5-Узагальнений~вид забеспеч.~(S032)', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'COL_P13', 'C', 'D5-Код~країни~(K040)', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'COL_P14', 'C', 'D5-Категорiя~ризику~(S080)', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'COL_P15', 'C', 'D5-Код цiлi~споживання~(S260)', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'COL_P2', 'C', 'D5-Тип залишку~чи обороту~(1-ДтЗ,2-КтЗ,6-КтО)', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'COL_P1', 'C', 'D5-1-сума~2-%% ставка', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'COL_P16', 'C', 'D5-Сегмент N~(2-залишок~3-середній зал~4-проц.доходи)', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'COL_P17', 'C', 'D5-Код областi~безбаланс.вiд', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'COL_P18', 'C', 'D5-Значення~показника', 1.2, 254, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

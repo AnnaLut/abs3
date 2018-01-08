@@ -209,12 +209,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  ALEGRO ***
-grant SELECT                                                                 on ALEGRO          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ALEGRO          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ALEGRO          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ALEGRO          to RCH_1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ALEGRO          to REF0000;
-grant SELECT                                                                 on ALEGRO          to UPLD;
 
 
 

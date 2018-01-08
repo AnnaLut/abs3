@@ -103,10 +103,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_OBU_SIGN_TYPES ***
-grant SELECT                                                                 on FIN_OBU_SIGN_TYPES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_OBU_SIGN_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_OBU_SIGN_TYPES to BARS_DM;
-grant SELECT                                                                 on FIN_OBU_SIGN_TYPES to UPLD;
 
 
 

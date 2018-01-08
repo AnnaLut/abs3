@@ -1,22 +1,18 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FF4_NN.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_FF4_NN ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_FF4_NN (Dat_ DATE ,
+CREATE OR REPLACE PROCEDURE BARS.P_FF4_NN (Dat_ DATE ,
                                       sheme_ varchar2 default 'G')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования #F4
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.  All Rights Reserved.
-% VERSION     : 04/01/2018 (14/11/2017)
+% VERSION     : 05/01/2018 (04/01/2018, 03/01/2018, 14/11/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+05/01/2018 - перекодируем старые балансовые счета на новые и для 
+             нерезидентов заполняем K072 значениями N3 или N7 или N8 
+04/01/2018 - параметры K072 и D020 будут формироваться 2-х значными 
+03/01/2018 - новая структура показателя (вместо R013 будет R011 и 
+             параметр K072 уже 2-х значный вместо однозначного) 
 14/11/2017 - изменил вызов процедуры P_POPULATE_KOR для разных отчетных
              месяцев (было на ММФО)
 06/07/2017 - для некоторых значений K072 устанавливаем K140='9'
@@ -58,6 +54,7 @@ sPCnt_   number;
 sPCnt1_  varchar2(20);
 Kv_      number;
 Nbs_     varchar2(4);
+codcagent_ number; 
 Cntr_    number;
 Cntr1_   varchar2(1);
 rnk_     number;
@@ -97,7 +94,7 @@ CURSOR SaldoAOd IS
          b.r011, 
          (case when b.mb = '0' and b.r013 <> '0' then b.r013 else b.mb end) r013,
          NVL(trim(e.k072),'00') k072,
-         b.mdate, b.dos, b.kos, b.ost, b.nbs, b.rnk, b.s180R, b.branch
+         b.mdate, b.dos, b.kos, b.ost, b.nbs, b.rnk, b.s180R, b.branch, b.codcagent
   from (
     SELECT c.acc, a.nls, a.kv, mod(d.codcagent,2) codc, a.odate, NVL(a.s180,'0') s180,
            NVL(trim(a.k112),'0') k112, lpad(NVL(trim(a.d020),'1'),2,'0') d020,
@@ -109,7 +106,7 @@ CURSOR SaldoAOd IS
            nvl(trim(P.R011), '0') r011, 
            nvl(trim(P.R013), '0') r013, 
            fs180(c.acc, substr(c.nls,1,1), a.odate) s180R,
-           c.branch
+           c.branch, d.codcagent
     FROM rnbu_history a, accounts c, specparam p, customer d
     WHERE a.kf = to_char(mfo_) and a.odate between DAT1_ + 1 and Dat_
      AND (a.dos+a.kos != 0 OR a.ost != 0)
@@ -129,7 +126,7 @@ CURSOR SaldoAOd IS
            nvl(trim(P.R011), '0') r011, 
            nvl(trim(P.R013), '0') r013, 
            fs180(c.acc, substr(c.nls,1,1), a.odate) s180R,
-           c.branch
+           c.branch, d.codcagent
     FROM rnbu_history a, accounts c, specparam p, customer d
     WHERE a.kf = to_char(mfo_)
      and a.nls like '86%'
@@ -150,7 +147,7 @@ CURSOR SaldoKor IS
   select b.acc, b.nls, b.kv, b.fdat, b.nbs, b.s180, b.r011, b.r013,
          NVL(trim(e.k072),'00') k072,
          b.codc, b.rnk, lpad(b.d020, 2, '0') d020, b.mdate, b.sdos, b.skos, NVL(trim(k.k112),'0') k112,
-         b.branch
+         b.branch, b.codcagent
   from (
     SELECT s.acc, s.nls, s.kv, a.fdat, s.nbs,
            DECODE(trim(p.s180), NULL, FS180(a.acc), p.s180) s180,
@@ -162,7 +159,7 @@ CURSOR SaldoKor IS
            NVL(to_char(to_number(p.d020)),'01') d020, s.mdate,
            SUM(DECODE(a.dk, 0, GL.P_ICURVAL(s.kv, a.s, a.fdat), 0)) sdos,
            SUM(DECODE(a.dk, 1, GL.P_ICURVAL(s.kv, a.s, a.fdat), 0)) skos,
-           s.branch
+           s.branch, c.codcagent
     FROM kor_prov a, accounts s, customer c, specparam p, kod_r020 k
     WHERE s.nbs LIKE k.r020 || '%'
       AND k.a010 = kodf_
@@ -178,7 +175,7 @@ CURSOR SaldoKor IS
              NVL(trim(p.k072),'00'),
              MOD(c.codcagent, 2), c.rnk, nvl(trim(c.ise), '00000'),
              nvl(trim(c.ved), '00000'), NVL(to_char(to_number(p.d020)),'01'),
-             s.mdate, s.branch) b
+             s.mdate, s.branch, c.codcagent) b
    left outer join
    (select * from KL_K110 where d_open <= dat_ and (d_close is null or d_close > dat_)) k
    on (b.k110 = k.k110)
@@ -236,7 +233,8 @@ mfo_:=F_OURMFO();
 OPEN SaldoAOd;
 LOOP
     FETCH SaldoAOd INTO acc_, nls_, Kv_, Cntr_, data_, S180_, K112_, d020_,
-                        sPCnt_, r011_, r013_, k072_, mdate_, sDos_, sKos_, se_, nbs_, rnk_, S180R_, branch_ ;
+                        sPCnt_, r011_, r013_, k072_, mdate_, sDos_, sKos_, se_, 
+                        nbs_, rnk_, S180R_, branch_, codcagent_;
     EXIT WHEN SaldoAOd%NOTFOUND;
 
     if r011_ <> '0' then
@@ -285,6 +283,18 @@ LOOP
 
     if cntr_ = 0 then
        k072_ := '00';
+       if dat_ >= dat_Izm2 
+       then   
+          if codcagent_ = 2 then
+             k072_ := 'N3';
+          elsif codcagent_ = 4 then
+             k072_ := 'N7';
+          elsif codcagent_ = 6 then
+             k072_ := 'N8';
+          else 
+             null;
+          end if;
+       end if;
     end if;
 
     k140_ := '9';
@@ -342,6 +352,22 @@ LOOP
                           s180_ || to_char(2-Cntr_) || d020_ ||
                           lpad(Kv_, 3, '0') || k140_;
              else 
+                if nbs_ = '2062' then 
+                   nbs_ := '2063';
+                elsif nbs_ = '2202' then
+                   nbs_ := '2203';
+                else
+                   null;
+                end if;
+                if nbs_ = '2063' and r011_ = '0'
+                then
+                   r011_ := '3';
+                end if;
+                if nbs_ = '2203' and r011_ = '0'
+                then
+                   r011_ := '1';
+                end if;
+
                 kodp_ := '5' || nbs_ || r011_ || K112_ || K072_ ||
                           s180_ || to_char(2-Cntr_) || d020_ ||
                           lpad(Kv_, 3, '0') || k140_;
@@ -423,6 +449,32 @@ LOOP
                           s180_ || to_char(2-Cntr_) || d020_ ||
                           lpad(Kv_, 3, '0') || k140_;
              else
+                if nbs_ = '2615' then
+                   nbs_ := '2610';
+                elsif nbs_ = '2635' then
+                   nbs_ := '2630';
+                elsif nbs_ = '2652' then
+                   nbs_ := '2651';
+                else
+                   null;
+                end if;
+                if nbs_ in ('2600','2605','2620','2625','2650','2655') and r011_ = '0'
+                then
+                   r011_ := '3';
+                end if;
+                if nbs_ in ('2610','2630') and r011_ = '0'
+                then
+                   r011_ := '1';
+                end if;
+                if nbs_ = '2620' and r011_ in ('1', '9')
+                then
+                   r011_ := '3';
+                end if;
+                if nbs_ = '2651' and r011_ = '0'
+                then
+                   r011_ := '4';
+                end if;
+
                 kodp_ := '6' || nbs_ || r011_ || K112_ || K072_ ||
                           s180_ || to_char(2-Cntr_) || d020_ ||
                           lpad(Kv_, 3, '0') || k140_;
@@ -454,6 +506,11 @@ LOOP
 
              if nbs_ in ('2600','2605','2620','2625','2650','2655') then
                 s180_ := '1';
+             end if;
+
+             if nbs_ in ('2600','2605','2620','2625','2650','2655') and r011_ = '0'
+             then
+                r011_ := '1';
              end if;
 
              if d020_ in ('00', '01', '02') then
@@ -576,7 +633,8 @@ CLOSE SaldoAOd;
 OPEN SaldoKor;
 LOOP
     FETCH SaldoKor INTO acc_, nls_, Kv_, data_, nbs_, S180_, r011_, r013_,
-                        k072_, Cntr_, rnk_, d020_, mdate_, sDos_, sKos_, k112_, branch_;
+                        k072_, Cntr_, rnk_, d020_, mdate_, sDos_, sKos_, k112_, 
+                        branch_, codcagent_;
 
     EXIT WHEN SaldoKor%NOTFOUND;
 
@@ -627,6 +685,18 @@ LOOP
 
     if cntr_ = 0 then
        k072_ := '00';
+       if dat_ >= dat_Izm2 
+       then   
+          if codcagent_ = 2 then
+             k072_ := 'N3';
+          elsif codcagent_ = 4 then
+             k072_ := 'N7';
+          elsif codcagent_ = 6 then
+             k072_ := 'N8';
+          else 
+             null;
+          end if;
+       end if;
     end if;
 
     IF nbs_ not in ('1600','2600','2605','2620','2625','2650','2655') AND sDos_>0 AND
@@ -649,6 +719,22 @@ LOOP
                          s180_ || to_char(2-Cntr_) || d020_ ||
                          lpad(Kv_, 3, '0') || k140_;
              else
+                if nbs_ = '2062' then 
+                   nbs_ := '2063';
+                elsif nbs_ = '2202' then
+                   nbs_ := '2203';
+                else
+                   null;
+                end if;
+                if nbs_ = '2063' and r011_ = '0'
+                then
+                   r011_ := '3';
+                end if;
+                if nbs_ = '2203' and r011_ = '0'
+                then
+                   r011_ := '1';
+                end if;
+
                 kodp_ := '5' || nbs_ || r011_ || K112_ || K072_ ||
                          s180_ || to_char(2-Cntr_) || d020_ ||
                          lpad(Kv_, 3, '0') || k140_;
@@ -723,6 +809,32 @@ LOOP
                          s180_ || to_char(2-Cntr_) || d020_ ||
                          lpad(Kv_, 3, '0') || k140_;
              else
+                if nbs_ = '2615' then
+                   nbs_ := '2610';
+                elsif nbs_ = '2635' then
+                   nbs_ := '2630';
+                elsif nbs_ = '2652' then
+                   nbs_ := '2651';
+                else
+                   null;
+                end if;
+                if nbs_ in ('2600','2605','2620','2625','2650','2655') and r011_ = '0'
+                then
+                   r011_ := '3';
+                end if;
+                if nbs_ in ('2610','2630') and r011_ = '0'
+                then
+                   r011_ := '1';
+                end if;
+                if nbs_ = '2620' and r011_ in ('1', '9')
+                then
+                   r011_ := '3';
+                end if;
+                if nbs_ = '2651' and r011_ = '0'
+                then
+                   r011_ := '4';
+                end if;
+
                 kodp_ := '6' || nbs_ || r011_ || K112_ || K072_ ||
                          s180_ || to_char(2-Cntr_) || d020_ ||
                          lpad(Kv_, 3, '0') || k140_;
@@ -770,13 +882,3 @@ logger.info ('P_FF4_NN: End ');
 ----------------------------------------------------------------------
 END P_FF4_NN;
 /
-show err;
-
-PROMPT *** Create  grants  P_FF4_NN ***
-grant EXECUTE                                                                on P_FF4_NN        to BARS_ACCESS_DEFROLE;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FF4_NN.sql =========*** End *** 
-PROMPT ===================================================================================== 

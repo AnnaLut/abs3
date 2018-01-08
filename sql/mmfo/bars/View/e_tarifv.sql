@@ -17,8 +17,6 @@ where kf=sys_context('bars_context', 'user_mfo')
  ;
 
 PROMPT *** Create  grants  E_TARIFV ***
-grant SELECT                                                                 on E_TARIFV        to BARSREADER_ROLE;
-grant SELECT                                                                 on E_TARIFV        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on E_TARIFV        to WR_ALL_RIGHTS;
 
 

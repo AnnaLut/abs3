@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/user_adm_ui.sql =========*** Run ***
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.USER_ADM_UI is
+create or replace package user_adm_ui is
 
     procedure create_user_meta(
         p_login_name in varchar2,
@@ -163,7 +157,7 @@
     return integer;
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.USER_ADM_UI as
+create or replace package body user_adm_ui as
 
     procedure create_user_meta(
         p_login_name in varchar2,
@@ -670,14 +664,3 @@ CREATE OR REPLACE PACKAGE BODY BARS.USER_ADM_UI as
     end;
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  USER_ADM_UI ***
-grant EXECUTE                                                                on USER_ADM_UI     to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/user_adm_ui.sql =========*** End ***
- PROMPT ===================================================================================== 
- 

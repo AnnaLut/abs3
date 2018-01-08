@@ -166,7 +166,6 @@ exception when others then
 
 PROMPT *** Create  grants  DOC_SCHEME ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DOC_SCHEME      to ABS_ADMIN;
-grant SELECT                                                                 on DOC_SCHEME      to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on DOC_SCHEME      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DOC_SCHEME      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DOC_SCHEME      to CC_DOC;
@@ -178,7 +177,6 @@ grant SELECT                                                                 on 
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on DOC_SCHEME      to FOREX;
 grant SELECT                                                                 on DOC_SCHEME      to RCC_DEAL;
 grant SELECT                                                                 on DOC_SCHEME      to REPORTER;
-grant SELECT                                                                 on DOC_SCHEME      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DOC_SCHEME      to WR_ALL_RIGHTS;
 grant SELECT                                                                 on DOC_SCHEME      to WR_CREDIT;
 grant SELECT                                                                 on DOC_SCHEME      to WR_VIEWACC;

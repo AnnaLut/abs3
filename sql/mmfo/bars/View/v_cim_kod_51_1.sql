@@ -11,9 +11,7 @@ PROMPT *** Create  view V_CIM_KOD_51_1 ***
   select ID,NAME from CIM_CREDIT_BORROWER where delete_date is null;
 
 PROMPT *** Create  grants  V_CIM_KOD_51_1 ***
-grant SELECT                                                                 on V_CIM_KOD_51_1  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_KOD_51_1  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_KOD_51_1  to UPLD;
 
 
 

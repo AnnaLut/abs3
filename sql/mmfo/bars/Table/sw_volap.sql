@@ -51,6 +51,19 @@ COMMENT ON COLUMN BARS.SW_VOLAP.CHRSET IS 'Код таблицы перекодировки';
 
 
 
+PROMPT *** Create  constraint FK_SWVOLAP_SWCHRSETS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_VOLAP ADD CONSTRAINT FK_SWVOLAP_SWCHRSETS FOREIGN KEY (CHRSET)
+	  REFERENCES BARS.SW_CHRSETS (SETID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SWVOLAP_RUCHAR_NN ***
 begin   
  execute immediate '
@@ -116,7 +129,6 @@ exception when others then
 
 PROMPT *** Create  grants  SW_VOLAP ***
 grant SELECT                                                                 on SW_VOLAP        to BARS013;
-grant SELECT                                                                 on SW_VOLAP        to BARSREADER_ROLE;
 grant SELECT                                                                 on SW_VOLAP        to BARS_ACCESS_DEFROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_VOLAP        to WR_ALL_RIGHTS;
 

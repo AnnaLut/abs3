@@ -25,10 +25,8 @@ ORDER BY 1, 2
  ;
 
 PROMPT *** Create  grants  V_DPT_IN_BONUS_QUEUE_DETAILS ***
-grant SELECT                                                                 on V_DPT_IN_BONUS_QUEUE_DETAILS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_IN_BONUS_QUEUE_DETAILS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_IN_BONUS_QUEUE_DETAILS to DPT_ADMIN;
-grant SELECT                                                                 on V_DPT_IN_BONUS_QUEUE_DETAILS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_IN_BONUS_QUEUE_DETAILS to WR_ALL_RIGHTS;
 
 

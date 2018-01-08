@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Cen-АРМи Ролі / M_ROLE_ARMC';
   l_tablinesdef := '20';
-  l_tabselect_statement := '';
   l_tabname     := 'M_ROLE_ARMC';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,14 +119,14 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'CODEAPP', 'C', 'Симв.код~Cen-АРМу', '1', null, 4, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'FUN', 'N', 'Функції~Cen-АРМу', '1', null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=M_ROLE_FUNC[NSIFUNCTION][ACCESSCODE=>4][PROC=>PUL.PUT( ''ARM'', :CODEAPP ); PUL.PUT( ''RI_ARM'', :ID )][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'ID', 'N', 'Числ.код~Cen-АРМу', '1', null, 3, 0, 0, 0, 0, '', '', 1, 0, 'Count(*)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NAME', 'C', 'Назва~Cen-АРМу', '3', 100, 5, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'REF', 'N', 'Довідники~Cen-АРМу', '1', null, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=M_ROLE_REF[NSIFUNCTION][ACCESSCODE=>4][PROC=>PUL.PUT( ''ARM'', :CODEAPP ); PUL.PUT( ''RI_ARM'', :ID ); PUL.PUT(''WC'',''ARM_CENTURA'') ][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'REP', 'N', 'Друк.звіти~Cen-АРМу', '1', null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=M_ROLE_REP[NSIFUNCTION][ACCESSCODE=>4][PROC=>PUL.PUT( ''ARM'', :CODEAPP ); PUL.PUT( ''RI_ARM'', :ID ); PUL.PUT(''WC'',''ARM_CENTURA'') ][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'ROL', 'C', 'Симв.код~ролі', '1.5', 100, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'RI', 'N', 'Числ.код~ролі', '1', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'CODEAPP', 'C', 'Симв.код~Cen-АРМу', 1, null, 4, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'FUN', 'N', 'Функції~Cen-АРМу', 1, null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=M_ROLE_FUNC[NSIFUNCTION][ACCESSCODE=>4][PROC=>PUL.PUT( ''ARM'', :CODEAPP ); PUL.PUT( ''RI_ARM'', :ID )][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'ID', 'N', 'Числ.код~Cen-АРМу', 1, null, 3, 0, 0, 0, 0, '', '', 1, 0, 'Count(*)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NAME', 'C', 'Назва~Cen-АРМу', 3, 100, 5, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'REF', 'N', 'Довідники~Cen-АРМу', 1, null, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=M_ROLE_REF[NSIFUNCTION][ACCESSCODE=>4][PROC=>PUL.PUT( ''ARM'', :CODEAPP ); PUL.PUT( ''RI_ARM'', :ID ); PUL.PUT(''WC'',''ARM_CENTURA'') ][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'REP', 'N', 'Друк.звіти~Cen-АРМу', 1, null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=M_ROLE_REP[NSIFUNCTION][ACCESSCODE=>4][PROC=>PUL.PUT( ''ARM'', :CODEAPP ); PUL.PUT( ''RI_ARM'', :ID ); PUL.PUT(''WC'',''ARM_CENTURA'') ][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'ROL', 'C', 'Симв.код~ролі', 1.5, 100, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'RI', 'N', 'Числ.код~ролі', 1, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание процедур
   bars_metabase.add_actiontbl(l_tabid, 'DELETE', 'DEL_FROM_ROLE(resource_utl.get_resource_type_id(''STAFF_ROLE''), :RI, resource_utl.get_resource_type_id(''ARM_CENTURA''), :ID  ) ');

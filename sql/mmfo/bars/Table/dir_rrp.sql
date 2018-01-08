@@ -91,7 +91,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  DIR_RRP ***
-grant SELECT                                                                 on DIR_RRP         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DIR_RRP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DIR_RRP         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DIR_RRP         to DIR_RRP;

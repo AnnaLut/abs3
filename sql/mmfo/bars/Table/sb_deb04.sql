@@ -51,10 +51,8 @@ COMMENT ON COLUMN BARS.SB_DEB04.RISK_RATE IS '';
 
 
 PROMPT *** Create  grants  SB_DEB04 ***
-grant SELECT                                                                 on SB_DEB04        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SB_DEB04        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SB_DEB04        to BARS_DM;
-grant SELECT                                                                 on SB_DEB04        to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_DEB04        to VN_OT;
 grant FLASHBACK,SELECT                                                       on SB_DEB04        to WR_REFREAD;
 

@@ -48,12 +48,10 @@ COMMENT ON COLUMN BARS.ACC_NLO_1414.KF IS '';
 
 
 
-PROMPT *** Create  constraint PK_ACC_NLO_1414 ***
+PROMPT *** Create  constraint CC_ACCNLO1414_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_NLO_1414 ADD CONSTRAINT PK_ACC_NLO_1414 PRIMARY KEY (ACC)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.ACC_NLO_1414 MODIFY (KF CONSTRAINT CC_ACCNLO1414_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -62,10 +60,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCNLO1414_KF_NN ***
+PROMPT *** Create  constraint PK_ACC_NLO_1414 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_NLO_1414 MODIFY (KF CONSTRAINT CC_ACCNLO1414_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_NLO_1414 ADD CONSTRAINT PK_ACC_NLO_1414 PRIMARY KEY (ACC)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -88,11 +88,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACC_NLO_1414 ***
-grant SELECT                                                                 on ACC_NLO_1414    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_NLO_1414    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_NLO_1414    to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_NLO_1414    to START1;
-grant SELECT                                                                 on ACC_NLO_1414    to UPLD;
 
 
 

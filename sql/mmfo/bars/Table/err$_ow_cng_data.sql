@@ -95,10 +95,6 @@ COMMENT ON COLUMN BARS.ERR$_OW_CNG_DATA.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OW_CNG_DATA ***
-grant SELECT                                                                 on ERR$_OW_CNG_DATA to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OW_CNG_DATA to UPLD;
-
 
 
 PROMPT ===================================================================================== 

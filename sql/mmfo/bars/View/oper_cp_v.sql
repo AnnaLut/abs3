@@ -70,14 +70,12 @@ PROMPT *** Create  view OPER_CP_V ***
                       decode(NEWNBS.GET_STATE,0,'6052','6124'),
                       decode(NEWNBS.GET_STATE,0,'6053','6125'),
                       decode(NEWNBS.GET_STATE,0,'6057','6126'),
-                      decode(NEWNBS.GET_STATE,0,'7720','7707')
+                      decode(NEWNBS.GET_STATE,0,'7720','7707')                      
                       ));
 
 PROMPT *** Create  grants  OPER_CP_V ***
-grant SELECT                                                                 on OPER_CP_V       to BARSREADER_ROLE;
 grant SELECT                                                                 on OPER_CP_V       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OPER_CP_V       to START1;
-grant SELECT                                                                 on OPER_CP_V       to UPLD;
 
 
 

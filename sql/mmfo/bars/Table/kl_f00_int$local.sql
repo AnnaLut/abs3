@@ -65,10 +65,96 @@ COMMENT ON COLUMN BARS.KL_F00_INT$LOCAL.KF IS '';
 
 
 
-PROMPT *** Create  constraint CC_KLF00INT$LOCAL_KF_NN ***
+PROMPT *** Create  constraint FK_KLFINTLOC_BRANCH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.KL_F00_INT$LOCAL MODIFY (KF CONSTRAINT CC_KLF00INT$LOCAL_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.KL_F00_INT$LOCAL ADD CONSTRAINT FK_KLFINTLOC_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KLFINTLOC_POLICYGRP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KL_F00_INT$LOCAL ADD CONSTRAINT FK_KLFINTLOC_POLICYGRP FOREIGN KEY (POLICY_GROUP)
+	  REFERENCES BARS.POLICY_GROUPS (POLICY_GROUP) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLFINTLOC_BRANCH_CC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KL_F00_INT$LOCAL ADD CONSTRAINT CC_KLFINTLOC_BRANCH_CC CHECK (length(branch)<=8) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLFINTLOC_UUU_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KL_F00_INT$LOCAL MODIFY (UUU CONSTRAINT CC_KLFINTLOC_UUU_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLFINTLOC_A017_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KL_F00_INT$LOCAL MODIFY (A017 CONSTRAINT CC_KLFINTLOC_A017_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLFINTLOC_KODF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KL_F00_INT$LOCAL MODIFY (KODF CONSTRAINT CC_KLFINTLOC_KODF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLFINTLOC_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KL_F00_INT$LOCAL MODIFY (BRANCH CONSTRAINT CC_KLFINTLOC_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLFINTLOC_POLICYGRP_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KL_F00_INT$LOCAL MODIFY (POLICY_GROUP CONSTRAINT CC_KLFINTLOC_POLICYGRP_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -91,10 +177,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_KLFINTLOC_POLICYGRP_NN ***
+PROMPT *** Create  constraint FK_KLF00INT$LOCAL_KF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.KL_F00_INT$LOCAL MODIFY (POLICY_GROUP CONSTRAINT CC_KLFINTLOC_POLICYGRP_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.KL_F00_INT$LOCAL ADD CONSTRAINT FK_KLF00INT$LOCAL_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -103,10 +190,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_KLFINTLOC_BRANCH_NN ***
+PROMPT *** Create  constraint CC_KLF00INT$LOCAL_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.KL_F00_INT$LOCAL MODIFY (BRANCH CONSTRAINT CC_KLFINTLOC_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.KL_F00_INT$LOCAL MODIFY (KF CONSTRAINT CC_KLF00INT$LOCAL_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -115,46 +202,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_KLFINTLOC_KODF_NN ***
+PROMPT *** Create  constraint FK_KLFINTLOC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.KL_F00_INT$LOCAL MODIFY (KODF CONSTRAINT CC_KLFINTLOC_KODF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLFINTLOC_A017_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KL_F00_INT$LOCAL MODIFY (A017 CONSTRAINT CC_KLFINTLOC_A017_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLFINTLOC_UUU_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KL_F00_INT$LOCAL MODIFY (UUU CONSTRAINT CC_KLFINTLOC_UUU_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLFINTLOC_BRANCH_CC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KL_F00_INT$LOCAL ADD CONSTRAINT CC_KLFINTLOC_BRANCH_CC CHECK (length(branch)<=8) ENABLE';
+  ALTER TABLE BARS.KL_F00_INT$LOCAL ADD CONSTRAINT FK_KLFINTLOC FOREIGN KEY (KODF, A017)
+	  REFERENCES BARS.KL_F00_INT$GLOBAL (KODF, A017) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -178,10 +230,8 @@ exception when others then
 
 PROMPT *** Create  grants  KL_F00_INT$LOCAL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F00_INT$LOCAL to ABS_ADMIN;
-grant SELECT                                                                 on KL_F00_INT$LOCAL to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F00_INT$LOCAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_F00_INT$LOCAL to BARS_DM;
-grant SELECT                                                                 on KL_F00_INT$LOCAL to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F00_INT$LOCAL to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KL_F00_INT$LOCAL to WR_REFREAD;
 

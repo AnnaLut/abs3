@@ -12,21 +12,24 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DU8', '+Позасистемний облік депозитних ліній ЮО', 1, '#(dpu.get_nls4pay(#(REF),#(NLSA),#(KVA)))', null, '#(dpu.get_nls4pay(#(REF),#(NLSB),#(KVB)))', null, null, null, null, null, 0, 0, 0, 0, 'case when dpu.is_line(#(REF)) is null then 0 else #(S) end', null, null, null, null, 0, '1000000000000000000000000000000000000100000000000000000000000000', null);
+    values ('DU8', '+Позасистемний облік депозитних ліній ЮО', 1, '#(dpu.get_nls4pay(#(REF),#(NLSA),#(KVA)))', null, '#(dpu.get_nls4pay(#(REF),#(NLSB),#(KVB)))', null, null, null, null, null, 0, 0, 0, 0, 'case when dpu.is_line(#(REF)) is null then 0 else #(S) end', null, null, null, null, 0, '0000000000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DU8', name='+Позасистемний облік депозитних ліній ЮО', dk=1, nlsm='#(dpu.get_nls4pay(#(REF),#(NLSA),#(KVA)))', kv=null, nlsk='#(dpu.get_nls4pay(#(REF),#(NLSB),#(KVB)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='case when dpu.is_line(#(REF)) is null then 0 else #(S) end', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='1000000000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='DU8', name='+Позасистемний облік депозитних ліній ЮО', dk=1, nlsm='#(dpu.get_nls4pay(#(REF),#(NLSA),#(KVA)))', kv=null, nlsk='#(dpu.get_nls4pay(#(REF),#(NLSB),#(KVB)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='case when dpu.is_line(#(REF)) is null then 0 else #(S) end', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000000000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='DU8';
   end;
+  
   --------------------------------
   ----------- Реквизиты ----------
   --------------------------------
   delete from op_rules where tt='DU8';
+  
   --------------------------------
   ------ Связанные операции ------
   --------------------------------
   delete from ttsap where tt='DU8';
+  
   --------------------------------
   ------- Балансовые счета -------
   --------------------------------
@@ -53,20 +56,25 @@ begin
       else raise;
       end if;
   end;
+  
   --------------------------------
   -------- Виды документов -------
   --------------------------------
   delete from tts_vob where tt='DU8';
+  
   --------------------------------
   -------- Группы контроля -------
   --------------------------------
   delete from chklist_tts where tt='DU8';
+  
   --------------------------------
   ------------- Папки ------------
   --------------------------------
   delete from folders_tts where tt='DU8';
+  
 end;
 /
+
 prompt Создание / Обновление операции DUJ
 prompt Наименование операции: Погашення депозиту в ін.валюті (міжбанк ВПС)
 declare
@@ -84,6 +92,7 @@ begin
          set tt='DUJ', name='Погашення депозиту в ін.валюті (міжбанк ВПС)', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=9, flags='0300100000000000000000000000000000010000000000000000000000000000', nazn='Повернення депозиту згідно #{DPU.F_NAZN(''U'',#(ND))}'
        where tt='DUJ';
   end;
+  
   --------------------------------
   ----------- Реквизиты ----------
   --------------------------------
@@ -101,17 +110,6 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('KOD_B', 'DUJ', 'O', 0, 3, '6', null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''KOD_B'', ''DUJ'', ''O'', 0, 3, ''6'', null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
     values ('ND   ', 'DUJ', 'M', 1, 1, null, null);
   exception
     when dup_val_on_index then null;
@@ -121,6 +119,18 @@ begin
       else raise;
       end if;
   end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('KOD_B', 'DUJ', 'O', 0, 3, '6', null);
+  exception
+    when dup_val_on_index then null;
+    when others then 
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''KOD_B'', ''DUJ'', ''O'', 1, 3, ''6'', null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  
   --------------------------------
   ------ Связанные операции ------
   --------------------------------
@@ -136,10 +146,12 @@ begin
       else raise;
       end if;
   end;
+  
   --------------------------------
   ------- Балансовые счета -------
   --------------------------------
   delete from ps_tts where tt='DUJ';
+  
   --------------------------------
   -------- Виды документов -------
   --------------------------------
@@ -166,6 +178,7 @@ begin
       else raise;
       end if;
   end;
+  
   --------------------------------
   -------- Группы контроля -------
   --------------------------------
@@ -192,6 +205,7 @@ begin
       else raise;
       end if;
   end;
+  
   --------------------------------
   ------------- Папки ------------
   --------------------------------
@@ -207,6 +221,8 @@ begin
       else raise;
       end if;
   end;
+  
 end;
 /
+
 commit;

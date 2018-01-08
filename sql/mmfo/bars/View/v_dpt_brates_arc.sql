@@ -20,9 +20,7 @@ PROMPT *** Create  view V_DPT_BRATES_ARC ***
 ORDER BY MOD_CODE, DATE_ENTRY, VIDD DESC;
 
 PROMPT *** Create  grants  V_DPT_BRATES_ARC ***
-grant SELECT                                                                 on V_DPT_BRATES_ARC to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_BRATES_ARC to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DPT_BRATES_ARC to UPLD;
 
 
 

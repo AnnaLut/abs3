@@ -90,10 +90,8 @@ exception when others then
 
 PROMPT *** Create  grants  DBF_IMP_TABS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DBF_IMP_TABS    to ABS_ADMIN;
-grant SELECT                                                                 on DBF_IMP_TABS    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DBF_IMP_TABS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DBF_IMP_TABS    to BARS_DM;
-grant SELECT                                                                 on DBF_IMP_TABS    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DBF_IMP_TABS    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DBF_IMP_TABS    to WR_REFREAD;
 

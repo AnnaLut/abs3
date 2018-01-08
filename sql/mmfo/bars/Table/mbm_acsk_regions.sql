@@ -76,9 +76,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  MBM_ACSK_REGIONS ***
-grant SELECT                                                                 on MBM_ACSK_REGIONS to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MBM_ACSK_REGIONS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on MBM_ACSK_REGIONS to UPLD;
 
 
 

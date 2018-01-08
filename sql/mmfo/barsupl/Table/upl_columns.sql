@@ -81,6 +81,30 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_UPLCOLUMNS_NULLABLE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_COLUMNS MODIFY (NULLABLE CONSTRAINT CC_UPLCOLUMNS_NULLABLE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_UPLCOLS_LEN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_COLUMNS MODIFY (COL_LENGTH CONSTRAINT CC_UPLCOLS_LEN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_UPLCOLUMNS_COLSCALE ***
 begin   
  execute immediate '
@@ -145,6 +169,45 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_UPLCOLUMNS_FILEID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_COLUMNS ADD CONSTRAINT FK_UPLCOLUMNS_FILEID FOREIGN KEY (FILE_ID)
+	  REFERENCES BARSUPL.UPL_FILES (FILE_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_UPLCOLUMNS_COLTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_COLUMNS ADD CONSTRAINT FK_UPLCOLUMNS_COLTYPE FOREIGN KEY (COL_TYPE)
+	  REFERENCES BARSUPL.UPL_COL_TYPES (TYPE_CODE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_UPLCOLUMNS_UPLPREFUN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_COLUMNS ADD CONSTRAINT FK_UPLCOLUMNS_UPLPREFUN FOREIGN KEY (PREFUN)
+	  REFERENCES BARSUPL.UPL_PREFUN (PREFUN) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_UPLCOLUMNS_FKCONSTR ***
 begin   
  execute immediate '
@@ -181,30 +244,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_UPLCOLS_LEN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARSUPL.UPL_COLUMNS MODIFY (COL_LENGTH CONSTRAINT CC_UPLCOLS_LEN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_UPLCOLUMNS_NULLABLE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARSUPL.UPL_COLUMNS MODIFY (NULLABLE CONSTRAINT CC_UPLCOLUMNS_NULLABLE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_UPLCOLUMNS ***
 begin   
  execute immediate '
@@ -231,10 +270,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  UPL_COLUMNS ***
-grant SELECT                                                                 on UPL_COLUMNS     to BARSREADER_ROLE;
-grant SELECT                                                                 on UPL_COLUMNS     to UPLD;
 
 
 

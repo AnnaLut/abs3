@@ -18,10 +18,8 @@ PROMPT *** Create  view BRANCH_BANKDATES_VIEW ***
  ;
 
 PROMPT *** Create  grants  BRANCH_BANKDATES_VIEW ***
-grant SELECT                                                                 on BRANCH_BANKDATES_VIEW to BARSREADER_ROLE;
 grant SELECT                                                                 on BRANCH_BANKDATES_VIEW to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH_BANKDATES_VIEW to DPT_ADMIN;
-grant SELECT                                                                 on BRANCH_BANKDATES_VIEW to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRANCH_BANKDATES_VIEW to WR_ALL_RIGHTS;
 
 

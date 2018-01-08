@@ -81,9 +81,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRVN_AUTOEVENT_ARC ***
-grant SELECT                                                                 on PRVN_AUTOEVENT_ARC to BARSREADER_ROLE;
 grant SELECT                                                                 on PRVN_AUTOEVENT_ARC to BARS_DM;
-grant SELECT                                                                 on PRVN_AUTOEVENT_ARC to UPLD;
 
 
 

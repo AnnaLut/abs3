@@ -77,10 +77,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_SCHOOLTYPES ***
-grant SELECT                                                                 on OW_SCHOOLTYPES  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_SCHOOLTYPES  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_SCHOOLTYPES  to BARS_DM;
-grant SELECT                                                                 on OW_SCHOOLTYPES  to UPLD;
 
 
 

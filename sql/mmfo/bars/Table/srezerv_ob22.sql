@@ -87,7 +87,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  SREZERV_OB22 ***
-grant SELECT                                                                 on SREZERV_OB22    to BARSREADER_ROLE;
 grant SELECT                                                                 on SREZERV_OB22    to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SREZERV_OB22    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SREZERV_OB22    to BARS_DM;

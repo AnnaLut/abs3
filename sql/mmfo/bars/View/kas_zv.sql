@@ -23,10 +23,8 @@ from KAS_Z k, kas_b n
 where k.branch = n.branch ;
 
 PROMPT *** Create  grants  KAS_ZV ***
-grant SELECT                                                                 on KAS_ZV          to BARSREADER_ROLE;
 grant SELECT                                                                 on KAS_ZV          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KAS_ZV          to PYOD001;
-grant SELECT                                                                 on KAS_ZV          to UPLD;
 
 
 

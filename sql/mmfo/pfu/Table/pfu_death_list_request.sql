@@ -58,10 +58,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111473 ***
+PROMPT *** Create  constraint FK_DEATH_LIST_REF_REQUEST ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_DEATH_LIST_REQUEST MODIFY (DATE_TO NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_DEATH_LIST_REQUEST ADD CONSTRAINT FK_DEATH_LIST_REF_REQUEST FOREIGN KEY (ID)
+	  REFERENCES PFU.PFU_REQUEST (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -84,6 +85,18 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint SYS_C00111473 ***
+begin   
+ execute immediate '
+  ALTER TABLE PFU.PFU_DEATH_LIST_REQUEST MODIFY (DATE_TO NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_PFU_DEATH_LIST_REQUEST ***
 begin   
  execute immediate '
@@ -96,10 +109,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  PFU_DEATH_LIST_REQUEST ***
-grant SELECT                                                                 on PFU_DEATH_LIST_REQUEST to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_DEATH_LIST_REQUEST to UPLD;
 
 
 

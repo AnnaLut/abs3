@@ -115,11 +115,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CLV_CUSTOMER_RISK ***
-grant SELECT                                                                 on CLV_CUSTOMER_RISK to BARSREADER_ROLE;
 grant SELECT                                                                 on CLV_CUSTOMER_RISK to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CLV_CUSTOMER_RISK to BARS_DM;
 grant SELECT                                                                 on CLV_CUSTOMER_RISK to CUST001;
-grant SELECT                                                                 on CLV_CUSTOMER_RISK to UPLD;
 
 
 

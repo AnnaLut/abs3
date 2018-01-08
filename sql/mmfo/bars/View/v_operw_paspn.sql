@@ -13,10 +13,8 @@ PROMPT *** Create  view V_OPERW_PASPN ***
   where tag='PASPN';
 
 PROMPT *** Create  grants  V_OPERW_PASPN ***
-grant SELECT                                                                 on V_OPERW_PASPN   to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_OPERW_PASPN   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OPERW_PASPN   to START1;
-grant SELECT                                                                 on V_OPERW_PASPN   to UPLD;
 grant FLASHBACK,SELECT                                                       on V_OPERW_PASPN   to WR_REFREAD;
 
 

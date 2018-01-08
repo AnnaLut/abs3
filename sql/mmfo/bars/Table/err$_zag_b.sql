@@ -84,9 +84,7 @@ COMMENT ON COLUMN BARS.ERR$_ZAG_B.SSP_SIGN_KEY IS '';
 
 
 PROMPT *** Create  grants  ERR$_ZAG_B ***
-grant SELECT                                                                 on ERR$_ZAG_B      to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_ZAG_B      to BARS_DM;
-grant SELECT                                                                 on ERR$_ZAG_B      to UPLD;
 
 
 

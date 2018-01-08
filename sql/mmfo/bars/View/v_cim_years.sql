@@ -11,9 +11,7 @@ PROMPT *** Create  view V_CIM_YEARS ***
   select to_char(bankdate,'YYYY')+level-1 from dual connect by level < 50;
 
 PROMPT *** Create  grants  V_CIM_YEARS ***
-grant SELECT                                                                 on V_CIM_YEARS     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_YEARS     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_YEARS     to UPLD;
 
 
 

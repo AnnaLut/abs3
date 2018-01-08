@@ -78,10 +78,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  OVR_REP_ZAG ***
-grant SELECT                                                                 on OVR_REP_ZAG     to BARSREADER_ROLE;
 grant SELECT                                                                 on OVR_REP_ZAG     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OVR_REP_ZAG     to START1;
-grant SELECT                                                                 on OVR_REP_ZAG     to UPLD;
 
 
 

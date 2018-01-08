@@ -117,11 +117,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRT_UNITS ***
-grant SELECT                                                                 on GRT_UNITS       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRT_UNITS       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRT_UNITS       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRT_UNITS       to START1;
-grant SELECT                                                                 on GRT_UNITS       to UPLD;
 
 
 

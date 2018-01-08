@@ -21,10 +21,8 @@ PROMPT *** Create  view V_PRVN_AUTOMATIC_EVENT ***
    and pa.rnk = c.rnk ;
 
 PROMPT *** Create  grants  V_PRVN_AUTOMATIC_EVENT ***
-grant SELECT                                                                 on V_PRVN_AUTOMATIC_EVENT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PRVN_AUTOMATIC_EVENT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PRVN_AUTOMATIC_EVENT to START1;
-grant SELECT                                                                 on V_PRVN_AUTOMATIC_EVENT to UPLD;
 
 
 

@@ -57,36 +57,10 @@ COMMENT ON COLUMN BARSAQ.CUSTOMERS.RUSSIAN_NAME IS '';
 
 
 
-PROMPT *** Create  constraint PK_CUSTOMERS ***
+PROMPT *** Create  constraint CC_CUSTOMERS_TYPEID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.CUSTOMERS ADD CONSTRAINT PK_CUSTOMERS PRIMARY KEY (BANK_ID, RNK)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_CLOSED ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.CUSTOMERS ADD CONSTRAINT CC_CUSTOMERS_CLOSED CHECK (closed = trunc(closed)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_BANKID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (BANK_ID CONSTRAINT CC_CUSTOMERS_BANKID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (TYPE_ID CONSTRAINT CC_CUSTOMERS_TYPEID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -107,10 +81,108 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMERS_TYPEID_NN ***
+PROMPT *** Create  constraint CC_CUSTOMERS_DATEON_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (TYPE_ID CONSTRAINT CC_CUSTOMERS_TYPEID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (OPENED CONSTRAINT CC_CUSTOMERS_DATEON_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERS_INSIDERID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (INSIDER_ID CONSTRAINT CC_CUSTOMERS_INSIDERID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERS_COVID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (COV_ID CONSTRAINT CC_CUSTOMERS_COVID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERS_COUNTRYID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (COUNTRY_ID CONSTRAINT CC_CUSTOMERS_COUNTRYID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERS_PRTID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (PRT_ID CONSTRAINT CC_CUSTOMERS_PRTID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERS_CUSTCODE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (CUST_CODE CONSTRAINT CC_CUSTOMERS_CUSTCODE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERS_BANKID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (BANK_ID CONSTRAINT CC_CUSTOMERS_BANKID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERS_CLOSED ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.CUSTOMERS ADD CONSTRAINT CC_CUSTOMERS_CLOSED CHECK (closed = trunc(closed)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_CUSTOMERS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.CUSTOMERS ADD CONSTRAINT PK_CUSTOMERS PRIMARY KEY (BANK_ID, RNK)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -147,78 +219,6 @@ PROMPT *** Create  constraint CC_CUSTOMERS_SHORTNAME_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARSAQ.CUSTOMERS MODIFY (SHORT_NAME CONSTRAINT CC_CUSTOMERS_SHORTNAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_CUSTCODE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (CUST_CODE CONSTRAINT CC_CUSTOMERS_CUSTCODE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_PRTID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (PRT_ID CONSTRAINT CC_CUSTOMERS_PRTID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_COUNTRYID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (COUNTRY_ID CONSTRAINT CC_CUSTOMERS_COUNTRYID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_COVID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (COV_ID CONSTRAINT CC_CUSTOMERS_COVID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_INSIDERID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (INSIDER_ID CONSTRAINT CC_CUSTOMERS_INSIDERID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_DATEON_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.CUSTOMERS MODIFY (OPENED CONSTRAINT CC_CUSTOMERS_DATEON_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -267,9 +267,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  CUSTOMERS ***
-grant SELECT                                                                 on CUSTOMERS       to BARSREADER_ROLE;
 
 
 

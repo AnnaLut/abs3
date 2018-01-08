@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_OB22NU.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_OB22NU ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_OB22NU (p_dat1 date,  p_dat2 date ) is
+CREATE OR REPLACE PROCEDURE BARS.P_OB22NU (p_dat1 date,  p_dat2 date ) is
 l_vdat    date;   l_vob number ; l_tt char(3);  l_nazn varchar2(160);
 l_prizn char(1)         ;  l_nlsn  varchar2(15)    ;
 l_ob22  varchar2(2)     ;  l_nmsn  varchar2(70)    ;
@@ -16,11 +7,11 @@ l_nlsn2 varchar2(15);
 l_prizn2 char(1);
 l_ob22_2 varchar2(2) ;
 /* процедура отбора данных для функции "Проводки в ПО по ОБ22"
-
+   
    01-07-2014  nvv  Добавив обработку А/П (6204)
                     + patch_XXX.sql 01/07/2014
-                    + v_ob22nu.vie  01/07/2014
-
+                    + v_ob22nu.vie  01/07/2014					
+  
    07-05-2010  qwa  Убрала хинты, так как в Житомире тормозило,
                     вместо них - псевдоним
 
@@ -155,14 +146,4 @@ end loop;
 commit;
 end  P_OB22NU;
 /
-show err;
 
-PROMPT *** Create  grants  P_OB22NU ***
-grant EXECUTE                                                                on P_OB22NU        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_OB22NU        to NALOG;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_OB22NU.sql =========*** End *** 
-PROMPT ===================================================================================== 

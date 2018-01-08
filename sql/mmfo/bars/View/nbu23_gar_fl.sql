@@ -14,10 +14,8 @@ where d.sos>9 and d.sos<15 and d.vidd in (9,19,29,39)
   and exists (select 1 from customer where rnk= d.rnk and custtype = 3);
 
 PROMPT *** Create  grants  NBU23_GAR_FL ***
-grant SELECT                                                                 on NBU23_GAR_FL    to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on NBU23_GAR_FL    to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on NBU23_GAR_FL    to START1;
-grant SELECT                                                                 on NBU23_GAR_FL    to UPLD;
 
 
 

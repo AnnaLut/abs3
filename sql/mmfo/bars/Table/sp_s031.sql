@@ -55,12 +55,10 @@ COMMENT ON COLUMN BARS.SP_S031.D_CLOSE IS 'Дата закрытия норматива';
 
 
 PROMPT *** Create  grants  SP_S031 ***
-grant SELECT                                                                 on SP_S031         to BARSREADER_ROLE;
 grant SELECT                                                                 on SP_S031         to BARSUPL;
 grant FLASHBACK,SELECT                                                       on SP_S031         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SP_S031         to BARS_DM;
 grant SELECT                                                                 on SP_S031         to START1;
-grant SELECT                                                                 on SP_S031         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SP_S031         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SP_S031         to WR_REFREAD;
 

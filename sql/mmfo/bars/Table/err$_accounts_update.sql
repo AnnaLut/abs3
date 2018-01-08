@@ -124,9 +124,7 @@ COMMENT ON COLUMN BARS.ERR$_ACCOUNTS_UPDATE.GLOBALBD IS '';
 
 
 PROMPT *** Create  grants  ERR$_ACCOUNTS_UPDATE ***
-grant SELECT                                                                 on ERR$_ACCOUNTS_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_ACCOUNTS_UPDATE to BARS_DM;
-grant SELECT                                                                 on ERR$_ACCOUNTS_UPDATE to UPLD;
 
 
 

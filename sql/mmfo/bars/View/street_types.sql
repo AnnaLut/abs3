@@ -13,11 +13,9 @@ PROMPT *** Create  view STREET_TYPES ***
 
 PROMPT *** Create  grants  STREET_TYPES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STREET_TYPES    to ABS_ADMIN;
-grant SELECT                                                                 on STREET_TYPES    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STREET_TYPES    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STREET_TYPES    to DPT_ADMIN;
 grant SELECT                                                                 on STREET_TYPES    to START1;
-grant SELECT                                                                 on STREET_TYPES    to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STREET_TYPES    to WR_ALL_RIGHTS;
 
 

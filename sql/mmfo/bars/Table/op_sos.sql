@@ -102,12 +102,10 @@ exception when others then
 
 PROMPT *** Create  grants  OP_SOS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OP_SOS          to ABS_ADMIN;
-grant SELECT                                                                 on OP_SOS          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OP_SOS          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OP_SOS          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OP_SOS          to OP_SOS;
 grant SELECT                                                                 on OP_SOS          to START1;
-grant SELECT                                                                 on OP_SOS          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OP_SOS          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on OP_SOS          to WR_REFREAD;
 

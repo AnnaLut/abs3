@@ -93,10 +93,62 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_FINMONQUE_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FINMON_QUE ADD CONSTRAINT FK_FINMONQUE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_FINMONQUE_FINMONQUE_STATUS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FINMON_QUE ADD CONSTRAINT R_FINMONQUE_FINMONQUE_STATUS FOREIGN KEY (STATUS)
+	  REFERENCES BARS.FINMON_QUE_STATUS (STATUS) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_FINMON_QUE_CUSTOMERA ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FINMON_QUE ADD CONSTRAINT R_FINMON_QUE_CUSTOMERA FOREIGN KEY (RNK_A)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_FINMONQUE_KF ***
 begin   
  execute immediate '
   ALTER TABLE BARS.FINMON_QUE MODIFY (KF CONSTRAINT CC_FINMONQUE_KF NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_FINMON_QUE_CUSTOMERB ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FINMON_QUE ADD CONSTRAINT R_FINMON_QUE_CUSTOMERB FOREIGN KEY (RNK_B)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -147,12 +199,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  FINMON_QUE ***
-grant SELECT                                                                 on FINMON_QUE      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FINMON_QUE      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FINMON_QUE      to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on FINMON_QUE      to FINMON;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FINMON_QUE      to FINMON01;
-grant SELECT                                                                 on FINMON_QUE      to UPLD;
 
 
 

@@ -141,7 +141,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  DOC_SYSTEM_ERRORS ***
-grant SELECT                                                                 on DOC_SYSTEM_ERRORS to BARSREADER_ROLE;
 grant SELECT                                                                 on DOC_SYSTEM_ERRORS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DOC_SYSTEM_ERRORS to START1;
 grant SELECT                                                                 on DOC_SYSTEM_ERRORS to WR_REFREAD;

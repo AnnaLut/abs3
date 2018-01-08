@@ -57,6 +57,19 @@ COMMENT ON COLUMN BARS.DWH_IMPORT_STAT.RETRY_CNT IS 'Номер попытки загрузки посл
 
 
 
+PROMPT *** Create  constraint XFK_DWHIMPSTAT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DWH_IMPORT_STAT ADD CONSTRAINT XFK_DWHIMPSTAT FOREIGN KEY (STATUS)
+	  REFERENCES BARS.DWH_STATUS (STATUS) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint XPK_DWHIMPSTAT ***
 begin   
  execute immediate '
@@ -86,9 +99,7 @@ exception when others then
 
 PROMPT *** Create  grants  DWH_IMPORT_STAT ***
 grant SELECT                                                                 on DWH_IMPORT_STAT to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on DWH_IMPORT_STAT to BARSREADER_ROLE;
 grant SELECT                                                                 on DWH_IMPORT_STAT to BARS_DM;
-grant SELECT                                                                 on DWH_IMPORT_STAT to UPLD;
 
 
 

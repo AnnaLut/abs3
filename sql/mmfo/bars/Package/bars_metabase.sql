@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_metabase.sql =========*** Run *
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_METABASE is
+CREATE OR REPLACE PACKAGE bars_metabase is
 
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 --| Пакет bars_metabase для работы с метаописанием таблиц комплекса |
@@ -308,7 +302,7 @@ procedure update_dyn_filter(p_tabid                in number,
 
 end bars_metabase;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_METABASE is
+CREATE OR REPLACE PACKAGE BODY bars_metabase is
 
 --***************************************************************************--
 --
@@ -2296,16 +2290,3 @@ end;
 
 end bars_metabase;
 /
- show err;
- 
-PROMPT *** Create  grants  BARS_METABASE ***
-grant EXECUTE                                                                on BARS_METABASE   to ABS_ADMIN;
-grant EXECUTE                                                                on BARS_METABASE   to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BARS_METABASE   to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_metabase.sql =========*** End *
- PROMPT ===================================================================================== 
- 

@@ -65,10 +65,6 @@ COMMENT ON COLUMN BARS.ERR$_MB_PLAN.DAT IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_MB_PLAN ***
-grant SELECT                                                                 on ERR$_MB_PLAN    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_MB_PLAN    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

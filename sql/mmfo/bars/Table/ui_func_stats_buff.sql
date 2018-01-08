@@ -55,9 +55,7 @@ COMMENT ON COLUMN BARS.UI_FUNC_STATS_BUFF.USER_DATA IS 'Данные хоста';
 
 
 PROMPT *** Create  grants  UI_FUNC_STATS_BUFF ***
-grant SELECT                                                                 on UI_FUNC_STATS_BUFF to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on UI_FUNC_STATS_BUFF to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on UI_FUNC_STATS_BUFF to UPLD;
 
 
 

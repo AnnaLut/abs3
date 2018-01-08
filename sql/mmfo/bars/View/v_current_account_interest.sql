@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CURRENT_ACCOUNT_INTEREST.sql ========
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_CURRENT_ACCOUNT_INTEREST ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_CURRENT_ACCOUNT_INTEREST ("ID", "ACCOUNT_ID", "CURRENCY_ID", "INTEREST_KIND_ID", "DATE_FROM", "DATE_THROUGH", "RECKONING_STATE", "ACCOUNT_REST", "INTEREST_RATE", "INTEREST_AMOUNT", "INTEREST_ACCOUNT_NUMBER", "RECEIVER_MFO", "RECEIVER_ACCOUNT", "RECEIVER_CURRENCY_ID", "PURPOSE", "RECKONING_COMMENT", "STATE_ID") AS 
-  select t.id,
+create or replace view v_current_account_interest as
+select t.id,
        t.account_id,
        a.kv currency_id,
        t.interest_kind_id,
@@ -47,11 +38,38 @@ where  t.grouping_line_id is null and
        -- t.account_id = sys_context('bars_pul', 'account_id') and
 order by t.date_from;
 
-PROMPT *** Create  grants  V_CURRENT_ACCOUNT_INTEREST ***
-grant SELECT                                                                 on V_CURRENT_ACCOUNT_INTEREST to UPLD;
+comment on column v_current_account_interest.ID                          is 'Ідентифікатор розрахунку';
+comment on column v_current_account_interest.ACCOUNT_ID                  is 'Ідентифікатор рахунка';
+comment on column v_current_account_interest.INTEREST_KIND_ID            is 'Ідентифікатор клієнта';
+comment on column v_current_account_interest.CURRENCY_ID                 is 'Валюта';
+comment on column v_current_account_interest.DATE_FROM                   is 'Дата з';
+comment on column v_current_account_interest.DATE_THROUGH                is 'Дата по';
+comment on column v_current_account_interest.RECKONING_STATE             is 'Стан розрахунку';
+comment on column v_current_account_interest.ACCOUNT_REST                is 'Залишок рахунка';
+comment on column v_current_account_interest.INTEREST_RATE               is 'Ставка';
+comment on column v_current_account_interest.INTEREST_AMOUNT             is 'Сума відсотків';
+comment on column v_current_account_interest.INTEREST_ACCOUNT_NUMBER     is 'Рахунок відсотків';
+comment on column v_current_account_interest.RECEIVER_MFO                is 'МФО отримувача';
+comment on column v_current_account_interest.RECEIVER_ACCOUNT            is 'Рахунок отримувача';
+comment on column v_current_account_interest.RECEIVER_CURRENCY_ID        is 'Валюта отримувача';
+comment on column v_current_account_interest.PURPOSE                     is 'Призначення документа';
+comment on column v_current_account_interest.RECKONING_COMMENT           is 'Деталі';
+comment on column v_current_account_interest.STATE_ID                    is 'Ідентифікатор стану розрахунку';
 
 
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CURRENT_ACCOUNT_INTEREST.sql ========
-PROMPT ===================================================================================== 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

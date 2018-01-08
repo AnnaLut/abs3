@@ -20,8 +20,6 @@ and m.dk=0 and a.acc=dk.acc
 ;
 
 PROMPT *** Create  grants  V_OPLDOK_ACC ***
-grant SELECT                                                                 on V_OPLDOK_ACC    to BARSREADER_ROLE;
-grant SELECT                                                                 on V_OPLDOK_ACC    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OPLDOK_ACC    to WR_ALL_RIGHTS;
 
 

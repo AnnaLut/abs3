@@ -79,10 +79,6 @@ COMMENT ON COLUMN BARS.ERR$_FIN_CALCULATIONS.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_FIN_CALCULATIONS ***
-grant SELECT                                                                 on ERR$_FIN_CALCULATIONS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_FIN_CALCULATIONS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

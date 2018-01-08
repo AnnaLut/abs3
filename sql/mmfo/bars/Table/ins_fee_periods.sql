@@ -94,6 +94,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_FEEPRDS_FID_FEES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_FEE_PERIODS ADD CONSTRAINT FK_FEEPRDS_FID_FEES FOREIGN KEY (FEE_ID, KF)
+	  REFERENCES BARS.INS_FEES (ID, KF) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint ÑÑ_FEEPRDS_PRDID ***
 begin   
  execute immediate '
@@ -118,10 +131,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  INS_FEE_PERIODS ***
-grant SELECT                                                                 on INS_FEE_PERIODS to BARSREADER_ROLE;
-grant SELECT                                                                 on INS_FEE_PERIODS to UPLD;
 
 
 

@@ -116,12 +116,10 @@ exception when others then
 
 PROMPT *** Create  grants  REPORTSF ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPORTSF        to ABS_ADMIN;
-grant SELECT                                                                 on REPORTSF        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REPORTSF        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REPORTSF        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPORTSF        to REF0000;
 grant SELECT                                                                 on REPORTSF        to START1;
-grant SELECT                                                                 on REPORTSF        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REPORTSF        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on REPORTSF        to WR_REFREAD;
 

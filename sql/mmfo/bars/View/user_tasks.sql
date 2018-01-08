@@ -24,10 +24,8 @@ WHERE
  ;
 
 PROMPT *** Create  grants  USER_TASKS ***
-grant SELECT                                                                 on USER_TASKS      to BARSREADER_ROLE;
 grant SELECT                                                                 on USER_TASKS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on USER_TASKS      to TASK_LIST;
-grant SELECT                                                                 on USER_TASKS      to UPLD;
 
 
 

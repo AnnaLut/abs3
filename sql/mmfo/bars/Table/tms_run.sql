@@ -79,10 +79,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0035449 ***
+PROMPT *** Create  constraint PK_TMS_RUN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMS_RUN MODIFY (NEW_BANK_DATE NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMS_RUN ADD CONSTRAINT PK_TMS_RUN PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -115,12 +117,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_TMS_RUN ***
+PROMPT *** Create  constraint SYS_C0035449 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMS_RUN ADD CONSTRAINT PK_TMS_RUN PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.TMS_RUN MODIFY (NEW_BANK_DATE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -141,10 +141,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  TMS_RUN ***
-grant SELECT                                                                 on TMS_RUN         to BARSREADER_ROLE;
-grant SELECT                                                                 on TMS_RUN         to UPLD;
 
 
 

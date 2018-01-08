@@ -131,58 +131,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C006642 ***
+PROMPT *** Create  constraint SYS_C006648 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.S6_USERS MODIFY (PR_END NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006643 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_USERS MODIFY (PR_ACT NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006644 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_USERS MODIFY (PR_PERMIT NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006645 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_USERS MODIFY (SIGN_TYPE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006646 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_USERS MODIFY (PR_LPMB NOT NULL ENABLE)';
+  ALTER TABLE BARS.S6_USERS MODIFY (DistrSgn NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -203,10 +155,58 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C006648 ***
+PROMPT *** Create  constraint SYS_C006646 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.S6_USERS MODIFY (DistrSgn NOT NULL ENABLE)';
+  ALTER TABLE BARS.S6_USERS MODIFY (PR_LPMB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006645 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_USERS MODIFY (SIGN_TYPE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006644 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_USERS MODIFY (PR_PERMIT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006643 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_USERS MODIFY (PR_ACT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006642 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_USERS MODIFY (PR_END NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -215,11 +215,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  S6_USERS ***
-grant SELECT                                                                 on S6_USERS        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_USERS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on S6_USERS        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_USERS        to START1;
-grant SELECT                                                                 on S6_USERS        to UPLD;
 
 
 

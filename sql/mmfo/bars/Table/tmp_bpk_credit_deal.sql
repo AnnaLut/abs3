@@ -73,10 +73,6 @@ COMMENT ON COLUMN BARS.TMP_BPK_CREDIT_DEAL.KF IS '';
 
 
 
-PROMPT *** Create  grants  TMP_BPK_CREDIT_DEAL ***
-grant SELECT                                                                 on TMP_BPK_CREDIT_DEAL to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_BPK_CREDIT_DEAL to UPLD;
-
 
 
 PROMPT ===================================================================================== 

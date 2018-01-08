@@ -1,5 +1,7 @@
 set serveroutput on
 
+exec suda;
+
 declare
 
   type t_rec_extrnval is record (
@@ -50,7 +52,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +61,6 @@ begin
 
   l_tabsemantic := 'Таблиця рахунків ВП';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'V_VPLIST';
 
   -- получаем код таблицы
@@ -73,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +83,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,29 +121,29 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'KV', 'N', 'Код~вал', '.3', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=V_SPOT[NSIFUNCTION][ACCESSCODE=>2][CONDITIONS=>V_SPOT.ACC= :ACC3800]', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'NLS3800', 'C', 'Валютна~позиція~3800', '1', null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC3800'||chr(38)||'type=1', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NLS3801', 'C', 'Екв.вал~поз.~3801', '1', null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC3801'||chr(38)||'type=1', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NLS6204', 'C', 'НКР~6204-курс', '1', null, 22, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC6024'||chr(38)||'type=1', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NLS_RRR', 'C', 'НКР~6204-опер', '1', null, 32, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC_RRR'||chr(38)||'type=1', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NMS3800', 'C', 'Назва ВП', '', null, 94, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'BRANCH', 'C', 'БРАНЧ', '1', null, 0, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'NLS_RRS', 'C', 'РКР~6204-опер', '1', null, 42, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC_RRS'||chr(38)||'type=1', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'OB3800', 'C', 'OB22~3800', '.3', null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'OB3801', 'C', 'OB22~3801', '.3', null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'OB6204', 'C', 'OB22~НКР-1', '.3', null, 23, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'OB_RRR', 'C', 'OB22~НКР-2', '.3', null, 33, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'OB_RRS', 'C', 'OB22~RКР', '.3', null, 43, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'ACC3800', 'N', 'ACC_3800', '', null, 90, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'ACC3801', 'N', 'ACC_801', '', null, 91, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'ACC6204', 'N', 'ACC_6204', '', null, 92, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'ACC_RRR', 'N', 'ACC_RRR', '', null, 95, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'ACC_RRS', 'N', 'ACC_RRS', '', null, 96, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'DAZS_3800', 'D', 'Дата~закр~3800', '1', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 34, 'DAZS_3801', 'D', 'Дата~закр~3801', '1', null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'DAZS_6204', 'D', 'Дата~закр~НКР-1', '1', null, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 36, 'DAZS_RRR', 'D', 'Дата~закр~НКР-2', '1', null, 34, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 37, 'DAZS_RRS', 'D', 'Дата~закр~RКР', '1', null, 44, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'KV', 'N', 'Код~вал', .3, null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=V_SPOT[NSIFUNCTION][ACCESSCODE=>2][CONDITIONS=>V_SPOT.ACC= :ACC3800]', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'NLS3800', 'C', 'Валютна~позиція~3800', 1, null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC3800'||chr(38)||'type=1', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NLS3801', 'C', 'Екв.вал~поз.~3801', 1, null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC3801'||chr(38)||'type=1', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NLS6204', 'C', 'НКР~6204-курс', 1, null, 22, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC6024'||chr(38)||'type=1', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NLS_RRR', 'C', 'НКР~6204-опер', 1, null, 32, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC_RRR'||chr(38)||'type=1', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NMS3800', 'C', 'Назва ВП', null, null, 94, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'BRANCH', 'C', 'БРАНЧ', 1, null, 0, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'NLS_RRS', 'C', 'РКР~6204-опер', 1, null, 42, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC_RRS'||chr(38)||'type=1', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'OB3800', 'C', 'OB22~3800', .3, null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'OB3801', 'C', 'OB22~3801', .3, null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'OB6204', 'C', 'OB22~НКР-1', .3, null, 23, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'OB_RRR', 'C', 'OB22~НКР-2', .3, null, 33, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'OB_RRS', 'C', 'OB22~RКР', .3, null, 43, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'ACC3800', 'N', 'ACC_3800', null, null, 90, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'ACC3801', 'N', 'ACC_801', null, null, 91, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'ACC6204', 'N', 'ACC_6204', null, null, 92, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'ACC_RRR', 'N', 'ACC_RRR', null, null, 95, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'ACC_RRS', 'N', 'ACC_RRS', null, null, 96, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'DAZS_3800', 'D', 'Дата~закр~3800', 1, null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'DAZS_3801', 'D', 'Дата~закр~3801', 1, null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'DAZS_6204', 'D', 'Дата~закр~НКР-1', 1, null, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'DAZS_RRR', 'D', 'Дата~закр~НКР-2', 1, null, 34, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'DAZS_RRS', 'D', 'Дата~закр~RКР', 1, null, 44, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

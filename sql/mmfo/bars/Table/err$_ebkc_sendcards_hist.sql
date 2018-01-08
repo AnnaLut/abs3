@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_EBKC_SENDCARDS_HIST.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_EBKC_SENDCARDS_HIST ***
-grant SELECT                                                                 on ERR$_EBKC_SENDCARDS_HIST to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_EBKC_SENDCARDS_HIST to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -162,10 +162,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMPYMTSHDARCH_PYMTDT_NN ***
+PROMPT *** Create  constraint CC_DMPYMTSHDARCH_S240_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_PAYMENT_SHD_ARCH MODIFY (PYMT_DT CONSTRAINT CC_DMPYMTSHDARCH_PYMTDT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_PAYMENT_SHD_ARCH MODIFY (S240 CONSTRAINT CC_DMPYMTSHDARCH_S240_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -222,10 +222,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMPYMTSHDARCH_S240_NN ***
+PROMPT *** Create  constraint CC_DMPYMTSHDARCH_PYMTDT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_PAYMENT_SHD_ARCH MODIFY (S240 CONSTRAINT CC_DMPYMTSHDARCH_S240_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_PAYMENT_SHD_ARCH MODIFY (PYMT_DT CONSTRAINT CC_DMPYMTSHDARCH_PYMTDT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -303,10 +303,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_DM_PAYMENT_SHD_ARCH ***
-grant SELECT                                                                 on NBUR_DM_PAYMENT_SHD_ARCH to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_DM_PAYMENT_SHD_ARCH to BARSUPL;
 grant SELECT                                                                 on NBUR_DM_PAYMENT_SHD_ARCH to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on NBUR_DM_PAYMENT_SHD_ARCH to UPLD;
 
 
 

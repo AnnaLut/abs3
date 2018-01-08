@@ -91,11 +91,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_REZ_PARAMS ***
-grant SELECT                                                                 on TMP_REZ_PARAMS  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_REZ_PARAMS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_REZ_PARAMS  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_REZ_PARAMS  to RCC_DEAL;
-grant SELECT                                                                 on TMP_REZ_PARAMS  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_REZ_PARAMS  to WR_ALL_RIGHTS;
 
 

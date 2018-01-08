@@ -13,9 +13,7 @@ from   cc_vidd t
 where  t.vidd in (3902, 3903);
 
 PROMPT *** Create  grants  V_CRSOUR_PRODUCT ***
-grant SELECT                                                                 on V_CRSOUR_PRODUCT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CRSOUR_PRODUCT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CRSOUR_PRODUCT to UPLD;
 
 
 

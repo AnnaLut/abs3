@@ -145,166 +145,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_KLP_ID_NN ***
+PROMPT *** Create  constraint CC_KLP_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (ID CONSTRAINT CC_KLP_ID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLP_EOM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (EOM CONSTRAINT CC_KLP_EOM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLP_VOB_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (VOB CONSTRAINT CC_KLP_VOB_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLP_ND_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (ND CONSTRAINT CC_KLP_ND_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLP_DATAD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (DATAD CONSTRAINT CC_KLP_DATAD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLP_NLS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (NLS CONSTRAINT CC_KLP_NLS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLP_MFO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (MFO CONSTRAINT CC_KLP_MFO_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLP_NAIMP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (NAIMP CONSTRAINT CC_KLP_NAIMP_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLP_NLSP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (NLSP CONSTRAINT CC_KLP_NLSP_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLP_S_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (S CONSTRAINT CC_KLP_S_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLP_TEXT1_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (TEXT1 CONSTRAINT CC_KLP_TEXT1_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLP_ISP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (ISP CONSTRAINT CC_KLP_ISP_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLP_KOKB_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (KOKB CONSTRAINT CC_KLP_KOKB_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLP_KOKA_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (KOKA CONSTRAINT CC_KLP_KOKA_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.KLP MODIFY (KF CONSTRAINT CC_KLP_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -325,10 +169,257 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_KLP_KF_NN ***
+PROMPT *** Create  constraint CC_KLP_KOKA_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.KLP MODIFY (KF CONSTRAINT CC_KLP_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.KLP MODIFY (KOKA CONSTRAINT CC_KLP_KOKA_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLP_KOKB_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP MODIFY (KOKB CONSTRAINT CC_KLP_KOKB_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLP_ISP_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP MODIFY (ISP CONSTRAINT CC_KLP_ISP_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLP_TEXT1_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP MODIFY (TEXT1 CONSTRAINT CC_KLP_TEXT1_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLP_S_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP MODIFY (S CONSTRAINT CC_KLP_S_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLP_NLSP_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP MODIFY (NLSP CONSTRAINT CC_KLP_NLSP_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLP_NAIMP_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP MODIFY (NAIMP CONSTRAINT CC_KLP_NAIMP_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLP_MFO_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP MODIFY (MFO CONSTRAINT CC_KLP_MFO_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLP_NLS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP MODIFY (NLS CONSTRAINT CC_KLP_NLS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLP_DATAD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP MODIFY (DATAD CONSTRAINT CC_KLP_DATAD_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLP_ND_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP MODIFY (ND CONSTRAINT CC_KLP_ND_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLP_VOB_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP MODIFY (VOB CONSTRAINT CC_KLP_VOB_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLP_EOM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP MODIFY (EOM CONSTRAINT CC_KLP_EOM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_KLPMT_KLP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP ADD CONSTRAINT R_KLPMT_KLP FOREIGN KEY (DOP)
+	  REFERENCES BARS.KLP_MT (DOP) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KLP_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP ADD CONSTRAINT FK_KLP_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KLP_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP ADD CONSTRAINT FK_KLP_STAFF FOREIGN KEY (EOM)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KLP_VOB ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP ADD CONSTRAINT FK_KLP_VOB FOREIGN KEY (VOB)
+	  REFERENCES BARS.VOB (VOB) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KLP_BANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP ADD CONSTRAINT FK_KLP_BANKS FOREIGN KEY (MFO)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KLP_STAFF2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP ADD CONSTRAINT FK_KLP_STAFF2 FOREIGN KEY (ISP)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KLP_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP ADD CONSTRAINT FK_KLP_TABVAL FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLP_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP MODIFY (ID CONSTRAINT CC_KLP_ID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -450,13 +541,11 @@ exception when others then
 
 PROMPT *** Create  grants  KLP ***
 grant SELECT,UPDATE                                                          on KLP             to BARS014;
-grant SELECT                                                                 on KLP             to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on KLP             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KLP             to BARS_DM;
 grant DELETE,SELECT,UPDATE                                                   on KLP             to OPERKKK;
 grant SELECT,UPDATE                                                          on KLP             to START1;
 grant INSERT,UPDATE                                                          on KLP             to TECH_MOM1;
-grant SELECT                                                                 on KLP             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLP             to WR_ALL_RIGHTS;
 
 

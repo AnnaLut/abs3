@@ -64,10 +64,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0035379 ***
+PROMPT *** Create  constraint SYS_C0035381 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_CIG_SEND_HISTORY MODIFY (BATCH_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_CIG_SEND_HISTORY MODIFY (BRANCH NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -88,20 +88,16 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0035381 ***
+PROMPT *** Create  constraint SYS_C0035379 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_CIG_SEND_HISTORY MODIFY (BRANCH NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_CIG_SEND_HISTORY MODIFY (BATCH_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-
-PROMPT *** Create  grants  TMP_CIG_SEND_HISTORY ***
-grant SELECT                                                                 on TMP_CIG_SEND_HISTORY to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_CIG_SEND_HISTORY to UPLD;
 
 
 

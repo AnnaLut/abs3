@@ -101,11 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OTCN_2H_ANKETA_DET ***
-grant SELECT                                                                 on OTCN_2H_ANKETA_DET to BARSREADER_ROLE;
 grant SELECT                                                                 on OTCN_2H_ANKETA_DET to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_2H_ANKETA_DET to BARS_DM;
 grant SELECT                                                                 on OTCN_2H_ANKETA_DET to RPBN002;
-grant SELECT                                                                 on OTCN_2H_ANKETA_DET to UPLD;
 
 
 

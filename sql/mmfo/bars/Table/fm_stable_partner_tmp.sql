@@ -51,11 +51,9 @@ COMMENT ON COLUMN BARS.FM_STABLE_PARTNER_TMP.KF IS '';
 
 
 PROMPT *** Create  grants  FM_STABLE_PARTNER_TMP ***
-grant SELECT                                                                 on FM_STABLE_PARTNER_TMP to BARSREADER_ROLE;
 grant SELECT                                                                 on FM_STABLE_PARTNER_TMP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_STABLE_PARTNER_TMP to BARS_DM;
 grant SELECT                                                                 on FM_STABLE_PARTNER_TMP to START1;
-grant SELECT                                                                 on FM_STABLE_PARTNER_TMP to UPLD;
 
 
 

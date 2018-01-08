@@ -83,10 +83,6 @@ COMMENT ON COLUMN BARS.ERR$_OW_OIC_STRANSFERS_DATA.CREDIT_CURRENCY IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OW_OIC_STRANSFERS_DATA ***
-grant SELECT                                                                 on ERR$_OW_OIC_STRANSFERS_DATA to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OW_OIC_STRANSFERS_DATA to UPLD;
-
 
 
 PROMPT ===================================================================================== 

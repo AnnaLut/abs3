@@ -115,9 +115,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  SMS_TEMPLATES ***
-grant SELECT                                                                 on SMS_TEMPLATES   to BARSREADER_ROLE;
 grant SELECT                                                                 on SMS_TEMPLATES   to BARS_DM;
-grant SELECT                                                                 on SMS_TEMPLATES   to UPLD;
 
 
 

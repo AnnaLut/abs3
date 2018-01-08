@@ -118,13 +118,11 @@ exception when others then
 
 PROMPT *** Create  grants  VED ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on VED             to ABS_ADMIN;
-grant SELECT                                                                 on VED             to BARSREADER_ROLE;
 grant SELECT                                                                 on VED             to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VED             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VED             to BARS_DM;
 grant SELECT                                                                 on VED             to CUST001;
 grant SELECT                                                                 on VED             to START1;
-grant SELECT                                                                 on VED             to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VED             to VED;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VED             to WR_ALL_RIGHTS;
 grant SELECT                                                                 on VED             to WR_CUSTREG;

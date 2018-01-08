@@ -27,10 +27,6 @@ COMMENT ON COLUMN PFU.PFU_ENVELOPE_STATE.NAME IS 'Наименование статуса';
 
 
 
-PROMPT *** Create  grants  PFU_ENVELOPE_STATE ***
-grant SELECT                                                                 on PFU_ENVELOPE_STATE to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_ENVELOPE_STATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

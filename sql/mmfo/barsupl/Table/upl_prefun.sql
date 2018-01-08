@@ -60,10 +60,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  UPL_PREFUN ***
-grant SELECT                                                                 on UPL_PREFUN      to BARSREADER_ROLE;
-grant SELECT                                                                 on UPL_PREFUN      to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -84,14 +84,12 @@ exception when others then
 
 PROMPT *** Create  grants  BOPCOUNT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BOPCOUNT        to ABS_ADMIN;
-grant SELECT                                                                 on BOPCOUNT        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BOPCOUNT        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BOPCOUNT        to BARS_DM;
 grant SELECT                                                                 on BOPCOUNT        to OPERKKK;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BOPCOUNT        to PB1;
 grant SELECT                                                                 on BOPCOUNT        to PYOD001;
 grant SELECT                                                                 on BOPCOUNT        to START1;
-grant SELECT                                                                 on BOPCOUNT        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BOPCOUNT        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BOPCOUNT        to WR_REFREAD;
 

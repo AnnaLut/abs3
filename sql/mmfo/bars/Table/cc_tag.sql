@@ -24,7 +24,7 @@ PROMPT *** Create  table CC_TAG ***
 begin 
   execute immediate '
   CREATE TABLE BARS.CC_TAG 
-   (	TAG VARCHAR2(7), 
+   (	TAG VARCHAR2(5), 
 	NAME VARCHAR2(50), 
 	TAGTYPE VARCHAR2(5), 
 	TABLE_NAME VARCHAR2(30), 
@@ -77,6 +77,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CC_TAG_META_TABLE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_TAG ADD CONSTRAINT FK_CC_TAG_META_TABLE FOREIGN KEY (TABLE_NAME)
+	  REFERENCES BARS.META_TABLES (TABNAME) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CCTAG_CODES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_TAG ADD CONSTRAINT FK_CCTAG_CODES FOREIGN KEY (CODE)
+	  REFERENCES BARS.CC_TAG_CODES (CODE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XPK_CC_TAG ***
 begin   
  execute immediate '
@@ -89,9 +115,13 @@ exception when others then
 /
 
 
+PROMPT *** MODIFY COLUMN  TAG***
+begin   
+ execute immediate 'ALTER TABLE BARS.CC_TAG MODIFY TAG VARCHAR2(7)';
+ end;
+/
 
 PROMPT *** Create  grants  CC_TAG ***
-grant SELECT                                                                 on CC_TAG          to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_TAG          to BARSUPL;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CC_TAG          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_TAG          to BARS_DM;

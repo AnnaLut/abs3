@@ -1,15 +1,9 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/xoz_mdate.sql =========*** Run *** 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.XOZ_MDATE 
+create or replace FUNCTION XOZ_MDATE 
 (
-  p_acc   number,
+  p_acc   number,     
   p_fdat  date,
   p_nbs   varchar2,
-  p_ob22  varchar2,
+  p_ob22  varchar2, 
   p_mdate date  ) return DATE  is
 
 -- 14.06.2017 Sta Функцию вынесено из пакеджа XOZ для использования в триггере
@@ -19,8 +13,8 @@
 
 begin
 
-  begin select  (p_fdat + x.KDX )  into l_mdate   from  XOZ_ob22_cl x where x.deb = p_nbs||p_ob22  and x.kdx > 0 ;
-  EXCEPTION WHEN NO_DATA_FOUND THEN
+  begin select  (p_fdat + x.KDX )  into l_mdate   from  XOZ_ob22_cl x where x.deb = p_nbs||p_ob22  and x.kdx > 0 ;    
+  EXCEPTION WHEN NO_DATA_FOUND THEN 
 
      begin  select * into sp from specparam where acc = p_ACC;
             If sp.s180 = '3' then l_MDATE := p_FDAT +   7 ;            -- Вiд 0 до  7 дня
@@ -47,11 +41,4 @@ begin
    RETURN l_mdate;
 end XOZ_MDATE ;
 /
- show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/xoz_mdate.sql =========*** End *** 
- PROMPT ===================================================================================== 
- 
+show err;

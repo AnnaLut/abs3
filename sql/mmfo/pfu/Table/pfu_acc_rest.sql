@@ -31,10 +31,6 @@ COMMENT ON COLUMN PFU.PFU_ACC_REST.FILEID IS 'ׁגÿחü ס נווסענמל';
 
 
 
-PROMPT *** Create  grants  PFU_ACC_REST ***
-grant SELECT                                                                 on PFU_ACC_REST    to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_ACC_REST    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

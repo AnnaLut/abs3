@@ -53,10 +53,8 @@ PROMPT *** Create  view V_STOSCHEDULES ***
     WHERE s.recid = t.idd;
 
 PROMPT *** Create  grants  V_STOSCHEDULES ***
-grant SELECT                                                                 on V_STOSCHEDULES  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STOSCHEDULES  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_STOSCHEDULES  to STO;
-grant SELECT                                                                 on V_STOSCHEDULES  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_STOSCHEDULES  to WR_ALL_RIGHTS;
 
 

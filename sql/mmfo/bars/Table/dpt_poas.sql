@@ -93,11 +93,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_POAS ***
-grant SELECT                                                                 on DPT_POAS        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_POAS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_POAS        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_POAS        to DPT_ADMIN;
-grant SELECT                                                                 on DPT_POAS        to UPLD;
 
 
 

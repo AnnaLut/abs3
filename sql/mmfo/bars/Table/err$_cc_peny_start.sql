@@ -65,10 +65,6 @@ COMMENT ON COLUMN BARS.ERR$_CC_PENY_START.IR IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CC_PENY_START ***
-grant SELECT                                                                 on ERR$_CC_PENY_START to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CC_PENY_START to UPLD;
-
 
 
 PROMPT ===================================================================================== 

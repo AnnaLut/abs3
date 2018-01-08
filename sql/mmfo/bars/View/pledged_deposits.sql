@@ -21,11 +21,9 @@ PROMPT *** Create  view PLEDGED_DEPOSITS ***
    and pc.s031 in ('15','18');
 
 PROMPT *** Create  grants  PLEDGED_DEPOSITS ***
-grant SELECT                                                                 on PLEDGED_DEPOSITS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PLEDGED_DEPOSITS to BARS_ACCESS_DEFROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PLEDGED_DEPOSITS to DPT_ROLE;
 grant SELECT                                                                 on PLEDGED_DEPOSITS to START1;
-grant SELECT                                                                 on PLEDGED_DEPOSITS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PLEDGED_DEPOSITS to WR_ALL_RIGHTS;
 
 

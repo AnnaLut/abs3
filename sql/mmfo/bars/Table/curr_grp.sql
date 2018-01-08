@@ -91,11 +91,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CURR_GRP ***
-grant SELECT                                                                 on CURR_GRP        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CURR_GRP        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CURR_GRP        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CURR_GRP        to START1;
-grant SELECT                                                                 on CURR_GRP        to UPLD;
 
 
 

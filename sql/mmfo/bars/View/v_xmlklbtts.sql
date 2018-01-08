@@ -22,9 +22,7 @@ where tt in (select tt from op_rules where tag = 'ISOFF')
  ;
 
 PROMPT *** Create  grants  V_XMLKLBTTS ***
-grant SELECT                                                                 on V_XMLKLBTTS     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_XMLKLBTTS     to KLBX;
-grant SELECT                                                                 on V_XMLKLBTTS     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_XMLKLBTTS     to WR_ALL_RIGHTS;
 
 

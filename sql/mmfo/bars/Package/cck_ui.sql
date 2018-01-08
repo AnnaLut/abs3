@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cck_ui.sql =========*** Run *** ====
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.CCK_UI IS
+CREATE OR REPLACE PACKAGE BARS.CCK_UI IS
 
   g_header_version CONSTANT VARCHAR2(64) := 'ver.3.1. 20.07.2017';
 /*
@@ -259,7 +253,8 @@
   -------------------
 END cck_ui;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
+
+CREATE OR REPLACE PACKAGE BODY BARS.cck_ui AS
 
   g_body_version CONSTANT VARCHAR2(64) := 'ver.3.3 PLAN 29.11.2017';
   g_errn NUMBER := -20203;
@@ -2841,14 +2836,3 @@ BEGIN
   NULL;
 END cck_ui;
 /
- show err;
- 
-PROMPT *** Create  grants  CCK_UI ***
-grant EXECUTE                                                                on CCK_UI          to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/cck_ui.sql =========*** End *** ====
- PROMPT ===================================================================================== 
- 

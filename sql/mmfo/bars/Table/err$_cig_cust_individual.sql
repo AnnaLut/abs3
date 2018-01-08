@@ -119,10 +119,6 @@ COMMENT ON COLUMN BARS.ERR$_CIG_CUST_INDIVIDUAL.BRANCH IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIG_CUST_INDIVIDUAL ***
-grant SELECT                                                                 on ERR$_CIG_CUST_INDIVIDUAL to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIG_CUST_INDIVIDUAL to UPLD;
-
 
 
 PROMPT ===================================================================================== 

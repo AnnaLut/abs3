@@ -149,10 +149,6 @@ COMMENT ON COLUMN BARS.ERR$_SKRYNKA_ND.DAT_CLOSE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SKRYNKA_ND ***
-grant SELECT                                                                 on ERR$_SKRYNKA_ND to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SKRYNKA_ND to UPLD;
-
 
 
 PROMPT ===================================================================================== 

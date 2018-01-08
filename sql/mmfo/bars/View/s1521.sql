@@ -30,10 +30,8 @@ WHERE a.acc=p.acc(+) and
                         pp.bdat<=s.fdat);
 
 PROMPT *** Create  grants  S1521 ***
-grant SELECT                                                                 on S1521           to BARSREADER_ROLE;
 grant SELECT                                                                 on S1521           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on S1521           to START1;
-grant SELECT                                                                 on S1521           to UPLD;
 
 
 

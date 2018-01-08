@@ -18,9 +18,7 @@ PROMPT *** Create  view VW_ESCR_ADR_STREETS ***
    AND t2.settlement_id = t.settlement_id;
 
 PROMPT *** Create  grants  VW_ESCR_ADR_STREETS ***
-grant SELECT                                                                 on VW_ESCR_ADR_STREETS to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_ADR_STREETS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on VW_ESCR_ADR_STREETS to UPLD;
 
 
 

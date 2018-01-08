@@ -1,17 +1,26 @@
+-- ======================================================================================
+-- Module : CDM (ЄБК)
+-- Author : BAA
+-- Date   : 07.10.2016
+-- ======================================================================================
+-- create view EBK_CUST_BD_INFO_V ( contains data for send to EBK )
+-- ======================================================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET ECHO         OFF
+SET LINES        500
+SET PAGES        500
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/EBK_CUST_BD_INFO_V.sql =========*** Run
-PROMPT ===================================================================================== 
+prompt -- ======================================================
+prompt -- create view EBK_CUST_BD_INFO_V
+prompt -- ======================================================
 
-
-PROMPT *** Create  view EBK_CUST_BD_INFO_V ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.EBK_CUST_BD_INFO_V ("KF", "RNK", "DATE_ON", "DATE_OFF", "NMK", "SN_LN", "SN_FN", "SN_MN", "NMKV", "SN_GC", "CODCAGENT", "K013", "COUNTRY", "PRINSIDER", "TGR", "OKPO", "PASSP", "SER", "NUMDOC", "ORGAN", "PDATE", "DATE_PHOTO", "BDAY", "BPLACE", "SEX", "ACTUAL_DATE", "EDDR_ID", "BRANCH", "ADR", "UR_ZIP", "UR_DOMAIN", "UR_REGION", "UR_LOCALITY", "UR_ADDRESS", "UR_TERRITORY_ID", "UR_LOCALITY_TYPE", "UR_STREET_TYPE", "UR_STREET", "UR_HOME_TYPE", "UR_HOME", "UR_HOMEPART_TYPE", "UR_HOME_PART", "UR_ROOM_TYPE", "UR_ROOM", "FGADR", "FGDST", "FGOBL", "FGTWN", "MPNO", "CELLPHONE", "TELD", "TELW", "EMAIL", "ISE", "FS", "VED", "K050", "PC_Z2", "PC_Z1", "PC_Z5", "PC_Z3", "PC_Z4", "SAMZ", "VIP_K", "WORK_PLACE", "PUBLP", "CIGPO", "CHORN", "SPMRK", "WORKB", "OKPO_EXCLUSION", "BANK_CARD", "CREDIT", "DEPOSIT", "CURRENT_ACCOUNT", "OTHER") AS 
-  with ru as ( select VAL as MFO
+create or replace view EBK_CUST_BD_INFO_V
+as
+with ru as ( select VAL as MFO
                from BARS.PARAMS$GLOBAL
-              where PAR = 'GLB-MFO'
-           )
+              where PAR = 'GLB-MFO' 
+           ) 
 select ru.MFO as kf,
        c.rnk as rnk,           -- Реєстр. № (РНК)
        c.date_on as date_on,   -- дата  реєстрації
@@ -28,13 +37,13 @@ select ru.MFO as kf,
        c.prinsider as prinsider, --ознака інсайдера (К060)
        c.tgr as tgr, --тип держ. реєстру
        c.okpo as okpo, --Ідентифікаційний код
-       p.passp as passp, -- вид документу
+       p.passp as passp, -- вид документу 
        p.ser as ser, --серія
        p.numdoc as numdoc, --номер
-       p.organ as organ, --ким виданий
+       p.organ as organ, --ким виданий 
        p.pdate as pdate, --дата видачі
        p.date_photo as date_photo, --Дата вклеювання фото в паспорт
-       p.bday as bday, --дата народження
+       p.bday as bday, --дата народження 
        p.bplace as bplace, -- місце народження
        p.sex as sex,       -- стать
        p.actual_date,      -- Дійсний до
@@ -53,7 +62,7 @@ select ru.MFO as kf,
        ad.street        as ur_street, --Юр.адр:Улица
        ad.home_type     as ur_home_type, --Юр.адр:Тип дома
        ad.home          as ur_home, --Юр.адр:№ дома
-       ad.homepart_type as ur_homepart_type, --Юр.адр:Тип дел.дома
+       ad.homepart_type as ur_homepart_type, --Юр.адр:Тип дел.дома    
        ad.homepart      as ur_home_part, --Юр.адр:№ типа дел.дома
        ad.room_type     as ur_room_type, --Юр.адр:Тип жилого помещения
        ad.room          as ur_room, -- Юр.адр:№ жилого помещения
@@ -76,8 +85,8 @@ select ru.MFO as kf,
        (select cw.value from customerw cw  where cw.tag='PC_Z3' and c.rnk=cw.rnk) as pc_z3,     -- БПК. Закордонний паспорт. Ким виданий
        (select cw.value from customerw cw  where cw.tag='PC_Z4' and c.rnk=cw.rnk) as pc_z4,     -- БПК. Закордонний паспорт. Дійсний до
        (select cw.value from customerw cw  where cw.tag='SAMZ'  and c.rnk=cw.rnk) as samz,      -- Вiдмiтка про самозайнятiсть фiзособи
-       (select cw.value from customerw cw  where cw.tag='VIP_K' and c.rnk=cw.rnk) as vip_k,     -- Ознака VIP-клієнта
-       (select cw.value from customerw cw  where cw.tag='WORK'  and c.rnk=cw.rnk) as work_place,-- Місце роботи, посада
+       (select cw.value from customerw cw  where cw.tag='VIP_K' and c.rnk=cw.rnk) as vip_k,     -- Ознака VIP-клієнта  
+       (select cw.value from customerw cw  where cw.tag='WORK'  and c.rnk=cw.rnk) as work_place,-- Місце роботи, посада 
        (select cw.value from customerw cw  where cw.tag='PUBLP' and c.rnk=cw.rnk) as publp,     -- Належнiсть до публiчних дiячiв
        (select cw.value from customerw cw  where cw.tag='CIGPO' and c.rnk=cw.rnk) as cigpo,     -- Статус зайнятості особи
        (select cw.value from customerw cw  where cw.tag='CHORN' and c.rnk=cw.rnk) as chorn,     -- Категорiя громадян, якi постраждали внаслiдок Чорноб.катастрофи
@@ -85,8 +94,8 @@ select ru.MFO as kf,
        (select cw.value from customerw cw  where cw.tag='WORKB' and c.rnk=cw.rnk) as workb,     -- Приналежнiсть до працiвникiв банку
        (select cw.value from customerw cw  where cw.tag='EXCLN' and c.rnk=cw.rnk) as okpo_exclusion,
        ( case when exists (select * from w4_acc w, bars.accounts a  where w.acc_pk = a.acc and a.dazs is null  and a.rnk = c.rnk ) then 1 else 0 end ) as bank_card,
-       ( case when exists (select * from cc_deal cc where cc.rnk = c.rnk and cc.sos not in (0,2,14,15) ) then 1 else 0 end ) as credit ,
-       ( case when exists (select * from dpt_deposit dd where dd.rnk = c.rnk) then 1 else 0 end) as deposit,
+       ( case when exists (select * from cc_deal cc where cc.rnk = c.rnk and cc.sos not in (0,2,14,15) ) then 1 else 0 end ) as credit , 
+       ( case when exists (select * from dpt_deposit dd where dd.rnk = c.rnk) then 1 else 0 end) as deposit,   
        ( case when exists (select * from accounts ac where ac.rnk = c.rnk and ac.dazs is null and nbs='2620') then 1 else 0 end) as current_account,
        0 as other
   from bars.customer c
@@ -97,13 +106,10 @@ select ru.MFO as kf,
    and c.rnk = ad.rnk(+)
    and ad.type_id(+) = 1;
 
-PROMPT *** Create  grants  EBK_CUST_BD_INFO_V ***
-grant SELECT                                                                 on EBK_CUST_BD_INFO_V to BARSREADER_ROLE;
-grant SELECT                                                                 on EBK_CUST_BD_INFO_V to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on EBK_CUST_BD_INFO_V to UPLD;
+show err
 
+prompt =========================================
+prompt Grants
+prompt ==========================================
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/EBK_CUST_BD_INFO_V.sql =========*** End
-PROMPT ===================================================================================== 
+grant select on BARS.EBK_CUST_BD_INFO_V to bars_access_defrole;

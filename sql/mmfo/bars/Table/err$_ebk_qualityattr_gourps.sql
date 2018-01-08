@@ -61,10 +61,6 @@ COMMENT ON COLUMN BARS.ERR$_EBK_QUALITYATTR_GOURPS.QUALITY IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_EBK_QUALITYATTR_GOURPS ***
-grant SELECT                                                                 on ERR$_EBK_QUALITYATTR_GOURPS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_EBK_QUALITYATTR_GOURPS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

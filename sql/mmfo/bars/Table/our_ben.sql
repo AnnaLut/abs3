@@ -49,10 +49,8 @@ COMMENT ON COLUMN BARS.OUR_BEN.NAME IS '';
 
 
 PROMPT *** Create  grants  OUR_BEN ***
-grant SELECT                                                                 on OUR_BEN         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OUR_BEN         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OUR_BEN         to START1;
-grant SELECT                                                                 on OUR_BEN         to UPLD;
 
 
 

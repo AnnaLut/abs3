@@ -71,6 +71,32 @@ COMMENT ON COLUMN BARS.DPU_DEAL_SWTAGS.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_DPUDEALSWTAGS_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL_SWTAGS ADD CONSTRAINT FK_DPUDEALSWTAGS_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPUDEALSWTAGS_DPUDEAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL_SWTAGS ADD CONSTRAINT FK_DPUDEALSWTAGS_DPUDEAL FOREIGN KEY (DPU_ID)
+	  REFERENCES BARS.DPU_DEAL (DPU_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DPUDEALSWTAGS_DPUID_NN ***
 begin   
  execute immediate '
@@ -135,11 +161,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPU_DEAL_SWTAGS ***
-grant SELECT                                                                 on DPU_DEAL_SWTAGS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_DEAL_SWTAGS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_DEAL_SWTAGS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_DEAL_SWTAGS to DPT_ROLE;
-grant SELECT                                                                 on DPU_DEAL_SWTAGS to UPLD;
 
 
 

@@ -110,13 +110,11 @@ exception when others then
 
 PROMPT *** Create  grants  TARIF_SCALE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TARIF_SCALE     to ABS_ADMIN;
-grant SELECT                                                                 on TARIF_SCALE     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TARIF_SCALE     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TARIF_SCALE     to BARS_DM;
 grant SELECT                                                                 on TARIF_SCALE     to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TARIF_SCALE     to TARIF;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TARIF_SCALE     to TECH005;
-grant SELECT                                                                 on TARIF_SCALE     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TARIF_SCALE     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on TARIF_SCALE     to WR_REFREAD;
 

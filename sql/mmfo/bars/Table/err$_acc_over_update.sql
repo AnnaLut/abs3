@@ -137,10 +137,6 @@ COMMENT ON COLUMN BARS.ERR$_ACC_OVER_UPDATE.DATD2 IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ACC_OVER_UPDATE ***
-grant SELECT                                                                 on ERR$_ACC_OVER_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ACC_OVER_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

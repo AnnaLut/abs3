@@ -15,10 +15,8 @@ where GRANTEE_TYPE_ID  = resource_utl.get_resource_type_id('ARM_WEB'     )
   and RESOURCE_TYPE_ID = resource_utl.get_resource_type_id('FUNCTION_WEB');
 
 PROMPT *** Create  grants  M_ROLE_FUNW ***
-grant SELECT                                                                 on M_ROLE_FUNW     to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_FUNW     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on M_ROLE_FUNW     to START1;
-grant SELECT                                                                 on M_ROLE_FUNW     to UPLD;
 
 
 

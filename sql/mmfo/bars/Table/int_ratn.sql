@@ -75,10 +75,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_INTRATN_ACC_NN ***
+PROMPT *** Create  constraint FK_INTRATN_ACCOUNTS2 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_RATN MODIFY (ACC CONSTRAINT CC_INTRATN_ACC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.INT_RATN ADD CONSTRAINT FK_INTRATN_ACCOUNTS2 FOREIGN KEY (ACC)
+	  REFERENCES BARS.ACCOUNTS (ACC) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -87,22 +88,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_INTRATN_ID_NN ***
+PROMPT *** Create  constraint CC_INTRATN_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_RATN MODIFY (ID CONSTRAINT CC_INTRATN_ID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INTRATN_BDAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_RATN MODIFY (BDAT CONSTRAINT CC_INTRATN_BDAT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.INT_RATN MODIFY (KF CONSTRAINT CC_INTRATN_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -123,10 +112,112 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_INTRATN_KF_NN ***
+PROMPT *** Create  constraint CC_INTRATN_BDAT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_RATN MODIFY (KF CONSTRAINT CC_INTRATN_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.INT_RATN MODIFY (BDAT CONSTRAINT CC_INTRATN_BDAT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INTRATN_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_RATN MODIFY (ID CONSTRAINT CC_INTRATN_ID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INTRATN_ACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_RATN MODIFY (ACC CONSTRAINT CC_INTRATN_ACC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTRATN_INTACCN2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_RATN ADD CONSTRAINT FK_INTRATN_INTACCN2 FOREIGN KEY (KF, ACC, ID)
+	  REFERENCES BARS.INT_ACCN (KF, ACC, ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_INTACCN_INTRATN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_RATN ADD CONSTRAINT R_INTACCN_INTRATN FOREIGN KEY (ACC, ID)
+	  REFERENCES BARS.INT_ACCN (ACC, ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTRATN_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_RATN ADD CONSTRAINT FK_INTRATN_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTRATN_BRATES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_RATN ADD CONSTRAINT FK_INTRATN_BRATES FOREIGN KEY (BR)
+	  REFERENCES BARS.BRATES (BR_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTRATN_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_RATN ADD CONSTRAINT FK_INTRATN_STAFF FOREIGN KEY (IDU)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTRATN_INTIDN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_RATN ADD CONSTRAINT FK_INTRATN_INTIDN FOREIGN KEY (ID)
+	  REFERENCES BARS.INT_IDN (ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -180,7 +271,6 @@ PROMPT *** Create  grants  INT_RATN ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_RATN        to ABS_ADMIN;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on INT_RATN        to BARS009;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on INT_RATN        to BARS010;
-grant SELECT                                                                 on INT_RATN        to BARSREADER_ROLE;
 grant SELECT                                                                 on INT_RATN        to BARSUPL;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on INT_RATN        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_RATN        to BARS_DM;
@@ -192,7 +282,6 @@ grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on 
 grant SELECT                                                                 on INT_RATN        to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_RATN        to TECH005;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_RATN        to TECH006;
-grant SELECT                                                                 on INT_RATN        to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_RATN        to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_RATN        to WR_ALL_RIGHTS;
 grant INSERT,UPDATE                                                          on INT_RATN        to WR_DEPOSIT_U;

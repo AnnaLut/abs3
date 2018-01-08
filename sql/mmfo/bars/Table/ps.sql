@@ -68,6 +68,96 @@ COMMENT ON COLUMN BARS.PS.SB IS '';
 
 
 
+PROMPT *** Create  constraint FK_PS_PAP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PS ADD CONSTRAINT FK_PS_PAP FOREIGN KEY (PAP)
+	  REFERENCES BARS.PAP (PAP) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_PS_CHKNBS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PS ADD CONSTRAINT FK_PS_CHKNBS FOREIGN KEY (CHKNBS)
+	  REFERENCES BARS.CHKNBS (CHKNBS) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PS_DCLOSE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PS ADD CONSTRAINT CC_PS_DCLOSE CHECK (d_close = trunc(d_close)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PS_AUTOSTOP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PS ADD CONSTRAINT CC_PS_AUTOSTOP CHECK (auto_stop in (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_PS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PS ADD CONSTRAINT PK_PS PRIMARY KEY (NBS)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_PS_XAR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PS ADD CONSTRAINT FK_PS_XAR FOREIGN KEY (XAR)
+	  REFERENCES BARS.XAR (XAR) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint XFK_PSSB ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PS ADD CONSTRAINT XFK_PSSB FOREIGN KEY (SB)
+	  REFERENCES BARS.PS_SBFLAGS (SBFLAG) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_PS_NBS_NN ***
 begin   
  execute immediate '
@@ -116,44 +206,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_PS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PS ADD CONSTRAINT PK_PS PRIMARY KEY (NBS)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PS_AUTOSTOP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PS ADD CONSTRAINT CC_PS_AUTOSTOP CHECK (auto_stop in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PS_DCLOSE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PS ADD CONSTRAINT CC_PS_DCLOSE CHECK (d_close = trunc(d_close)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_PS ***
 begin   
  execute immediate '
@@ -169,7 +221,6 @@ exception when others then
 
 PROMPT *** Create  grants  PS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PS              to ABS_ADMIN;
-grant SELECT                                                                 on PS              to BARSREADER_ROLE;
 grant SELECT                                                                 on PS              to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PS              to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PS              to BARS_DM;
@@ -179,7 +230,6 @@ grant DELETE,INSERT,SELECT,UPDATE                                            on 
 grant SELECT                                                                 on PS              to SALGL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PS              to START1;
 grant SELECT                                                                 on PS              to TECH005;
-grant SELECT                                                                 on PS              to UPLD;
 grant SELECT                                                                 on PS              to WEB_BALANS;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PS              to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on PS              to WR_REFREAD;

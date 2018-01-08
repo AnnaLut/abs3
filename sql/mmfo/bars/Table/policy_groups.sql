@@ -75,7 +75,6 @@ exception when others then
 
 PROMPT *** Create  grants  POLICY_GROUPS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on POLICY_GROUPS   to ABS_ADMIN;
-grant SELECT                                                                 on POLICY_GROUPS   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on POLICY_GROUPS   to BARS_ACCESS_DEFROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on POLICY_GROUPS   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on POLICY_GROUPS   to WR_REFREAD;

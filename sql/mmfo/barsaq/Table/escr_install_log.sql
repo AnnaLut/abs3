@@ -35,9 +35,6 @@ COMMENT ON COLUMN BARSAQ.ESCR_INSTALL_LOG.COMMENTS IS '';
 
 
 
-PROMPT *** Create  grants  ESCR_INSTALL_LOG ***
-grant SELECT                                                                 on ESCR_INSTALL_LOG to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

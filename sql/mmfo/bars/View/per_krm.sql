@@ -50,10 +50,8 @@ PROMPT *** Create  view PER_KRM ***
 
 PROMPT *** Create  grants  PER_KRM ***
 grant DELETE,SELECT,UPDATE                                                   on PER_KRM         to BARS015;
-grant SELECT                                                                 on PER_KRM         to BARSREADER_ROLE;
 grant DELETE,SELECT,UPDATE                                                   on PER_KRM         to BARS_ACCESS_DEFROLE;
 grant DELETE,SELECT,UPDATE                                                   on PER_KRM         to START1;
-grant SELECT                                                                 on PER_KRM         to UPLD;
 
 
 

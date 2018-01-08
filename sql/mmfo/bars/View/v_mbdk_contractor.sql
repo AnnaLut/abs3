@@ -44,9 +44,7 @@ PROMPT *** Create  view V_MBDK_CONTRACTOR ***
       ORDER BY 1;
 
 PROMPT *** Create  grants  V_MBDK_CONTRACTOR ***
-grant SELECT                                                                 on V_MBDK_CONTRACTOR to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBDK_CONTRACTOR to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_MBDK_CONTRACTOR to UPLD;
 
 
 

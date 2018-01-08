@@ -24,9 +24,7 @@ PROMPT *** Create  view V_MBM_DAY_TURNOVERS ***
 from saldoa s;
 
 PROMPT *** Create  grants  V_MBM_DAY_TURNOVERS ***
-grant SELECT                                                                 on V_MBM_DAY_TURNOVERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBM_DAY_TURNOVERS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_MBM_DAY_TURNOVERS to UPLD;
 
 
 

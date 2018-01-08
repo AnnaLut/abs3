@@ -61,10 +61,6 @@ COMMENT ON COLUMN BARS.ERR$_PFU_CA_FILES_TRACKING.SYS_TIME IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_PFU_CA_FILES_TRACKING ***
-grant SELECT                                                                 on ERR$_PFU_CA_FILES_TRACKING to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_PFU_CA_FILES_TRACKING to UPLD;
-
 
 
 PROMPT ===================================================================================== 

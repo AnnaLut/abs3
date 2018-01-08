@@ -127,10 +127,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTBONUS_BONUSNAME_NN ***
+PROMPT *** Create  constraint CC_DPTBONUS_DATEON_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_BONUSES MODIFY (BONUS_NAME CONSTRAINT CC_DPTBONUS_BONUSNAME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_BONUSES MODIFY (BONUS_ON CONSTRAINT CC_DPTBONUS_DATEON_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -187,10 +187,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTBONUS_DATEON_NN ***
+PROMPT *** Create  constraint CC_DPTBONUS_BONUSNAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_BONUSES MODIFY (BONUS_ON CONSTRAINT CC_DPTBONUS_DATEON_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_BONUSES MODIFY (BONUS_NAME CONSTRAINT CC_DPTBONUS_BONUSNAME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -213,11 +213,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_BONUSES ***
-grant SELECT                                                                 on DPT_BONUSES     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_BONUSES     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_BONUSES     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_BONUSES     to DPT_ADMIN;
-grant SELECT                                                                 on DPT_BONUSES     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_BONUSES     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_BONUSES     to WR_REFREAD;
 

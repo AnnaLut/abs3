@@ -63,6 +63,32 @@ COMMENT ON COLUMN BARS.MIGR_WEBUSERS.WEBLOGIN IS 'Логін користувача';
 
 
 
+PROMPT *** Create  constraint FK_MIGRWEBUSERS_USERTYPES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MIGR_WEBUSERS ADD CONSTRAINT FK_MIGRWEBUSERS_USERTYPES FOREIGN KEY (USER_TYPE)
+	  REFERENCES BARS.MIGR_USER_TYPES (TYPE_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_MIGRWEBUSERS_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MIGR_WEBUSERS ADD CONSTRAINT FK_MIGRWEBUSERS_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_MIGR_WEBUSERS_FIO_NN ***
 begin   
  execute immediate '
@@ -99,11 +125,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  MIGR_WEBUSERS ***
-grant SELECT                                                                 on MIGR_WEBUSERS   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MIGR_WEBUSERS   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MIGR_WEBUSERS   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MIGR_WEBUSERS   to START1;
-grant SELECT                                                                 on MIGR_WEBUSERS   to UPLD;
 
 
 

@@ -75,10 +75,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SECATTRJOURNAL_RECID_NN ***
+PROMPT *** Create  constraint FK_SECATTRJOURNAL_STAFF2 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_ATTR_JOURNAL MODIFY (REC_ID CONSTRAINT CC_SECATTRJOURNAL_RECID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEC_ATTR_JOURNAL ADD CONSTRAINT FK_SECATTRJOURNAL_STAFF2 FOREIGN KEY (USER_ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -87,22 +88,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SECATTRJOURNAL_WHOGRANT_NN ***
+PROMPT *** Create  constraint CC_SECATTRJOURNAL_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_ATTR_JOURNAL MODIFY (WHO_GRANT CONSTRAINT CC_SECATTRJOURNAL_WHOGRANT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SECATTRJOURNAL_DATEGRANT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEC_ATTR_JOURNAL MODIFY (DATE_GRANT CONSTRAINT CC_SECATTRJOURNAL_DATEGRANT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEC_ATTR_JOURNAL MODIFY (BRANCH CONSTRAINT CC_SECATTRJOURNAL_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -123,10 +112,73 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SECATTRJOURNAL_BRANCH_NN ***
+PROMPT *** Create  constraint CC_SECATTRJOURNAL_DATEGRANT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_ATTR_JOURNAL MODIFY (BRANCH CONSTRAINT CC_SECATTRJOURNAL_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEC_ATTR_JOURNAL MODIFY (DATE_GRANT CONSTRAINT CC_SECATTRJOURNAL_DATEGRANT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SECATTRJOURNAL_WHOGRANT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEC_ATTR_JOURNAL MODIFY (WHO_GRANT CONSTRAINT CC_SECATTRJOURNAL_WHOGRANT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SECATTRJOURNAL_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEC_ATTR_JOURNAL ADD CONSTRAINT FK_SECATTRJOURNAL_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SECATTRJOURNAL_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEC_ATTR_JOURNAL ADD CONSTRAINT FK_SECATTRJOURNAL_STAFF FOREIGN KEY (WHO_GRANT)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SECATTRJOURNAL_SECATTR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEC_ATTR_JOURNAL ADD CONSTRAINT FK_SECATTRJOURNAL_SECATTR FOREIGN KEY (ATTR_ID)
+	  REFERENCES BARS.SEC_ATTRIBUTES (ATTR_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SECATTRJOURNAL_RECID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEC_ATTR_JOURNAL MODIFY (REC_ID CONSTRAINT CC_SECATTRJOURNAL_RECID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -150,10 +202,8 @@ exception when others then
 
 PROMPT *** Create  grants  SEC_ATTR_JOURNAL ***
 grant INSERT,SELECT                                                          on SEC_ATTR_JOURNAL to ABS_ADMIN;
-grant SELECT                                                                 on SEC_ATTR_JOURNAL to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on SEC_ATTR_JOURNAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEC_ATTR_JOURNAL to BARS_DM;
-grant SELECT                                                                 on SEC_ATTR_JOURNAL to UPLD;
 
 
 

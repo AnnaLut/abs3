@@ -13,10 +13,8 @@ PROMPT *** Create  view V_ACCM_STATE_SNAP ***
  where s.caldt_id=c.caldt_id;
 
 PROMPT *** Create  grants  V_ACCM_STATE_SNAP ***
-grant SELECT                                                                 on V_ACCM_STATE_SNAP to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACCM_STATE_SNAP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ACCM_STATE_SNAP to START1;
-grant SELECT                                                                 on V_ACCM_STATE_SNAP to UPLD;
 
 
 

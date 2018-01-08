@@ -80,9 +80,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CHKLIST_TTS_GOU ***
-grant SELECT                                                                 on CHKLIST_TTS_GOU to BARSREADER_ROLE;
 grant SELECT                                                                 on CHKLIST_TTS_GOU to BARS_DM;
-grant SELECT                                                                 on CHKLIST_TTS_GOU to UPLD;
 
 
 

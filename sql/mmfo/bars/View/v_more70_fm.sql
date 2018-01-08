@@ -35,10 +35,8 @@ select a.rnk, a.acc, sum(o.sq) as s_k
     where sum_kas*100/sum_ob > 70;
 
 PROMPT *** Create  grants  V_MORE70_FM ***
-grant SELECT                                                                 on V_MORE70_FM     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MORE70_FM     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_MORE70_FM     to CUST001;
-grant SELECT                                                                 on V_MORE70_FM     to UPLD;
 
 
 

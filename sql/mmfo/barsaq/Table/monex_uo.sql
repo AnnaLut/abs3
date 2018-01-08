@@ -88,7 +88,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  MONEX_UO ***
-grant SELECT                                                                 on MONEX_UO        to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MONEX_UO        to START1;
 
 

@@ -65,10 +65,6 @@ COMMENT ON COLUMN BARS.ERR$_EBKC_REQ_UPDATECARD.CUST_TYPE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_EBKC_REQ_UPDATECARD ***
-grant SELECT                                                                 on ERR$_EBKC_REQ_UPDATECARD to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_EBKC_REQ_UPDATECARD to UPLD;
-
 
 
 PROMPT ===================================================================================== 

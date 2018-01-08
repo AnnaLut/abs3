@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции BP2
-prompt Наименование операции: BP2 d Розрахунки за отриманими інвестиційними монетами через фельдсжбу
+prompt Наименование операции: d Розрахунки за отриманими інвестиційними монетами через фельдсжбу
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('BP2', 'BP2 d Розрахунки за отриманими інвестиційними монетами через фельдсжбу', 1, null, 980, '#(NBS_OB22(''1007'',''01''))', 980, null, null, null, null, 0, 0, 1, 0, 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', null, null, null, null, '0000100001000001000000000000000000010000000000000000000000000000', null);
+    values ('BP2', 'd Розрахунки за отриманими інвестиційними монетами через фельдсжбу', 1, null, 980, '#(NBS_OB22(''1007'',''01''))', 980, null, null, null, null, 0, 0, 1, 0, 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', null, null, null, null, '0000100001000001000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='BP2', name='BP2 d Розрахунки за отриманими інвестиційними монетами через фельдсжбу', dk=1, nlsm=null, kv=980, nlsk='#(NBS_OB22(''1007'',''01''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', s2='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', sk=null, proc=null, s3800=null, rang=null, flags='0000100001000001000000000000000000010000000000000000000000000000', nazn=null
+         set tt='BP2', name='d Розрахунки за отриманими інвестиційними монетами через фельдсжбу', dk=1, nlsm=null, kv=980, nlsk='#(NBS_OB22(''1007'',''01''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', s2='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', sk=null, proc=null, s3800=null, rang=null, flags='0000100001000001000000000000000000010000000000000000000000000000', nazn=null
        where tt='BP2';
   end;
   --------------------------------

@@ -135,6 +135,45 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OWLOCPAYMATCH_ACCOUNTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_LOCPAY_MATCH ADD CONSTRAINT FK_OWLOCPAYMATCH_ACCOUNTS FOREIGN KEY (ACC)
+	  REFERENCES BARS.ACCOUNTS (ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OWLOCPAYMATCH_OWOICREV ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_LOCPAY_MATCH ADD CONSTRAINT FK_OWLOCPAYMATCH_OWOICREV FOREIGN KEY (REVFILE_NAME)
+	  REFERENCES BARS.OW_OICREVFILES (FILE_NAME) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OWLOCPAYMATCH_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_LOCPAY_MATCH ADD CONSTRAINT FK_OWLOCPAYMATCH_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OWLOCPAYMATCH_KF_NN ***
 begin   
  execute immediate '
@@ -151,20 +190,6 @@ PROMPT *** Create  index PK_OWLOCPAYMATCH ***
 begin   
  execute immediate '
   CREATE UNIQUE INDEX BARS.PK_OWLOCPAYMATCH ON BARS.OW_LOCPAY_MATCH (REF) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index I_OWLOCPAYMATCH_ACC ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.I_OWLOCPAYMATCH_ACC ON BARS.OW_LOCPAY_MATCH (ACC) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYNI ';
 exception when others then
@@ -305,9 +330,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_LOCPAY_MATCH ***
-grant SELECT                                                                 on OW_LOCPAY_MATCH to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_LOCPAY_MATCH to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on OW_LOCPAY_MATCH to UPLD;
 
 
 

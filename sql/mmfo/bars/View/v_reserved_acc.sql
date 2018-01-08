@@ -16,10 +16,8 @@ PROMPT *** Create  view V_RESERVED_ACC ***
    and c.date_off is null;
 
 PROMPT *** Create  grants  V_RESERVED_ACC ***
-grant SELECT                                                                 on V_RESERVED_ACC  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_RESERVED_ACC  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_RESERVED_ACC  to CUST001;
-grant SELECT                                                                 on V_RESERVED_ACC  to UPLD;
 grant FLASHBACK,SELECT                                                       on V_RESERVED_ACC  to WR_REFREAD;
 
 

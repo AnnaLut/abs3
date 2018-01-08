@@ -1,3 +1,5 @@
+SET SERVEROUTPUT ON 
+SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_@WF1.sql =========*
 PROMPT ===================================================================================== 
@@ -16,11 +18,11 @@ PROMPT *** Create/replace  ARM  $RM_@WF1 ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-	d integer := 0;
+    d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_@WF1 створюємо (або оновлюємо) АРМ АРМ SWIFT. Обробка повідомлень (повна) ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
-                             P_ARM_NAME              => l_application_name,
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
+                             P_ARM_NAME              => l_application_name, 
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -28,365 +30,353 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Друк звітів ********** ');
           --  Створюємо функцію Друк звітів
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Друк звітів',
                                                   p_funcname => '/barsroot/cbirep/rep_list.aspx?codeapp=\S*',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
-
-      --  Створюємо дочірню функцію Друк звітів
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Друк звітів',
-															  p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+     
 
       --  Створюємо дочірню функцію Друк звітів
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Друк звітів',
-															  p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Друк звітів',
+                                                              p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Друк звітів
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'Друк звітів',
+                                                              p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Візування комісій (190) ********** ');
           --  Створюємо функцію Візування комісій (190)
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Візування комісій (190)',
                                                   p_funcname => '/barsroot/checkinner/default.aspx?type=8',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію NLF Картотека надходжень на конс. бал/рахунок 3739 (тип NLF) ********** ');
-          --  Створюємо функцію NLF Картотека надходжень на конс. бал/рахунок 3739 (тип NLF)
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'NLF Картотека надходжень на конс. бал/рахунок 3739 (тип NLF)',
-                                                  p_funcname => '/barsroot/gl/nl/index?tip=nlf&ttList=65',
-                                                  p_rolename => '' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Х-3) База значень <50 K> для МТ-103 (О) ********** ');
           --  Створюємо функцію Х-3) База значень <50 K> для МТ-103 (О)
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Х-3) База значень <50 K> для МТ-103 (О)',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0&sPar=TEST_50K',
-                                                  p_rolename => 'START1' ,
+                                                  p_rolename => 'START1' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перекриття  погашення кредитів Крим ********** ');
           --  Створюємо функцію Перекриття  погашення кредитів Крим
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Перекриття  погашення кредитів Крим',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=TSEL023[NSIFUNCTION][PROC=>SPS.SEL023(7,324,''PER_KRM'')][EXEC=>BEFORE][CONDITIONS=>US_ID=sys_context(''bars_global'',''user_id'')]',
-                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,
+                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Х-1) Фільтр по переадресації СВІФТ-повідомлень на /262* ********** ');
           --  Створюємо функцію Х-1) Фільтр по переадресації СВІФТ-повідомлень на /262*
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Х-1) Фільтр по переадресації СВІФТ-повідомлень на /262*',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=VEST_SWT_RU[PROC=>LORO.SWIFT_RU(99,0,:P)][PAR=>:P(SEM=1/0=Форм/Без)][EXEC=>BEFORE][MSG=>ОК !]',
-                                                  p_rolename => 'START1' ,
+                                                  p_rolename => 'START1' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Х-2) Авто-Переадресацiя СВIФТ-повiдомлень на /262* ********** ');
           --  Створюємо функцію Х-2) Авто-Переадресацiя СВIФТ-повiдомлень на /262*
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Х-2) Авто-Переадресацiя СВIФТ-повiдомлень на /262*',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=[PROC=>LORO.SWIFT_RU(0,:N,:P)][PAR=>:P(SEM=Поле_50K,REF=TEST_50K),:N(SEM=SWREF_или_ПУСТО,TYPE=N)][QST=>Виконати переадресацiю SWT-103 на /262* ?][MSG=>ОК!]',
-                                                  p_rolename => 'START1' ,
+                                                  p_rolename => 'START1' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. Коррахунки банку ********** ');
           --  Створюємо функцію SWIFT. Коррахунки банку
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'SWIFT. Коррахунки банку',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_CORR_ACC&accessCode=0',
-                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,
+                                                  p_rolename => 'bars_access_defrole' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. Імпортовані повідомлення БЕЗ аутентифікації ********** ');
           --  Створюємо функцію SWIFT. Імпортовані повідомлення БЕЗ аутентифікації
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'SWIFT. Імпортовані повідомлення БЕЗ аутентифікації',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_SW_AUTH_MESSAGES&accessCode=1&sPar=[NSIFUNCTION][CONDITIONS=>DATE_IN>=sysdate-30]',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. Прогноз стану НОСТРО рахунків ********** ');
           --  Створюємо функцію SWIFT. Прогноз стану НОСТРО рахунків
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'SWIFT. Прогноз стану НОСТРО рахунків',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_SW_FORECAST_NOSTRO&accessCode=1',
-                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,
+                                                  p_rolename => 'bars_access_defrole' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довідники NEW ********** ');
           --  Створюємо функцію Довідники NEW
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Довідники NEW',
                                                   p_funcname => '/barsroot/referencebook/referencelist/',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Обробка запитів ********** ');
           --  Створюємо функцію Обробка запитів
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Обробка запитів',
                                                   p_funcname => '/barsroot/requestsProcessing/requestsProcessing',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію СЕП. Технологічні рахунки ********** ');
           --  Створюємо функцію СЕП. Технологічні рахунки
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'СЕП. Технологічні рахунки',
                                                   p_funcname => '/barsroot/sep/septechaccounts/',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. Архів повідомлень ********** ');
-          --  Створюємо функцію SWIFT. Архів повідомлень
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'SWIFT. Архів повідомлень',
-                                                  p_funcname => '/barsroot/swi/archive.aspx',
-                                                  p_rolename => '' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
-
-      --  Створюємо дочірню функцію SWIFT. Архів повідомлень(дочірня)
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'SWIFT. Архів повідомлень(дочірня)',
-															  p_funcname => '/barsroot/swi/pickup_doc.aspx?swref=/d+',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Nostro Reconciliation ********** ');
-          --  Створюємо функцію Nostro Reconciliation
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Nostro Reconciliation',
-                                                  p_funcname => '/barsroot/swi/reconsilation.aspx',
-                                                  p_rolename => 'START1' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
-
-      --  Створюємо дочірню функцію Перегляд SWIFT
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Перегляд SWIFT',
-															  p_funcname => '/barsroot/documentview/view_swift.aspx?swref=\d+',
-															  p_rolename => 'BARS_ACCESS_DEFROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
-
-      --  Створюємо дочірню функцію Nostro Reconciliation
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Nostro Reconciliation',
-															  p_funcname => '/barsroot/swi/reconsilation_tt.aspx?stmt_ref=\d+&coln=\d+',
-															  p_rolename => 'START1' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
-
-      --  Створюємо дочірню функцію Nostro Reconciliation
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Nostro Reconciliation',
-															  p_funcname => '/barsroot/swi/reconsilation_link_swt.aspx?stmt_ref=\d+&coln=\d+',
-															  p_rolename => 'START1' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. Перегляд нерозібраних та необроблених SWIFT повідомлень ********** ');
-          --  Створюємо функцію SWIFT. Перегляд нерозібраних та необроблених SWIFT повідомлень
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'SWIFT. Перегляд нерозібраних та необроблених SWIFT повідомлень',
-                                                  p_funcname => '/barsroot/swi/undistributed.aspx',
-                                                  p_rolename => 'START1' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
-
-      --  Створюємо дочірню функцію Користувачі SWIFT
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Користувачі SWIFT',
-															  p_funcname => '/barsroot/swi/swi_users.aspx?fromUser=/d+',
-															  p_rolename => 'START1' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT.Видалення прив"язки документів ********** ');
-          --  Створюємо функцію SWIFT.Видалення прив"язки документів
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'SWIFT.Видалення прив"язки документів',
-                                                  p_funcname => '/barsroot/swi/unlink_document.aspx',
-                                                  p_rolename => 'START1' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. Пошук повідомлень ********** ');
           --  Створюємо функцію SWIFT. Пошук повідомлень
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'SWIFT. Пошук повідомлень',
                                                   p_funcname => '/barsroot/swift/search',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
+     
 
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. Архів повідомлень ********** ');
+          --  Створюємо функцію SWIFT. Архів повідомлень
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'SWIFT. Архів повідомлень',
+                                                  p_funcname => '/barsroot/swi/archive.aspx',
+                                                  p_rolename => '' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
+     
+
+      --  Створюємо дочірню функцію SWIFT. Архів повідомлень(дочірня)
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'SWIFT. Архів повідомлень(дочірня)',
+                                                              p_funcname => '/barsroot/swi/pickup_doc.aspx?swref=/d+',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Nostro Reconciliation ********** ');
+          --  Створюємо функцію Nostro Reconciliation
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Nostro Reconciliation',
+                                                  p_funcname => '/barsroot/swi/reconsilation.aspx',
+                                                  p_rolename => 'START1' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
+     
+
+      --  Створюємо дочірню функцію Перегляд SWIFT
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'Перегляд SWIFT',
+                                                              p_funcname => '/barsroot/documentview/view_swift.aspx?swref=\d+',
+                                                              p_rolename => 'bars_access_defrole' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Nostro Reconciliation
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'Nostro Reconciliation',
+                                                              p_funcname => '/barsroot/swi/reconsilation_tt.aspx?stmt_ref=\d+&coln=\d+',
+                                                              p_rolename => 'START1' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Nostro Reconciliation
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'Nostro Reconciliation',
+                                                              p_funcname => '/barsroot/swi/reconsilation_link_swt.aspx?stmt_ref=\d+&coln=\d+',
+                                                              p_rolename => 'START1' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. Перегляд нерозібраних та необроблених SWIFT повідомлень ********** ');
+          --  Створюємо функцію SWIFT. Перегляд нерозібраних та необроблених SWIFT повідомлень
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'SWIFT. Перегляд нерозібраних та необроблених SWIFT повідомлень',
+                                                  p_funcname => '/barsroot/swi/undistributed.aspx',
+                                                  p_rolename => 'START1' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
+     
+
+      --  Створюємо дочірню функцію Користувачі SWIFT
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'Користувачі SWIFT',
+                                                              p_funcname => '/barsroot/swi/swi_users.aspx?fromUser=/d+',
+                                                              p_rolename => 'START1' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT.Видалення прив"язки документів ********** ');
+          --  Створюємо функцію SWIFT.Видалення прив"язки документів
+      l := l +1;
+      l_function_ids.extend(l);      
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'SWIFT.Видалення прив"язки документів',
+                                                  p_funcname => '/barsroot/swi/unlink_document.aspx',
+                                                  p_rolename => 'START1' ,    
+                                                  p_frontend => l_application_type_id
+                                                  );
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Формування виписок МТ-950 ********** ');
           --  Створюємо функцію Формування виписок МТ-950
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Формування виписок МТ-950',
                                                   p_funcname => '/barsroot/swift/stmt950',
-                                                  p_rolename => 'START1' ,
+                                                  p_rolename => 'START1' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. CLAIMS. Обробка прийнятих повідомлень ********** ');
           --  Створюємо функцію SWIFT. CLAIMS. Обробка прийнятих повідомлень
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'SWIFT. CLAIMS. Обробка прийнятих повідомлень',
                                                   p_funcname => '/barsroot/swift/swift?isClaims=true',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. Обробка прийнятих повідомлень ********** ');
           --  Створюємо функцію SWIFT. Обробка прийнятих повідомлень
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'SWIFT. Обробка прийнятих повідомлень',
                                                   p_funcname => '/barsroot/swift/swift?strPar02=',
-                                                  p_rolename => 'START1' ,
+                                                  p_rolename => 'START1' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. Розподіл/Обробка прийнятих повідомлень ********** ');
           --  Створюємо функцію SWIFT. Розподіл/Обробка прийнятих повідомлень
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'SWIFT. Розподіл/Обробка прийнятих повідомлень',
                                                   p_funcname => '/barsroot/swift/swift?strPar02=&sUserF=0',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. Обробка прийнятих повідомлень(не термінових) ********** ');
           --  Створюємо функцію SWIFT. Обробка прийнятих повідомлень(не термінових)
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'SWIFT. Обробка прийнятих повідомлень(не термінових)',
                                                   p_funcname => '/barsroot/swift/swift?strPar02=&sUserF=0&sFILTR=noturgently',
-                                                  p_rolename => 'START1' ,
+                                                  p_rolename => 'START1' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. Обробка прийнятих повідомлень(термінових) ********** ');
           --  Створюємо функцію SWIFT. Обробка прийнятих повідомлень(термінових)
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'SWIFT. Обробка прийнятих повідомлень(термінових)',
                                                   p_funcname => '/barsroot/swift/swift?strPar02=&sUserF=0&sFILTR=urgently',
-                                                  p_rolename => 'START1' ,
+                                                  p_rolename => 'START1' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. Управління формуванням повідомлень(950) ********** ');
           --  Створюємо функцію SWIFT. Управління формуванням повідомлень(950)
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'SWIFT. Управління формуванням повідомлень(950)',
                                                   p_funcname => '/barsroot/swift/unlockmsg?mt=950',
-                                                  p_rolename => 'START1' ,
+                                                  p_rolename => 'START1' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_@WF1) - АРМ SWIFT. Обробка повідомлень (повна)  ');
     l := l_function_ids.first;
@@ -394,8 +384,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-
-
+     
+     
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -409,15 +399,6 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
-umu.add_report2arm(261,'$RM_@WF1');
-umu.add_report2arm(263,'$RM_@WF1');
-umu.add_report2arm(1012,'$RM_@WF1');
-umu.add_report2arm(100071,'$RM_@WF1');
-umu.add_report2arm(100072,'$RM_@WF1');
-umu.add_report2arm(100073,'$RM_@WF1');
-umu.add_report2arm(100952,'$RM_@WF1');
-umu.add_report2arm(100953,'$RM_@WF1');
-commit;
 end;
 /
 

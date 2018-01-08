@@ -18,10 +18,8 @@ PROMPT *** Create  view V_BANKS_REPORT_INT ***
      FROM tmp_irep;
 
 PROMPT *** Create  grants  V_BANKS_REPORT_INT ***
-grant SELECT                                                                 on V_BANKS_REPORT_INT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BANKS_REPORT_INT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BANKS_REPORT_INT to RPBN002;
-grant SELECT                                                                 on V_BANKS_REPORT_INT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BANKS_REPORT_INT to WR_ALL_RIGHTS;
 
 

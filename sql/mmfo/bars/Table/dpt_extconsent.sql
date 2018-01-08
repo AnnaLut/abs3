@@ -67,6 +67,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_DPTEXTCONSENT_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_EXTCONSENT ADD CONSTRAINT FK_DPTEXTCONSENT_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DPTEXTCONSENT_DPTID_NN ***
 begin   
  execute immediate '
@@ -130,12 +143,10 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_EXTCONSENT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_EXTCONSENT  to ABS_ADMIN;
-grant SELECT                                                                 on DPT_EXTCONSENT  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_EXTCONSENT  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_EXTCONSENT  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_EXTCONSENT  to DPT_ADMIN;
 grant SELECT                                                                 on DPT_EXTCONSENT  to START1;
-grant SELECT                                                                 on DPT_EXTCONSENT  to UPLD;
 
 
 

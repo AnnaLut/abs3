@@ -1,14 +1,38 @@
+-- ======================================================================================
+-- Module : SOC
+-- Author : BAA
+-- Date   : 14.07.2016
+-- ======================================================================================
+-- create view V_DPT_FILE_IMPR_DTL
+-- ======================================================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET ECHO         OFF
+SET LINES        500
+SET PAGES        500
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_DPT_FILE_IMPR_DTL.sql =========*** Ru
-PROMPT ===================================================================================== 
+prompt -- ======================================================
+prompt -- create view V_DPT_FILE_IMPR_DTL
+prompt -- ======================================================
 
-
-PROMPT *** Create  view V_DPT_FILE_IMPR_DTL ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_DPT_FILE_IMPR_DTL ("KF", "USR_ID", "FILE_DT", "FILE_TP", "FILE_NM", "FILE_SUM", "FILE_QTY", "FILE_HDR_ID", "TOT_AMT", "TOT_QTY", "PAID_QTY", "PAID_AMT", "BAD_QTY", "CLS_QTY", "PYMT_QTY") AS 
-  select fh.KF
+create or replace view V_DPT_FILE_IMPR_DTL
+( KF
+, USR_ID
+, FILE_DT
+, FILE_TP
+, FILE_NM
+, FILE_SUM
+, FILE_QTY
+, FILE_HDR_ID
+, TOT_AMT
+, TOT_QTY
+, PAID_QTY
+, PAID_AMT
+, BAD_QTY
+, CLS_QTY
+, PYMT_QTY
+) as
+select fh.KF
      , fh.USR_ID
      , fh.DAT     as FILE_DT
      , fh.TYPE_ID as FILE_TP
@@ -42,12 +66,6 @@ PROMPT *** Create  view V_DPT_FILE_IMPR_DTL ***
    and fh.USR_ID = USER_ID
 ;
 
-PROMPT *** Create  grants  V_DPT_FILE_IMPR_DTL ***
-grant SELECT                                                                 on V_DPT_FILE_IMPR_DTL to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DPT_FILE_IMPR_DTL to UPLD;
+show errors
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_DPT_FILE_IMPR_DTL.sql =========*** En
-PROMPT ===================================================================================== 
+grant select on V_DPT_FILE_IMPR_DTL to BARS_ACCESS_DEFROLE;

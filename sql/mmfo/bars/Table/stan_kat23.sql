@@ -107,7 +107,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  STAN_KAT23 ***
-grant SELECT                                                                 on STAN_KAT23      to BARSREADER_ROLE;
 grant SELECT                                                                 on STAN_KAT23      to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAN_KAT23      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAN_KAT23      to START1;

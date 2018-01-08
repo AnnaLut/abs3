@@ -86,7 +86,7 @@ is
     --                                                             --
     --         Свод документов дня                                 --
     -- 04.12.2017 Сухова - добавлено население виртуальніми оборотами по переходу на форі йплан счетов
-    -- В будущем желательно убрать. чтобы не делать лишний поиск ,
+    -- В будущем желательно убрать. чтобы не делать лишний поиск ,                                    
     -----------------------------------------------------------------
 
 
@@ -319,7 +319,7 @@ is
         insert into part_zvt_doc (fdat, isp, kv, tt, ref, stmt, nlsd,nlsk,branch,tema,sq,s, kf)
         select dat_alt, isp, kv, '024', -1,  0, decode (zn,1,nlsalt,nls),  decode(zn,1,nls,nlsalt), branch, 80, gl.p_icurval(kv,vx,p_FDAT), vx, kf
         from (select dat_alt, isp, kv, ABS(fost(acc,(p_FDAT-1))) vx, sign(fost(acc,(p_FDAT-1))) zn,  nls, nlsalt, branch, kf
-              from accounts where nlsalt is not null and dat_alt = p_FDAT and fost(acc,(p_FDAT-1)) <>0
+              from accounts where nlsalt is not null and dat_alt = p_FDAT and fost(acc,(p_FDAT-1)) <>0 
               );
 
     end;
@@ -345,9 +345,9 @@ is
                              )
              ) fd
         where n = p_days_before;
-
-         purge_table_for_date(l_bankdate);
-
+  
+         purge_table_for_date(l_bankdate);     
+          
         for c in (select kf from mv_kf) loop
            bc.go('/'||c.kf||'/');
            nest_report_table( l_bankdate );

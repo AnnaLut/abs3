@@ -135,11 +135,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_KOL_SP ***
-grant SELECT                                                                 on CC_KOL_SP       to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_KOL_SP       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_KOL_SP       to BARS_DM;
 grant SELECT                                                                 on CC_KOL_SP       to RCC_DEAL;
-grant SELECT                                                                 on CC_KOL_SP       to UPLD;
 
 
 

@@ -25,11 +25,9 @@ and (s.id=USER_ID OR s.id IN
 
 PROMPT *** Create  grants  V_USERREFAPP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_USERREFAPP    to ABS_ADMIN;
-grant SELECT                                                                 on V_USERREFAPP    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_USERREFAPP    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_USERREFAPP    to BASIC_INFO;
 grant SELECT                                                                 on V_USERREFAPP    to START1;
-grant SELECT                                                                 on V_USERREFAPP    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USERREFAPP    to WR_ALL_RIGHTS;
 
 

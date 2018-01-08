@@ -69,10 +69,6 @@ COMMENT ON COLUMN BARS.ERR$_OW_ACC_HISTORY.RESP_TEXT IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OW_ACC_HISTORY ***
-grant SELECT                                                                 on ERR$_OW_ACC_HISTORY to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OW_ACC_HISTORY to UPLD;
-
 
 
 PROMPT ===================================================================================== 

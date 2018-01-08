@@ -47,10 +47,6 @@ PROMPT *** Create  view V_CIG_REPORTS ***
   from cig_reports r, STAFF$BASE s
  where r.user_id = s.id;
 
-PROMPT *** Create  grants  V_CIG_REPORTS ***
-grant SELECT                                                                 on V_CIG_REPORTS   to BARSREADER_ROLE;
-grant SELECT                                                                 on V_CIG_REPORTS   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -14,9 +14,7 @@ from fx_deal  f , customer c
 where f.rnk = c.rnk (+)  and   f.deal_tag = to_number (pul.get('DSW') ) ;
 
 PROMPT *** Create  grants  V_FX_SWAP0 ***
-grant SELECT                                                                 on V_FX_SWAP0      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_FX_SWAP0      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_FX_SWAP0      to UPLD;
 
 
 

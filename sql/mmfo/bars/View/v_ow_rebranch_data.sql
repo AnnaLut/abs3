@@ -11,9 +11,7 @@ PROMPT *** Create  view V_OW_REBRANCH_DATA ***
   select t.id, t.fileid, t.idn, t.rnk, t.nls, t.branch, t.state, t.msg from ow_rebranch_data t;
 
 PROMPT *** Create  grants  V_OW_REBRANCH_DATA ***
-grant SELECT                                                                 on V_OW_REBRANCH_DATA to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_REBRANCH_DATA to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_OW_REBRANCH_DATA to UPLD;
 
 
 

@@ -79,12 +79,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_FUNCTIONS ***
-grant SELECT                                                                 on REZ_FUNCTIONS   to BARSREADER_ROLE;
 grant SELECT                                                                 on REZ_FUNCTIONS   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ_FUNCTIONS   to BARS_DM;
 grant SELECT                                                                 on REZ_FUNCTIONS   to RCC_DEAL;
 grant SELECT                                                                 on REZ_FUNCTIONS   to START1;
-grant SELECT                                                                 on REZ_FUNCTIONS   to UPLD;
 
 
 

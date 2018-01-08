@@ -143,6 +143,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_PRVNDEALSVAR_PRVNDEALSCONST ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRVN_FLOW_DEALS_VAR ADD CONSTRAINT FK_PRVNDEALSVAR_PRVNDEALSCONST FOREIGN KEY (ID)
+	  REFERENCES BARS.PRVN_FLOW_DEALS_CONST (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_PRVN_F_D_VAR ***
 begin   
  execute immediate '
@@ -171,11 +184,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRVN_FLOW_DEALS_VAR ***
-grant SELECT                                                                 on PRVN_FLOW_DEALS_VAR to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on PRVN_FLOW_DEALS_VAR to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRVN_FLOW_DEALS_VAR to BARS_DM;
 grant SELECT,UPDATE                                                          on PRVN_FLOW_DEALS_VAR to START1;
-grant SELECT                                                                 on PRVN_FLOW_DEALS_VAR to UPLD;
 
 
 

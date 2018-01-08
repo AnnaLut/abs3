@@ -67,6 +67,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CUSTBIZSECTOR_CUSTBIZLINE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUST_BUSINESS_SECTOR ADD CONSTRAINT FK_CUSTBIZSECTOR_CUSTBIZLINE FOREIGN KEY (LINE_ID)
+	  REFERENCES BARS.CUST_BUSINESS_LINE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_CUSTBIZSECTOR_ID_NN ***
 begin   
  execute immediate '
@@ -105,7 +118,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUST_BUSINESS_SECTOR ***
-grant SELECT                                                                 on CUST_BUSINESS_SECTOR to BARSREADER_ROLE;
 grant SELECT                                                                 on CUST_BUSINESS_SECTOR to BARSUPL;
 grant SELECT                                                                 on CUST_BUSINESS_SECTOR to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUST_BUSINESS_SECTOR to BARS_DM;

@@ -87,9 +87,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_ACC_HISTORY ***
-grant SELECT                                                                 on OW_ACC_HISTORY  to BARSREADER_ROLE;
 grant SELECT                                                                 on OW_ACC_HISTORY  to BARS_DM;
-grant SELECT                                                                 on OW_ACC_HISTORY  to UPLD;
 
 
 

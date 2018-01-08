@@ -105,13 +105,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DOC_ATTR ***
-grant SELECT                                                                 on DOC_ATTR        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DOC_ATTR        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DOC_ATTR        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DOC_ATTR        to CC_DOC;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DOC_ATTR        to DPT_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DOC_ATTR        to START1;
-grant SELECT                                                                 on DOC_ATTR        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DOC_ATTR        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DOC_ATTR        to WR_REFREAD;
 

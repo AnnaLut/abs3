@@ -77,10 +77,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_KORDEFAULT_CODEVAR ***
+PROMPT *** Create  constraint PK_KORDEFAULT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_KOR_DEFAULT MODIFY (CODE_VAR CONSTRAINT CC_KORDEFAULT_CODEVAR NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_KOR_DEFAULT ADD CONSTRAINT PK_KORDEFAULT PRIMARY KEY (KF, REPORT_CODE, CODE_VAR)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -101,12 +103,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_KORDEFAULT ***
+PROMPT *** Create  constraint CC_KORDEFAULT_CODEVAR ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_KOR_DEFAULT ADD CONSTRAINT PK_KORDEFAULT PRIMARY KEY (KF, REPORT_CODE, CODE_VAR)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.NBUR_KOR_DEFAULT MODIFY (CODE_VAR CONSTRAINT CC_KORDEFAULT_CODEVAR NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -129,11 +129,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_KOR_DEFAULT ***
-grant SELECT                                                                 on NBUR_KOR_DEFAULT to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_KOR_DEFAULT to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBUR_KOR_DEFAULT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_KOR_DEFAULT to RPBN002;
-grant SELECT                                                                 on NBUR_KOR_DEFAULT to UPLD;
 
 
 

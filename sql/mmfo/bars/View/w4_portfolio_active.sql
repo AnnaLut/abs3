@@ -29,9 +29,7 @@ PROMPT *** Create  view W4_PORTFOLIO_ACTIVE ***
    where a.dazs Is Null;
 
 PROMPT *** Create  grants  W4_PORTFOLIO_ACTIVE ***
-grant SELECT                                                                 on W4_PORTFOLIO_ACTIVE to BARSREADER_ROLE;
 grant SELECT                                                                 on W4_PORTFOLIO_ACTIVE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on W4_PORTFOLIO_ACTIVE to UPLD;
 
 
 

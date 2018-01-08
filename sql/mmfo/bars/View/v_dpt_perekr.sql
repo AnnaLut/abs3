@@ -13,9 +13,7 @@ PROMPT *** Create  view V_DPT_PEREKR ***
  WHERE nls_d IS NOT NULL;
 
 PROMPT *** Create  grants  V_DPT_PEREKR ***
-grant SELECT                                                                 on V_DPT_PEREKR    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_PEREKR    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DPT_PEREKR    to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPT_PEREKR    to VKLAD;
 grant FLASHBACK,SELECT                                                       on V_DPT_PEREKR    to WR_REFREAD;
 

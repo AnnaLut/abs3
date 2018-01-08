@@ -100,10 +100,8 @@ COMMENT ON COLUMN BARS.ERR$_INT_ACCN.OKPO IS '';
 
 
 PROMPT *** Create  grants  ERR$_INT_ACCN ***
-grant SELECT                                                                 on ERR$_INT_ACCN   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_INT_ACCN   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ERR$_INT_ACCN   to BARS_DM;
-grant SELECT                                                                 on ERR$_INT_ACCN   to UPLD;
 
 
 

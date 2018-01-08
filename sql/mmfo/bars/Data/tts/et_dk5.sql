@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DK5
-prompt Наименование операции: DK5 +Виплата відсотків в нац.валюті (внутр)
+prompt Наименование операции: +Виплата відсотків в нац.валюті (внутр)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DK5', 'DK5 +Виплата відсотків в нац.валюті (внутр)', 1, null, 980, null, 980, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000010000000010100000000000000000000000000', 'Виплата відсотків згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DK5', '+Виплата відсотків в нац.валюті (внутр)', 1, null, 980, null, 980, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000010000000010100000000000000000000000000', 'Виплата відсотків згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DK5', name='DK5 +Виплата відсотків в нац.валюті (внутр)', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000010000000010100000000000000000000000000', nazn='Виплата відсотків згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DK5', name='+Виплата відсотків в нац.валюті (внутр)', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000010000000010100000000000000000000000000', nazn='Виплата відсотків згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DK5';
   end;
   --------------------------------

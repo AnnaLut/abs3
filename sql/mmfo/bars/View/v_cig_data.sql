@@ -82,9 +82,7 @@ where cg.currency_id=t.kv
   and not exists (select dog_id from cig_dog_stop where dog_id = cg.id and branch = cg.branch);
 
 PROMPT *** Create  grants  V_CIG_DATA ***
-grant SELECT                                                                 on V_CIG_DATA      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIG_DATA      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIG_DATA      to UPLD;
 
 
 

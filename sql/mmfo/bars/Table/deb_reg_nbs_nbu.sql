@@ -59,11 +59,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DEB_REG_NBS_NBU ***
-grant SELECT                                                                 on DEB_REG_NBS_NBU to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEB_REG_NBS_NBU to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEB_REG_NBS_NBU to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEB_REG_NBS_NBU to START1;
-grant SELECT                                                                 on DEB_REG_NBS_NBU to UPLD;
 
 
 

@@ -104,14 +104,12 @@ exception when others then
 
 PROMPT *** Create  grants  SPR_OBL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPR_OBL         to ABS_ADMIN;
-grant SELECT                                                                 on SPR_OBL         to BARSREADER_ROLE;
 grant SELECT                                                                 on SPR_OBL         to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPR_OBL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SPR_OBL         to BARS_DM;
 grant SELECT                                                                 on SPR_OBL         to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPR_OBL         to SPR_OBL;
 grant SELECT                                                                 on SPR_OBL         to START1;
-grant SELECT                                                                 on SPR_OBL         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPR_OBL         to WR_ALL_RIGHTS;
 grant SELECT                                                                 on SPR_OBL         to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on SPR_OBL         to WR_REFREAD;

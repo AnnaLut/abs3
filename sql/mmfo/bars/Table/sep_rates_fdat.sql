@@ -87,7 +87,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  SEP_RATES_FDAT ***
-grant SELECT                                                                 on SEP_RATES_FDAT  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEP_RATES_FDAT  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEP_RATES_FDAT  to START1;
 

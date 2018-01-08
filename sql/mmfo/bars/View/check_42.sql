@@ -17,10 +17,8 @@ where  ca.acc=a.acc  and  ca.rnk=c.rnk   and  a.acc=k.acc and
        kl.kf='42'    and  a.nbs=kl.r020  and  a.ost<>0;
 
 PROMPT *** Create  grants  CHECK_42 ***
-grant SELECT                                                                 on CHECK_42        to BARSREADER_ROLE;
 grant SELECT                                                                 on CHECK_42        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHECK_42        to START1;
-grant SELECT                                                                 on CHECK_42        to UPLD;
 
 
 

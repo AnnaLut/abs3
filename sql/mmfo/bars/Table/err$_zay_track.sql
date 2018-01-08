@@ -69,10 +69,6 @@ COMMENT ON COLUMN BARS.ERR$_ZAY_TRACK.BRANCH IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ZAY_TRACK ***
-grant SELECT                                                                 on ERR$_ZAY_TRACK  to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ZAY_TRACK  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

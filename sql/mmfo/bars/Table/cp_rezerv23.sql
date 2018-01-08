@@ -73,6 +73,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_REF_CP_REZERV23 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_REZERV23 ADD CONSTRAINT FK_REF_CP_REZERV23 FOREIGN KEY (REF)
+	  REFERENCES BARS.CP_DEAL (REF) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ID_CP_REZERV23 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_REZERV23 ADD CONSTRAINT FK_ID_CP_REZERV23 FOREIGN KEY (ID)
+	  REFERENCES BARS.CP_KOD (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C006169 ***
 begin   
  execute immediate '
@@ -99,10 +125,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_REZERV23 ***
-grant SELECT                                                                 on CP_REZERV23     to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CP_REZERV23     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_REZERV23     to BARS_DM;
-grant SELECT                                                                 on CP_REZERV23     to UPLD;
 grant FLASHBACK,SELECT                                                       on CP_REZERV23     to WR_REFREAD;
 
 

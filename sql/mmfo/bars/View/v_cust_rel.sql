@@ -24,10 +24,8 @@ PROMPT *** Create  view V_CUST_REL ***
 ;
 
 PROMPT *** Create  grants  V_CUST_REL ***
-grant SELECT                                                                 on V_CUST_REL      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUST_REL      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUST_REL      to CUST001;
-grant SELECT                                                                 on V_CUST_REL      to UPLD;
 
 
 

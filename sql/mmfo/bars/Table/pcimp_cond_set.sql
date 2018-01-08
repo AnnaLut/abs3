@@ -67,10 +67,6 @@ COMMENT ON COLUMN BARS.PCIMP_COND_SET.NOTE IS '';
 
 
 
-PROMPT *** Create  grants  PCIMP_COND_SET ***
-grant SELECT                                                                 on PCIMP_COND_SET  to BARSREADER_ROLE;
-grant SELECT                                                                 on PCIMP_COND_SET  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

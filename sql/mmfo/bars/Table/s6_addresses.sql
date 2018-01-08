@@ -116,9 +116,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  S6_Addresses ***
-grant SELECT                                                                 on S6_Addresses    to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

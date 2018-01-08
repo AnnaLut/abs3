@@ -1,14 +1,13 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CCK_ZAYF.sql =========*** Run *** ===
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_CCK_ZAYF ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_ZAYF ("PROD", "NAME", "TERM", "AIM", "VVOD") AS 
-  SELECT c.NBS || c.ob22 prod,
+CREATE OR REPLACE FORCE VIEW BARS.V_CCK_ZAYF
+(
+   PROD,
+   NAME,
+   TERM,
+   AIM,
+   VVOD
+)
+AS
+   SELECT c.NBS || c.ob22 prod,
           SUBSTR (s.txt, 1, 255) name,
           DECODE (SUBSTR (cck_dop.get_prod_old(c.NBS || c.ob22), 4, 1),
                   '3', 'Довгий',
@@ -36,17 +35,26 @@ PROMPT *** Create  view V_CCK_ZAYF ***
                         '2232',
                         '2233');
 
-PROMPT *** Create  grants  V_CCK_ZAYF ***
-grant SELECT                                                                 on V_CCK_ZAYF      to BARSREADER_ROLE;
-grant FLASHBACK,SELECT                                                       on V_CCK_ZAYF      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CCK_ZAYF      to RCC_DEAL;
-grant SELECT                                                                 on V_CCK_ZAYF      to UPLD;
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CCK_ZAYF      to WR_ALL_RIGHTS;
-grant SELECT                                                                 on V_CCK_ZAYF      to WR_CREDIT;
-grant FLASHBACK,SELECT                                                       on V_CCK_ZAYF      to WR_REFREAD;
+COMMENT ON TABLE BARS.V_CCK_ZAYF IS 'Заявка на кредит для ФО';
+
+COMMENT ON COLUMN BARS.V_CCK_ZAYF.PROD IS 'Код Продукту';
+
+COMMENT ON COLUMN BARS.V_CCK_ZAYF.NAME IS 'Назва Продукту';
+
+COMMENT ON COLUMN BARS.V_CCK_ZAYF.VVOD IS 'Сформувати';
 
 
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CCK_ZAYF.sql =========*** End *** ===
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.V_CCK_ZAYF TO BARSREADER_ROLE;
+
+GRANT SELECT, FLASHBACK ON BARS.V_CCK_ZAYF TO BARS_ACCESS_DEFROLE;
+
+GRANT SELECT ON BARS.V_CCK_ZAYF TO RCC_DEAL;
+
+GRANT SELECT ON BARS.V_CCK_ZAYF TO UPLD;
+
+GRANT DELETE, INSERT, SELECT, UPDATE, FLASHBACK ON BARS.V_CCK_ZAYF TO WR_ALL_RIGHTS;
+
+GRANT SELECT ON BARS.V_CCK_ZAYF TO WR_CREDIT;
+
+GRANT SELECT, FLASHBACK ON BARS.V_CCK_ZAYF TO WR_REFREAD;

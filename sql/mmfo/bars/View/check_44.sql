@@ -42,10 +42,8 @@ from
        a3.ref(+)=o.ref and a3.tag(+)='FIO';
 
 PROMPT *** Create  grants  CHECK_44 ***
-grant SELECT                                                                 on CHECK_44        to BARSREADER_ROLE;
 grant SELECT                                                                 on CHECK_44        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHECK_44        to START1;
-grant SELECT                                                                 on CHECK_44        to UPLD;
 
 
 

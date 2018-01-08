@@ -55,6 +55,19 @@ COMMENT ON COLUMN BARS.WEB_BARSCONFIG.COMM IS '';
 
 
 
+PROMPT *** Create  constraint FK_WEB_BARSCONFIG_GROUPTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WEB_BARSCONFIG ADD CONSTRAINT FK_WEB_BARSCONFIG_GROUPTYPE FOREIGN KEY (GROUPTYPE)
+	  REFERENCES BARS.WEB_BARSCONFIG_GROUPTYPES (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_WEB_BARSCONFIG ***
 begin   
  execute immediate '
@@ -83,10 +96,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  WEB_BARSCONFIG ***
-grant SELECT                                                                 on WEB_BARSCONFIG  to BARSREADER_ROLE;
 grant SELECT                                                                 on WEB_BARSCONFIG  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WEB_BARSCONFIG  to BARS_DM;
-grant SELECT                                                                 on WEB_BARSCONFIG  to UPLD;
 grant SELECT                                                                 on WEB_BARSCONFIG  to WEBTECH;
 grant SELECT                                                                 on WEB_BARSCONFIG  to WR_ADMIN;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_BARSCONFIG  to WR_ALL_RIGHTS;

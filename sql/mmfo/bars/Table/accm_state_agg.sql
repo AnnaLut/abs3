@@ -127,11 +127,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACCM_STATE_AGG ***
-grant SELECT                                                                 on ACCM_STATE_AGG  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_STATE_AGG  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCM_STATE_AGG  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_STATE_AGG  to START1;
-grant SELECT                                                                 on ACCM_STATE_AGG  to UPLD;
 
 
 

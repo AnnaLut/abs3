@@ -38,9 +38,7 @@ where  mbk.check_if_deal_belong_to_mbdk(d.vidd) = 'Y' and
 ;
 
 PROMPT *** Create  grants  V_MBDK_PAWN_ACCOUNT ***
-grant SELECT                                                                 on V_MBDK_PAWN_ACCOUNT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBDK_PAWN_ACCOUNT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_MBDK_PAWN_ACCOUNT to UPLD;
 
 
 

@@ -51,7 +51,7 @@ begin
                :new.cena_kup, :new.cena_kup0, :new.cena_start, :new.country, :new.cp_id, :new.datp, :new.datvk,
                :new.datzr, :new.dat_em, :new.dat_rr, :new.dcp, :new.dnk, :new.dok, :new.dox, :new.emi, :new.fin23, :new.gs, :new.id,
                :new.idt, :new.ir, :new.k23, :new.kat23, :new.kv, :new.ky, :new.metr, :new.name, :new.period_kup, :new.pr1_kup,
-               :new.pr_akt, :new.pr_amr, :new.quot_sign, :new.rnk, :new.tip, :new.vncrr, :new.zal_cp, :new.pawn,:new.expiry, :new.hierarchy_id,
+               :new.pr_akt, :new.pr_amr, :new.quot_sign, :new.rnk, :new.tip, :new.vncrr, :new.zal_cp, :new.pawn,:new.expiry, :new.hierarchy_id, 
                :new.fin_351, :new.pd, :new.fair_method_id, :new.kf);
    end if;
 end;

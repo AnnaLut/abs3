@@ -64,10 +64,8 @@ PROMPT *** Create  view V_DEP_ODB ***
            ORDER BY m.bsd, m.ob22, m.kv);
 
 PROMPT *** Create  grants  V_DEP_ODB ***
-grant SELECT                                                                 on V_DEP_ODB       to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_DEP_ODB       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DEP_ODB       to RCC_DEAL;
-grant SELECT                                                                 on V_DEP_ODB       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DEP_ODB       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_DEP_ODB       to WR_REFREAD;
 

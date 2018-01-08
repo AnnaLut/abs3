@@ -71,6 +71,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_ACCOVERMDATE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER_MDATE ADD CONSTRAINT FK_ACCOVERMDATE FOREIGN KEY (KF, ACCO)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCOVERMDATE_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER_MDATE ADD CONSTRAINT FK_ACCOVERMDATE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint NK_ACC_OVER_MDATE_ND ***
 begin   
  execute immediate '
@@ -123,12 +149,10 @@ exception when others then
 PROMPT *** Create  grants  ACC_OVER_MDATE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_MDATE  to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_MDATE  to BARS009;
-grant SELECT                                                                 on ACC_OVER_MDATE  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_MDATE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_OVER_MDATE  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_MDATE  to TECH005;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_MDATE  to TECH006;
-grant SELECT                                                                 on ACC_OVER_MDATE  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_OVER_MDATE  to WR_ALL_RIGHTS;
 
 

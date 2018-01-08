@@ -67,6 +67,105 @@ COMMENT ON COLUMN BARS.REFAPP.GRANTOR IS 'Кто выдал ресурс';
 
 
 
+PROMPT *** Create  constraint FK_REFAPP_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REFAPP ADD CONSTRAINT FK_REFAPP_STAFF FOREIGN KEY (GRANTOR)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_REFAPP_METATACCESS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REFAPP ADD CONSTRAINT FK_REFAPP_METATACCESS FOREIGN KEY (ACODE)
+	  REFERENCES BARS.META_TACCESS (ACODE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_REFAPP_REVOKED ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REFAPP ADD CONSTRAINT CC_REFAPP_REVOKED CHECK (revoked in (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_REFAPP_REVERSE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REFAPP ADD CONSTRAINT CC_REFAPP_REVERSE CHECK (reverse in (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_REFAPP_RDATE1 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REFAPP ADD CONSTRAINT CC_REFAPP_RDATE1 CHECK (rdate1 <= rdate2) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_REFAPP_ADATE1 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REFAPP ADD CONSTRAINT CC_REFAPP_ADATE1 CHECK (adate1 <= adate2) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_REFAPP_APPROVE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REFAPP ADD CONSTRAINT CC_REFAPP_APPROVE CHECK (approve in (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_REFAPP_METATABLES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REFAPP ADD CONSTRAINT FK_REFAPP_METATABLES FOREIGN KEY (TABID)
+	  REFERENCES BARS.META_TABLES (TABID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C007296 ***
 begin   
  execute immediate '
@@ -117,66 +216,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_REFAPP_APPROVE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REFAPP ADD CONSTRAINT CC_REFAPP_APPROVE CHECK (approve in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_REFAPP_ADATE1 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REFAPP ADD CONSTRAINT CC_REFAPP_ADATE1 CHECK (adate1 <= adate2) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_REFAPP_RDATE1 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REFAPP ADD CONSTRAINT CC_REFAPP_RDATE1 CHECK (rdate1 <= rdate2) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_REFAPP_REVERSE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REFAPP ADD CONSTRAINT CC_REFAPP_REVERSE CHECK (reverse in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_REFAPP_REVOKED ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REFAPP ADD CONSTRAINT CC_REFAPP_REVOKED CHECK (revoked in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_REFAPP ***
 begin   
  execute immediate '
@@ -192,13 +231,11 @@ exception when others then
 
 PROMPT *** Create  grants  REFAPP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on REFAPP          to ABS_ADMIN;
-grant SELECT                                                                 on REFAPP          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REFAPP          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REFAPP          to BARS_DM;
 grant SELECT                                                                 on REFAPP          to REF0000;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REFAPP          to REFAPP;
 grant SELECT                                                                 on REFAPP          to START1;
-grant SELECT                                                                 on REFAPP          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REFAPP          to WR_ALL_RIGHTS;
 grant SELECT                                                                 on REFAPP          to WR_METATAB;
 grant FLASHBACK,SELECT                                                       on REFAPP          to WR_REFREAD;

@@ -52,13 +52,11 @@ COMMENT ON COLUMN BARS.RNBU_0_INT.VIEW_NAME IS 'Iм'€ консолiдованого 'у€вленн€'(
 
 PROMPT *** Create  grants  RNBU_0_INT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_0_INT      to ABS_ADMIN;
-grant SELECT                                                                 on RNBU_0_INT      to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on RNBU_0_INT      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RNBU_0_INT      to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on RNBU_0_INT      to RPBN002;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on RNBU_0_INT      to SALGL;
 grant SELECT                                                                 on RNBU_0_INT      to START1;
-grant SELECT                                                                 on RNBU_0_INT      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RNBU_0_INT      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on RNBU_0_INT      to WR_REFREAD;
 

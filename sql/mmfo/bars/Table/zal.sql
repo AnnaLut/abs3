@@ -53,10 +53,8 @@ COMMENT ON COLUMN BARS.ZAL.VID IS '';
 
 
 PROMPT *** Create  grants  ZAL ***
-grant SELECT                                                                 on ZAL             to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAL             to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAL             to START1;
-grant SELECT                                                                 on ZAL             to UPLD;
 
 
 

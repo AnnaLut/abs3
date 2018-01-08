@@ -26,9 +26,7 @@ from ( --------------------------------------------------------------------
 ;
 
 PROMPT *** Create  grants  CC_DOPW ***
-grant SELECT                                                                 on CC_DOPW         to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_DOPW         to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on CC_DOPW         to UPLD;
 
 
 

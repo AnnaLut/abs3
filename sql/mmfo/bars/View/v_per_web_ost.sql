@@ -65,9 +65,7 @@ PROMPT *** Create  view V_PER_WEB_OST ***
    ORDER BY a.nls, a.kv;
 
 PROMPT *** Create  grants  V_PER_WEB_OST ***
-grant SELECT                                                                 on V_PER_WEB_OST   to BARSREADER_ROLE;
 grant DELETE,SELECT,UPDATE                                                   on V_PER_WEB_OST   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_PER_WEB_OST   to UPLD;
 
 
 

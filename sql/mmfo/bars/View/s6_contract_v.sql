@@ -17,9 +17,6 @@ PROMPT *** Create  view S6_Contract_V ***
                        GROUP_C
  ;
 
-PROMPT *** Create  grants  S6_Contract_V ***
-grant SELECT                                                                 on S6_Contract_V   to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

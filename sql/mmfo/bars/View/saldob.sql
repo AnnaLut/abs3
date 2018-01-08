@@ -19,9 +19,7 @@ PROMPT *** Create  view SALDOB ***
 
 PROMPT *** Create  grants  SALDOB ***
 grant SELECT                                                                 on SALDOB          to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on SALDOB          to BARSREADER_ROLE;
 grant SELECT                                                                 on SALDOB          to DM;
-grant SELECT                                                                 on SALDOB          to UPLD;
 
 
 

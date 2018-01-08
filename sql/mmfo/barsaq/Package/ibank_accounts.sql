@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARSAQ/package/ibank_accounts.sql =========*** Ru
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARSAQ.IBANK_ACCOUNTS is
+CREATE OR REPLACE PACKAGE BARSAQ.ibank_accounts is
 
   -- Copyryight : UNITY-BARS
   -- Author     : SERG
@@ -225,13 +219,16 @@
   --  @p_obj - исходный LCR
   --
   procedure doccurexexclusive_handler(p_obj in sys.anydata);
-
+  
   procedure SetTransform_CutRUKey;
   FUNCTION CutRUKey (p_anydata IN SYS.ANYDATA)    RETURN SYS.ANYDATA;
 
 end ibank_accounts;
 /
-CREATE OR REPLACE PACKAGE BODY BARSAQ.IBANK_ACCOUNTS 
+show errors
+
+
+CREATE OR REPLACE PACKAGE BODY BARSAQ.ibank_accounts
 IS
    -- global consts
    G_BODY_VERSION    CONSTANT VARCHAR2 (64) := 'version 1.5 13/05/2017';
@@ -399,7 +396,7 @@ IS
       l_result            VARCHAR2 (32767);
       l_scn               NUMBER;
    BEGIN
-      l_scn := NVL (p_scn, sys.DBMS_FLASHBACK.get_system_change_number ());
+      l_scn := NVL (p_scn, DBMS_FLASHBACK.get_system_change_number ());
 
         SELECT nazn, d_rec, bis
           BULK COLLECT INTO l_narrative_array
@@ -437,7 +434,7 @@ IS
    IS
       l_clob   CLOB;
    BEGIN
-
+      
       l_clob := extract_bis_external (p_ref, p_scn);
       RETURN l_clob;
    END extract_bis_external_clob;
@@ -455,7 +452,7 @@ IS
       l_temp          VARCHAR2 (32767);
       l_scn           NUMBER;
    BEGIN
-      l_scn := NVL (p_scn, sys.DBMS_FLASHBACK.get_system_change_number ());
+      l_scn := NVL (p_scn, DBMS_FLASHBACK.get_system_change_number ());
 
       -- читаем доп.реквизиты из oper
       SELECT d_rec
@@ -1016,8 +1013,8 @@ FUNCTION transform_saldoa_test (p_anydata IN SYS.ANYDATA)
       -- возвращаем объект
       RETURN anydata.ConvertObject (l_target);
    END transform_saldoa_test;
-
-
+   
+   
       --
    --  Преобразование BARS.OPLDOK
    --
@@ -1932,11 +1929,11 @@ FUNCTION transform_opldok_test (p_anydata IN SYS.ANYDATA)
       END IF;
 
       -- возвращаем объект
-      bars.bars_audit.info('StreamsLCR:'||chr(13)||chr(10)||sys.dbms_streams.convert_lcr_to_xml(anydata.ConvertObject (l_target)).GetClobVal());
+      bars.bars_audit.info('StreamsLCR:'||chr(13)||chr(10)||dbms_streams.convert_lcr_to_xml(anydata.ConvertObject (l_target)).GetClobVal());
       RETURN anydata.ConvertObject (l_target);
    END transform_opldok_test;
-
-
+   
+   
 PROCEDURE update_transaction_clob_test (p_obj IN SYS.ANYDATA)
    IS
       l_tran      acc_transactions_test%ROWTYPE;
@@ -1987,7 +1984,7 @@ PROCEDURE update_transaction_clob_test (p_obj IN SYS.ANYDATA)
       END IF;
    --
    END update_transaction_clob_test;
-
+   
          ----
    -- subscribe - подпысывает на изменения по счету p_acc
    --
@@ -2432,15 +2429,15 @@ PROCEDURE update_transaction_clob_test (p_obj IN SYS.ANYDATA)
             column_name    => 'BANKDATE',
             COLUMN_VALUE   => anydata.convertDate (
                                 TO_DATE ('12/29/2015',
-                                         'MM/DD/YYYY')));
-         else
+                                         'MM/DD/YYYY'))); 
+         else 
           l_target.add_column (
             value_type     => 'new',
             column_name    => 'BANKDATE',
             COLUMN_VALUE   => anydata.convertDate (
                                 TO_DATE (l_value.accessVarchar2 (),
                                          'MM/DD/YYYY')));
-         end if;
+         end if;                                         
          --
          RETURN anydata.convertobject (l_target);
       END IF;
@@ -3821,9 +3818,9 @@ PROCEDURE update_transaction_clob_test (p_obj IN SYS.ANYDATA)
                                     column_name    => 'RNK',
                                     COLUMN_VALUE   => l_value);
             END IF;
-
+            
             SELECT kf INTO l_bankid FROM ibank_rnk WHERE rnk = l_value.AccessNumber();
-
+            
             -- TYPE_ID
             l_value := l_source.get_value ('old', 'TYPE_ID');
 
@@ -3852,9 +3849,9 @@ PROCEDURE update_transaction_clob_test (p_obj IN SYS.ANYDATA)
                                     column_name    => 'RNK',
                                     COLUMN_VALUE   => l_value);
             END IF;
-
+            
             SELECT kf INTO l_bankid FROM ibank_rnk WHERE rnk = l_value.AccessNumber();
-
+            
             -- TYPE_ID
             l_value := l_source.get_value ('new', 'TYPE_ID');
 
@@ -4155,28 +4152,28 @@ PROCEDURE update_transaction_clob_test (p_obj IN SYS.ANYDATA)
                  on r.object_name = t.TABLE_NAME
               where streams_name = 'TR_CAPTURE'
                 and t.COLUMN_NAME = 'RNK') loop
-     sys.dbms_streams_adm.set_rule_transform_function(i.rule_name, 'ibank_accounts.CutRUKey');
+     dbms_streams_adm.set_rule_transform_function(i.rule_name, 'ibank_accounts.CutRUKey');
    end loop;
   end;
-
+  
   FUNCTION CutRUKey (p_anydata IN SYS.ANYDATA)    RETURN SYS.ANYDATA
   IS
     lcr           SYS.lcr$_row_record;
     l_rc               NUMBER;
-    l_value            ANYDATA;
-
+    l_value            ANYDATA;   
+        
   function fCutRUKey(p_rnk in anydata) return anydata is
    l_rnk string(100);
   begin
    l_rnk := p_rnk.AccessNumber;
-  --     raise_application_error(-20000, 'l_rnk='||l_rnk);
+  --     raise_application_error(-20000, 'l_rnk='||l_rnk); 
    l_rnk := substr(l_rnk, 1, length(l_rnk) - 2);
    return anydata.ConvertNumber(to_number(l_rnk));
   exception
    when others then
      return p_rnk;
   end fCutRUKey;
-
+           
   BEGIN
     l_rc := p_anydata.getobject (lcr);
 
@@ -4192,19 +4189,16 @@ PROCEDURE update_transaction_clob_test (p_obj IN SYS.ANYDATA)
 
     RETURN anydata.ConvertObject (lcr);
   END CutRUKey;
-
+      
 BEGIN
    init;
 END ibank_accounts;
 /
- show err;
+show errors
  
-PROMPT *** Create  grants  IBANK_ACCOUNTS ***
-grant EXECUTE                                                                on IBANK_ACCOUNTS  to BARS;
-
+grant execute on barsaq.ibank_accounts to bars;
  
  
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARSAQ/package/ibank_accounts.sql =========*** En
  PROMPT ===================================================================================== 
- 

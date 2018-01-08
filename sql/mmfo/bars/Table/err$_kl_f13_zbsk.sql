@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_KL_F13_ZBSK.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_KL_F13_ZBSK ***
-grant SELECT                                                                 on ERR$_KL_F13_ZBSK to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_KL_F13_ZBSK to UPLD;
-
 
 
 PROMPT ===================================================================================== 

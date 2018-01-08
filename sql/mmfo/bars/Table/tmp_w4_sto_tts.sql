@@ -57,10 +57,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_W4_STO_TTS ***
-grant SELECT                                                                 on TMP_W4_STO_TTS  to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_W4_STO_TTS  to UPLD;
-
 
 
 PROMPT ===================================================================================== 
