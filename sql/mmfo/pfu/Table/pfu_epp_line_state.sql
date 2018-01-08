@@ -28,18 +28,6 @@ COMMENT ON COLUMN PFU.PFU_EPP_LINE_STATE.NAME IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C00111488 ***
-begin   
- execute immediate '
-  ALTER TABLE PFU.PFU_EPP_LINE_STATE MODIFY (NAME NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C00111487 ***
 begin   
  execute immediate '
@@ -51,8 +39,22 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint SYS_C00111488 ***
+begin   
+ execute immediate '
+  ALTER TABLE PFU.PFU_EPP_LINE_STATE MODIFY (NAME NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  PFU_EPP_LINE_STATE ***
+grant SELECT                                                                 on PFU_EPP_LINE_STATE to BARSREADER_ROLE;
 grant SELECT                                                                 on PFU_EPP_LINE_STATE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on PFU_EPP_LINE_STATE to UPLD;
 
 
 

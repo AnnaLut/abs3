@@ -1,5 +1,14 @@
-CREATE OR REPLACE VIEW PFU.V_PFU_FILE_KVIT2_HISTORY AS
-SELECT pf."ID",
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/PFU/View/V_PFU_FILE_KVIT2_HISTORY.sql =========**
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_PFU_FILE_KVIT2_HISTORY ***
+
+  CREATE OR REPLACE FORCE VIEW PFU.V_PFU_FILE_KVIT2_HISTORY ("ID", "ENVELOPE_REQUEST_ID", "CHECK_SUM", "CHECK_LINES_COUNT", "PAYMENT_DATE", "FILE_NUMBER", "FILE_NAME", "FILE_DATA", "STATE", "STATE_NAME", "CRT_DATE", "DATA_SIGN", "USERID", "PAY_DATE", "MATCH_DATE") AS 
+  SELECT pf."ID",
           pf."ENVELOPE_REQUEST_ID",
           pf."CHECK_SUM",
           pf."CHECK_LINES_COUNT",
@@ -18,15 +27,9 @@ SELECT pf."ID",
           pf."MATCH_DATE"
      FROM pfu.pfu_file pf
     WHERE pf.state = 'MATCH_SEND';
-comment on table PFU.V_PFU_FILE_KVIT2_HISTORY is 'Представлення для перегляду пачок (файлів реєстрів) з статусом MATCH_SEND (відправлена 2-га квитанція)';
-comment on column PFU.V_PFU_FILE_KVIT2_HISTORY.ID is 'ID файлу (реєстру)';
-comment on column PFU.V_PFU_FILE_KVIT2_HISTORY.ENVELOPE_REQUEST_ID is 'ID конверту';
-comment on column PFU.V_PFU_FILE_KVIT2_HISTORY.CHECK_SUM is 'Сума реєстру в копійках';
-comment on column PFU.V_PFU_FILE_KVIT2_HISTORY.CHECK_LINES_COUNT is 'К-ть записів у реєстрі';
-comment on column PFU.V_PFU_FILE_KVIT2_HISTORY.PAYMENT_DATE is 'Дата оплати реєстру';
-comment on column PFU.V_PFU_FILE_KVIT2_HISTORY.FILE_NUMBER is 'Порядковий номер файлу у конверті';
-comment on column PFU.V_PFU_FILE_KVIT2_HISTORY.FILE_NAME is 'Імя файла реєстру';
-comment on column PFU.V_PFU_FILE_KVIT2_HISTORY.FILE_DATA is 'Дані реєстру';
-comment on column PFU.V_PFU_FILE_KVIT2_HISTORY.STATE is 'Статус файлу (реєстру)';
-comment on column PFU.V_PFU_FILE_KVIT2_HISTORY.DATA_SIGN is 'Підпис';
-comment on column PFU.V_PFU_FILE_KVIT2_HISTORY.USERID is 'ID користувача, який відправив 2-гу квитанцію';
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/PFU/View/V_PFU_FILE_KVIT2_HISTORY.sql =========**
+PROMPT ===================================================================================== 

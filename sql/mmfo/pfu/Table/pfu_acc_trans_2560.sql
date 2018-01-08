@@ -31,7 +31,9 @@ COMMENT ON COLUMN PFU.PFU_ACC_TRANS_2560.EDRPU IS '';
 
 PROMPT *** Create  grants  PFU_ACC_TRANS_2560 ***
 grant SELECT                                                                 on PFU_ACC_TRANS_2560 to BARS;
+grant SELECT                                                                 on PFU_ACC_TRANS_2560 to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PFU_ACC_TRANS_2560 to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on PFU_ACC_TRANS_2560 to UPLD;
 
 
 

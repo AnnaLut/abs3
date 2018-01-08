@@ -37,10 +37,10 @@ COMMENT ON COLUMN FINMON.REPORTS.QUERY IS '';
 
 
 
-PROMPT *** Create  constraint NK_REPORTS_DESCRIPTION ***
+PROMPT *** Create  constraint NK_REPORTS_ID ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.REPORTS MODIFY (DESCRIPTION CONSTRAINT NK_REPORTS_DESCRIPTION NOT NULL ENABLE)';
+  ALTER TABLE FINMON.REPORTS MODIFY (ID CONSTRAINT NK_REPORTS_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -61,10 +61,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_REPORTS_ID ***
+PROMPT *** Create  constraint NK_REPORTS_DESCRIPTION ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.REPORTS MODIFY (ID CONSTRAINT NK_REPORTS_ID NOT NULL ENABLE)';
+  ALTER TABLE FINMON.REPORTS MODIFY (DESCRIPTION CONSTRAINT NK_REPORTS_DESCRIPTION NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -111,6 +111,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  REPORTS ***
+grant SELECT                                                                 on REPORTS         to BARSREADER_ROLE;
 
 
 

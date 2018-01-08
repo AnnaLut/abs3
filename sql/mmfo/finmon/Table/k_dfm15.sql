@@ -69,6 +69,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  K_DFM15 ***
+grant SELECT                                                                 on K_DFM15         to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

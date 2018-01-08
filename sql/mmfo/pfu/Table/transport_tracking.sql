@@ -53,10 +53,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111525 ***
+PROMPT *** Create  constraint SYS_C00111523 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.TRANSPORT_TRACKING MODIFY (STATE_ID NOT NULL ENABLE)';
+  ALTER TABLE PFU.TRANSPORT_TRACKING MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -77,10 +77,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111523 ***
+PROMPT *** Create  constraint SYS_C00111525 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.TRANSPORT_TRACKING MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE PFU.TRANSPORT_TRACKING MODIFY (STATE_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -101,6 +101,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  TRANSPORT_TRACKING ***
+grant SELECT                                                                 on TRANSPORT_TRACKING to BARSREADER_ROLE;
+grant SELECT                                                                 on TRANSPORT_TRACKING to UPLD;
 
 
 

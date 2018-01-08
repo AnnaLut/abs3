@@ -64,6 +64,9 @@ end;
 /
  show err;
  
+PROMPT *** Create  grants  FM_POLICIES ***
+grant EXECUTE                                                                on FM_POLICIES     to BARSREADER_ROLE;
+
  
  
  PROMPT ===================================================================================== 

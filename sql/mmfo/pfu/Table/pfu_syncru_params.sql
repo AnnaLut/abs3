@@ -76,11 +76,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_PFUSYNCPARAMS_STATUS ***
+PROMPT *** Create  constraint SYS_C00111441 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_SYNCRU_PARAMS ADD CONSTRAINT FK_PFUSYNCPARAMS_STATUS FOREIGN KEY (LAST_SYNC_STATUS)
-	  REFERENCES PFU.PFU_SYNCRU_STATUS (SYNC_STATUS) ENABLE';
+  ALTER TABLE PFU.PFU_SYNCRU_PARAMS MODIFY (SYNC_LOGIN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -127,18 +126,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111441 ***
-begin   
- execute immediate '
-  ALTER TABLE PFU.PFU_SYNCRU_PARAMS MODIFY (SYNC_LOGIN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_PFUSYNCRUPARAMS ***
 begin   
  execute immediate '
@@ -151,6 +138,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  PFU_SYNCRU_PARAMS ***
+grant SELECT                                                                 on PFU_SYNCRU_PARAMS to BARSREADER_ROLE;
+grant SELECT                                                                 on PFU_SYNCRU_PARAMS to UPLD;
 
 
 

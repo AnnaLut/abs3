@@ -42,10 +42,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111490 ***
+PROMPT *** Create  constraint CC_PFUSYNCRUSTATUS_NAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_SYNCRU_STATUS MODIFY (SYNC_STATUS NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_SYNCRU_STATUS ADD CONSTRAINT CC_PFUSYNCRUSTATUS_NAME_NN CHECK (NAME IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -54,10 +54,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PFUSYNCRUSTATUS_NAME_NN ***
+PROMPT *** Create  constraint SYS_C00111490 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_SYNCRU_STATUS ADD CONSTRAINT CC_PFUSYNCRUSTATUS_NAME_NN CHECK (NAME IS NOT NULL) ENABLE';
+  ALTER TABLE PFU.PFU_SYNCRU_STATUS MODIFY (SYNC_STATUS NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -78,6 +78,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  PFU_SYNCRU_STATUS ***
+grant SELECT                                                                 on PFU_SYNCRU_STATUS to BARSREADER_ROLE;
+grant SELECT                                                                 on PFU_SYNCRU_STATUS to UPLD;
 
 
 
