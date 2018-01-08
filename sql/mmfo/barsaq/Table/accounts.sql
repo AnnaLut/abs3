@@ -82,10 +82,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCOUNTS_EQCT_NN ***
+PROMPT *** Create  constraint CC_ACCOUNTS_BANKID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ACCOUNTS MODIFY (EQ_CREDIT_TURNS CONSTRAINT CC_ACCOUNTS_EQCT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.ACCOUNTS MODIFY (BANK_ID CONSTRAINT CC_ACCOUNTS_BANKID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -310,10 +310,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCOUNTS_BANKID_NN ***
+PROMPT *** Create  constraint CC_ACCOUNTS_EQCT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ACCOUNTS MODIFY (BANK_ID CONSTRAINT CC_ACCOUNTS_BANKID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.ACCOUNTS MODIFY (EQ_CREDIT_TURNS CONSTRAINT CC_ACCOUNTS_EQCT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -348,6 +348,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  ACCOUNTS ***
+grant SELECT                                                                 on ACCOUNTS        to BARSREADER_ROLE;
 
 
 

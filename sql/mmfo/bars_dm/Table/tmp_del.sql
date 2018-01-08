@@ -29,7 +29,9 @@ COMMENT ON COLUMN BARS_DM.TMP_DEL.ID IS '';
 
 
 PROMPT *** Create  grants  TMP_DEL ***
+grant SELECT                                                                 on TMP_DEL         to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_DEL         to BARSUPL;
+grant SELECT                                                                 on TMP_DEL         to UPLD;
 
 
 

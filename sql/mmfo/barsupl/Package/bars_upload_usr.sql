@@ -1,5 +1,5 @@
 
-
+ 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARSUPL/package/bars_upload_usr.sql =========*** 
  PROMPT ===================================================================================== 
@@ -214,7 +214,6 @@
 
 end;
 /
-
 CREATE OR REPLACE PACKAGE BODY BARSUPL.BARS_UPLOAD_USR is
 
     -----------------------------------------------------------------
@@ -921,7 +920,7 @@ end;',
                               p_enabled  => p_enabled,
                               p_sheduled => p_sheduled,
                               p_bankdate => p_bankdate
-                            );         
+                            );
     exception when others then
        bars.bars_audit.error(l_trace||' '||substr(dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace(), 1, 500));
     end;
@@ -1196,3 +1195,4 @@ grant EXECUTE                                                                on 
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARSUPL/package/bars_upload_usr.sql =========*** 
  PROMPT ===================================================================================== 
+ 

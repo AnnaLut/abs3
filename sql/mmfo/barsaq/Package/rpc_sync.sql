@@ -2025,7 +2025,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.RPC_SYNC is
                    closed = :p_closed,
                    notes = :p_notes,
                    cust_limit = :p_cust_limit
-             where rnk = round(:p_rnk/100, 0)
+             where rnk = :p_rnk
                and bank_id = :p_bank_id'
     using p_row.type_id,
           p_row.name,

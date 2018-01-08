@@ -53,6 +53,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  UPL_COL_TYPES ***
+grant SELECT                                                                 on UPL_COL_TYPES   to BARSREADER_ROLE;
+grant SELECT                                                                 on UPL_COL_TYPES   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

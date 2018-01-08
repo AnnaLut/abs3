@@ -70,19 +70,6 @@ COMMENT ON COLUMN BARS_DM.BPK.OSTC IS 'Поточний залишок';
 
 
 
-PROMPT *** Create  constraint FK_BPK_PERID_PERIOD_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.BPK ADD CONSTRAINT FK_BPK_PERID_PERIOD_ID FOREIGN KEY (PER_ID)
-	  REFERENCES BARS_DM.PERIODS (ID) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_BPK_PERID_NN ***
 begin   
  execute immediate '
@@ -146,7 +133,9 @@ exception when others then
 
 PROMPT *** Create  grants  BPK ***
 grant SELECT                                                                 on BPK             to BARS;
+grant SELECT                                                                 on BPK             to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK             to BARSUPL;
+grant SELECT                                                                 on BPK             to UPLD;
 
 
 

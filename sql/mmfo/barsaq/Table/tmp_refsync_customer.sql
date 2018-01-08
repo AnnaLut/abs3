@@ -123,10 +123,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010426 ***
+PROMPT *** Create  constraint SYS_C0010424 ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.TMP_REFSYNC_CUSTOMER MODIFY (TOBO NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.TMP_REFSYNC_CUSTOMER MODIFY (DATE_ON NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -147,10 +147,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010424 ***
+PROMPT *** Create  constraint SYS_C0010426 ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.TMP_REFSYNC_CUSTOMER MODIFY (DATE_ON NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.TMP_REFSYNC_CUSTOMER MODIFY (TOBO NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -160,6 +160,7 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_REFSYNC_CUSTOMER ***
 grant DELETE,INSERT,SELECT                                                   on TMP_REFSYNC_CUSTOMER to BARS;
+grant SELECT                                                                 on TMP_REFSYNC_CUSTOMER to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on TMP_REFSYNC_CUSTOMER to KLBX;
 grant SELECT                                                                 on TMP_REFSYNC_CUSTOMER to REFSYNC_USR;
 

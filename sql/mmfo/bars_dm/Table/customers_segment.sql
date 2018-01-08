@@ -560,22 +560,11 @@ COMMENT ON COLUMN BARS_DM.CUSTOMERS_SEGMENT.LASTCHANGEDT IS 'Дата останнього ред
 
 
 
-
-PROMPT *** Create  constraint FK_CUSTSEGM_PERID_PERIOD_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS_SEGMENT ADD CONSTRAINT FK_CUSTSEGM_PERID_PERIOD_ID FOREIGN KEY (PER_ID)
-	  REFERENCES BARS_DM.PERIODS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
 PROMPT *** Create  grants  CUSTOMERS_SEGMENT ***
 grant SELECT                                                                 on CUSTOMERS_SEGMENT to BARS;
+grant SELECT                                                                 on CUSTOMERS_SEGMENT to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTOMERS_SEGMENT to BARSUPL;
+grant SELECT                                                                 on CUSTOMERS_SEGMENT to UPLD;
 
 
 

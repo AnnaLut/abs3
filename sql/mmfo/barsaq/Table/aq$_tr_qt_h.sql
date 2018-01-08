@@ -73,6 +73,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  AQ$_TR_QT_H ***
+grant SELECT                                                                 on AQ$_TR_QT_H     to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

@@ -90,7 +90,7 @@ COMMENT ON COLUMN BARS_DM.CUSTOMERS.RU IS 'РУ';
 COMMENT ON COLUMN BARS_DM.CUSTOMERS.RNK IS 'Ідентифікатор клієнта';
 COMMENT ON COLUMN BARS_DM.CUSTOMERS.BRANCH IS 'Відділення, за яким закріплений клієнт';
 COMMENT ON COLUMN BARS_DM.CUSTOMERS.LAST_NAME IS 'Прізвище позичальника';
-COMMENT ON COLUMN BARS_DM.CUSTOMERS.FIRST_NAME IS 'Ім''я позичальника';
+COMMENT ON COLUMN BARS_DM.CUSTOMERS.FIRST_NAME IS 'Ім'я позичальника';
 COMMENT ON COLUMN BARS_DM.CUSTOMERS.MIDDLE_NAME IS 'По-батькові позичальника';
 COMMENT ON COLUMN BARS_DM.CUSTOMERS.SEX IS 'Стать';
 COMMENT ON COLUMN BARS_DM.CUSTOMERS.GR IS 'Громадянство';
@@ -150,47 +150,10 @@ COMMENT ON COLUMN BARS_DM.CUSTOMERS.ACTUAL_DATE IS 'Дійсний до';
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMERS_PERID_NN ***
+PROMPT *** Create  constraint SYS_C00120084 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS ADD CONSTRAINT CC_CUSTOMERS_PERID_NN CHECK (PER_ID IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_MFO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS ADD CONSTRAINT CC_CUSTOMERS_MFO_NN CHECK (KF IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERS_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS ADD CONSTRAINT CC_CUSTOMERS_BRANCH_NN CHECK (BRANCH IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMERS_PERID_PERIOD_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS ADD CONSTRAINT FK_CUSTOMERS_PERID_PERIOD_ID FOREIGN KEY (PER_ID)
-	  REFERENCES BARS_DM.PERIODS (ID) ENABLE';
+  ALTER TABLE BARS_DM.CUSTOMERS MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -213,10 +176,34 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00120084 ***
+PROMPT *** Create  constraint CC_CUSTOMERS_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS_DM.CUSTOMERS MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE BARS_DM.CUSTOMERS ADD CONSTRAINT CC_CUSTOMERS_BRANCH_NN CHECK (BRANCH IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERS_MFO_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS_DM.CUSTOMERS ADD CONSTRAINT CC_CUSTOMERS_MFO_NN CHECK (KF IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERS_PERID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS_DM.CUSTOMERS ADD CONSTRAINT CC_CUSTOMERS_PERID_NN CHECK (PER_ID IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -266,7 +253,9 @@ exception when others then
 
 PROMPT *** Create  grants  CUSTOMERS ***
 grant SELECT                                                                 on CUSTOMERS       to BARS;
+grant SELECT                                                                 on CUSTOMERS       to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTOMERS       to BARSUPL;
+grant SELECT                                                                 on CUSTOMERS       to UPLD;
 
 
 

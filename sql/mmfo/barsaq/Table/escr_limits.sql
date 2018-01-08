@@ -31,6 +31,9 @@ COMMENT ON COLUMN BARSAQ.ESCR_LIMITS.DATE_TO IS '';
 
 
 
+PROMPT *** Create  grants  ESCR_LIMITS ***
+grant SELECT                                                                 on ESCR_LIMITS     to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

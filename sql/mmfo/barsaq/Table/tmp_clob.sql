@@ -22,6 +22,9 @@ COMMENT ON COLUMN BARSAQ.TMP_CLOB.ACLOB IS '';
 
 
 
+PROMPT *** Create  grants  TMP_CLOB ***
+grant SELECT                                                                 on TMP_CLOB        to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

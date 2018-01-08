@@ -54,10 +54,12 @@
 /
  show err;
  
+PROMPT *** Create  grants  IS_T0_OK ***
+grant EXECUTE                                                                on IS_T0_OK        to BARS;
+
  
  
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARSUPL/function/is_t0_ok.sql =========*** End **
  PROMPT ===================================================================================== 
-
- grant execute on is_t0_ok to bars;
+ 

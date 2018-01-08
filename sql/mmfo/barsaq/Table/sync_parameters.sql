@@ -93,6 +93,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  SYNC_PARAMETERS ***
+grant SELECT                                                                 on SYNC_PARAMETERS to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

@@ -52,10 +52,12 @@ COMMENT ON COLUMN BARSAQ.CUST_INDIVIDUALS.EMAIL IS 'Адрес электронной почты';
 
 
 
-PROMPT *** Create  constraint CC_CUSTINDIVID_BANKID_NN ***
+PROMPT *** Create  constraint PK_CUSTINDIVID ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.CUST_INDIVIDUALS MODIFY (BANK_ID CONSTRAINT CC_CUSTINDIVID_BANKID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.CUST_INDIVIDUALS ADD CONSTRAINT PK_CUSTINDIVID PRIMARY KEY (BANK_ID, RNK)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -76,12 +78,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_CUSTINDIVID ***
+PROMPT *** Create  constraint CC_CUSTINDIVID_BANKID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.CUST_INDIVIDUALS ADD CONSTRAINT PK_CUSTINDIVID PRIMARY KEY (BANK_ID, RNK)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
+  ALTER TABLE BARSAQ.CUST_INDIVIDUALS MODIFY (BANK_ID CONSTRAINT CC_CUSTINDIVID_BANKID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -102,10 +102,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTINDIVID_BIRTHPLACE_NN ***
+PROMPT *** Create  constraint CC_CUSTINDIVID_IDID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.CUST_INDIVIDUALS MODIFY (BIRTHPLACE CONSTRAINT CC_CUSTINDIVID_BIRTHPLACE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.CUST_INDIVIDUALS MODIFY (ID_ID CONSTRAINT CC_CUSTINDIVID_IDID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -162,10 +162,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTINDIVID_IDID_NN ***
+PROMPT *** Create  constraint CC_CUSTINDIVID_BIRTHPLACE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.CUST_INDIVIDUALS MODIFY (ID_ID CONSTRAINT CC_CUSTINDIVID_IDID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.CUST_INDIVIDUALS MODIFY (BIRTHPLACE CONSTRAINT CC_CUSTINDIVID_BIRTHPLACE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -186,6 +186,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  CUST_INDIVIDUALS ***
+grant SELECT                                                                 on CUST_INDIVIDUALS to BARSREADER_ROLE;
 
 
 

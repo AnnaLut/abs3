@@ -128,22 +128,10 @@ COMMENT ON COLUMN BARSAQ.DOC_IMPORT.SYSTEM_ERR_DATE IS 'Дата возникновения систе
 
 
 
-PROMPT *** Create  constraint CC_DOCIMPORT_RMFL ***
+PROMPT *** Create  constraint CC_DOCIMPORT_VRFL ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.DOC_IMPORT ADD CONSTRAINT CC_DOCIMPORT_RMFL CHECK (removal_flag=''Y'') ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DOCIMPORT_INSDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.DOC_IMPORT MODIFY (INSERTION_DATE CONSTRAINT CC_DOCIMPORT_INSDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.DOC_IMPORT ADD CONSTRAINT CC_DOCIMPORT_VRFL CHECK (verification_flag in (''Y'',''N'')) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -164,10 +152,22 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DOCIMPORT_VRFL ***
+PROMPT *** Create  constraint CC_DOCIMPORT_BKFL ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.DOC_IMPORT ADD CONSTRAINT CC_DOCIMPORT_VRFL CHECK (verification_flag in (''Y'',''N'')) ENABLE';
+  ALTER TABLE BARSAQ.DOC_IMPORT ADD CONSTRAINT CC_DOCIMPORT_BKFL CHECK (booking_flag in (''Y'',''N'')) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DOCIMPORT_RMFL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.DOC_IMPORT ADD CONSTRAINT CC_DOCIMPORT_RMFL CHECK (removal_flag=''Y'') ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -382,10 +382,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DOCIMPORT_BKFL ***
+PROMPT *** Create  constraint CC_DOCIMPORT_INSDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.DOC_IMPORT ADD CONSTRAINT CC_DOCIMPORT_BKFL CHECK (booking_flag in (''Y'',''N'')) ENABLE';
+  ALTER TABLE BARSAQ.DOC_IMPORT MODIFY (INSERTION_DATE CONSTRAINT CC_DOCIMPORT_INSDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -479,6 +479,7 @@ exception when others then
 
 PROMPT *** Create  grants  DOC_IMPORT ***
 grant SELECT                                                                 on DOC_IMPORT      to BARS with grant option;
+grant SELECT                                                                 on DOC_IMPORT      to BARSREADER_ROLE;
 grant SELECT                                                                 on DOC_IMPORT      to BARS_ACCESS_DEFROLE;
 grant INSERT,SELECT                                                          on DOC_IMPORT      to REFSYNC_USR;
 grant SELECT                                                                 on DOC_IMPORT      to START1;
