@@ -61,19 +61,6 @@ COMMENT ON COLUMN BARS.WCS_SCORING_QS_MATRIX.AXIS4_ORD IS 'Номер ответа по оси 4
 
 
 
-PROMPT *** Create  constraint FK_SCORQSMTX_SCORQUESTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX ADD CONSTRAINT FK_SCORQSMTX_SCORQUESTS FOREIGN KEY (SCORING_ID, QUESTION_ID)
-	  REFERENCES BARS.WCS_SCORING_QUESTIONS (SCORING_ID, QUESTION_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SCORQSMTX_SID_NN ***
 begin   
  execute immediate '
@@ -86,10 +73,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SCORQSMTX_AXIS1ORD_NN ***
+PROMPT *** Create  constraint CC_SCORQSMTX_QID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX MODIFY (AXIS1_ORD CONSTRAINT CC_SCORQSMTX_AXIS1ORD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX MODIFY (QUESTION_ID CONSTRAINT CC_SCORQSMTX_QID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -122,10 +109,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SCORQSMTX_QID_NN ***
+PROMPT *** Create  constraint CC_SCORQSMTX_AXIS1ORD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX MODIFY (QUESTION_ID CONSTRAINT CC_SCORQSMTX_QID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX MODIFY (AXIS1_ORD CONSTRAINT CC_SCORQSMTX_AXIS1ORD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -148,8 +135,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SCORING_QS_MATRIX ***
+grant SELECT                                                                 on WCS_SCORING_QS_MATRIX to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SCORING_QS_MATRIX to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SCORING_QS_MATRIX to START1;
+grant SELECT                                                                 on WCS_SCORING_QS_MATRIX to UPLD;
 
 
 

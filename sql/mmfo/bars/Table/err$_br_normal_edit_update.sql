@@ -71,6 +71,10 @@ COMMENT ON COLUMN BARS.ERR$_BR_NORMAL_EDIT_UPDATE.BRANCH IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_BR_NORMAL_EDIT_UPDATE ***
+grant SELECT                                                                 on ERR$_BR_NORMAL_EDIT_UPDATE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_BR_NORMAL_EDIT_UPDATE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Довiдник ОБ22 в Резервуваннi';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'SREZERV_OB22';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,20 +124,20 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'CUSTTYPE', 'C', 'Тип~контрагента~0-всі~1-Банк~2-ЮО~3-ФО', null, 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KV', 'C', 'Код~вал~0-всі', null, 3, 4, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NBS', 'C', 'БР~риз.~акт', null, 4, 1, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NBS_7F', 'C', 'БР~7 кл~форм~рез', null, 4, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NBS_7R', 'C', 'БР~7 кл~зменш~рез', null, 4, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NBS_REZ', 'C', 'БР~рез~фонду', null, 4, 6, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'OB22', 'C', 'ОБ22~риз.~акт~0-всі', null, 2, 2, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'OB22_7F', 'C', 'ОБ22~7 кл~форм~рез', null, 2, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'OB22_7R', 'C', 'ОБ22~7 кл~зменш~рез', null, 2, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'OB22_REZ', 'C', 'ОБ22~рез~фонду', null, 2, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'PR', 'N', '1-МБ~2-Юр~3-Фіз~9-Проц', null, 1, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'S080', 'C', 'Кат~риз~0-Для всіх~1-Станд~2-Нест', null, 1, 5, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'R013', 'C', 'R013', null, 1, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'NAL', 'C', 'Група~формування~резерву', null, null, 14, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'CUSTTYPE', 'C', 'Тип~контрагента~0-всі~1-Банк~2-ЮО~3-ФО', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KV', 'C', 'Код~вал~0-всі', '', 3, 4, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NBS', 'C', 'БР~риз.~акт', '', 4, 1, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NBS_7F', 'C', 'БР~7 кл~форм~рез', '', 4, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NBS_7R', 'C', 'БР~7 кл~зменш~рез', '', 4, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NBS_REZ', 'C', 'БР~рез~фонду', '', 4, 6, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'OB22', 'C', 'ОБ22~риз.~акт~0-всі', '', 2, 2, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'OB22_7F', 'C', 'ОБ22~7 кл~форм~рез', '', 2, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'OB22_7R', 'C', 'ОБ22~7 кл~зменш~рез', '', 2, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'OB22_REZ', 'C', 'ОБ22~рез~фонду', '', 2, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'PR', 'N', '1-МБ~2-Юр~3-Фіз~9-Проц', '', 1, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'S080', 'C', 'Кат~риз~0-Для всіх~1-Станд~2-Нест', '', 1, 5, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'R013', 'C', 'R013', '', 1, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'NAL', 'C', 'Група~формування~резерву', '', null, 14, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('PS');

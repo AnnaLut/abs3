@@ -17,8 +17,10 @@ PROMPT *** Create  view V_XOZ_REFZ ***
     WHERE x.REF = p.REF;
 
 PROMPT *** Create  grants  V_XOZ_REFZ ***
+grant SELECT                                                                 on V_XOZ_REFZ      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_XOZ_REFZ      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_XOZ_REFZ      to START1;
+grant SELECT                                                                 on V_XOZ_REFZ      to UPLD;
 
 
 

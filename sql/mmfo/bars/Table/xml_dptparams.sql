@@ -77,8 +77,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_DPTPARAMS ***
+grant SELECT                                                                 on XML_DPTPARAMS   to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_DPTPARAMS   to BARS_DM;
 grant SELECT                                                                 on XML_DPTPARAMS   to KLBX;
+grant SELECT                                                                 on XML_DPTPARAMS   to UPLD;
 
 
 

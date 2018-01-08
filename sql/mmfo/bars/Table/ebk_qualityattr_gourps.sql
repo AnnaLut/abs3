@@ -83,8 +83,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBK_QUALITYATTR_GOURPS ***
+grant SELECT                                                                 on EBK_QUALITYATTR_GOURPS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBK_QUALITYATTR_GOURPS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBK_QUALITYATTR_GOURPS to BARS_DM;
+grant SELECT                                                                 on EBK_QUALITYATTR_GOURPS to UPLD;
 
 
 

@@ -80,8 +80,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OVR_CHKO ***
+grant SELECT                                                                 on OVR_CHKO        to BARSREADER_ROLE;
 grant SELECT                                                                 on OVR_CHKO        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OVR_CHKO        to START1;
+grant SELECT                                                                 on OVR_CHKO        to UPLD;
 
 
 

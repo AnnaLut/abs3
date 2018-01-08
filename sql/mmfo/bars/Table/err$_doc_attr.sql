@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_DOC_ATTR.SSQL IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DOC_ATTR ***
+grant SELECT                                                                 on ERR$_DOC_ATTR   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DOC_ATTR   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

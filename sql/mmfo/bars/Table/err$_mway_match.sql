@@ -71,6 +71,10 @@ COMMENT ON COLUMN BARS.ERR$_MWAY_MATCH.REF_FEE_TR IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_MWAY_MATCH ***
+grant SELECT                                                                 on ERR$_MWAY_MATCH to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_MWAY_MATCH to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_INS_PARTNER_TYPE_TEMPLATE.PRT_FORMAT IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_INS_PARTNER_TYPE_TEMPLATE ***
+grant SELECT                                                                 on ERR$_INS_PARTNER_TYPE_TEMPLATE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_INS_PARTNER_TYPE_TEMPLATE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

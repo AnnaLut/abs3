@@ -69,62 +69,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BICACC_ACCOUNTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BIC_ACC ADD CONSTRAINT FK_BICACC_ACCOUNTS FOREIGN KEY (KF, TRANSIT)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_SWBANKS_BICACC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BIC_ACC ADD CONSTRAINT R_SWBANKS_BICACC FOREIGN KEY (BIC)
-	  REFERENCES BARS.SW_BANKS (BIC) ON DELETE CASCADE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_BICACC_ACCOUNTS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BIC_ACC ADD CONSTRAINT FK_BICACC_ACCOUNTS2 FOREIGN KEY (KF, ACC)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_BICACC_KF_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.BIC_ACC MODIFY (KF CONSTRAINT CC_BICACC_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_BICACC_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BIC_ACC ADD CONSTRAINT FK_BICACC_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -189,9 +137,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BIC_ACC ***
+grant SELECT                                                                 on BIC_ACC         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BIC_ACC         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BIC_ACC         to BARS_DM;
 grant SELECT                                                                 on BIC_ACC         to SWTOSS;
+grant SELECT                                                                 on BIC_ACC         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BIC_ACC         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BIC_ACC         to WR_REFREAD;
 

@@ -89,10 +89,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  MS_UR_K ***
+grant SELECT                                                                 on MS_UR_K         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MS_UR_K         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MS_UR_K         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MS_UR_K         to CC_AIM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MS_UR_K         to RCC_DEAL;
+grant SELECT                                                                 on MS_UR_K         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MS_UR_K         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on MS_UR_K         to WR_REFREAD;
 

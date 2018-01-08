@@ -81,22 +81,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PSTTS_DK_NN ***
+PROMPT *** Create  constraint CC_PSTTS_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PS_TTS MODIFY (DK CONSTRAINT CC_PSTTS_DK_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PSTTS_NBS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PS_TTS MODIFY (NBS CONSTRAINT CC_PSTTS_NBS_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.PS_TTS MODIFY (ID CONSTRAINT CC_PSTTS_ID_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -117,10 +105,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PSTTS_ID_NN ***
+PROMPT *** Create  constraint CC_PSTTS_NBS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PS_TTS MODIFY (ID CONSTRAINT CC_PSTTS_ID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.PS_TTS MODIFY (NBS CONSTRAINT CC_PSTTS_NBS_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -129,37 +117,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_PSTTS_TTS ***
+PROMPT *** Create  constraint CC_PSTTS_DK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PS_TTS ADD CONSTRAINT FK_PSTTS_TTS FOREIGN KEY (TT)
-	  REFERENCES BARS.TTS (TT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_PSTTS_DK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PS_TTS ADD CONSTRAINT FK_PSTTS_DK FOREIGN KEY (DK)
-	  REFERENCES BARS.DK (DK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_PSTTS_PS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PS_TTS ADD CONSTRAINT FK_PSTTS_PS FOREIGN KEY (NBS)
-	  REFERENCES BARS.PS (NBS) ENABLE';
+  ALTER TABLE BARS.PS_TTS MODIFY (DK CONSTRAINT CC_PSTTS_DK_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -197,12 +158,14 @@ exception when others then
 
 PROMPT *** Create  grants  PS_TTS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PS_TTS          to ABS_ADMIN;
+grant SELECT                                                                 on PS_TTS          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PS_TTS          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PS_TTS          to BARS_DM;
 grant SELECT                                                                 on PS_TTS          to KLBX;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PS_TTS          to PS_TTS;
 grant SELECT                                                                 on PS_TTS          to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PS_TTS          to TECH005;
+grant SELECT                                                                 on PS_TTS          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PS_TTS          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on PS_TTS          to WR_REFREAD;
 

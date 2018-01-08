@@ -69,10 +69,10 @@ COMMENT ON COLUMN BARS.ACC_BALANCE_CHANGES_UPDATE.KF IS '';
 
 
 
-PROMPT *** Create  constraint CC_ACCBALCHUPD_RNK_NN ***
+PROMPT *** Create  constraint CC_ACCBALCHUPD_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_BALANCE_CHANGES_UPDATE MODIFY (RNK CONSTRAINT CC_ACCBALCHUPD_RNK_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.ACC_BALANCE_CHANGES_UPDATE MODIFY (ID CONSTRAINT CC_ACCBALCHUPD_ID_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -93,10 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCBALCHUPD_ID_NN ***
+PROMPT *** Create  constraint CC_ACCBALCHUPD_RNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_BALANCE_CHANGES_UPDATE MODIFY (ID CONSTRAINT CC_ACCBALCHUPD_ID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.ACC_BALANCE_CHANGES_UPDATE MODIFY (RNK CONSTRAINT CC_ACCBALCHUPD_RNK_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -153,8 +153,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACC_BALANCE_CHANGES_UPDATE ***
+grant SELECT                                                                 on ACC_BALANCE_CHANGES_UPDATE to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on ACC_BALANCE_CHANGES_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_BALANCE_CHANGES_UPDATE to BARS_DM;
+grant SELECT                                                                 on ACC_BALANCE_CHANGES_UPDATE to UPLD;
 
 
 

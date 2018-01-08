@@ -18,7 +18,9 @@ with read only
 
 PROMPT *** Create  grants  V_SW_SEARCHMSG ***
 grant SELECT                                                                 on V_SW_SEARCHMSG  to BARS013;
+grant SELECT                                                                 on V_SW_SEARCHMSG  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW_SEARCHMSG  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_SW_SEARCHMSG  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SW_SEARCHMSG  to WR_ALL_RIGHTS;
 
 

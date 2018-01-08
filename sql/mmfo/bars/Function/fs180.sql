@@ -12,7 +12,7 @@
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :   Функция расчета кода срока
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     :   15/02/2012 (25/03/2011)
+% VERSION     :   16/08/2017 (15/02/2012)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: acc_    - идентификатор счета
                klass_  - для установки значений по-умолчанию - 0
@@ -42,14 +42,27 @@ IS
 
 BEGIN
    if klassR_ = 1 then
-   --bars_audit.info('fs180_klass');  --***
    -- klassR_ = 1 - МЕЖБАНК
       begin
-         SELECT a.wdate, a.sdate, substr(nls, 1, 4) nbs
+--         SELECT a.wdate, a.sdate, substr(nls, 1, 4) nbs
+--            INTO mdate_, dapp_, nbs_
+--         FROM mbd_k a
+--         WHERE a.acc=acc_
+--           and dat_ between a.sdate and a.wdate;
+           
+        select d.wdate wdate, ad.wdate sdate, substr(a.nls, 1, 4)
             INTO mdate_, dapp_, nbs_
-         FROM mbd_k a
-         WHERE a.acc=acc_
-           and dat_ between a.sdate and a.wdate;
+        from  cc_deal d,
+              cc_add ad,
+              cc_vidd v,
+              accounts a
+        where a.acc=acc_
+          AND d.nd = ad.nd
+          AND d.vidd = v.vidd
+          AND v.custtype = 1
+          AND LENGTH (v.vidd) = 4
+          AND ad.accs = a.acc
+          and dat_ between ad.wdate and d.wdate ;          
 
          kod_ := '0';
       exception
@@ -57,10 +70,8 @@ BEGIN
          klassR_ := null;
       end;
    end if;
---bars_audit.info('fs180_klass=kod_='||kod_||'=klassR_='||klassR_);
-   if klassR_ is null or klassR_ not in ('0','1') then
 
-   ----bars_audit.info('fs180_klassR_ ='||klassR_);
+   if klassR_ is null or klassR_ not in ('0','1') then
       BEGIN
          SELECT NVL (Trim (s180), '0')
             INTO kod_
@@ -73,7 +84,6 @@ BEGIN
       END;
 
       if kod_ = '0' then
-       --bars_audit.info('fs180_kod_ ='||kod_);
          begin
             SELECT a.mdate, a.dapp, a.daos, nbs
                INTO mdate_, dapp_, daos_, nbs_
@@ -93,17 +103,14 @@ BEGIN
 
    IF kod_ = '0' or klass_ = '0'
    THEN
-   --bars_audit.info('fs180_ =kod_= '||kod_||'=klass_='||klass_);
       if mdate_ is not null then
          -- если задана дата открытия договора, отличная от даты первого
          -- движения или даты открытия счета
-        --bars_audit.info('fs180_ =mdate_= '||mdate_||' bdat_='||bdat_);
          if bdat_ is not null then
             dapp_ := bdat_;
          end if;
 
          kod_ := nvl(f_srok(dapp_, mdate_, tp_), '0');
-----bars_audit.info('fs180_ =kod_= '||kod_);
          -- для тех случаев, если дата погашения установлена неверно,
          -- или перебросили остаток со счета 2630 (Сбербанк, например)
          if oz_kor_ = 1 then
@@ -125,7 +132,6 @@ BEGIN
 
       -- значения по умолчанию
       IF kod_ = '0'   THEN
-      ----bars_audit.info('fs180_ =kod_ = 0 =Fs180_DEF=nbs='||nbs_||'tp_='||tp_);
          kod_ := Fs180_DEF (nbs_, tp_);
       END IF;
    END IF;

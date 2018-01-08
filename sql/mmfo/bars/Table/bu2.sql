@@ -65,32 +65,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BU2_DK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BU2 ADD CONSTRAINT FK_BU2_DK FOREIGN KEY (PAP)
-	  REFERENCES BARS.DK (DK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_BU2_BU1 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BU2 ADD CONSTRAINT FK_BU2_BU1 FOREIGN KEY (ID)
-	  REFERENCES BARS.BU1 (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_BU2_ID_NN ***
 begin   
  execute immediate '
@@ -118,10 +92,12 @@ exception when others then
 
 PROMPT *** Create  grants  BU2 ***
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on BU2             to ABS_ADMIN;
+grant SELECT                                                                 on BU2             to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on BU2             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BU2             to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BU2             to BU;
 grant SELECT                                                                 on BU2             to SALGL;
+grant SELECT                                                                 on BU2             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BU2             to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BU2             to WR_REFREAD;
 

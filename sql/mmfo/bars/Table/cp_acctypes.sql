@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_ACCTYPES ***
+grant SELECT                                                                 on CP_ACCTYPES     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_ACCTYPES     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_ACCTYPES     to BARS_DM;
+grant SELECT                                                                 on CP_ACCTYPES     to UPLD;
 
 
 

@@ -78,7 +78,9 @@ COMMENT ON COLUMN BARS.KOD_OP.VID IS '';
 
 
 PROMPT *** Create  grants  KOD_OP ***
+grant SELECT                                                                 on KOD_OP          to BARSREADER_ROLE;
 grant SELECT                                                                 on KOD_OP          to BARS_DM;
+grant SELECT                                                                 on KOD_OP          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KOD_OP          to WR_ALL_RIGHTS;
 
 

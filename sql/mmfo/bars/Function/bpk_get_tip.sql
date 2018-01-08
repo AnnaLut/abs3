@@ -12,12 +12,11 @@ BEGIN
 
 SELECT f.name into  v_code  from  W4_acc b, w4_card c , w4_subproduct f  where  C.CODE=B.CARD_CODE  and b.ACC_PK=p_code  and c.sub_code=f.code and rownum=1;
 
-v_code := ltrim(v_code, 'грн');
-v_code:= replace(v_code, '.', '');
+v_code := regexp_replace(v_code,'([0-9]|[[:punct:]]|[а-я]|[А-Я]|[їієІ])','');
 v_code := trim(v_code);
+v_code := rtrim(v_code,'MU');
+v_code := replace(v_code,'PP','PayPass');
 
-v_code:=  rtrim(v_code ,'0123456789');
-v_code := trim(v_code);
   RETURN v_code ;
 END;
 /

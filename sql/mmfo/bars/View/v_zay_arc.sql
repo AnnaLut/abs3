@@ -110,7 +110,9 @@ PROMPT *** Create  view V_ZAY_ARC ***
     WHERE v_zay.mfo <> f_ourmfo_g;
 
 PROMPT *** Create  grants  V_ZAY_ARC ***
+grant SELECT                                                                 on V_ZAY_ARC       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY_ARC       to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ZAY_ARC       to UPLD;
 grant SELECT                                                                 on V_ZAY_ARC       to ZAY;
 
 

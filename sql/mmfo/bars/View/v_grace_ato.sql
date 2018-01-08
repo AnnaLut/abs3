@@ -48,8 +48,10 @@ PROMPT *** Create  view V_GRACE_ATO ***
           AND d.nd = x.nd(+);
 
 PROMPT *** Create  grants  V_GRACE_ATO ***
+grant SELECT                                                                 on V_GRACE_ATO     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GRACE_ATO     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_GRACE_ATO     to START1;
+grant SELECT                                                                 on V_GRACE_ATO     to UPLD;
 
 
 

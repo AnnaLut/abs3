@@ -1,14 +1,14 @@
 
 
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CIG_SHED_JOB.sql ====*** Run *** ====
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CIG_SHED_JOB.sql =========*** Run ***
 PROMPT ===================================================================================== 
 
 
 PROMPT *** Create  view V_CIG_SHED_JOB ***
 
-create or replace view bars.V_CIG_SHED_JOB as
-select 
+  CREATE OR REPLACE FORCE VIEW BARS.V_CIG_SHED_JOB ("JOB", "LAST_DATE", "LAST_SEC", "THIS_DATE", "THIS_SEC", "NEXT_DATE", "NEXT_SEC", "TOTAL_TIME", "BROKEN", "INTERVAL", "FAILURES", "WHAT", "BRANCH") AS 
+  select
   s.job_name job,
   TO_CHAR (s.last_start_date, 'dd.mm.yyyy') last_date,
   TO_CHAR (s.last_start_date, 'hh24:mi:ss') last_sec,
@@ -20,14 +20,17 @@ select
   broken,
   s.interval,
   s.failures,
-  s.what, 
+  s.what,
   branch
 from cig_shed_jobs_state s;
 
 PROMPT *** Create  grants  V_CIG_SHED_JOB ***
-grant SELECT on V_CIG_SHED_JOB to BARS_ACCESS_DEFROLE;
-grant SELECT on V_CIG_SHED_JOB to CIG_ROLE;
+grant SELECT                                                                 on V_CIG_SHED_JOB  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIG_SHED_JOB  to CIG_ROLE;
+grant SELECT                                                                 on V_CIG_SHED_JOB  to UPLD;
+
+
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CIG_SHED_JOB.sql ====*** End *** ====
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CIG_SHED_JOB.sql =========*** End ***
 PROMPT ===================================================================================== 

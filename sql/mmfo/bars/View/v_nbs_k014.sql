@@ -21,10 +21,12 @@ PROMPT *** Create  view V_NBS_K014 ***
   from nbs_k014;
 
 PROMPT *** Create  grants  V_NBS_K014 ***
+grant SELECT                                                                 on V_NBS_K014      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_NBS_K014      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT                                                   on V_NBS_K014      to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_NBS_K014      to PAP;
 grant DELETE,INSERT,SELECT                                                   on V_NBS_K014      to START1;
+grant SELECT                                                                 on V_NBS_K014      to UPLD;
 grant FLASHBACK,SELECT                                                       on V_NBS_K014      to WR_REFREAD;
 
 

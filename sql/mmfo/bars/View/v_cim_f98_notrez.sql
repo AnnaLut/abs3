@@ -25,7 +25,9 @@ PROMPT *** Create  view V_CIM_F98_NOTREZ ***
    order by f.r4, nvl(f.datnaksk, f.datanak), f.v_sank;
 
 PROMPT *** Create  grants  V_CIM_F98_NOTREZ ***
+grant SELECT                                                                 on V_CIM_F98_NOTREZ to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_F98_NOTREZ to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_F98_NOTREZ to UPLD;
 
 
 

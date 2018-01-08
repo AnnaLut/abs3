@@ -97,9 +97,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  IMP_FILE ***
+grant SELECT                                                                 on IMP_FILE        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on IMP_FILE        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on IMP_FILE        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on IMP_FILE        to START1;
+grant SELECT                                                                 on IMP_FILE        to UPLD;
 
 
 

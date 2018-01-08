@@ -82,10 +82,10 @@ loop
           replace(
           replace(
           replace(
-          replace(l_value ,',',''), '.',''), '-',''), '/',''), ' ','');
+          replace(l_value ,',','.'), '.','.'), '-','.'), '/','.'), ' ','');
 
           begin
-            l_sumDZ := to_number(l_value)/100;
+            l_sumDZ := to_number(l_value,'99999999999990.00');
           exception  when others then l_sumDZ :=0 ;
           end;
 

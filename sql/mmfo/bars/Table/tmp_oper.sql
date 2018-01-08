@@ -69,6 +69,10 @@ COMMENT ON COLUMN BARS.TMP_OPER.DK IS '';
 
 
 
+PROMPT *** Create  grants  TMP_OPER ***
+grant SELECT                                                                 on TMP_OPER        to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_OPER        to UPLD;
+
 
 
 PROMPT ===================================================================================== 

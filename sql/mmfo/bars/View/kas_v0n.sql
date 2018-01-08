@@ -16,8 +16,10 @@ PROMPT *** Create  view KAS_V0N ***
 from kas_VID v;
 
 PROMPT *** Create  grants  KAS_V0N ***
+grant SELECT                                                                 on KAS_V0N         to BARSREADER_ROLE;
 grant SELECT                                                                 on KAS_V0N         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KAS_V0N         to PYOD001;
+grant SELECT                                                                 on KAS_V0N         to UPLD;
 
 
 

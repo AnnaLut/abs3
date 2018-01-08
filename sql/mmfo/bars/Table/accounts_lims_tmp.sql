@@ -49,9 +49,11 @@ COMMENT ON COLUMN BARS.ACCOUNTS_LIMS_TMP.LIM IS '';
 
 
 PROMPT *** Create  grants  ACCOUNTS_LIMS_TMP ***
+grant SELECT                                                                 on ACCOUNTS_LIMS_TMP to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCOUNTS_LIMS_TMP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCOUNTS_LIMS_TMP to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCOUNTS_LIMS_TMP to START1;
+grant SELECT                                                                 on ACCOUNTS_LIMS_TMP to UPLD;
 
 
 

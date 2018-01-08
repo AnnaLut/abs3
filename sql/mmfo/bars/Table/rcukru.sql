@@ -161,9 +161,11 @@ COMMENT ON COLUMN BARS.RCUKRU.SID IS '';
 
 
 PROMPT *** Create  grants  RCUKRU ***
+grant SELECT                                                                 on RCUKRU          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RCUKRU          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RCUKRU          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RCUKRU          to RCUKRU;
+grant SELECT                                                                 on RCUKRU          to UPLD;
 
 
 

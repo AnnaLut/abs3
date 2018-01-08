@@ -62,7 +62,9 @@ PROMPT *** Create  view V_ACCOUNTS_ALL_W4 ***
     and a.nbs = '2625';
 
 PROMPT *** Create  grants  V_ACCOUNTS_ALL_W4 ***
+grant SELECT                                                                 on V_ACCOUNTS_ALL_W4 to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACCOUNTS_ALL_W4 to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ACCOUNTS_ALL_W4 to UPLD;
 
 
 

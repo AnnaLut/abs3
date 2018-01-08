@@ -75,6 +75,10 @@ COMMENT ON COLUMN BARS.ERR$_CC_LIM_ARC.TYPM IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CC_LIM_ARC ***
+grant SELECT                                                                 on ERR$_CC_LIM_ARC to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CC_LIM_ARC to UPLD;
+
 
 
 PROMPT ===================================================================================== 

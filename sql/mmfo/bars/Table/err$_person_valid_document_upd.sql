@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_PERSON_VALID_DOCUMENT_UPD.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_PERSON_VALID_DOCUMENT_UPD ***
+grant SELECT                                                                 on ERR$_PERSON_VALID_DOCUMENT_UPD to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_PERSON_VALID_DOCUMENT_UPD to UPLD;
+
 
 
 PROMPT ===================================================================================== 

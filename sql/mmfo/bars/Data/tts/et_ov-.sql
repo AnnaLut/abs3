@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции OV-
-prompt Наименование операции: Регулювання залишку на рах.невикорист.лiмiту овердрафту 9129
+prompt Наименование операции: OV- Регулювання залишку на рах.невикорист.лiмiту овердрафту 9129
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('OV-', 'Регулювання залишку на рах.невикорист.лiмiту овердрафту 9129', 1, null, 980, '99002916', 980, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('OV-', 'OV- Регулювання залишку на рах.невикорист.лiмiту овердрафту 9129', 1, null, 980, '99002916', 980, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='OV-', name='Регулювання залишку на рах.невикорист.лiмiту овердрафту 9129', dk=1, nlsm=null, kv=980, nlsk='99002916', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='OV-', name='OV- Регулювання залишку на рах.невикорист.лiмiту овердрафту 9129', dk=1, nlsm=null, kv=980, nlsk='99002916', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='OV-';
   end;
   --------------------------------

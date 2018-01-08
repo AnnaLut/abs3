@@ -23,7 +23,7 @@ END;
 
 
 /
-ALTER TRIGGER BARS.TU_VDPTAGRDAT DISABLE;
+ALTER TRIGGER BARS.TU_VDPTAGRDAT ENABLE;
 
 
 PROMPT ===================================================================================== 

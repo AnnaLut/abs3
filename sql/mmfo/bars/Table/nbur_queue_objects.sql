@@ -67,11 +67,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_QUEUEOBJECTS_REFOBJECTS ***
+PROMPT *** Create  constraint CC_QUEUEOBJECTS_REPDATE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_QUEUE_OBJECTS ADD CONSTRAINT FK_QUEUEOBJECTS_REFOBJECTS FOREIGN KEY (ID)
-	  REFERENCES BARS.NBUR_REF_OBJECTS (ID) ENABLE';
+  ALTER TABLE BARS.NBUR_QUEUE_OBJECTS MODIFY (REPORT_DATE CONSTRAINT CC_QUEUEOBJECTS_REPDATE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -94,18 +93,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_QUEUEOBJECTS_REPDATE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBUR_QUEUE_OBJECTS MODIFY (REPORT_DATE CONSTRAINT CC_QUEUEOBJECTS_REPDATE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index UK_QUEUEOBJECTS ***
 begin   
  execute immediate '
@@ -120,7 +107,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_QUEUE_OBJECTS ***
+grant SELECT                                                                 on NBUR_QUEUE_OBJECTS to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_QUEUE_OBJECTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on NBUR_QUEUE_OBJECTS to UPLD;
 
 
 

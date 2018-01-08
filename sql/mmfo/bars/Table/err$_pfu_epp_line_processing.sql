@@ -143,6 +143,10 @@ COMMENT ON COLUMN BARS.ERR$_PFU_EPP_LINE_PROCESSING.REQID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_PFU_EPP_LINE_PROCESSING ***
+grant SELECT                                                                 on ERR$_PFU_EPP_LINE_PROCESSING to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_PFU_EPP_LINE_PROCESSING to UPLD;
+
 
 
 PROMPT ===================================================================================== 

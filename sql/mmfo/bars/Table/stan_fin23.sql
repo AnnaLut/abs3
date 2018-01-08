@@ -103,6 +103,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  STAN_FIN23 ***
+grant SELECT                                                                 on STAN_FIN23      to BARSREADER_ROLE;
 grant SELECT                                                                 on STAN_FIN23      to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAN_FIN23      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAN_FIN23      to BARS_DM;

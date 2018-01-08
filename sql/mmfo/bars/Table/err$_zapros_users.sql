@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.ERR$_ZAPROS_USERS.USER_ID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ZAPROS_USERS ***
+grant SELECT                                                                 on ERR$_ZAPROS_USERS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ZAPROS_USERS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

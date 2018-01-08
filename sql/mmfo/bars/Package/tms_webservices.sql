@@ -1,4 +1,10 @@
-create or replace package tms_webservices is
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/tms_webservices.sql =========*** Run
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.TMS_WEBSERVICES is
 
     -- Author  : VITALII.KHOMIDA
     -- Created : 30.01.2017 8:10:56
@@ -11,7 +17,7 @@ create or replace package tms_webservices is
     procedure load_insiders;
 end tms_webservices;
 /
-create or replace package body tms_webservices is
+CREATE OR REPLACE PACKAGE BODY BARS.TMS_WEBSERVICES is
 
   FUNCTION get_data_from_xml(p_dataxml xmltype, p_param varchar2)
   RETURN varchar2
@@ -490,7 +496,7 @@ create or replace package body tms_webservices is
 
             begin
                 insert into customer_ri
-                values (bars_sqnc.get_nextval('s_customer_ri'),        -- id        number 
+                values (bars_sqnc.get_nextval('s_customer_ri'),        -- id        number
                         l_idcode,                                      -- idcode    varchar2(10)   Код за ЄДРПОУ/ДРФО
                         l_doct,                                        -- doct      number(2)      Тип документа
                         l_docs,                                        -- docs      varchar2(10)   Серія документа
@@ -658,8 +664,17 @@ create or replace package body tms_webservices is
                     if (l_receipt_file_path not like '%\') then
                         l_receipt_file_path := l_receipt_file_path || '\';
                     end if;
+                    BARS_AUDIT.LOG_INFO('tms_webservices.load_insiders', 'path : ' || l_receipt_file_path || l_receipt_file_name, p_auxiliary_info => l_receipt_clob);
 
-                    ext_file_mgr.put_file_text(l_receipt_clob, l_receipt_file_path || l_receipt_file_name, p_overwrite => 1);
+                    begin
+                        ext_file_mgr.put_file_text(l_receipt_clob, l_receipt_file_path || l_receipt_file_name, p_overwrite => 1);
+                    exception
+                        when others then
+                             BARS_AUDIT.LOG_ERROR('tms_webservices.load_insiders (receipt failure)',
+                                                  'path : ' || l_receipt_file_path || l_receipt_file_name || chr(10) ||
+                                                  sqlerrm || chr(10) || dbms_utility.format_error_backtrace(),
+                                                  p_auxiliary_info => l_receipt_clob);
+                    end;
                 end loop;
 
 
@@ -668,7 +683,15 @@ create or replace package body tms_webservices is
                         l_archive_file_path := l_archive_file_path || '\';
                     end if;
 
-                    ext_file_mgr.put_file_text(l_file_clob, l_archive_file_path || l_file_name, p_overwrite => 1);
+                    begin
+                        ext_file_mgr.put_file_text(l_file_clob, l_archive_file_path || l_file_name, p_overwrite => 1);
+                    exception
+                        when others then
+                             BARS_AUDIT.LOG_ERROR('tms_webservices.load_insiders (archive failure)',
+                                                  'path : ' || l_archive_file_path || l_file_name || chr(10) ||
+                                                  sqlerrm || chr(10) || dbms_utility.format_error_backtrace(),
+                                                  p_auxiliary_info => l_file_clob);
+                    end;
                 end if;
 
                 ext_file_mgr.remove_file(l_insiders_file_list(i));
@@ -682,3 +705,10 @@ create or replace package body tms_webservices is
 end tms_webservices;
 /
  show err;
+ 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/tms_webservices.sql =========*** End
+ PROMPT ===================================================================================== 
+ 

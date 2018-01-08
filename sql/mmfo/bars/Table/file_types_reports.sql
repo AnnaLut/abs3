@@ -52,8 +52,10 @@ COMMENT ON COLUMN BARS.FILE_TYPES_REPORTS.STATUS IS 'Статус: 1-активний; 0- не в
 
 
 PROMPT *** Create  grants  FILE_TYPES_REPORTS ***
+grant SELECT                                                                 on FILE_TYPES_REPORTS to BARSREADER_ROLE;
 grant DELETE,SELECT,UPDATE                                                   on FILE_TYPES_REPORTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FILE_TYPES_REPORTS to BARS_DM;
+grant SELECT                                                                 on FILE_TYPES_REPORTS to UPLD;
 
 
 

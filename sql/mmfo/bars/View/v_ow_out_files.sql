@@ -15,7 +15,9 @@ PROMPT *** Create  view V_OW_OUT_FILES ***
     from ow_oicrevfiles o;
 
 PROMPT *** Create  grants  V_OW_OUT_FILES ***
+grant SELECT                                                                 on V_OW_OUT_FILES  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_OUT_FILES  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_OW_OUT_FILES  to UPLD;
 
 
 

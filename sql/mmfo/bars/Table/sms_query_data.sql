@@ -165,8 +165,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SMS_QUERY_DATA ***
+grant SELECT                                                                 on SMS_QUERY_DATA  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SMS_QUERY_DATA  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SMS_QUERY_DATA  to START1;
+grant SELECT                                                                 on SMS_QUERY_DATA  to UPLD;
 
 
 

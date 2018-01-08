@@ -31,8 +31,10 @@ PROMPT *** Create  view V_NBUR_DM_MONTHLY_BALANCES ***
   FROM NBUR_DM_BALANCES_MONTHLY;
 
 PROMPT *** Create  grants  V_NBUR_DM_MONTHLY_BALANCES ***
+grant SELECT                                                                 on V_NBUR_DM_MONTHLY_BALANCES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_DM_MONTHLY_BALANCES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_DM_MONTHLY_BALANCES to RPBN002;
+grant SELECT                                                                 on V_NBUR_DM_MONTHLY_BALANCES to UPLD;
 
 
 

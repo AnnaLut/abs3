@@ -111,7 +111,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  PS2 ***
+grant SELECT                                                                 on PS2             to BARSREADER_ROLE;
 grant SELECT                                                                 on PS2             to BARS_DM;
+grant SELECT                                                                 on PS2             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PS2             to WR_ALL_RIGHTS;
 
 

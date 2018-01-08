@@ -125,12 +125,6 @@ begin
 
   insert into mbk_cp (ND, ID, KOL, sasin, ref, acc, tipd) values ( P_ND_MBK, p_ID_cp, P_KOL_cp, P_sasin, oo1.ref, aa1.acc, vv1.tipd  ) ;
 
-/*14.12.2017  
-  GET_ACCW (a.acc,0,null,0,'CP_ZAL',gl.bdate)
-  працювати буде невірно, так як функціонал розширений і перероблений. Вся необхідна інформація більше не зберігається в accountsp,
-  вона безпосередньо в cp_zal
-  
-*/
   If vv1.tipd =  2 then
      l_kol := p_kol_cp;
      for k in ( select a.acc, a.ostc, nvl( GET_ACCW (a.acc,0,null,0,'CP_ZAL',gl.bdate), 0) zal, d.ref

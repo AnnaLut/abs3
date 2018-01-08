@@ -76,8 +76,10 @@ PROMPT *** Create  view V_KASS ***
             KAS_ZV.IDZ;
 
 PROMPT *** Create  grants  V_KASS ***
+grant SELECT                                                                 on V_KASS          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_KASS          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_KASS          to PYOD001;
+grant SELECT                                                                 on V_KASS          to UPLD;
 
 
 

@@ -101,8 +101,10 @@ COMMENT ON COLUMN BARS.TABVAL_TMP.EMI IS '';
 
 
 PROMPT *** Create  grants  TABVAL_TMP ***
+grant SELECT                                                                 on TABVAL_TMP      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TABVAL_TMP      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TABVAL_TMP      to START1;
+grant SELECT                                                                 on TABVAL_TMP      to UPLD;
 
 
 

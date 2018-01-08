@@ -115,23 +115,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CUSTOMERWUPDATE_CUSTOMER ***
+PROMPT *** Create  constraint C_CUSTOMERWUPDATE_RNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMERW_UPDATE ADD CONSTRAINT FK_CUSTOMERWUPDATE_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint C_CUSTOMERWUPDATE_IDUPD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMERW_UPDATE MODIFY (IDUPD CONSTRAINT C_CUSTOMERWUPDATE_IDUPD_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CUSTOMERW_UPDATE MODIFY (RNK CONSTRAINT C_CUSTOMERWUPDATE_RNK_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -188,10 +175,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint C_CUSTOMERWUPDATE_RNK_NN ***
+PROMPT *** Create  constraint C_CUSTOMERWUPDATE_IDUPD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMERW_UPDATE MODIFY (RNK CONSTRAINT C_CUSTOMERWUPDATE_RNK_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CUSTOMERW_UPDATE MODIFY (IDUPD CONSTRAINT C_CUSTOMERWUPDATE_IDUPD_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -256,6 +243,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUSTOMERW_UPDATE ***
+grant SELECT                                                                 on CUSTOMERW_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTOMERW_UPDATE to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTOMERW_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMERW_UPDATE to BARS_DM;

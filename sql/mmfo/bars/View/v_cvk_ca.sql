@@ -49,9 +49,11 @@ PROMPT *** Create  view V_CVK_CA ***
     WHERE s.nbs = ps264.nbs AND s.dazs IS NULL AND s.rnk = c.rnk;
 
 PROMPT *** Create  grants  V_CVK_CA ***
+grant SELECT                                                                 on V_CVK_CA        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CVK_CA        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CVK_CA        to RPBN002;
 grant SELECT                                                                 on V_CVK_CA        to START1;
+grant SELECT                                                                 on V_CVK_CA        to UPLD;
 
 
 

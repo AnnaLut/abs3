@@ -21,8 +21,10 @@ PROMPT *** Create  view V_CP_DAT ***
      WHERE k.id = d.id);
 
 PROMPT *** Create  grants  V_CP_DAT ***
+grant SELECT                                                                 on V_CP_DAT        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_DAT        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_DAT        to START1;
+grant SELECT                                                                 on V_CP_DAT        to UPLD;
 
 
 

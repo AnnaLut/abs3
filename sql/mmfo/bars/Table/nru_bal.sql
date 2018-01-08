@@ -47,6 +47,10 @@ COMMENT ON COLUMN BARS.NRU_BAL.OB22 IS 'Аналітика об22';
 
 
 
+PROMPT *** Create  grants  NRU_BAL ***
+grant SELECT                                                                 on NRU_BAL         to BARSREADER_ROLE;
+grant SELECT                                                                 on NRU_BAL         to UPLD;
+
 
 
 PROMPT ===================================================================================== 

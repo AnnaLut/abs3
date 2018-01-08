@@ -68,19 +68,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CONTRACTSLICENCE_CONTRACTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CONTRACTS_LICENCE ADD CONSTRAINT FK_CONTRACTSLICENCE_CONTRACTS FOREIGN KEY (PID)
-	  REFERENCES BARS.TOP_CONTRACTS (PID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_CONTRACTSLICENCE_ID_NN ***
 begin   
  execute immediate '
@@ -155,7 +142,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CONTRACTS_LICENCE ***
+grant SELECT                                                                 on CONTRACTS_LICENCE to BARSREADER_ROLE;
 grant SELECT                                                                 on CONTRACTS_LICENCE to BARS_DM;
+grant SELECT                                                                 on CONTRACTS_LICENCE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CONTRACTS_LICENCE to WR_ALL_RIGHTS;
 
 

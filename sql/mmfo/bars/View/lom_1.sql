@@ -35,8 +35,10 @@ PROMPT *** Create  view LOM_1 ***
     and a.ostb = a.ostc and a.ostc<0 ;
 
 PROMPT *** Create  grants  LOM_1 ***
+grant SELECT                                                                 on LOM_1           to BARSREADER_ROLE;
 grant FLASHBACK,SELECT,UPDATE                                                on LOM_1           to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on LOM_1           to RCC_DEAL;
+grant SELECT                                                                 on LOM_1           to UPLD;
 grant FLASHBACK,SELECT,UPDATE                                                on LOM_1           to WR_REFREAD;
 
 

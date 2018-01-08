@@ -225,6 +225,10 @@ COMMENT ON COLUMN BARS.ERR$_INV_CCK_FL.G104 IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_INV_CCK_FL ***
+grant SELECT                                                                 on ERR$_INV_CCK_FL to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_INV_CCK_FL to UPLD;
+
 
 
 PROMPT ===================================================================================== 

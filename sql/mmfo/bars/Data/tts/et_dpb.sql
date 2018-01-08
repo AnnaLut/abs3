@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DPB
-prompt Наименование операции: Первинний внесок на вклад з поточного рах.клієнта
+prompt Наименование операции: DPB Первинний внесок на вклад з поточного рах.клієнта
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DPB', 'Первинний внесок на вклад з поточного рах.клієнта', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000000000000000000000', 'Внесення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DPB', 'DPB Первинний внесок на вклад з поточного рах.клієнта', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000000000000000000000', 'Внесення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DPB', name='Первинний внесок на вклад з поточного рах.клієнта', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn='Внесення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DPB', name='DPB Первинний внесок на вклад з поточного рах.клієнта', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn='Внесення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DPB';
   end;
   --------------------------------

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Подготовка к внедрению КП';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_CC_START';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,28 +124,28 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'BRANCH', 1, 15, 30, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CC_ID', 'C', 'Ид. КД', 1, 20, 1, 1, 0, 0, 0, '', '', 1, 0, 'count(V_CC_START.CC_ID)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DAT1', 'D', 'Дата начала', 1, 10, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DAT4', 'D', 'Дата заверш', 1, 10, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KV', 'N', 'Вал КД', 1, 22, 4, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'LIMIT', 'N', 'Нач.сумма КД', 1, 22, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NLS_9129', 'C', 'Сч неисп лимита(9129)', 1, 15, 18, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NLS_SG', 'C', 'Сч.гашения (3739)', 1, 15, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NLS_SK0', 'C', 'Сч нач комис (3578)', 1, 15, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NLS_SK9', 'C', 'Сч проср комис (3579)', 1, 15, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NLS_SN', 'C', 'Сч нач % (2208)', 1, 15, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'NLS_SP', 'C', 'Сч проср. осн долга (2207)', 1, 15, 13, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'NLS_SPN', 'C', 'Сч проср % (2209)', 1, 15, 17, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'NLS_SS', 'C', 'Сч норм.осн. долга (2203)', 1, 15, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'NS', 'N', 'Кол связ ссудн. счетов', 1, 22, 12, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'RNK', 'N', 'Рег № заемщ', 1, 22, 2, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'OSTC', 'N', 'Остаток', 1, 22, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'DAY_POG', 'N', 'День погашения', 1, 2, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'SUM_POG', 'N', 'Сумма ежем. платежа', 1, 22, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'DWN', 'N', 'Признак~загруженности~строки', 1, 1, 31, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'NLS_REZ', 'C', 'Счет ~резерва', 1, 15, 20, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'NLS_9031', 'C', 'Счет~ поруки', 1, 15, 21, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'BRANCH', '1', 15, 30, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CC_ID', 'C', 'Ид. КД', '1', 20, 1, 1, 0, 0, 0, '', '', 1, 0, 'count(V_CC_START.CC_ID)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAT1', 'D', 'Дата начала', '1', 10, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DAT4', 'D', 'Дата заверш', '1', 10, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KV', 'N', 'Вал КД', '1', 22, 4, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'LIMIT', 'N', 'Нач.сумма КД', '1', 22, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NLS_9129', 'C', 'Сч неисп лимита(9129)', '1', 15, 18, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NLS_SG', 'C', 'Сч.гашения (3739)', '1', 15, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NLS_SK0', 'C', 'Сч нач комис (3578)', '1', 15, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NLS_SK9', 'C', 'Сч проср комис (3579)', '1', 15, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NLS_SN', 'C', 'Сч нач % (2208)', '1', 15, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'NLS_SP', 'C', 'Сч проср. осн долга (2207)', '1', 15, 13, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'NLS_SPN', 'C', 'Сч проср % (2209)', '1', 15, 17, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'NLS_SS', 'C', 'Сч норм.осн. долга (2203)', '1', 15, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'NS', 'N', 'Кол связ ссудн. счетов', '1', 22, 12, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'RNK', 'N', 'Рег № заемщ', '1', 22, 2, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'OSTC', 'N', 'Остаток', '1', 22, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'DAY_POG', 'N', 'День погашения', '1', 2, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'SUM_POG', 'N', 'Сумма ежем. платежа', '1', 22, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'DWN', 'N', 'Признак~загруженности~строки', '1', 1, 31, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'NLS_REZ', 'C', 'Счет ~резерва', '1', 15, 20, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'NLS_9031', 'C', 'Счет~ поруки', '1', 15, 21, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

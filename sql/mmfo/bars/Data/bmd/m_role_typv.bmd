@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := '0) Вертикальна "Гілка" Рольової Моделі';
   l_tablinesdef := '20';
+  l_tabselect_statement := '';
   l_tabname     := 'M_ROLE_TYPV';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,15 +124,15 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'CODE', 'C', 'Симв.код~Ресурсу', 2, null, 2, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ID', 'N', 'Числ.код~Ресурсу', 1, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NAME', 'C', 'Назва~Ресурсу', 3, null, 3, 0, 0, 1, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'IX', 'N', 'Числ.значення~Ресурсу', 2, null, 10, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'TABNAME', 'C', 'Назва табл.~доп.значень~/які ВІДСУТНІ в РМ', 3, null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=:TABNAME[ACCESSCODE=>1][PROC=>PUL.PUT(''TABNAME'', :TABNAME  ) ][EXEC=>BEFORE][showDialogWindow=>false][CONDITIONS=>NOT_ROLE(|:TABNAME|.ROWID)=0]', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'XXX', 'C', 'XXX.код~Ресурсу', .5, null, 50, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NPP', 'N', '№ п/п', .5, null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'SEM', 'C', 'Назва Значення~Ресурсу', 3, null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'MLT', 'C', 'по Ролям ?', 3, null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=M_ROLE_ADD[ACCESSCODE=>7][PROC=>PUL.PUT(''RES_ID'',:ID);PUL.PUT(''RES_IX'',:IX);PUL.PUT(''RES_SEM'',:SEM)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]
+  bars_metabase.add_column(l_tabid, 1, 'CODE', 'C', 'Симв.код~Ресурсу', '2', null, 2, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ID', 'N', 'Числ.код~Ресурсу', '1', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NAME', 'C', 'Назва~Ресурсу', '3', null, 3, 0, 0, 1, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'IX', 'N', 'Числ.значення~Ресурсу', '2', null, 10, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'TABNAME', 'C', 'Назва табл.~доп.значень~/які ВІДСУТНІ в РМ', '3', null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=:TABNAME[ACCESSCODE=>1][PROC=>PUL.PUT(''TABNAME'', :TABNAME  ) ][EXEC=>BEFORE][showDialogWindow=>false][CONDITIONS=>NOT_ROLE(|:TABNAME|.ROWID)=0]', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'XXX', 'C', 'XXX.код~Ресурсу', '.5', null, 50, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NPP', 'N', '№ п/п', '.5', null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'SEM', 'C', 'Назва Значення~Ресурсу', '3', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'MLT', 'C', 'по Ролям ?', '3', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=M_ROLE_ADD[ACCESSCODE=>7][PROC=>PUL.PUT(''RES_ID'',:ID);PUL.PUT(''RES_IX'',:IX);PUL.PUT(''RES_SEM'',:SEM)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]
 ', '', 0);
 
   -- добавляем описание сложного поля

@@ -49,7 +49,9 @@ COMMENT ON COLUMN BARS.USERS_PRINT_PDF.PRINT_PDF IS 'ƒрук PDF 1-так, 2-н≥';
 
 
 PROMPT *** Create  grants  USERS_PRINT_PDF ***
+grant SELECT                                                                 on USERS_PRINT_PDF to BARSREADER_ROLE;
 grant SELECT                                                                 on USERS_PRINT_PDF to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on USERS_PRINT_PDF to UPLD;
 
 
 

@@ -17,7 +17,9 @@ PROMPT *** Create  view V_CIM_CONCLUSION ***
     FROM cim_conclusion c WHERE delete_date is null;
 
 PROMPT *** Create  grants  V_CIM_CONCLUSION ***
+grant SELECT                                                                 on V_CIM_CONCLUSION to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_CONCLUSION to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_CONCLUSION to UPLD;
 
 
 

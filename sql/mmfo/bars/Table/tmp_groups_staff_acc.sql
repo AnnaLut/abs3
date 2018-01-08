@@ -45,6 +45,10 @@ COMMENT ON COLUMN BARS.TMP_GROUPS_STAFF_ACC.ACC_GROUP_ID IS '';
 
 
 
+PROMPT *** Create  grants  TMP_GROUPS_STAFF_ACC ***
+grant SELECT                                                                 on TMP_GROUPS_STAFF_ACC to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_GROUPS_STAFF_ACC to UPLD;
+
 
 
 PROMPT ===================================================================================== 

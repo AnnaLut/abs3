@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Заяви на купiвлю валюти';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'KLP_ZKUPP';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,34 +124,34 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'APARTMENT', 'C', 'Мiсцезнаходження/~мiсце проживання, Кiмната/офic', 1.5, 32, 11, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CITY', 'C', 'Мiсцезнаходження/~мiсце проживання,~Мiсто', 2, 96, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DATETIMEPICKER1', 'C', 'Дата вiд', 1, 16, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'FIO1', 'C', 'ПIБ - 1', 2, 96, 25, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'FIO2', 'C', 'ПIБ - 2', 2, 96, 26, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'FL', 'N', 'Флаг обробки', 1, 22, 3, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'FONFAX', 'C', 'Мiсцезнаходження/~мсце проживання,~Телефон', 2, 96, 12, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'HOUSE', 'C', 'Мiсцезнаходження/~мiсце проживання,~Будинок', 1.5, 32, 10, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'ID', 'N', 'Iдентифiкатор', 1, 22, 27, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'I_VA', 'C', 'Умови купiвлi,~Код валюти', 1, 16, 16, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'KF', 'C', 'Код фiлiї', .5, 6, 1, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'KOMIS', 'C', 'Зобов''язання та доручення,~Комiсiя (%)', 1.5, 32, 23, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'KURS', 'C', 'Умови купiвлi,~Курс в грн.', 1.5, 32, 20, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'NAME', 'C', 'Юридична особа,~пiдприємець,~Найменування клiєнта ', 5, 254, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'NAMEF', 'C', 'Найменування~файла', .5, 12, 28, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'NAMEUP', 'C', 'Уповноважений працiвник,~П.I.Б.', 2, 96, 13, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'PIDSTAV', 'C', 'Пiдстава~для купiвлi валюти', 5, 254, 15, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'POSTIND', 'C', 'Мiсцезнаходження/~мiсце проживання,~Iндекс', 1.5, 32, 5, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'PS_NUMBER', 'C', 'Заява~на купiвлю~№', 2, 96, 1, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'RAHBANK', 'C', 'Зобов''язання та доручення,~Рах-к коштiв д/купiвл', 2, 96, 21, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'RAHPOT', 'C', 'Зобов''язання та доручення,~Рахунок д/невикорист', 2, 96, 22, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'RAHPOTVAL', 'C', 'Зобов''язання та доручення,~Рахунок д/зарахування', 2, 96, 24, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'REGION', 'C', 'Мiсцезнаходження/~мiсце проживання,~Область', 2, 96, 6, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'STREET', 'C', 'Мiсцезнаходження/~мiсце проживання,~Вулиця', 2, 96, 9, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'SUMKURS', 'C', 'Умови купiвлi,~Сума в грн. по курсу', 1.5, 32, 19, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'SUMVAL', 'C', 'Умови купiвлi,~Сума купiвлi', 2, 96, 18, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'TELUP', 'C', 'Уповноважений працiвник,~Телефон', 2, 96, 14, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'DATEDOKKB', 'D', 'Дата/час~надходження~заявки', null, null, 28, 1, 0, 0, 0, '', 'dd.MM.yyyy hhhh:mm:ss', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'APARTMENT', 'C', 'Мiсцезнаходження/~мiсце проживання, Кiмната/офic', '1.5', 32, 11, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CITY', 'C', 'Мiсцезнаходження/~мiсце проживання,~Мiсто', '2', 96, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DATETIMEPICKER1', 'C', 'Дата вiд', '1', 16, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'FIO1', 'C', 'ПIБ - 1', '2', 96, 25, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'FIO2', 'C', 'ПIБ - 2', '2', 96, 26, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'FL', 'N', 'Флаг обробки', '1', 22, 3, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'FONFAX', 'C', 'Мiсцезнаходження/~мсце проживання,~Телефон', '2', 96, 12, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'HOUSE', 'C', 'Мiсцезнаходження/~мiсце проживання,~Будинок', '1.5', 32, 10, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'ID', 'N', 'Iдентифiкатор', '1', 22, 27, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'I_VA', 'C', 'Умови купiвлi,~Код валюти', '1', 16, 16, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'KF', 'C', 'Код фiлiї', '.5', 6, 1, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'KOMIS', 'C', 'Зобов''язання та доручення,~Комiсiя (%)', '1.5', 32, 23, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'KURS', 'C', 'Умови купiвлi,~Курс в грн.', '1.5', 32, 20, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'NAME', 'C', 'Юридична особа,~пiдприємець,~Найменування клiєнта ', '5', 254, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'NAMEF', 'C', 'Найменування~файла', '.5', 12, 28, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'NAMEUP', 'C', 'Уповноважений працiвник,~П.I.Б.', '2', 96, 13, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'PIDSTAV', 'C', 'Пiдстава~для купiвлi валюти', '5', 254, 15, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'POSTIND', 'C', 'Мiсцезнаходження/~мiсце проживання,~Iндекс', '1.5', 32, 5, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'PS_NUMBER', 'C', 'Заява~на купiвлю~№', '2', 96, 1, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'RAHBANK', 'C', 'Зобов''язання та доручення,~Рах-к коштiв д/купiвл', '2', 96, 21, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'RAHPOT', 'C', 'Зобов''язання та доручення,~Рахунок д/невикорист', '2', 96, 22, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'RAHPOTVAL', 'C', 'Зобов''язання та доручення,~Рахунок д/зарахування', '2', 96, 24, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'REGION', 'C', 'Мiсцезнаходження/~мiсце проживання,~Область', '2', 96, 6, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'STREET', 'C', 'Мiсцезнаходження/~мiсце проживання,~Вулиця', '2', 96, 9, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'SUMKURS', 'C', 'Умови купiвлi,~Сума в грн. по курсу', '1.5', 32, 19, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'SUMVAL', 'C', 'Умови купiвлi,~Сума купiвлi', '2', 96, 18, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'TELUP', 'C', 'Уповноважений працiвник,~Телефон', '2', 96, 14, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'DATEDOKKB', 'D', 'Дата/час~надходження~заявки', '', null, 28, 1, 0, 0, 0, '', 'dd.MM.yyyy hhhh:mm:ss', 1, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('KLP_FL');

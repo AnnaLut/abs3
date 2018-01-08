@@ -68,6 +68,10 @@ COMMENT ON COLUMN BARS.TMP_MBK_DPS.N12 IS '';
 
 
 
+PROMPT *** Create  grants  TMP_MBK_DPS ***
+grant SELECT                                                                 on TMP_MBK_DPS     to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_MBK_DPS     to UPLD;
+
 
 
 PROMPT ===================================================================================== 

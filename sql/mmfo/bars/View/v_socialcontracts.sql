@@ -29,8 +29,10 @@ PROMPT *** Create  view V_SOCIALCONTRACTS ***
  ;
 
 PROMPT *** Create  grants  V_SOCIALCONTRACTS ***
+grant SELECT                                                                 on V_SOCIALCONTRACTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SOCIALCONTRACTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SOCIALCONTRACTS to DPT_ROLE;
+grant SELECT                                                                 on V_SOCIALCONTRACTS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SOCIALCONTRACTS to WR_ALL_RIGHTS;
 
 

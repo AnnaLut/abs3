@@ -101,45 +101,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_TTSAP_DK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTSAP ADD CONSTRAINT FK_TTSAP_DK FOREIGN KEY (DK)
-	  REFERENCES BARS.DK (DK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_TTSAP_TTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTSAP ADD CONSTRAINT FK_TTSAP_TTS FOREIGN KEY (TT)
-	  REFERENCES BARS.TTS (TT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_TTSAP_TTS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTSAP ADD CONSTRAINT FK_TTSAP_TTS2 FOREIGN KEY (TTAP)
-	  REFERENCES BARS.TTS (TT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_TTSAP ***
 begin   
  execute immediate '
@@ -155,6 +116,7 @@ exception when others then
 
 PROMPT *** Create  grants  TTSAP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TTSAP           to ABS_ADMIN;
+grant SELECT                                                                 on TTSAP           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TTSAP           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TTSAP           to PYOD001;
 grant SELECT                                                                 on TTSAP           to START1;

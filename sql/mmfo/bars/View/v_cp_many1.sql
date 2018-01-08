@@ -35,8 +35,10 @@ PROMPT *** Create  view V_CP_MANY1 ***
    where substr(nls,1,4)<>3541;
 
 PROMPT *** Create  grants  V_CP_MANY1 ***
+grant SELECT                                                                 on V_CP_MANY1      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_MANY1      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_MANY1      to START1;
+grant SELECT                                                                 on V_CP_MANY1      to UPLD;
 
 
 

@@ -107,54 +107,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SECRES_APPROVE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEC_RESOURCES MODIFY (RES_APPROVE CONSTRAINT CC_SECRES_APPROVE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SECRES_RESPARENTID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEC_RESOURCES MODIFY (RES_PARENTID CONSTRAINT CC_SECRES_RESPARENTID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SECRES_RESTYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEC_RESOURCES MODIFY (RES_TYPE CONSTRAINT CC_SECRES_RESTYPE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SECRES_RESNAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEC_RESOURCES MODIFY (RES_NAME CONSTRAINT CC_SECRES_RESNAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SECRES_RESTYPE ***
 begin   
  execute immediate '
@@ -179,11 +131,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SECRES_SECRES ***
+PROMPT *** Create  constraint CC_SECRES_RESID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_RESOURCES ADD CONSTRAINT FK_SECRES_SECRES FOREIGN KEY (RES_PARENTID)
-	  REFERENCES BARS.SEC_RESOURCES (RES_ID) ENABLE';
+  ALTER TABLE BARS.SEC_RESOURCES MODIFY (RES_ID CONSTRAINT CC_SECRES_RESID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -192,10 +143,46 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SECRES_RESID_NN ***
+PROMPT *** Create  constraint CC_SECRES_RESNAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_RESOURCES MODIFY (RES_ID CONSTRAINT CC_SECRES_RESID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEC_RESOURCES MODIFY (RES_NAME CONSTRAINT CC_SECRES_RESNAME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SECRES_RESTYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEC_RESOURCES MODIFY (RES_TYPE CONSTRAINT CC_SECRES_RESTYPE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SECRES_RESPARENTID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEC_RESOURCES MODIFY (RES_PARENTID CONSTRAINT CC_SECRES_RESPARENTID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SECRES_APPROVE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEC_RESOURCES MODIFY (RES_APPROVE CONSTRAINT CC_SECRES_APPROVE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -233,8 +220,10 @@ exception when others then
 
 PROMPT *** Create  grants  SEC_RESOURCES ***
 grant SELECT                                                                 on SEC_RESOURCES   to ABS_ADMIN;
+grant SELECT                                                                 on SEC_RESOURCES   to BARSREADER_ROLE;
 grant SELECT                                                                 on SEC_RESOURCES   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEC_RESOURCES   to BARS_DM;
+grant SELECT                                                                 on SEC_RESOURCES   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SEC_RESOURCES   to WR_ALL_RIGHTS;
 
 

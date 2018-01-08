@@ -249,17 +249,6 @@ begin
   delete from chklist_tts where tt='IB1';
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (5, 'IB1', 1, null, null, 1);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''IB1'', 1, null, null, 1) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
     values (7, 'IB1', 2, null, '(((substr(nlsa,1,4) in (''2600'',''2650'',''2603'',''2530'',''2541'',''2542'',''2544'',''2545'')) and nvl(f_get_ob22(kv, nlsb), ''02'')=''04'' and kv=980 and substr(nlsb,1,4)=''1919'') or kv<>980)', null);
   exception
     when dup_val_on_index then null;
@@ -277,6 +266,17 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (chklist_tts: 11, ''IB1'', 5, null, ''((substr(NLSA,1,4) in (''''2062'''',''''2063'''',''''2072'''',''''2073'''',''''2082'''',''''2083'''',''''2102'''',''''2103'''',''''2112'''',''''2113'''',''''2122'''',''''2123'''',''''2132'''',''''2133'''')) or kv<>980 or (substr(NLSB,1,4) in (''''2909'''',''''2924'''')))'', null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
+    values (25, 'IB1', 1, null, null, 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 25, ''IB1'', 1, null, null, 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;

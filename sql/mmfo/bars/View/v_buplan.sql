@@ -29,8 +29,10 @@ FROM bu1 u,
 WHERE u.ID = s.ID(+) AND b.branch = s.branch;
 
 PROMPT *** Create  grants  V_BUPLAN ***
+grant SELECT                                                                 on V_BUPLAN        to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_BUPLAN        to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_BUPLAN        to SALGL;
+grant SELECT                                                                 on V_BUPLAN        to UPLD;
 
 
 

@@ -69,6 +69,10 @@ COMMENT ON COLUMN BARS.ERR$_INS_PAYMENTS_SCHEDULE.PAYED IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_INS_PAYMENTS_SCHEDULE ***
+grant SELECT                                                                 on ERR$_INS_PAYMENTS_SCHEDULE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_INS_PAYMENTS_SCHEDULE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

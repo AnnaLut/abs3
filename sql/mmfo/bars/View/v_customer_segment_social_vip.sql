@@ -15,8 +15,10 @@ where  li.list_type_id = (select id
                           where  lt.list_code = 'CUSTOMER_SEGMENT_SOCIAL_VIP');
 
 PROMPT *** Create  grants  V_CUSTOMER_SEGMENT_SOCIAL_VIP ***
+grant SELECT                                                                 on V_CUSTOMER_SEGMENT_SOCIAL_VIP to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTOMER_SEGMENT_SOCIAL_VIP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUSTOMER_SEGMENT_SOCIAL_VIP to START1;
+grant SELECT                                                                 on V_CUSTOMER_SEGMENT_SOCIAL_VIP to UPLD;
 
 
 

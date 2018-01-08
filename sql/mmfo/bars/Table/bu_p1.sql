@@ -46,9 +46,11 @@ COMMENT ON COLUMN BARS.BU_P1.NAME IS '';
 
 
 PROMPT *** Create  grants  BU_P1 ***
+grant SELECT                                                                 on BU_P1           to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on BU_P1           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BU_P1           to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on BU_P1           to BU;
+grant SELECT                                                                 on BU_P1           to UPLD;
 
 
 

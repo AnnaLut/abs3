@@ -115,45 +115,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTVIDDSTAFF_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_STAFF ADD CONSTRAINT FK_DPTVIDDSTAFF_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTVIDDSTAFF_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_STAFF ADD CONSTRAINT FK_DPTVIDDSTAFF_STAFF FOREIGN KEY (USERID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTVIDDSTAFF_DPTVIDD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_STAFF ADD CONSTRAINT FK_DPTVIDDSTAFF_DPTVIDD FOREIGN KEY (VIDD)
-	  REFERENCES BARS.DPT_VIDD (VIDD) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_DPTVIDDSTAFF ***
 begin   
  execute immediate '
@@ -168,6 +129,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_VIDD_STAFF ***
+grant SELECT                                                                 on DPT_VIDD_STAFF  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VIDD_STAFF  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VIDD_STAFF  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_STAFF  to DPT_ADMIN;

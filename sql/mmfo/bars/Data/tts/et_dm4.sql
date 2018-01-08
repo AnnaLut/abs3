@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DM4
-prompt Наименование операции: Виплата відсотків по поточному металевого рахунку (готів.)
+prompt Наименование операции: DM4 Виплата відсотків по поточному металевого рахунку (готів.)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DM4', 'Виплата відсотків по поточному металевого рахунку (готів.)', 1, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH11'',0))', null, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', null, 1, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000100000000000000000', 'Виплата відсотків згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DM4', 'DM4 Виплата відсотків по поточному металевого рахунку (готів.)', 1, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH11'',0))', null, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', null, 1, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000100000000000000000', 'Виплата відсотків згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DM4', name='Виплата відсотків по поточному металевого рахунку (готів.)', dk=1, nlsm=null, kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH11'',0))', kvk=null, nlss=null, nlsa=null, nlsb='#(tobopack.GetTOBOParam(''CASH11''))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000100000000000000000', nazn='Виплата відсотків згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DM4', name='DM4 Виплата відсотків по поточному металевого рахунку (готів.)', dk=1, nlsm=null, kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH11'',0))', kvk=null, nlss=null, nlsa=null, nlsb='#(tobopack.GetTOBOParam(''CASH11''))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000100000000000000000', nazn='Виплата відсотків згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DM4';
   end;
   --------------------------------

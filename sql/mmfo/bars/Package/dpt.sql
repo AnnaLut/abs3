@@ -873,8 +873,8 @@ begin
   l_s181 := substr(fs181(p_depaccid, null, l_s180),          1, 1);
   bars_audit.trace('%s (s180, s181, r011, r013, d020) = (%s, %s, %s, %s)',
                    l_title, l_s180, l_s181, l_r011, l_r013, l_d020);
-                   
-/* -- commented by Livshyts 29/11/17 . Not Actual Check 
+
+/* -- commented by Livshyts 29/11/17 . Not Actual Check
   -- контроль соответствия бал.счета срочности депозита только для 2630,2635
   begin
     select s181

@@ -17,8 +17,10 @@ PROMPT *** Create  view V_OW_ACCHISTORY ***
     and q.f_n = f.file_name;
 
 PROMPT *** Create  grants  V_OW_ACCHISTORY ***
+grant SELECT                                                                 on V_OW_ACCHISTORY to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_ACCHISTORY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_ACCHISTORY to OW;
+grant SELECT                                                                 on V_OW_ACCHISTORY to UPLD;
 
 
 

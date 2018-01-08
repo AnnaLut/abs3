@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SURVEY_GROUP_RECTYPES ***
+grant SELECT                                                                 on WCS_SURVEY_GROUP_RECTYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_SURVEY_GROUP_RECTYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_SURVEY_GROUP_RECTYPES to BARS_DM;
+grant SELECT                                                                 on WCS_SURVEY_GROUP_RECTYPES to UPLD;
 
 
 

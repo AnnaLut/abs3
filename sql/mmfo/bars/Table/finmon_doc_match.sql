@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FINMON_DOC_MATCH ***
+grant SELECT                                                                 on FINMON_DOC_MATCH to BARSREADER_ROLE;
 grant SELECT                                                                 on FINMON_DOC_MATCH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FINMON_DOC_MATCH to BARS_DM;
 grant SELECT                                                                 on FINMON_DOC_MATCH to START1;
+grant SELECT                                                                 on FINMON_DOC_MATCH to UPLD;
 
 
 

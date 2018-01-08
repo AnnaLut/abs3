@@ -136,11 +136,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_EADSYNCQUEUE_KF ***
+PROMPT *** Create  constraint CC_EADSYNCQ_STSID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.EAD_SYNC_QUEUE ADD CONSTRAINT FK_EADSYNCQUEUE_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+  ALTER TABLE BARS.EAD_SYNC_QUEUE MODIFY (STATUS_ID CONSTRAINT CC_EADSYNCQ_STSID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -187,18 +186,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_EADSYNCQ_STSID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.EAD_SYNC_QUEUE MODIFY (STATUS_ID CONSTRAINT CC_EADSYNCQ_STSID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_EADSYNCQ ***
 begin   
  execute immediate '
@@ -230,8 +217,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  EAD_SYNC_QUEUE ***
+grant SELECT                                                                 on EAD_SYNC_QUEUE  to BARSREADER_ROLE;
 grant SELECT                                                                 on EAD_SYNC_QUEUE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EAD_SYNC_QUEUE  to BARS_DM;
+grant SELECT                                                                 on EAD_SYNC_QUEUE  to UPLD;
 
 
 

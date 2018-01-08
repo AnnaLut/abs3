@@ -130,7 +130,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ESCR_EVENTS ***
+grant SELECT                                                                 on ESCR_EVENTS     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ESCR_EVENTS     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on ESCR_EVENTS     to UPLD;
 
 
 

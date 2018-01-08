@@ -108,8 +108,10 @@ PROMPT *** Create  view VV_ARJK ***
     WHERE i.rnk = c.rnk;
 
 PROMPT *** Create  grants  VV_ARJK ***
+grant SELECT                                                                 on VV_ARJK         to BARSREADER_ROLE;
 grant SELECT                                                                 on VV_ARJK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VV_ARJK         to START1;
+grant SELECT                                                                 on VV_ARJK         to UPLD;
 
 
 

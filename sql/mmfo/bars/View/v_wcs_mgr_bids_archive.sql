@@ -12,7 +12,9 @@ PROMPT *** Create  view V_WCS_MGR_BIDS_ARCHIVE ***
   from v_wcs_bids_archive b;
 
 PROMPT *** Create  grants  V_WCS_MGR_BIDS_ARCHIVE ***
+grant SELECT                                                                 on V_WCS_MGR_BIDS_ARCHIVE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_MGR_BIDS_ARCHIVE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_MGR_BIDS_ARCHIVE to UPLD;
 
 
 

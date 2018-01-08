@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_CP_RATES_SB.QUOT_SIGN IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CP_RATES_SB ***
+grant SELECT                                                                 on ERR$_CP_RATES_SB to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CP_RATES_SB to UPLD;
+
 
 
 PROMPT ===================================================================================== 

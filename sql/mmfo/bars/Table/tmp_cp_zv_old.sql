@@ -483,6 +483,10 @@ COMMENT ON COLUMN BARS.TMP_CP_ZV_OLD.G044 IS '';
 
 
 
+PROMPT *** Create  grants  TMP_CP_ZV_OLD ***
+grant SELECT                                                                 on TMP_CP_ZV_OLD   to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_CP_ZV_OLD   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

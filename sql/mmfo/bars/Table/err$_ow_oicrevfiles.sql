@@ -71,6 +71,10 @@ COMMENT ON COLUMN BARS.ERR$_OW_OICREVFILES.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_OW_OICREVFILES ***
+grant SELECT                                                                 on ERR$_OW_OICREVFILES to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_OW_OICREVFILES to UPLD;
+
 
 
 PROMPT ===================================================================================== 

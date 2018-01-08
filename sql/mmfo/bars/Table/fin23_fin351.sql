@@ -52,9 +52,11 @@ COMMENT ON COLUMN BARS.FIN23_FIN351.FIN351 IS 'Клас позичальника фіз.особи 351';
 
 
 PROMPT *** Create  grants  FIN23_FIN351 ***
+grant SELECT                                                                 on FIN23_FIN351    to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN23_FIN351    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN23_FIN351    to RCC_DEAL;
 grant SELECT                                                                 on FIN23_FIN351    to START1;
+grant SELECT                                                                 on FIN23_FIN351    to UPLD;
 
 
 

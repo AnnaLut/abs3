@@ -79,9 +79,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_GRP_COUNTRY ***
+grant SELECT                                                                 on REZ_GRP_COUNTRY to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REZ_GRP_COUNTRY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ_GRP_COUNTRY to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZ_GRP_COUNTRY to RCC_DEAL;
+grant SELECT                                                                 on REZ_GRP_COUNTRY to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REZ_GRP_COUNTRY to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on REZ_GRP_COUNTRY to WR_REFREAD;
 

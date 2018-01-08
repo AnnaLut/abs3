@@ -66,7 +66,9 @@ PROMPT *** Create  view V_DBO_DEPOSIT_LIST ***
     WHERE dpa.vidd_code = v.vidd;
 
 PROMPT *** Create  grants  V_DBO_DEPOSIT_LIST ***
+grant SELECT                                                                 on V_DBO_DEPOSIT_LIST to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DBO_DEPOSIT_LIST to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DBO_DEPOSIT_LIST to UPLD;
 
 
 

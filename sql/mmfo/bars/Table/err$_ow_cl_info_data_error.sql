@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_OW_CL_INFO_DATA_ERROR.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_OW_CL_INFO_DATA_ERROR ***
+grant SELECT                                                                 on ERR$_OW_CL_INFO_DATA_ERROR to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_OW_CL_INFO_DATA_ERROR to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -29,9 +29,11 @@ SELECT s.nbuc, s.kodf, s.datf, s.kodp,
        GROUP BY s.nbuc, s.kodf, s.datf, s.kodp;
 
 PROMPT *** Create  grants  V_BANKS_REPORT2 ***
+grant SELECT                                                                 on V_BANKS_REPORT2 to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BANKS_REPORT2 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BANKS_REPORT2 to RPBN002;
 grant SELECT                                                                 on V_BANKS_REPORT2 to START1;
+grant SELECT                                                                 on V_BANKS_REPORT2 to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BANKS_REPORT2 to WR_ALL_RIGHTS;
 
 

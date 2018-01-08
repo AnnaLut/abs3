@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_SW_950A.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_SW_950A ***
+grant SELECT                                                                 on ERR$_SW_950A    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_SW_950A    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

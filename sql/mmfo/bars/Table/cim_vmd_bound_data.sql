@@ -119,9 +119,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_VMD_BOUND_DATA ***
+grant SELECT                                                                 on CIM_VMD_BOUND_DATA to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_VMD_BOUND_DATA to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_VMD_BOUND_DATA to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_VMD_BOUND_DATA to CIM_ROLE;
+grant SELECT                                                                 on CIM_VMD_BOUND_DATA to UPLD;
 
 
 

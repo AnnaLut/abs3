@@ -143,7 +143,7 @@ BEGIN
       null;
    end;    
 
-   sql_acc_ := 'select  /*+parallel(a)*/ * from accounts a where nvl(nbs, substr(nls,1,4)) in ';
+   sql_acc_ := 'select  /*+parallel(8)*/ * from accounts a where nvl(nbs, substr(nls,1,4)) in ';
    sql_acc_ := sql_acc_ || '(''1322'',''1326'',''1327'',''1328'') ';
 
    ret_ := F_Pop_Otcn(Dat_, 2, sql_acc_, null, 0, 1);

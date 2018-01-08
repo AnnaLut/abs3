@@ -43,8 +43,10 @@ from (select k.name, k.branch, k.kv,
 where a.kupl>0 or a.prod> 0;
 
 PROMPT *** Create  grants  R6204 ***
+grant SELECT                                                                 on R6204           to BARSREADER_ROLE;
 grant SELECT                                                                 on R6204           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on R6204           to START1;
+grant SELECT                                                                 on R6204           to UPLD;
 
 
 

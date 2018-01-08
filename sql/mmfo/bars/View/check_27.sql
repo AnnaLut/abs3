@@ -38,8 +38,10 @@ WHERE o.sos=5                   and ca.acc=a.acc         and
       aux1.tag (+) = 'D#27'     and s.id=o.userid;
 
 PROMPT *** Create  grants  CHECK_27 ***
+grant SELECT                                                                 on CHECK_27        to BARSREADER_ROLE;
 grant SELECT                                                                 on CHECK_27        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHECK_27        to START1;
+grant SELECT                                                                 on CHECK_27        to UPLD;
 
 
 

@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_CIG_DOG_STOP.BRANCH IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIG_DOG_STOP ***
+grant SELECT                                                                 on ERR$_CIG_DOG_STOP to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIG_DOG_STOP to UPLD;
+
 
 
 PROMPT ===================================================================================== 

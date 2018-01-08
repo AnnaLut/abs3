@@ -118,37 +118,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_APPREP_STAFF ***
+PROMPT *** Create  constraint CC_APPREP_CODEAPP_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.APP_REP ADD CONSTRAINT FK_APPREP_STAFF FOREIGN KEY (GRANTOR)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_APPREP_APPLIST ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.APP_REP ADD CONSTRAINT FK_APPREP_APPLIST FOREIGN KEY (CODEAPP)
-	  REFERENCES BARS.APPLIST (CODEAPP) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_APPREP_REPORTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.APP_REP ADD CONSTRAINT FK_APPREP_REPORTS FOREIGN KEY (CODEREP)
-	  REFERENCES BARS.REPORTS (ID) ENABLE';
+  ALTER TABLE BARS.APP_REP MODIFY (CODEAPP CONSTRAINT CC_APPREP_CODEAPP_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -161,18 +134,6 @@ PROMPT *** Create  constraint CC_APPREP_CODEREP_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.APP_REP MODIFY (CODEREP CONSTRAINT CC_APPREP_CODEREP_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_APPREP_CODEAPP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.APP_REP MODIFY (CODEAPP CONSTRAINT CC_APPREP_CODEAPP_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -197,9 +158,11 @@ exception when others then
 PROMPT *** Create  grants  APP_REP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on APP_REP         to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on APP_REP         to APP_REP;
+grant SELECT                                                                 on APP_REP         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on APP_REP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on APP_REP         to BARS_DM;
 grant SELECT                                                                 on APP_REP         to START1;
+grant SELECT                                                                 on APP_REP         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on APP_REP         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on APP_REP         to WR_REFREAD;
 

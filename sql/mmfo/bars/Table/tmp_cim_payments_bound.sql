@@ -164,7 +164,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_CIM_PAYMENTS_BOUND ***
+grant SELECT                                                                 on TMP_CIM_PAYMENTS_BOUND to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_CIM_PAYMENTS_BOUND to BARS_DM;
+grant SELECT                                                                 on TMP_CIM_PAYMENTS_BOUND to UPLD;
 
 
 

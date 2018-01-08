@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DPS
-prompt Наименование операции: Стягнення штрафу при достроковому розірванні вкладу
+prompt Наименование операции: DPS Стягнення штрафу при достроковому розірванні вкладу
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DPS', 'Стягнення штрафу при достроковому розірванні вкладу', 1, null, null, null, 980, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''03''))', 0, '0000100000000000000000000000000000010000000000000000000000000000', 'Повернення нарахованих, але не сплачених відсотків при достроковому розірванні договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DPS', 'DPS Стягнення штрафу при достроковому розірванні вкладу', 1, null, null, null, 980, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''03''))', 0, '0000100000000000000000000000000000010000000000000000000000000000', 'Повернення нарахованих, але не сплачених відсотків при достроковому розірванні договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DPS', name='Стягнення штрафу при достроковому розірванні вкладу', dk=1, nlsm=null, kv=null, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=0, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn='Повернення нарахованих, але не сплачених відсотків при достроковому розірванні договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DPS', name='DPS Стягнення штрафу при достроковому розірванні вкладу', dk=1, nlsm=null, kv=null, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=0, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn='Повернення нарахованих, але не сплачених відсотків при достроковому розірванні договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DPS';
   end;
   --------------------------------

@@ -57,7 +57,9 @@ COMMENT ON COLUMN BARS.KL_S134.DATA_M IS '';
 
 
 PROMPT *** Create  grants  KL_S134 ***
+grant SELECT                                                                 on KL_S134         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_S134         to BARS_DM;
+grant SELECT                                                                 on KL_S134         to UPLD;
 
 
 

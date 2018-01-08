@@ -79,6 +79,10 @@ COMMENT ON COLUMN BARS.ERR$_CC_SOB_UPDATE.FACT_DATE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CC_SOB_UPDATE ***
+grant SELECT                                                                 on ERR$_CC_SOB_UPDATE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CC_SOB_UPDATE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

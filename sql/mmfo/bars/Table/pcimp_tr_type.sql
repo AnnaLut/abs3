@@ -50,7 +50,9 @@ COMMENT ON COLUMN BARS.PCIMP_TR_TYPE.SERV IS '';
 
 
 PROMPT *** Create  grants  PCIMP_TR_TYPE ***
+grant SELECT                                                                 on PCIMP_TR_TYPE   to BARSREADER_ROLE;
 grant SELECT                                                                 on PCIMP_TR_TYPE   to BARS_DM;
+grant SELECT                                                                 on PCIMP_TR_TYPE   to UPLD;
 
 
 

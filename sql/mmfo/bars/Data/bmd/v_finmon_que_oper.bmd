@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'ФМ. Все документы';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_FINMON_QUE_OPER';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,39 +124,39 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'REF', 'N', 'Реф.', null, 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'STATUS_NAME', 'A', 'Статус', null, 35, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'TT', 'C', 'Оп.', null, 3, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'ND', 'C', 'Номер~документа', null, 10, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DATD', 'D', 'Дата~документа', null, 10, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NLSA', 'C', 'Рахунок-А', null, 15, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'S', 'N', 'Сума', null, 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'SQ', 'N', 'Сума в еквів.', null, 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'LCV', 'C', 'Вал А', null, 3, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'MFOA', 'C', 'МФО-А', null, 12, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'DK', 'N', 'Д/К', null, 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'NLSB', 'C', 'Рахунок-Б', null, 15, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'S2', 'N', 'Сума 2', null, 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SQ2', 'N', 'Сума 2 в эквів.', null, 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'LCV2', 'C', 'Вал Б', null, 3, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'MFOB', 'C', 'МФО-Б', null, 12, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'VDAT', 'D', 'Дата~валютирования', null, 10, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'NAZN', 'A', 'Призначення платежу', null, 160, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'TOBO', 'C', 'Відділення', null, 30, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'OPR_VID2', 'C', 'Ознака обов`язк. моніторінгу', null, 4, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'OPR_VID3', 'C', 'Ознака внутр. моніторінгу', null, 3, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'FIO', 'A', 'Повідомив', null, 60, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'IN_DATE', 'D', 'Дата реєстрації', null, 10, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'COMMENTS', 'C', 'Коментар', null, 254, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'OTM', 'N', '№ особи в переліку осіб', null, 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'NMKA', 'A', 'Назва відправника', null, 70, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'NMKB', 'A', 'Назва отримувача', null, 70, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'ID_A', 'C', 'ОКПО-А', null, 14, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'ID_B', 'C', 'ОКПО-Б', null, 14, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'RNK_A', 'N', 'РНК А', null, 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'RNK_B', 'N', 'РНК Б', null, 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'KV', 'N', 'Вал А (код)', null, 3, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'KV2', 'N', 'Вал Б (код)', null, 3, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'REF', 'N', 'Реф.', '', 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'STATUS_NAME', 'A', 'Статус', '', 35, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'TT', 'C', 'Оп.', '', 3, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ND', 'C', 'Номер~документа', '', 10, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DATD', 'D', 'Дата~документа', '', 10, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NLSA', 'C', 'Рахунок-А', '', 15, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'S', 'N', 'Сума', '', 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'SQ', 'N', 'Сума в еквів.', '', 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'LCV', 'C', 'Вал А', '', 3, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'MFOA', 'C', 'МФО-А', '', 12, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'DK', 'N', 'Д/К', '', 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'NLSB', 'C', 'Рахунок-Б', '', 15, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'S2', 'N', 'Сума 2', '', 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SQ2', 'N', 'Сума 2 в эквів.', '', 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'LCV2', 'C', 'Вал Б', '', 3, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'MFOB', 'C', 'МФО-Б', '', 12, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'VDAT', 'D', 'Дата~валютирования', '', 10, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'NAZN', 'A', 'Призначення платежу', '', 160, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'TOBO', 'C', 'Відділення', '', 30, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'OPR_VID2', 'C', 'Ознака обов`язк. моніторінгу', '', 4, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'OPR_VID3', 'C', 'Ознака внутр. моніторінгу', '', 3, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'FIO', 'A', 'Повідомив', '', 60, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'IN_DATE', 'D', 'Дата реєстрації', '', 10, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'COMMENTS', 'C', 'Коментар', '', 254, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'OTM', 'N', '№ особи в переліку осіб', '', 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'NMKA', 'A', 'Назва відправника', '', 70, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'NMKB', 'A', 'Назва отримувача', '', 70, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'ID_A', 'C', 'ОКПО-А', '', 14, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'ID_B', 'C', 'ОКПО-Б', '', 14, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'RNK_A', 'N', 'РНК А', '', 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'RNK_B', 'N', 'РНК Б', '', 22, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'KV', 'N', 'Вал А (код)', '', 3, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'KV2', 'N', 'Вал Б (код)', '', 3, null, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

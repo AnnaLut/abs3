@@ -63,32 +63,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SWBANKKEY_SWBANKS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_BANK_KEY ADD CONSTRAINT FK_SWBANKKEY_SWBANKS FOREIGN KEY (BIC)
-	  REFERENCES BARS.SW_BANKS (BIC) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SWBANKKEY_SWBANKS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_BANK_KEY ADD CONSTRAINT FK_SWBANKKEY_SWBANKS2 FOREIGN KEY (CORR_BIC)
-	  REFERENCES BARS.SW_BANKS (BIC) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SWBANKKEY_BIC_NN ***
 begin   
  execute immediate '
@@ -116,8 +90,10 @@ exception when others then
 
 PROMPT *** Create  grants  SW_BANK_KEY ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_BANK_KEY     to BARS013;
+grant SELECT                                                                 on SW_BANK_KEY     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_BANK_KEY     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_BANK_KEY     to BARS_DM;
+grant SELECT                                                                 on SW_BANK_KEY     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_BANK_KEY     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SW_BANK_KEY     to WR_REFREAD;
 

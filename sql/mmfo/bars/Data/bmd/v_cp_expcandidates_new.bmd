@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'V_CP_EXPCANDIDATES_NEW: Кандидати на прострочку';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_CP_EXPCANDIDATES_NEW';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,16 +124,16 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'ID ЦП', null, 22, 1, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'FunNSIEditFFiltered("V_CPDEAL_EXPCANDIDATES",1, "(V_CPDEAL_EXPCANDIDATES.id = :ID)")', 'sPar=V_CPDEAL_EXPCANDIDATES[ACCESSCODE=>2][CONDITIONS=>id = :ID]', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CP_ID', 'C', 'ISIN ЦП', null, 20, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'FunNSIEditFFiltered("CP_KOD",1, "(CP_KOD.cp_id = :CP_ID)")', 'sPar=CP_KOD[ACCESSCODE=>1][CONDITIONS=>cp_id = :CP_ID]', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DNK', 'D', 'Дата закінчення~діючого~купонного періоду', null, 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DOK', 'D', 'Дата початку~діючого~купонного періоду', null, 10, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'EXP_DATE', 'D', 'Дата~виносу~на прострочку', null, 10, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NAME', 'C', 'Назва емітента', null, 70, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'OST_N_EXP', 'N', 'Сума номіналу~до погашення', null, 22, 7, 0, 0, 0, 0, '', '', 0, 0, 'SUM(OST_N_EXP)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'OST_R_EXP', 'N', 'Сумма купона ~ до погашення', null, 22, 9, 0, 0, 0, 0, '', '', 0, 0, 'SUM(OST_R_EXP)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'RUN_EXPN', 'B', 'Виконати ~винос на~прострочку~номіналу', null, null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'RUN_EXPR', 'B', 'Виконати~винос на~прострочку~купона', null, null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'ID ЦП', '', 22, 1, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'FunNSIEditFFiltered("V_CPDEAL_EXPCANDIDATES",1, "(V_CPDEAL_EXPCANDIDATES.id = :ID)")', 'sPar=V_CPDEAL_EXPCANDIDATES[ACCESSCODE=>2][CONDITIONS=>id = :ID]', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CP_ID', 'C', 'ISIN ЦП', '', 20, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'FunNSIEditFFiltered("CP_KOD",1, "(CP_KOD.cp_id = :CP_ID)")', 'sPar=CP_KOD[ACCESSCODE=>1][CONDITIONS=>cp_id = :CP_ID]', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DNK', 'D', 'Дата закінчення~діючого~купонного періоду', '', 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DOK', 'D', 'Дата початку~діючого~купонного періоду', '', 10, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'EXP_DATE', 'D', 'Дата~виносу~на прострочку', '', 10, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NAME', 'C', 'Назва емітента', '', 70, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'OST_N_EXP', 'N', 'Сума номіналу~до погашення', '', 22, 7, 0, 0, 0, 0, '', '', 0, 0, 'SUM(OST_N_EXP)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'OST_R_EXP', 'N', 'Сумма купона ~ до погашення', '', 22, 9, 0, 0, 0, 0, '', '', 0, 0, 'SUM(OST_R_EXP)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'RUN_EXPN', 'B', 'Виконати ~винос на~прострочку~номіналу', '', null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'RUN_EXPR', 'B', 'Виконати~винос на~прострочку~купона', '', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CP_KOD');

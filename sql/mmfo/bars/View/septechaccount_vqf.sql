@@ -99,7 +99,9 @@ PROMPT *** Create  view SEPTECHACCOUNT_VQF ***
    ORDER BY a.nls;
 
 PROMPT *** Create  grants  SEPTECHACCOUNT_VQF ***
+grant SELECT                                                                 on SEPTECHACCOUNT_VQF to BARSREADER_ROLE;
 grant SELECT                                                                 on SEPTECHACCOUNT_VQF to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on SEPTECHACCOUNT_VQF to UPLD;
 
 
 

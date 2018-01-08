@@ -14,8 +14,10 @@ from customer c,specparam s, (select * from accounts where nbs in (select r020 f
 where a.dazs is null  and a.acc = s.acc and a.rnk = c.rnk ;
 
 PROMPT *** Create  grants  V_CCN_R013 ***
+grant SELECT                                                                 on V_CCN_R013      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CCN_R013      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CCN_R013      to START1;
+grant SELECT                                                                 on V_CCN_R013      to UPLD;
 
 
 

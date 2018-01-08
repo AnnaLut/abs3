@@ -113,59 +113,12 @@ COMMENT ON COLUMN BARS.CIG_CUST_INDIVIDUAL.BRANCH IS '';
 
 
 
-PROMPT *** Create  constraint CC_CIGCUSTIND_PASSPORGAN_NN ***
+PROMPT *** Create  constraint PK_CIGCUSTIND ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_CUST_INDIVIDUAL MODIFY (PASSP_ORGAN CONSTRAINT CC_CIGCUSTIND_PASSPORGAN_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CIGCUSTIND_PASSPSER_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIG_CUST_INDIVIDUAL MODIFY (PASSP_SER CONSTRAINT CC_CIGCUSTIND_PASSPSER_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CIGCUSTIND_PASSPNUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIG_CUST_INDIVIDUAL MODIFY (PASSP_NUM CONSTRAINT CC_CIGCUSTIND_PASSPNUM_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CIGCUSTIND_FACSTBUNUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIG_CUST_INDIVIDUAL MODIFY (FACT_STREET_BUILDNUM CONSTRAINT CC_CIGCUSTIND_FACSTBUNUM_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CIGCUSTIND_CIGCUSTOMERS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIG_CUST_INDIVIDUAL ADD CONSTRAINT FK_CIGCUSTIND_CIGCUSTOMERS FOREIGN KEY (CUST_ID, BRANCH)
-	  REFERENCES BARS.CIG_CUSTOMERS (CUST_ID, BRANCH) DEFERRABLE DISABLE';
+  ALTER TABLE BARS.CIG_CUST_INDIVIDUAL ADD CONSTRAINT PK_CIGCUSTIND PRIMARY KEY (CUST_ID, BRANCH)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -186,12 +139,46 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_CIGCUSTIND ***
+PROMPT *** Create  constraint CC_CIGCUSTIND_FACSTBUNUM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_CUST_INDIVIDUAL ADD CONSTRAINT PK_CIGCUSTIND PRIMARY KEY (CUST_ID, BRANCH)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CIG_CUST_INDIVIDUAL MODIFY (FACT_STREET_BUILDNUM CONSTRAINT CC_CIGCUSTIND_FACSTBUNUM_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CIGCUSTIND_PASSPNUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIG_CUST_INDIVIDUAL MODIFY (PASSP_NUM CONSTRAINT CC_CIGCUSTIND_PASSPNUM_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CIGCUSTIND_PASSPIDAT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIG_CUST_INDIVIDUAL MODIFY (PASSP_ISS_DATE CONSTRAINT CC_CIGCUSTIND_PASSPIDAT_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CIGCUSTIND_PASSPORGAN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIG_CUST_INDIVIDUAL MODIFY (PASSP_ORGAN CONSTRAINT CC_CIGCUSTIND_PASSPORGAN_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -356,10 +343,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIGCUSTIND_PASSPIDAT_NN ***
+PROMPT *** Create  constraint CC_CIGCUSTIND_PASSPSER_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_CUST_INDIVIDUAL MODIFY (PASSP_ISS_DATE CONSTRAINT CC_CIGCUSTIND_PASSPIDAT_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIG_CUST_INDIVIDUAL MODIFY (PASSP_SER CONSTRAINT CC_CIGCUSTIND_PASSPSER_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -382,9 +369,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_CUST_INDIVIDUAL ***
+grant SELECT                                                                 on CIG_CUST_INDIVIDUAL to BARSREADER_ROLE;
 grant SELECT                                                                 on CIG_CUST_INDIVIDUAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_CUST_INDIVIDUAL to BARS_DM;
 grant SELECT                                                                 on CIG_CUST_INDIVIDUAL to CIG_ROLE;
+grant SELECT                                                                 on CIG_CUST_INDIVIDUAL to UPLD;
 
 
 

@@ -51,32 +51,6 @@ COMMENT ON COLUMN BARS.DPT_TTS_VIDD.ISMAIN IS '';
 
 
 
-PROMPT *** Create  constraint FK_DPTTTSVIDD_DPTVIDD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TTS_VIDD ADD CONSTRAINT FK_DPTTTSVIDD_DPTVIDD FOREIGN KEY (VIDD)
-	  REFERENCES BARS.DPT_VIDD (VIDD) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTTTSVIDD_TTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TTS_VIDD ADD CONSTRAINT FK_DPTTTSVIDD_TTS FOREIGN KEY (TT)
-	  REFERENCES BARS.TTS (TT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DPTTTSVIDD_VIDD_NN ***
 begin   
  execute immediate '
@@ -144,6 +118,7 @@ PROMPT *** Create  grants  DPT_TTS_VIDD ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_TTS_VIDD    to ABS_ADMIN;
 grant REFERENCES,SELECT                                                      on DPT_TTS_VIDD    to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on DPT_TTS_VIDD    to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on DPT_TTS_VIDD    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_TTS_VIDD    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_TTS_VIDD    to BARS_DM;
 grant DELETE,INSERT,SELECT                                                   on DPT_TTS_VIDD    to DPT;

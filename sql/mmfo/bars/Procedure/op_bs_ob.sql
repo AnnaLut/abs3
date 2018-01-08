@@ -1,4 +1,13 @@
-create or replace procedure BARS.OP_BS_OB
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/OP_BS_OB.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure OP_BS_OB ***
+
+  CREATE OR REPLACE PROCEDURE BARS.OP_BS_OB 
 ( P_BBBOO varchar2 )
 is
 /*
@@ -8,16 +17,16 @@ is
   aa accounts%rowtype;
 ------------------------------------------------------------------------
 begin
-  
+
   bars_audit.trace( $$PLSQL_UNIT||': Entry with P_BBBOO='||P_BBBOO );
-  
+
   aa.NBS  := substr(P_BBBOO,1,4);
   aa.OB22 := substr(P_BBBOO,5,2);
   aa.kv   := nvl ( to_number( pul.get_mas_ini_val ('OP_BSOB_KV') ), gl.baseval );
   aa.kv   := nvl ( aa.kv, 980 );
-  
+
   bars_audit.trace( $$PLSQL_UNIT||': nbs='||aa.NBS||', OB22='||aa.OB22||', KV='||to_char(aa.kv) );
-  
+
   for p in ( select BRANCH
                from BARS.BRANCH
               where BRANCH like '/'||gl.aMfo||'/______/'
@@ -25,31 +34,38 @@ begin
   loop
     begin
       -- м.б. уже есть
-      select * 
-        into aa 
-        from accounts 
-       where branch = p.BRANCH 
-         and nbs  = aa.nbs 
-         and ob22 = aa.ob22 
-         and kv   = aa.kv 
-         and dazs is null 
+      select *
+        into aa
+        from accounts
+       where branch = p.BRANCH
+         and nbs  = aa.nbs
+         and ob22 = aa.ob22
+         and kv   = aa.kv
+         and dazs is null
          and rownum = 1;
     EXCEPTION
-      WHEN NO_DATA_FOUND THEN  
+      WHEN NO_DATA_FOUND THEN
         OP_BMASK( P.BRANCH, aa.NBS, aa.OB22, null, null, null, aa.NLS, aa.ACC );
         -- Accreg.setAccountSParam(aa.acc, 'OB22', aa.ob22);
-        update BARS.ACCOUNTS 
+        update BARS.ACCOUNTS
            set TOBO = p.branch
              , OB22 = aa.ob22
          where ACC  = aa.ACC;
     end;
   end loop;
-  
+
   bars_audit.trace( $$PLSQL_UNIT||': Exit.' );
-  
+
 end OP_BS_OB;
 /
-
 show err;
 
-grant EXECUTE on OP_BSOBV to BARS_ACCESS_DEFROLE;
+PROMPT *** Create  grants  OP_BS_OB ***
+grant EXECUTE                                                                on OP_BS_OB        to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on OP_BS_OB        to CUST001;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/OP_BS_OB.sql =========*** End *** 
+PROMPT ===================================================================================== 

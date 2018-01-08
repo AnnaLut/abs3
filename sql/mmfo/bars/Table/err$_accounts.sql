@@ -140,7 +140,9 @@ COMMENT ON COLUMN BARS.ERR$_ACCOUNTS.NLSALT IS '';
 
 
 PROMPT *** Create  grants  ERR$_ACCOUNTS ***
+grant SELECT                                                                 on ERR$_ACCOUNTS   to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_ACCOUNTS   to BARS_DM;
+grant SELECT                                                                 on ERR$_ACCOUNTS   to UPLD;
 
 
 

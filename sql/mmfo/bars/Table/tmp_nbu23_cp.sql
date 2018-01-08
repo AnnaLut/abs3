@@ -214,7 +214,9 @@ COMMENT ON COLUMN BARS.TMP_NBU23_CP.SPEC IS '';
 
 
 PROMPT *** Create  grants  TMP_NBU23_CP ***
+grant SELECT                                                                 on TMP_NBU23_CP    to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_NBU23_CP    to BARS_DM;
+grant SELECT                                                                 on TMP_NBU23_CP    to UPLD;
 
 
 

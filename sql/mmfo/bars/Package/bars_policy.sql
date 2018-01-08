@@ -471,6 +471,7 @@ end bars_policy;
 PROMPT *** Create  grants  BARS_POLICY ***
 grant EXECUTE                                                                on BARS_POLICY     to ABS_ADMIN;
 grant EXECUTE                                                                on BARS_POLICY     to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on BARS_POLICY     to UPLD;
 grant EXECUTE                                                                on BARS_POLICY     to WR_ALL_RIGHTS;
 
  

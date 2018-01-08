@@ -30,6 +30,10 @@ PROMPT *** Create  view V_SESION_LOAD ***
             AND prev_sql_id IS NOT NULL
    ORDER BY action;
 
+PROMPT *** Create  grants  V_SESION_LOAD ***
+grant SELECT                                                                 on V_SESION_LOAD   to BARSREADER_ROLE;
+grant SELECT                                                                 on V_SESION_LOAD   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

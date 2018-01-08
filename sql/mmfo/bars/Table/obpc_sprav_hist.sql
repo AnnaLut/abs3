@@ -73,9 +73,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_SPRAV_HIST ***
+grant SELECT                                                                 on OBPC_SPRAV_HIST to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_SPRAV_HIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_SPRAV_HIST to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_SPRAV_HIST to OBPC;
+grant SELECT                                                                 on OBPC_SPRAV_HIST to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_SPRAV_HIST to WR_ALL_RIGHTS;
 
 

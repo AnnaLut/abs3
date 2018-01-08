@@ -12,8 +12,10 @@ PROMPT *** Create  view V_CP_EMIW ***
 from v_cp_emi r, v1_cp_tag t;
 
 PROMPT *** Create  grants  V_CP_EMIW ***
+grant SELECT                                                                 on V_CP_EMIW       to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_CP_EMIW       to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_CP_EMIW       to START1;
+grant SELECT                                                                 on V_CP_EMIW       to UPLD;
 
 
 

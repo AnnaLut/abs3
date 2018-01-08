@@ -7,20 +7,23 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view VAL_PROVODKI_Y ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.VAL_PROVODKI_Y ("PDAT", "FDAT", "REF", "TT", "KV", "OB_D", "NLSD", "NMSD", "OB_K", "NLSK", "NMSK", "S", "SQ", "NAZN", "SOS", "VOB") AS 
-  SELECT n.PDAT, i.FDAT, i.REF, i.TT, i.KV, i.OB_D, i.NLSD,i.NMSD,  i.OB_K, i.NLSK,i.NMSK, i.S, i.SQ, n.NAZN, n.sos, n.VOB
-from (SELECT * from oper  nn  where  nazn like PUL.GET('Y')  and exists (select 1 from opldok where fdat = gl.bd and ref = nn.REF )  ) n,
-     (SELECT oo.FDAT, oo.REF, oo.TT, ad.KV, oo.S/100 S, oo.SQ/100 SQ, ad.ob22 OB_D, ad.nls NLSD, ad.nms NMSD, ak.ob22 OB_K, ak.nls NLSK, ak.nms NMSK
-        FROM (select ref, stmt, fdat, tt, s, sq, sum(decode(dk,0,acc,0)) ACCD,sum(decode(dk,1,acc,0)) ACCk
-               from opldok pp where fdat = gl.BD and exists (select 1 from oper where ref = pp.ref and nazn like PUL.GET('Y') )  group by ref,stmt,fdat,tt,s,sq ) oo,
-             (select * from accounts where nls like PUL.GET('D')||'%' ) ad,
-             (select * from accounts where nls like PUL.GET('K')||'%' ) ak
-       WHERE ad.acc = oo.accD AND ak.acc = oo.accK
-     ) i  where i.ref = n.ref  ;
+  CREATE OR REPLACE FORCE VIEW BARS.VAL_PROVODKI_Y ("PDAT", "NAZN", "SOS", "VOB", "FDAT", "REF", "TT", "KV", "NLSD", "NLSK", "S", "SQ", "OB_D", "NMSD", "OB_K", "NMSK") AS 
+  SELECT o.PDAT, o.NAZN, o.sos, o.VOB,
+       z.FDAT, z.REF ,  z.TT,  z.KV, z.NLSD, z.NLSK, z.S/100 s, z.SQ/100 sq, 
+       ad.ob22 OB_D  , ad.NMS nmsD, ak.ob22  OB_K,  ak.nms NMSK
+from oper o,
+     accounts ad,  
+     accounts ak,
+   ( select * from PART_ZVT_DOC where nlsD LIKE PUL.GET('D')||'%' and nlsK LIKE PUL.GET('K')||'%' and fdat=pul_BD)  z 
+where ad.nls = z.nlsd and ad.kv = z.kv
+  and ak.nls = z.nlsk and ak.kv = z.kv
+  and  o.ref = z.REF;
 
 PROMPT *** Create  grants  VAL_PROVODKI_Y ***
+grant SELECT                                                                 on VAL_PROVODKI_Y  to BARSREADER_ROLE;
 grant SELECT                                                                 on VAL_PROVODKI_Y  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VAL_PROVODKI_Y  to START1;
+grant SELECT                                                                 on VAL_PROVODKI_Y  to UPLD;
 
 
 

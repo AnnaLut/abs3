@@ -214,7 +214,9 @@ COMMENT ON COLUMN BARS.TMP_NBU23_CP_10.SDATE IS '';
 
 
 PROMPT *** Create  grants  TMP_NBU23_CP_10 ***
+grant SELECT                                                                 on TMP_NBU23_CP_10 to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_NBU23_CP_10 to BARS_DM;
+grant SELECT                                                                 on TMP_NBU23_CP_10 to UPLD;
 
 
 

@@ -18,6 +18,8 @@ WHERE
  ;
 
 PROMPT *** Create  grants  BE_DELETED_LIBS ***
+grant SELECT                                                                 on BE_DELETED_LIBS to BARSREADER_ROLE;
+grant SELECT                                                                 on BE_DELETED_LIBS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BE_DELETED_LIBS to WR_ALL_RIGHTS;
 
 

@@ -64,12 +64,10 @@ COMMENT ON COLUMN BARS.OPLDOK_BACK.ID IS '';
 
 
 
-PROMPT *** Create  constraint XPK_OPLDOK_BACK ***
+PROMPT *** Create  constraint SYS_C0011812 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPLDOK_BACK ADD CONSTRAINT XPK_OPLDOK_BACK PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.OPLDOK_BACK ADD CHECK (DK IN (0,1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -78,10 +76,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0011812 ***
+PROMPT *** Create  constraint XPK_OPLDOK_BACK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPLDOK_BACK ADD CHECK (DK IN (0,1)) ENABLE';
+  ALTER TABLE BARS.OPLDOK_BACK ADD CONSTRAINT XPK_OPLDOK_BACK PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -118,8 +118,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OPLDOK_BACK ***
+grant SELECT                                                                 on OPLDOK_BACK     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPLDOK_BACK     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OPLDOK_BACK     to BARS_DM;
+grant SELECT                                                                 on OPLDOK_BACK     to UPLD;
 
 
 

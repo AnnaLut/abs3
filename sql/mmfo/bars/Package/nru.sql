@@ -151,14 +151,7 @@ procedure ACC1   ( p_acc number, p_dat date  ) is  -- обработка одной строки (пт
 
       -- при цьому інформація для файлу ДПІ про закриття рахунків формується з типом операції «5» - зміна рахунка (закрито рахунок не за ініціативою клієнта).
       -- При закрытии счета (update DAZS) срабатывает триггер TBU_ACCOUNTS_TAX.   Он инсертит(НЕ инс) запись по этому счету в
-      UPDATE REE_TMP
-         SET OT   = 5
-             -- COBUSUPABS-6887 установить правильную дату закрытия 
-            ,odat = DAT_NEXT_U(gl.bdate
-                              ,1)
-       WHERE mfo = gl.amfo
-         AND nls = k.nls
-         AND kv = k.kv;
+      update REE_TMP set OT = 5 where mfo = gl.amfo and nls = k.nls AND kv = k.kv ;
 
       -- д) створити на рахунках клієнтів позначку «Закритий як нерухомий» з її автоматичним відображенням після закриття рахунку.
       accreg.setAccountwParam (  p_acc => k.acc,  p_tag  =>'PRIM_CL',  p_val =>'Закритий як нерухомий');

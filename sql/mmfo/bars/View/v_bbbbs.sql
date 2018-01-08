@@ -74,8 +74,10 @@ PROMPT *** Create  view V_BBBBS ***
            GROUP BY branch, NBS);
 
 PROMPT *** Create  grants  V_BBBBS ***
+grant SELECT                                                                 on V_BBBBS         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BBBBS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BBBBS         to SALGL;
+grant SELECT                                                                 on V_BBBBS         to UPLD;
 
 
 

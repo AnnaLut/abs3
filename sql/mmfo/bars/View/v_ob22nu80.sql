@@ -47,12 +47,14 @@ PROMPT *** Create  view V_OB22NU80 ***
           AND s.p080 = p.p080;
 
 PROMPT *** Create  grants  V_OB22NU80 ***
+grant SELECT                                                                 on V_OB22NU80      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OB22NU80      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OB22NU80      to CUST001;
 grant SELECT                                                                 on V_OB22NU80      to NALOG;
 grant SELECT                                                                 on V_OB22NU80      to RPBN001;
 grant SELECT                                                                 on V_OB22NU80      to RPBN002;
 grant SELECT                                                                 on V_OB22NU80      to START1;
+grant SELECT                                                                 on V_OB22NU80      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OB22NU80      to WR_ALL_RIGHTS;
 
 

@@ -61,19 +61,6 @@ COMMENT ON COLUMN BARS.TMS_LIST_TASKS.FAILED_ACTION IS '';
 
 
 
-PROMPT *** Create  constraint FK_ID_GROUP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMS_LIST_TASKS ADD CONSTRAINT FK_ID_GROUP FOREIGN KEY (TASK_ID_GROUP)
-	  REFERENCES BARS.TMS_TASK_GROUPS (ID_GROUP) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_TASK_ID ***
 begin   
  execute immediate '
@@ -102,7 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMS_LIST_TASKS ***
+grant SELECT                                                                 on TMS_LIST_TASKS  to BARSREADER_ROLE;
 grant SELECT                                                                 on TMS_LIST_TASKS  to BARS_DM;
+grant SELECT                                                                 on TMS_LIST_TASKS  to UPLD;
 
 
 

@@ -15,8 +15,10 @@ PROMPT *** Create  view V_NP ***
 
 PROMPT *** Create  grants  V_NP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_NP            to ABS_ADMIN;
+grant SELECT                                                                 on V_NP            to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_NP            to BARS_ACCESS_DEFROLE;
 grant DELETE,SELECT,UPDATE                                                   on V_NP            to PYOD001;
+grant SELECT                                                                 on V_NP            to UPLD;
 grant DELETE,FLASHBACK,SELECT,UPDATE                                         on V_NP            to WR_ALL_RIGHTS;
 grant DELETE,FLASHBACK,SELECT,UPDATE                                         on V_NP            to WR_REFREAD;
 

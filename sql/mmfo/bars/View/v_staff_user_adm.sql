@@ -34,7 +34,9 @@ from   staff$base u
 where  u.active = 1 /*user_utl.USER_STATE_CLOSED*/;
 
 PROMPT *** Create  grants  V_STAFF_USER_ADM ***
+grant SELECT                                                                 on V_STAFF_USER_ADM to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFF_USER_ADM to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STAFF_USER_ADM to UPLD;
 
 
 

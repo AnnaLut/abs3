@@ -11,9 +11,9 @@ PROMPT *** ALTER_POLICY_INFO to NBS_PROFACC ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''NBS_PROFACC'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''NBS_PROFACC'', ''FILIAL'' , null, ''E'', ''E'', ''E'');
-               bpa.alter_policy_info(''NBS_PROFACC'', ''WHOLE'' , null, null, null, null);
+               bpa.alter_policy_info(''NBS_PROFACC'', ''CENTER'' , null, ''E'', ''E'', ''E'');
+               bpa.alter_policy_info(''NBS_PROFACC'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''NBS_PROFACC'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
           '; 
@@ -81,32 +81,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_NBSPROFACC_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBS_PROFACC ADD CONSTRAINT FK_NBSPROFACC_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_NBS_PROFACC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBS_PROFACC ADD CONSTRAINT FK_NBS_PROFACC FOREIGN KEY (KF, NBS, NP)
-	  REFERENCES BARS.NBS_PROFNAM (KF, NBS, NP) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_NBSPROFACC ***
 begin   
  execute immediate '
@@ -121,8 +95,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBS_PROFACC ***
+grant SELECT                                                                 on NBS_PROFACC     to BARSREADER_ROLE;
 grant SELECT                                                                 on NBS_PROFACC     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBS_PROFACC     to NBS_PROF;
+grant SELECT                                                                 on NBS_PROFACC     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBS_PROFACC     to WR_ALL_RIGHTS;
 
 

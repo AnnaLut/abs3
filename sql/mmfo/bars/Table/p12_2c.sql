@@ -60,7 +60,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  P12_2C ***
+grant SELECT                                                                 on P12_2C          to BARSREADER_ROLE;
 grant SELECT                                                                 on P12_2C          to BARS_DM;
+grant SELECT                                                                 on P12_2C          to UPLD;
 
 
 

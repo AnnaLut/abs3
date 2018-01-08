@@ -56,32 +56,6 @@ COMMENT ON COLUMN BARS.MBM_CUST_REL_USERS_MAP.APPROVED_TYPE IS 'Тип змін, що пот
 
 
 
-PROMPT *** Create  constraint SYS_C00111427 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MBM_CUST_REL_USERS_MAP ADD FOREIGN KEY (REL_CUST_ID)
-	  REFERENCES BARS.MBM_REL_CUSTOMERS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00111428 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MBM_CUST_REL_USERS_MAP ADD FOREIGN KEY (CUST_ID)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C00111412 ***
 begin   
  execute immediate '
@@ -118,7 +92,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  MBM_CUST_REL_USERS_MAP ***
+grant SELECT                                                                 on MBM_CUST_REL_USERS_MAP to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MBM_CUST_REL_USERS_MAP to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on MBM_CUST_REL_USERS_MAP to UPLD;
 
 
 

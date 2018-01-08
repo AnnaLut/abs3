@@ -64,19 +64,6 @@ COMMENT ON COLUMN BARS.APPLIST_STAFF.GRANTOR IS 'Кто выдал ресурс';
 
 
 
-PROMPT *** Create  constraint FK_APPLISTSTAFF_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.APPLIST_STAFF ADD CONSTRAINT FK_APPLISTSTAFF_STAFF FOREIGN KEY (ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_APPLISTSTAFF_ID_NN ***
 begin   
  execute immediate '
@@ -131,9 +118,11 @@ exception when others then
 PROMPT *** Create  grants  APPLIST_STAFF ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on APPLIST_STAFF   to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on APPLIST_STAFF   to APPLIST_STAFF;
+grant SELECT                                                                 on APPLIST_STAFF   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on APPLIST_STAFF   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on APPLIST_STAFF   to BARS_DM;
 grant SELECT                                                                 on APPLIST_STAFF   to START1;
+grant SELECT                                                                 on APPLIST_STAFF   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on APPLIST_STAFF   to WR_ALL_RIGHTS;
 grant DELETE,INSERT,SELECT,UPDATE                                            on APPLIST_STAFF   to WR_DIAGNOSTICS;
 grant SELECT                                                                 on APPLIST_STAFF   to WR_METATAB;

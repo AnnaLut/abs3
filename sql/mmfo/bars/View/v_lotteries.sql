@@ -36,8 +36,10 @@ PROMPT *** Create  view V_LOTTERIES ***
       AND  n.nls_2905 IS NOT NULL AND n.nls_2805 IS NOT NULL  AND v.cena > 0 ;
 
 PROMPT *** Create  grants  V_LOTTERIES ***
+grant SELECT                                                                 on V_LOTTERIES     to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_LOTTERIES     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_LOTTERIES     to PYOD001;
+grant SELECT                                                                 on V_LOTTERIES     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_LOTTERIES     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_LOTTERIES     to WR_REFREAD;
 

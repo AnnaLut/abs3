@@ -61,7 +61,9 @@ join accounts ab on ab.acc = i.acrb
 where d.vidd in (3902, 3903);
 
 PROMPT *** Create  grants  V_CRSOUR_ACCOUNTS ***
+grant SELECT                                                                 on V_CRSOUR_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CRSOUR_ACCOUNTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CRSOUR_ACCOUNTS to UPLD;
 
 
 

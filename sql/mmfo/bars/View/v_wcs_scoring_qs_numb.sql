@@ -30,7 +30,9 @@ PROMPT *** Create  view V_WCS_SCORING_QS_NUMB ***
  order by sqn.scoring_id, sqn.question_id, sqn.ord;
 
 PROMPT *** Create  grants  V_WCS_SCORING_QS_NUMB ***
+grant SELECT                                                                 on V_WCS_SCORING_QS_NUMB to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SCORING_QS_NUMB to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_SCORING_QS_NUMB to UPLD;
 
 
 

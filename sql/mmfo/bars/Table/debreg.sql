@@ -89,11 +89,10 @@ COMMENT ON COLUMN BARS.DEBREG.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_DEBREG_KF ***
+PROMPT *** Create  constraint NK_DEBREG_OKPO ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DEBREG ADD CONSTRAINT FK_DEBREG_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+  ALTER TABLE BARS.DEBREG MODIFY (OKPO CONSTRAINT NK_DEBREG_OKPO NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -102,10 +101,130 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_DEBREG_OKPO ***
+PROMPT *** Create  constraint NK_DEBREG_NMK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DEBREG MODIFY (OKPO CONSTRAINT NK_DEBREG_OKPO NOT NULL ENABLE)';
+  ALTER TABLE BARS.DEBREG MODIFY (NMK CONSTRAINT NK_DEBREG_NMK NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_DEBREG_ADR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEBREG MODIFY (ADR CONSTRAINT NK_DEBREG_ADR NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_DEBREG_CUSTTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEBREG MODIFY (CUSTTYPE CONSTRAINT NK_DEBREG_CUSTTYPE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_DEBREG_PRINSIDER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEBREG MODIFY (PRINSIDER CONSTRAINT NK_DEBREG_PRINSIDER NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_DEBREG_KV ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEBREG MODIFY (KV CONSTRAINT NK_DEBREG_KV NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_DEBREG_CRDAGRNUM ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEBREG MODIFY (CRDAGRNUM CONSTRAINT NK_DEBREG_CRDAGRNUM NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_DEBREG_CRDDATE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEBREG MODIFY (CRDDATE CONSTRAINT NK_DEBREG_CRDDATE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_DEBREG_SUMM ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEBREG MODIFY (SUMM CONSTRAINT NK_DEBREG_SUMM NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_DEBREG_DEBDATE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEBREG MODIFY (DEBDATE CONSTRAINT NK_DEBREG_DEBDATE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_DEBREG_REZID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEBREG MODIFY (REZID CONSTRAINT NK_DEBREG_REZID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DEBREG_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEBREG MODIFY (KF CONSTRAINT CC_DEBREG_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -128,138 +247,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DEBREG_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEBREG MODIFY (KF CONSTRAINT CC_DEBREG_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_DEBREG_REZID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEBREG MODIFY (REZID CONSTRAINT NK_DEBREG_REZID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_DEBREG_DEBDATE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEBREG MODIFY (DEBDATE CONSTRAINT NK_DEBREG_DEBDATE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_DEBREG_SUMM ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEBREG MODIFY (SUMM CONSTRAINT NK_DEBREG_SUMM NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_DEBREG_CRDDATE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEBREG MODIFY (CRDDATE CONSTRAINT NK_DEBREG_CRDDATE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_DEBREG_CRDAGRNUM ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEBREG MODIFY (CRDAGRNUM CONSTRAINT NK_DEBREG_CRDAGRNUM NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_DEBREG_KV ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEBREG MODIFY (KV CONSTRAINT NK_DEBREG_KV NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_DEBREG_PRINSIDER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEBREG MODIFY (PRINSIDER CONSTRAINT NK_DEBREG_PRINSIDER NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_DEBREG_CUSTTYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEBREG MODIFY (CUSTTYPE CONSTRAINT NK_DEBREG_CUSTTYPE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_DEBREG_ADR ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEBREG MODIFY (ADR CONSTRAINT NK_DEBREG_ADR NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_DEBREG_NMK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEBREG MODIFY (NMK CONSTRAINT NK_DEBREG_NMK NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index XPK_DEBREG_DEBNUM ***
 begin   
  execute immediate '
@@ -274,9 +261,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DEBREG ***
+grant SELECT                                                                 on DEBREG          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEBREG          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEBREG          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEBREG          to DEB_REG;
+grant SELECT                                                                 on DEBREG          to UPLD;
 
 
 

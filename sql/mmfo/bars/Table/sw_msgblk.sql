@@ -101,7 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_MSGBLK ***
+grant SELECT                                                                 on SW_MSGBLK       to BARSREADER_ROLE;
 grant SELECT                                                                 on SW_MSGBLK       to BARS_DM;
+grant SELECT                                                                 on SW_MSGBLK       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_MSGBLK       to WR_ALL_RIGHTS;
 
 

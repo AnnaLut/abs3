@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('BAK', 'BAK(p) Виконання сторно-операції', null, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, 30, null, null, 99, '0000100000000000000000000000000000000010000000000000000000000000', null);
+    values ('BAK', 'BAK(p) Виконання сторно-операції', null, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, 30, null, '0', 99, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='BAK', name='BAK(p) Виконання сторно-операції', dk=null, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=30, proc=null, s3800=null, rang=99, flags='0000100000000000000000000000000000000010000000000000000000000000', nazn=null
+         set tt='BAK', name='BAK(p) Виконання сторно-операції', dk=null, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=30, proc=null, s3800='0', rang=99, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='BAK';
   end;
   --------------------------------

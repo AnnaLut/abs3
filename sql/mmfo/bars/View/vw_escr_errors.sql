@@ -125,7 +125,9 @@ SELECT cc.nd deal_numb
    AND f_date_check(cw.value) = 1);
 
 PROMPT *** Create  grants  VW_ESCR_ERRORS ***
+grant SELECT                                                                 on VW_ESCR_ERRORS  to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_ERRORS  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VW_ESCR_ERRORS  to UPLD;
 
 
 

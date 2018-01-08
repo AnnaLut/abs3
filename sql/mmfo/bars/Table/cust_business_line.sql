@@ -103,6 +103,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUST_BUSINESS_LINE ***
+grant SELECT                                                                 on CUST_BUSINESS_LINE to BARSREADER_ROLE;
 grant SELECT                                                                 on CUST_BUSINESS_LINE to BARSUPL;
 grant SELECT                                                                 on CUST_BUSINESS_LINE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUST_BUSINESS_LINE to BARS_DM;

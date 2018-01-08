@@ -48,8 +48,10 @@ select 'Корpсчет 1200',
 --  where nls='37396012';
 
 PROMPT *** Create  grants  V_BLOCKED_DOCS ***
+grant SELECT                                                                 on V_BLOCKED_DOCS  to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_BLOCKED_DOCS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BLOCKED_DOCS  to START1;
+grant SELECT                                                                 on V_BLOCKED_DOCS  to UPLD;
 grant FLASHBACK,SELECT                                                       on V_BLOCKED_DOCS  to WR_REFREAD;
 
 

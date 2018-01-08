@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_MESSTYPES ***
+grant SELECT                                                                 on XML_MESSTYPES   to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_MESSTYPES   to BARS_DM;
 grant SELECT                                                                 on XML_MESSTYPES   to KLBX;
+grant SELECT                                                                 on XML_MESSTYPES   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_MESSTYPES   to WR_ALL_RIGHTS;
 
 

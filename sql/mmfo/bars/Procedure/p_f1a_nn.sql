@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_F1A_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования файла #1A для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 07/03/2017 (20/09/2016, 12/01/2015)
+% VERSION     :    16.08.2017 (07/03/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -109,7 +109,7 @@ add_       NUMBER;
 
 --- остатки счетов+месячные корректирующие обороты+
 CURSOR SALDO IS
-   SELECT c.rnk, c.codcagent, c.country, a.mdate, acrn.fproc(a.acc, Dat_),
+   SELECT c.rnk, c.codcagent, c.country, a.mdate, acrn_otc.fproc(a.acc, Dat_),
           s.acc, s.nls, s.kv, s.fdat, s.nbs, s.ost, s.ostq,
           s.dos96, s.dosq96, s.kos96, s.kosq96,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg, s.dos99zg, s.kos99zg, a.daos,
@@ -188,7 +188,7 @@ BEGIN
     -- наповнення проводок за зв_тну дату
    insert /*+ APPEND*/ into tmp_file03
    select *
-   from (SELECT /*+ parallel(4) */
+   from (SELECT /*+ leading(a) */
             (case when o.dk = 0 then o.acc else z.acc end) ACCD,
              o.TT,
              o.REF,
@@ -221,27 +221,6 @@ BEGIN
               nlsk not like '___8%' and 
               substr(nlsd,1,3) = substr(nlsk,1,3));    
     
---    insert /*+ APPEND*/ into tmp_file03
---       (ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
---       select  /*+ PARALLEL(4)*/ 
---            ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP
---       from provodki_otc p
---       where p.fdat between Datnp_ and dat_
---         and substr(p.NLSD,1,4) in (select r020 from kl_f3_29 where kf='1A')
---       union
---       select  /*+ PARALLEL(4)*/
---            ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP
---       from provodki_otc p
---       where p.fdat between Datnp_ and dat_
---         and substr(p.NLSK,1,4) in (select r020 from kl_f3_29 where kf='1A');
---    commit;
---    
---    -- исключаем проводки по капитализации процентов
---    delete from tmp_file03
---    where nlsd like '___8%'
---      and nlsk not like '___8%'
---      and substr(nlsd,1,3) = substr(nlsk,1,3);
-
     -------------------------------------------------------------------
     --- остатки
     OPEN SALDO;
@@ -268,7 +247,6 @@ BEGIN
 
           if typ_>0 then
              nbuc_ := nvl(F_Codobl_Tobo_new (acc_, dat_, typ_), nbuc1_);
-             --nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
           else
              nbuc_ := nbuc1_;
           end if;
@@ -489,7 +467,7 @@ BEGIN
                      end if;
                   end if;
 
-                  acrn.p_int(acc_, id_, datn_, date_, int_, null, 0);
+                  acrn_otc.p_int(acc_, id_, datn_, date_, int_, null, 0);
 
                   if mfo_ = 300120 and codcagent_ in (2,4) and country_ = 643 then
                      int_ := ABS(ROUND(int_,0))*0.9;
@@ -592,7 +570,6 @@ BEGIN
           if s41_ != 0 then
              if typ_>0 then
                 nbuc_ := nvl(F_Codobl_Tobo_new (acc_, dat_, typ_), nbuc1_);
-                --nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
              else
                 nbuc_ := nbuc1_;
              end if;

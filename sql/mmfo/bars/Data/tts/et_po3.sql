@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции PO3
-prompt Наименование операции: Операції податкового обліку (авто)
+prompt Наименование операции: PO3 Операції податкового обліку (авто)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('PO3', 'Операції податкового обліку (авто)', 1, null, null, null, null, null, null, null, '300465', 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('PO3', 'PO3 Операції податкового обліку (авто)', 1, null, null, null, null, null, null, null, '300465', 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='PO3', name='Операції податкового обліку (авто)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob='300465', flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='PO3', name='PO3 Операції податкового обліку (авто)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob='300465', flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='PO3';
   end;
   --------------------------------

@@ -159,7 +159,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BE_LIBS_ARC ***
+grant SELECT                                                                 on BE_LIBS_ARC     to BARSREADER_ROLE;
 grant SELECT                                                                 on BE_LIBS_ARC     to BARS_DM;
+grant SELECT                                                                 on BE_LIBS_ARC     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BE_LIBS_ARC     to WR_ALL_RIGHTS;
 
 

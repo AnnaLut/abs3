@@ -85,6 +85,10 @@ COMMENT ON COLUMN BARS.TMP_MONEXR_0.KOMB3 IS '';
 
 
 
+PROMPT *** Create  grants  TMP_MONEXR_0 ***
+grant SELECT                                                                 on TMP_MONEXR_0    to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_MONEXR_0    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

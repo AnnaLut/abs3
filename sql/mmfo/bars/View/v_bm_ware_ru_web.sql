@@ -22,7 +22,9 @@ PROMPT *** Create  view V_BM_WARE_RU_WEB ***
      FROM BANK_METALS b;
 
 PROMPT *** Create  grants  V_BM_WARE_RU_WEB ***
+grant SELECT                                                                 on V_BM_WARE_RU_WEB to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_BM_WARE_RU_WEB to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_BM_WARE_RU_WEB to UPLD;
 
 
 

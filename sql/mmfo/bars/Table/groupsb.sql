@@ -89,11 +89,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  GROUPSB ***
+grant SELECT                                                                 on GROUPSB         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on GROUPSB         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GROUPSB         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GROUPSB         to GROUPSB;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GROUPSB         to SEP_ROLE;
 grant SELECT                                                                 on GROUPSB         to START1;
+grant SELECT                                                                 on GROUPSB         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on GROUPSB         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on GROUPSB         to WR_REFREAD;
 

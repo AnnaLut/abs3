@@ -59,7 +59,9 @@ begin
 	P222 CHAR(1) DEFAULT ''V'', 
 	P223 CHAR(1) DEFAULT ''V'', 
 	P292 CHAR(1) DEFAULT ''V'', 
-	P293 CHAR(1) DEFAULT ''V''
+	P293 CHAR(1) DEFAULT ''V'', 
+	P010 NUMBER(1,0), 
+	P320 NUMBER(1,0)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -77,6 +79,8 @@ PROMPT *** ALTER_POLICIES to CIM_F504 ***
 
 
 COMMENT ON TABLE BARS.CIM_F504 IS 'Дані для звіту f504';
+COMMENT ON COLUMN BARS.CIM_F504.P010 IS 'вид позичальника';
+COMMENT ON COLUMN BARS.CIM_F504.P320 IS 'Код типу реорганізації';
 COMMENT ON COLUMN BARS.CIM_F504.F504_ID IS '';
 COMMENT ON COLUMN BARS.CIM_F504.CONTR_ID IS 'Внутрішній код контракту';
 COMMENT ON COLUMN BARS.CIM_F504.P_DATE_TO IS 'Звіт сформований на дату';
@@ -143,28 +147,12 @@ exception when others then
  end;
 /
 
-begin
-    execute immediate 'alter table bars.cim_f504 add (p010  number(1))';
- exception when others then 
-    if sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/ 
-COMMENT ON COLUMN bars.cim_f504.p010 IS 'вид позичальника';
-
-begin
-    execute immediate 'alter table bars.cim_f504 add (p320  number(1))';
- exception when others then 
-    if sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/ 
-COMMENT ON COLUMN bars.cim_f504.p320 IS 'Код типу реорганізації';
-
 
 
 PROMPT *** Create  grants  CIM_F504 ***
+grant SELECT                                                                 on CIM_F504        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F504        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CIM_F504        to UPLD;
 
 
 

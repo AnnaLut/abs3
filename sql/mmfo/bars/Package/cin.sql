@@ -1,7 +1,13 @@
-CREATE OR REPLACE PACKAGE BARS.CIN IS
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cin.sql =========*** Run *** =======
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.CIN IS
 
 /*
-26-09-2016 Коррекция вюшки 
+26-09-2016 Коррекция вюшки
 17.12.2014 Процедура предварительной подготовки даннях для расчета за прошлый кал.месяц
  11.03.2013
  Заявка № 719. Возможность расчетов комиссии (прогноз+финиш) по одному или всем  клиентам
@@ -17,8 +23,8 @@ CREATE OR REPLACE PACKAGE BARS.CIN IS
  FUNCTION E return date   ;
  FUNCTION R return number ;
 
- --- корректировка сумм комисии по протоколу 
- procedure UPD1 ( p_RI varchar2, p_kc0 number,  p_ka1 number,  p_ka2 number,  p_kb1 number, p_kb2 number, p_kb3 number); 
+ --- корректировка сумм комисии по протоколу
+ procedure UPD1 ( p_RI varchar2, p_kc0 number,  p_ka1 number,  p_ka2 number,  p_kb1 number, p_kb2 number, p_kb3 number);
 --------------------------------------------------------------------
 -- SK_A1 : Pасчет суммы (или комиссии)  по одному доп реквизиту
 --------------------------------------------------------------------
@@ -48,10 +54,7 @@ CREATE OR REPLACE PACKAGE BARS.CIN IS
  PROCEDURE  KOM_GOU( p_mode int);
 
 END CIN;
-
 /
-
-
 CREATE OR REPLACE PACKAGE BODY BARS.CIN IS
   k_branch  varchar2(30);
 
@@ -99,7 +102,7 @@ r020 = '6119'; ob22 = '16'  ;  TRANSFER_2017 : 6119 =>6519 , об22 не изм в новом
  FUNCTION E return date   is begin   return to_date   (pul.Get_Mas_Ini_Val('sFdat2'), 'dd.mm.yyyy'); end E;
  FUNCTION R return number is begin   return to_number (pul.Get_Mas_Ini_Val('RNK'   )              ); end R;
 
- --- корректировка сумм комисии по протоколу 
+ --- корректировка сумм комисии по протоколу
  procedure UPD1 ( p_RI varchar2, p_kc0 number,  p_ka1 number,  p_ka2 number,  p_kb1 number, p_kb2 number, p_kb3 number) is
 begin   update CIN_TKR set  kc0 = p_kc0 , ka1 = p_ka1 , ka2 = p_ka2 , kb1=p_kb1 , kb2 = p_kb2 , kb3 = p_kb3 where rowid = p_RI;
 end UPD1;
@@ -341,7 +344,7 @@ If p_mode = 1 then
    --архив расчетов
    insert into cin_tkr
          (RNK,NMK,NLS_2909,ID,NAME,MFO,NLS,REF,S,KA2,KA1,KB2,KB1,DAT1,DAT2,VDAT,KC0,A2,B1, SB1_MIN, B2,C0,NLSR,REC,SR,BRANCH,  b3,kb3,s3 )
-   select RNK,NMK,NLS_2909,ID,NAME,MFO,NLS,REF,S,KA2,KA1,KB2,KB1,DAT1,DAT2,VDAT,KC0,A2,B1, SB1_MIN, B2,C0,NLSR,REC,SR,BRANCH,  b3,kb3,s3 
+   select RNK,NMK,NLS_2909,ID,NAME,MFO,NLS,REF,S,KA2,KA1,KB2,KB1,DAT1,DAT2,VDAT,KC0,A2,B1, SB1_MIN, B2,C0,NLSR,REC,SR,BRANCH,  b3,kb3,s3
    from cin_kom1 u   where l_RNK in (0, u.rnk);
 
 end if;
@@ -405,8 +408,8 @@ begin
 
 
   ------------------------------- TRANSFER_2017 : 6119 =>6519 , об22 не изм в новом
-  begin select * into SBO from sb_ob22 where r020 = '6519' and ob22 ='16' and d_close is null;  
-  EXCEPTION WHEN NO_DATA_FOUND THEN 
+  begin select * into SBO from sb_ob22 where r020 = '6519' and ob22 ='16' and d_close is null;
+  EXCEPTION WHEN NO_DATA_FOUND THEN
         begin select * into SBO from sb_ob22 where r020 = '6119' and ob22 ='16' and d_close is null;
         EXCEPTION WHEN NO_DATA_FOUND then raise_application_error(-20100, 'Не знайдено аналітики в SB_Ob22 рах R020=6519(6119), Ob22=16 ' ) ;
         end;
@@ -530,5 +533,15 @@ end KOM_GOU;
 
 END CIN;
 /
+ show err;
+ 
+PROMPT *** Create  grants  CIN ***
+grant EXECUTE                                                                on CIN             to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on CIN             to PYOD001;
 
-GRANT execute ON BARS.CIN TO BARS_ACCESS_DEFROLE;
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/cin.sql =========*** End *** =======
+ PROMPT ===================================================================================== 
+ 

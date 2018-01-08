@@ -71,6 +71,10 @@ COMMENT ON COLUMN BARS.ERR$_ALIEN.REC_ID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ALIEN ***
+grant SELECT                                                                 on ERR$_ALIEN      to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ALIEN      to UPLD;
+
 
 
 PROMPT ===================================================================================== 

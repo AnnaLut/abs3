@@ -104,10 +104,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010501 ***
+PROMPT *** Create  constraint SYS_C0010499 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.REZ_ZAL MODIFY (ACCS1 NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.REZ_ZAL MODIFY (KV NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -128,10 +128,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010499 ***
+PROMPT *** Create  constraint SYS_C0010501 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.REZ_ZAL MODIFY (KV NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.REZ_ZAL MODIFY (ACCS1 NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -150,6 +150,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  REZ_ZAL ***
+grant SELECT                                                                 on REZ_ZAL         to BARSREADER_ROLE;
+grant SELECT                                                                 on REZ_ZAL         to UPLD;
 
 
 

@@ -69,6 +69,10 @@ COMMENT ON COLUMN BARS.ERR$_ZAY_DATA_TRANSFER.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ZAY_DATA_TRANSFER ***
+grant SELECT                                                                 on ERR$_ZAY_DATA_TRANSFER to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ZAY_DATA_TRANSFER to UPLD;
+
 
 
 PROMPT ===================================================================================== 

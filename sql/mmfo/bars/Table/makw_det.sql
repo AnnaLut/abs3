@@ -97,70 +97,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C006965 ***
+PROMPT *** Create  constraint SYS_C006958 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.MAKW_DET MODIFY (VOB NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006964 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MAKW_DET MODIFY (NAM_B NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006963 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MAKW_DET MODIFY (NAZN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006962 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MAKW_DET MODIFY (OKPOB NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006961 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MAKW_DET MODIFY (MFOB NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006960 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MAKW_DET MODIFY (NLSB NOT NULL ENABLE)';
+  ALTER TABLE BARS.MAKW_DET MODIFY (GRP NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -181,10 +121,70 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C006958 ***
+PROMPT *** Create  constraint SYS_C006960 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.MAKW_DET MODIFY (GRP NOT NULL ENABLE)';
+  ALTER TABLE BARS.MAKW_DET MODIFY (NLSB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006961 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MAKW_DET MODIFY (MFOB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006962 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MAKW_DET MODIFY (OKPOB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006963 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MAKW_DET MODIFY (NAZN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006964 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MAKW_DET MODIFY (NAM_B NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006965 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MAKW_DET MODIFY (VOB NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -221,7 +221,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  MAKW_DET ***
+grant SELECT                                                                 on MAKW_DET        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MAKW_DET        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on MAKW_DET        to UPLD;
 
 
 

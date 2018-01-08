@@ -43,9 +43,11 @@ COMMENT ON COLUMN BARS.TMP_NAEK_CLOB.C IS '';
 
 
 PROMPT *** Create  grants  TMP_NAEK_CLOB ***
+grant SELECT                                                                 on TMP_NAEK_CLOB   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_NAEK_CLOB   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_NAEK_CLOB   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_NAEK_CLOB   to TOSS;
+grant SELECT                                                                 on TMP_NAEK_CLOB   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_NAEK_CLOB   to WR_ALL_RIGHTS;
 
 

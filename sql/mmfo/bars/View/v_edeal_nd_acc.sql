@@ -17,7 +17,9 @@ PROMPT *** Create  view V_EDEAL_ND_ACC ***
     select nd, 'ACCP' as name, accp as acc from e_deal$base);
 
 PROMPT *** Create  grants  V_EDEAL_ND_ACC ***
+grant SELECT                                                                 on V_EDEAL_ND_ACC  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_EDEAL_ND_ACC  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_EDEAL_ND_ACC  to UPLD;
 
 
 

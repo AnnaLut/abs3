@@ -123,9 +123,11 @@ COMMENT ON COLUMN BARS.TMP_LICN.GRPLST IS '';
 
 
 PROMPT *** Create  grants  TMP_LICN ***
+grant SELECT                                                                 on TMP_LICN        to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TMP_LICN        to BARS_ACCESS_DEFROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TMP_LICN        to RPBN001;
 grant SELECT                                                                 on TMP_LICN        to TEST;
+grant SELECT                                                                 on TMP_LICN        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_LICN        to WR_ALL_RIGHTS;
 
 

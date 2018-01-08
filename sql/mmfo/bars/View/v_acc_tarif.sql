@@ -34,9 +34,11 @@ select c.acc, decode(c.ids,0,0,1), t.kod, t.tar, t.pr, t.smin, t.kv_smin, t.smax
                        and trunc(bankdate,'dd')<=decode(edate,null,trunc(bankdate,'dd'),edate) ) ;
 
 PROMPT *** Create  grants  V_ACC_TARIF ***
+grant SELECT                                                                 on V_ACC_TARIF     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACC_TARIF     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ACC_TARIF     to CUST001;
 grant SELECT                                                                 on V_ACC_TARIF     to START1;
+grant SELECT                                                                 on V_ACC_TARIF     to UPLD;
 
 
 

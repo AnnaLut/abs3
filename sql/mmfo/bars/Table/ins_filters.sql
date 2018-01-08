@@ -106,7 +106,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  INS_FILTERS ***
+grant SELECT                                                                 on INS_FILTERS     to BARSREADER_ROLE;
 grant SELECT                                                                 on INS_FILTERS     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on INS_FILTERS     to UPLD;
 
 
 

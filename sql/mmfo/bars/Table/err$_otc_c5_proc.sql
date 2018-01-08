@@ -70,7 +70,9 @@ COMMENT ON COLUMN BARS.ERR$_OTC_C5_PROC.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_OTC_C5_PROC ***
+grant SELECT                                                                 on ERR$_OTC_C5_PROC to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_OTC_C5_PROC to BARS_DM;
+grant SELECT                                                                 on ERR$_OTC_C5_PROC to UPLD;
 
 
 

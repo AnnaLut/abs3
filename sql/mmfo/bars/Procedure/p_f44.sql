@@ -11,7 +11,7 @@ PROMPT *** Create  procedure P_F44 ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #44 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 08/11/2017 (23/03/2017)
+% VERSION     : 17/11/2017 (08/11/2017, 23/03/2017)
 %-----------------------------------------------------------------------------
 %23.03.2017 - показатели 92-98 будут формироваться по корреспонденции счетов 
 %             доп.реквизит "D#44" не обязателен 
@@ -94,25 +94,25 @@ cena_nomi_  Number;
 
 -- покупка/продажа безналичных металлов
 CURSOR OPL_DOK1 IS
-   SELECT /*+ leading(a) */
+   SELECT /*+ ordered */
           a.acc, a.nls, a.kv, a1.acc, a1.nls, o.ref, o.mfoa, o.mfob, o.nlsb, 
           c.ref, c.fdat, k.tag, k.value, translate(p.value,',','.'), sum(c.s)
-   FROM accounts a, accounts a1, opldok c, opldok c1, oper o, operw k, operw p
+   FROM accounts a,  opldok c, opldok c1, accounts a1,oper o, operw k, operw p
    WHERE a.kv in (959,961,962,964)  AND
-         a.acc = c.acc              AND
          a.nls not like '110%'      AND
          a.nls not like '8%'        AND
          a.nls not like '9%'        AND
+         a.acc = c.acc              AND
          c.fdat = any (select fdat from fdat where fdat between Dat1_ and Dat_) AND
          c.dk = 0                   AND
          c.sos = 5                  AND
-         a1.acc = c1.acc            AND
-         a1.nls not like '110%'     AND
-         c1.dk = 1-c.dk             AND
+         c.ref = o.ref              AND
          c.stmt = c1.stmt           AND
          c.tt not in ('024')        AND   
+         c1.dk = 1-c.dk             AND
+         a1.acc = c1.acc            AND
+         a1.nls not like '110%'     AND
          c.ref = k.ref(+)           AND
-         c.ref = o.ref              AND
          ((k.tag(+) LIKE 'D#39%' AND substr(k.value(+),1,3) in ('112','122') ) OR
           (k.tag(+) LIKE 'D#44%' AND substr(k.value(+),1,2) in ('92','93','94',
                                                     '95','96','97') ) 
@@ -120,9 +120,9 @@ CURSOR OPL_DOK1 IS
          c.ref = p.ref(+)           AND
          p.tag(+) LIKE '%KURS%'        AND
          SUBSTR(LOWER(TRIM(o.nazn)),1,4) <> 'конв'
-GROUP BY a.acc, a.nls, a.kv, a1.acc, a1.nls, o.ref, o.mfoa, o.mfob, o.nlsb, 
-         c.ref, c.fdat, k.tag, k.value, translate(p.value,',','.')
-ORDER BY 1, 2, 3, 9, 10;
+    GROUP BY a.acc, a.nls, a.kv, a1.acc, a1.nls, o.ref, o.mfoa, o.mfob, o.nlsb, 
+             c.ref, c.fdat, k.tag, k.value, translate(p.value,',','.')
+    ORDER BY 1, 2, 3, 9, 10;
 
 CURSOR BaseL IS
     SELECT kodp, SUM(TO_NUMBER(znap))
@@ -137,8 +137,7 @@ CURSOR Basel1 IS
          FROM RNBU_TRACE a
          WHERE SUBSTR (a.kodp, 1, 1) = '1'
          UNION ALL
-         SELECT a.nbuc NBUC, '1'||decode(substr(a.kodp,2,1),'A','1','2')||
-                                  substr(a.kodp,3,18) KODP,
+         SELECT a.nbuc NBUC, '1'||substr(a.kodp,2) KODP,
                 '0' ZNAP, a.znap ZNAP_PR
          FROM RNBU_TRACE a
          WHERE SUBSTR (a.kodp, 1, 1) = '3')
@@ -383,9 +382,9 @@ BEGIN
        END LOOP;
     CLOSE basel1;
 
-    DELETE FROM RNBU_TRACE
-       WHERE userid = userid_ AND
-             kodp like '3%';
+--    DELETE FROM RNBU_TRACE
+--       WHERE userid = userid_ AND
+--             kodp like '3%';
     -----------------------------------------------------------------------------
     logger.info ('P_F44_NN: End for '||to_char(dat_,'dd.mm.yyyy'));
 END p_f44;

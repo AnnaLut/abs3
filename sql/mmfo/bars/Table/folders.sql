@@ -102,6 +102,7 @@ exception when others then
 
 PROMPT *** Create  grants  FOLDERS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on FOLDERS         to ABS_ADMIN;
+grant SELECT                                                                 on FOLDERS         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FOLDERS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FOLDERS         to BARS_DM;
 grant SELECT                                                                 on FOLDERS         to KLBX;
@@ -110,6 +111,7 @@ grant SELECT                                                                 on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on FOLDERS         to REF0000;
 grant SELECT                                                                 on FOLDERS         to START1;
 grant SELECT                                                                 on FOLDERS         to TECH005;
+grant SELECT                                                                 on FOLDERS         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FOLDERS         to WR_ALL_RIGHTS;
 grant SELECT                                                                 on FOLDERS         to WR_DOC_INPUT;
 grant FLASHBACK,SELECT                                                       on FOLDERS         to WR_REFREAD;

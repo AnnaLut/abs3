@@ -75,6 +75,10 @@ COMMENT ON COLUMN BARS.TMP_CUSTOMER_SEGMENT_REPORT.CURRENT_ACCOUNTS_FACTOR IS ''
 
 
 
+PROMPT *** Create  grants  TMP_CUSTOMER_SEGMENT_REPORT ***
+grant SELECT                                                                 on TMP_CUSTOMER_SEGMENT_REPORT to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_CUSTOMER_SEGMENT_REPORT to UPLD;
+
 
 
 PROMPT ===================================================================================== 

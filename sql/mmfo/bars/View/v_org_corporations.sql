@@ -23,8 +23,10 @@ connect by prior id = parent_id
 ;
 
 PROMPT *** Create  grants  V_ORG_CORPORATIONS ***
+grant SELECT                                                                 on V_ORG_CORPORATIONS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ORG_CORPORATIONS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ORG_CORPORATIONS to CORP_CLIENT;
+grant SELECT                                                                 on V_ORG_CORPORATIONS to UPLD;
 
 
 

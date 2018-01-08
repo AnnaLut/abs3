@@ -51,8 +51,10 @@ COMMENT ON COLUMN BARS.OBPC_TRANS_TRAN_ARC.TRANSIT IS '';
 
 
 PROMPT *** Create  grants  OBPC_TRANS_TRAN_ARC ***
+grant SELECT                                                                 on OBPC_TRANS_TRAN_ARC to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_TRANS_TRAN_ARC to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_TRANS_TRAN_ARC to START1;
+grant SELECT                                                                 on OBPC_TRANS_TRAN_ARC to UPLD;
 
 
 

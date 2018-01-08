@@ -97,66 +97,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SURVEYQUEST_QUESTMULTI_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_QUEST MODIFY (QUEST_MULTI CONSTRAINT CC_SURVEYQUEST_QUESTMULTI_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEYQUEST_QFMTID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_QUEST MODIFY (QFMT_ID CONSTRAINT CC_SURVEYQUEST_QFMTID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEYQUEST_QGRPID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_QUEST MODIFY (QGRP_ID CONSTRAINT CC_SURVEYQUEST_QGRPID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEYQUEST_SURVEYID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_QUEST MODIFY (SURVEY_ID CONSTRAINT CC_SURVEYQUEST_SURVEYID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEYQUEST_QUESTNAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_QUEST MODIFY (QUEST_NAME CONSTRAINT CC_SURVEYQUEST_QUESTNAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint UK_SURVEYQUEST ***
 begin   
  execute immediate '
@@ -188,62 +128,70 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SURVEYQUEST_SURVEYOPTLIST ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_QUEST ADD CONSTRAINT FK_SURVEYQUEST_SURVEYOPTLIST FOREIGN KEY (LIST_ID)
-	  REFERENCES BARS.SURVEY_OPT_LIST (LIST_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SURVEYQUEST_SURVEYQGRP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_QUEST ADD CONSTRAINT FK_SURVEYQUEST_SURVEYQGRP FOREIGN KEY (SURVEY_ID, QGRP_ID)
-	  REFERENCES BARS.SURVEY_QGRP (SURVEY_ID, GRP_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SURVEYQUEST_SURVEYQFMT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_QUEST ADD CONSTRAINT FK_SURVEYQUEST_SURVEYQFMT FOREIGN KEY (QFMT_ID)
-	  REFERENCES BARS.SURVEY_QFMT (FMT_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SURVEYQUEST_SURVEY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_QUEST ADD CONSTRAINT FK_SURVEYQUEST_SURVEY FOREIGN KEY (SURVEY_ID)
-	  REFERENCES BARS.SURVEY (SURVEY_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SURVEYQUEST_QUESTID_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.SURVEY_QUEST MODIFY (QUEST_ID CONSTRAINT CC_SURVEYQUEST_QUESTID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SURVEYQUEST_QUESTNAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_QUEST MODIFY (QUEST_NAME CONSTRAINT CC_SURVEYQUEST_QUESTNAME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SURVEYQUEST_SURVEYID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_QUEST MODIFY (SURVEY_ID CONSTRAINT CC_SURVEYQUEST_SURVEYID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SURVEYQUEST_QGRPID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_QUEST MODIFY (QGRP_ID CONSTRAINT CC_SURVEYQUEST_QGRPID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SURVEYQUEST_QFMTID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_QUEST MODIFY (QFMT_ID CONSTRAINT CC_SURVEYQUEST_QFMTID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SURVEYQUEST_QUESTMULTI_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_QUEST MODIFY (QUEST_MULTI CONSTRAINT CC_SURVEYQUEST_QUESTMULTI_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -308,10 +256,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  SURVEY_QUEST ***
+grant SELECT                                                                 on SURVEY_QUEST    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SURVEY_QUEST    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SURVEY_QUEST    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY_QUEST    to DPT_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY_QUEST    to RCC_DEAL;
+grant SELECT                                                                 on SURVEY_QUEST    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SURVEY_QUEST    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SURVEY_QUEST    to WR_REFREAD;
 

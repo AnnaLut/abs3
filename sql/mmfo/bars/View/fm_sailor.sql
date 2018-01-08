@@ -29,6 +29,7 @@ PROMPT *** Create  view FM_SAILOR ***
    SELECT 'В декретній відпустці' name, '9' id FROM DUAL;
 
 PROMPT *** Create  grants  FM_SAILOR ***
+grant SELECT                                                                 on FM_SAILOR       to BARSREADER_ROLE;
 grant SELECT                                                                 on FM_SAILOR       to BARSUPL;
 grant SELECT                                                                 on FM_SAILOR       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_SAILOR       to START1;

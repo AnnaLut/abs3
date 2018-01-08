@@ -13,8 +13,10 @@ from accounts a, OVR_LIM_dog l , cc_deal d
 where l.acc = a.acc  and d.ND  = to_number( pul.Get('ND') ) and d.nd = l.nd ;
 
 PROMPT *** Create  grants  V3D_OVRN ***
+grant SELECT                                                                 on V3D_OVRN        to BARSREADER_ROLE;
 grant SELECT                                                                 on V3D_OVRN        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V3D_OVRN        to START1;
+grant SELECT                                                                 on V3D_OVRN        to UPLD;
 
 
 

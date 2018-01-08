@@ -84,11 +84,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_TASK_RUN_TRACK_REF_TASK_RUN ***
+PROMPT *** Create  constraint SYS_C0035462 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMS_TASK_RUN_TRACKING ADD CONSTRAINT FK_TASK_RUN_TRACK_REF_TASK_RUN FOREIGN KEY (TASK_RUN_ID)
-	  REFERENCES BARS.TMS_TASK_RUN (ID) ENABLE';
+  ALTER TABLE BARS.TMS_TASK_RUN_TRACKING MODIFY (STATE_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -123,18 +122,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0035462 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMS_TASK_RUN_TRACKING MODIFY (STATE_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_TMS_TASK_RUN_TRACKING ***
 begin   
  execute immediate '
@@ -147,6 +134,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  TMS_TASK_RUN_TRACKING ***
+grant SELECT                                                                 on TMS_TASK_RUN_TRACKING to BARSREADER_ROLE;
+grant SELECT                                                                 on TMS_TASK_RUN_TRACKING to UPLD;
 
 
 

@@ -67,32 +67,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_FIREWALL_USER_MODULE_USRID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FIREWALL_USER_MODULE ADD CONSTRAINT FK_FIREWALL_USER_MODULE_USRID FOREIGN KEY (USRID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_FIREWALL_USER_MODULE_ACTION ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FIREWALL_USER_MODULE ADD CONSTRAINT FK_FIREWALL_USER_MODULE_ACTION FOREIGN KEY (ACTION)
-	  REFERENCES BARS.FIREWALL_USER_ACTION (CODE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_FIREWALL_USER_MODULE_MODULE ***
 begin   
  execute immediate '
@@ -131,9 +105,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIREWALL_USER_MODULE ***
+grant SELECT                                                                 on FIREWALL_USER_MODULE to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIREWALL_USER_MODULE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIREWALL_USER_MODULE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIREWALL_USER_MODULE to FIREWALL_USER_MODULE;
+grant SELECT                                                                 on FIREWALL_USER_MODULE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIREWALL_USER_MODULE to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on FIREWALL_USER_MODULE to WR_REFREAD;
 

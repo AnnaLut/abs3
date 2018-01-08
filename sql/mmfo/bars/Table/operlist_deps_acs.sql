@@ -101,6 +101,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  OPERLIST_DEPS_ACS ***
+grant SELECT                                                                 on OPERLIST_DEPS_ACS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPERLIST_DEPS_ACS to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPERLIST_DEPS_ACS to START1;
 

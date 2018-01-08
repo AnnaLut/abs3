@@ -101,19 +101,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_RNBUINFILES_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.RNBU_IN_FILES ADD CONSTRAINT FK_RNBUINFILES_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_RNBUINFILES_KF_NN ***
 begin   
  execute immediate '
@@ -155,11 +142,13 @@ exception when others then
 
 PROMPT *** Create  grants  RNBU_IN_FILES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_IN_FILES   to ABS_ADMIN;
+grant SELECT                                                                 on RNBU_IN_FILES   to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on RNBU_IN_FILES   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RNBU_IN_FILES   to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on RNBU_IN_FILES   to RPBN002;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on RNBU_IN_FILES   to SALGL;
 grant SELECT                                                                 on RNBU_IN_FILES   to START1;
+grant SELECT                                                                 on RNBU_IN_FILES   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RNBU_IN_FILES   to WR_ALL_RIGHTS;
 
 

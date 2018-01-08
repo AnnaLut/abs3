@@ -55,19 +55,6 @@ COMMENT ON COLUMN BARS.XML_SERVLIST_PARAMS.DEFVALUE IS '';
 
 
 
-PROMPT *** Create  constraint FK_XMLSERVPARAMS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML_SERVLIST_PARAMS ADD CONSTRAINT FK_XMLSERVPARAMS FOREIGN KEY (SNAM)
-	  REFERENCES BARS.XML_SERVLIST (SNAM) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XPK_XMLSERVPARAMS ***
 begin   
  execute immediate '
@@ -96,8 +83,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_SERVLIST_PARAMS ***
+grant SELECT                                                                 on XML_SERVLIST_PARAMS to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_SERVLIST_PARAMS to BARS_DM;
 grant SELECT                                                                 on XML_SERVLIST_PARAMS to KLBX;
+grant SELECT                                                                 on XML_SERVLIST_PARAMS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_SERVLIST_PARAMS to WR_ALL_RIGHTS;
 
 

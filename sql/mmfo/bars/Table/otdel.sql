@@ -102,11 +102,13 @@ exception when others then
 
 PROMPT *** Create  grants  OTDEL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTDEL           to ABS_ADMIN;
+grant SELECT                                                                 on OTDEL           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTDEL           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTDEL           to BARS_DM;
 grant SELECT                                                                 on OTDEL           to RPBN001;
 grant SELECT                                                                 on OTDEL           to SALGL;
 grant SELECT                                                                 on OTDEL           to START1;
+grant SELECT                                                                 on OTDEL           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTDEL           to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on OTDEL           to WR_REFREAD;
 

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Коефiцiєнти для "Аналiзу клiєнтiв"';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'AN_KL_K';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,29 +124,29 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'K1_810', 'N', 'K1_810~СПСа~RUB', 1, 22, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'K1_840', 'N', 'K1_840~СПСа~USD', 1, 22, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'K1_978', 'N', 'K1_978~СПСа~EUR', 1, 22, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'K1_980', 'N', 'K1_980~СПСа~грн', 1, 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'K2_810', 'N', 'K2_810~КВ~RUB', 1, 22, 32, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'K2_840', 'N', 'K2_840~КВ~USD', 1, 22, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'K2_978', 'N', 'K2_978~КВ~EUR', 1, 22, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'K2_980', 'N', 'K2_980~КВ~грн', 1, 22, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'K3_810', 'N', 'K3_810~СПСз~RUB', 1, 22, 33, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'K3_840', 'N', 'K3_840~СПСз~USD', 1, 22, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'K3_978', 'N', 'K3_978~СПСз~EUR', 1, 22, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'K3_980', 'N', 'K3_980~СПСз~грн', 1, 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'K4_810', 'N', 'K4_810~НР~RUB', 1, 22, 34, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'K4_840', 'N', 'K4_840~НР~USD', 1, 22, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'K4_978', 'N', 'K4_978~НР~EUR', 1, 22, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'K4_980', 'N', 'K4_980~НР~грн', 1, 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'K5_810', 'N', 'K5_810~КВд~RUB', 1, 22, 35, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'K5_840', 'N', 'K5_840~КВд~USD', 1, 22, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'K5_978', 'N', 'K5_978~КВд~EUR', 1, 22, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'K5_980', 'N', 'K5_980~КВд~грн', 1, 22, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'YYYYMM', 'C', 'Р_к+М_с', 1, 6, 0, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'D360', 'N', 'Дн_в~в роц_', .5, 3, 999, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'D30', 'N', 'Дн_в~в м_с', .5, 2, 999, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'K1_810', 'N', 'K1_810~СПСа~RUB', '1', 22, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'K1_840', 'N', 'K1_840~СПСа~USD', '1', 22, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'K1_978', 'N', 'K1_978~СПСа~EUR', '1', 22, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'K1_980', 'N', 'K1_980~СПСа~грн', '1', 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'K2_810', 'N', 'K2_810~КВ~RUB', '1', 22, 32, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'K2_840', 'N', 'K2_840~КВ~USD', '1', 22, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'K2_978', 'N', 'K2_978~КВ~EUR', '1', 22, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'K2_980', 'N', 'K2_980~КВ~грн', '1', 22, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'K3_810', 'N', 'K3_810~СПСз~RUB', '1', 22, 33, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'K3_840', 'N', 'K3_840~СПСз~USD', '1', 22, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'K3_978', 'N', 'K3_978~СПСз~EUR', '1', 22, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'K3_980', 'N', 'K3_980~СПСз~грн', '1', 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'K4_810', 'N', 'K4_810~НР~RUB', '1', 22, 34, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'K4_840', 'N', 'K4_840~НР~USD', '1', 22, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'K4_978', 'N', 'K4_978~НР~EUR', '1', 22, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'K4_980', 'N', 'K4_980~НР~грн', '1', 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'K5_810', 'N', 'K5_810~КВд~RUB', '1', 22, 35, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'K5_840', 'N', 'K5_840~КВд~USD', '1', 22, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'K5_978', 'N', 'K5_978~КВд~EUR', '1', 22, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'K5_980', 'N', 'K5_980~КВд~грн', '1', 22, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'YYYYMM', 'C', 'Р_к+М_с', '1', 6, 0, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'D360', 'N', 'Дн_в~в роц_', '.5', 3, 999, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'D30', 'N', 'Дн_в~в м_с', '.5', 2, 999, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 21, 1, 'ASC ');

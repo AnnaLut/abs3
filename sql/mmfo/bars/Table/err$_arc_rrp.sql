@@ -148,7 +148,9 @@ COMMENT ON COLUMN BARS.ERR$_ARC_RRP.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_ARC_RRP ***
+grant SELECT                                                                 on ERR$_ARC_RRP    to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_ARC_RRP    to BARS_DM;
+grant SELECT                                                                 on ERR$_ARC_RRP    to UPLD;
 
 
 

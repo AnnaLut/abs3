@@ -283,6 +283,10 @@ COMMENT ON COLUMN BARS.ERR$_NBU23_REZ.K110 IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_NBU23_REZ ***
+grant SELECT                                                                 on ERR$_NBU23_REZ  to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_NBU23_REZ  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

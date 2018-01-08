@@ -106,7 +106,9 @@ COMMENT ON COLUMN BARS.ERR$_CUSTOMER_EXTERN_UPDATE.NOTES IS '';
 
 
 PROMPT *** Create  grants  ERR$_CUSTOMER_EXTERN_UPDATE ***
+grant SELECT                                                                 on ERR$_CUSTOMER_EXTERN_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CUSTOMER_EXTERN_UPDATE to BARS_DM;
+grant SELECT                                                                 on ERR$_CUSTOMER_EXTERN_UPDATE to UPLD;
 
 
 

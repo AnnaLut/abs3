@@ -87,6 +87,10 @@ COMMENT ON COLUMN BARS.ERR$_REZ_ACC.KV_D IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_REZ_ACC ***
+grant SELECT                                                                 on ERR$_REZ_ACC    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_REZ_ACC    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

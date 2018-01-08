@@ -24,7 +24,7 @@ PROMPT *** Create  table KL_Z230 ***
 begin 
   execute immediate '
   CREATE TABLE BARS.KL_Z230 
-   (	Z230 CHAR(2), 
+   (	Z230 VARCHAR2(2), 
 	TXT VARCHAR2(54), 
 	TXT54 VARCHAR2(54), 
 	D_OPEN DATE, 
@@ -57,9 +57,8 @@ COMMENT ON COLUMN BARS.KL_Z230.D_CHANGE IS '';
 
 
 PROMPT *** Create  grants  KL_Z230 ***
-grant DELETE,INSERT,SELECT,UPDATE                                            on KL_Z230         to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on KL_Z230         to BARS_DM;
-grant DELETE,INSERT,SELECT,UPDATE                                            on KL_Z230         to START1;
+grant SELECT                                                                 on KL_Z230         to BARSREADER_ROLE;
+grant SELECT                                                                 on KL_Z230         to UPLD;
 
 
 

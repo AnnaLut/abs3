@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('013', '013-Mеморіальний Oрдер (різновалютний)', 1, null, null, null, null, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22(''3800'',nvl(F_DOP(#(REF),''OB22''),''03'')))', null, '1001100000000000000000000011000000010000000000000000000000000000', null);
+    values ('013', '013-Mеморіальний Oрдер (різновалютний)', 1, null, null, null, null, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22(''3800'',nvl(F_DOP(null,''OB22''),''03''))) ', null, '1001100000000000000000000011000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='013', name='013-Mеморіальний Oрдер (різновалютний)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22(''3800'',nvl(F_DOP(#(REF),''OB22''),''03'')))', rang=null, flags='1001100000000000000000000011000000010000000000000000000000000000', nazn=null
+         set tt='013', name='013-Mеморіальний Oрдер (різновалютний)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22(''3800'',nvl(F_DOP(null,''OB22''),''03''))) ', rang=null, flags='1001100000000000000000000011000000010000000000000000000000000000', nazn=null
        where tt='013';
   end;
   --------------------------------

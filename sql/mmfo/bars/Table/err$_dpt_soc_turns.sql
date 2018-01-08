@@ -73,6 +73,10 @@ COMMENT ON COLUMN BARS.ERR$_DPT_SOC_TURNS.OST_FOR_TAX IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DPT_SOC_TURNS ***
+grant SELECT                                                                 on ERR$_DPT_SOC_TURNS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DPT_SOC_TURNS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

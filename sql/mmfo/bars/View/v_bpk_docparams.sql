@@ -26,8 +26,10 @@ PROMPT *** Create  view V_BPK_DOCPARAMS ***
  where branch is not null;
 
 PROMPT *** Create  grants  V_BPK_DOCPARAMS ***
+grant SELECT                                                                 on V_BPK_DOCPARAMS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BPK_DOCPARAMS to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BPK_DOCPARAMS to OBPC;
+grant SELECT                                                                 on V_BPK_DOCPARAMS to UPLD;
 grant FLASHBACK,SELECT                                                       on V_BPK_DOCPARAMS to WR_REFREAD;
 
 

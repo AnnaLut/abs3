@@ -9,6 +9,7 @@ PROMPT *** Create  procedure P_CH_SK ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_CH_SK (kodf_ varchar2,dat_ date,dat1_ date,userid_ number) is
 -- проверка допустимых символов по kl_d010
+-- version      11.10.2017
 n_ number:=0;
 begin
 
@@ -72,8 +73,7 @@ begin
 
    n_:=0;
 
-   for k in (select -- /*+ parallel(p) */
-                    s.acc,o.nlsa,o.nlsb, o.kv, p.fdat, p.ref,
+   for k in (select s.acc,o.nlsa,o.nlsb, o.kv, p.fdat, p.ref,
               nvl(decode(p.tt, o.tt, o.sk, t.sk),0) sk, p.s
               from opldok p, oper o, accounts s, tts t
               where p.acc=s.acc
@@ -113,8 +113,7 @@ begin
    values (kodf_, userid_, 'Перевiрка вiдповiдностi СКП типу проводок ');
 
    for k in (select pref, fdat, nvl(SK0, sk3) sk0, sk1, sk2, nlsa, kv, dk2, s, ptt, ott
-             from (SELECT -- /*+ parallel(s) parallel(p) */
-                           DECODE(p.TT, o.TT, o.SK, t.SK) sk0,
+             from (SELECT DECODE(p.TT, o.TT, o.SK, t.SK) sk0,
                            o.SK sk1, t.sk sk2,
                            (select TO_NUMBER (SUBSTR (W.VALUE, 1, 2))
                             from OPERW W
@@ -129,7 +128,7 @@ begin
                          s.tip='KAS'             AND
                          s.nbs in ('1001','1002','1003','1004') AND
                          s.kv=980                AND
-                         p.FDAT between Dat1_ and Dat_ and
+                         p.FDAT = any (select fdat from fdat where FDAT between Dat1_ and Dat_) and
                          o.REF=p.REF             AND
                          p.SOS=5                 AND
                          p.TT=t.TT)

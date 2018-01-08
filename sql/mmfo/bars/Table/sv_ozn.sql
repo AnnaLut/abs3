@@ -101,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SV_OZN ***
+grant SELECT                                                                 on SV_OZN          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_OZN          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SV_OZN          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_OZN          to RPBN002;
+grant SELECT                                                                 on SV_OZN          to UPLD;
 
 
 

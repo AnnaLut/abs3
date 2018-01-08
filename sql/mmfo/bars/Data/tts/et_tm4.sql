@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции TM4
-prompt Наименование операции: 5) # TM4 - доч до TMK
+prompt Наименование операции: TM4 5) # TM4 - доч до TMK
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('TM4', '5) # TM4 - доч до TMK', 0, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 1, 0, 'ROUND(#(S)*(SELECT DECODE(NVL(VES_UN,0),0, VES/31.1034807, VES_UN )FROM V_BANK_METALS_BRANCH B,OPERW W WHERE W.REF=#(REF) AND W.TAG=''N_BMK'' AND W.VALUE=N_BMK(B.KOD)),0)', '(#(S)/100)*(select cena_k from v_bank_metals_branch b, operw w where w.ref=#(REF) and w.tag=''N_BMK'' and w.value=N_BMK(b.kod))', 30, null, '#(nbs_ob22 (''3800'',''09''))', null, '0000100001000000000000000000000000010000000000000000000000010000', null);
+    values ('TM4', 'TM4 5) # TM4 - доч до TMK', 0, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 1, 0, 'ROUND(#(S)*(SELECT DECODE(NVL(VES_UN,0),0, VES/31.1034807, VES_UN )FROM V_BANK_METALS_BRANCH B,OPERW W WHERE W.REF=#(REF) AND W.TAG=''N_BMK'' AND W.VALUE=N_BMK(B.KOD)),0)', '(#(S)/100)*(select cena_k from v_bank_metals_branch b, operw w where w.ref=#(REF) and w.tag=''N_BMK'' and w.value=N_BMK(b.kod))', 30, null, '#(nbs_ob22 (''3800'',''09''))', null, '0000100001000000000000000000000000010000000000000000000000010000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='TM4', name='5) # TM4 - доч до TMK', dk=0, nlsm=null, kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='ROUND(#(S)*(SELECT DECODE(NVL(VES_UN,0),0, VES/31.1034807, VES_UN )FROM V_BANK_METALS_BRANCH B,OPERW W WHERE W.REF=#(REF) AND W.TAG=''N_BMK'' AND W.VALUE=N_BMK(B.KOD)),0)', s2='(#(S)/100)*(select cena_k from v_bank_metals_branch b, operw w where w.ref=#(REF) and w.tag=''N_BMK'' and w.value=N_BMK(b.kod))', sk=30, proc=null, s3800='#(nbs_ob22 (''3800'',''09''))', rang=null, flags='0000100001000000000000000000000000010000000000000000000000010000', nazn=null
+         set tt='TM4', name='TM4 5) # TM4 - доч до TMK', dk=0, nlsm=null, kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='ROUND(#(S)*(SELECT DECODE(NVL(VES_UN,0),0, VES/31.1034807, VES_UN )FROM V_BANK_METALS_BRANCH B,OPERW W WHERE W.REF=#(REF) AND W.TAG=''N_BMK'' AND W.VALUE=N_BMK(B.KOD)),0)', s2='(#(S)/100)*(select cena_k from v_bank_metals_branch b, operw w where w.ref=#(REF) and w.tag=''N_BMK'' and w.value=N_BMK(b.kod))', sk=30, proc=null, s3800='#(nbs_ob22 (''3800'',''09''))', rang=null, flags='0000100001000000000000000000000000010000000000000000000000010000', nazn=null
        where tt='TM4';
   end;
   --------------------------------

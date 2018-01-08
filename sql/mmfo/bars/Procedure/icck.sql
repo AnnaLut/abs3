@@ -175,13 +175,13 @@ ElsIf Mode_ = 0 then
 
 begin
   delete from BRANCH_PARAMETERS where tag = 'REF_ICCK' and branch = l_branch;
-  
+
   insert into BRANCH_PARAMETERS (val,tag, branch)
   select to_char(max(REF)) , 'REF_ICCK' , l_branch from oper;
 exception  when others then
   --ORA-00001: unique constraint
-  if sqlcode = -00001 then      null;  
-                      else      raise;     
+  if sqlcode = -00001 then      null;
+                      else      raise;
   end if;
 end;
 
@@ -239,17 +239,17 @@ end;
                kv2_  => gl.baseval ,
                nls2_ => k.nls,
                sum2_ => k.S );
-	     
-		 
+
+
 		 gl.pay2(p_flag  => 2,
                  p_ref   => REF_ ,
                  p_vdat  => gl.bDATE );
-			   
+
        for z in (select nd, nmk, decode(k.ob22,
                    '02',k_02,
                    '03',k_03,
-                   '83',k_83, 
-				   '79',k_79, 
+                   '83',k_83,
+				   '79',k_79,
 				   'I3',k_i3,
 				   'B8',k_b8,
 				   0
@@ -305,11 +305,11 @@ end;
 
             insert into operw (ref,tag,value) values (REF_,'FIO',z.NMK );
             insert into operw (ref,tag,value) values (REF_,'ND' ,z.ND  );
-           
+
 		     gl.pay2(p_flag  => 2,
                      p_ref   => REF_ ,
                      p_vdat  => gl.bDATE );
-			
+
          end if;
        end loop;
 

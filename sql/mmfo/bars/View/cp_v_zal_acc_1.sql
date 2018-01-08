@@ -30,8 +30,10 @@ PROMPT *** Create  view CP_V_ZAL_ACC_1 ***
           AND fost (e.acc, x.B) < 0;
 
 PROMPT *** Create  grants  CP_V_ZAL_ACC_1 ***
+grant SELECT                                                                 on CP_V_ZAL_ACC_1  to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_V_ZAL_ACC_1  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_V_ZAL_ACC_1  to START1;
+grant SELECT                                                                 on CP_V_ZAL_ACC_1  to UPLD;
 
 
 

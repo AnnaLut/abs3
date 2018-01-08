@@ -18,8 +18,10 @@ PROMPT *** Create  view INV_BPK_D ***
 	      ACC, RNK, ACC2208 from INV_CCK_FL where GR = 'R' and gt = 0 and (g21<>0 or g22<>0));
 
 PROMPT *** Create  grants  INV_BPK_D ***
+grant SELECT                                                                 on INV_BPK_D       to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on INV_BPK_D       to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on INV_BPK_D       to RCC_DEAL;
+grant SELECT                                                                 on INV_BPK_D       to UPLD;
 
 
 

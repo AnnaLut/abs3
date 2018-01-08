@@ -87,9 +87,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  STO_PAYMENT_QUE ***
+grant SELECT                                                                 on STO_PAYMENT_QUE to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on STO_PAYMENT_QUE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STO_PAYMENT_QUE to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on STO_PAYMENT_QUE to STO;
+grant SELECT                                                                 on STO_PAYMENT_QUE to UPLD;
 
 
 

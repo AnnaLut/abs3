@@ -38,8 +38,10 @@ PROMPT *** Create  view V_PAY_FOR_CASH_META1 ***
           and k.acc = a.acc;
 
 PROMPT *** Create  grants  V_PAY_FOR_CASH_META1 ***
+grant SELECT                                                                 on V_PAY_FOR_CASH_META1 to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PAY_FOR_CASH_META1 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PAY_FOR_CASH_META1 to START1;
+grant SELECT                                                                 on V_PAY_FOR_CASH_META1 to UPLD;
 
 
 

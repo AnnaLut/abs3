@@ -23,8 +23,10 @@ from ( select tag, name,
       );
 
 PROMPT *** Create  grants  OP_TAG_TAB ***
+grant SELECT                                                                 on OP_TAG_TAB      to BARSREADER_ROLE;
 grant SELECT                                                                 on OP_TAG_TAB      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OP_TAG_TAB      to STO;
+grant SELECT                                                                 on OP_TAG_TAB      to UPLD;
 
 
 

@@ -27,7 +27,9 @@ PROMPT *** Create  view V_COIN_INVOICE ***
  from tmp_coin_invoice v where v.userid = bars.user_id;
 
 PROMPT *** Create  grants  V_COIN_INVOICE ***
+grant SELECT                                                                 on V_COIN_INVOICE  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_COIN_INVOICE  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_COIN_INVOICE  to UPLD;
 
 
 

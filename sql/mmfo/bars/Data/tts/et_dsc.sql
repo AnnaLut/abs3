@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DSC
-prompt Наименование операции: Капіталізація відсотків на поточні рахунки пенсіонерів
+prompt Наименование операции: DSC Капіталізація відсотків на поточні рахунки пенсіонерів
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DSC', 'Капіталізація відсотків на поточні рахунки пенсіонерів', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000000000000000000000', null);
+    values ('DSC', 'DSC Капіталізація відсотків на поточні рахунки пенсіонерів', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DSC', name='Капіталізація відсотків на поточні рахунки пенсіонерів', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn=null
+         set tt='DSC', name='DSC Капіталізація відсотків на поточні рахунки пенсіонерів', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn=null
        where tt='DSC';
   end;
   --------------------------------

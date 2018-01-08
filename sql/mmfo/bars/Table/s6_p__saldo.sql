@@ -143,9 +143,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  S6_P__SALDO ***
+grant SELECT                                                                 on S6_P__SALDO     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_P__SALDO     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on S6_P__SALDO     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_P__SALDO     to START1;
+grant SELECT                                                                 on S6_P__SALDO     to UPLD;
 
 
 

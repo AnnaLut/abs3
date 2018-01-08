@@ -55,19 +55,6 @@ COMMENT ON COLUMN BARS.META_REGENTRY.PID IS 'Код родительского параметра';
 
 
 
-PROMPT *** Create  constraint FK_METAREGENTRY_METAREGENTRY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_REGENTRY ADD CONSTRAINT FK_METAREGENTRY_METAREGENTRY FOREIGN KEY (PID)
-	  REFERENCES BARS.META_REGENTRY (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_METAREGENTRY_ID_NN ***
 begin   
  execute immediate '
@@ -157,9 +144,11 @@ exception when others then
 
 PROMPT *** Create  grants  META_REGENTRY ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_REGENTRY   to ABS_ADMIN;
+grant SELECT                                                                 on META_REGENTRY   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_REGENTRY   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on META_REGENTRY   to BARS_DM;
 grant SELECT                                                                 on META_REGENTRY   to START1;
+grant SELECT                                                                 on META_REGENTRY   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on META_REGENTRY   to WR_ALL_RIGHTS;
 
 

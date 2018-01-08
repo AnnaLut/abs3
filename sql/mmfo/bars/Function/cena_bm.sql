@@ -12,19 +12,20 @@ begin
 
     begin
          select max(fdat)
-		 into pdat_   -- попередня банківська дата
-		 from fdat
-		 where fdat <gl.BD;
+         into pdat_   -- попередня банківська дата
+         from fdat
+         where fdat <gl.BD;
     EXCEPTION WHEN NO_DATA_FOUND THEN  cena_ := null;
   end;
 
   begin
     SELECT decode( p_mod, 1, L.cena, L.cena_k )  into cena_ from bank_metals$local L
     where L.kod  =  p_kod
-      and ((L.fdat =  (select max(fdat) from bank_metals$local  where kod = L.kod and fdat between pdat_ and sysdate)
+      and l.kf = sys_context('bars_context','user_mfo')
+      and ((L.fdat =  (select max(fdat) from bank_metals$local  where kod = L.kod and fdat between pdat_ and sysdate and kf = sys_context('bars_context','user_mfo'))
       and sdat_  >  pdat_
       and sdat_  < gl.bd)
-            or (L.fdat =  (select max(fdat) from bank_metals$local  where kod = L.kod and fdat between sdat_ and sysdate)
+            or (L.fdat =  (select max(fdat) from bank_metals$local  where kod = L.kod and fdat between sdat_ and sysdate and kf = sys_context('bars_context','user_mfo'))
                 and  sdat_  = gl.bd ));
   EXCEPTION WHEN NO_DATA_FOUND THEN  cena_ := null;
   end;

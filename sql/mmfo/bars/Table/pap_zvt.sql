@@ -79,9 +79,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  PAP_ZVT ***
+grant SELECT                                                                 on PAP_ZVT         to BARSREADER_ROLE;
 grant SELECT                                                                 on PAP_ZVT         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PAP_ZVT         to BARS_DM;
 grant SELECT                                                                 on PAP_ZVT         to RPBN001;
+grant SELECT                                                                 on PAP_ZVT         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PAP_ZVT         to WR_ALL_RIGHTS;
 
 

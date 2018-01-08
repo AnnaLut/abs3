@@ -114,7 +114,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  JOBS_LIST ***
+grant SELECT                                                                 on JOBS_LIST       to BARSREADER_ROLE;
 grant SELECT                                                                 on JOBS_LIST       to BARS_DM;
+grant SELECT                                                                 on JOBS_LIST       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on JOBS_LIST       to WR_ALL_RIGHTS;
 
 

@@ -26,8 +26,10 @@ PROMPT *** Create  view V_INFLATION_SALDOA ***
 );
 
 PROMPT *** Create  grants  V_INFLATION_SALDOA ***
+grant SELECT                                                                 on V_INFLATION_SALDOA to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_INFLATION_SALDOA to BARS_ACCESS_DEFROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_INFLATION_SALDOA to RCC_DEAL;
+grant SELECT                                                                 on V_INFLATION_SALDOA to UPLD;
 
 
 

@@ -25,9 +25,11 @@ PROMPT *** Create  view V_NBUR_LIST_PROCS ***
                  AND k.PROC_ACTIVE = 'Y');
 
 PROMPT *** Create  grants  V_NBUR_LIST_PROCS ***
+grant SELECT                                                                 on V_NBUR_LIST_PROCS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_LIST_PROCS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_LIST_PROCS to RPBN002;
 grant SELECT                                                                 on V_NBUR_LIST_PROCS to START1;
+grant SELECT                                                                 on V_NBUR_LIST_PROCS to UPLD;
 
 
 

@@ -22,7 +22,9 @@ PROMPT *** Create  view V_NOTARY_ACCREDITATION ***
 from   NOTARY_ACCREDITATION       a;
 
 PROMPT *** Create  grants  V_NOTARY_ACCREDITATION ***
+grant SELECT                                                                 on V_NOTARY_ACCREDITATION to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NOTARY_ACCREDITATION to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_NOTARY_ACCREDITATION to UPLD;
 
 
 

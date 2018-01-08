@@ -12,8 +12,8 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''ND_ACC_ARC'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''ND_ACC_ARC'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''ND_ACC_ARC'', ''WHOLE'' , null, null, null, null);
+               bpa.alter_policy_info(''ND_ACC_ARC'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''ND_ACC_ARC'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
           '; 
@@ -26,7 +26,8 @@ begin
   CREATE TABLE BARS.ND_ACC_ARC 
    (	ND NUMBER(*,0), 
 	ACC NUMBER(*,0), 
-	MDAT DATE
+	MDAT DATE, 
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -44,14 +45,13 @@ PROMPT *** ALTER_POLICIES to ND_ACC_ARC ***
 
 
 COMMENT ON TABLE BARS.ND_ACC_ARC IS 'Архив привязки счетов и договоров';
+COMMENT ON COLUMN BARS.ND_ACC_ARC.KF IS '';
 COMMENT ON COLUMN BARS.ND_ACC_ARC.ND IS 'Реф. договора';
 COMMENT ON COLUMN BARS.ND_ACC_ARC.ACC IS 'ACC счета';
 COMMENT ON COLUMN BARS.ND_ACC_ARC.MDAT IS 'Дата среза.';
 
-exec bars_policy_adm.add_column_kf(p_table_name => 'ND_ACC_ARC');
-exec bars_policy_adm.alter_policy_info(p_table_name => 'ND_ACC_ARC', p_policy_group => 'WHOLE', p_select_policy => null, p_insert_policy => 'E', p_update_policy => 'E', p_delete_policy => 'E');
-exec bars_policy_adm.alter_policy_info(p_table_name => 'ND_ACC_ARC', p_policy_group => 'FILIAL', p_select_policy => 'M', p_insert_policy => 'M', p_update_policy => 'M', p_delete_policy => 'M');
-exec bars_policy_adm.alter_policies(p_table_name => 'ND_ACC_ARC');
+
+
 
 PROMPT *** Create  constraint PK_NDACCARC ***
 begin   
@@ -81,9 +81,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ND_ACC_ARC ***
+grant SELECT                                                                 on ND_ACC_ARC      to BARSREADER_ROLE;
 grant SELECT                                                                 on ND_ACC_ARC      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ND_ACC_ARC      to BARS_DM;
 grant SELECT                                                                 on ND_ACC_ARC      to START1;
+grant SELECT                                                                 on ND_ACC_ARC      to UPLD;
 
 
 

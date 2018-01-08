@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_DPT_EXTCONSENT.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DPT_EXTCONSENT ***
+grant SELECT                                                                 on ERR$_DPT_EXTCONSENT to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DPT_EXTCONSENT to UPLD;
+
 
 
 PROMPT ===================================================================================== 

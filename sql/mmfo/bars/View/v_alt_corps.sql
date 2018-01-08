@@ -12,8 +12,10 @@ PROMPT *** Create  view V_ALT_CORPS ***
 ;
 
 PROMPT *** Create  grants  V_ALT_CORPS ***
+grant SELECT                                                                 on V_ALT_CORPS     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ALT_CORPS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ALT_CORPS     to CORP_CLIENT;
+grant SELECT                                                                 on V_ALT_CORPS     to UPLD;
 
 
 

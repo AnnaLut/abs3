@@ -45,6 +45,10 @@ COMMENT ON COLUMN BARS.TMP_REF_KODDZ.KF IS '';
 
 
 
+PROMPT *** Create  grants  TMP_REF_KODDZ ***
+grant SELECT                                                                 on TMP_REF_KODDZ   to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_REF_KODDZ   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

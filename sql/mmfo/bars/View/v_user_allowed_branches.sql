@@ -24,8 +24,10 @@ select BRANCH
 ;
 
 PROMPT *** Create  grants  V_USER_ALLOWED_BRANCHES ***
+grant SELECT                                                                 on V_USER_ALLOWED_BRANCHES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USER_ALLOWED_BRANCHES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_USER_ALLOWED_BRANCHES to START1;
+grant SELECT                                                                 on V_USER_ALLOWED_BRANCHES to UPLD;
 
 
 

@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции CLE
-prompt Наименование операции: Платежі по міжбанку (WEB Клієнт-Банк)
+prompt Наименование операции: CLE Платежі по міжбанку (WEB Клієнт-Банк)
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CLE', 'Платежі по міжбанку (WEB Клієнт-Банк)', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 0, 1, 0, 0, null, null, null, null, null, null, '0300100000000000000000000000000000010000000000000000000000000000', null);
+    values ('CLE', 'CLE Платежі по міжбанку (WEB Клієнт-Банк)', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 0, 1, 0, 0, null, null, null, null, null, null, '0300100000000000000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CLE', name='Платежі по міжбанку (WEB Клієнт-Банк)', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0300100000000000000000000000000000010000000000000000000000000000', nazn=null
+         set tt='CLE', name='CLE Платежі по міжбанку (WEB Клієнт-Банк)', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0300100000000000000000000000000000010000000000000000000000000000', nazn=null
        where tt='CLE';
   end;
   --------------------------------

@@ -143,19 +143,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OWCRVFILESDATA_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_CRVFILES_DATA ADD CONSTRAINT FK_OWCRVFILESDATA_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_OWCRVFILESDATA_ID_NN ***
 begin   
  execute immediate '
@@ -194,8 +181,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_CRVFILES_DATA ***
+grant SELECT                                                                 on OW_CRVFILES_DATA to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_CRVFILES_DATA to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_CRVFILES_DATA to OW;
+grant SELECT                                                                 on OW_CRVFILES_DATA to UPLD;
 
 
 

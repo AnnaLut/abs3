@@ -22,7 +22,9 @@ PROMPT *** Create  view V_INS_CUSTOMERS ***
  where c.rnk = p.rnk(+);
 
 PROMPT *** Create  grants  V_INS_CUSTOMERS ***
+grant SELECT                                                                 on V_INS_CUSTOMERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_CUSTOMERS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_INS_CUSTOMERS to UPLD;
 
 
 

@@ -24,7 +24,9 @@ PROMPT *** Create  view V_INS_PAYMENTS_SCHEDULE ***
  order by ps.deal_id, ps.plan_date;
 
 PROMPT *** Create  grants  V_INS_PAYMENTS_SCHEDULE ***
+grant SELECT                                                                 on V_INS_PAYMENTS_SCHEDULE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_PAYMENTS_SCHEDULE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_INS_PAYMENTS_SCHEDULE to UPLD;
 
 
 

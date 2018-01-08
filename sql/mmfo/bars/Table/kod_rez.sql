@@ -49,8 +49,10 @@ COMMENT ON COLUMN BARS.KOD_REZ.TXT IS '';
 
 
 PROMPT *** Create  grants  KOD_REZ ***
+grant SELECT                                                                 on KOD_REZ         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_REZ         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_REZ         to START1;
+grant SELECT                                                                 on KOD_REZ         to UPLD;
 
 
 

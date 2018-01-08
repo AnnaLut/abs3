@@ -65,6 +65,7 @@ PROMPT *** Create  view KU_109 ***
  ;
 
 PROMPT *** Create  grants  KU_109 ***
+grant SELECT                                                                 on KU_109          to BARSREADER_ROLE;
 grant SELECT                                                                 on KU_109          to BARSUPL;
 grant SELECT                                                                 on KU_109          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KU_109          to RCC_DEAL;

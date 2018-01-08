@@ -22,8 +22,10 @@ PROMPT *** Create  view V_DATAGROUP ***
    ORDER BY   a.dat_a, b.nb;
 
 PROMPT *** Create  grants  V_DATAGROUP ***
+grant SELECT                                                                 on V_DATAGROUP     to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_DATAGROUP     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DATAGROUP     to START1;
+grant SELECT                                                                 on V_DATAGROUP     to UPLD;
 grant FLASHBACK,SELECT                                                       on V_DATAGROUP     to WR_REFREAD;
 
 

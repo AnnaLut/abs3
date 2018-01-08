@@ -15,7 +15,9 @@ PROMPT *** Create  view V_WCS_CUSTOMERS ***
  order by c.rnk desc;
 
 PROMPT *** Create  grants  V_WCS_CUSTOMERS ***
+grant SELECT                                                                 on V_WCS_CUSTOMERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_CUSTOMERS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_CUSTOMERS to UPLD;
 
 
 

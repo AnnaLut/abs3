@@ -91,8 +91,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  KEKB ***
+grant SELECT                                                                 on KEKB            to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KEKB            to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KEKB            to START1;
+grant SELECT                                                                 on KEKB            to UPLD;
 
 
 

@@ -103,8 +103,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRT_DETAIL_TABLES ***
+grant SELECT                                                                 on GRT_DETAIL_TABLES to BARSREADER_ROLE;
 grant SELECT                                                                 on GRT_DETAIL_TABLES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRT_DETAIL_TABLES to BARS_DM;
+grant SELECT                                                                 on GRT_DETAIL_TABLES to UPLD;
 
 
 

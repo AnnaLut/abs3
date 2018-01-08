@@ -36,7 +36,9 @@ PROMPT *** Create  view VW_ESCR_ADDRESS_CENTURA ***
 --AND t4.suburb_id(+) = t.suburbs_f;;
 
 PROMPT *** Create  grants  VW_ESCR_ADDRESS_CENTURA ***
+grant SELECT                                                                 on VW_ESCR_ADDRESS_CENTURA to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_ADDRESS_CENTURA to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VW_ESCR_ADDRESS_CENTURA to UPLD;
 
 
 

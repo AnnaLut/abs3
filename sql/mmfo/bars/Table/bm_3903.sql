@@ -51,9 +51,11 @@ COMMENT ON COLUMN BARS.BM_3903.NMS IS '';
 
 
 PROMPT *** Create  grants  BM_3903 ***
+grant SELECT                                                                 on BM_3903         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BM_3903         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BM_3903         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BM_3903         to START1;
+grant SELECT                                                                 on BM_3903         to UPLD;
 
 
 

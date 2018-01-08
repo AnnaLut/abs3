@@ -32,10 +32,12 @@ PROMPT *** Create  view V_DPT_TYPE ***
 
 PROMPT *** Create  grants  V_DPT_TYPE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPT_TYPE      to ABS_ADMIN;
+grant SELECT                                                                 on V_DPT_TYPE      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPT_TYPE      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_TYPE      to DPT;
 grant SELECT                                                                 on V_DPT_TYPE      to DPT_ROLE;
 grant SELECT                                                                 on V_DPT_TYPE      to START1;
+grant SELECT                                                                 on V_DPT_TYPE      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_TYPE      to WR_ALL_RIGHTS;
 
 

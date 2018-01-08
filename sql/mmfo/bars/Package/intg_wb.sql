@@ -1,13 +1,19 @@
-CREATE OR REPLACE PACKAGE INTG_WB
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/intg_wb.sql =========*** Run *** ===
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.INTG_WB 
 IS
   --
   -- пакет процедур дл€ работы интеграции веб банкинга "¬клады населени€-WEB"
   -- часть 1 продуктовый р€д депозитов
   --
   g_header_version  CONSTANT VARCHAR2(64)  := 'version 1.07 05.04.2017';
-  
+
   procedure header_mode (gmode in int);
-  
+
   FUNCTION header_version RETURN varchar2;
   FUNCTION body_version   RETURN varchar2;
 
@@ -49,7 +55,7 @@ IS
   procedure makeblob(dpt_id in dpt_deposit.deposit_id%type, report in blob, flags in dpt_vidd_flags.id%type);
 END INTG_WB;
 /
-CREATE OR REPLACE PACKAGE BODY INTG_WB
+CREATE OR REPLACE PACKAGE BODY BARS.INTG_WB 
 IS
   --
   -- пакет процедур дл€ работы интеграции веб банкинга "¬клады населени€-WEB"
@@ -64,7 +70,7 @@ IS
   g_prod_mode     NUMBER := 1; -- брать активные/неактивные продукты 1- брать и активные и неактивные продукты/субпродукты; 2 - брать только активные продукты.субпродукты
 
   procedure header_mode (gmode in int) is
-    begin 
+    begin
       g_prod_mode := gmode;
       end;
 
@@ -820,3 +826,14 @@ IS
     end;
 END INTG_WB;
 /
+ show err;
+ 
+PROMPT *** Create  grants  INTG_WB ***
+grant EXECUTE                                                                on INTG_WB         to BARS_ACCESS_DEFROLE;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/intg_wb.sql =========*** End *** ===
+ PROMPT ===================================================================================== 
+ 

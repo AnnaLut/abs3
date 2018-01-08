@@ -75,19 +75,6 @@ COMMENT ON COLUMN BARS.COMPEN_MOTIONS.STAT IS 'Стан операцiї';
 
 
 
-PROMPT *** Create  constraint FK_COMPEN_MOTIONS_PORTFOLIO ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.COMPEN_MOTIONS ADD CONSTRAINT FK_COMPEN_MOTIONS_PORTFOLIO FOREIGN KEY (ID_COMPEN)
-	  REFERENCES BARS.COMPEN_PORTFOLIO (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_COMPEN_MOTIONS ***
 begin   
  execute immediate '
@@ -116,9 +103,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  COMPEN_MOTIONS ***
+grant SELECT                                                                 on COMPEN_MOTIONS  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on COMPEN_MOTIONS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on COMPEN_MOTIONS  to BARS_DM;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on COMPEN_MOTIONS  to START1;
+grant SELECT                                                                 on COMPEN_MOTIONS  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on COMPEN_MOTIONS  to WR_ALL_RIGHTS;
 
 

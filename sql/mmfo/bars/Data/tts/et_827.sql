@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции 8K7
-prompt Наименование операции: d: Комісія за переказ готівки з ФО за погашення кредитів (доч до 827)
+prompt Наименование операции: 8K7 d: Комісія за переказ готівки з ФО за погашення кредитів (доч до 8
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('8K7', 'd: Комісія за переказ готівки з ФО за погашення кредитів (доч до 827)', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, '#(nbs_ob22 (''6110'',''26''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(8, #(KVA),#(NLSA), #(S))', null, 5, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('8K7', '8K7 d: Комісія за переказ готівки з ФО за погашення кредитів (доч до 8', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, '#(nbs_ob22 (''6510'',''26''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(8, #(KVA),#(NLSA), #(S))', null, 5, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='8K7', name='d: Комісія за переказ готівки з ФО за погашення кредитів (доч до 827)', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kv=980, nlsk='#(nbs_ob22 (''6110'',''26''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(8, #(KVA),#(NLSA), #(S))', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='8K7', name='8K7 d: Комісія за переказ готівки з ФО за погашення кредитів (доч до 8', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kv=980, nlsk='#(nbs_ob22 (''6510'',''26''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(8, #(KVA),#(NLSA), #(S))', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='8K7';
   end;
   --------------------------------
@@ -100,7 +100,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции HO5
-prompt Наименование операции: d: Прийом готівки (СК=14)
+prompt Наименование операции: HO5 d: Прийом готівки (СК=14)
 declare
   cnt_  number;
 begin
@@ -109,11 +109,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('HO5', 'd: Прийом готівки (СК=14)', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, 14, null, null, null, '0000100001000000000001000000000000000100000000000000000000000000', null);
+    values ('HO5', 'HO5 d: Прийом готівки (СК=14)', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, 14, null, null, null, '0000100001000000000001000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='HO5', name='d: Прийом готівки (СК=14)', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=14, proc=null, s3800=null, rang=null, flags='0000100001000000000001000000000000000100000000000000000000000000', nazn=null
+         set tt='HO5', name='HO5 d: Прийом готівки (СК=14)', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=14, proc=null, s3800=null, rang=null, flags='0000100001000000000001000000000000000100000000000000000000000000', nazn=null
        where tt='HO5';
   end;
   --------------------------------

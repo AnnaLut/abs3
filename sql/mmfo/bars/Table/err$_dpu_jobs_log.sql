@@ -85,6 +85,10 @@ COMMENT ON COLUMN BARS.ERR$_DPU_JOBS_LOG.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DPU_JOBS_LOG ***
+grant SELECT                                                                 on ERR$_DPU_JOBS_LOG to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DPU_JOBS_LOG to UPLD;
+
 
 
 PROMPT ===================================================================================== 

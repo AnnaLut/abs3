@@ -51,32 +51,6 @@ COMMENT ON COLUMN BARS.DPT_DEPOSIT_ALL.BRANCH IS '';
 
 
 
-PROMPT *** Create  constraint FK_DPTDPTALL_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT_ALL ADD CONSTRAINT FK_DPTDPTALL_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTDPTALL_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT_ALL ADD CONSTRAINT FK_DPTDPTALL_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DPTDPTALL_DEPOSITID_NN ***
 begin   
  execute immediate '
@@ -169,7 +143,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_DEPOSIT_ALL ***
+grant SELECT                                                                 on DPT_DEPOSIT_ALL to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_DEPOSIT_ALL to BARS_DM;
+grant SELECT                                                                 on DPT_DEPOSIT_ALL to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_DEPOSIT_ALL to WR_ALL_RIGHTS;
 
 

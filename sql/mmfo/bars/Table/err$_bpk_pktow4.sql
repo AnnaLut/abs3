@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.ERR$_BPK_PKTOW4.ND IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_BPK_PKTOW4 ***
+grant SELECT                                                                 on ERR$_BPK_PKTOW4 to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_BPK_PKTOW4 to UPLD;
+
 
 
 PROMPT ===================================================================================== 

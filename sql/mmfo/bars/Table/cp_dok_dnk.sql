@@ -65,34 +65,10 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint FK_CPDOKDNKREF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CP_DOK_DNK ADD CONSTRAINT FK_CPDOKDNKREF FOREIGN KEY (CP_REF)
-	  REFERENCES BARS.CP_DEAL (REF) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CPDOKDNKID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CP_DOK_DNK ADD CONSTRAINT FK_CPDOKDNKID FOREIGN KEY (ID)
-	  REFERENCES BARS.CP_KOD (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
 PROMPT *** Create  grants  CP_DOK_DNK ***
+grant SELECT                                                                 on CP_DOK_DNK      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_DOK_DNK      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CP_DOK_DNK      to UPLD;
 
 
 

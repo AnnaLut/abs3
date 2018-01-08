@@ -49,6 +49,10 @@ COMMENT ON COLUMN BARS.INS_SYNC.KF IS '';
 
 
 
+PROMPT *** Create  grants  INS_SYNC ***
+grant SELECT                                                                 on INS_SYNC        to BARSREADER_ROLE;
+grant SELECT                                                                 on INS_SYNC        to UPLD;
+
 
 
 PROMPT ===================================================================================== 

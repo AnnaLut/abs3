@@ -22,8 +22,10 @@ PROMPT *** Create  view OUR_BRANCH_SUB ***
 
 PROMPT *** Create  grants  OUR_BRANCH_SUB ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OUR_BRANCH_SUB  to ABS_ADMIN;
+grant SELECT                                                                 on OUR_BRANCH_SUB  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OUR_BRANCH_SUB  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OUR_BRANCH_SUB  to START1;
+grant SELECT                                                                 on OUR_BRANCH_SUB  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OUR_BRANCH_SUB  to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on OUR_BRANCH_SUB  to WR_REFREAD;
 

@@ -64,19 +64,6 @@ COMMENT ON COLUMN BARS.INS_PAYMENTS_SCHEDULE.PAYED IS 'Платіж сплачено';
 
 
 
-PROMPT *** Create  constraint FK_INSPSCH_DEALID_DEALS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_PAYMENTS_SCHEDULE ADD CONSTRAINT FK_INSPSCH_DEALID_DEALS FOREIGN KEY (DEAL_ID, KF)
-	  REFERENCES BARS.INS_DEALS (ID, KF) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_INSPMTSSDL ***
 begin   
  execute immediate '
@@ -91,46 +78,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_INSPSCH_PAYED ***
+PROMPT *** Create  constraint UK_INSPAYMENTSSCHEDULE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INS_PAYMENTS_SCHEDULE ADD CONSTRAINT CC_INSPSCH_PAYED CHECK (payed in (0, 1)) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INSPMTSSDL_PAYED_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_PAYMENTS_SCHEDULE MODIFY (PAYED CONSTRAINT CC_INSPMTSSDL_PAYED_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INSPMTSSDL_PSUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_PAYMENTS_SCHEDULE MODIFY (PLAN_SUM CONSTRAINT CC_INSPMTSSDL_PSUM_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INSPMTSSDL_PDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_PAYMENTS_SCHEDULE MODIFY (PLAN_DATE CONSTRAINT CC_INSPMTSSDL_PDATE_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.INS_PAYMENTS_SCHEDULE ADD CONSTRAINT UK_INSPAYMENTSSCHEDULE UNIQUE (DEAL_ID, PLAN_DATE, KF)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -151,12 +104,46 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_INSPAYMENTSSCHEDULE ***
+PROMPT *** Create  constraint CC_INSPMTSSDL_PDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INS_PAYMENTS_SCHEDULE ADD CONSTRAINT UK_INSPAYMENTSSCHEDULE UNIQUE (DEAL_ID, PLAN_DATE, KF)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.INS_PAYMENTS_SCHEDULE MODIFY (PLAN_DATE CONSTRAINT CC_INSPMTSSDL_PDATE_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INSPMTSSDL_PSUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_PAYMENTS_SCHEDULE MODIFY (PLAN_SUM CONSTRAINT CC_INSPMTSSDL_PSUM_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INSPMTSSDL_PAYED_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_PAYMENTS_SCHEDULE MODIFY (PAYED CONSTRAINT CC_INSPMTSSDL_PAYED_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INSPSCH_PAYED ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_PAYMENTS_SCHEDULE ADD CONSTRAINT CC_INSPSCH_PAYED CHECK (payed in (0, 1)) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -193,7 +180,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  INS_PAYMENTS_SCHEDULE ***
+grant SELECT                                                                 on INS_PAYMENTS_SCHEDULE to BARSREADER_ROLE;
 grant SELECT                                                                 on INS_PAYMENTS_SCHEDULE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on INS_PAYMENTS_SCHEDULE to UPLD;
 
 
 

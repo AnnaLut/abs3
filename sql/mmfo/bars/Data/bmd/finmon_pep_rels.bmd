@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Перелік ПЕП КЛІЄНТИ';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'FINMON_PEP_RELS';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,23 +124,23 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BDATE', 'D', 'Дата~народження', null, 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Код філії~банка (МФО)', null, 6, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'CATEGORY', 'C', 'Категорія~ПЕП', null, 300, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'COMMENTS', 'C', 'Примітки', null, 300, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'DOCN', 'N', 'Номер~документу', null, 22, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'DOCS', 'C', 'Серія~документу', null, 10, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'DOCT', 'N', 'Тип~документу', null, 22, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'EDATE', 'D', 'Дата втрати~ознаки ПЕП', null, 10, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'ID', 'N', 'Унікальний~код', null, 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'IDCODE', 'C', 'ІНН', null, 10, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'MDATE', 'D', 'Дата останніх~змін в даних', null, 10, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'NAME', 'C', 'ПІБ ФО~або назва ЮО', null, 300, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'PEP', 'C', 'Пов’язана з ЮО~публічна особа', null, 300, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'PERMIT', 'N', 'Дозвіл на~встановлення~ділових ~відносин', null, 22, 12, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'PRES', 'N', 'Резидентність', null, 22, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'PTYPE', 'N', 'Тип особи~ (1-ФО,2-ЮО,3-ФОП)', null, 22, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'REMDOC', 'N', 'Зауваження~до пакета~документів', null, 22, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BDATE', 'D', 'Дата~народження', '', 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Код філії~банка (МФО)', '', 6, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'CATEGORY', 'C', 'Категорія~ПЕП', '', 300, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'COMMENTS', 'C', 'Примітки', '', 300, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'DOCN', 'N', 'Номер~документу', '', 22, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'DOCS', 'C', 'Серія~документу', '', 10, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'DOCT', 'N', 'Тип~документу', '', 22, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'EDATE', 'D', 'Дата втрати~ознаки ПЕП', '', 10, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'ID', 'N', 'Унікальний~код', '', 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'IDCODE', 'C', 'ІНН', '', 10, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'MDATE', 'D', 'Дата останніх~змін в даних', '', 10, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'NAME', 'C', 'ПІБ ФО~або назва ЮО', '', 300, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'PEP', 'C', 'Пов’язана з ЮО~публічна особа', '', 300, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'PERMIT', 'N', 'Дозвіл на~встановлення~ділових ~відносин', '', 22, 12, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'PRES', 'N', 'Резидентність', '', 22, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'PTYPE', 'N', 'Тип особи~ (1-ФО,2-ЮО,3-ФОП)', '', 22, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'REMDOC', 'N', 'Зауваження~до пакета~документів', '', 22, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

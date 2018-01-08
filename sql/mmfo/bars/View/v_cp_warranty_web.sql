@@ -35,7 +35,9 @@ PROMPT *** Create  view V_CP_WARRANTY_WEB ***
           AND ck.id = cd.id;
 
 PROMPT *** Create  grants  V_CP_WARRANTY_WEB ***
+grant SELECT                                                                 on V_CP_WARRANTY_WEB to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_CP_WARRANTY_WEB to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CP_WARRANTY_WEB to UPLD;
 
 
 

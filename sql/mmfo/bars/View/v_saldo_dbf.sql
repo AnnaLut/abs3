@@ -40,8 +40,10 @@ from  accounts x0,  cust_acc x1
         (x0.nls != '62048'));
 
 PROMPT *** Create  grants  V_SALDO_DBF ***
+grant SELECT                                                                 on V_SALDO_DBF     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SALDO_DBF     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SALDO_DBF     to START1;
+grant SELECT                                                                 on V_SALDO_DBF     to UPLD;
 
 
 

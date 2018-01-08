@@ -1,18 +1,26 @@
-create or replace trigger TU_DPTADD
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TU_DPTADD.sql =========*** Run *** =
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  trigger TU_DPTADD ***
+
+  CREATE OR REPLACE TRIGGER BARS.TU_DPTADD 
 before update of OSTB, OSTC
 on ACCOUNTS
 for each row
-when ( old.NBS in ('2630','2635') 
+ WHEN ( old.NBS in ('2630','2635')
        AND
        ( ( nvl(old.OSTB,0) > 0 and new.OSTB > old.OSTB )
         or
          ( nvl(old.OSTC,0) > 0 and new.OSTC > old.OSTC )
        )
-     )
-declare
+     ) declare
   l_res   integer;
 begin
-  
+
   if ( gl.aTT in ( 'DP5', 'DPL' ) )
   then -- виплата відсотків (капіталізація)
     l_res := 0;
@@ -37,5 +45,9 @@ begin
 
 end TU_DPTADD;
 /
+ALTER TRIGGER BARS.TU_DPTADD ENABLE;
 
-show errors;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TU_DPTADD.sql =========*** End *** =
+PROMPT ===================================================================================== 

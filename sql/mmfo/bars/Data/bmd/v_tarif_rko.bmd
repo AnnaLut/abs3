@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Перегляд Тарифів за РKО по Рахункам';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_TARIF_RKO';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,23 +124,23 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', '~Код вiддiлення ', null, 30, 2, 0, 0, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', '', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NLS', 'C', '~Рахунок', null, 15, 1, 0, 0, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NMS', 'C', '~Найменування рахунку', null, 70, 2, 0, 0, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'TAR13', 'N', 'ВИХ.платiж~СЕП- ПН - Оп.час~13', null, 22, 3, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'TAR14', 'N', 'ВИХ.платiж~СЕП- КБ -Оп.час~14', null, 22, 4, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'TAR15', 'N', 'В Х I Д Н I ~з СЕП ~15', null, 22, 11, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'TAR16', 'N', 'ВИХ.платiж~СЕП-ПН-ПслОп.час~16', null, 22, 5, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'TAR17', 'N', 'ВИХ.платiж~СЕП-КБ-ПслОп.час~17', null, 22, 6, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'TAR32', 'N', 'Видаток ~ гот. по ЧЕКУ  %~32', null, 22, 14, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'RNK', 'C', '~Рег. № клiєнта ~ ( РНК )', null, null, 15, 0, 0, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'TAR113', 'C', 'ВИХ.платiж~ВПС / ПН ~113', null, 22, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'TAR114', 'C', 'ВИХ.платiж~ВПС / КБ ~114', null, 22, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'TAR115', 'C', 'ВИХ.платiж~внутр. / ПН ~115', null, 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'TAR116', 'C', 'ВИХ.платiж~внутр. / КБ ~116', null, 22, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'TAR117', 'C', 'В Х I Д Н I ~з ВПС ~117', null, 22, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'TAR118', 'C', 'В Х I Д Н I ~внутр. ~118', null, 22, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', '~Код вiддiлення ', '', 30, 2, 0, 0, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', '', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NLS', 'C', '~Рахунок', '', 15, 1, 0, 0, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NMS', 'C', '~Найменування рахунку', '', 70, 2, 0, 0, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'TAR13', 'N', 'ВИХ.платiж~СЕП- ПН - Оп.час~13', '', 22, 3, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'TAR14', 'N', 'ВИХ.платiж~СЕП- КБ -Оп.час~14', '', 22, 4, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'TAR15', 'N', 'В Х I Д Н I ~з СЕП ~15', '', 22, 11, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'TAR16', 'N', 'ВИХ.платiж~СЕП-ПН-ПслОп.час~16', '', 22, 5, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'TAR17', 'N', 'ВИХ.платiж~СЕП-КБ-ПслОп.час~17', '', 22, 6, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'TAR32', 'N', 'Видаток ~ гот. по ЧЕКУ  %~32', '', 22, 14, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'RNK', 'C', '~Рег. № клiєнта ~ ( РНК )', '', null, 15, 0, 0, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'TAR113', 'C', 'ВИХ.платiж~ВПС / ПН ~113', '', 22, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'TAR114', 'C', 'ВИХ.платiж~ВПС / КБ ~114', '', 22, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'TAR115', 'C', 'ВИХ.платiж~внутр. / ПН ~115', '', 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'TAR116', 'C', 'ВИХ.платiж~внутр. / КБ ~116', '', 22, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'TAR117', 'C', 'В Х I Д Н I ~з ВПС ~117', '', 22, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'TAR118', 'C', 'В Х I Д Н I ~внутр. ~118', '', 22, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание для условий фильтра
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

@@ -28,8 +28,10 @@ PROMPT *** Create  view BANKS_OB ***
                     WHERE   (mfo = 300465 OR mfop = 300465) AND mfo <> 999999);
 
 PROMPT *** Create  grants  BANKS_OB ***
+grant SELECT                                                                 on BANKS_OB        to BARSREADER_ROLE;
 grant SELECT                                                                 on BANKS_OB        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BANKS_OB        to START1;
+grant SELECT                                                                 on BANKS_OB        to UPLD;
 
 
 

@@ -1,11 +1,13 @@
+
+
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ====== Scripts /Sql/BARS/Procedure/dpt_bonus_addit.sql =====*** Run *** =
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/DPT_BONUS_ADDIT.sql =========*** R
 PROMPT ===================================================================================== 
 
 
-PROMPT *** Create  procedure dpt_bonus_addit ***
+PROMPT *** Create  procedure DPT_BONUS_ADDIT ***
 
-create or replace procedure dpt_bonus_addit is
+  CREATE OR REPLACE PROCEDURE BARS.DPT_BONUS_ADDIT is
 l_title constant varchar2(16) := 'dpt_bonus_addit:';
 l_bonusval number;
 l_bonus_cnt number;
@@ -24,7 +26,7 @@ BEGIN
         AND U.OB22 IN ('24', '27', '31')
         AND U.CHGDATE between (p_dat-1) AND p_dat
      ),
-  C2 AS 
+  C2 AS
      (select distinct o.pdat, dp.dpt_id
       from oper o, dpt_payments dp
       where 1=1
@@ -35,8 +37,8 @@ BEGIN
     (
     -- условие1 остаток на депозитном счете превышает минимальную граничную сумму по виду вклада
      SELECT D.DEPOSIT_ID, trunc(c2.pdat) + 1 DATZ, D.KF
-       from  BARS.DPT_DEPOSIT D,  c2, INT_RATN IR 
-      WHERE d.deposit_id = c2.dpt_id 
+       from  BARS.DPT_DEPOSIT D,  c2, INT_RATN IR
+      WHERE d.deposit_id = c2.dpt_id
         AND KOST(D.ACC, trunc(c2.pdat)) >
             (SELECT NVL(MIN(S), 0)
                FROM BARS.DPT_BONUS_SETTINGS -- сумма превышает минимальную граничную дл€ бонусов этого вида
@@ -45,7 +47,7 @@ BEGIN
                     (SELECT TYPE_ID FROM BARS.DPT_VIDD WHERE VIDD = D.VIDD))
            --общее исключение
         AND D.ACC = IR.ACC
-        AND IR.BDAT IN (SELECT MAX(BDAT) FROM INT_RATN WHERE ACC = IR.ACC) 
+        AND IR.BDAT IN (SELECT MAX(BDAT) FROM INT_RATN WHERE ACC = IR.ACC)
         AND IR.BR is not null -- ставка не индивидуальна€
         AND not exists (select 1 from BARS.BR_TIER_EDIT e where e.br_id = ir.br)-- не ступенчатый код ставки на текущий момент
         AND D.VIDD NOT IN (SELECT V.VIDD -- не "ѕрогрессивный" и не виды со ступенчатой ставкой
@@ -85,7 +87,7 @@ BEGIN
      UNION
      -- условие 3 по клиенту закрылась «ѕ карта
      SELECT D.DEPOSIT_ID, A.DAZS + 1 DATZ, D.KF
-       FROM BARS.DPT_DEPOSIT D, BARS.DPT_VIDD VV, BARS.ACCOUNTS A, C1, INT_RATN IR 
+       FROM BARS.DPT_DEPOSIT D, BARS.DPT_VIDD VV, BARS.ACCOUNTS A, C1, INT_RATN IR
       WHERE C1.RNK = A.RNK
         AND A.DAZS >= (p_dat -1)
         AND A.RNK = D.RNK
@@ -144,13 +146,12 @@ end;
 /
 show err;
 
-PROMPT *** Create  grants  dpt_bonus_addit ***
-grant EXECUTE                                                                on dpt_bonus_addit         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on dpt_bonus_addit         to DPT_ADMIN;
+PROMPT *** Create  grants  DPT_BONUS_ADDIT ***
+grant EXECUTE                                                                on DPT_BONUS_ADDIT to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on DPT_BONUS_ADDIT to DPT_ADMIN;
 
 
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/dpt_bonus_addit.sql =========*** End *** =
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/DPT_BONUS_ADDIT.sql =========*** E
 PROMPT ===================================================================================== 
-

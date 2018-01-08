@@ -15,9 +15,11 @@ where t.tobo=s.branch and s.id=BARS.USER_ID
 
 PROMPT *** Create  grants  V_USER_TOBO ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_USER_TOBO     to ABS_ADMIN;
+grant SELECT                                                                 on V_USER_TOBO     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USER_TOBO     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_USER_TOBO     to BASIC_INFO;
 grant SELECT                                                                 on V_USER_TOBO     to START1;
+grant SELECT                                                                 on V_USER_TOBO     to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_USER_TOBO     to V_USER_TOBO;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USER_TOBO     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_USER_TOBO     to WR_REFREAD;

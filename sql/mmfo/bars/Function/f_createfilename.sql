@@ -4,16 +4,16 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_createfilename.sql =========*** R
  PROMPT ===================================================================================== 
  
-CREATE OR REPLACE FUNCTION BARS.F_CREATEFILENAME (
+  CREATE OR REPLACE FUNCTION BARS.F_CREATEFILENAME (
                                 sNumFile varchar2,  -- KODF из KL_F00
                                 sGCode varchar2,    -- A017 из KL_F00
                                 dtRepDate date,     -- отчетная дата
                                 nFileId number
                         ) return varchar2 is
 ----------------------------------------------------------------
---    Функция для формирования имени файла отчетности      --
+--       Функция для формирования имени файла отчетности      --
 ----------------------------------------------------------------
---    VERSION:  19/06/2015 (02/02/2011)                       --
+--    VERSION:  08/06/2015 (02/02/2011)                       --
 ----------------------------------------------------------------
     sPeriod         varchar2(1);   -- Period из V_F00
     sCQNum          varchar2(1);    -- Nom из V_F00
@@ -48,17 +48,17 @@ begin
     end;
 
     begin
-        select f.version_id, f.finish_time, f.file_name
-        into l_version_id, dDatf, FileName_
-        FROM NBUR_LST_FILES f, NBUR_REF_FILES s
-        WHERE     f.file_id = nFileId
-              and f.report_date = dtRepDate 
-              AND s.id = f.file_id
-              AND f.FILE_STATUS IN ('FINISHED', 'BLOCKED');
+        select version_id, finish_time
+        into l_version_id, dDatf
+        from V_NBUR_LIST_FORM_FINISHED
+        where file_id = nFileId and
+              report_date = dtRepDate and
+              status_code in ('FINISHED', 'BLOCKED');
+
     exception
         when no_data_found then return null;
     end;
-    
+
     if l_version_id <= 35 then
        sCQNum := nvl(f_ret_lit_code(l_version_id), '1');
     else
@@ -90,14 +90,14 @@ begin
         end if;                         
     end if;
     
---    FileName_ :=  prefix_ ||
---                  nvl(sNumExt, sNumFile) ||
---                  Upper(trim(sEBox)) ||
---                  chr(iif_n(nMonthN_, 9, ascii(nMonthN_), ascii(nMonthN_), nMonthN_ + 55)) ||
---                  chr(iif_n(nDayN_, 9, ascii(nDayN_), ascii(nDayN_), nDayN_ + 55))||
---                  '.'||
---                  Upper(substr(sGCode, 1, 1));
---
+    FileName_ :=  prefix_ ||
+                  nvl(sNumExt, sNumFile) ||
+                  Upper(trim(sEBox)) ||
+                  chr(iif_n(nMonthN_, 9, ascii(nMonthN_), ascii(nMonthN_), nMonthN_ + 55)) ||
+                  chr(iif_n(nDayN_, 9, ascii(nDayN_), ascii(nDayN_), nDayN_ + 55))||
+                  '.'||
+                  Upper(substr(sGCode, 1, 1));
+
     case nPeriod_
         when 53 then -- Once in 5 day
             nI_ := floor(nDayN_ / 5);
@@ -132,19 +132,19 @@ begin
 
     nDayN_   := to_number(to_char(dtExtDate_, 'dd'));
     nMonthN_ := to_number(to_char(dtExtDate_, 'mm'));
---
---    If substr(upper(trim(sPeriod)), 1, 1) in ('M', 'Q', 'H', 'Y') then
---        FileName_ := FileName_ || chr(iif_n(nMonthN_, 9, ascii(nMonthN_), ascii(nMonthN_), nMonthN_ + 55));
---    else
---        FileName_ := FileName_ || chr(iif_n(nDayN_, 9, ascii(nDayN_), ascii(nDayN_), nDayN_ + 55));
---    end if;
---
---    if trunc(dDatf) <> trunc(sysdate) then
---       sCQNum := '1';
---
---    end if;
 
-    FileName_ := FileName_ ||'_' || to_char(dtExtDate_,'ddmmyyyy');
+    If substr(upper(trim(sPeriod)), 1, 1) in ('M', 'Q', 'H', 'Y') then
+        FileName_ := FileName_ || chr(iif_n(nMonthN_, 9, ascii(nMonthN_), ascii(nMonthN_), nMonthN_ + 55));
+    else
+        FileName_ := FileName_ || chr(iif_n(nDayN_, 9, ascii(nDayN_), ascii(nDayN_), nDayN_ + 55));
+    end if;
+
+    if trunc(dDatf) <> trunc(sysdate) then
+       sCQNum := '1';
+
+    end if;
+
+    FileName_ := FileName_ || nvl(trim(sCQNum), '1')||'_' || to_char(dtExtDate_,'ddmmyyyy');
 
     return FileName_;
 end;

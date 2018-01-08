@@ -55,19 +55,6 @@ COMMENT ON COLUMN BARS.CH_KOM.S IS '';
 
 
 
-PROMPT *** Create  constraint FK_CH_KOM_BIC_E ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CH_KOM ADD CONSTRAINT FK_CH_KOM_BIC_E FOREIGN KEY (BIC_E)
-	  REFERENCES BARS.CH_BIC (BIC_E) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_CH_KOM ***
 begin   
  execute immediate '
@@ -96,10 +83,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  CH_KOM ***
+grant SELECT                                                                 on CH_KOM          to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CH_KOM          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CH_KOM          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CH_KOM          to RCH_1;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CH_KOM          to START1;
+grant SELECT                                                                 on CH_KOM          to UPLD;
 grant FLASHBACK,SELECT                                                       on CH_KOM          to WR_REFREAD;
 
 

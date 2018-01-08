@@ -63,9 +63,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACCOUNTS_GROUP ***
+grant SELECT                                                                 on ACCOUNTS_GROUP  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCOUNTS_GROUP  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCOUNTS_GROUP  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCOUNTS_GROUP  to START1;
+grant SELECT                                                                 on ACCOUNTS_GROUP  to UPLD;
 
 
 

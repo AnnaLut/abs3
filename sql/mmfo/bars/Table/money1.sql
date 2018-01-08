@@ -80,8 +80,10 @@ exception when others then
 
 PROMPT *** Create  grants  MONEY1 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on MONEY1          to ABS_ADMIN;
+grant SELECT                                                                 on MONEY1          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MONEY1          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MONEY1          to BARS_DM;
+grant SELECT                                                                 on MONEY1          to UPLD;
 
 
 

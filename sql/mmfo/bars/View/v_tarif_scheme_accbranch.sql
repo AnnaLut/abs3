@@ -19,8 +19,10 @@ PROMPT *** Create  view V_TARIF_SCHEME_ACCBRANCH ***
    and nvl(s.dat_end,bankdate) >= bankdate;
 
 PROMPT *** Create  grants  V_TARIF_SCHEME_ACCBRANCH ***
+grant SELECT                                                                 on V_TARIF_SCHEME_ACCBRANCH to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TARIF_SCHEME_ACCBRANCH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TARIF_SCHEME_ACCBRANCH to CUST001;
+grant SELECT                                                                 on V_TARIF_SCHEME_ACCBRANCH to UPLD;
 
 
 

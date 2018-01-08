@@ -51,19 +51,6 @@ COMMENT ON COLUMN BARS.TABLE_COL_ALIAS.COLUMN_ALIAS IS '"ְכטאס" סעמכבצמג';
 
 
 
-PROMPT *** Create  constraint FK_TABCOLALIAS_TABALIAS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TABLE_COL_ALIAS ADD CONSTRAINT FK_TABCOLALIAS_TABALIAS FOREIGN KEY (TABLE_NAME)
-	  REFERENCES BARS.TABLE_ALIAS (TABLE_NAME) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_TABCOLALIAS_TABNAME_NN ***
 begin   
  execute immediate '
@@ -128,7 +115,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TABLE_COL_ALIAS ***
+grant SELECT                                                                 on TABLE_COL_ALIAS to BARSREADER_ROLE;
 grant SELECT                                                                 on TABLE_COL_ALIAS to BARS_DM;
+grant SELECT                                                                 on TABLE_COL_ALIAS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TABLE_COL_ALIAS to WR_ALL_RIGHTS;
 
 

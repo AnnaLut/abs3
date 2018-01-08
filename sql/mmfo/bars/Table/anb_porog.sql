@@ -51,19 +51,6 @@ COMMENT ON COLUMN BARS.ANB_POROG.S2 IS 'Пороговая сумма-2';
 
 
 
-PROMPT *** Create  constraint FK_ANB_POROG ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ANB_POROG ADD CONSTRAINT FK_ANB_POROG FOREIGN KEY (ID)
-	  REFERENCES BARS.ANB_POR (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XPK_ANB_POROG ***
 begin   
  execute immediate '
@@ -92,11 +79,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  ANB_POROG ***
+grant SELECT                                                                 on ANB_POROG       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANB_POROG       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANB_POROG       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANB_POROG       to RCC_DEAL;
 grant SELECT                                                                 on ANB_POROG       to RPBN001;
 grant SELECT                                                                 on ANB_POROG       to SALGL;
+grant SELECT                                                                 on ANB_POROG       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ANB_POROG       to WR_ALL_RIGHTS;
 
 

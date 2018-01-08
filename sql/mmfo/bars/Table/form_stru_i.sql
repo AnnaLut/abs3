@@ -83,9 +83,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FORM_STRU_I ***
+grant SELECT                                                                 on FORM_STRU_I     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FORM_STRU_I     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FORM_STRU_I     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FORM_STRU_I     to START1;
+grant SELECT                                                                 on FORM_STRU_I     to UPLD;
 
 
 

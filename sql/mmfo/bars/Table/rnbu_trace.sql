@@ -27,7 +27,7 @@ begin
 	KV NUMBER, 
 	ODATE DATE, 
 	KODP VARCHAR2(35), 
-	ZNAP VARCHAR2(70), 
+	ZNAP VARCHAR2(254), 
 	NBUC VARCHAR2(30), 
 	ISP NUMBER, 
 	RNK NUMBER, 
@@ -82,11 +82,37 @@ exception when others then
 
 
 
+
+PROMPT *** Create  index I2_RNBU_TRACE ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I2_RNBU_TRACE ON BARS.RNBU_TRACE (KODP) ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index I3_RNBU_TRACE ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I3_RNBU_TRACE ON BARS.RNBU_TRACE (REF) ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  RNBU_TRACE ***
+grant SELECT                                                                 on RNBU_TRACE      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_TRACE      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RNBU_TRACE      to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_TRACE      to RPBN002;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_TRACE      to START1;
+grant SELECT                                                                 on RNBU_TRACE      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RNBU_TRACE      to WR_ALL_RIGHTS;
 
 

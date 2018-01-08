@@ -34,7 +34,7 @@ end TaI_CP_ARCH;
 
 
 /
-ALTER TRIGGER BARS.TAI_CP_ARCH DISABLE;
+ALTER TRIGGER BARS.TAI_CP_ARCH ENABLE;
 
 
 PROMPT ===================================================================================== 

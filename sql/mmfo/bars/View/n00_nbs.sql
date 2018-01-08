@@ -43,8 +43,10 @@ GROUP BY nbs));
 
 PROMPT *** Create  grants  N00_NBS ***
 grant SELECT                                                                 on N00_NBS         to BARS014;
+grant SELECT                                                                 on N00_NBS         to BARSREADER_ROLE;
 grant SELECT                                                                 on N00_NBS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on N00_NBS         to SALGL;
+grant SELECT                                                                 on N00_NBS         to UPLD;
 
 
 

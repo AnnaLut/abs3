@@ -83,6 +83,10 @@ COMMENT ON COLUMN BARS.ERR$_CIM_CREDGRAPH_PERIOD.PERCENT_DAY IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIM_CREDGRAPH_PERIOD ***
+grant SELECT                                                                 on ERR$_CIM_CREDGRAPH_PERIOD to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIM_CREDGRAPH_PERIOD to UPLD;
+
 
 
 PROMPT ===================================================================================== 

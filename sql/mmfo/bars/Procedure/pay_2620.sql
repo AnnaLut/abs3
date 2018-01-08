@@ -1,4 +1,13 @@
-CREATE OR REPLACE PROCEDURE BARS.PAY_2620
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/PAY_2620.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure PAY_2620 ***
+
+  CREATE OR REPLACE PROCEDURE BARS.PAY_2620 
                (flg_ SMALLINT,  -- флаг оплаты
                 ref_ INTEGER,   -- референция
                VDAT_ DATE,      -- дата валютировния
@@ -15,7 +24,7 @@ CREATE OR REPLACE PROCEDURE BARS.PAY_2620
 
 Для проведення безготівкових ЛЮБИХ перерахувань з рахунків клієнтів (2620/20) військових
 Умови:
--Платник (наш 2620/20, customer.OKPO, customer.NMK – тільки ПРИЗВІЩЕ  ) 
+-Платник (наш 2620/20, customer.OKPO, customer.NMK – тільки ПРИЗВІЩЕ  )
 -Отримува – неважниво хто
 -Признач.платежу  like %customer.OKPO%    +  like % сustomer.NMK%
 6110/10(1%-но минимум 15грн, максимум 750 грн)
@@ -28,15 +37,15 @@ CREATE OR REPLACE PROCEDURE BARS.PAY_2620
   l_tag   operw.tag%type      := 'KTAR ';
   l_ttD   tts.tt%type         := 'D06'  ;
   -----------------------------
-begin  
-  -- основная проводка 
+begin
+  -- основная проводка
   gl.payv(flg_,ref_, VDAT_, tt_,dk_,kv_,nlsm_,sa_,kvk_,nlsk_,ss_);
 
   -- Комиссию НЕ берем
-  iF KV_ <> GL.BASEVAL      or 
+  iF KV_ <> GL.BASEVAL      or
      gl.doc.NLSA  NOT LIKE '2620%' OR  -- счет не 2620
-     gl.doc.MFOA  <>  gL.aMfo      OR  -- отправитель не в нашем МФО  
-     gl.doc.MFOB  = gl.aMfo THEN       -- получатель     в нашем МФО 
+     gl.doc.MFOA  <>  gL.aMfo      OR  -- отправитель не в нашем МФО
+     gl.doc.MFOB  = gl.aMfo THEN       -- получатель     в нашем МФО
      RETURN ;
   END IF;
 
@@ -49,23 +58,29 @@ begin
      EXCEPTION WHEN NO_DATA_FOUND THEN   raise_application_error(-20203,'PAY_2620: Не знайдено кл.'||aa.rnk );
      end;
      If gl.doc.nazn        not like '%'||cc.okpo||'%'  then goto KOMIS_ ; end if ; -- комиссию берем , тк не совпадает ОКПО
-     cc.nmk := trim  (cc.nmk); 
+     cc.nmk := trim  (cc.nmk);
      i_     := instr (cc.nmk, ' ',1 ) -1 ;
      cc.nmk := substr(cc.nmk, 1 , i_)    ;
      If upper(gl.doc.nazn) not like '%'||cc.nmk ||'%'  then goto KOMIS_ ; end if ; -- комиссию берем , тк не совпадает ФИО ( толко фамилия )
-     RETURN;  -- ура  ! 
+     RETURN;  -- ура  !
   end if;
 
   <<komis_>> null;
   -----------------------------
-  oo.nlsb := nbs_ob22_bra ( l_nbs, l_ob, substr( aa.branch, 1, 15 ) ) ; 
+  oo.nlsb := nbs_ob22_bra ( l_nbs, l_ob, substr( aa.branch, 1, 15 ) ) ;
   oo.s    := f_tarif (l_Kod, kv_, gl.doc.NLSA, sa_, 0, null) ;
-  if oo.s >=1  then  
-     gl.payv ( flg_, ref_, VDAT_, l_ttD, 1, gl.baseval, gl.doc.NLSA, oo.s, gl.baseval,  oo.nlsb , oo.s ); 
+  if oo.s >=1  then
+     gl.payv ( flg_, ref_, VDAT_, l_ttD, 1, gl.baseval, gl.doc.NLSA, oo.s, gl.baseval,  oo.nlsb , oo.s );
      update operw set value = l_kod  where ref = ref_ and tag =l_tag;
      if SQL%rowcount = 0 then insert into operw (ref,tag, value) values (Ref_, l_tag, l_kod) ;  end if  ;
   end if;
 
 END PAY_2620 ;
 /
+show err;
 
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/PAY_2620.sql =========*** End *** 
+PROMPT ===================================================================================== 

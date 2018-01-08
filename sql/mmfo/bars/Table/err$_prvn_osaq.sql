@@ -81,6 +81,10 @@ COMMENT ON COLUMN BARS.ERR$_PRVN_OSAQ.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_PRVN_OSAQ ***
+grant SELECT                                                                 on ERR$_PRVN_OSAQ  to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_PRVN_OSAQ  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -77,6 +77,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_GROUPS_ACC ***
+grant SELECT                                                                 on TMP_GROUPS_ACC  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_GROUPS_ACC  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_GROUPS_ACC  to START1;
 

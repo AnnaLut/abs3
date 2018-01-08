@@ -104,58 +104,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SETTLEMENTS_SPIUSETLID_NN ***
+PROMPT *** Create  constraint CC_SETTLEMENTS_TYPEID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ADR_SETTLEMENTS MODIFY (SPIU_CITY_ID CONSTRAINT CC_SETTLEMENTS_SPIUSETLID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SETTLEMENTS_EFFDT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_SETTLEMENTS MODIFY (EFF_DT CONSTRAINT CC_SETTLEMENTS_EFFDT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SETTLEMENTS_AREACENTERF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_SETTLEMENTS MODIFY (AREA_CENTER_F CONSTRAINT CC_SETTLEMENTS_AREACENTERF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SETTLEMENTS_REGNCENTERF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_SETTLEMENTS MODIFY (REGION_CENTER_F CONSTRAINT CC_SETTLEMENTS_REGNCENTERF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SETTLEMENTS_POSTCODEMAX_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADR_SETTLEMENTS MODIFY (POSTAL_CODE_MAX CONSTRAINT CC_SETTLEMENTS_POSTCODEMAX_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ADR_SETTLEMENTS MODIFY (SETTLEMENT_TYPE_ID CONSTRAINT CC_SETTLEMENTS_TYPEID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -176,10 +128,58 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SETTLEMENTS_TYPEID_NN ***
+PROMPT *** Create  constraint CC_SETTLEMENTS_POSTCODEMAX_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ADR_SETTLEMENTS MODIFY (SETTLEMENT_TYPE_ID CONSTRAINT CC_SETTLEMENTS_TYPEID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ADR_SETTLEMENTS MODIFY (POSTAL_CODE_MAX CONSTRAINT CC_SETTLEMENTS_POSTCODEMAX_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SETTLEMENTS_REGNCENTERF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADR_SETTLEMENTS MODIFY (REGION_CENTER_F CONSTRAINT CC_SETTLEMENTS_REGNCENTERF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SETTLEMENTS_AREACENTERF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADR_SETTLEMENTS MODIFY (AREA_CENTER_F CONSTRAINT CC_SETTLEMENTS_AREACENTERF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SETTLEMENTS_EFFDT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADR_SETTLEMENTS MODIFY (EFF_DT CONSTRAINT CC_SETTLEMENTS_EFFDT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SETTLEMENTS_SPIUSETLID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADR_SETTLEMENTS MODIFY (SPIU_CITY_ID CONSTRAINT CC_SETTLEMENTS_SPIUSETLID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -188,6 +188,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ADR_SETTLEMENTS ***
+grant SELECT                                                                 on ADR_SETTLEMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on ADR_SETTLEMENTS to BARSUPL;
 grant SELECT                                                                 on ADR_SETTLEMENTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ADR_SETTLEMENTS to START1;

@@ -42,6 +42,8 @@ PROMPT *** Create  view AQ$AQT_KLBX_REPLIES ***
                              EXPIRATION_REASON , sender_name SENDER_NAME, sender_address SENDER_ADDRESS, sender_protocol SENDER_PROTOCOL, dequeue_msgid ORIGINAL_MSGID  FROM "AQT_KLBX_REPLIES" WHERE state != 7 AND   state != 9 WITH READ ONLY;
 
 PROMPT *** Create  grants  AQ$AQT_KLBX_REPLIES ***
+grant SELECT                                                                 on AQ$AQT_KLBX_REPLIES to BARSREADER_ROLE;
+grant SELECT                                                                 on AQ$AQT_KLBX_REPLIES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on AQ$AQT_KLBX_REPLIES to WR_ALL_RIGHTS;
 
 

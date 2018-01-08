@@ -18,9 +18,9 @@ PROMPT *** Create  procedure NBUR_P_I22 ***
 % DESCRIPTION : Процедура формирования @22 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.002  11.86.2016
+% VERSION     :  v.16.003  09.08.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.002  11.08.2016';
+  ver_          char(30)  := 'v.16.003  09.08.2017';
 /*
    Структура показника    D BBBB VVV Y
 
@@ -39,7 +39,7 @@ BEGIN
     logger.info ('NBUR_P_I22 begin for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 
     -- определение начальных параметров (код области или МФО или подразделение)
-    nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 2, l_file_code, l_nbuc, l_type);
+    nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 2, l_file_code, l_nbuc, l_type, p_report_date);
 
     BEGIN
        INSERT INTO nbur_detail_protocols (report_date,
@@ -87,7 +87,8 @@ BEGIN
                          nbuc,
                          colname,
                          ABS (VALUE) field_value
-                    FROM (SELECT b.cust_id,
+                    FROM (SELECT /*+ ordered*/
+                                 b.cust_id,
                                  b.acc_id,
                                  a.maturity_date,
                                  a.kf,

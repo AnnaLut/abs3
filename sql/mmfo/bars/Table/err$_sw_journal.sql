@@ -109,6 +109,10 @@ COMMENT ON COLUMN BARS.ERR$_SW_JOURNAL.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_SW_JOURNAL ***
+grant SELECT                                                                 on ERR$_SW_JOURNAL to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_SW_JOURNAL to UPLD;
+
 
 
 PROMPT ===================================================================================== 

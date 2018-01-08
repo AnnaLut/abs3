@@ -70,7 +70,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_F503_AUTO_CHANGE_HIST ***
+grant SELECT                                                                 on CIM_F503_AUTO_CHANGE_HIST to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F503_AUTO_CHANGE_HIST to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CIM_F503_AUTO_CHANGE_HIST to UPLD;
 
 
 

@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  NOTARY_OB22 ***
+grant SELECT                                                                 on NOTARY_OB22     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NOTARY_OB22     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NOTARY_OB22     to BARS_DM;
+grant SELECT                                                                 on NOTARY_OB22     to UPLD;
 grant FLASHBACK,SELECT                                                       on NOTARY_OB22     to WR_REFREAD;
 
 

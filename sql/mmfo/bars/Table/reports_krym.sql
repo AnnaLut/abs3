@@ -47,9 +47,11 @@ COMMENT ON COLUMN BARS.REPORTS_KRYM.RNK IS '';
 
 
 PROMPT *** Create  grants  REPORTS_KRYM ***
+grant SELECT                                                                 on REPORTS_KRYM    to BARSREADER_ROLE;
 grant SELECT                                                                 on REPORTS_KRYM    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REPORTS_KRYM    to BARS_DM;
 grant SELECT                                                                 on REPORTS_KRYM    to START1;
+grant SELECT                                                                 on REPORTS_KRYM    to UPLD;
 
 
 

@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_EBKC_SLAVE.SLAVE_RNK IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_EBKC_SLAVE ***
+grant SELECT                                                                 on ERR$_EBKC_SLAVE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_EBKC_SLAVE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

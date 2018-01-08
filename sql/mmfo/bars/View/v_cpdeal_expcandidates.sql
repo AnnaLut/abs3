@@ -85,7 +85,9 @@ PROMPT *** Create  view V_CPDEAL_EXPCANDIDATES ***
    where OST_R_DIFF > 0 or OST_N_EXP > 0;
 
 PROMPT *** Create  grants  V_CPDEAL_EXPCANDIDATES ***
+grant SELECT                                                                 on V_CPDEAL_EXPCANDIDATES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CPDEAL_EXPCANDIDATES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CPDEAL_EXPCANDIDATES to UPLD;
 
 
 

@@ -78,7 +78,9 @@ COMMENT ON COLUMN BARS.ERR$_GROUPS_STAFF.SEC_DEB IS '';
 
 
 PROMPT *** Create  grants  ERR$_GROUPS_STAFF ***
+grant SELECT                                                                 on ERR$_GROUPS_STAFF to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_GROUPS_STAFF to BARS_DM;
+grant SELECT                                                                 on ERR$_GROUPS_STAFF to UPLD;
 
 
 

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'SALDO_DSW: Таблиця СТАРТ-даних по ДЕПО-СВОПАМ';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_SALDO_DSW';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,21 +124,21 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'FDAT', 'D', 'Дата зрізу', null, 10, 1, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'Код~вал.', null, 22, 3, 0, 1, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'LONG_I1', 'N', 'Розміщ:~Ср % ст.~Строков~(довг.)', null, 22, 33, 0, 0, 0, 0, '', '#0.0000', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'LONG_I2', 'N', 'Залуч.~Ср % ст.~Строков~(довг.)', null, 22, 23, 0, 0, 0, 0, '', '#0.0000', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'LONG_S1', 'N', 'Розміщ~Залишок~Строков~(довг.)', null, 22, 32, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'LONG_S1_UAH', 'N', 'Залуч. ГРН:Залишок TOD+TOМ (корот)', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'LONG_S2', 'N', 'Залуч.~Залишок~Строков~(довг.)', null, 22, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'LONG_S2_UAH', 'N', 'Залуч. ГРН:Залишок Строков (довг.)', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'RNK', 'N', 'Код.кл~заг=0', null, 22, 2, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'SHORT_I1', 'N', 'Розміщ~Ср % ст.~TOD+TOМ~(корот)', null, 22, null, 0, 0, 0, 0, '', '#0.0000', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'SHORT_I2', 'N', 'Залуч.~Ср % ст.~TOD+TOМ~(корот)', null, 22, 21, 0, 0, 0, 0, '', '#0.0000', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'SHORT_S1', 'N', 'Розміщ~Залишок~TOD+TOМ~(корот)', null, 22, 30, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SHORT_S1_UAH', 'N', 'Розміщ ГРН:Залишок TOD+TOМ (корот)', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SHORT_S2', 'N', 'Залуч.~Залишок~TOD+TOМ~(корот)', null, 22, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'SHORT_S2_UAH', 'N', 'Розміщ ГРН:Залишок Строков (довг.)', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'FDAT', 'D', 'Дата зрізу', '', 10, 1, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'Код~вал.', '', 22, 3, 0, 1, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'LONG_I1', 'N', 'Розміщ:~Ср % ст.~Строков~(довг.)', '', 22, 33, 0, 0, 0, 0, '', '#0.0000', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'LONG_I2', 'N', 'Залуч.~Ср % ст.~Строков~(довг.)', '', 22, 23, 0, 0, 0, 0, '', '#0.0000', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'LONG_S1', 'N', 'Розміщ~Залишок~Строков~(довг.)', '', 22, 32, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'LONG_S1_UAH', 'N', 'Залуч. ГРН:Залишок TOD+TOМ (корот)', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'LONG_S2', 'N', 'Залуч.~Залишок~Строков~(довг.)', '', 22, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'LONG_S2_UAH', 'N', 'Залуч. ГРН:Залишок Строков (довг.)', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'RNK', 'N', 'Код.кл~заг=0', '', 22, 2, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'SHORT_I1', 'N', 'Розміщ~Ср % ст.~TOD+TOМ~(корот)', '', 22, null, 0, 0, 0, 0, '', '#0.0000', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'SHORT_I2', 'N', 'Залуч.~Ср % ст.~TOD+TOМ~(корот)', '', 22, 21, 0, 0, 0, 0, '', '#0.0000', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'SHORT_S1', 'N', 'Розміщ~Залишок~TOD+TOМ~(корот)', '', 22, 30, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SHORT_S1_UAH', 'N', 'Розміщ ГРН:Залишок TOD+TOМ (корот)', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SHORT_S2', 'N', 'Залуч.~Залишок~TOD+TOМ~(корот)', '', 22, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'SHORT_S2_UAH', 'N', 'Розміщ ГРН:Залишок Строков (довг.)', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

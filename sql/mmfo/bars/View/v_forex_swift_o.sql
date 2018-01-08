@@ -33,7 +33,9 @@ PROMPT *** Create  view V_FOREX_SWIFT_O ***
           AND j.vdate BETWEEN bankdate_g - 7 AND bankdate_g + 7;
 
 PROMPT *** Create  grants  V_FOREX_SWIFT_O ***
+grant SELECT                                                                 on V_FOREX_SWIFT_O to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FOREX_SWIFT_O to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_FOREX_SWIFT_O to UPLD;
 
 
 

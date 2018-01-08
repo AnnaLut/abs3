@@ -70,8 +70,9 @@ begin
 	PAWN NUMBER(*,0), 
 	HIERARCHY_ID NUMBER(*,0), 
 	FIN_351 NUMBER, 
-	PD NUMBER,
-    KF varchar2(6)         
+	PD NUMBER, 
+	KF VARCHAR2(6), 
+	FAIR_METHOD_ID NUMBER(2,0)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 0 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -89,8 +90,6 @@ PROMPT *** ALTER_POLICIES to CP_KAZ ***
 
 
 COMMENT ON TABLE BARS.CP_KAZ IS 'Справочник кодов ЦБ';
-COMMENT ON COLUMN BARS.CP_KAZ.FIN_351 IS 'Фін.стан згідно 351 пост.';
-COMMENT ON COLUMN BARS.CP_KAZ.PD IS 'PD';
 COMMENT ON COLUMN BARS.CP_KAZ.ID IS 'Номер пп - первичный ключ';
 COMMENT ON COLUMN BARS.CP_KAZ.EMI IS 'Вид эмитента';
 COMMENT ON COLUMN BARS.CP_KAZ.DOX IS 'Вид доходности';
@@ -141,6 +140,12 @@ COMMENT ON COLUMN BARS.CP_KAZ.VNCRP IS 'Початковий ВКР';
 COMMENT ON COLUMN BARS.CP_KAZ.ZAL_CP IS 'Забезпечення на 1 шт.ЦП';
 COMMENT ON COLUMN BARS.CP_KAZ.PAWN IS 'Вид забезпечення';
 COMMENT ON COLUMN BARS.CP_KAZ.HIERARCHY_ID IS 'Рівень ієрархії справедливої вартості цінних паперів';
+COMMENT ON COLUMN BARS.CP_KAZ.FIN_351 IS 'Фін.стан згідно 351 пост.';
+COMMENT ON COLUMN BARS.CP_KAZ.PD IS 'PD';
+COMMENT ON COLUMN BARS.CP_KAZ.KF IS '';
+COMMENT ON COLUMN BARS.CP_KAZ.FAIR_METHOD_ID IS 'Метод розрахунку справедливої вартості';
+
+
 
 
 PROMPT *** Create  constraint XPK_CP_KAZ ***
@@ -156,6 +161,7 @@ exception when others then
 
 
 
+
 PROMPT *** Create  index XPK_CP_KAZ ***
 begin   
  execute immediate '
@@ -166,18 +172,6 @@ exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
-
-
-begin
-    execute immediate 'alter table CP_KAZ add fair_method_id number(2)';
- exception when others then 
-    if sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/ 
-
-COMMENT ON COLUMN BARS.CP_KAZ.fair_method_id IS 'Метод розрахунку справедливої вартості';
-
 
 
 
@@ -195,20 +189,3 @@ grant FLASHBACK,SELECT                                                       on 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/CP_KAZ.sql =========*** End *** ======
 PROMPT ===================================================================================== 
-
-begin
-
-insert into cp_kaz (ID, EMI, DOX, CP_ID, KV, NAME, COUNTRY, DATP, IR, TIP, DAT_EM, AMORT, DCP, CENA, BASEY, CENA_KUP, KY, DOK, DNK, RNK, PERIOD_KUP, IDT, DAT_RR, PR1_KUP, PR_AMR, FIN23, KAT23, K23, VNCRR, PR_AKT, METR, GS, CENA_KUP0, CENA_START, QUOT_SIGN, DATZR, DATVK, IO, RIVEN, IN_BR)  
-    select ID, EMI, DOX, CP_ID, KV, NAME, COUNTRY, DATP, IR, TIP, DAT_EM, AMORT, DCP, CENA, BASEY, CENA_KUP, KY, DOK, DNK, RNK, PERIOD_KUP, IDT, DAT_RR, PR1_KUP, PR_AMR, FIN23, KAT23, K23, VNCRR, PR_AKT, METR, GS, CENA_KUP0, CENA_START, QUOT_SIGN, DATZR, DATVK, IO, RIVEN, IN_BR from cp_kod
-      where id in (select id from CP_KAZ_OB)
-	    and id not in (select id from cp_kaz);
-
-update cp_kaz
-   set datp = to_date('30-12-2016','dd-mm-yyyy')
- where id = case f_ourmfo_g when '300465' then  465 else 282 end; 
- 
-end;
-/
-commit;
-
-

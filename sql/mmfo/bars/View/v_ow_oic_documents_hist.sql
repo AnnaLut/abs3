@@ -16,8 +16,10 @@ PROMPT *** Create  view V_OW_OIC_DOCUMENTS_HIST ***
   from ow_oic_documents_hist;
 
 PROMPT *** Create  grants  V_OW_OIC_DOCUMENTS_HIST ***
+grant SELECT                                                                 on V_OW_OIC_DOCUMENTS_HIST to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_OIC_DOCUMENTS_HIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_OIC_DOCUMENTS_HIST to OW;
+grant SELECT                                                                 on V_OW_OIC_DOCUMENTS_HIST to UPLD;
 
 
 

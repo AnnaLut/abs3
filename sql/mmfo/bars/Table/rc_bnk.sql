@@ -58,6 +58,9 @@ COMMENT ON COLUMN BARS.RC_BNK.SWIFT_CODE IS '';
 
 
 
+PROMPT *** Create  grants  RC_BNK ***
+grant SELECT                                                                 on RC_BNK          to UPLD;
+
 
 
 PROMPT *** Create SYNONYM  to RC_BNK ***

@@ -89,9 +89,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_ANSWER_ACTION_TYPES ***
+grant SELECT                                                                 on WCS_ANSWER_ACTION_TYPES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_ANSWER_ACTION_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_ANSWER_ACTION_TYPES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_ANSWER_ACTION_TYPES to START1;
+grant SELECT                                                                 on WCS_ANSWER_ACTION_TYPES to UPLD;
 
 
 

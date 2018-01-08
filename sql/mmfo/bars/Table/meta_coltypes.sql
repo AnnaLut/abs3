@@ -102,9 +102,11 @@ exception when others then
 
 PROMPT *** Create  grants  META_COLTYPES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_COLTYPES   to ABS_ADMIN;
+grant SELECT                                                                 on META_COLTYPES   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_COLTYPES   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on META_COLTYPES   to BARS_DM;
 grant SELECT                                                                 on META_COLTYPES   to START1;
+grant SELECT                                                                 on META_COLTYPES   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on META_COLTYPES   to WR_ALL_RIGHTS;
 
 

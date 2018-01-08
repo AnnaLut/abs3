@@ -79,8 +79,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  PO_NBS ***
+grant SELECT                                                                 on PO_NBS          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PO_NBS          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PO_NBS          to START1;
+grant SELECT                                                                 on PO_NBS          to UPLD;
 
 
 

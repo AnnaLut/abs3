@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Таблиця для даних перекриття';
   l_tablinesdef := '20';
+  l_tabselect_statement := '';
   l_tabname     := 'TSEL023';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,29 +124,29 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'NLSA', 'C', 'Рахунок А', null, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KVA', 'N', 'Валюта А', 1, null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'MFOB', 'C', 'МФО Б', 1, null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NLSB', 'C', 'Рахунок Б', null, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KVB', 'N', 'Валюта Б', 1, null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'TT', 'C', 'Код операції', 1, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'VOB', 'N', 'Вид операції', 1, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'ND', 'C', 'Номер договору', null, null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'DATD', 'D', 'Дата документу', null, null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'S/100', 'N', 'Сума документу', null, null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NAM_A', 'C', 'Платник', 4, null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'NAM_B', 'C', 'Отримувач', 4, null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'NAZN', 'C', 'Призначення', 10, null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'OKPOA', 'C', 'ОКПО А', 2, null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'OKPOB', 'C', 'ОКПО Б', 2, null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'GRP', 'N', 'Група перекриття', null, null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'REF', 'N', 'Референс документу', null, null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'SOS', 'N', 'Стан документу', null, null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'ID', 'C', 'ID', null, null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'DREC', 'C', 'Додаткові реквізити', null, null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'DK', 'N', 'ДК', null, null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'S2', 'C', 'Сума документу', null, null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'TABN', 'C', 'Назва таблиці', null, null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'NLSA', 'C', 'Рахунок А', '', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KVA', 'N', 'Валюта А', '1', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'MFOB', 'C', 'МФО Б', '1', null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NLSB', 'C', 'Рахунок Б', '', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KVB', 'N', 'Валюта Б', '1', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'TT', 'C', 'Код операції', '1', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'VOB', 'N', 'Вид операції', '1', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'ND', 'C', 'Номер договору', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'DATD', 'D', 'Дата документу', '', null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'S/100', 'N', 'Сума документу', '', null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NAM_A', 'C', 'Платник', '4', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'NAM_B', 'C', 'Отримувач', '4', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'NAZN', 'C', 'Призначення', '10', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'OKPOA', 'C', 'ОКПО А', '2', null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'OKPOB', 'C', 'ОКПО Б', '2', null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'GRP', 'N', 'Група перекриття', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'REF', 'N', 'Референс документу', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'SOS', 'N', 'Стан документу', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'ID', 'C', 'ID', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'DREC', 'C', 'Додаткові реквізити', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'DK', 'N', 'ДК', '', null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'S2', 'C', 'Сума документу', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'TABN', 'C', 'Назва таблиці', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

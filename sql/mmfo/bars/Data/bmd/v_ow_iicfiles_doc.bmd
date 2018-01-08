@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'W4. Документи файлів IIC';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_OW_IICFILES_DOC';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,22 +124,22 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'FLAG_KVT', 'B', 'Ознака~квитовки', 1, 22, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'REF', 'N', 'Реф.', 1.4, 22, 2, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DK', 'N', 'Д/К', .6, 22, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'TT', 'C', 'Оп.', .6, 3, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NLS', 'C', 'Рахунок', 1.8, 15, 5, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/viewaccounts/accountform.aspx?type=2'||chr(38)||'acc=:ACC'||chr(38)||'rnk='||chr(38)||'accessmode=1 ', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NMS', 'C', 'Назва рахугку', 3, 70, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'S', 'N', 'Сума док.', 1.6, 22, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'LCV', 'C', 'Вал.', .6, 3, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'BRANCH', 'C', 'Відділення', 2, 30, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NAZN', 'C', 'Призначення платежу', 4, 160, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'RESP_CLASS', 'C', 'Статус~обробки', 2, 100, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'RESP_CODE', 'C', 'Код~обробки', 1, 100, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'RESP_TEXT', 'C', 'Повідомлення', 2, 254, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'FILE_NAME', 'C', 'Ім''я файла', null, 100, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'FILE_DATE', 'D', 'Дата файла', null, 20, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'ACC', 'N', 'ACC рахунку', null, null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'FLAG_KVT', 'B', 'Ознака~квитовки', '1', 22, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'REF', 'N', 'Реф.', '1.4', 22, 2, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DK', 'N', 'Д/К', '.6', 22, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'TT', 'C', 'Оп.', '.6', 3, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NLS', 'C', 'Рахунок', '1.8', 15, 5, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/viewaccounts/accountform.aspx?type=2'||chr(38)||'acc=:ACC'||chr(38)||'rnk='||chr(38)||'accessmode=1 ', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NMS', 'C', 'Назва рахугку', '3', 70, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'S', 'N', 'Сума док.', '1.6', 22, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'LCV', 'C', 'Вал.', '.6', 3, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'BRANCH', 'C', 'Відділення', '2', 30, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NAZN', 'C', 'Призначення платежу', '4', 160, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'RESP_CLASS', 'C', 'Статус~обробки', '2', 100, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'RESP_CODE', 'C', 'Код~обробки', '1', 100, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'RESP_TEXT', 'C', 'Повідомлення', '2', 254, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'FILE_NAME', 'C', 'Ім''я файла', '', 100, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'FILE_DATE', 'D', 'Дата файла', '', 20, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'ACC', 'N', 'ACC рахунку', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

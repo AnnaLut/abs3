@@ -73,8 +73,10 @@ COMMENT ON COLUMN BARS.TMP_BAL.DAT IS '';
 
 
 PROMPT *** Create  grants  TMP_BAL ***
+grant SELECT                                                                 on TMP_BAL         to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_BAL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_BAL         to RPBN001;
+grant SELECT                                                                 on TMP_BAL         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_BAL         to WR_ALL_RIGHTS;
 
 

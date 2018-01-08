@@ -69,10 +69,10 @@ COMMENT ON COLUMN BARS.CIM_CONTRACTS_APE.DELETE_UID IS 'id користувача, який вид
 
 
 
-PROMPT *** Create  constraint CC_CIMAPE_KV_NN ***
+PROMPT *** Create  constraint CC_CIMAPE_CONTRID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_CONTRACTS_APE MODIFY (KV CONSTRAINT CC_CIMAPE_KV_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_CONTRACTS_APE MODIFY (CONTR_ID CONSTRAINT CC_CIMAPE_CONTRID_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -81,10 +81,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMAPE_CONTRID_NN ***
+PROMPT *** Create  constraint CC_CIMAPE_KV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_CONTRACTS_APE MODIFY (CONTR_ID CONSTRAINT CC_CIMAPE_CONTRID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_CONTRACTS_APE MODIFY (KV CONSTRAINT CC_CIMAPE_KV_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -181,9 +181,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_CONTRACTS_APE ***
+grant SELECT                                                                 on CIM_CONTRACTS_APE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONTRACTS_APE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_CONTRACTS_APE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONTRACTS_APE to CIM_ROLE;
+grant SELECT                                                                 on CIM_CONTRACTS_APE to UPLD;
 
 
 

@@ -57,6 +57,10 @@ COMMENT ON COLUMN BARS.ERR$_TMP_RNK_KAT.ISTVAL IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_TMP_RNK_KAT ***
+grant SELECT                                                                 on ERR$_TMP_RNK_KAT to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_TMP_RNK_KAT to UPLD;
+
 
 
 PROMPT ===================================================================================== 

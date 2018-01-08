@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.ERR$_OW_CRVFILES.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_OW_CRVFILES ***
+grant SELECT                                                                 on ERR$_OW_CRVFILES to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_OW_CRVFILES to UPLD;
+
 
 
 PROMPT ===================================================================================== 

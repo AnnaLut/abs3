@@ -29,8 +29,10 @@ WHERE p.sos >= 5
 
 PROMPT *** Create  grants  N00_DON1 ***
 grant SELECT                                                                 on N00_DON1        to BARS014;
+grant SELECT                                                                 on N00_DON1        to BARSREADER_ROLE;
 grant SELECT                                                                 on N00_DON1        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on N00_DON1        to SALGL;
+grant SELECT                                                                 on N00_DON1        to UPLD;
 
 
 

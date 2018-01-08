@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_FM_STABLE_PARTNER_ARC.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_FM_STABLE_PARTNER_ARC ***
+grant SELECT                                                                 on ERR$_FM_STABLE_PARTNER_ARC to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_FM_STABLE_PARTNER_ARC to UPLD;
+
 
 
 PROMPT ===================================================================================== 

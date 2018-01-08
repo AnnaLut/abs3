@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CI4', 'CI4  ом≥с≥€ банку за прийом переказу УINTEREXPRESSФ (залишок)', 1, '#(nbs_ob22 (''2909'',''42''))', 980, '#(nbs_ob22 (''6110'',''82''))', 980, null, '#(nbs_ob22 (''2909'',''42''))', '#(nbs_ob22 (''6110'',''82''))', null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', ' ом≥с≥€ банку за прийом переказу УINTEREXPRESSФ (залишок), що належить установ≥ банку ');
+    values ('CI4', 'CI4  ом≥с≥€ банку за прийом переказу УINTEREXPRESSФ (залишок)', 1, '#(nbs_ob22 (''2909'',''42''))', 980, '#(nbs_ob22 (''6510'',''82''))', 980, null, '#(nbs_ob22 (''2909'',''42''))', '#(nbs_ob22 (''6510'',''82''))', null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', ' ом≥с≥€ банку за прийом переказу УINTEREXPRESSФ (залишок), що належить установ≥ банку ');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CI4', name='CI4  ом≥с≥€ банку за прийом переказу УINTEREXPRESSФ (залишок)', dk=1, nlsm='#(nbs_ob22 (''2909'',''42''))', kv=980, nlsk='#(nbs_ob22 (''6110'',''82''))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''2909'',''42''))', nlsb='#(nbs_ob22 (''6110'',''82''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=' ом≥с≥€ банку за прийом переказу УINTEREXPRESSФ (залишок), що належить установ≥ банку '
+         set tt='CI4', name='CI4  ом≥с≥€ банку за прийом переказу УINTEREXPRESSФ (залишок)', dk=1, nlsm='#(nbs_ob22 (''2909'',''42''))', kv=980, nlsk='#(nbs_ob22 (''6510'',''82''))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''2909'',''42''))', nlsb='#(nbs_ob22 (''6510'',''82''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=' ом≥с≥€ банку за прийом переказу УINTEREXPRESSФ (залишок), що належить установ≥ банку '
        where tt='CI4';
   end;
   --------------------------------

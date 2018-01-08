@@ -50,6 +50,18 @@ COMMENT ON COLUMN BARS.CCK_REP_LIST_YL.FUNCNAME IS '';
 
 
 
+PROMPT *** Create  constraint SYS_C00119425 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CCK_REP_LIST_YL MODIFY (ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C00119426 ***
 begin   
  execute immediate '
@@ -61,17 +73,9 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint SYS_C00119425 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CCK_REP_LIST_YL MODIFY (ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
+PROMPT *** Create  grants  CCK_REP_LIST_YL ***
+grant SELECT                                                                 on CCK_REP_LIST_YL to BARSREADER_ROLE;
+grant SELECT                                                                 on CCK_REP_LIST_YL to UPLD;
 
 
 

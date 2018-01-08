@@ -75,6 +75,10 @@ COMMENT ON COLUMN BARS.ERR$_SOCIAL_CONTRACTS.DETAILS IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_SOCIAL_CONTRACTS ***
+grant SELECT                                                                 on ERR$_SOCIAL_CONTRACTS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_SOCIAL_CONTRACTS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

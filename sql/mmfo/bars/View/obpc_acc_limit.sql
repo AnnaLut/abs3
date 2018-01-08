@@ -23,8 +23,10 @@ PROMPT *** Create  view OBPC_ACC_LIMIT ***
    and a.rnk = c.rnk;
 
 PROMPT *** Create  grants  OBPC_ACC_LIMIT ***
+grant SELECT                                                                 on OBPC_ACC_LIMIT  to BARSREADER_ROLE;
 grant SELECT                                                                 on OBPC_ACC_LIMIT  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_ACC_LIMIT  to OBPC;
+grant SELECT                                                                 on OBPC_ACC_LIMIT  to UPLD;
 
 
 

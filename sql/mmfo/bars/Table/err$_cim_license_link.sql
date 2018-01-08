@@ -69,6 +69,10 @@ COMMENT ON COLUMN BARS.ERR$_CIM_LICENSE_LINK.DELETE_UID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIM_LICENSE_LINK ***
+grant SELECT                                                                 on ERR$_CIM_LICENSE_LINK to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIM_LICENSE_LINK to UPLD;
+
 
 
 PROMPT ===================================================================================== 

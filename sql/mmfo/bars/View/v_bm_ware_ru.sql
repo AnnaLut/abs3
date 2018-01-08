@@ -14,8 +14,10 @@ from BANK_METALS  b, dk d
 where d.dk =0;
 
 PROMPT *** Create  grants  V_BM_WARE_RU ***
+grant SELECT                                                                 on V_BM_WARE_RU    to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_BM_WARE_RU    to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_BM_WARE_RU    to START1;
+grant SELECT                                                                 on V_BM_WARE_RU    to UPLD;
 
 
 

@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_CCK_PROBL_ON_DATE ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_PROBL_ON_DATE ("BRANCH", "VIDD", "PROD", "RNK", "NMK", "ND", "CC_ID", "KV", "SDOG", "SDATE", "WDATE", "UADR", "ND_SUM", "BODY_NORM", "PERSENT_NORM", "BODY_DATE", "DATE_EXPIRED_BODY", "DAY_EXPIRED_BODY", "EXPIRED_BODY", "DOUBTFUL_BODY", "DAY_EXPIRED_PERSENT", "EXPIRED_PERSENTM31", "EXPIRED_PERSENTB31", "DOUBTFUL_PERSENT", "DUE_DATE", "SUM_PROPERTY") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_PROBL_ON_DATE ("BRANCH", "VIDD", "PROD", "RNK", "NMK", "ND", "CC_ID", "KV", "SDOG", "SDATE", "WDATE", "UADR", "ND_SUM", "BODY_NORM", "PERSENT_NORM", "BODY_DATE", "DATE_EXPIRED_BODY", "DAY_EXPIRED_BODY", "EXPIRED_BODY", "DOUBTFUL_BODY", "DAY_EXPIRED_PERSENT", "EXPIRED_PERSENTM31", "EXPIRED_PERSENTB31", "DOUBTFUL_PERSENT", "DUE_DATE", "SUM_PROPERTY", "NOHOP") AS 
   (SELECT d.branch,
            d.vidd,
            d.prod,
@@ -100,7 +100,8 @@ PROMPT *** Create  view V_CCK_PROBL_ON_DATE ***
                                    30,
                                    31)
                    AND cp.accs = cd.accs)
-              sum_property
+              sum_property,
+             cck_app.Get_ND_TXT_ex(d.nd,'NOHOP') as NOHOP
       FROM cc_deal d,
            customer c,
            cc_add cd,
@@ -174,7 +175,9 @@ PROMPT *** Create  view V_CCK_PROBL_ON_DATE ***
                 OR p.sln <> 0));
 
 PROMPT *** Create  grants  V_CCK_PROBL_ON_DATE ***
+grant SELECT                                                                 on V_CCK_PROBL_ON_DATE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CCK_PROBL_ON_DATE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CCK_PROBL_ON_DATE to UPLD;
 
 
 

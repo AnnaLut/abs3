@@ -90,7 +90,9 @@ COMMENT ON COLUMN BARS.TMP_DYNAMIC_LAYOUT_DETAIL.USERID IS '';
 
 
 PROMPT *** Create  grants  TMP_DYNAMIC_LAYOUT_DETAIL ***
+grant SELECT                                                                 on TMP_DYNAMIC_LAYOUT_DETAIL to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DYNAMIC_LAYOUT_DETAIL to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on TMP_DYNAMIC_LAYOUT_DETAIL to UPLD;
 
 
 

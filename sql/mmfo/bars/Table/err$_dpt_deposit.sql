@@ -119,6 +119,10 @@ COMMENT ON COLUMN BARS.ERR$_DPT_DEPOSIT.FORBID_EXTENSION IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DPT_DEPOSIT ***
+grant SELECT                                                                 on ERR$_DPT_DEPOSIT to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DPT_DEPOSIT to UPLD;
+
 
 
 PROMPT ===================================================================================== 

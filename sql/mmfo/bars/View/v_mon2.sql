@@ -24,6 +24,8 @@ from v_mon1
  ;
 
 PROMPT *** Create  grants  V_MON2 ***
+grant SELECT                                                                 on V_MON2          to BARSREADER_ROLE;
+grant SELECT                                                                 on V_MON2          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_MON2          to WR_ALL_RIGHTS;
 
 

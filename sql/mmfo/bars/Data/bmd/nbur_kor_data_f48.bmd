@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Довідник "Дані про двадцять найбільших учасників банку" (для файлу #48)';
   l_tablinesdef := '20';
+  l_tabselect_statement := '';
   l_tabname     := 'NBUR_KOR_DATA_F48';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,17 +124,17 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'Ідентифікатор~учасника', 1.3, 22, 1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'VAR_10', 'C', 'Повне найменування~ЮО або ПІБ ФО', 8, 135, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'VAR_15', 'C', 'Ідентифікаційний~код', 1.5, 10, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'VAR_16', 'C', 'Код~країни', 1, 3, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'VAR_17', 'C', 'Код виду~економічної~діяльності', 1.5, 5, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'VAR_20', 'C', 'Адреса учасника', 8, 135, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'VAR_30', 'C', 'Платіжні реквізити ЮО~паспортні дані ФО', 8, 135, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'VAR_40', 'N', 'Кількість акцій ~у статутному капіталі', 2, 22, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'VAR_51', 'N', 'Заявлена~вартість акцій', 3, 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'VAR_60', 'N', 'Відсоток у статутному~капіталі (пряма участь)', 3, 22, 10, 0, 0, 0, 0, '', '99999.0000', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'VAR_70', 'N', 'Відсоток у статутному~капіталі (опосеред. участь)', 3, 22, 11, 0, 0, 0, 0, '', '99999.0000', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'Ідентифікатор~учасника', '1.3', 22, 1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'VAR_10', 'C', 'Повне найменування~ЮО або ПІБ ФО', '8', 135, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'VAR_15', 'C', 'Ідентифікаційний~код', '1.5', 10, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'VAR_16', 'C', 'Код~країни', '1', 3, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'VAR_17', 'C', 'Код виду~економічної~діяльності', '1.5', 5, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'VAR_20', 'C', 'Адреса учасника', '8', 135, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'VAR_30', 'C', 'Платіжні реквізити ЮО~паспортні дані ФО', '8', 135, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'VAR_40', 'N', 'Кількість акцій ~у статутному капіталі', '2', 22, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'VAR_51', 'N', 'Заявлена~вартість акцій', '3', 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'VAR_60', 'N', 'Відсоток у статутному~капіталі (пряма участь)', '3', 22, 10, 0, 0, 0, 0, '', '99999.0000', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'VAR_70', 'N', 'Відсоток у статутному~капіталі (опосеред. участь)', '3', 22, 11, 0, 0, 0, 0, '', '99999.0000', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

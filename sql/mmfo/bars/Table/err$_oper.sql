@@ -154,7 +154,9 @@ COMMENT ON COLUMN BARS.ERR$_OPER.BIS IS '';
 
 
 PROMPT *** Create  grants  ERR$_OPER ***
+grant SELECT                                                                 on ERR$_OPER       to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_OPER       to BARS_DM;
+grant SELECT                                                                 on ERR$_OPER       to UPLD;
 
 
 

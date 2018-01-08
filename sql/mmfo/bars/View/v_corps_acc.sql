@@ -30,7 +30,9 @@ WHERE cca.rnk = q.rnk
     AND q.req_type IN (0, 2);
 
 PROMPT *** Create  grants  V_CORPS_ACC ***
+grant SELECT                                                                 on V_CORPS_ACC     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CORPS_ACC     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CORPS_ACC     to UPLD;
 
 
 

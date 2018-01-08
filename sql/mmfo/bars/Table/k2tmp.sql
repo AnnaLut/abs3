@@ -65,8 +65,10 @@ COMMENT ON COLUMN BARS.K2TMP.S IS '';
 
 
 PROMPT *** Create  grants  K2TMP ***
+grant SELECT                                                                 on K2TMP           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on K2TMP           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on K2TMP           to START1;
+grant SELECT                                                                 on K2TMP           to UPLD;
 
 
 

@@ -67,45 +67,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_STO_DAT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_DAT ADD CONSTRAINT FK_STO_DAT FOREIGN KEY (IDD)
-	  REFERENCES BARS.STO_DET (IDD) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_STODAT_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_DAT ADD CONSTRAINT FK_STODAT_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_STODAT_STODET2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_DAT ADD CONSTRAINT FK_STODAT_STODET2 FOREIGN KEY (KF, IDD)
-	  REFERENCES BARS.STO_DET (KF, IDD) ON DELETE CASCADE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_STODAT_IDD_NN ***
 begin   
  execute immediate '
@@ -170,9 +131,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  STO_DAT ***
+grant SELECT                                                                 on STO_DAT         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_DAT         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STO_DAT         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_DAT         to STO;
+grant SELECT                                                                 on STO_DAT         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STO_DAT         to WR_ALL_RIGHTS;
 grant SELECT                                                                 on STO_DAT         to WR_CHCKINNR_ALL;
 grant SELECT                                                                 on STO_DAT         to WR_CHCKINNR_SELF;

@@ -16,6 +16,10 @@ PROMPT *** Create  view V_CUSTOMER_BYDATE ***
                             and chgaction in (1,2)
                           group by rnk );
 
+PROMPT *** Create  grants  V_CUSTOMER_BYDATE ***
+grant SELECT                                                                 on V_CUSTOMER_BYDATE to BARSREADER_ROLE;
+grant SELECT                                                                 on V_CUSTOMER_BYDATE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

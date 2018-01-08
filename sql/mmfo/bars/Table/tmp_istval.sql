@@ -56,8 +56,10 @@ COMMENT ON COLUMN BARS.TMP_ISTVAL.S6 IS '';
 
 
 PROMPT *** Create  grants  TMP_ISTVAL ***
+grant SELECT                                                                 on TMP_ISTVAL      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_ISTVAL      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_ISTVAL      to START1;
+grant SELECT                                                                 on TMP_ISTVAL      to UPLD;
 
 
 

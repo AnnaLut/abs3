@@ -161,9 +161,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_BORG_MESSAGE ***
+grant SELECT                                                                 on CIM_BORG_MESSAGE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_BORG_MESSAGE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_BORG_MESSAGE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_BORG_MESSAGE to CIM_ROLE;
+grant SELECT                                                                 on CIM_BORG_MESSAGE to UPLD;
 
 
 

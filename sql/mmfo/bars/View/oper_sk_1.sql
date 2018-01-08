@@ -14,9 +14,11 @@ PROMPT *** Create  view OPER_SK_1 ***
  ;
 
 PROMPT *** Create  grants  OPER_SK_1 ***
+grant SELECT                                                                 on OPER_SK_1       to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on OPER_SK_1       to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on OPER_SK_1       to PYOD001;
 grant UPDATE                                                                 on OPER_SK_1       to START1;
+grant SELECT                                                                 on OPER_SK_1       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OPER_SK_1       to WR_ALL_RIGHTS;
 
 

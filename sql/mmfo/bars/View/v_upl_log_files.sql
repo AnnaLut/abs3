@@ -27,7 +27,9 @@ PROMPT *** Create  view V_UPL_LOG_FILES ***
    ORDER BY id DESC;
 
 PROMPT *** Create  grants  V_UPL_LOG_FILES ***
+grant SELECT                                                                 on V_UPL_LOG_FILES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_UPL_LOG_FILES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_UPL_LOG_FILES to UPLD;
 
 
 

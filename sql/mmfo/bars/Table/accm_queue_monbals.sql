@@ -87,6 +87,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACCM_QUEUE_MONBALS ***
+grant SELECT                                                                 on ACCM_QUEUE_MONBALS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_QUEUE_MONBALS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCM_QUEUE_MONBALS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_QUEUE_MONBALS to START1;

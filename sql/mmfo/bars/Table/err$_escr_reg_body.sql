@@ -65,6 +65,10 @@ COMMENT ON COLUMN BARS.ERR$_ESCR_REG_BODY.DEAL_EVENT_ID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ESCR_REG_BODY ***
+grant SELECT                                                                 on ERR$_ESCR_REG_BODY to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ESCR_REG_BODY to UPLD;
+
 
 
 PROMPT ===================================================================================== 

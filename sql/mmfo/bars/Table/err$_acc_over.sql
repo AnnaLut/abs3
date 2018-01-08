@@ -127,6 +127,10 @@ COMMENT ON COLUMN BARS.ERR$_ACC_OVER.FLAG_3600 IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ACC_OVER ***
+grant SELECT                                                                 on ERR$_ACC_OVER   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ACC_OVER   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

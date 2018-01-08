@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции GOP
-prompt Наименование операции: --- Перерахування 1.3% від купівлі ВАЛ до Пенс.Фонду
+prompt Наименование операции: GOP --- Перерахування 1.3% від купівлі ВАЛ до Пенс.Фонду
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('GOP', '--- Перерахування 1.3% від купівлі ВАЛ до Пенс.Фонду', 1, null, null, '2902501062', null, null, null, '2902501062', null, 0, 0, 0, 0, null, null, null, null, null, null, '0100100000000000000000000000000000010100000000000000000000000000', null);
+    values ('GOP', 'GOP --- Перерахування 1.3% від купівлі ВАЛ до Пенс.Фонду', 1, null, null, '#(get_nls_tt(''GOP'',''NLSK''))', null, null, null, '2902501062', null, 0, 0, 0, 0, null, null, null, null, null, null, '0100100000000000000000000000000000010100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='GOP', name='--- Перерахування 1.3% від купівлі ВАЛ до Пенс.Фонду', dk=1, nlsm=null, kv=null, nlsk='2902501062', kvk=null, nlss=null, nlsa=null, nlsb='2902501062', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000010100000000000000000000000000', nazn=null
+         set tt='GOP', name='GOP --- Перерахування 1.3% від купівлі ВАЛ до Пенс.Фонду', dk=1, nlsm=null, kv=null, nlsk='#(get_nls_tt(''GOP'',''NLSK''))', kvk=null, nlss=null, nlsa=null, nlsb='2902501062', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000010100000000000000000000000000', nazn=null
        where tt='GOP';
   end;
   --------------------------------

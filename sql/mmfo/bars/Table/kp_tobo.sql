@@ -91,9 +91,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  KP_TOBO ***
+grant SELECT                                                                 on KP_TOBO         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KP_TOBO         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KP_TOBO         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KP_TOBO         to R_KP;
+grant SELECT                                                                 on KP_TOBO         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KP_TOBO         to WR_ALL_RIGHTS;
 
 

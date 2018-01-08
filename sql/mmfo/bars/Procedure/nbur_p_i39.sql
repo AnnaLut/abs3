@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_I39 ***
 
-CREATE OR REPLACE PROCEDURE BARS.NBUR_P_I39 (p_kod_filii        varchar2,
+  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_I39 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -185,7 +185,7 @@ BEGIN
                           join nbur_dm_accounts s
                           on (s.report_date = a.report_date and
                               s.kf = a.kf and
-                              s.acc_id = a.acc_id) 
+                              s.acc_id = a.acc_id)
                           left outer join operw b
                           on (a.ref = b.ref and
                               b.tag='BM__C')

@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции KDP
-prompt Наименование операции: Дочірня до DPP
+prompt Наименование операции: KDP Дочірня до DPP
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KDP', 'Дочірня до DPP', 1, null, 980, '#(nbs_ob22 (''6110'',''10''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(136, 980, #(NLSA), #(S))', null, 5, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', 'Kомісія за переказ вкладу');
+    values ('KDP', 'KDP Дочірня до DPP', 1, null, 980, '#(nbs_ob22 (''6510'',''10''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(136, 980, #(NLSA), #(S))', null, 5, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', 'Kомісія за переказ вкладу');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KDP', name='Дочірня до DPP', dk=1, nlsm=null, kv=980, nlsk='#(nbs_ob22 (''6110'',''10''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(136, 980, #(NLSA), #(S))', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn='Kомісія за переказ вкладу'
+         set tt='KDP', name='KDP Дочірня до DPP', dk=1, nlsm=null, kv=980, nlsk='#(nbs_ob22 (''6510'',''10''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(136, 980, #(NLSA), #(S))', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn='Kомісія за переказ вкладу'
        where tt='KDP';
   end;
   --------------------------------
@@ -177,7 +177,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции DPP
-prompt Наименование операции: Переказ коштів в НВ для зар. кор.рах. банків
+prompt Наименование операции: DPP Переказ коштів в НВ для зар. кор.рах. банків
 declare
   cnt_  number;
 begin
@@ -186,11 +186,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DPP', 'Переказ коштів в НВ для зар. кор.рах. банків', 1, null, 980, '#(get_proc_nls(''T00'',#(KVA)))', 980, null, null, null, null, 1, 1, 0, 0, null, null, null, null, null, 0, '0300100000000000000000000000000000010000000000000000000000000000', 'Повернення коштів згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DPP', 'DPP Переказ коштів в НВ для зар. кор.рах. банків', 1, null, 980, '#(get_proc_nls(''T00'',#(KVA)))', 980, null, null, null, null, 1, 1, 0, 0, null, null, null, null, null, 0, '0300100000000000000000000000000000010000000000000000000000000000', 'Повернення коштів згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DPP', name='Переказ коштів в НВ для зар. кор.рах. банків', dk=1, nlsm=null, kv=980, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0300100000000000000000000000000000010000000000000000000000000000', nazn='Повернення коштів згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DPP', name='DPP Переказ коштів в НВ для зар. кор.рах. банків', dk=1, nlsm=null, kv=980, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0300100000000000000000000000000000010000000000000000000000000000', nazn='Повернення коштів згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DPP';
   end;
   --------------------------------

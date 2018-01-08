@@ -63,7 +63,9 @@ COMMENT ON COLUMN BARS.CIN_REC.NLSB IS '';
 
 
 PROMPT *** Create  grants  CIN_REC ***
+grant SELECT                                                                 on CIN_REC         to BARSREADER_ROLE;
 grant SELECT                                                                 on CIN_REC         to BARS_DM;
+grant SELECT                                                                 on CIN_REC         to UPLD;
 
 
 

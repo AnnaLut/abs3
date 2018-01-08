@@ -92,9 +92,11 @@ COMMENT ON COLUMN BARS.BRANCH_OPELOT.PRZ IS 'Признак закриття сальдо рах(0- по с
 
 PROMPT *** Create  grants  BRANCH_OPELOT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BRANCH_OPELOT   to ABS_ADMIN;
+grant SELECT                                                                 on BRANCH_OPELOT   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRANCH_OPELOT   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH_OPELOT   to BARS_DM;
 grant SELECT,UPDATE                                                          on BRANCH_OPELOT   to PYOD001;
+grant SELECT                                                                 on BRANCH_OPELOT   to UPLD;
 grant FLASHBACK,SELECT                                                       on BRANCH_OPELOT   to WR_REFREAD;
 
 

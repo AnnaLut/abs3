@@ -113,6 +113,10 @@ COMMENT ON COLUMN BARS.ERR$_CP_DEAL_UPDATE.ACCUNREC IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CP_DEAL_UPDATE ***
+grant SELECT                                                                 on ERR$_CP_DEAL_UPDATE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CP_DEAL_UPDATE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

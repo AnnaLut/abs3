@@ -59,9 +59,11 @@ COMMENT ON COLUMN BARS.KOD_DZR.KOD IS '';
 
 
 PROMPT *** Create  grants  KOD_DZR ***
+grant SELECT                                                                 on KOD_DZR         to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on KOD_DZR         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_DZR         to BARS_DM;
 grant SELECT,UPDATE                                                          on KOD_DZR         to START1;
+grant SELECT                                                                 on KOD_DZR         to UPLD;
 
 
 

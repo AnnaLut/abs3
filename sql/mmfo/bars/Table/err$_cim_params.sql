@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_CIM_PARAMS.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIM_PARAMS ***
+grant SELECT                                                                 on ERR$_CIM_PARAMS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIM_PARAMS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

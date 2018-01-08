@@ -173,9 +173,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_MVPS_INFDOCS ***
+grant SELECT                                                                 on SW_MVPS_INFDOCS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_MVPS_INFDOCS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_MVPS_INFDOCS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_MVPS_INFDOCS to START1;
+grant SELECT                                                                 on SW_MVPS_INFDOCS to UPLD;
 
 
 

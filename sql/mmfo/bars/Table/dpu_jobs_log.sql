@@ -105,46 +105,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUJOBSLOG_KF_NN ***
+PROMPT *** Create  constraint CC_DPUJOBSLOG_RUNID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_LOG MODIFY (KF CONSTRAINT CC_DPUJOBSLOG_KF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUJOBSLOG_DEALNUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_LOG MODIFY (DEAL_NUM CONSTRAINT CC_DPUJOBSLOG_DEALNUM_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUJOBSLOG_STATUS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_LOG MODIFY (STATUS CONSTRAINT CC_DPUJOBSLOG_STATUS_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUJOBSLOG_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_LOG MODIFY (BRANCH CONSTRAINT CC_DPUJOBSLOG_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.DPU_JOBS_LOG MODIFY (RUN_ID CONSTRAINT CC_DPUJOBSLOG_RUNID_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -165,10 +129,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUJOBSLOG_RUNID_NN ***
+PROMPT *** Create  constraint CC_DPUJOBSLOG_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_LOG MODIFY (RUN_ID CONSTRAINT CC_DPUJOBSLOG_RUNID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.DPU_JOBS_LOG MODIFY (BRANCH CONSTRAINT CC_DPUJOBSLOG_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -177,11 +141,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPUJOBSLOG_TABVAL ***
+PROMPT *** Create  constraint CC_DPUJOBSLOG_STATUS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_LOG ADD CONSTRAINT FK_DPUJOBSLOG_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPU_JOBS_LOG MODIFY (STATUS CONSTRAINT CC_DPUJOBSLOG_STATUS_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -190,11 +153,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPUJOBSLOG_BANKS_KF ***
+PROMPT *** Create  constraint CC_DPUJOBSLOG_DEALNUM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_LOG ADD CONSTRAINT FK_DPUJOBSLOG_BANKS_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPU_JOBS_LOG MODIFY (DEAL_NUM CONSTRAINT CC_DPUJOBSLOG_DEALNUM_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -203,37 +165,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPUJOBSLOG_DPTJOBSLIST ***
+PROMPT *** Create  constraint CC_DPUJOBSLOG_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_LOG ADD CONSTRAINT FK_DPUJOBSLOG_DPTJOBSLIST FOREIGN KEY (JOB_ID)
-	  REFERENCES BARS.DPT_JOBS_LIST (JOB_ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPUJOBSLOG_CUSTOMER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_LOG ADD CONSTRAINT FK_DPUJOBSLOG_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPUJOBSLOG_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_LOG ADD CONSTRAINT FK_DPUJOBSLOG_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPU_JOBS_LOG MODIFY (KF CONSTRAINT CC_DPUJOBSLOG_KF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -284,10 +219,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPU_JOBS_LOG ***
+grant SELECT                                                                 on DPU_JOBS_LOG    to BARSREADER_ROLE;
 grant SELECT                                                                 on DPU_JOBS_LOG    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_JOBS_LOG    to BARS_DM;
 grant SELECT                                                                 on DPU_JOBS_LOG    to DPT_ADMIN;
 grant SELECT                                                                 on DPU_JOBS_LOG    to RPBN001;
+grant SELECT                                                                 on DPU_JOBS_LOG    to UPLD;
 
 
 

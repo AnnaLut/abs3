@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Вклади до нарахування та сплати відсотків';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_DPT_INTPAYPRETENDERS';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,24 +124,24 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 2, 'BRANCHNAME', 'C', 'Назва~підрозділу', null, 70, 18, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DATBEG', 'D', 'Дата~початку', null, 10, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DATEND', 'D', 'Дата~закінчення', null, 10, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DPT_DAT', 'D', 'Дата~договору', null, 10, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'DPT_ID', 'N', 'Ідентифікатор~вкладу', null, 22, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'DPT_NUM', 'C', 'Номер~договору', null, 35, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'FREQID', 'N', 'Код~період-ті', null, 22, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'FREQNAME', 'C', 'Період-ть~виплати %%', null, 35, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'RCVACC', 'C', 'Рахунок~отримувача %%', null, 15, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'RCVMFO', 'C', 'МФО банку~отримувача', null, 12, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'TYPE_ID', 'N', 'Код~виду', null, 22, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'TYPE_NAME', 'C', 'Назва~виду вкладу', null, 50, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'ACCNUM', 'C', 'Рахунок~нарах.відсотків', null, 15, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'ACRDAT', 'D', 'Дата~"нараховано по"', null, 10, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'CURID', 'N', 'Код~валюти', null, 22, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'SALDO_FACT', 'N', 'Залишок~факт. (коп.)', null, 22, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'SALDO_PLAN', 'N', 'Залишок~план. (коп.)', null, 22, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'INTPAYDATE', 'D', 'План.дата~виплати %%', null, 10, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BRANCHNAME', 'C', 'Назва~підрозділу', '', 70, 18, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DATBEG', 'D', 'Дата~початку', '', 10, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DATEND', 'D', 'Дата~закінчення', '', 10, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DPT_DAT', 'D', 'Дата~договору', '', 10, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'DPT_ID', 'N', 'Ідентифікатор~вкладу', '', 22, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'DPT_NUM', 'C', 'Номер~договору', '', 35, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'FREQID', 'N', 'Код~період-ті', '', 22, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'FREQNAME', 'C', 'Період-ть~виплати %%', '', 35, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'RCVACC', 'C', 'Рахунок~отримувача %%', '', 15, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'RCVMFO', 'C', 'МФО банку~отримувача', '', 12, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'TYPE_ID', 'N', 'Код~виду', '', 22, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'TYPE_NAME', 'C', 'Назва~виду вкладу', '', 50, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'ACCNUM', 'C', 'Рахунок~нарах.відсотків', '', 15, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'ACRDAT', 'D', 'Дата~"нараховано по"', '', 10, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'CURID', 'N', 'Код~валюти', '', 22, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'SALDO_FACT', 'N', 'Залишок~факт. (коп.)', '', 22, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'SALDO_PLAN', 'N', 'Залишок~план. (коп.)', '', 22, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'INTPAYDATE', 'D', 'План.дата~виплати %%', '', 10, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 3, 2, 'ASC ');

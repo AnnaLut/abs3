@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_FIN_RNK_OKPO.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_FIN_RNK_OKPO ***
+grant SELECT                                                                 on ERR$_FIN_RNK_OKPO to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_FIN_RNK_OKPO to UPLD;
+
 
 
 PROMPT ===================================================================================== 

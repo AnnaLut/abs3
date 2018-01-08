@@ -1,3 +1,13 @@
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/CP_ON_DATE.sql =========*** Run *** ==
+PROMPT ===================================================================================== 
+
+
+PROMPT *** ALTER_POLICY_INFO to CP_ON_DATE ***
+
+
 BEGIN 
         execute immediate  
           'begin  
@@ -14,40 +24,45 @@ PROMPT *** Create  table CP_ON_DATE ***
 begin 
   execute immediate '
   CREATE TABLE BARS.CP_ON_DATE 
-   (	USER_ID  NUMBER DEFAULT sys_context(''bars_global'', ''user_id''),
-        ID 	 NUMBER,        --5 № ЦП в системi
-        CP_ID    VARCHAR2(20),  --6 Код ЦП
-	RYN      NUMBER, 
-        RYN_NAME VARCHAR2(35),  --10 Суб.портфель
-	REF      NUMBER,        --4 Реф угоди купiвлi 
-	ERAT     NUMBER,        --22 Ефект. ставка %
-        DOX      NUMBER,
-        EMI      NUMBER,
-        KV       NUMBER,         --7 Вал 
-        MDATE    DATE,           --11 Дата погашення 
-        OSTA     NUMBER,         --14 Сума Номiналу
-        PF       NUMBER,
-        PF_NAME  VARCHAR2(70),   --9 Портфель
-        DATD     DATE,           --1 Дата угоди купiвлі
-        ND       VARCHAR2(32),   --2 № угоди купiвлi
-        RNK      NUMBER,
-        SUMB     NUMBER,         --3 Сума угоди купiвлi 
-        VIDD     NUMBER,         --8 Вид угод (Бал.Рах.)
-        IR       NUMBER,         --12 Номінальна %ст. річна 
-        MO_PR    NUMBER,         --13 Ном.% ст.місячна
-        OSTD     NUMBER,         --15 Сума дисконту
-        OSTP     NUMBER,         --16 Сума премії
-        OSTR     NUMBER,         --17 Сума нарах %
-        OSTR2    NUMBER,         --18 Сума куплених %
-        OSTS     NUMBER,         --19 Сума переоц.
-        OSTAB    NUMBER,         --20 Сума ном N-план
-        OSTAF    NUMBER,         --21 Сума ном N-буд
-        P_DATE   DATE            --23 На дату
-   ) TABLESPACE BRSDYND ';
+   (	USER_ID NUMBER DEFAULT sys_context(''bars_global'', ''user_id''), 
+	ID NUMBER, 
+	CP_ID VARCHAR2(20), 
+	RYN NUMBER, 
+	RYN_NAME VARCHAR2(35), 
+	REF NUMBER, 
+	ERAT NUMBER, 
+	DOX NUMBER, 
+	EMI NUMBER, 
+	KV NUMBER, 
+	MDATE DATE, 
+	OSTA NUMBER, 
+	PF NUMBER, 
+	PF_NAME VARCHAR2(70), 
+	DATD DATE, 
+	ND VARCHAR2(32), 
+	RNK NUMBER, 
+	SUMB NUMBER, 
+	VIDD NUMBER, 
+	IR NUMBER, 
+	MO_PR NUMBER, 
+	OSTD NUMBER, 
+	OSTP NUMBER, 
+	OSTR NUMBER, 
+	OSTR2 NUMBER, 
+	OSTS NUMBER, 
+	OSTAB NUMBER, 
+	OSTAF NUMBER, 
+	P_DATE DATE
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  TABLESPACE BRSDYND ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
+
+
 
 
 PROMPT *** ALTER_POLICIES to CP_ON_DATE ***
@@ -55,25 +70,58 @@ PROMPT *** ALTER_POLICIES to CP_ON_DATE ***
 
 
 COMMENT ON TABLE BARS.CP_ON_DATE IS 'Таблиця для звіту ЦП Портфель на дату';
+COMMENT ON COLUMN BARS.CP_ON_DATE.USER_ID IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.ID IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.CP_ID IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.RYN IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.RYN_NAME IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.REF IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.ERAT IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.DOX IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.EMI IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.KV IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.MDATE IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.OSTA IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.PF IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.PF_NAME IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.DATD IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.ND IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.RNK IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.SUMB IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.VIDD IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.IR IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.MO_PR IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.OSTD IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.OSTP IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.OSTR IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.OSTR2 IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.OSTS IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.OSTAB IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.OSTAF IS '';
+COMMENT ON COLUMN BARS.CP_ON_DATE.P_DATE IS '';
+
+
 
 
 PROMPT *** Create  index IDX1_CPONDATE ***
 begin   
  execute immediate '
   CREATE INDEX BARS.IDX1_CPONDATE ON BARS.CP_ON_DATE (USER_ID, ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYNI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
 
+
+
 PROMPT *** Create  grants  CP_ON_DATE ***
-grant SELECT                                            on CP_ON_DATE         to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CP_ON_DATE      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CP_ON_DATE      to UPLD;
 
 
 
-
-
-
-
-
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Table/CP_ON_DATE.sql =========*** End *** ==
+PROMPT ===================================================================================== 

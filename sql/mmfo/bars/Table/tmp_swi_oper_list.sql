@@ -66,10 +66,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119151 ***
+PROMPT *** Create  constraint SYS_C00119149 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_SWI_OPER_LIST MODIFY (NAZN_TEMPLATE NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_SWI_OPER_LIST MODIFY (TT NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -90,16 +90,20 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119149 ***
+PROMPT *** Create  constraint SYS_C00119151 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_SWI_OPER_LIST MODIFY (TT NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_SWI_OPER_LIST MODIFY (NAZN_TEMPLATE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
+
+PROMPT *** Create  grants  TMP_SWI_OPER_LIST ***
+grant SELECT                                                                 on TMP_SWI_OPER_LIST to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_SWI_OPER_LIST to UPLD;
 
 
 

@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_PFU_EPP_KILLED.STATE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_PFU_EPP_KILLED ***
+grant SELECT                                                                 on ERR$_PFU_EPP_KILLED to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_PFU_EPP_KILLED to UPLD;
+
 
 
 PROMPT ===================================================================================== 

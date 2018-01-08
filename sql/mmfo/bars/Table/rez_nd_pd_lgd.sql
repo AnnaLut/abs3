@@ -84,9 +84,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_ND_PD_LGD ***
+grant SELECT                                                                 on REZ_ND_PD_LGD   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZ_ND_PD_LGD   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZ_ND_PD_LGD   to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZ_ND_PD_LGD   to START1;
+grant SELECT                                                                 on REZ_ND_PD_LGD   to UPLD;
 
 
 

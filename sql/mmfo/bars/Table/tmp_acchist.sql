@@ -83,8 +83,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_ACCHIST ***
+grant SELECT                                                                 on TMP_ACCHIST     to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_ACCHIST     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_ACCHIST     to CUST001;
+grant SELECT                                                                 on TMP_ACCHIST     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_ACCHIST     to WR_ALL_RIGHTS;
 grant SELECT                                                                 on TMP_ACCHIST     to WR_ND_ACCOUNTS;
 

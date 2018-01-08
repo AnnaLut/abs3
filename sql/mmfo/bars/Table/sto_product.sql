@@ -75,45 +75,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_STO_PROD_REFERENCE_STO_TYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_PRODUCT ADD CONSTRAINT FK_STO_PROD_REFERENCE_STO_TYPE FOREIGN KEY (ORDER_TYPE_ID)
-	  REFERENCES BARS.STO_TYPE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_STO_PROD_REF_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_PRODUCT ADD CONSTRAINT FK_STO_PROD_REF_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_STOPRODUCT_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_PRODUCT ADD CONSTRAINT FK_STOPRODUCT_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C005467 ***
 begin   
  execute immediate '
@@ -126,10 +87,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_STOPRODUCT_KF_NN ***
+PROMPT *** Create  constraint SYS_C005466 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STO_PRODUCT MODIFY (KF CONSTRAINT CC_STOPRODUCT_KF_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.STO_PRODUCT MODIFY (ID NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -198,10 +159,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005466 ***
+PROMPT *** Create  constraint CC_STOPRODUCT_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STO_PRODUCT MODIFY (ID NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.STO_PRODUCT MODIFY (KF CONSTRAINT CC_STOPRODUCT_KF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -224,8 +185,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  STO_PRODUCT ***
+grant SELECT                                                                 on STO_PRODUCT     to BARSREADER_ROLE;
 grant SELECT                                                                 on STO_PRODUCT     to BARSUPL;
 grant SELECT                                                                 on STO_PRODUCT     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on STO_PRODUCT     to SBON;
+grant SELECT                                                                 on STO_PRODUCT     to UPLD;
 
 
 

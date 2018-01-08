@@ -30,7 +30,9 @@ PROMPT *** Create  view V_CIM_TRADE_CONTRACTS ***
 		  and c.contr_type in (0,1);
 
 PROMPT *** Create  grants  V_CIM_TRADE_CONTRACTS ***
+grant SELECT                                                                 on V_CIM_TRADE_CONTRACTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_TRADE_CONTRACTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_TRADE_CONTRACTS to UPLD;
 
 
 

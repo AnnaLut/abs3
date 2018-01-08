@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_NBUR_#C5 ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_NBUR_#C5 ("REPORT_DATE", "KF", "VERSION_ID", "NBUC", "FIELD_CODE", "SEG_01", "SEG_02", "SEG_03", "SEG_04", "SEG_05", "SEG_06", "SEG_07", "SEG_08", "FIELD_VALUE", "ERROR_MSG", "ADJ_IND") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_NBUR_#C5 ("REPORT_DATE", "KF", "VERSION_ID", "NBUC", "FIELD_CODE", "SEG_01", "SEG_02", "SEG_03", "SEG_04", "SEG_05", "SEG_06", "SEG_07", "SEG_08", "SEG_09", "SEG_10", "FIELD_VALUE") AS 
   select p.REPORT_DATE
      , p.KF
      , p.VERSION_ID
@@ -16,14 +16,14 @@ PROMPT *** Create  view V_NBUR_#C5 ***
      , SUBSTR(p.FIELD_CODE,1,1) as SEG_01
      , SUBSTR(p.FIELD_CODE,2,4) as SEG_02
      , SUBSTR(p.FIELD_CODE,6,1) as SEG_03
-     , SUBSTR(p.FIELD_CODE,7,3) as SEG_04
-     , SUBSTR(p.FIELD_CODE,10,1) as SEG_05
+     , SUBSTR(p.FIELD_CODE,7,1) as SEG_04
+     , SUBSTR(p.FIELD_CODE,8,3) as SEG_05
      , SUBSTR(p.FIELD_CODE,11,1) as SEG_06
      , SUBSTR(p.FIELD_CODE,12,1) as SEG_07
      , SUBSTR(p.FIELD_CODE,13,3) as SEG_08
+     , SUBSTR(p.FIELD_CODE,16,1) as SEG_09
+     , SUBSTR(p.FIELD_CODE,17,1) as SEG_10
      , p.FIELD_VALUE
-     , p.ERROR_MSG
-     , p.ADJ_IND
   from NBUR_AGG_PROTOCOLS_ARCH p
   join NBUR_REF_FILES f
     on ( f.FILE_CODE = p.REPORT_CODE )
@@ -36,7 +36,9 @@ PROMPT *** Create  view V_NBUR_#C5 ***
    and v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED' );
 
 PROMPT *** Create  grants  V_NBUR_#C5 ***
+grant SELECT                                                                 on V_NBUR_#C5      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_#C5      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_NBUR_#C5      to UPLD;
 
 
 

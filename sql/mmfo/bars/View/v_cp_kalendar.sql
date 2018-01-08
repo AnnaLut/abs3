@@ -12,8 +12,10 @@ PROMPT *** Create  view V_CP_KALENDAR ***
      WHERE frm like 'KL%');
 
 PROMPT *** Create  grants  V_CP_KALENDAR ***
+grant SELECT                                                                 on V_CP_KALENDAR   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_KALENDAR   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_KALENDAR   to START1;
+grant SELECT                                                                 on V_CP_KALENDAR   to UPLD;
 
 
 

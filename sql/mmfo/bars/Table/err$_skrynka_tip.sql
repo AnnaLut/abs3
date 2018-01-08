@@ -65,6 +65,10 @@ COMMENT ON COLUMN BARS.ERR$_SKRYNKA_TIP.CELL_COUNT IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_SKRYNKA_TIP ***
+grant SELECT                                                                 on ERR$_SKRYNKA_TIP to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_SKRYNKA_TIP to UPLD;
+
 
 
 PROMPT ===================================================================================== 

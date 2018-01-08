@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Чеки';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'V_CHECKS_WEB';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,25 +124,25 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BIC_E', 'C', 'Емітент (BIC)', null, 11, 8, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'FDAT', 'D', 'Дата~поступлення', null, 10, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'FIO', 'C', 'ПІБ отримувача/~Банк-агент', null, 70, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'ID', 'N', '№~пп', null, 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KOL', 'N', 'Кіль-~кість', null, 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KV', 'N', 'Вал.~чека', null, 22, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'MFO', 'C', 'МФО для~сплати', null, 12, 10, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'MFOA', 'C', 'МФО банка-агента', null, 12, 12, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NAME', 'C', 'Емітент (назва)', null, 38, 9, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NAMEUKRB', 'C', 'Назва відділення~або банку агента', null, 70, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NB', 'C', 'Надійшов від', null, 38, 17, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'ND', 'C', '№ чека', null, 40, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'NLS', 'C', 'Рахунок~для сплати', null, 15, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'NOM', 'N', 'Номінал', null, 22, 6, 0, 0, 0, 0, '', '0,00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'OKPO', 'C', 'ЗКПО для сплати', null, 10, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'PAP', 'N', '', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'REF1', 'N', 'Реф.1~прийому', null, 22, 16, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'S', 'N', 'Сума~чеків', null, 22, 7, 0, 0, 0, 0, '', '0,00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'TOBO', 'C', 'Номер~відділення', null, 30, 13, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BIC_E', 'C', 'Емітент (BIC)', '', 11, 8, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'FDAT', 'D', 'Дата~поступлення', '', 10, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'FIO', 'C', 'ПІБ отримувача/~Банк-агент', '', 70, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ID', 'N', '№~пп', '', 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KOL', 'N', 'Кіль-~кість', '', 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KV', 'N', 'Вал.~чека', '', 22, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'MFO', 'C', 'МФО для~сплати', '', 12, 10, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'MFOA', 'C', 'МФО банка-агента', '', 12, 12, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NAME', 'C', 'Емітент (назва)', '', 38, 9, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NAMEUKRB', 'C', 'Назва відділення~або банку агента', '', 70, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NB', 'C', 'Надійшов від', '', 38, 17, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'ND', 'C', '№ чека', '', 40, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'NLS', 'C', 'Рахунок~для сплати', '', 15, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'NOM', 'N', 'Номінал', '', 22, 6, 0, 0, 0, 0, '', '0,00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'OKPO', 'C', 'ЗКПО для сплати', '', 10, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'PAP', 'N', '', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'REF1', 'N', 'Реф.1~прийому', '', 22, 16, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'S', 'N', 'Сума~чеків', '', 22, 7, 0, 0, 0, 0, '', '0,00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'TOBO', 'C', 'Номер~відділення', '', 30, 13, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CH_BIC');

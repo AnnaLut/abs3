@@ -55,9 +55,11 @@ COMMENT ON COLUMN BARS.KOD_R032.TXT IS '';
 
 
 PROMPT *** Create  grants  KOD_R032 ***
+grant SELECT                                                                 on KOD_R032        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_R032        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_R032        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_R032        to START1;
+grant SELECT                                                                 on KOD_R032        to UPLD;
 
 
 

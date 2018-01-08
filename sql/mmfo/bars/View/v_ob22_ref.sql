@@ -23,8 +23,10 @@ order by 1
  ;
 
 PROMPT *** Create  grants  V_OB22_REF ***
+grant SELECT                                                                 on V_OB22_REF      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OB22_REF      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OB22_REF      to NALOG;
+grant SELECT                                                                 on V_OB22_REF      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OB22_REF      to WR_ALL_RIGHTS;
 
 

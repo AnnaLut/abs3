@@ -53,32 +53,6 @@ COMMENT ON COLUMN BARS.SW_OPER.SWRNUM IS '';
 
 
 
-PROMPT *** Create  constraint FK_SWOPER_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_OPER ADD CONSTRAINT FK_SWOPER_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SWOPER_SWJOURNAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_OPER ADD CONSTRAINT FK_SWOPER_SWJOURNAL FOREIGN KEY (SWREF)
-	  REFERENCES BARS.SW_JOURNAL (SWREF) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SWOPER_REF_NN ***
 begin   
  execute immediate '
@@ -157,6 +131,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_OPER ***
+grant SELECT                                                                 on SW_OPER         to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on SW_OPER         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_OPER         to START1;
 grant SELECT                                                                 on SW_OPER         to SWTOSS;

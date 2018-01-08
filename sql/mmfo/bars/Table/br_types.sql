@@ -102,12 +102,14 @@ exception when others then
 
 PROMPT *** Create  grants  BR_TYPES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BR_TYPES        to ABS_ADMIN;
+grant SELECT                                                                 on BR_TYPES        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BR_TYPES        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BR_TYPES        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BR_TYPES        to BR_TYPES;
 grant SELECT                                                                 on BR_TYPES        to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BR_TYPES        to DPT_ADMIN;
 grant SELECT                                                                 on BR_TYPES        to START1;
+grant SELECT                                                                 on BR_TYPES        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BR_TYPES        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BR_TYPES        to WR_REFREAD;
 

@@ -113,9 +113,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBS_K014 ***
+grant SELECT                                                                 on NBS_K014        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBS_K014        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBS_K014        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBS_K014        to CUST001;
+grant SELECT                                                                 on NBS_K014        to UPLD;
 grant FLASHBACK,SELECT                                                       on NBS_K014        to WR_REFREAD;
 
 

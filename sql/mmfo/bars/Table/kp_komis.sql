@@ -75,19 +75,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_KP_KOMIS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KP_KOMIS ADD CONSTRAINT FK_KP_KOMIS FOREIGN KEY (ND)
-	  REFERENCES BARS.KP_DEAL (ND) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C005407 ***
 begin   
  execute immediate '
@@ -152,9 +139,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  KP_KOMIS ***
+grant SELECT                                                                 on KP_KOMIS        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KP_KOMIS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KP_KOMIS        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KP_KOMIS        to R_KP;
+grant SELECT                                                                 on KP_KOMIS        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KP_KOMIS        to WR_ALL_RIGHTS;
 
 

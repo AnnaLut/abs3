@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Рахунки по портфелю Кредитних Ресурсів';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'V_CRSOUR_ACCOUNTS';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,17 +124,17 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Відділення', null, null, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DAOS', 'D', 'Дата~відкриття~рахунку', null, null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DAPP', 'D', 'Дата~останнього~руху~рахунку', null, null, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Код~валюти', null, null, 3, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Номер договору', null, null, 1, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NLS', 'C', 'Рахунок', null, null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/viewaccounts/accountform.aspx?type=2'||chr(38)||'acc=:ACC'||chr(38)||'rnk='||chr(38)||'accessmode=1 ', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NMS', 'C', 'Найменування~рахунку', null, null, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'OB22', 'C', 'ОБ22', null, null, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'OSTC', 'N', 'Залишок по рахунку', null, null, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'RNK', 'N', 'РНК рахунку', null, null, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'ACC', 'N', 'ACC', null, null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Відділення', '', null, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DAOS', 'D', 'Дата~відкриття~рахунку', '', null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAPP', 'D', 'Дата~останнього~руху~рахунку', '', null, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Код~валюти', '', null, 3, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Номер договору', '', null, 1, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NLS', 'C', 'Рахунок', '', null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/viewaccounts/accountform.aspx?type=2'||chr(38)||'acc=:ACC'||chr(38)||'rnk='||chr(38)||'accessmode=1 ', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NMS', 'C', 'Найменування~рахунку', '', null, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'OB22', 'C', 'ОБ22', '', null, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'OSTC', 'N', 'Залишок по рахунку', '', null, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'RNK', 'N', 'РНК рахунку', '', null, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'ACC', 'N', 'ACC', '', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

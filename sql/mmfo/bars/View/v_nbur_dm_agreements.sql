@@ -30,7 +30,9 @@ PROMPT *** Create  view V_NBUR_DM_AGREEMENTS ***
 ;
 
 PROMPT *** Create  grants  V_NBUR_DM_AGREEMENTS ***
+grant SELECT                                                                 on V_NBUR_DM_AGREEMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_DM_AGREEMENTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_NBUR_DM_AGREEMENTS to UPLD;
 
 
 

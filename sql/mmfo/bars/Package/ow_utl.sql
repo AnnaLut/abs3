@@ -99,6 +99,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_UTL is
       for i in l_lines.first .. l_lines.last
       loop
         begin
+          savepoint befor_upd;
+
           select nd
             into l_nd
             from w4_acc w
@@ -123,7 +125,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_UTL is
                                                                   acc_pk))
            where nd = l_nd;
 
-          savepoint befor_upd;
           upd_branch(l_acc_list, l_lines(i).branch);
 
           -- формуємо заявку в СМ на зміну бранча
@@ -253,7 +254,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_UTL is
     end if;
     return utl_raw.substr( utl_raw.cast_from_binary_integer( t_big, utl_raw.little_endian ), 1, p_bytes );
   end;
-     
+
   function blob2num(p_blob blob,
                     p_len  integer,
                     p_pos  integer) return number is

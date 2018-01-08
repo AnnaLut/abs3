@@ -20,7 +20,9 @@ PROMPT *** Create  view V_WCS_GARANTEE_TEMPLATES ***
  order by gt.garantee_id, gt.print_state_id, gt.template_id;
 
 PROMPT *** Create  grants  V_WCS_GARANTEE_TEMPLATES ***
+grant SELECT                                                                 on V_WCS_GARANTEE_TEMPLATES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_GARANTEE_TEMPLATES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_GARANTEE_TEMPLATES to UPLD;
 
 
 

@@ -93,62 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SW950_TABVAL ***
+PROMPT *** Create  constraint CC_SW950_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_950 ADD CONSTRAINT FK_SW950_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SW950_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_950 ADD CONSTRAINT FK_SW950_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SW950_ACCOUNTS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_950 ADD CONSTRAINT FK_SW950_ACCOUNTS2 FOREIGN KEY (KF, NOSTRO_ACC)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SW950_SWJOURNAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_950 ADD CONSTRAINT FK_SW950_SWJOURNAL FOREIGN KEY (SWREF)
-	  REFERENCES BARS.SW_JOURNAL (SWREF) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SW950_KV_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_950 MODIFY (KV CONSTRAINT CC_SW950_KV_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_950 MODIFY (KF CONSTRAINT CC_SW950_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -229,10 +177,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SW950_KF_NN ***
+PROMPT *** Create  constraint CC_SW950_KV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_950 MODIFY (KF CONSTRAINT CC_SW950_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_950 MODIFY (KV CONSTRAINT CC_SW950_KV_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -256,8 +204,10 @@ exception when others then
 
 PROMPT *** Create  grants  SW_950 ***
 grant SELECT,UPDATE                                                          on SW_950          to BARS013;
+grant SELECT                                                                 on SW_950          to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on SW_950          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_950          to BARS_DM;
+grant SELECT                                                                 on SW_950          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_950          to WR_ALL_RIGHTS;
 
 

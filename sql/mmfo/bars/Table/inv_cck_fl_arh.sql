@@ -157,8 +157,10 @@ COMMENT ON COLUMN BARS.INV_CCK_FL_ARH.G55 IS '';
 
 
 PROMPT *** Create  grants  INV_CCK_FL_ARH ***
+grant SELECT                                                                 on INV_CCK_FL_ARH  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INV_CCK_FL_ARH  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INV_CCK_FL_ARH  to START1;
+grant SELECT                                                                 on INV_CCK_FL_ARH  to UPLD;
 
 
 

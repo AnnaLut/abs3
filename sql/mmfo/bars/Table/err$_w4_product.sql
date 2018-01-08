@@ -71,6 +71,10 @@ COMMENT ON COLUMN BARS.ERR$_W4_PRODUCT.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_W4_PRODUCT ***
+grant SELECT                                                                 on ERR$_W4_PRODUCT to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_W4_PRODUCT to UPLD;
+
 
 
 PROMPT ===================================================================================== 

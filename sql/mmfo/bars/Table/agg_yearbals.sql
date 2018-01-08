@@ -133,10 +133,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_YEARBALS_WCKOS_NN ***
+PROMPT *** Create  constraint CC_YEARBALS_FDAT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.AGG_YEARBALS MODIFY (WCKOS CONSTRAINT CC_YEARBALS_WCKOS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.AGG_YEARBALS MODIFY (FDAT CONSTRAINT CC_YEARBALS_FDAT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -373,10 +373,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_YEARBALS_FDAT_NN ***
+PROMPT *** Create  constraint CC_YEARBALS_WCKOS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.AGG_YEARBALS MODIFY (FDAT CONSTRAINT CC_YEARBALS_FDAT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.AGG_YEARBALS MODIFY (WCKOS CONSTRAINT CC_YEARBALS_WCKOS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -454,9 +454,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  AGG_YEARBALS ***
+grant SELECT                                                                 on AGG_YEARBALS    to BARSREADER_ROLE;
 grant SELECT                                                                 on AGG_YEARBALS    to BARS_ACCESS_DEFROLE;
 grant ALTER,SELECT                                                           on AGG_YEARBALS    to DM;
 grant SELECT                                                                 on AGG_YEARBALS    to START1;
+grant SELECT                                                                 on AGG_YEARBALS    to UPLD;
 
 
 

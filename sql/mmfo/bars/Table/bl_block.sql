@@ -91,71 +91,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BL_BLOCK_BLK ***
+PROMPT *** Create  constraint NN_BL_BLOCK_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BL_BLOCK ADD CONSTRAINT FK_BL_BLOCK_BLK FOREIGN KEY (BLK)
-	  REFERENCES BARS.BL_BLOCK_DICT (BLK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NN_BL_BLOCK_USER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_BLOCK MODIFY (USER_ID CONSTRAINT NN_BL_BLOCK_USER NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NN_BL_BLOCK_BLK_DATE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_BLOCK MODIFY (BLK_DATE CONSTRAINT NN_BL_BLOCK_BLK_DATE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NN_BL_BLOCK_BLK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_BLOCK MODIFY (BLK CONSTRAINT NN_BL_BLOCK_BLK NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NN_BL_BLOCK_TYPE_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_BLOCK MODIFY (TYPE_ID CONSTRAINT NN_BL_BLOCK_TYPE_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NN_BL_BLOCK_SVZ ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_BLOCK MODIFY (SVZ_ID CONSTRAINT NN_BL_BLOCK_SVZ NOT NULL ENABLE)';
+  ALTER TABLE BARS.BL_BLOCK MODIFY (ID CONSTRAINT NN_BL_BLOCK_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -176,10 +115,58 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NN_BL_BLOCK_ID ***
+PROMPT *** Create  constraint NN_BL_BLOCK_SVZ ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BL_BLOCK MODIFY (ID CONSTRAINT NN_BL_BLOCK_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.BL_BLOCK MODIFY (SVZ_ID CONSTRAINT NN_BL_BLOCK_SVZ NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NN_BL_BLOCK_TYPE_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BL_BLOCK MODIFY (TYPE_ID CONSTRAINT NN_BL_BLOCK_TYPE_ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NN_BL_BLOCK_BLK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BL_BLOCK MODIFY (BLK CONSTRAINT NN_BL_BLOCK_BLK NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NN_BL_BLOCK_BLK_DATE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BL_BLOCK MODIFY (BLK_DATE CONSTRAINT NN_BL_BLOCK_BLK_DATE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NN_BL_BLOCK_USER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BL_BLOCK MODIFY (USER_ID CONSTRAINT NN_BL_BLOCK_USER NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -188,8 +175,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  BL_BLOCK ***
+grant SELECT                                                                 on BL_BLOCK        to BARSREADER_ROLE;
 grant SELECT                                                                 on BL_BLOCK        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BL_BLOCK        to RBLOCK;
+grant SELECT                                                                 on BL_BLOCK        to UPLD;
 
 
 

@@ -55,6 +55,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_POLICY_ERRORS ***
+grant SELECT                                                                 on TMP_POLICY_ERRORS to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_POLICY_ERRORS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_POLICY_ERRORS to WR_ALL_RIGHTS;
 
 

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'CP_ACCC Консолiд. рахунки по ЦП';
   l_tablinesdef := '25';
+  l_tabselect_statement := '';
   l_tabname     := 'CP_ACCC';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,45 +124,46 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'NLSA', 'C', 'Рах-к~номіналу', 1.1, 15, 10, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'NLSD', 'C', 'Рах-к~дисконту', 1.1, 15, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NLSE', 'C', 'Рах-к~', 1.5, 15, 99, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NLSG', 'C', 'Рах-к~торг.результату', 1.8, 15, 23, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NLSN1', 'C', 'Рах. 9350_1~купл.,~не отр.', 1.5, 15, 31, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NLSN2', 'C', 'Рах. 9360_2~активы~до відправки', 1.5, 15, 32, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NLSN3', 'C', 'Рах-к 9350_2~продані,~не відправ.', 1.5, 15, 33, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NLSN4', 'C', 'Рахк 9360_1~активи~до отримання', 1.5, 15, 34, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NLSP', 'C', 'Рах-к премії', 1.5, 15, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NLSR', 'C', 'Рах-к~нарах. %', 1.5, 15, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NLSS', 'C', 'Рах-к~переоцінки', 1.5, 15, 18, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'NLSZ', 'C', 'Рах-к~резервного~фонду', 1.5, 15, 41, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'RYN', 'N', 'Суб~Портфель', 1.3, 22, 4, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'VIDD', 'N', 'Вид~обліку~ (БР)', 1.1, 22, 3, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'NLSR2', 'C', 'Рах-к~накопич. %', 1.5, 15, 17, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'EMI', 'N', 'Вид~емітента', 1, 22, 2, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'PF', 'N', 'Портфель', 1.3, 22, 1, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'IDB', 'N', 'Код~джерела~ціни', 1.2, 22, 22, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'NLSZF', 'C', 'Рах-к ....', 1.5, 15, 42, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'NLS_FXP', 'C', 'Рах.FXP~НЕреалiз.рез~переоцінки', 1.5, 15, 19, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'NLSSN', 'C', 'Рах.3811~для переоцінки~ПОЗАБАЛ', 1.8, 15, 21, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'NLS71', 'C', 'Рах.ком.~видаткiв', 1.5, 15, 55, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'S605', 'C', 'Рах.амортиз~Дисконту', 1.5, 15, 12, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'S605P', 'C', 'Рах.амортиз~Премiї', 1.5, 15, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'NLS_PR', 'C', 'Рах.проц.~доходiв', 1.5, 15, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'NLS_FXR', 'C', 'Рах.FXR~РЕАЛIЗОВ.рез~переоцінки', 1.5, 15, 20, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'S2VD', 'C', 'Сист.рах.~віртуального~Дисконту', 1.5, 15, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'S2VP', 'C', 'Сист.рах.~віртуальної~Премії', null, 15, 41, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'S2VD0', 'C', 'Сист.рах-к~утворення~вірт.Дисконту', null, 15, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'S2VP0', 'C', 'Сист.рах-к~утворення~вірт.Премії', null, 15, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'S2VD1', 'C', 'Сист.рах-к~амортиз.~вірт.Дисконту', null, 15, 43, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'S2VP1', 'C', 'Сист. рах-к~амортиз.~вірт.Премії', null, 15, 43, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'NLSEXPN', 'C', 'Рах-к~прострочки~номіналу', 1.5, 15, 44, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 34, 'NLSEXPR', 'C', 'Рах-к~прострочки~купону', 1.5, 15, 45, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'S6499', 'C', 'Рах.6390~для сальдо Р+В Д/П~(оп.не акц.)', 2, null, 45, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 36, 'S7499', 'C', 'Рах.7390~для сальдо Р+В Д/П~(оп.не акц.)', 2, null, 45, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 37, 'NLSR3', 'C', 'Рах-к~кривого~купона', null, null, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 38, 'UNREC', 'C', 'Рах-к~НЕ визнаних~доходів', null, null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 39, 'NLSFD', 'C', 'Рах-к фін~дебеторки', 1.5, 22, 46, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'NLSA', 'C', 'Рах-к~номіналу', '1.1', 15, 10, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'NLSD', 'C', 'Рах-к~дисконту', '1.1', 15, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NLSE', 'C', 'Рах-к~', '1.5', 15, 99, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NLSG', 'C', 'Рах-к~торг.результату', '1.8', 15, 23, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NLSN1', 'C', 'Рах. 9350_1~купл.,~не отр.', '1.5', 15, 31, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NLSN2', 'C', 'Рах. 9360_2~активы~до відправки', '1.5', 15, 32, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NLSN3', 'C', 'Рах-к 9350_2~продані,~не відправ.', '1.5', 15, 33, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NLSN4', 'C', 'Рахк 9360_1~активи~до отримання', '1.5', 15, 34, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NLSP', 'C', 'Рах-к премії', '1.5', 15, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NLSR', 'C', 'Рах-к~нарах. %', '1.5', 15, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NLSS', 'C', 'Рах-к~переоцінки', '1.5', 15, 18, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'NLSZ', 'C', 'Рах-к~резервного~фонду', '1.5', 15, 41, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'RYN', 'N', 'Суб~Портфель', '1.3', 22, 4, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'VIDD', 'N', 'Вид~обліку~ (БР)', '1.1', 22, 3, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'NLSR2', 'C', 'Рах-к~накопич. %', '1.5', 15, 17, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'EMI', 'N', 'Вид~емітента', '1', 22, 2, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'PF', 'N', 'Портфель', '1.3', 22, 1, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'IDB', 'N', 'Код~джерела~ціни', '1.2', 22, 22, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'NLSZF', 'C', 'Рах-к ....', '1.5', 15, 42, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'NLS_FXP', 'C', 'Рах.FXP~НЕреалiз.рез~переоцінки', '1.5', 15, 19, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'NLSSN', 'C', 'Рах.3811~для переоцінки~ПОЗАБАЛ', '1.8', 15, 21, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'NLS71', 'C', 'Рах.ком.~видаткiв', '1.5', 15, 55, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'S605', 'C', 'Рах.амортиз~Дисконту', '1.5', 15, 12, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'S605P', 'C', 'Рах.амортиз~Премiї', '1.5', 15, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'NLS_PR', 'C', 'Рах.проц.~доходiв', '1.5', 15, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'NLS_FXR', 'C', 'Рах.FXR~РЕАЛIЗОВ.рез~переоцінки', '1.5', 15, 20, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'S2VD', 'C', 'Сист.рах.~віртуального~Дисконту', '1.5', 15, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'S2VP', 'C', 'Сист.рах.~віртуальної~Премії', '', 15, 41, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'S2VD0', 'C', 'Сист.рах-к~утворення~вірт.Дисконту', '', 15, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'S2VP0', 'C', 'Сист.рах-к~утворення~вірт.Премії', '', 15, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'S2VD1', 'C', 'Сист.рах-к~амортиз.~вірт.Дисконту', '', 15, 43, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'S2VP1', 'C', 'Сист. рах-к~амортиз.~вірт.Премії', '', 15, 43, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'NLSEXPN', 'C', 'Рах-к~прострочки~номіналу', '1.5', 15, 44, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'NLSEXPR', 'C', 'Рах-к~прострочки~купону', '1.5', 15, 45, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'S6499', 'C', 'Рах.6390~для сальдо Р+В Д/П~(оп.не акц.)', '2', null, 45, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'S7499', 'C', 'Рах.7390~для сальдо Р+В Д/П~(оп.не акц.)', '2', null, 45, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'NLSR3', 'C', 'Рах-к~кривого~купона', '', null, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'UNREC', 'C', 'Рах-к~НЕ визнаних~доходів', '', null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'NLSFD', 'C', 'Рах-к фін~дебеторки', '1.5', 22, 46, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'D_CLOSE', 'D', 'Дата закр С/П', '1.5', null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CP_RYN');

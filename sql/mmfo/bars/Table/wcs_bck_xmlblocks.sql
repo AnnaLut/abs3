@@ -91,9 +91,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_BCK_XMLBLOCKS ***
+grant SELECT                                                                 on WCS_BCK_XMLBLOCKS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_BCK_XMLBLOCKS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_BCK_XMLBLOCKS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_BCK_XMLBLOCKS to START1;
+grant SELECT                                                                 on WCS_BCK_XMLBLOCKS to UPLD;
 
 
 

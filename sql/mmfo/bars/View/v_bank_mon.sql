@@ -17,8 +17,10 @@ FROM bank_mon b
 WHERE b.razr <> 0;
 
 PROMPT *** Create  grants  V_BANK_MON ***
+grant SELECT                                                                 on V_BANK_MON      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BANK_MON      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BANK_MON      to PYOD001;
+grant SELECT                                                                 on V_BANK_MON      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BANK_MON      to WR_ALL_RIGHTS;
 
 

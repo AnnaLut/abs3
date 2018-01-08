@@ -1,12 +1,13 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TAIU_STAFF_SUBSTITUTE_CORP2.sql ====
 PROMPT ===================================================================================== 
 
+
 PROMPT *** Create  trigger TAIU_STAFF_SUBSTITUTE_CORP2 ***
 
-DROP TRIGGER BARS.TAIU_STAFF_SUBSTITUTE_CORP2;
-
-CREATE OR REPLACE TRIGGER BARS."TAIU_STAFF_SUBSTITUTE_CORP2"
+  CREATE OR REPLACE TRIGGER BARS.TAIU_STAFF_SUBSTITUTE_CORP2 
 after insert or update ON BARS.STAFF_SUBSTITUTE for each row
 begin
 --====================================================================
@@ -16,7 +17,7 @@ begin
 --============ <Comments> ============================================
 /*
    триггер для автоматического перебрасываение документов по copr2 (tt like 'IB%') на нового исполнителя в случае делегирования прав
-   
+
    заявка COBUSUPABS-6383
    10.09.2017 yurii.hrytsenia додано операції 'CL1', 'CL2', 'CL5' - операції CorpLight
  */
@@ -28,8 +29,8 @@ begin
         and date_is_valid(:new.date_start, :new.date_finish, null, null)=1;
 end;
 /
-
 ALTER TRIGGER BARS.TAIU_STAFF_SUBSTITUTE_CORP2 ENABLE;
+
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TAIU_STAFF_SUBSTITUTE_CORP2.sql ====

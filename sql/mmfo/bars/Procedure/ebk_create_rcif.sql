@@ -1,9 +1,18 @@
-CREATE OR REPLACE procedure BARS.EBK_CREATE_RCIF
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/EBK_CREATE_RCIF.sql =========*** R
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure EBK_CREATE_RCIF ***
+
+  CREATE OR REPLACE PROCEDURE BARS.EBK_CREATE_RCIF 
 is
 -- Дописываем те записи по которым ещё нет данных в RCIF и нет дублей
 begin
-  
-  insert 
+
+  insert
     into BARS.EBK_RCIF
        ( KF, RCIF, SEND )
   select KF
@@ -17,10 +26,10 @@ $end
     left
     join ( select RCIF
              from BARS.EBK_RCIF
-            union 
+            union
            select M_RNK
              from BARS.EBK_DUPLICATE_GROUPS
-            union 
+            union
            select D_RNK
              from BARS.EBK_DUPLICATE_GROUPS
          ) r
@@ -29,10 +38,15 @@ $end
      and (c.BC = 0 or c.BC is null)
      and c.DATE_OFF is null
      and r.RCIF Is Null;
-  
+
   commit;
-  
+
 end EBK_CREATE_RCIF;
 /
+show err;
 
-show err
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/EBK_CREATE_RCIF.sql =========*** E
+PROMPT ===================================================================================== 

@@ -20,8 +20,10 @@ PROMPT *** Create  view V_CLV_CUSTOMER_RISK ***
    and r.inuse = 1;
 
 PROMPT *** Create  grants  V_CLV_CUSTOMER_RISK ***
+grant SELECT                                                                 on V_CLV_CUSTOMER_RISK to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CLV_CUSTOMER_RISK to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CLV_CUSTOMER_RISK to CUST001;
+grant SELECT                                                                 on V_CLV_CUSTOMER_RISK to UPLD;
 
 
 

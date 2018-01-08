@@ -91,43 +91,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OPERAPP_CODEOPER_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPERAPP MODIFY (CODEOPER CONSTRAINT CC_OPERAPP_CODEOPER_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPERAPP_CODEAPP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPERAPP MODIFY (CODEAPP CONSTRAINT CC_OPERAPP_CODEAPP_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_OPERAPP_APPLIST ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPERAPP ADD CONSTRAINT FK_OPERAPP_APPLIST FOREIGN KEY (CODEAPP)
-	  REFERENCES BARS.APPLIST (CODEAPP) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_OPERAPP_RDATE1 ***
 begin   
  execute immediate '
@@ -178,11 +141,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OPERAPP_STAFF ***
+PROMPT *** Create  constraint CC_OPERAPP_CODEAPP_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPERAPP ADD CONSTRAINT FK_OPERAPP_STAFF FOREIGN KEY (GRANTOR)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+  ALTER TABLE BARS.OPERAPP MODIFY (CODEAPP CONSTRAINT CC_OPERAPP_CODEAPP_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -191,11 +153,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OPERAPP_OPERLIST ***
+PROMPT *** Create  constraint CC_OPERAPP_CODEOPER_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPERAPP ADD CONSTRAINT FK_OPERAPP_OPERLIST FOREIGN KEY (CODEOPER)
-	  REFERENCES BARS.OPERLIST (CODEOPER) ON DELETE CASCADE ENABLE';
+  ALTER TABLE BARS.OPERAPP MODIFY (CODEOPER CONSTRAINT CC_OPERAPP_CODEOPER_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -219,10 +180,12 @@ exception when others then
 
 PROMPT *** Create  grants  OPERAPP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPERAPP         to ABS_ADMIN;
+grant SELECT                                                                 on OPERAPP         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OPERAPP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OPERAPP         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPERAPP         to OPERAPP;
 grant SELECT                                                                 on OPERAPP         to START1;
+grant SELECT                                                                 on OPERAPP         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OPERAPP         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on OPERAPP         to WR_REFREAD;
 

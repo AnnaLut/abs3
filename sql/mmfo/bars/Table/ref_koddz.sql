@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  REF_KODDZ ***
+grant SELECT                                                                 on REF_KODDZ       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REF_KODDZ       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REF_KODDZ       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REF_KODDZ       to START1;
+grant SELECT                                                                 on REF_KODDZ       to UPLD;
 
 
 

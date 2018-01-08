@@ -74,9 +74,11 @@ COMMENT ON COLUMN BARS.ERR$_REFAPP.GRANTOR IS '';
 
 
 PROMPT *** Create  grants  ERR$_REFAPP ***
+grant SELECT                                                                 on ERR$_REFAPP     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_REFAPP     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ERR$_REFAPP     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_REFAPP     to START1;
+grant SELECT                                                                 on ERR$_REFAPP     to UPLD;
 
 
 

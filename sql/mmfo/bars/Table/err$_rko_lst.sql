@@ -89,6 +89,10 @@ COMMENT ON COLUMN BARS.ERR$_RKO_LST.ACC IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_RKO_LST ***
+grant SELECT                                                                 on ERR$_RKO_LST    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_RKO_LST    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

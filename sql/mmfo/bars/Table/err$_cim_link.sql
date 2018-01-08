@@ -71,6 +71,10 @@ COMMENT ON COLUMN BARS.ERR$_CIM_LINK.CREATE_DATE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIM_LINK ***
+grant SELECT                                                                 on ERR$_CIM_LINK   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIM_LINK   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

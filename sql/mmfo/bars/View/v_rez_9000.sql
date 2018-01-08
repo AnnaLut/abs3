@@ -20,8 +20,10 @@ PROMPT *** Create  view V_REZ_9000 ***
                   AND dazs IS NULL  AND A.ACC = s.acc(+)  AND ost_korr (a.acc,v.z,z23.di,a.nbs) < 0 AND a.acc = f.acc(+)) x;
 
 PROMPT *** Create  grants  V_REZ_9000 ***
+grant SELECT                                                                 on V_REZ_9000      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REZ_9000      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_REZ_9000      to START1;
+grant SELECT                                                                 on V_REZ_9000      to UPLD;
 
 
 

@@ -91,6 +91,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  TMP_NOTARY ***
+grant SELECT                                                                 on TMP_NOTARY      to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_NOTARY      to UPLD;
+
 
 
 PROMPT ===================================================================================== 

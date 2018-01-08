@@ -87,10 +87,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  KLP_WOZW ***
+grant SELECT                                                                 on KLP_WOZW        to BARSREADER_ROLE;
 grant SELECT                                                                 on KLP_WOZW        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KLP_WOZW        to BARS_DM;
 grant INSERT,SELECT                                                          on KLP_WOZW        to OPERKKK;
 grant SELECT                                                                 on KLP_WOZW        to START1;
+grant SELECT                                                                 on KLP_WOZW        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLP_WOZW        to WR_ALL_RIGHTS;
 
 

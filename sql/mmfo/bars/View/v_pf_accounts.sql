@@ -25,8 +25,10 @@ PROMPT *** Create  view V_PF_ACCOUNTS ***
  where a.kod_upf = to_char(o.kod_upf(+));
 
 PROMPT *** Create  grants  V_PF_ACCOUNTS ***
+grant SELECT                                                                 on V_PF_ACCOUNTS   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PF_ACCOUNTS   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PF_ACCOUNTS   to RPBN001;
+grant SELECT                                                                 on V_PF_ACCOUNTS   to UPLD;
 
 
 

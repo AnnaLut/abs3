@@ -28,7 +28,9 @@ PROMPT *** Create  view V_CIM_BOUND_PAYMENTS ***
    WHERE b.delete_date is null;
 
 PROMPT *** Create  grants  V_CIM_BOUND_PAYMENTS ***
+grant SELECT                                                                 on V_CIM_BOUND_PAYMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_BOUND_PAYMENTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_BOUND_PAYMENTS to UPLD;
 
 
 

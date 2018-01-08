@@ -49,8 +49,10 @@ COMMENT ON COLUMN BARS.PS_PS2.NBS2 IS '';
 
 
 PROMPT *** Create  grants  PS_PS2 ***
+grant SELECT                                                                 on PS_PS2          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PS_PS2          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PS_PS2          to START1;
+grant SELECT                                                                 on PS_PS2          to UPLD;
 
 
 

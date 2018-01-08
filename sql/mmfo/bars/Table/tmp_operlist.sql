@@ -133,6 +133,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  TMP_OPERLIST ***
+grant SELECT                                                                 on TMP_OPERLIST    to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_OPERLIST    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

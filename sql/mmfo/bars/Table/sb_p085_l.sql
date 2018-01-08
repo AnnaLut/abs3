@@ -69,8 +69,10 @@ COMMENT ON COLUMN BARS.SB_P085_L.GR_IN IS '';
 
 
 PROMPT *** Create  grants  SB_P085_L ***
+grant SELECT                                                                 on SB_P085_L       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_P085_L       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_P085_L       to START1;
+grant SELECT                                                                 on SB_P085_L       to UPLD;
 
 
 

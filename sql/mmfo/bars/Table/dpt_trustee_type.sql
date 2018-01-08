@@ -115,11 +115,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_TRUSTEE_TYPE ***
+grant SELECT                                                                 on DPT_TRUSTEE_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_TRUSTEE_TYPE to BARSUPL;
 grant SELECT                                                                 on DPT_TRUSTEE_TYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_TRUSTEE_TYPE to BARS_DM;
 grant SELECT                                                                 on DPT_TRUSTEE_TYPE to DPT_ROLE;
 grant SELECT                                                                 on DPT_TRUSTEE_TYPE to KLBX;
+grant SELECT                                                                 on DPT_TRUSTEE_TYPE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_TRUSTEE_TYPE to WR_ALL_RIGHTS;
 
 

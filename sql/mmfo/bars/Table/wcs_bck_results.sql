@@ -85,34 +85,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_WCSBCKRESULTS_SEQID_NN ***
+PROMPT *** Create  constraint CC_WCSBCKRESULTS_REPID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_BCK_RESULTS MODIFY (SEQ_ID CONSTRAINT CC_WCSBCKRESULTS_SEQID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_WCSBCKRESULTS_TAGVALUE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_BCK_RESULTS MODIFY (TAG_VALUE CONSTRAINT CC_WCSBCKRESULTS_TAGVALUE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_WCSBCKRESULTS_TAGBLOCK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_BCK_RESULTS MODIFY (TAG_BLOCK CONSTRAINT CC_WCSBCKRESULTS_TAGBLOCK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_BCK_RESULTS MODIFY (REP_ID CONSTRAINT CC_WCSBCKRESULTS_REPID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -133,10 +109,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_WCSBCKRESULTS_REPID_NN ***
+PROMPT *** Create  constraint CC_WCSBCKRESULTS_TAGBLOCK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_BCK_RESULTS MODIFY (REP_ID CONSTRAINT CC_WCSBCKRESULTS_REPID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_BCK_RESULTS MODIFY (TAG_BLOCK CONSTRAINT CC_WCSBCKRESULTS_TAGBLOCK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -145,11 +121,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_WCSBCKRESULTS_WCSBCKRTAGS ***
+PROMPT *** Create  constraint CC_WCSBCKRESULTS_TAGVALUE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_BCK_RESULTS ADD CONSTRAINT FK_WCSBCKRESULTS_WCSBCKRTAGS FOREIGN KEY (TAG_NAME, TAG_BLOCK)
-	  REFERENCES BARS.WCS_BCK_TAGS (TAG_NAME, TAG_BLOCK) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.WCS_BCK_RESULTS MODIFY (TAG_VALUE CONSTRAINT CC_WCSBCKRESULTS_TAGVALUE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -158,24 +133,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_WCSBCKRESULTS_WCSBCKXMLBLK ***
+PROMPT *** Create  constraint CC_WCSBCKRESULTS_SEQID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_BCK_RESULTS ADD CONSTRAINT FK_WCSBCKRESULTS_WCSBCKXMLBLK FOREIGN KEY (TAG_BLOCK)
-	  REFERENCES BARS.WCS_BCK_XMLBLOCKS (BLOCK_ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_WCSBCKRESULTS_WCSBCKREPORTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_BCK_RESULTS ADD CONSTRAINT FK_WCSBCKRESULTS_WCSBCKREPORTS FOREIGN KEY (REP_ID)
-	  REFERENCES BARS.WCS_BCK_REPORTS (REP_ID) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.WCS_BCK_RESULTS MODIFY (SEQ_ID CONSTRAINT CC_WCSBCKRESULTS_SEQID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -212,9 +173,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_BCK_RESULTS ***
+grant SELECT                                                                 on WCS_BCK_RESULTS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_BCK_RESULTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_BCK_RESULTS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_BCK_RESULTS to START1;
+grant SELECT                                                                 on WCS_BCK_RESULTS to UPLD;
 
 
 

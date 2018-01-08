@@ -1,4 +1,13 @@
-CREATE OR REPLACE procedure BARS.p_clt_sendsms ( p_phone varchar2, p_msg_text varchar2) is
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_CLT_SENDSMS.sql =========*** Run
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_CLT_SENDSMS ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_CLT_SENDSMS ( p_phone varchar2, p_msg_text varchar2) is
 l_msgid number;
 begin
     bars_sms.create_msg(p_msgid           => l_msgid,
@@ -15,5 +24,13 @@ exception
            raise_application_error(-20000, sqlerrm || chr(10) || dbms_utility.format_error_backtrace());
 end p_clt_sendsms;
 /
+show err;
 
-grant execute on BARS.p_clt_sendsms to bars_access_defrole;
+PROMPT *** Create  grants  P_CLT_SENDSMS ***
+grant EXECUTE                                                                on P_CLT_SENDSMS   to BARS_ACCESS_DEFROLE;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_CLT_SENDSMS.sql =========*** End
+PROMPT ===================================================================================== 

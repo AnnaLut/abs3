@@ -73,19 +73,6 @@ COMMENT ON COLUMN BARS.ZAG_K.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_ZAGK_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAG_K ADD CONSTRAINT FK_ZAGK_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_ZAGK ***
 begin   
  execute immediate '
@@ -155,9 +142,11 @@ exception when others then
 
 PROMPT *** Create  grants  ZAG_K ***
 grant UPDATE                                                                 on ZAG_K           to BARS014;
+grant SELECT                                                                 on ZAG_K           to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on ZAG_K           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAG_K           to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on ZAG_K           to TOSS;
+grant SELECT                                                                 on ZAG_K           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAG_K           to WR_ALL_RIGHTS;
 
 

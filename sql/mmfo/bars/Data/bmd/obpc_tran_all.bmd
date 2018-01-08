@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'ПЦ. Файли транзакцій, прийняті з ПЦ (TRAN*.DBF)';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'OBPC_TRAN_ALL';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,28 +124,28 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ABVR_NAME', 'C', 'ABVR_NAME', null, 27, 9, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'AMOUNT', 'N', 'Сума в~валюті~рахунку', 1.2, 22, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'BATCH_NR', 'C', '№ пакета', 1, 7, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'CARD', 'C', '№ картки', 2, 16, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'CARD_ACCT', 'C', 'Тех.~картковий~рахунок', 1.4, 10, 1, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'CARD_TYPE', 'N', 'Тип~картки', 1, 22, 17, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'CCY', 'C', 'Вал~операції', .8, 3, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'CITY', 'C', 'Місто', 3, 15, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'COUNTRY', 'C', 'Країна', .8, 3, 18, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'CURRENCY', 'C', 'Вал~рахунки', .8, 3, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'ID', 'N', 'Код~файла', .8, 22, 0, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'MCC_CODE', 'C', 'Код~торг~точки', 1, 4, 19, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'MERCHANT', 'C', 'MERCHANT', null, 7, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'POST_DATE', 'D', 'Дата~обробки', 2, 7, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'SLIP_NR', 'C', '№ сліпа', 1.2, 7, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'TERMINAL', 'C', 'Код~термінала', 1, 1, 20, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'TRAN_AMT', 'N', 'Сума~операції', 1.2, 22, 12, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'TRAN_DATE', 'D', 'Дата~операції', 1.2, 7, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'TRAN_NAME', 'C', 'Назва~операції', 3, 40, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'TRAN_RUSS', 'C', 'Назва~операції~(російська)', 3, 40, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'TRAN_TYPE', 'C', 'Тип~транзакції', 1, 2, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'REF', 'N', 'Референс', 1.2, 22, 22, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ABVR_NAME', 'C', 'ABVR_NAME', '', 27, 9, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'AMOUNT', 'N', 'Сума в~валюті~рахунку', '1.2', 22, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'BATCH_NR', 'C', '№ пакета', '1', 7, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'CARD', 'C', '№ картки', '2', 16, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'CARD_ACCT', 'C', 'Тех.~картковий~рахунок', '1.4', 10, 1, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'CARD_TYPE', 'N', 'Тип~картки', '1', 22, 17, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'CCY', 'C', 'Вал~операції', '.8', 3, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'CITY', 'C', 'Місто', '3', 15, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'COUNTRY', 'C', 'Країна', '.8', 3, 18, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'CURRENCY', 'C', 'Вал~рахунки', '.8', 3, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'ID', 'N', 'Код~файла', '.8', 22, 0, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'MCC_CODE', 'C', 'Код~торг~точки', '1', 4, 19, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'MERCHANT', 'C', 'MERCHANT', '', 7, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'POST_DATE', 'D', 'Дата~обробки', '2', 7, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'SLIP_NR', 'C', '№ сліпа', '1.2', 7, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'TERMINAL', 'C', 'Код~термінала', '1', 1, 20, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'TRAN_AMT', 'N', 'Сума~операції', '1.2', 22, 12, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'TRAN_DATE', 'D', 'Дата~операції', '1.2', 7, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'TRAN_NAME', 'C', 'Назва~операції', '3', 40, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'TRAN_RUSS', 'C', 'Назва~операції~(російська)', '3', 40, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'TRAN_TYPE', 'C', 'Тип~транзакції', '1', 2, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'REF', 'N', 'Референс', '1.2', 22, 22, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание для условий фильтра
   l_newtabid := bars_metabase.get_tabid('OBPC_FILES');

@@ -49,8 +49,10 @@ COMMENT ON COLUMN BARS.KOD_NAD.TXT IS '';
 
 
 PROMPT *** Create  grants  KOD_NAD ***
+grant SELECT                                                                 on KOD_NAD         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_NAD         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_NAD         to START1;
+grant SELECT                                                                 on KOD_NAD         to UPLD;
 
 
 

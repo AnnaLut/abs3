@@ -73,10 +73,12 @@ COMMENT ON COLUMN BARS.CIG_DOG_CREDIT.BRANCH IS '';
 
 
 
-PROMPT *** Create  constraint CC_CIGDOGCREDIT_DOGID_NN ***
+PROMPT *** Create  constraint PK_CIGDOGCRED ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_CREDIT MODIFY (DOG_ID CONSTRAINT CC_CIGDOGCREDIT_DOGID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CIG_DOG_CREDIT ADD CONSTRAINT PK_CIGDOGCRED PRIMARY KEY (ID, BRANCH)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -97,25 +99,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CIGDOGCREDIT_CIGDOGGENERAL ***
+PROMPT *** Create  constraint CC_CIGDOGCREDIT_DOGID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_CREDIT ADD CONSTRAINT FK_CIGDOGCREDIT_CIGDOGGENERAL FOREIGN KEY (DOG_ID, BRANCH)
-	  REFERENCES BARS.CIG_DOG_GENERAL (ID, BRANCH) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint PK_CIGDOGCRED ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIG_DOG_CREDIT ADD CONSTRAINT PK_CIGDOGCRED PRIMARY KEY (ID, BRANCH)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.CIG_DOG_CREDIT MODIFY (DOG_ID CONSTRAINT CC_CIGDOGCREDIT_DOGID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -148,10 +135,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIGDOGCRED_BRANCH_NN ***
+PROMPT *** Create  constraint CC_CIGDOGCREDIT_UPDDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_CREDIT MODIFY (BRANCH CONSTRAINT CC_CIGDOGCRED_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CIG_DOG_CREDIT MODIFY (UPDATE_DATE CONSTRAINT CC_CIGDOGCREDIT_UPDDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -220,10 +207,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIGDOGCREDIT_UPDDATE_NN ***
+PROMPT *** Create  constraint CC_CIGDOGCRED_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_CREDIT MODIFY (UPDATE_DATE CONSTRAINT CC_CIGDOGCREDIT_UPDDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CIG_DOG_CREDIT MODIFY (BRANCH CONSTRAINT CC_CIGDOGCRED_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -274,9 +261,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_DOG_CREDIT ***
+grant SELECT                                                                 on CIG_DOG_CREDIT  to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on CIG_DOG_CREDIT  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_DOG_CREDIT  to BARS_DM;
 grant SELECT,UPDATE                                                          on CIG_DOG_CREDIT  to CIG_ROLE;
+grant SELECT                                                                 on CIG_DOG_CREDIT  to UPLD;
 
 
 

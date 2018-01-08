@@ -20,6 +20,7 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on TABVAL          to BARS015;
 grant FLASHBACK,REFERENCES,SELECT                                            on TABVAL          to BARSAQ with grant option;
 grant SELECT                                                                 on TABVAL          to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on TABVAL          to BARSREADER_ROLE;
 grant SELECT                                                                 on TABVAL          to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TABVAL          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TABVAL          to CC_DOC;
@@ -38,6 +39,7 @@ grant SELECT                                                                 on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on TABVAL          to TABVAL;
 grant SELECT                                                                 on TABVAL          to TASK_LIST;
 grant SELECT                                                                 on TABVAL          to TOSS;
+grant SELECT                                                                 on TABVAL          to UPLD;
 grant SELECT                                                                 on TABVAL          to WEB_BALANS;
 grant SELECT                                                                 on TABVAL          to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TABVAL          to WR_ALL_RIGHTS;

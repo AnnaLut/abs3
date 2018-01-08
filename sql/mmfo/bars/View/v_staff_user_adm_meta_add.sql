@@ -27,7 +27,9 @@ PROMPT *** Create  view V_STAFF_USER_ADM_META_ADD ***
      order by t.id;
 
 PROMPT *** Create  grants  V_STAFF_USER_ADM_META_ADD ***
+grant SELECT                                                                 on V_STAFF_USER_ADM_META_ADD to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFF_USER_ADM_META_ADD to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STAFF_USER_ADM_META_ADD to UPLD;
 
 
 

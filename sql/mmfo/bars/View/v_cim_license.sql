@@ -16,7 +16,9 @@ PROMPT *** Create  view V_CIM_LICENSE ***
     from cim_license l where delete_date is null;
 
 PROMPT *** Create  grants  V_CIM_LICENSE ***
+grant SELECT                                                                 on V_CIM_LICENSE   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_LICENSE   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_LICENSE   to UPLD;
 
 
 

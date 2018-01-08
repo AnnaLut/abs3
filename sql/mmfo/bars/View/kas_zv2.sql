@@ -14,8 +14,10 @@ PROMPT *** Create  view KAS_ZV2 ***
     WHERE vid = 2 AND kv IN (961, 959, 962) AND sos = 0;
 
 PROMPT *** Create  grants  KAS_ZV2 ***
+grant SELECT                                                                 on KAS_ZV2         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_ZV2         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_ZV2         to PYOD001;
+grant SELECT                                                                 on KAS_ZV2         to UPLD;
 
 
 

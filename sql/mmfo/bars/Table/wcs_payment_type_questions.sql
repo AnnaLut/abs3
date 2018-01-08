@@ -63,32 +63,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SBPPAYMENTS_TID_PMTTS_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_PAYMENT_TYPE_QUESTIONS ADD CONSTRAINT FK_SBPPAYMENTS_TID_PMTTS_ID FOREIGN KEY (TYPE_ID)
-	  REFERENCES BARS.WCS_PAYMENT_TYPES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SBPPAYMENTS_QID_QUESTS_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_PAYMENT_TYPE_QUESTIONS ADD CONSTRAINT FK_SBPPAYMENTS_QID_QUESTS_ID FOREIGN KEY (QUESTION_ID)
-	  REFERENCES BARS.WCS_QUESTIONS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_PMTTYPEQS ***
 begin   
  execute immediate '
@@ -103,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_PAYMENT_TYPE_QUESTIONS ***
+grant SELECT                                                                 on WCS_PAYMENT_TYPE_QUESTIONS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_PAYMENT_TYPE_QUESTIONS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_PAYMENT_TYPE_QUESTIONS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_PAYMENT_TYPE_QUESTIONS to START1;
+grant SELECT                                                                 on WCS_PAYMENT_TYPE_QUESTIONS to UPLD;
 
 
 

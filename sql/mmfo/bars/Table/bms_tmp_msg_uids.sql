@@ -44,7 +44,9 @@ COMMENT ON COLUMN BARS.BMS_TMP_MSG_UIDS.USER_ID IS 'ID користувача';
 
 
 PROMPT *** Create  grants  BMS_TMP_MSG_UIDS ***
+grant SELECT                                                                 on BMS_TMP_MSG_UIDS to BARSREADER_ROLE;
 grant SELECT                                                                 on BMS_TMP_MSG_UIDS to BARS_DM;
+grant SELECT                                                                 on BMS_TMP_MSG_UIDS to UPLD;
 
 
 

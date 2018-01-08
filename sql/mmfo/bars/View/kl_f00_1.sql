@@ -27,9 +27,11 @@ group by kodf,  a017
 
 PROMPT *** Create  grants  KL_F00_1 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F00_1        to ABS_ADMIN;
+grant SELECT                                                                 on KL_F00_1        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F00_1        to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on KL_F00_1        to RPBN002;
 grant SELECT                                                                 on KL_F00_1        to START1;
+grant SELECT                                                                 on KL_F00_1        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F00_1        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KL_F00_1        to WR_REFREAD;
 

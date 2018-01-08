@@ -82,8 +82,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_FORMS ***
+grant SELECT                                                                 on WCS_FORMS       to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_FORMS       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_FORMS       to BARS_DM;
+grant SELECT                                                                 on WCS_FORMS       to UPLD;
 
 
 

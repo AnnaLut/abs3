@@ -1,5 +1,14 @@
-CREATE OR REPLACE VIEW V_OLDBPK_INT_RECKONING AS
-SELECT t.account_id,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_OLDBPK_INT_RECKONING.sql =========***
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_OLDBPK_INT_RECKONING ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_OLDBPK_INT_RECKONING ("ACCOUNT_ID", "INTEREST_KIND", "CURRENCY_ID", "MFO", "PARTNER_NAME", "ACCOUNT_NUMBER", "ACCOUNT_REST", "INTEREST_RATE", "INTEREST_AMOUNT", "DATE_FROM", "DATE_TO", "PURPOSE", "OPERATION_TYPE", "INTEREST_ACCOUNT_NUMBER", "INCOME_ACCOUNT", "MESSAGE", "STATE_ID", "ID", "RECKONING_ID", "OPER_REF", "ISP") AS 
+  SELECT t.account_id,
           t.interest_kind,
           a.kv currency_id,
           a.kf mfo,
@@ -30,4 +39,13 @@ SELECT t.account_id,
     WHERE     t.reckoning_id = SYS_CONTEXT ('bars_pul', 'reckoning_id')
           AND t.interest_amount > 0
 order by a.acc, i.id, t.date_from;
-grant select on V_OLDBPK_INT_RECKONING to bars_access_defrole;
+
+PROMPT *** Create  grants  V_OLDBPK_INT_RECKONING ***
+grant SELECT                                                                 on V_OLDBPK_INT_RECKONING to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_OLDBPK_INT_RECKONING to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_OLDBPK_INT_RECKONING.sql =========***
+PROMPT ===================================================================================== 

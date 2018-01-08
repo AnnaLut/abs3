@@ -65,6 +65,10 @@ COMMENT ON COLUMN BARS.ERR$_DPT_REQ_DELDEALS.BRANCH IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DPT_REQ_DELDEALS ***
+grant SELECT                                                                 on ERR$_DPT_REQ_DELDEALS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DPT_REQ_DELDEALS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

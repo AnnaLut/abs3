@@ -13,7 +13,9 @@ PROMPT *** Create  view V_ALEGRO_CH1 ***
      where t1.mfo = f_ourmfo);
 
 PROMPT *** Create  grants  V_ALEGRO_CH1 ***
+grant SELECT                                                                 on V_ALEGRO_CH1    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ALEGRO_CH1    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ALEGRO_CH1    to UPLD;
 
 
 

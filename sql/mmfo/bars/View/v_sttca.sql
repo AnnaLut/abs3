@@ -13,8 +13,10 @@ PROMPT *** Create  view V_STTCA ***
    SELECT 'не передано' name, 0 id FROM DUAL;
 
 PROMPT *** Create  grants  V_STTCA ***
+grant SELECT                                                                 on V_STTCA         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STTCA         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_STTCA         to START1;
+grant SELECT                                                                 on V_STTCA         to UPLD;
 
 
 

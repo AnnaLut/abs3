@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_CCK_RF ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_RF ("ISP", "ND", "CC_ID", "VIDD", "RNK", "KV", "S", "GPK", "DSDATE", "DWDATE", "PR", "OSTC", "SOS", "NAMK", "ACC8", "DAZS", "BRANCH", "CUSTTYPE", "PROD", "SDOG", "NDI", "VIDD_NAME", "SOS_NAME", "NLS", "TR", "OPL_DAY") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_RF ("ISP", "ND", "CC_ID", "VIDD", "RNK", "KV", "S", "GPK", "DSDATE", "DWDATE", "PR", "OSTC", "SOS", "NAMK", "ACC8", "DAZS", "BRANCH", "CUSTTYPE", "PROD", "SDOG", "NDI", "VIDD_NAME", "SOS_NAME", "NLS", "TR", "OPL_DAY", "BASEM") AS 
   SELECT x.isp
       ,x.nd
       ,x.cc_id
@@ -40,6 +40,7 @@ PROMPT *** Create  view V_CCK_RF ***
           0
        END tr
        ,x.opl_day
+       ,x.basem
   FROM (SELECT d.user_id isp
               ,d.nd
               ,d.cc_id
@@ -69,6 +70,7 @@ PROMPT *** Create  view V_CCK_RF ***
                  WHERE nd = d.nd
                    AND tag = 'PR_TR') pr_tr
                ,ia.s opl_day
+               ,ia.basem
           FROM cc_deal d, customer c, accounts a8, nd_acc n, cc_sos cs,cc_vidd cv,INT_accn ia
          WHERE n.nd = d.nd
            AND c.rnk = d.rnk
@@ -81,10 +83,13 @@ PROMPT *** Create  view V_CCK_RF ***
            AND a8.tip = 'LIM'
            AND d.vidd IN (11, 12, 13)
            AND d.sos > 0
-           AND d.sos < 14) x;
+           AND d.sos < 14) x where x.branch like  SYS_CONTEXT ('bars_context', 'user_branch_mask')
+;
 
 PROMPT *** Create  grants  V_CCK_RF ***
+grant SELECT                                                                 on V_CCK_RF        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CCK_RF        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CCK_RF        to UPLD;
 
 
 

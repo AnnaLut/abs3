@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции KB3
-prompt Наименование операции: off Прихiд каси (ГРН)
+prompt Наименование операции: KB3 off Прихiд каси (ГРН)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KB3', 'off Прихiд каси (ГРН)', 0, null, 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, '#( TOBOPACK.GetToboCASH)', null, 0, 0, 0, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''09''))', null, '1001100001000000000000000000000000010000000000100000000000000000', null);
+    values ('KB3', 'KB3 off Прихiд каси (ГРН)', 0, null, 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, '#( TOBOPACK.GetToboCASH)', null, 0, 0, 0, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''09''))', null, '1001100001000000000000000000000000010000000000100000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KB3', name='off Прихiд каси (ГРН)', dk=0, nlsm=null, kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb='#( TOBOPACK.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''09''))', rang=null, flags='1001100001000000000000000000000000010000000000100000000000000000', nazn=null
+         set tt='KB3', name='KB3 off Прихiд каси (ГРН)', dk=0, nlsm=null, kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb='#( TOBOPACK.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''09''))', rang=null, flags='1001100001000000000000000000000000010000000000100000000000000000', nazn=null
        where tt='KB3';
   end;
   --------------------------------

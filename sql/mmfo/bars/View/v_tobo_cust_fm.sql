@@ -19,7 +19,9 @@ PROMPT *** Create  view V_TOBO_CUST_FM ***
                          AND rnk = c.rnk);
 
 PROMPT *** Create  grants  V_TOBO_CUST_FM ***
+grant SELECT                                                                 on V_TOBO_CUST_FM  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TOBO_CUST_FM  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_TOBO_CUST_FM  to UPLD;
 
 
 

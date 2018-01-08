@@ -105,19 +105,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_XMLGATE_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML_GATE ADD CONSTRAINT FK_XMLGATE_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_XMLGATE_KF_NN ***
 begin   
  execute immediate '
@@ -158,8 +145,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_GATE ***
+grant SELECT                                                                 on XML_GATE        to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_GATE        to BARS_DM;
 grant SELECT                                                                 on XML_GATE        to KLBX;
+grant SELECT                                                                 on XML_GATE        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_GATE        to WR_ALL_RIGHTS;
 
 

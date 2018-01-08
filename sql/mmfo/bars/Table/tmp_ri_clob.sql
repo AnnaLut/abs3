@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_RI_CLOB ***
+grant SELECT                                                                 on TMP_RI_CLOB     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_RI_CLOB     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_RI_CLOB     to TECH005;
+grant SELECT                                                                 on TMP_RI_CLOB     to UPLD;
 
 
 

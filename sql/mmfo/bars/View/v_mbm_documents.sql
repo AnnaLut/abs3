@@ -82,7 +82,9 @@ PROMPT *** Create  view V_MBM_DOCUMENTS ***
     WHERE ba.MFO = op.MFOA AND bb.MFO = op.MFOB;
 
 PROMPT *** Create  grants  V_MBM_DOCUMENTS ***
+grant SELECT                                                                 on V_MBM_DOCUMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBM_DOCUMENTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_MBM_DOCUMENTS to UPLD;
 
 
 

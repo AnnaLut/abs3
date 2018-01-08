@@ -26,29 +26,24 @@ begin
   CREATE TABLE BARS.KL_K070 
    (	K070 VARCHAR2(5), 
 	K071 VARCHAR2(1), 
-	K072 VARCHAR2(1), 
+	K072 VARCHAR2(2), 
 	K073 VARCHAR2(1), 
 	K074 VARCHAR2(1), 
+	K075 VARCHAR2(1), 
+	K077 VARCHAR2(1), 
 	TXT VARCHAR2(190), 
+	K072_OLD VARCHAR2(1), 
+	K070_OLD VARCHAR2(5), 
+	TXT_OLD VARCHAR2(100), 
 	D_OPEN DATE, 
 	D_CLOSE DATE, 
-	D_MODE DATE, 
-	K070_OLD VARCHAR2(5), 
-	TXT_OLD VARCHAR2(100)
+	D_MODE DATE
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSDYND ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
-end; 
-/
-
-
-begin
-  execute immediate 'alter table KL_K070  add ( 	K077  VARCHAR2(1) ) ';
-exception when others then       
-  if sqlcode=-1430 then null; else raise; end if; 
 end; 
 /
 
@@ -65,22 +60,17 @@ COMMENT ON COLUMN BARS.KL_K070.K071 IS '';
 COMMENT ON COLUMN BARS.KL_K070.K072 IS '';
 COMMENT ON COLUMN BARS.KL_K070.K073 IS '';
 COMMENT ON COLUMN BARS.KL_K070.K074 IS '';
+COMMENT ON COLUMN BARS.KL_K070.K075 IS '';
+COMMENT ON COLUMN BARS.KL_K070.K077 IS '';
 COMMENT ON COLUMN BARS.KL_K070.TXT IS '';
+COMMENT ON COLUMN BARS.KL_K070.K072_OLD IS '';
+COMMENT ON COLUMN BARS.KL_K070.K070_OLD IS '';
+COMMENT ON COLUMN BARS.KL_K070.TXT_OLD IS '';
 COMMENT ON COLUMN BARS.KL_K070.D_OPEN IS '';
 COMMENT ON COLUMN BARS.KL_K070.D_CLOSE IS '';
 COMMENT ON COLUMN BARS.KL_K070.D_MODE IS '';
-COMMENT ON COLUMN BARS.KL_K070.K070_OLD IS '';
-COMMENT ON COLUMN BARS.KL_K070.TXT_OLD IS '';
 
 
-
-PROMPT *** Create  grants  KL_K070 ***
-grant SELECT                                                                 on KL_K070         to BARSUPL;
-grant SELECT                                                                 on KL_K070         to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on KL_K070         to BARS_DM;
-grant SELECT                                                                 on KL_K070         to CUST001;
-grant SELECT                                                                 on KL_K070         to UPLD;
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_K070         to WR_ALL_RIGHTS;
 
 
 

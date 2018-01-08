@@ -87,6 +87,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  IDDOC ***
+grant SELECT                                                                 on IDDOC           to BARSREADER_ROLE;
 grant SELECT                                                                 on IDDOC           to BARS_DM;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on IDDOC           to WR_ALL_RIGHTS;
 

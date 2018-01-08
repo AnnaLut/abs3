@@ -34,7 +34,7 @@ begin
 	ISP VARCHAR2(4000), 
 	VED VARCHAR2(4000), 
 	DATEA VARCHAR2(4000)
-   ) SEGMENT CREATION DEFERRED 
+   ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSDYND ';
@@ -66,6 +66,10 @@ COMMENT ON COLUMN BARS.ERR$_FIN_CUST.VED IS '';
 COMMENT ON COLUMN BARS.ERR$_FIN_CUST.DATEA IS '';
 
 
+
+PROMPT *** Create  grants  ERR$_FIN_CUST ***
+grant SELECT                                                                 on ERR$_FIN_CUST   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_FIN_CUST   to UPLD;
 
 
 

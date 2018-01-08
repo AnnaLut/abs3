@@ -87,19 +87,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BRATES_BRTYPES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BRATES ADD CONSTRAINT FK_BRATES_BRTYPES FOREIGN KEY (BR_TYPE)
-	  REFERENCES BARS.BR_TYPES (BR_TYPE) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_BRATES_BRID_NN ***
 begin   
  execute immediate '
@@ -167,6 +154,7 @@ PROMPT *** Create  grants  BRATES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BRATES          to ABS_ADMIN;
 grant SELECT                                                                 on BRATES          to BARS009;
 grant SELECT                                                                 on BRATES          to BARSAQ with grant option;
+grant SELECT                                                                 on BRATES          to BARSREADER_ROLE;
 grant SELECT                                                                 on BRATES          to BARSUPL;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on BRATES          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRATES          to BARS_DM;
@@ -178,6 +166,7 @@ grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on 
 grant SELECT                                                                 on BRATES          to REFSYNC_USR;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BRATES          to SALGL;
 grant SELECT                                                                 on BRATES          to START1;
+grant SELECT                                                                 on BRATES          to UPLD;
 grant SELECT                                                                 on BRATES          to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRATES          to WR_ALL_RIGHTS;
 grant SELECT                                                                 on BRATES          to WR_DEPOSIT_U;

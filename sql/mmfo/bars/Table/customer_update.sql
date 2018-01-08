@@ -173,82 +173,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMER_GLOBALBD_NN ***
+PROMPT *** Create  constraint CC_CUSTOMERUPD_BC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE MODIFY (GLOBAL_BDATE CONSTRAINT CC_CUSTOMER_GLOBALBD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERUPD_DONEBY_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE MODIFY (DONEBY CONSTRAINT CC_CUSTOMERUPD_DONEBY_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERUPD_IDUPD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE MODIFY (IDUPD CONSTRAINT CC_CUSTOMERUPD_IDUPD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERUPD_CHGACTION_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE MODIFY (CHGACTION CONSTRAINT CC_CUSTOMERUPD_CHGACTION_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERUPD_DATEON_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE MODIFY (DATE_ON CONSTRAINT CC_CUSTOMERUPD_DATEON_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERUPD_RNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE MODIFY (RNK CONSTRAINT CC_CUSTOMERUPD_RNK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERUPDATE_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE MODIFY (KF CONSTRAINT CC_CUSTOMERUPDATE_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT CC_CUSTOMERUPD_BC CHECK (bc in (0,1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -269,11 +197,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CUSTOMERUPD_PRINSIDER ***
+PROMPT *** Create  constraint CC_CUSTOMERUPDATE_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_PRINSIDER FOREIGN KEY (PRINSIDER)
-	  REFERENCES BARS.PRINSIDER (PRINSIDER) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CUSTOMER_UPDATE MODIFY (KF CONSTRAINT CC_CUSTOMERUPDATE_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -282,11 +209,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CUSTOMERUPD_CUSTOMER ***
+PROMPT *** Create  constraint CC_CUSTOMERUPD_RNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CUSTOMER_UPDATE MODIFY (RNK CONSTRAINT CC_CUSTOMERUPD_RNK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -295,11 +221,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CUSTOMERUPD_TGR ***
+PROMPT *** Create  constraint CC_CUSTOMERUPD_DATEON_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_TGR FOREIGN KEY (TGR)
-	  REFERENCES BARS.TGR (TGR) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CUSTOMER_UPDATE MODIFY (DATE_ON CONSTRAINT CC_CUSTOMERUPD_DATEON_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -308,11 +233,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CUSTOMERUPD_STAFF ***
+PROMPT *** Create  constraint CC_CUSTOMERUPD_CHGACTION_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_STAFF FOREIGN KEY (ISP)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CUSTOMER_UPDATE MODIFY (CHGACTION CONSTRAINT CC_CUSTOMERUPD_CHGACTION_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -321,11 +245,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CUSTOMERUPD_SED ***
+PROMPT *** Create  constraint CC_CUSTOMERUPD_IDUPD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_SED FOREIGN KEY (SED)
-	  REFERENCES BARS.SED (SED) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CUSTOMER_UPDATE MODIFY (IDUPD CONSTRAINT CC_CUSTOMERUPD_IDUPD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -334,10 +257,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMERUPD_BC ***
+PROMPT *** Create  constraint CC_CUSTOMERUPD_DONEBY_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT CC_CUSTOMERUPD_BC CHECK (bc in (0,1)) ENABLE';
+  ALTER TABLE BARS.CUSTOMER_UPDATE MODIFY (DONEBY CONSTRAINT CC_CUSTOMERUPD_DONEBY_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -346,141 +269,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CUSTOMERUPD_ISE ***
+PROMPT *** Create  constraint CC_CUSTOMER_GLOBALBD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_ISE FOREIGN KEY (ISE)
-	  REFERENCES BARS.ISE (ISE) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMERUPD_FS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_FS FOREIGN KEY (FS)
-	  REFERENCES BARS.FS (FS) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMERUPD_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMERUPDATE_TOBO ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPDATE_TOBO FOREIGN KEY (TOBO)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMERUPD_CUSTTYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_CUSTTYPE FOREIGN KEY (CUSTTYPE)
-	  REFERENCES BARS.CUSTTYPE (CUSTTYPE) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMERUPD_OE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_OE FOREIGN KEY (OE)
-	  REFERENCES BARS.OE (OE) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMERUPD_STMT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_STMT FOREIGN KEY (STMT)
-	  REFERENCES BARS.STMT (STMT) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMERUPD_SPRREG ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_SPRREG FOREIGN KEY (C_REG, C_DST)
-	  REFERENCES BARS.SPR_REG (C_REG, C_DST) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMERUPD_CODCAGENT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_CODCAGENT FOREIGN KEY (CODCAGENT)
-	  REFERENCES BARS.CODCAGENT (CODCAGENT) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMERUPD_COUNTRY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_COUNTRY FOREIGN KEY (COUNTRY)
-	  REFERENCES BARS.COUNTRY (COUNTRY) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMERUPD_VED ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_UPDATE ADD CONSTRAINT FK_CUSTOMERUPD_VED FOREIGN KEY (VED)
-	  REFERENCES BARS.VED (VED) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CUSTOMER_UPDATE MODIFY (GLOBAL_BDATE CONSTRAINT CC_CUSTOMER_GLOBALBD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -575,12 +367,14 @@ exception when others then
 
 PROMPT *** Create  grants  CUSTOMER_UPDATE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_UPDATE to ABS_ADMIN;
+grant SELECT                                                                 on CUSTOMER_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTOMER_UPDATE to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_UPDATE to BARS_DM;
 grant INSERT                                                                 on CUSTOMER_UPDATE to CUST001;
 grant SELECT                                                                 on CUSTOMER_UPDATE to KLBX;
 grant SELECT                                                                 on CUSTOMER_UPDATE to START1;
+grant SELECT                                                                 on CUSTOMER_UPDATE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTOMER_UPDATE to WR_ALL_RIGHTS;
 
 

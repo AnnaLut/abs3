@@ -18,8 +18,10 @@ PROMPT *** Create  view V_OBPC_ZP_DOCS ***
    and a.branch like sys_context('bars_context','user_branch_mask');
 
 PROMPT *** Create  grants  V_OBPC_ZP_DOCS ***
+grant SELECT                                                                 on V_OBPC_ZP_DOCS  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_ZP_DOCS  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OBPC_ZP_DOCS  to OBPC;
+grant SELECT                                                                 on V_OBPC_ZP_DOCS  to UPLD;
 
 
 

@@ -1,86 +1,161 @@
 
 
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/skrn_msg.sql =========*** Run *** =====
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/SKRN_MSG.sql =========*** Run *** ====
 PROMPT ===================================================================================== 
 
 
-PROMPT *** ALTER_POLICY_INFO to skrn_msg ***
+PROMPT *** ALTER_POLICY_INFO to SKRN_MSG ***
 
 
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''skrn_msg'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''skrn_msg'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''skrn_msg'', ''WHOLE'' , null, null, null, null);
+               bpa.alter_policy_info(''SKRN_MSG'', ''CENTER'' , null, null, null, null);
+               bpa.alter_policy_info(''SKRN_MSG'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''SKRN_MSG'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
           '; 
-END;  
+END; 
 /
 
-PROMPT *** Create  table skrn_msg ***
+PROMPT *** Create  table SKRN_MSG ***
 begin 
-  execute immediate 
-    ' create table skrn_msg'||
-    ' ('||
-    '   msg_id      integer,'||
-    '   change_time date default sysdate not null,'||
-    '   branch      varchar2(30) not null,'||
-    '   nd          number not null,'||
-    '   type_sms    char(6) not null,'||
-    '   state       number,'||
-    '   error       varchar2(254)'||
-    ' )';
-exception when others then 
-  if sqlcode=-955 then null; else raise; end if;
-end;
+  execute immediate '
+  CREATE TABLE BARS.SKRN_MSG 
+   (	MSG_ID NUMBER(*,0), 
+	CHANGE_TIME DATE DEFAULT sysdate, 
+	BRANCH VARCHAR2(30), 
+	ND NUMBER, 
+	TYPE_SMS CHAR(6), 
+	STATE NUMBER, 
+	ERROR VARCHAR2(254)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  TABLESPACE BRSDYND ';
+exception when others then       
+  if sqlcode=-955 then null; else raise; end if; 
+end; 
 /
 
 
 
 
-PROMPT *** ALTER_POLICIES to skrn_msg ***
- exec bpa.alter_policies('skrn_msg');
+PROMPT *** ALTER_POLICIES to SKRN_MSG ***
+ exec bpa.alter_policies('SKRN_MSG');
 
 
-comment on column skrn_msg.msg_id is 'код смс';
-comment on column skrn_msg.change_time is 'дата отправки в очередь смс';
-comment on column skrn_msg.branch is 'бранч';
-comment on column skrn_msg.nd is 'номер договора';
-comment on column skrn_msg.type_sms is 'тип смс';
-comment on column skrn_msg.state is 'статус: 1-отправлена в очередь; 0 - не обработана';
-comment on column skrn_msg.error is 'ошибка';
+COMMENT ON TABLE BARS.SKRN_MSG IS '';
+COMMENT ON COLUMN BARS.SKRN_MSG.MSG_ID IS 'код смс';
+COMMENT ON COLUMN BARS.SKRN_MSG.CHANGE_TIME IS 'дата отправки в очередь смс';
+COMMENT ON COLUMN BARS.SKRN_MSG.BRANCH IS 'бранч';
+COMMENT ON COLUMN BARS.SKRN_MSG.ND IS 'номер договора';
+COMMENT ON COLUMN BARS.SKRN_MSG.TYPE_SMS IS 'тип смс';
+COMMENT ON COLUMN BARS.SKRN_MSG.STATE IS 'статус: 1-отправлена в очередь; 0 - не обработана';
+COMMENT ON COLUMN BARS.SKRN_MSG.ERROR IS 'ошибка';
 
 
-PROMPT *** Create  constraint skrn_msg_id ***
-begin 
-  execute immediate 
-    'alter table SKRN_MSG add constraint SKRN_MSG_PR primary key (BRANCH, ND)';
+
+
+PROMPT *** Create  constraint SYS_C00137963 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRN_MSG MODIFY (CHANGE_TIME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-PROMPT *** Create  index skrn_msg_norm ***
-begin 
-  execute immediate 
-    'create index skrn_msg_norm on skrn_msg (branch, nd, type_sms)';
-exception when others then 
-  if sqlcode=-955 then null; else raise; end if;
-end;
+
+
+PROMPT *** Create  constraint SYS_C00137964 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRN_MSG MODIFY (BRANCH NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
 /
 
 
-PROMPT *** Create  grants  skrn_msg ***
-grant select on skrn_msg to BARSREADER_ROLE;
-grant select, insert, update, delete on skrn_msg to BARS_ACCESS_DEFROLE;
-grant select on skrn_msg to BARS_DM;
+
+
+PROMPT *** Create  constraint SYS_C00137965 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRN_MSG MODIFY (ND NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C00137966 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRN_MSG MODIFY (TYPE_SMS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SKRN_MSG_PR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRN_MSG ADD CONSTRAINT SKRN_MSG_PR PRIMARY KEY (BRANCH, ND)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index SKRN_MSG_PR ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.SKRN_MSG_PR ON BARS.SKRN_MSG (BRANCH, ND) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index SKRN_MSG_NORM ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.SKRN_MSG_NORM ON BARS.SKRN_MSG (BRANCH, ND, TYPE_SMS) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
+PROMPT *** Create  grants  SKRN_MSG ***
+grant SELECT                                                                 on SKRN_MSG        to BARSREADER_ROLE;
+grant DELETE,INSERT,SELECT,UPDATE                                            on SKRN_MSG        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on SKRN_MSG        to BARS_DM;
+grant SELECT                                                                 on SKRN_MSG        to UPLD;
 
 
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/skrn_msg.sql =========*** End *** =====
+PROMPT *** End *** ========== Scripts /Sql/BARS/Table/SKRN_MSG.sql =========*** End *** ====
 PROMPT ===================================================================================== 

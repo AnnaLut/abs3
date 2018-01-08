@@ -106,7 +106,9 @@ PROMPT *** Create  view V_CP_EXPCANDIDATES ***
 GROUP BY ID, DOK, EXPIRY, DNK, EXP_DATE;
 
 PROMPT *** Create  grants  V_CP_EXPCANDIDATES ***
+grant SELECT                                                                 on V_CP_EXPCANDIDATES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_EXPCANDIDATES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CP_EXPCANDIDATES to UPLD;
 
 
 

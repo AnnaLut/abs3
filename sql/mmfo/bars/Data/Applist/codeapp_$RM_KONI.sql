@@ -1,5 +1,3 @@
-SET SERVEROUTPUT ON 
-SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_KONI.sql =========*
 PROMPT ===================================================================================== 
@@ -18,11 +16,11 @@ PROMPT *** Create/replace  ARM  $RM_KONI ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-    d integer := 0;
+	d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_KONI створюємо (або оновлюємо) АРМ АРМ Виконання перекриття iнкасацiї ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
-                             P_ARM_NAME              => l_application_name, 
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
+                             P_ARM_NAME              => l_application_name,
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -30,77 +28,77 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію GRP101-Перекр. інкасації по докум. призн. пл. сх. перекр. (WEB) ********** ');
           --  Створюємо функцію GRP101-Перекр. інкасації по докум. призн. пл. сх. перекр. (WEB)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'GRP101-Перекр. інкасації по докум. призн. пл. сх. перекр. (WEB)',
                                                   p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_ink_web&grp=101&mode=1',
-                                                  p_rolename => 'START1' ,    
+                                                  p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Візування "своїх" операцій ********** ');
           --  Створюємо функцію Візування "своїх" операцій
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Візування "своїх" операцій',
                                                   p_funcname => '/barsroot/checkinner/default.aspx?type=0',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Візування "своїх" операцій
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Візування "своїх" операцій',
-                                                              p_funcname => '/barsroot/checkinner/documents.aspx?type=0&grpid=\w+',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Візування "своїх" операцій',
+															  p_funcname => '/barsroot/checkinner/documents.aspx?type=0&grpid=\w+',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Сервіс додатку BarsWeb.CheckInner
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Сервіс додатку BarsWeb.CheckInner',
-                                                              p_funcname => '/barsroot/checkinner/service.asmx',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Сервіс додатку BarsWeb.CheckInner',
+															  p_funcname => '/barsroot/checkinner/service.asmx',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перекриття по документу ГР.17(Пр.пл. перв. док.) ********** ');
           --  Створюємо функцію Перекриття по документу ГР.17(Пр.пл. перв. док.)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Перекриття по документу ГР.17(Пр.пл. перв. док.)',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=TSEL023[NSIFUNCTION][PROC=>SPS.SEL023(7,17,''PER_INK_N'')][EXEC=>BEFORE][CONDITIONS=>US_ID=sys_context(''bars_global'',''user_id'')]',
-                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,    
+                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію DPU. Перегляд параметрів виду депозиту ЮО
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'DPU. Перегляд параметрів виду депозиту ЮО',
-                                                              p_funcname => '/barsroot/udeposit_admin/dpuvidddetails.aspx?mode=\d&vidd=\d+\S*',
-                                                              p_rolename => 'BARS_ACCESS_DEFROLE' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'DPU. Перегляд параметрів виду депозиту ЮО',
+															  p_funcname => '/barsroot/udeposit_admin/dpuvidddetails.aspx?mode=\d&vidd=\d+\S*',
+															  p_rolename => 'BARS_ACCESS_DEFROLE' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перекриття по документу (Пр.пл. перв. док.) ********** ');
           --  Створюємо функцію Перекриття по документу (Пр.пл. перв. док.)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Перекриття по документу (Пр.пл. перв. док.)',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=TSEL023[NSIFUNCTION][PROC=>SPS.SEL023(7,77,''PER_INK_N'')][EXEC=>BEFORE][CONDITIONS=>US_ID=sys_context(''bars_global'',''user_id'')]',
-                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,    
+                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_KONI) - АРМ Виконання перекриття iнкасацiї  ');
     l := l_function_ids.first;
@@ -108,8 +106,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-     
-     
+
+
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -123,6 +121,7 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
+commit;
 end;
 /
 

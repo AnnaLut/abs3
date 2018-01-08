@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Резрв з господарської дебіторської заборгованності (зведена)';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'DEB_HOZ';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,15 +124,15 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'KAT', 'N', 'Кат.~якості', null, 22, 3, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'Код~валюти', null, 22, 2, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NBS', 'C', 'Бал.~рах.', null, 4, 1, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'REZ', 'N', 'Розрахунковий~резерв~в ном.', null, 22, 6, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(REZ)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'REZQ', 'N', 'Розрахунковий~резерв~в екв.', null, 22, 7, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(REZQ)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'BV', 'N', 'Бал.вартість~ном. ', null, null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(BV)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'BVQ', 'N', 'Бал.вартість~екв.', null, null, 5, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(BVQ)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'REZF', 'N', 'Фактично~сформований~резерв~в ном.', null, null, 8, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(REZF)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'REZQF', 'N', 'Фактично~сформований~резерв~в екв.', null, null, 9, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(REZQF)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'KAT', 'N', 'Кат.~якості', '', 22, 3, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'Код~валюти', '', 22, 2, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NBS', 'C', 'Бал.~рах.', '', 4, 1, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'REZ', 'N', 'Розрахунковий~резерв~в ном.', '', 22, 6, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(REZ)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'REZQ', 'N', 'Розрахунковий~резерв~в екв.', '', 22, 7, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(REZQ)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'BV', 'N', 'Бал.вартість~ном. ', '', null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(BV)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'BVQ', 'N', 'Бал.вартість~екв.', '', null, 5, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(BVQ)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'REZF', 'N', 'Фактично~сформований~резерв~в ном.', '', null, 8, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(REZF)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'REZQF', 'N', 'Фактично~сформований~резерв~в екв.', '', null, 9, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(REZQF)', 1, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

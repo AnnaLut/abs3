@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_REP3099 ***
 
-CREATE OR REPLACE procedure BARS.p_rep3099(p_dat date)
+  CREATE OR REPLACE PROCEDURE BARS.P_REP3099 (p_dat date)
  as
 
   /*

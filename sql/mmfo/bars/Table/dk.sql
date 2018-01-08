@@ -116,11 +116,13 @@ exception when others then
 
 PROMPT *** Create  grants  DK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DK              to ABS_ADMIN;
+grant SELECT                                                                 on DK              to BARSREADER_ROLE;
 grant SELECT                                                                 on DK              to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DK              to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DK              to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DK              to DK;
 grant SELECT                                                                 on DK              to START1;
+grant SELECT                                                                 on DK              to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DK              to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DK              to WR_REFREAD;
 

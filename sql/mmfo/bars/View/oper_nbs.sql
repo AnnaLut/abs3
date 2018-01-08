@@ -13,8 +13,10 @@ PROMPT *** Create  view OPER_NBS ***
   from oper;
 
 PROMPT *** Create  grants  OPER_NBS ***
+grant SELECT                                                                 on OPER_NBS        to BARSREADER_ROLE;
 grant SELECT                                                                 on OPER_NBS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OPER_NBS        to START1;
+grant SELECT                                                                 on OPER_NBS        to UPLD;
 
 
 

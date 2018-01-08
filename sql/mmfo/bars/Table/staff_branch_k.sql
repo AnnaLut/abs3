@@ -80,24 +80,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_STAFFBRANCHK_BRANCH ***
+PROMPT *** Create  constraint CC_STAFFBRANCHK_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STAFF_BRANCH_K ADD CONSTRAINT FK_STAFFBRANCHK_BRANCH FOREIGN KEY (BRANCH_K)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_STAFFBRANCHK_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_BRANCH_K ADD CONSTRAINT FK_STAFFBRANCHK_STAFF FOREIGN KEY (ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+  ALTER TABLE BARS.STAFF_BRANCH_K MODIFY (ID CONSTRAINT CC_STAFFBRANCHK_ID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -110,18 +96,6 @@ PROMPT *** Create  constraint CC_STAFFBRANCHK_BR_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.STAFF_BRANCH_K MODIFY (BRANCH_K CONSTRAINT CC_STAFFBRANCHK_BR_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFFBRANCHK_ID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_BRANCH_K MODIFY (ID CONSTRAINT CC_STAFFBRANCHK_ID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -145,9 +119,11 @@ exception when others then
 
 PROMPT *** Create  grants  STAFF_BRANCH_K ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_BRANCH_K  to ABS_ADMIN;
+grant SELECT                                                                 on STAFF_BRANCH_K  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF_BRANCH_K  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF_BRANCH_K  to RPBN001;
 grant SELECT                                                                 on STAFF_BRANCH_K  to SALGL;
+grant SELECT                                                                 on STAFF_BRANCH_K  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF_BRANCH_K  to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on STAFF_BRANCH_K  to WR_REFREAD;
 

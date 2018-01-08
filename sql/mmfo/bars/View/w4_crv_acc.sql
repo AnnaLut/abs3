@@ -14,8 +14,10 @@ PROMPT *** Create  view W4_CRV_ACC ***
    and a.tip = 'W4V';
 
 PROMPT *** Create  grants  W4_CRV_ACC ***
+grant SELECT                                                                 on W4_CRV_ACC      to BARSREADER_ROLE;
 grant SELECT                                                                 on W4_CRV_ACC      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_CRV_ACC      to OW;
+grant SELECT                                                                 on W4_CRV_ACC      to UPLD;
 
 
 

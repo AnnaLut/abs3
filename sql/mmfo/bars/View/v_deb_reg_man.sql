@@ -29,8 +29,10 @@ PROMPT *** Create  view V_DEB_REG_MAN ***
    order by custtype, okpo;
 
 PROMPT *** Create  grants  V_DEB_REG_MAN ***
+grant SELECT                                                                 on V_DEB_REG_MAN   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DEB_REG_MAN   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DEB_REG_MAN   to DEB_REG;
+grant SELECT                                                                 on V_DEB_REG_MAN   to UPLD;
 
 
 

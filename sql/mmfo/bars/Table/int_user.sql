@@ -67,32 +67,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_INTUSER_STAFF2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_USER ADD CONSTRAINT FK_INTUSER_STAFF2 FOREIGN KEY (PROCMAN)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_INTUSER_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_USER ADD CONSTRAINT FK_INTUSER_STAFF FOREIGN KEY (USERID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_INTUSER_USERID_NN ***
 begin   
  execute immediate '
@@ -145,6 +119,7 @@ exception when others then
 PROMPT *** Create  grants  INT_USER ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_USER        to ABS_ADMIN;
 grant SELECT                                                                 on INT_USER        to BARS010;
+grant SELECT                                                                 on INT_USER        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_USER        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_USER        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_USER        to DPT_ADMIN;
@@ -152,6 +127,7 @@ grant SELECT                                                                 on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_USER        to INT_USER;
 grant SELECT                                                                 on INT_USER        to RPBN001;
 grant SELECT                                                                 on INT_USER        to START1;
+grant SELECT                                                                 on INT_USER        to UPLD;
 grant SELECT                                                                 on INT_USER        to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_USER        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on INT_USER        to WR_REFREAD;

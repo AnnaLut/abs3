@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_CP_ACCOUNTS.OSTCR IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CP_ACCOUNTS ***
+grant SELECT                                                                 on ERR$_CP_ACCOUNTS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CP_ACCOUNTS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

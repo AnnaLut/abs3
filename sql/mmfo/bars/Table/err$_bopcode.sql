@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_BOPCODE.TRANSCODE_N IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_BOPCODE ***
+grant SELECT                                                                 on ERR$_BOPCODE    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_BOPCODE    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

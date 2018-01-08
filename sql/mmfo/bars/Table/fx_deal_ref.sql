@@ -63,11 +63,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_FXDEALREF_FXDEAL ***
+PROMPT *** Create  constraint CC_FXDEALREF_REF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FX_DEAL_REF ADD CONSTRAINT FK_FXDEALREF_FXDEAL FOREIGN KEY (DEAL_TAG)
-	  REFERENCES BARS.FX_DEAL (DEAL_TAG) ENABLE';
+  ALTER TABLE BARS.FX_DEAL_REF ADD CONSTRAINT CC_FXDEALREF_REF CHECK (ref is not null) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -90,18 +89,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_FXDEALREF_REF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FX_DEAL_REF ADD CONSTRAINT CC_FXDEALREF_REF CHECK (ref is not null) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_FXDEALREF ***
 begin   
  execute immediate '
@@ -116,10 +103,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  FX_DEAL_REF ***
+grant SELECT                                                                 on FX_DEAL_REF     to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on FX_DEAL_REF     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FX_DEAL_REF     to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on FX_DEAL_REF     to FOREX;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FX_DEAL_REF     to START1;
+grant SELECT                                                                 on FX_DEAL_REF     to UPLD;
 
 
 

@@ -13,7 +13,9 @@ union all select 'euribor' as base from dual
 union all select 'wibor' as base from dual;
 
 PROMPT *** Create  grants  V_CIM_F503_P_BASE ***
+grant SELECT                                                                 on V_CIM_F503_P_BASE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_F503_P_BASE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_F503_P_BASE to UPLD;
 
 
 

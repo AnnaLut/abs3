@@ -63,7 +63,9 @@ select "BID_ID","TEMPLATE_ID","TEMPLATE_NAME","FILE_NAME","PRINT_STATE_ID","PRIN
          order by bg.bid_id, gt.template_id);
 
 PROMPT *** Create  grants  V_WCS_BID_TEMPLATES ***
+grant SELECT                                                                 on V_WCS_BID_TEMPLATES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_BID_TEMPLATES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_BID_TEMPLATES to UPLD;
 
 
 

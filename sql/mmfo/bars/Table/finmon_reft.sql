@@ -183,9 +183,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FINMON_REFT ***
+grant SELECT                                                                 on FINMON_REFT     to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on FINMON_REFT     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FINMON_REFT     to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on FINMON_REFT     to FINMON;
+grant SELECT                                                                 on FINMON_REFT     to UPLD;
 
 
 

@@ -21,8 +21,10 @@ PROMPT *** Create  view V_RKO_ACCOUNTS ***
    and a.branch like sys_context ('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  V_RKO_ACCOUNTS ***
+grant SELECT                                                                 on V_RKO_ACCOUNTS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RKO_ACCOUNTS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_RKO_ACCOUNTS  to CUST001;
+grant SELECT                                                                 on V_RKO_ACCOUNTS  to UPLD;
 
 
 

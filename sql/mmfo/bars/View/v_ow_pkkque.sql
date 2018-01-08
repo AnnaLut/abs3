@@ -80,8 +80,10 @@ PROMPT *** Create  view V_OW_PKKQUE ***
           AND o.sos > 0;
 
 PROMPT *** Create  grants  V_OW_PKKQUE ***
+grant SELECT                                                                 on V_OW_PKKQUE     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_PKKQUE     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_PKKQUE     to OW;
+grant SELECT                                                                 on V_OW_PKKQUE     to UPLD;
 
 
 

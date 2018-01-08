@@ -77,6 +77,10 @@ COMMENT ON COLUMN BARS.ERR$_CIM_CONCLUSION.ORG_ID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIM_CONCLUSION ***
+grant SELECT                                                                 on ERR$_CIM_CONCLUSION to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIM_CONCLUSION to UPLD;
+
 
 
 PROMPT ===================================================================================== 

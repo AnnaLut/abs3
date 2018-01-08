@@ -36,8 +36,10 @@ FROM
  ) ;
 
 PROMPT *** Create  grants  ACC_PLUS1 ***
+grant SELECT                                                                 on ACC_PLUS1       to BARSREADER_ROLE;
 grant SELECT                                                                 on ACC_PLUS1       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_PLUS1       to START1;
+grant SELECT                                                                 on ACC_PLUS1       to UPLD;
 
 
 

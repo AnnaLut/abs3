@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции CB4
-prompt Наименование операции: (доч.CA4) Комісія агента за прийом переказу для BLIZKO
+prompt Наименование операции: CB4 (доч.CA4) Комісія агента за прийом переказу для BLIZKO
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CB4', '(доч.CA4) Комісія агента за прийом переказу для BLIZKO', 1, '#(nbs_ob22 (''2909'',''58''))', 980, '#(nbs_ob22 (''2909'',''58''))', 840, null, null, null, null, 0, 0, 1, 0, '(GL.P_ICURVAL(#(KVA),F_TARIF(39,#(KVA),#(NLSA),#(S)),SYSDATE))*(.6)', 'gl.p_ncurval(#(KVA),(gl.p_icurval(#(KVA),F_TARIF(39,#(KVA),#(NLSA),#(S)),bankdate))*(.6),bankdate)', null, null, '#(nbs_ob22 (''3800'',''03''))', null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('CB4', 'CB4 (доч.CA4) Комісія агента за прийом переказу для BLIZKO', 1, '#(nbs_ob22 (''2909'',''58''))', 980, '#(nbs_ob22 (''2909'',''58''))', 840, null, null, null, null, 0, 0, 1, 0, '(GL.P_ICURVAL(#(KVA),F_TARIF(39,#(KVA),#(NLSA),#(S)),SYSDATE))*(.6)', 'gl.p_ncurval(#(KVA),(gl.p_icurval(#(KVA),F_TARIF(39,#(KVA),#(NLSA),#(S)),bankdate))*(.6),bankdate)', null, null, '#(nbs_ob22 (''3800'',''03''))', null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CB4', name='(доч.CA4) Комісія агента за прийом переказу для BLIZKO', dk=1, nlsm='#(nbs_ob22 (''2909'',''58''))', kv=980, nlsk='#(nbs_ob22 (''2909'',''58''))', kvk=840, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='(GL.P_ICURVAL(#(KVA),F_TARIF(39,#(KVA),#(NLSA),#(S)),SYSDATE))*(.6)', s2='gl.p_ncurval(#(KVA),(gl.p_icurval(#(KVA),F_TARIF(39,#(KVA),#(NLSA),#(S)),bankdate))*(.6),bankdate)', sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='CB4', name='CB4 (доч.CA4) Комісія агента за прийом переказу для BLIZKO', dk=1, nlsm='#(nbs_ob22 (''2909'',''58''))', kv=980, nlsk='#(nbs_ob22 (''2909'',''58''))', kvk=840, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='(GL.P_ICURVAL(#(KVA),F_TARIF(39,#(KVA),#(NLSA),#(S)),SYSDATE))*(.6)', s2='gl.p_ncurval(#(KVA),(gl.p_icurval(#(KVA),F_TARIF(39,#(KVA),#(NLSA),#(S)),bankdate))*(.6),bankdate)', sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='CB4';
   end;
   --------------------------------

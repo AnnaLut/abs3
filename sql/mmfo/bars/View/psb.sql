@@ -12,8 +12,10 @@ PROMPT *** Create  view PSB ***
  ;
 
 PROMPT *** Create  grants  PSB ***
+grant SELECT                                                                 on PSB             to BARSREADER_ROLE;
 grant SELECT                                                                 on PSB             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PSB             to START1;
+grant SELECT                                                                 on PSB             to UPLD;
 
 
 

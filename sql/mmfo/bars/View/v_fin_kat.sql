@@ -22,8 +22,10 @@ from fin_kat k
 order by  idf,kat23,  obs23, fin23;
 
 PROMPT *** Create  grants  V_FIN_KAT ***
+grant SELECT                                                                 on V_FIN_KAT       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_FIN_KAT       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_FIN_KAT       to START1;
+grant SELECT                                                                 on V_FIN_KAT       to UPLD;
 grant FLASHBACK,SELECT                                                       on V_FIN_KAT       to WR_REFREAD;
 
 

@@ -55,7 +55,9 @@ COMMENT ON COLUMN BARS.KOD_7181.D_CLOSE IS '';
 
 
 PROMPT *** Create  grants  KOD_7181 ***
+grant SELECT                                                                 on KOD_7181        to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on KOD_7181        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on KOD_7181        to UPLD;
 grant FLASHBACK,SELECT                                                       on KOD_7181        to WR_REFREAD;
 
 

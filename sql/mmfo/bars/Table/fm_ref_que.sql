@@ -51,19 +51,6 @@ COMMENT ON COLUMN BARS.FM_REF_QUE.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_FMREFQUE_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FM_REF_QUE ADD CONSTRAINT FK_FMREFQUE_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_FM_REF_QUE_REF ***
 begin   
  execute immediate '
@@ -128,8 +115,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_REF_QUE ***
+grant SELECT                                                                 on FM_REF_QUE      to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on FM_REF_QUE      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_REF_QUE      to BARS_DM;
+grant SELECT                                                                 on FM_REF_QUE      to UPLD;
 
 
 

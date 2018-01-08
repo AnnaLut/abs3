@@ -78,8 +78,10 @@ exception when others then
 
 PROMPT *** Create  grants  KAS_SOS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_SOS         to ABS_ADMIN;
+grant SELECT                                                                 on KAS_SOS         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KAS_SOS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KAS_SOS         to PYOD001;
+grant SELECT                                                                 on KAS_SOS         to UPLD;
 grant FLASHBACK,SELECT                                                       on KAS_SOS         to WR_REFREAD;
 
 

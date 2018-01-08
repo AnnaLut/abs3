@@ -96,7 +96,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  INS_FEES ***
+grant SELECT                                                                 on INS_FEES        to BARSREADER_ROLE;
 grant SELECT                                                                 on INS_FEES        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on INS_FEES        to UPLD;
 
 
 

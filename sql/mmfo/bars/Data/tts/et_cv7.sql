@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CV7', 'CV7-Конвертацiя безготiвк. валюти за операцiями купiвлi-продажу', 1, null, null, null, null, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22_kv (''3800'',''10'', #(KVA) ) )', null, '1000100000000000000000000000000000010000000000000000000000010000', 'Конвертація безготівкової валюти за операціями купівлі-продажу');
+    values ('CV7', 'CV7-Конвертацiя безготiвк. валюти за операцiями купiвлi-продажу', 1, null, null, null, null, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(get_nls_tt(''CV7'',''S3800'',p_kva=>#(KVA)))', null, '1000100000000000000000000000000000010000000000000000000000010000', 'Конвертація безготівкової валюти за операціями купівлі-продажу');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CV7', name='CV7-Конвертацiя безготiвк. валюти за операцiями купiвлi-продажу', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22_kv (''3800'',''10'', #(KVA) ) )', rang=null, flags='1000100000000000000000000000000000010000000000000000000000010000', nazn='Конвертація безготівкової валюти за операціями купівлі-продажу'
+         set tt='CV7', name='CV7-Конвертацiя безготiвк. валюти за операцiями купiвлi-продажу', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(get_nls_tt(''CV7'',''S3800'',p_kva=>#(KVA)))', rang=null, flags='1000100000000000000000000000000000010000000000000000000000010000', nazn='Конвертація безготівкової валюти за операціями купівлі-продажу'
        where tt='CV7';
   end;
   --------------------------------

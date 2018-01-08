@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_SKR_IMPORT_SAFES.BRANCH IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_SKR_IMPORT_SAFES ***
+grant SELECT                                                                 on ERR$_SKR_IMPORT_SAFES to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_SKR_IMPORT_SAFES to UPLD;
+
 
 
 PROMPT ===================================================================================== 

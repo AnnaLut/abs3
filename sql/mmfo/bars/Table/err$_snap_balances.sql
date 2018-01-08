@@ -72,7 +72,9 @@ COMMENT ON COLUMN BARS.ERR$_SNAP_BALANCES.CALDT_ID IS '';
 
 
 PROMPT *** Create  grants  ERR$_SNAP_BALANCES ***
+grant SELECT                                                                 on ERR$_SNAP_BALANCES to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_SNAP_BALANCES to BARS_DM;
+grant SELECT                                                                 on ERR$_SNAP_BALANCES to UPLD;
 
 
 

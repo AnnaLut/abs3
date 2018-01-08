@@ -87,32 +87,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DOCROOT_CCVIDD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DOC_ROOT ADD CONSTRAINT FK_DOCROOT_CCVIDD FOREIGN KEY (VIDD)
-	  REFERENCES BARS.CC_VIDD (VIDD) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DOCROOT_DOCSCHEME ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DOC_ROOT ADD CONSTRAINT FK_DOCROOT_DOCSCHEME FOREIGN KEY (ID)
-	  REFERENCES BARS.DOC_SCHEME (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_DOCROOT ***
 begin   
  execute immediate '
@@ -127,6 +101,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DOC_ROOT ***
+grant SELECT                                                                 on DOC_ROOT        to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DOC_ROOT        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DOC_ROOT        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DOC_ROOT        to CC_DOC;

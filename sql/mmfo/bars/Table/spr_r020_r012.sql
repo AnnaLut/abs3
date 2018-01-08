@@ -83,8 +83,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SPR_R020_R012 ***
+grant SELECT                                                                 on SPR_R020_R012   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPR_R020_R012   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SPR_R020_R012   to BARS_DM;
+grant SELECT                                                                 on SPR_R020_R012   to UPLD;
 
 
 

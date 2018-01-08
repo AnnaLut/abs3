@@ -28,7 +28,9 @@ HAVING sum (Z.SS ) > 1
 WHERE X.SS1 + X.SP1 <> 0;
 
 PROMPT *** Create  grants  V_MSFZ9 ***
+grant SELECT                                                                 on V_MSFZ9         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MSFZ9         to START1;
+grant SELECT                                                                 on V_MSFZ9         to UPLD;
 
 
 

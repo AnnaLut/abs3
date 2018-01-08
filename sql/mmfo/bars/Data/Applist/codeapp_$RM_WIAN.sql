@@ -1,5 +1,3 @@
-SET SERVEROUTPUT ON 
-SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_WIAN.sql =========*
 PROMPT ===================================================================================== 
@@ -18,11 +16,11 @@ PROMPT *** Create/replace  ARM  $RM_WIAN ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-    d integer := 0;
+	d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_WIAN створюємо (або оновлюємо) АРМ АРМ Страхування (Аналітик) ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
-                             P_ARM_NAME              => l_application_name, 
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
+                             P_ARM_NAME              => l_application_name,
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -30,14 +28,14 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Портфель (Аналітик) ********** ');
           --  Створюємо функцію Портфель (Аналітик)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Портфель (Аналітик)',
                                                   p_funcname => '/barsroot/ins/deals.aspx?fid=anlst&type=user',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_WIAN) - АРМ Страхування (Аналітик)  ');
     l := l_function_ids.first;
@@ -45,8 +43,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-     
-     
+
+
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -60,6 +58,7 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
+commit;
 end;
 /
 

@@ -20,8 +20,10 @@ from (select c.caldt_date, a.nbs, a.branch,
       ) group by caldt_date, nbs, branch;
 
 PROMPT *** Create  grants  BAL_BRANCH_PMZ ***
+grant SELECT                                                                 on BAL_BRANCH_PMZ  to BARSREADER_ROLE;
 grant SELECT                                                                 on BAL_BRANCH_PMZ  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BAL_BRANCH_PMZ  to SALGL;
+grant SELECT                                                                 on BAL_BRANCH_PMZ  to UPLD;
 
 
 

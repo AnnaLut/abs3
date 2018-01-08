@@ -59,84 +59,6 @@ COMMENT ON COLUMN BARS.SURVEY.SURVEY_CODE IS 'Программный идентификатор анкеты';
 
 
 
-PROMPT *** Create  constraint FK_SURVEY_DOCSCHEME ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY ADD CONSTRAINT FK_SURVEY_DOCSCHEME FOREIGN KEY (TEMPLATE_ID)
-	  REFERENCES BARS.DOC_SCHEME (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SURVEY_CUSTTYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY ADD CONSTRAINT FK_SURVEY_CUSTTYPE FOREIGN KEY (CUSTTYPE)
-	  REFERENCES BARS.CUSTTYPE (CUSTTYPE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint UK_SURVEY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY ADD CONSTRAINT UK_SURVEY UNIQUE (ACTIVITY, SURVEY_CODE)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEY_ACTIVITY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY ADD CONSTRAINT CC_SURVEY_ACTIVITY CHECK (activity IN (0, 1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint PK_SURVEY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY ADD CONSTRAINT PK_SURVEY PRIMARY KEY (SURVEY_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEY_SURVEYMULTI ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY ADD CONSTRAINT CC_SURVEY_SURVEYMULTI CHECK (survey_multi IN (0, 1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SURVEY_SURVEYNAME_NN ***
 begin   
  execute immediate '
@@ -197,6 +119,58 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_SURVEY_SURVEYMULTI ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY ADD CONSTRAINT CC_SURVEY_SURVEYMULTI CHECK (survey_multi IN (0, 1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_SURVEY ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY ADD CONSTRAINT PK_SURVEY PRIMARY KEY (SURVEY_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SURVEY_ACTIVITY ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY ADD CONSTRAINT CC_SURVEY_ACTIVITY CHECK (activity IN (0, 1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint UK_SURVEY ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY ADD CONSTRAINT UK_SURVEY UNIQUE (ACTIVITY, SURVEY_CODE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index UK_SURVEY ***
 begin   
  execute immediate '
@@ -225,11 +199,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  SURVEY ***
+grant SELECT                                                                 on SURVEY          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SURVEY          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SURVEY          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY          to DPT_ADMIN;
 grant SELECT                                                                 on SURVEY          to RCC_DEAL;
 grant SELECT                                                                 on SURVEY          to START1;
+grant SELECT                                                                 on SURVEY          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SURVEY          to WR_ALL_RIGHTS;
 grant SELECT                                                                 on SURVEY          to WR_CREDIT;
 grant FLASHBACK,SELECT                                                       on SURVEY          to WR_REFREAD;

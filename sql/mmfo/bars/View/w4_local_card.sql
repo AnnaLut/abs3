@@ -18,8 +18,10 @@ PROMPT *** Create  view W4_LOCAL_CARD ***
    and a.branch like sys_context ('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  W4_LOCAL_CARD ***
+grant SELECT                                                                 on W4_LOCAL_CARD   to BARSREADER_ROLE;
 grant SELECT                                                                 on W4_LOCAL_CARD   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_LOCAL_CARD   to OW;
+grant SELECT                                                                 on W4_LOCAL_CARD   to UPLD;
 
 
 

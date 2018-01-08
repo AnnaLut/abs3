@@ -27,7 +27,9 @@ PROMPT *** Create  view V_CUST_RELATION_TYPES ***
  order by cr.rnk, cr.rel_intext, cr.rel_rnk, crt.id;
 
 PROMPT *** Create  grants  V_CUST_RELATION_TYPES ***
+grant SELECT                                                                 on V_CUST_RELATION_TYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUST_RELATION_TYPES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CUST_RELATION_TYPES to UPLD;
 
 
 

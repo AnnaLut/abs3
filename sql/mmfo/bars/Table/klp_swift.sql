@@ -153,32 +153,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_KLPSWIFT_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP_SWIFT ADD CONSTRAINT FK_KLPSWIFT_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_KLPSWIFT_FL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP_SWIFT ADD CONSTRAINT FK_KLPSWIFT_FL FOREIGN KEY (FL)
-	  REFERENCES BARS.KLP_FL (FL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_KLPSWIFT_KF_NN ***
 begin   
  execute immediate '
@@ -206,9 +180,11 @@ exception when others then
 
 PROMPT *** Create  grants  KLP_SWIFT ***
 grant SELECT                                                                 on KLP_SWIFT       to ABS_ADMIN;
+grant SELECT                                                                 on KLP_SWIFT       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_SWIFT       to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on KLP_SWIFT       to PYOD001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_SWIFT       to TECH_MOM1;
+grant SELECT                                                                 on KLP_SWIFT       to UPLD;
 
 
 

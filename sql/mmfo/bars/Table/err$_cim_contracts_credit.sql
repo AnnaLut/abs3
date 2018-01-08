@@ -111,6 +111,10 @@ COMMENT ON COLUMN BARS.ERR$_CIM_CONTRACTS_CREDIT.F503_PURPOSE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIM_CONTRACTS_CREDIT ***
+grant SELECT                                                                 on ERR$_CIM_CONTRACTS_CREDIT to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIM_CONTRACTS_CREDIT to UPLD;
+
 
 
 PROMPT ===================================================================================== 

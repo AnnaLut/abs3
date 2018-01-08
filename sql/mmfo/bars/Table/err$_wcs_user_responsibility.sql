@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_WCS_USER_RESPONSIBILITY.BRANCH IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_WCS_USER_RESPONSIBILITY ***
+grant SELECT                                                                 on ERR$_WCS_USER_RESPONSIBILITY to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_WCS_USER_RESPONSIBILITY to UPLD;
+
 
 
 PROMPT ===================================================================================== 

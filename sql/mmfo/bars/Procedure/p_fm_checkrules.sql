@@ -1,7 +1,13 @@
-п»ї
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FM_CHECKRULES.sql =========*** R
+PROMPT ===================================================================================== 
+
+
 PROMPT *** Create  procedure P_FM_CHECKRULES ***
 
-create or replace procedure p_fm_checkrules (p_dat1 date, p_dat2 date, p_rules varchar2)
+  CREATE OR REPLACE PROCEDURE BARS.P_FM_CHECKRULES (p_dat1 date, p_dat2 date, p_rules varchar2)
 is
   i number;
   l_rules varchar2(254);
@@ -13,7 +19,7 @@ begin
   exception
       when others then
           if sqlcode = -54 then
-              raise_application_error(-20000, 'Р—Р°РїРёС‚ РІС–Рґ С†СЊРѕРіРѕ РєРѕСЂРёСЃС‚СѓРІР°С‡Р° РІР¶Рµ РІРёРєРѕРЅСѓС”С‚СЊСЃСЏ; СЃРїСЂРѕР±СѓР№С‚Рµ С‡РµСЂРµР· РґРµСЏРєРёР№ С‡Р°СЃ');
+              raise_application_error(-20000, 'Запит від цього користувача вже виконується; спробуйте через деякий час');
           end if;
   end;
   delete from tmp_fm_checkrules where id = user_id;
@@ -55,3 +61,9 @@ PROMPT *** Create  grants  P_FM_CHECKRULES ***
 grant EXECUTE                                                                on P_FM_CHECKRULES to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on P_FM_CHECKRULES to FINMON01;
 grant EXECUTE                                                                on P_FM_CHECKRULES to START1;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FM_CHECKRULES.sql =========*** E
+PROMPT ===================================================================================== 

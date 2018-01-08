@@ -42,8 +42,10 @@ PROMPT *** Create  view NBU23_DEB ***
                   '3710');
 
 PROMPT *** Create  grants  NBU23_DEB ***
+grant SELECT                                                                 on NBU23_DEB       to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on NBU23_DEB       to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on NBU23_DEB       to START1;
+grant SELECT                                                                 on NBU23_DEB       to UPLD;
 
 
 

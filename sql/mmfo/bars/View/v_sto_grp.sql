@@ -11,7 +11,9 @@ PROMPT *** Create  view V_STO_GRP ***
   (SELECT rownum as NUM, NAME FROM STO_GRP UNION ALL SELECT (select max(rownum)+1 from STO_GRP) as NUM, 'ÔÎ‡Ú≥Ê —¡ŒÕ' FROM DUAL);
 
 PROMPT *** Create  grants  V_STO_GRP ***
+grant SELECT                                                                 on V_STO_GRP       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STO_GRP       to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STO_GRP       to UPLD;
 
 
 

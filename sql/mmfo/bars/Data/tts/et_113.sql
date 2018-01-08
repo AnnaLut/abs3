@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('126', '126  Комісія ін.банку за купівлю ДОРОЖНІХ ЧЕКІВ USD', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, '#(nbs_ob22 (''6110'',''A9''))', 980, null, null, null, null, 0, 0, 0, 0, 'GL.P_ICURVAL( #(KVA),F_TARIF_TAG(#(REF),''PO_KK'')*F_TARIF (94, #(KVA), #(NLSA), #(S) ), SYSDATE)', null, 5, null, null, null, '0100100000000000000000000000000000010000000000000000000000000000', null);
+    values ('126', '126  Комісія ін.банку за купівлю ДОРОЖНІХ ЧЕКІВ USD', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, '#(nbs_ob22 (''6510'',''A9''))', 980, null, null, null, null, 0, 0, 0, 0, 'GL.P_ICURVAL( #(KVA),F_TARIF_TAG(#(REF),''PO_KK'')*F_TARIF (94, #(KVA), #(NLSA), #(S) ), SYSDATE)', null, 5, null, null, null, '0100100000000000000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='126', name='126  Комісія ін.банку за купівлю ДОРОЖНІХ ЧЕКІВ USD', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kv=980, nlsk='#(nbs_ob22 (''6110'',''A9''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='GL.P_ICURVAL( #(KVA),F_TARIF_TAG(#(REF),''PO_KK'')*F_TARIF (94, #(KVA), #(NLSA), #(S) ), SYSDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000010000000000000000000000000000', nazn=null
+         set tt='126', name='126  Комісія ін.банку за купівлю ДОРОЖНІХ ЧЕКІВ USD', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kv=980, nlsk='#(nbs_ob22 (''6510'',''A9''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='GL.P_ICURVAL( #(KVA),F_TARIF_TAG(#(REF),''PO_KK'')*F_TARIF (94, #(KVA), #(NLSA), #(S) ), SYSDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000010000000000000000000000000000', nazn=null
        where tt='126';
   end;
   --------------------------------
@@ -57,7 +57,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции 131
-prompt Наименование операции: d: Комісія за Сплата дорожніх чеків (123)
+prompt Наименование операции: 131 d: Комісія за Сплата дорожніх чеків (123)
 declare
   cnt_  number;
 begin
@@ -66,11 +66,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('131', 'd: Комісія за Сплата дорожніх чеків (123)', 0, '#(nbs_ob22 (''6110'',''A9''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'GL.P_ICURVAL( #(KVA), F_TARIF(48, #(KVA), #(NLSA), #(S) ), SYSDATE)', null, 5, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', 'Комісія по сплаті дорожніх чеків');
+    values ('131', '131 d: Комісія за Сплата дорожніх чеків (123)', 0, '#(nbs_ob22 (''6510'',''A9''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'GL.P_ICURVAL( #(KVA), F_TARIF(48, #(KVA), #(NLSA), #(S) ), SYSDATE)', null, 5, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', 'Комісія по сплаті дорожніх чеків');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='131', name='d: Комісія за Сплата дорожніх чеків (123)', dk=0, nlsm='#(nbs_ob22 (''6110'',''A9''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='GL.P_ICURVAL( #(KVA), F_TARIF(48, #(KVA), #(NLSA), #(S) ), SYSDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn='Комісія по сплаті дорожніх чеків'
+         set tt='131', name='131 d: Комісія за Сплата дорожніх чеків (123)', dk=0, nlsm='#(nbs_ob22 (''6510'',''A9''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='GL.P_ICURVAL( #(KVA), F_TARIF(48, #(KVA), #(NLSA), #(S) ), SYSDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn='Комісія по сплаті дорожніх чеків'
        where tt='131';
   end;
   --------------------------------
@@ -109,12 +109,12 @@ begin
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '131', 1);
+    values ('6510', '131', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''131'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''131'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;

@@ -62,7 +62,9 @@ PROMPT *** Create  view CP_V1 ***
           AND RYN = TO_NUMBER (bars.PUL.GET ('CP_RYN'));
 
 PROMPT *** Create  grants  CP_V1 ***
+grant SELECT                                                                 on CP_V1           to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_V1           to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CP_V1           to UPLD;
 
 
 

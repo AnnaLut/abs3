@@ -58,7 +58,9 @@ PROMPT *** Create  view V_TOBO_CUST_RSTN ***
     WHERE exists ( select 0 from BARS.SALDO s where s.RNK = c.RNK );
 
 PROMPT *** Create  grants  V_TOBO_CUST_RSTN ***
+grant SELECT                                                                 on V_TOBO_CUST_RSTN to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TOBO_CUST_RSTN to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_TOBO_CUST_RSTN to UPLD;
 grant SELECT                                                                 on V_TOBO_CUST_RSTN to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_TOBO_CUST_RSTN to WR_CUSTLIST;
 grant SELECT                                                                 on V_TOBO_CUST_RSTN to WR_CUSTREG;

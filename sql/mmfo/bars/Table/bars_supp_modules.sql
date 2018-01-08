@@ -48,10 +48,10 @@ COMMENT ON COLUMN BARS.BARS_SUPP_MODULES.MOD_NAME IS 'Наименование модуля';
 
 
 
-PROMPT *** Create  constraint XUK_SUPP_MODULES_WIDECODE ***
+PROMPT *** Create  constraint XPK_BARS_SUPP_MODULES ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BARS_SUPP_MODULES ADD CONSTRAINT XUK_SUPP_MODULES_WIDECODE UNIQUE (MOD_WIDECODE)
+  ALTER TABLE BARS.BARS_SUPP_MODULES ADD CONSTRAINT XPK_BARS_SUPP_MODULES PRIMARY KEY (MOD_CODE)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSSMLI  ENABLE';
 exception when others then
@@ -62,10 +62,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint XPK_BARS_SUPP_MODULES ***
+PROMPT *** Create  constraint XUK_SUPP_MODULES_WIDECODE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BARS_SUPP_MODULES ADD CONSTRAINT XPK_BARS_SUPP_MODULES PRIMARY KEY (MOD_CODE)
+  ALTER TABLE BARS.BARS_SUPP_MODULES ADD CONSTRAINT XUK_SUPP_MODULES_WIDECODE UNIQUE (MOD_WIDECODE)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSSMLI  ENABLE';
 exception when others then
@@ -104,9 +104,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BARS_SUPP_MODULES ***
+grant SELECT                                                                 on BARS_SUPP_MODULES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BARS_SUPP_MODULES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BARS_SUPP_MODULES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BARS_SUPP_MODULES to START1;
+grant SELECT                                                                 on BARS_SUPP_MODULES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BARS_SUPP_MODULES to WR_ALL_RIGHTS;
 
 

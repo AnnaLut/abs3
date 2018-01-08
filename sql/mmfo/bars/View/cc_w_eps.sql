@@ -26,7 +26,9 @@ PROMPT *** Create  view CC_W_EPS ***
 ;
 
 PROMPT *** Create  grants  CC_W_EPS ***
+grant SELECT                                                                 on CC_W_EPS        to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_W_EPS        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CC_W_EPS        to UPLD;
 
 
 

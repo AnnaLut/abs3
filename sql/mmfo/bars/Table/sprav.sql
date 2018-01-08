@@ -61,8 +61,10 @@ COMMENT ON COLUMN BARS.SPRAV.NLS IS '';
 
 
 PROMPT *** Create  grants  SPRAV ***
+grant SELECT                                                                 on SPRAV           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPRAV           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPRAV           to START1;
+grant SELECT                                                                 on SPRAV           to UPLD;
 
 
 

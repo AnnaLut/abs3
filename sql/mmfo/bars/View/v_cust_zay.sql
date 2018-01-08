@@ -48,7 +48,9 @@ PROMPT *** Create  view V_CUST_ZAY ***
           AND C.kf = SYS_CONTEXT ('bars_context', 'user_mfo');
 
 PROMPT *** Create  grants  V_CUST_ZAY ***
+grant SELECT                                                                 on V_CUST_ZAY      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUST_ZAY      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CUST_ZAY      to UPLD;
 
 
 

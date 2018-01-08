@@ -15,9 +15,11 @@ WHERE  USRID = USER_ID
 
 PROMPT *** Create  grants  V_WEB_USERPARAMS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_WEB_USERPARAMS to ABS_ADMIN;
+grant SELECT                                                                 on V_WEB_USERPARAMS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_WEB_USERPARAMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_WEB_USERPARAMS to BASIC_INFO;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_WEB_USERPARAMS to START1;
+grant SELECT                                                                 on V_WEB_USERPARAMS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_WEB_USERPARAMS to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_WEB_USERPARAMS to WR_CUSTLIST;
 grant SELECT                                                                 on V_WEB_USERPARAMS to WR_DOCVIEW;

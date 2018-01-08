@@ -69,6 +69,10 @@ COMMENT ON COLUMN BARS.ERR$_CLV_CORPS.SEAL_ID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CLV_CORPS ***
+grant SELECT                                                                 on ERR$_CLV_CORPS  to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CLV_CORPS  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

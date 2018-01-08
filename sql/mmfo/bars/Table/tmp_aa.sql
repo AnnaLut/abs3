@@ -60,7 +60,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_AA ***
+grant SELECT                                                                 on TMP_AA          to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_AA          to BARS_DM;
+grant SELECT                                                                 on TMP_AA          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_AA          to WR_ALL_RIGHTS;
 
 

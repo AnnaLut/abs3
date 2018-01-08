@@ -149,10 +149,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_JOBS_LIST ***
+grant SELECT                                                                 on DPT_JOBS_LIST   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_JOBS_LIST   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_JOBS_LIST   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_JOBS_LIST   to DPT_ADMIN;
 grant SELECT                                                                 on DPT_JOBS_LIST   to RPBN001;
+grant SELECT                                                                 on DPT_JOBS_LIST   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_JOBS_LIST   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_JOBS_LIST   to WR_REFREAD;
 

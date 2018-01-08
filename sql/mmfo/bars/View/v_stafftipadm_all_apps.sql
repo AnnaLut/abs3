@@ -18,7 +18,9 @@ select a.codeapp, a.name
 
 PROMPT *** Create  grants  V_STAFFTIPADM_ALL_APPS ***
 grant SELECT                                                                 on V_STAFFTIPADM_ALL_APPS to ABS_ADMIN;
+grant SELECT                                                                 on V_STAFFTIPADM_ALL_APPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFFTIPADM_ALL_APPS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STAFFTIPADM_ALL_APPS to UPLD;
 
 
 

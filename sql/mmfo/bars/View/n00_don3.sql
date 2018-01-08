@@ -33,8 +33,10 @@ from (SELECT c.okpo, c.nmk, a.nls, a.kv, s.s240, a.nbs,
 
 PROMPT *** Create  grants  N00_DON3 ***
 grant SELECT                                                                 on N00_DON3        to BARS014;
+grant SELECT                                                                 on N00_DON3        to BARSREADER_ROLE;
 grant SELECT                                                                 on N00_DON3        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on N00_DON3        to SALGL;
+grant SELECT                                                                 on N00_DON3        to UPLD;
 
 
 

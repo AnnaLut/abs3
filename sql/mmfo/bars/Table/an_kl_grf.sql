@@ -53,19 +53,6 @@ COMMENT ON COLUMN BARS.AN_KL_GRF.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_ANKLGRF_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.AN_KL_GRF ADD CONSTRAINT FK_ANKLGRF_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C009766 ***
 begin   
  execute immediate '
@@ -119,8 +106,10 @@ exception when others then
 
 PROMPT *** Create  grants  AN_KL_GRF ***
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on AN_KL_GRF       to AN_KL;
+grant SELECT                                                                 on AN_KL_GRF       to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on AN_KL_GRF       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AN_KL_GRF       to BARS_DM;
+grant SELECT                                                                 on AN_KL_GRF       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on AN_KL_GRF       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on AN_KL_GRF       to WR_REFREAD;
 

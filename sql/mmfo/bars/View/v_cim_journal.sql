@@ -146,7 +146,9 @@ PROMPT *** Create  view V_CIM_JOURNAL ***
 ;
 
 PROMPT *** Create  grants  V_CIM_JOURNAL ***
+grant SELECT                                                                 on V_CIM_JOURNAL   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_JOURNAL   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_JOURNAL   to UPLD;
 
 
 

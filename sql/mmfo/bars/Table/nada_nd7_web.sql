@@ -97,7 +97,9 @@ COMMENT ON COLUMN BARS.NADA_ND7_WEB.USERID IS '';
 
 
 PROMPT *** Create  grants  NADA_ND7_WEB ***
+grant SELECT                                                                 on NADA_ND7_WEB    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NADA_ND7_WEB    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on NADA_ND7_WEB    to UPLD;
 
 
 

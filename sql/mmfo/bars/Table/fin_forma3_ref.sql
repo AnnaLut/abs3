@@ -25,16 +25,16 @@ begin
   execute immediate '
   CREATE TABLE BARS.FIN_FORMA3_REF 
    (	ID NUMBER, 
-		IDF VARCHAR2(1), 
-		KOD VARCHAR2(4), 
-		ORD NUMBER, 
-		NAME VARCHAR2(254), 
-		TYPE_ROW VARCHAR2(2), 
-		COL3 VARCHAR2(1), 
-		COL4 VARCHAR2(1), 
-		SQL_TEXT3 VARCHAR2(512), 
-		SQL_TEXT4 VARCHAR2(512), 
-		FM VARCHAR2(1)
+	IDF VARCHAR2(1), 
+	KOD VARCHAR2(4), 
+	ORD NUMBER, 
+	NAME VARCHAR2(254), 
+	TYPE_ROW VARCHAR2(2), 
+	COL3 VARCHAR2(1), 
+	COL4 VARCHAR2(1), 
+	SQL_TEXT3 VARCHAR2(512), 
+	SQL_TEXT4 VARCHAR2(512), 
+	FM VARCHAR2(1)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -97,6 +97,7 @@ exception when others then
 PROMPT *** Create  grants  FIN_FORMA3_REF ***
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_FORMA3_REF  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_FORMA3_REF  to BARS_DM;
+grant SELECT                                                                 on FIN_FORMA3_REF  to UPLD;
 
 
 

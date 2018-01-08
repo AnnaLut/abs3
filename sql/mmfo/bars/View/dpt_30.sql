@@ -26,6 +26,8 @@ WHERE d.acc=i.acc         AND
  ;
 
 PROMPT *** Create  grants  DPT_30 ***
+grant SELECT                                                                 on DPT_30          to BARSREADER_ROLE;
+grant SELECT                                                                 on DPT_30          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_30          to WR_ALL_RIGHTS;
 
 

@@ -15,8 +15,10 @@ PROMPT *** Create  view PRVN_PACKAGE ***
        );
 
 PROMPT *** Create  grants  PRVN_PACKAGE ***
+grant SELECT                                                                 on PRVN_PACKAGE    to BARSREADER_ROLE;
 grant SELECT                                                                 on PRVN_PACKAGE    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRVN_PACKAGE    to START1;
+grant SELECT                                                                 on PRVN_PACKAGE    to UPLD;
 
 
 

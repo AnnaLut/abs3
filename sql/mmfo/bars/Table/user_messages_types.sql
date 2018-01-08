@@ -115,9 +115,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  USER_MESSAGES_TYPES ***
+grant SELECT                                                                 on USER_MESSAGES_TYPES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on USER_MESSAGES_TYPES to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on USER_MESSAGES_TYPES to DPT_ADMIN;
 grant SELECT                                                                 on USER_MESSAGES_TYPES to START1;
+grant SELECT                                                                 on USER_MESSAGES_TYPES to UPLD;
 
 
 

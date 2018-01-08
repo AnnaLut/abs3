@@ -69,19 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_PAYM_TRACK_REF_PAYMENT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_PAYMENT_TRACKING ADD CONSTRAINT FK_PAYM_TRACK_REF_PAYMENT FOREIGN KEY (PAYMENT_ID)
-	  REFERENCES BARS.STO_PAYMENT (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C006798 ***
 begin   
  execute immediate '
@@ -156,6 +143,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  STO_PAYMENT_TRACKING ***
+grant SELECT                                                                 on STO_PAYMENT_TRACKING to BARSREADER_ROLE;
+grant SELECT                                                                 on STO_PAYMENT_TRACKING to UPLD;
 
 
 

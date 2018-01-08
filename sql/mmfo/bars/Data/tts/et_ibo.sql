@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('IBO', 'IBO-SWIFT-доручення (іноземна валюта, OUR)', 1, null, null, '191992', null, null, null, '191992', '300465', 0, 2, 0, 0, null, null, null, null, null, null, '0101000000000000000000000000000000010000000000000000000000000000', null);
+    values ('IBO', 'IBO-SWIFT-доручення (іноземна валюта, OUR)', 1, null, null, '#(get_nls_tt(''IBO'',''NLSK'',p_kva=>#(KVA)))', null, null, null, '191992', '300465', 0, 1, 0, 0, null, null, null, null, '0', null, '0001000000000000000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='IBO', name='IBO-SWIFT-доручення (іноземна валюта, OUR)', dk=1, nlsm=null, kv=null, nlsk='191992', kvk=null, nlss=null, nlsa=null, nlsb='191992', mfob='300465', flc=0, fli=2, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0101000000000000000000000000000000010000000000000000000000000000', nazn=null
+         set tt='IBO', name='IBO-SWIFT-доручення (іноземна валюта, OUR)', dk=1, nlsm=null, kv=null, nlsk='#(get_nls_tt(''IBO'',''NLSK'',p_kva=>#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb='191992', mfob='300465', flc=0, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800='0', rang=null, flags='0001000000000000000000000000000000010000000000000000000000000000', nazn=null
        where tt='IBO';
   end;
   --------------------------------
@@ -696,6 +696,17 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('N    ', 'IBO', 'O', 1, 3, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''N    '', ''IBO'', ''O'', 1, 3, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
     values ('NOS_A', 'IBO', 'M', 0, null, '0', null);
   exception
     when dup_val_on_index then null;
@@ -713,6 +724,17 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''f    '', ''IBO'', ''M'', 0, null, ''MT 103'', null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('n    ', 'IBO', 'O', 1, 2, 'О', null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''n    '', ''IBO'', ''O'', 1, 2, ''О'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -767,23 +789,12 @@ begin
   delete from chklist_tts where tt='IBO';
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (2, 'IBO', 4, null, null, null);
+    values (2, 'IBO', 4, null, null, 3);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 2, ''IBO'', 4, null, null, null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (5, 'IBO', 1, null, null, null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''IBO'', 1, null, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 2, ''IBO'', 4, null, null, 3) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -795,6 +806,17 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (chklist_tts: 7, ''IBO'', 2, null, ''kv<>980'', null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
+    values (25, 'IBO', 1, null, null, 3);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 25, ''IBO'', 1, null, null, 3) - первичный ключ не найден!');
       else raise;
       end if;
   end;

@@ -1,4 +1,10 @@
-create or replace package bars.pkg_dkbo_utl is
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/pkg_dkbo_utl.sql =========*** Run **
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.PKG_DKBO_UTL is
 
   FUNCTION header_version RETURN VARCHAR2;
   FUNCTION body_version RETURN VARCHAR2;
@@ -37,7 +43,7 @@ create or replace package bars.pkg_dkbo_utl is
   ) RETURN VARCHAR2;
 end pkg_dkbo_utl;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.pkg_dkbo_utl IS
+CREATE OR REPLACE PACKAGE BODY BARS.PKG_DKBO_UTL IS
   g_body_version     CONSTANT VARCHAR2(64) := 'version 5.9 08/06/2017';
   g_header_version   CONSTANT VARCHAR2(64) := 'version 5.9 08/06/2017';
   lc_new_line        CONSTANT VARCHAR2(5) := chr(13) || chr(10);
@@ -624,3 +630,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.pkg_dkbo_utl IS
   END f_dkbo_list_print;
 END;
 /
+ show err;
+ 
+PROMPT *** Create  grants  PKG_DKBO_UTL ***
+grant EXECUTE                                                                on PKG_DKBO_UTL    to BARS_ACCESS_DEFROLE;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/pkg_dkbo_utl.sql =========*** End **
+ PROMPT ===================================================================================== 
+ 

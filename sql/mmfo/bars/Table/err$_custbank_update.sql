@@ -86,7 +86,9 @@ COMMENT ON COLUMN BARS.ERR$_CUSTBANK_UPDATE.NUM_ND IS '';
 
 
 PROMPT *** Create  grants  ERR$_CUSTBANK_UPDATE ***
+grant SELECT                                                                 on ERR$_CUSTBANK_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CUSTBANK_UPDATE to BARS_DM;
+grant SELECT                                                                 on ERR$_CUSTBANK_UPDATE to UPLD;
 
 
 

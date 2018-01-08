@@ -47,19 +47,6 @@ COMMENT ON COLUMN BARS.PRIOCOM_CREDIT_NBS.NBS IS '';
 
 
 
-PROMPT *** Create  constraint FK_PRIOCOM_CREDIT_NBS_PS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_CREDIT_NBS ADD CONSTRAINT FK_PRIOCOM_CREDIT_NBS_PS FOREIGN KEY (NBS)
-	  REFERENCES BARS.PS (NBS) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XPK_PRIOCOM_CREDIT_NBS ***
 begin   
  execute immediate '
@@ -88,9 +75,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRIOCOM_CREDIT_NBS ***
+grant SELECT                                                                 on PRIOCOM_CREDIT_NBS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PRIOCOM_CREDIT_NBS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRIOCOM_CREDIT_NBS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PRIOCOM_CREDIT_NBS to PRIOCOM_CREDIT_NBS;
+grant SELECT                                                                 on PRIOCOM_CREDIT_NBS to UPLD;
 grant FLASHBACK,SELECT                                                       on PRIOCOM_CREDIT_NBS to WR_REFREAD;
 
 

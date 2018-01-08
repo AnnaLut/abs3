@@ -53,7 +53,9 @@ COMMENT ON COLUMN BARS.BOPCODE_K.KIND IS '';
 
 
 PROMPT *** Create  grants  BOPCODE_K ***
+grant SELECT                                                                 on BOPCODE_K       to BARSREADER_ROLE;
 grant SELECT                                                                 on BOPCODE_K       to BARS_DM;
+grant SELECT                                                                 on BOPCODE_K       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BOPCODE_K       to WR_ALL_RIGHTS;
 
 

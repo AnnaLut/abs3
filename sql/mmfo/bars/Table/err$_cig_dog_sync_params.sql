@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_CIG_DOG_SYNC_PARAMS.IS_SYNC IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIG_DOG_SYNC_PARAMS ***
+grant SELECT                                                                 on ERR$_CIG_DOG_SYNC_PARAMS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIG_DOG_SYNC_PARAMS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

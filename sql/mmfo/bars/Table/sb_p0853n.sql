@@ -68,6 +68,9 @@ COMMENT ON COLUMN BARS.SB_P0853N.GR_IN IS '';
 
 
 
+PROMPT *** Create  grants  SB_P0853N ***
+grant SELECT                                                                 on SB_P0853N       to UPLD;
+
 
 
 PROMPT *** Create SYNONYM  to SB_P0853N ***

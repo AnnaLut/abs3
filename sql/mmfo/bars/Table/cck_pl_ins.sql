@@ -61,9 +61,11 @@ COMMENT ON COLUMN BARS.CCK_PL_INS.REF IS 'Реф.проводки на отримувача';
 
 
 PROMPT *** Create  grants  CCK_PL_INS ***
+grant SELECT                                                                 on CCK_PL_INS      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_PL_INS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_PL_INS      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_PL_INS      to START1;
+grant SELECT                                                                 on CCK_PL_INS      to UPLD;
 
 
 

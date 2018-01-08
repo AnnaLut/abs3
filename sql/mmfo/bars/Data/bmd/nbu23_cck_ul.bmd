@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'НБУ-23/R.Перегляд/заповнення параметрiв угод КП ЮО';
   l_tablinesdef := '50';
+  l_tabselect_statement := '';
   l_tabname     := 'NBU23_CCK_UL';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,22 +124,22 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'CC_ID', 'C', '№угоди~рах', null, null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'FIN23', 'N', 'Фiн~Клас ', null, null, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'K23', 'N', 'Пок.~ризику', null, null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KAT23', 'N', 'Категорi~якостi', null, null, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Реф~-acc', null, null, 2, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'OBS23', 'N', 'Обсл.~боргу ', null, null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'RNK', 'N', 'РНК кл', null, null, 15, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'TOBO', 'C', 'Бранч', null, null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'VIDD', 'N', 'Вид', null, null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'WDATE', 'D', 'Дата заверш', null, null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'COMM', 'C', 'Причина ручного коригування показників', null, 0, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'HIST', 'C', 'Перегляд змін', null, 11, 19, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'ZDAT', 'C', 'Звітний~період', null, 0, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'FIN_351', 'N', 'Клас~боржника~(пост.351)', null, null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'PD', 'N', 'PD~(імовірність~дефолту)', null, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'VKR', 'C', 'Внутрішній~кредитний~рейтінг ', null, null, 11, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'CC_ID', 'C', '№угоди~рах', '', null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'FIN23', 'N', 'Фiн~Клас ', '', null, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'K23', 'N', 'Пок.~ризику', '', null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'KAT23', 'N', 'Категорi~якостi', '', null, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Реф~-acc', '', null, 2, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'OBS23', 'N', 'Обсл.~боргу ', '', null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'RNK', 'N', 'РНК кл', '', null, 15, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'TOBO', 'C', 'Бранч', '', null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'VIDD', 'N', 'Вид', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'WDATE', 'D', 'Дата заверш', '', null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'COMM', 'C', 'Причина ручного коригування показників', '', 0, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'HIST', 'C', 'Перегляд змін', '', 11, 19, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'ZDAT', 'C', 'Звітний~період', '', 0, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'FIN_351', 'N', 'Клас~боржника~(пост.351)', '', null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'PD', 'N', 'PD~(імовірність~дефолту)', '', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'VKR', 'C', 'Внутрішній~кредитний~рейтінг ', '', null, 11, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

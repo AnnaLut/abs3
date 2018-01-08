@@ -82,10 +82,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPSWMSG_STATUS ***
+PROMPT *** Create  constraint CC_TMPSWMSG_EMPTY ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_SW_MESSAGE ADD CONSTRAINT CC_TMPSWMSG_STATUS CHECK (status in (''M'', ''O'')) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.TMP_SW_MESSAGE ADD CONSTRAINT CC_TMPSWMSG_EMPTY CHECK (empty in (''Y'', ''N'')) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -106,10 +106,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPSWMSG_EMPTY ***
+PROMPT *** Create  constraint CC_TMPSWMSG_STATUS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_SW_MESSAGE ADD CONSTRAINT CC_TMPSWMSG_EMPTY CHECK (empty in (''Y'', ''N'')) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.TMP_SW_MESSAGE ADD CONSTRAINT CC_TMPSWMSG_STATUS CHECK (status in (''M'', ''O'')) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -133,7 +133,9 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_SW_MESSAGE ***
 grant DELETE,INSERT,SELECT                                                   on TMP_SW_MESSAGE  to BARS013;
+grant SELECT                                                                 on TMP_SW_MESSAGE  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SW_MESSAGE  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on TMP_SW_MESSAGE  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_SW_MESSAGE  to WR_ALL_RIGHTS;
 
 

@@ -138,6 +138,7 @@ exception when others then
 
 PROMPT *** Create  grants  ACCM_CALENDAR ***
 grant SELECT                                                                 on ACCM_CALENDAR   to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on ACCM_CALENDAR   to BARSREADER_ROLE;
 grant SELECT                                                                 on ACCM_CALENDAR   to BARSUPL;
 grant SELECT                                                                 on ACCM_CALENDAR   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCM_CALENDAR   to BARS_DM;

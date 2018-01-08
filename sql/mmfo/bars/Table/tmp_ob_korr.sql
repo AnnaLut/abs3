@@ -84,9 +84,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_OB_KORR ***
+grant SELECT                                                                 on TMP_OB_KORR     to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_OB_KORR     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_OB_KORR     to BARS_DM;
 grant SELECT                                                                 on TMP_OB_KORR     to START1;
+grant SELECT                                                                 on TMP_OB_KORR     to UPLD;
 
 
 

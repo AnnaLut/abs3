@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции MF1
-prompt Наименование операции: Оприбуткування монет та футлярів згідно накладної
+prompt Наименование операции: MF1 Оприбуткування монет та футлярів згідно накладної
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('MF1', 'Оприбуткування монет та футлярів згідно накладної', 1, null, 980, null, 980, null, null, null, null, 0, 0, 0, 0, null, null, 37, null, null, null, '0000100000000000000000000000000000000300000000000000000000000000', null);
+    values ('MF1', 'MF1 Оприбуткування монет та футлярів згідно накладної', 1, null, 980, null, 980, null, null, null, null, 0, 0, 0, 0, null, null, 37, null, null, null, '0000100000000000000000000000000000000300000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='MF1', name='Оприбуткування монет та футлярів згідно накладної', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=37, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000300000000000000000000000000', nazn=null
+         set tt='MF1', name='MF1 Оприбуткування монет та футлярів згідно накладної', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=37, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000300000000000000000000000000', nazn=null
        where tt='MF1';
   end;
   --------------------------------

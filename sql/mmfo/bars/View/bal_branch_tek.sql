@@ -19,8 +19,10 @@ from (select nbs, branch, kv, ob22,
       from v_gl where nbs not like '8%'   )  group by nbs, branch, kv, ob22;
 
 PROMPT *** Create  grants  BAL_BRANCH_TEK ***
+grant SELECT                                                                 on BAL_BRANCH_TEK  to BARSREADER_ROLE;
 grant SELECT                                                                 on BAL_BRANCH_TEK  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BAL_BRANCH_TEK  to SALGL;
+grant SELECT                                                                 on BAL_BRANCH_TEK  to UPLD;
 
 
 

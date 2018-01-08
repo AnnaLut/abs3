@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -58,7 +59,8 @@ declare
 begin
 
   l_tabsemantic := 'Дані по контрагенту, якому надані в заставу ЦП';
-  l_tablinesdef := '100';
+  l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'V_CP_ZAL_WEB14';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,44 +124,65 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'FDAT', 'D', 'Станом~на дату', '', 7, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DATZ_FROM', 'D', 'Діє з', '', 7, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DATZ_TO', 'D', 'Діє по', '', 7, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KOLZ', 'N', 'Кількість~обтяження', '', 7, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'REF', 'N', 'Референс~угоди', '', 22, 6, 0, 1, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'ID', 'N', 'ID~ЦП', 1, 5, 7, 0, 1, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'RNK', 'N', 'RNK~контрагента', '', 22, 5, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'ID_CP_ZAL', 'N', 'Унікальний~ID запису', '', 22, 21, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'IN_ST', 'N', '1 - Діє', '', 22, 21, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'FDAT', 'D', 'Станом~на~дату', '', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'REF', 'N', 'Код~угоди', '', null, 5, 0, 1, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'ND', 'C', 'Номер~договору', '', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ACC', 'N', 'Рахунок~номiналу~ACC', '', null, 19, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'VDAT', 'D', 'Дата~угоди', '', null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'ID', 'N', 'Внутр~ID ЦП', '', null, 8, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'VIDD', 'C', 'Портфель~баланс~рах-к', '', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'RYN', 'N', 'Суб портфель~особовий рах-к', '', null, 3, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'KOL_ALL', 'N', 'Загальна~кількисть', '', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'KOL_ZAL', 'N', 'ВВОД~обтяжена~кількість', '', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'DAT_ZAL', 'D', 'ВВОД~дата~діі~обтяження', '', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'NOM_ALL', 'N', 'Загальний~номінал', '', null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'NOM_ZAL', 'N', 'Обтяжений~номінал', '', null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'DIS_ZAL', 'N', 'Обтяжений~дісконт', '', null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'PRE_ZAL', 'N', 'Обтяжений~премія', '', null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'KUN_ZAL', 'N', 'Обтяжений~купон~нарахування', '', null, 17, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'KUK_ZAL', 'N', 'Обтяжений~купон~сплачений', '', null, 18, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'PRC_ZAL', 'N', 'Обтяжена~переоцінка', '', null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'RNK', 'N', 'Код~Контрагента', '', null, 13, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'ID_CP_ZAL', 'N', 'Код~строки', '', null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('CP_KOD');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'ID');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 4, l_newtabid, l_newcolid, '', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица CP_KOD для описания сложного поля таблицы V_CP_ZAL_WEB14.');
+  end if;
 
-    -- добавляем описание сложного поля
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('CP_RYN');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'RYN');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 17, l_newtabid, l_newcolid, '', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица CP_RYN для описания сложного поля таблицы V_CP_ZAL_WEB14.');
+  end if;
+
+  -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('V_CUSTOMER');
   l_newcolid := bars_metabase.get_colid(l_newtabid, 'RNK');
   if (l_newtabid is not null and l_newcolid is not null) then
     bars_metabase.add_extrnval(l_tabid, 22, l_newtabid, l_newcolid, '', '', '', '');
   else
     dbms_output.put_line('В БМД не описана таблица V_CUSTOMER для описания сложного поля таблицы V_CP_ZAL_WEB14.');
-  end if;  
-  
- -- очищаем описание функций на справочник
-  bars_metabase.delete_nsifunction(l_tabid);
-  
-  -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'DELETE', 'CP.cp_zal_change(:REF, :RNK, :ID_CP_ZAL, :ID, :KOLZ, :DATZ_FROM, :DATZ_TO, 3)');
-  -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'CP.cp_zal_change(:REF, :RNK, :ID_CP_ZAL, :ID, :KOLZ, :DATZ_FROM, :DATZ_TO, 2)');
-  -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'CP.cp_zal_change(:REF, :RNK, :ID_CP_ZAL, :ID, :KOLZ, :DATZ_FROM, :DATZ_TO, 1)');
-
-   -- добавляем описание раскраски
-  bars_metabase.add_tblcolor(l_tabid, 1, null, ':IN_ST = 1', 1, 'COLOR_Green');
-  l_newcolid := bars_metabase.get_colid(l_tabid, 'RNK');
-  if (l_newcolid is not null) then
-    bars_metabase.add_tblcolor(l_tabid, 2, l_newcolid, ':RNK is NULL', 2, 'COLOR_Red');
   end if;
 
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'DELETE', 'CP_V_ZAL_IND(:REF, :ACC, :ID, :KOL_ZAL, :DAT_ZAL, 3,:RNK, :ID_CP_ZAL)');
 
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'CP_V_ZAL_IND(:REF, :ACC, :ID, :KOL_ZAL, :DAT_ZAL, 2,:RNK, :ID_CP_ZAL)');
+
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'CP_V_ZAL_IND(:REF, :ACC, :ID, :KOL_ZAL, :DAT_ZAL, 2,:RNK, :ID_CP_ZAL)');
+
+  -- очищаем описание функций на справочник
+  bars_metabase.delete_nsifunction(l_tabid);
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop

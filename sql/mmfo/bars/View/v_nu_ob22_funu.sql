@@ -18,7 +18,9 @@ PROMPT *** Create  view V_NU_OB22_FUNU ***
      and otm = 0;
 
 PROMPT *** Create  grants  V_NU_OB22_FUNU ***
+grant SELECT                                                                 on V_NU_OB22_FUNU  to BARSREADER_ROLE;
 grant DELETE,SELECT,UPDATE                                                   on V_NU_OB22_FUNU  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_NU_OB22_FUNU  to UPLD;
 
 
 

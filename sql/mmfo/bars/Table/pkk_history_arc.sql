@@ -69,19 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_PKKHISTORYARC_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PKK_HISTORY_ARC ADD CONSTRAINT FK_PKKHISTORYARC_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_PKKHISTORYARC_REF_NN ***
 begin   
  execute immediate '
@@ -134,10 +121,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  PKK_HISTORY_ARC ***
+grant SELECT                                                                 on PKK_HISTORY_ARC to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PKK_HISTORY_ARC to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PKK_HISTORY_ARC to OBPC;
 grant DELETE                                                                 on PKK_HISTORY_ARC to PYOD001;
 grant SELECT                                                                 on PKK_HISTORY_ARC to TECH004;
+grant SELECT                                                                 on PKK_HISTORY_ARC to UPLD;
 
 
 

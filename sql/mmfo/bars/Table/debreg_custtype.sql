@@ -46,8 +46,10 @@ COMMENT ON COLUMN BARS.DEBREG_CUSTTYPE.CUSTTYPE IS 'Найменування типу клієнта';
 
 
 PROMPT *** Create  grants  DEBREG_CUSTTYPE ***
+grant SELECT                                                                 on DEBREG_CUSTTYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on DEBREG_CUSTTYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEBREG_CUSTTYPE to DEB_REG;
+grant SELECT                                                                 on DEBREG_CUSTTYPE to UPLD;
 
 
 

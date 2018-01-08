@@ -67,9 +67,11 @@ COMMENT ON COLUMN BARS.KL_R011_.D_MODE IS '';
 
 
 PROMPT *** Create  grants  KL_R011_ ***
+grant SELECT                                                                 on KL_R011_        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_R011_        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_R011_        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_R011_        to START1;
+grant SELECT                                                                 on KL_R011_        to UPLD;
 
 
 

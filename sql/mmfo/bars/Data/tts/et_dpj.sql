@@ -303,12 +303,24 @@ begin
   end;
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (7, 'DPJ', 2, null, '((substr(NLSA,1,4) = ''2620'' and substr(NLSB,1,4) = ''2620'') and kv<>980 and ID_A<>ID_B)', null);
+    values (7, 'DPJ', 2, null, '( 
+    ( 
+      ( SUBSTR(NLSA,1,4)=''2620'' AND f_get_ob22(kv, nlsa)<>''30'' ) 
+      AND 
+      ( SUBSTR(NLSB,1,4)=''2620'' AND f_get_ob22(kv, nlsb)<>''30'' ) 
+    ) and kv<>980 and ID_A<>ID_B 
+  )', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 7, ''DPJ'', 2, null, ''((substr(NLSA,1,4) = ''''2620'''' and substr(NLSB,1,4) = ''''2620'''') and kv<>980 and ID_A<>ID_B)'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 7, ''DPJ'', 2, null, ''( 
+    ( 
+      ( SUBSTR(NLSA,1,4)=''''2620'''' AND f_get_ob22(kv, nlsa)<>''''30'''' ) 
+      AND 
+      ( SUBSTR(NLSB,1,4)=''''2620'''' AND f_get_ob22(kv, nlsb)<>''''30'''' ) 
+    ) and kv<>980 and ID_A<>ID_B 
+  )'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

@@ -102,9 +102,11 @@ exception when others then
 
 PROMPT *** Create  grants  META_RELTYPES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_RELTYPES   to ABS_ADMIN;
+grant SELECT                                                                 on META_RELTYPES   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_RELTYPES   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on META_RELTYPES   to BARS_DM;
 grant SELECT                                                                 on META_RELTYPES   to START1;
+grant SELECT                                                                 on META_RELTYPES   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on META_RELTYPES   to WR_ALL_RIGHTS;
 
 

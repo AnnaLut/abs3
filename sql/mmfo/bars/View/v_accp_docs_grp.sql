@@ -1,6 +1,14 @@
-create or replace view v_accp_docs_grp
-as             
-select okpo,  -- групування платежів по окпо, бранчах, рахунках
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ACCP_DOCS_GRP.sql =========*** Run **
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_ACCP_DOCS_GRP ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_ACCP_DOCS_GRP ("OKPO", "BRANCH", "NLS", "S", "SF_1", "SF_2", "SF_3", "AFEE", "CNT_PAYS", "PERIOD_START", "PERIOD_END") AS 
+  select okpo,  -- групування платежів по окпо, бранчах, рахунках
     branch,
     nls,
     sum(sum_pays_d) s,                      -- сума платежів
@@ -11,7 +19,7 @@ select okpo,  -- групування платежів по окпо, бранчах, рахунках
     sum(cnt_pays) cnt_pays,  -- кількість платежів
     max(period_start) period_start,
     max(period_end)   period_end
- from 
+ from
      (select okpo_org okpo,  -- групування платежів по окпо, бранчах, рахунках і днях
            fdat,
            branch,
@@ -27,6 +35,13 @@ select okpo,  -- групування платежів по окпо, бранчах, рахунках
      where t.check_on = 1
      group by okpo_org, branch, decode(typepl, 1, nlsb, 2, nlsa), fdat)
  group by okpo, branch, nls;
-          
-grant select on v_accp_docs_grp to bars_access_defrole;          
- 
+
+PROMPT *** Create  grants  V_ACCP_DOCS_GRP ***
+grant SELECT                                                                 on V_ACCP_DOCS_GRP to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ACCP_DOCS_GRP to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ACCP_DOCS_GRP.sql =========*** End **
+PROMPT ===================================================================================== 

@@ -67,19 +67,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CCK_SIZE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CCK_SIZE ADD CONSTRAINT FK_CCK_SIZE FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_CCK_SIZE_ID ***
 begin   
  execute immediate '
@@ -106,9 +93,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CCK_SIZE ***
+grant SELECT                                                                 on CCK_SIZE        to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CCK_SIZE        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_SIZE        to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CCK_SIZE        to RCC_DEAL;
+grant SELECT                                                                 on CCK_SIZE        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_SIZE        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CCK_SIZE        to WR_REFREAD;
 

@@ -65,32 +65,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint R_REZERV_REZ0 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REZERV ADD CONSTRAINT R_REZERV_REZ0 FOREIGN KEY (ID)
-	  REFERENCES BARS.REZ0 (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_REZERV_PS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REZERV ADD CONSTRAINT R_REZERV_PS FOREIGN KEY (NBS)
-	  REFERENCES BARS.PS (NBS) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_REZERV_NBS ***
 begin   
  execute immediate '
@@ -117,7 +91,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZERV ***
+grant SELECT                                                                 on REZERV          to BARSREADER_ROLE;
 grant SELECT                                                                 on REZERV          to BARS_DM;
+grant SELECT                                                                 on REZERV          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REZERV          to WR_ALL_RIGHTS;
 
 

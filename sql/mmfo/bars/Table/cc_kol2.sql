@@ -53,19 +53,6 @@ COMMENT ON COLUMN BARS.CC_KOL2.BRANCH IS '';
 
 
 
-PROMPT *** Create  constraint FK_CC_KOL2_TIP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_KOL2 ADD CONSTRAINT FK_CC_KOL2_TIP FOREIGN KEY (TBLANK)
-	  REFERENCES BARS.CC_KOL_TBLANK (TBLANK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C007376 ***
 begin   
  execute immediate '
@@ -104,9 +91,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_KOL2 ***
+grant SELECT                                                                 on CC_KOL2         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_KOL2         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_KOL2         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_KOL2         to RCC_DEAL;
+grant SELECT                                                                 on CC_KOL2         to UPLD;
 
 
 

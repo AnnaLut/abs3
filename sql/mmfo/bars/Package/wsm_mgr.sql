@@ -823,7 +823,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.WSM_MGR is
       when others then
         p_response.xdoc := null;
     end;
-    trace_info('l_result_clob = [' || p_response.cdoc || ']');
+    trace_info('l_result_clob = [' || dbms_lob.substr(p_response.cdoc, 2000) || ']');
   end;
 
   --------------------------------------------------------------------------------
@@ -996,6 +996,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.WSM_MGR is
     --update test_clob set data = l_result where metod_name = 'test';
     --    commit;
     if g_status_code != 200 then
+      bars_audit.log_error('wsm_mgr.execute_api', 'g_status_code : ' || g_status_code, p_auxiliary_info => l_result);
       raise_application_error(-20001,
                               'Сервіс повернув код [' || g_status_code || ']. Перевірте налаштування. Текст відповіді:' || chr(13) || chr(10) || l_result,
                               false);

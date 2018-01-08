@@ -65,6 +65,10 @@ COMMENT ON COLUMN BARS.ERR$_WCS_JOBS.RS_STATE_ID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_WCS_JOBS ***
+grant SELECT                                                                 on ERR$_WCS_JOBS   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_WCS_JOBS   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

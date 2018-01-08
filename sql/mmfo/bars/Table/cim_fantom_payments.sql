@@ -69,10 +69,10 @@ COMMENT ON COLUMN BARS.CIM_FANTOM_PAYMENTS.DETAILS IS 'Призначення платежу';
 
 
 
-PROMPT *** Create  constraint CC_FANTOMPAYMENTS_PAYTYPE_CC ***
+PROMPT *** Create  constraint CC_FANTOMPAYMENTS_DIRECT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_FANTOM_PAYMENTS ADD CONSTRAINT CC_FANTOMPAYMENTS_PAYTYPE_CC CHECK (payment_type>0) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CIM_FANTOM_PAYMENTS MODIFY (DIRECT CONSTRAINT CC_FANTOMPAYMENTS_DIRECT_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -93,10 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_FANTOMPAYMENTS_DIRECT_NN ***
+PROMPT *** Create  constraint CC_FANTOMPAYMENTS_PAYTYPE_CC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_FANTOM_PAYMENTS MODIFY (DIRECT CONSTRAINT CC_FANTOMPAYMENTS_DIRECT_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_FANTOM_PAYMENTS ADD CONSTRAINT CC_FANTOMPAYMENTS_PAYTYPE_CC CHECK (payment_type>0) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -143,10 +143,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_FANTOMPAYMENTS_COMMENTS ***
+PROMPT *** Create  constraint CC_FANTOMPAYMENTS_OPERTYPE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_FANTOM_PAYMENTS MODIFY (DETAILS CONSTRAINT CC_FANTOMPAYMENTS_COMMENTS NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_FANTOM_PAYMENTS MODIFY (OPER_TYPE CONSTRAINT CC_FANTOMPAYMENTS_OPERTYPE_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -227,10 +227,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_FANTOMPAYMENTS_OPERTYPE_NN ***
+PROMPT *** Create  constraint CC_FANTOMPAYMENTS_COMMENTS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_FANTOM_PAYMENTS MODIFY (OPER_TYPE CONSTRAINT CC_FANTOMPAYMENTS_OPERTYPE_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_FANTOM_PAYMENTS MODIFY (DETAILS CONSTRAINT CC_FANTOMPAYMENTS_COMMENTS NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -253,9 +253,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_FANTOM_PAYMENTS ***
+grant SELECT                                                                 on CIM_FANTOM_PAYMENTS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_FANTOM_PAYMENTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_FANTOM_PAYMENTS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_FANTOM_PAYMENTS to CIM_ROLE;
+grant SELECT                                                                 on CIM_FANTOM_PAYMENTS to UPLD;
 
 
 

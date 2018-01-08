@@ -13,8 +13,10 @@ PROMPT *** Create  view V_OPER_DEPARTMENT ***
  where o.branch like sys_context('bars_context','user_branch_mask');
 
 PROMPT *** Create  grants  V_OPER_DEPARTMENT ***
+grant SELECT                                                                 on V_OPER_DEPARTMENT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OPER_DEPARTMENT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OPER_DEPARTMENT to START1;
+grant SELECT                                                                 on V_OPER_DEPARTMENT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OPER_DEPARTMENT to WR_ALL_RIGHTS;
 
 

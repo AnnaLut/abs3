@@ -224,10 +224,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMBALANCESYEARLY_ADJBALUAH ***
+PROMPT *** Create  constraint CC_DMBALANCESYEARLY_CUSTID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_BALANCES_YEARLY MODIFY (ADJ_BAL_UAH CONSTRAINT CC_DMBALANCESYEARLY_ADJBALUAH NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_BALANCES_YEARLY MODIFY (CUST_ID CONSTRAINT CC_DMBALANCESYEARLY_CUSTID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -272,10 +272,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMBALANCESYEARLY_CUSTID ***
+PROMPT *** Create  constraint CC_DMBALANCESYEARLY_ADJBALUAH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_BALANCES_YEARLY MODIFY (CUST_ID CONSTRAINT CC_DMBALANCESYEARLY_CUSTID NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_BALANCES_YEARLY MODIFY (ADJ_BAL_UAH CONSTRAINT CC_DMBALANCESYEARLY_ADJBALUAH NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -376,7 +376,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_DM_BALANCES_YEARLY ***
+grant SELECT                                                                 on NBUR_DM_BALANCES_YEARLY to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_DM_BALANCES_YEARLY to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on NBUR_DM_BALANCES_YEARLY to UPLD;
 
 
 

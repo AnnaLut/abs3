@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K62', 'K62 Комiсiя за доставку готiвки "УКРПОШТI"', 1, '#(nbs_ob22_RNK (''3578'',''09'',#(NLSA),980))', 980, '#(nbs_ob22 (''6119'',''17''))', 980, null, null, null, null, 0, 0, 0, 0, 'case  WHEN #(KVA) = 980 THEN  F_TARIF(62, #(KVA),#(NLSA), #(S))  ELSE 0  END', null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('K62', 'K62 Комiсiя за доставку готiвки "УКРПОШТI"', 1, '#(nbs_ob22_RNK (''3578'',''09'',#(NLSA),980))', 980, '#(nbs_ob22 (''6519'',''17''))', 980, null, null, null, null, 0, 0, 0, 0, 'case  WHEN #(KVA) = 980 THEN  F_TARIF(62, #(KVA),#(NLSA), #(S))  ELSE 0  END', null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K62', name='K62 Комiсiя за доставку готiвки "УКРПОШТI"', dk=1, nlsm='#(nbs_ob22_RNK (''3578'',''09'',#(NLSA),980))', kv=980, nlsk='#(nbs_ob22 (''6119'',''17''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='case  WHEN #(KVA) = 980 THEN  F_TARIF(62, #(KVA),#(NLSA), #(S))  ELSE 0  END', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='K62', name='K62 Комiсiя за доставку готiвки "УКРПОШТI"', dk=1, nlsm='#(nbs_ob22_RNK (''3578'',''09'',#(NLSA),980))', kv=980, nlsk='#(nbs_ob22 (''6519'',''17''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='case  WHEN #(KVA) = 980 THEN  F_TARIF(62, #(KVA),#(NLSA), #(S))  ELSE 0  END', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='K62';
   end;
   --------------------------------

@@ -13,7 +13,9 @@ PROMPT *** Create  view V_CIM_OPER ***
   from oper o;
 
 PROMPT *** Create  grants  V_CIM_OPER ***
+grant SELECT                                                                 on V_CIM_OPER      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_OPER      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_OPER      to UPLD;
 
 
 

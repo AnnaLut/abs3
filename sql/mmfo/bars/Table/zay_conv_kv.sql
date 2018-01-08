@@ -79,8 +79,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAY_CONV_KV ***
+grant SELECT                                                                 on ZAY_CONV_KV     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAY_CONV_KV     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAY_CONV_KV     to BARS_DM;
+grant SELECT                                                                 on ZAY_CONV_KV     to UPLD;
 grant FLASHBACK,SELECT                                                       on ZAY_CONV_KV     to WR_REFREAD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_CONV_KV     to ZAY;
 

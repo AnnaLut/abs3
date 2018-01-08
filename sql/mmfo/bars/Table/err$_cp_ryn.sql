@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.ERR$_CP_RYN.SERIES IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CP_RYN ***
+grant SELECT                                                                 on ERR$_CP_RYN     to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CP_RYN     to UPLD;
+
 
 
 PROMPT ===================================================================================== 

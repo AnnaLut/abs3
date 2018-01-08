@@ -53,8 +53,10 @@ PROMPT *** Create  view V_SW_IMPMSG_DOC ***
 
 PROMPT *** Create  grants  V_SW_IMPMSG_DOC ***
 grant SELECT                                                                 on V_SW_IMPMSG_DOC to BARS013;
+grant SELECT                                                                 on V_SW_IMPMSG_DOC to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW_IMPMSG_DOC to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SW_IMPMSG_DOC to START1;
+grant SELECT                                                                 on V_SW_IMPMSG_DOC to UPLD;
 
 
 

@@ -1,4 +1,13 @@
-CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F79 (p_kod_filii        varchar2,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_F79.sql =========*** Run **
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure NBUR_P_F79 ***
+
+  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F79 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -191,3 +200,10 @@ BEGIN
 
 END;
 /
+show err;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_F79.sql =========*** End **
+PROMPT ===================================================================================== 

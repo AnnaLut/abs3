@@ -65,10 +65,12 @@ COMMENT ON COLUMN BARS.CIG_DOG_NONINSTALMENT.BRANCH IS '';
 
 
 
-PROMPT *** Create  constraint CC_CIGDOGNINST_DOGID_NN ***
+PROMPT *** Create  constraint PK_CIGDOGNINST ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_NONINSTALMENT MODIFY (DOG_ID CONSTRAINT CC_CIGDOGNINST_DOGID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CIG_DOG_NONINSTALMENT ADD CONSTRAINT PK_CIGDOGNINST PRIMARY KEY (ID, BRANCH)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -89,12 +91,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_CIGDOGNINST ***
+PROMPT *** Create  constraint CC_CIGDOGNINST_DOGID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_NONINSTALMENT ADD CONSTRAINT PK_CIGDOGNINST PRIMARY KEY (ID, BRANCH)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.CIG_DOG_NONINSTALMENT MODIFY (DOG_ID CONSTRAINT CC_CIGDOGNINST_DOGID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -115,10 +115,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIGDOGNINST_BRANCH_NN ***
+PROMPT *** Create  constraint CC_CIGDOGNINST_LIMITSUM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_NONINSTALMENT MODIFY (BRANCH CONSTRAINT CC_CIGDOGNINST_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CIG_DOG_NONINSTALMENT MODIFY (LIMIT_SUM CONSTRAINT CC_CIGDOGNINST_LIMITSUM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -175,10 +175,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIGDOGNINST_LIMITSUM_NN ***
+PROMPT *** Create  constraint CC_CIGDOGNINST_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_NONINSTALMENT MODIFY (LIMIT_SUM CONSTRAINT CC_CIGDOGNINST_LIMITSUM_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CIG_DOG_NONINSTALMENT MODIFY (BRANCH CONSTRAINT CC_CIGDOGNINST_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -229,9 +229,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_DOG_NONINSTALMENT ***
+grant SELECT                                                                 on CIG_DOG_NONINSTALMENT to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on CIG_DOG_NONINSTALMENT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_DOG_NONINSTALMENT to BARS_DM;
 grant INSERT,SELECT,UPDATE                                                   on CIG_DOG_NONINSTALMENT to CIG_ROLE;
+grant SELECT                                                                 on CIG_DOG_NONINSTALMENT to UPLD;
 
 
 

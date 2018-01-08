@@ -71,6 +71,10 @@ COMMENT ON COLUMN BARS.ERR$_DEB_HOZ.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DEB_HOZ ***
+grant SELECT                                                                 on ERR$_DEB_HOZ    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DEB_HOZ    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

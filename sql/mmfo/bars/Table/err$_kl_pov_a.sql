@@ -71,6 +71,10 @@ COMMENT ON COLUMN BARS.ERR$_KL_POV_A.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_KL_POV_A ***
+grant SELECT                                                                 on ERR$_KL_POV_A   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_KL_POV_A   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

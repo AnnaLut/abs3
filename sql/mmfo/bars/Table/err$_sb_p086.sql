@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_SB_P086.COD_ACT IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_SB_P086 ***
+grant SELECT                                                                 on ERR$_SB_P086    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_SB_P086    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

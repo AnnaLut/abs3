@@ -50,25 +50,10 @@ COMMENT ON COLUMN BARS.DEPRICATED_BRANCH_TAGS.OB22 IS 'Óìîë÷.ÎÁ22';
 
 
 
-PROMPT *** Create  constraint FK_BRANCHTAGS_NBSOB22 ***
+PROMPT *** Create  constraint CC_BRANCHTAGS_TAG_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DEPRICATED_BRANCH_TAGS ADD CONSTRAINT FK_BRANCHTAGS_NBSOB22 FOREIGN KEY (NBS, OB22)
-	  REFERENCES BARS.SB_OB22 (R020, OB22) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint PK_BRANCHTAGS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEPRICATED_BRANCH_TAGS ADD CONSTRAINT PK_BRANCHTAGS PRIMARY KEY (TAG)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.DEPRICATED_BRANCH_TAGS MODIFY (TAG CONSTRAINT CC_BRANCHTAGS_TAG_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -89,10 +74,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BRANCHTAGS_TAG_NN ***
+PROMPT *** Create  constraint PK_BRANCHTAGS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DEPRICATED_BRANCH_TAGS MODIFY (TAG CONSTRAINT CC_BRANCHTAGS_TAG_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DEPRICATED_BRANCH_TAGS ADD CONSTRAINT PK_BRANCHTAGS PRIMARY KEY (TAG)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -116,10 +103,12 @@ exception when others then
 
 PROMPT *** Create  grants  DEPRICATED_BRANCH_TAGS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEPRICATED_BRANCH_TAGS to ABS_ADMIN;
+grant SELECT                                                                 on DEPRICATED_BRANCH_TAGS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEPRICATED_BRANCH_TAGS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEPRICATED_BRANCH_TAGS to BARS_DM;
 grant SELECT                                                                 on DEPRICATED_BRANCH_TAGS to KLBX;
 grant SELECT                                                                 on DEPRICATED_BRANCH_TAGS to START1;
+grant SELECT                                                                 on DEPRICATED_BRANCH_TAGS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEPRICATED_BRANCH_TAGS to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DEPRICATED_BRANCH_TAGS to WR_REFREAD;
 

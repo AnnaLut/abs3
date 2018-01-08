@@ -103,8 +103,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRICE_FORMAT ***
+grant SELECT                                                                 on PRICE_FORMAT    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PRICE_FORMAT    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PRICE_FORMAT    to PRICE_FOR;
+grant SELECT                                                                 on PRICE_FORMAT    to UPLD;
 grant FLASHBACK,SELECT                                                       on PRICE_FORMAT    to WR_REFREAD;
 
 

@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_SW_ACC_SPARAM.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_SW_ACC_SPARAM ***
+grant SELECT                                                                 on ERR$_SW_ACC_SPARAM to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_SW_ACC_SPARAM to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -69,58 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_W4SPARAM_W4PRODUCTGROUPS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_SPARAM ADD CONSTRAINT FK_W4SPARAM_W4PRODUCTGROUPS FOREIGN KEY (GRP_CODE)
-	  REFERENCES BARS.W4_PRODUCT_GROUPS (CODE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_W4SPARAM_SPARAMLIST ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_SPARAM ADD CONSTRAINT FK_W4SPARAM_SPARAMLIST FOREIGN KEY (SP_ID)
-	  REFERENCES BARS.SPARAM_LIST (SPID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_W4SPARAM_PS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_SPARAM ADD CONSTRAINT FK_W4SPARAM_PS FOREIGN KEY (NBS)
-	  REFERENCES BARS.PS (NBS) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_W4SPARAM_TIPS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_SPARAM ADD CONSTRAINT FK_W4SPARAM_TIPS FOREIGN KEY (TIP)
-	  REFERENCES BARS.TIPS (TIP) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_W4SPARAM ***
 begin   
  execute immediate '
@@ -135,9 +83,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  W4_SPARAM ***
+grant SELECT                                                                 on W4_SPARAM       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on W4_SPARAM       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_SPARAM       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on W4_SPARAM       to OW;
+grant SELECT                                                                 on W4_SPARAM       to UPLD;
 grant FLASHBACK,SELECT                                                       on W4_SPARAM       to WR_REFREAD;
 
 

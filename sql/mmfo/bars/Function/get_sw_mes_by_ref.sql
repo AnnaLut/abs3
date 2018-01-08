@@ -1,10 +1,10 @@
 
  
  PROMPT ===================================================================================== 
- PROMPT *** Run *** = Scripts /Sql/BARS/function/get_sw_mes_by_ref.sql =========*** Run *** =
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/function/get_sw_mes_by_ref.sql =========*** 
  PROMPT ===================================================================================== 
  
-  create or replace function get_sw_mes_by_ref(p_ref oper.ref%type)
+  CREATE OR REPLACE FUNCTION BARS.GET_SW_MES_BY_REF (p_ref oper.ref%type)
   return varchar2 is
   Result varchar2(4000);
 begin
@@ -26,13 +26,15 @@ begin
      group by sw.ref;
   return(Result);
 end get_sw_mes_by_ref;
-/ 
-grant execute on get_sw_mes_by_ref to bars_access_defrole;
-commit;
-show err;
+/
+ show err;
  
+PROMPT *** Create  grants  GET_SW_MES_BY_REF ***
+grant EXECUTE                                                                on GET_SW_MES_BY_REF to BARS_ACCESS_DEFROLE;
+
  
  
  PROMPT ===================================================================================== 
- PROMPT *** End *** = Scripts /Sql/BARS/function/get_sw_mes_by_ref.sql =========*** End *** =
+ PROMPT *** End *** ========== Scripts /Sql/BARS/function/get_sw_mes_by_ref.sql =========*** 
  PROMPT ===================================================================================== 
+ 

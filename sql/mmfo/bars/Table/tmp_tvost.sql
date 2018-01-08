@@ -70,9 +70,11 @@ COMMENT ON COLUMN BARS.TMP_TVOST.KOS IS '';
 
 
 PROMPT *** Create  grants  TMP_TVOST ***
+grant SELECT                                                                 on TMP_TVOST       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_TVOST       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_TVOST       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_TVOST       to START1;
+grant SELECT                                                                 on TMP_TVOST       to UPLD;
 
 
 

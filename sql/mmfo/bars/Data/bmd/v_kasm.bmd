@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Моніторинг доставки підкріплень кас';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'V_KASM';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,24 +124,24 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'REFA', 'N', 'Реф. А~відправки', 1.5, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFA', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DATA', 'D', 'Віза-А', 1.8, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'REFB', 'N', 'Реф. Б~отримання', 1.5, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFB', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DATB', 'D', 'Віза-Б', 1.8, null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'HH', 'N', 'Годин', 1.1, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NAME', 'C', 'Назва~маршруту', 1, null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NSM', 'N', '№~зміни', 1, null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NOMS', 'C', '№~інкас.сумки~(мішка)', 1, null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'BRANCH', 'C', 'Код бранчу', 2, null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'B_NAME', 'C', 'Назва бранчу', 3, null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'IDZ', 'N', 'Системний~№ заявки', 1, null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'SVID', 'C', 'Тип заявки', 1.5, null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'KV', 'N', 'Код~валюти', 1, null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'S', 'N', 'Сума~готівки', 1.2, null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'K2', 'N', 'Кількість~виробів з БМ', 1.2, null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'K3', 'N', 'Кількість~монет', 1.2, null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'K4', 'N', 'Кількість~цінн.98*', 1, null, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'SOSB', 'N', 'SOSB', 1, null, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'REFA', 'N', 'Реф. А~відправки', '1.5', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFA', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DATA', 'D', 'Віза-А', '1.8', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'REFB', 'N', 'Реф. Б~отримання', '1.5', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFB', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DATB', 'D', 'Віза-Б', '1.8', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'HH', 'N', 'Годин', '1.1', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NAME', 'C', 'Назва~маршруту', '1', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NSM', 'N', '№~зміни', '1', null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NOMS', 'C', '№~інкас.сумки~(мішка)', '1', null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'BRANCH', 'C', 'Код бранчу', '2', null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'B_NAME', 'C', 'Назва бранчу', '3', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'IDZ', 'N', 'Системний~№ заявки', '1', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'SVID', 'C', 'Тип заявки', '1.5', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'KV', 'N', 'Код~валюти', '1', null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'S', 'N', 'Сума~готівки', '1.2', null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'K2', 'N', 'Кількість~виробів з БМ', '1.2', null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'K3', 'N', 'Кількість~монет', '1.2', null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'K4', 'N', 'Кількість~цінн.98*', '1', null, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'SOSB', 'N', 'SOSB', '1', null, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

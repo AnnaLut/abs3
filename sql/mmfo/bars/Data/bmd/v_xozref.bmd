@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := '26/07/17.V_XOZREF. ДЗ за госп діяльністю. Проплати та Закриття.';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'V_XOZREF';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,31 +124,31 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC', .5, null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DATD', 'D', 'Дата~док~Деб', 1.3, null, 35, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'ID_B', 'C', 'Iд.код~отримувача', 1.3, null, 38, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Вал~Деб~заборг.', .3, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'MFOB', 'C', 'МФО~Б', .7, null, 40, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NAM_B', 'C', 'Назва~отримувача', 1.5, null, 36, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NAZN', 'C', 'Призначен~пл-1', 2, 160, 37, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'ND', 'C', '№ ~док~Деб', .8, null, 34, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NLS', 'C', 'Рах~Деб.заборг.', 1.3, null, 2, 0, 0, 0, 0, '', '', 0, 0, 'To_char ( Min(V_XOZREF.OSTC) - Sum(S0) , ''9,999,999,999.99'') ', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NLSB', 'C', 'Рах~отримувача', 1.3, null, 45, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'OSTC', 'N', 'Залиш~Рах~Деб.заборг.', 1.3, null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Min(V_XOZREF.OSTC)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'REF1', 'N', 'Реф-1~Деб~ДОКУМЕНТ', 1, null, 6, 0, 1, 0, 0, '', '', 1, 0, 'Count(*)', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF1', 'DocViewContentsEx(hWndForm, :REF1)', 0);
-  bars_metabase.add_column(l_tabid, 14, 'VDAT', 'D', 'Дата ~ВИНИКНЕННЯ~Деб.заборг.', 1.5, null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'NMS', 'C', 'Назва~Рах~Деб.заборг.', 1.5, null, 95, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'DNI', 'N', 'Залишк.~термiн~днiв', .5, null, 31, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'DNIP', 'N', 'Початк.~термiн~днiв', .5, null, 32, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'S0', 'N', 'Сума~ВИНИКНЕННЯ~Деб.заборг.', 1.5, null, 9, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(S0)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'STMT1', 'N', 'STMT1', .5, null, 98, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'OB22', 'C', 'Ob22', .3, null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'BRANCH', 'C', 'Бранч', 1, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'PROD', 'C', 'NBS+OB22', 1, null, 97, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'NBS', 'C', 'Бал.', .3, null, 95, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'NOTP', 'B', 'Без~угоди', .3, null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 38, 'REFD', 'N', 'Реф-D~Реф.Деб.зап~до ЦА', 1, null, 47, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 39, 'MDATE', 'D', 'План-дата~закриття', 1, null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC', '.5', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DATD', 'D', 'Дата~док~Деб', '1.3', null, 35, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'ID_B', 'C', 'Iд.код~отримувача', '1.3', null, 38, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Вал~Деб~заборг.', '.3', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'MFOB', 'C', 'МФО~Б', '.7', null, 40, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NAM_B', 'C', 'Назва~отримувача', '1.5', null, 36, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NAZN', 'C', 'Призначен~пл-1', '2', 160, 37, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'ND', 'C', '№ ~док~Деб', '.8', null, 34, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NLS', 'C', 'Рах~Деб.заборг.', '1.3', null, 2, 0, 0, 0, 0, '', '', 0, 0, 'To_char ( Min(V_XOZREF.OSTC) - Sum(S0) , ''9,999,999,999.99'') ', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NLSB', 'C', 'Рах~отримувача', '1.3', null, 45, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'OSTC', 'N', 'Залиш~Рах~Деб.заборг.', '1.3', null, 4, 0, 0, 0, 0, '', '0.00', 0, 0, 'Min(V_XOZREF.OSTC)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'REF1', 'N', 'Реф-1~Деб~ДОКУМЕНТ', '1', null, 6, 0, 1, 0, 0, '', '', 1, 0, 'Count(*)', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF1', 'DocViewContentsEx(hWndForm, :REF1)', 0);
+  bars_metabase.add_column(l_tabid, 14, 'VDAT', 'D', 'Дата ~ВИНИКНЕННЯ~Деб.заборг.', '1.5', null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'NMS', 'C', 'Назва~Рах~Деб.заборг.', '1.5', null, 95, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'DNI', 'N', 'Залишк.~термiн~днiв', '.5', null, 31, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'DNIP', 'N', 'Початк.~термiн~днiв', '.5', null, 32, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'S0', 'N', 'Сума~ВИНИКНЕННЯ~Деб.заборг.', '1.5', null, 9, 0, 0, 0, 0, '', '0.00', 1, 0, 'Sum(S0)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'STMT1', 'N', 'STMT1', '.5', null, 98, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'OB22', 'C', 'Ob22', '.3', null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'BRANCH', 'C', 'Бранч', '1', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'PROD', 'C', 'NBS+OB22', '1', null, 97, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'NBS', 'C', 'Бал.', '.3', null, 95, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'NOTP', 'B', 'Без~угоди', '.3', null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'REFD', 'N', 'Реф-D~Реф.Деб.зап~до ЦА', '1', null, 47, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'MDATE', 'D', 'План-дата~закриття', '1', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 1, 'ASC ');

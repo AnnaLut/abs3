@@ -55,10 +55,113 @@ begin
 	GRP NUMBER(*,0), 
 	NOT_USE_REZ23 DATE, 
 	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
-   ) SEGMENT CREATION IMMEDIATE 
+   ) PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+  TABLESPACE BRSBIGD 
+  PARTITION BY LIST (KF) 
+ (PARTITION W4A_300465  VALUES (''300465'') SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSSMLD ';
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_302076  VALUES (''302076'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_303398  VALUES (''303398'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_304665  VALUES (''304665'') SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_305482  VALUES (''305482'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_311647  VALUES (''311647'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_312356  VALUES (''312356'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_313957  VALUES (''313957'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_315784  VALUES (''315784'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_322669  VALUES (''322669'') SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_323475  VALUES (''323475'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_324805  VALUES (''324805'') SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_325796  VALUES (''325796'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_326461  VALUES (''326461'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_328845  VALUES (''328845'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_331467  VALUES (''331467'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_333368  VALUES (''333368'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_335106  VALUES (''335106'') SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_336503  VALUES (''336503'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_337568  VALUES (''337568'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_338545  VALUES (''338545'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_351823  VALUES (''351823'') SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_352457  VALUES (''352457'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_353553  VALUES (''353553'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_354507  VALUES (''354507'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION W4A_356334  VALUES (''356334'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD ) ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
@@ -72,7 +175,6 @@ PROMPT *** ALTER_POLICIES to W4_ACC ***
 
 
 COMMENT ON TABLE BARS.W4_ACC IS 'OW. Портфель карткових угод для ЦРВ';
-COMMENT ON COLUMN BARS.W4_ACC.KF IS '';
 COMMENT ON COLUMN BARS.W4_ACC.ND IS 'Номер договору';
 COMMENT ON COLUMN BARS.W4_ACC.ACC_PK IS 'Поточний картковий рахунок';
 COMMENT ON COLUMN BARS.W4_ACC.ACC_OVR IS 'Кред. БПК';
@@ -103,42 +205,15 @@ COMMENT ON COLUMN BARS.W4_ACC.KOL_SP IS 'К-во дней просрочки по договору';
 COMMENT ON COLUMN BARS.W4_ACC.S250 IS 'Портфельный метод (8)';
 COMMENT ON COLUMN BARS.W4_ACC.GRP IS 'група активу портфельного методу';
 COMMENT ON COLUMN BARS.W4_ACC.NOT_USE_REZ23 IS 'Карточка не используется в расчете резерва по 23 постанове';
+COMMENT ON COLUMN BARS.W4_ACC.KF IS '';
 
 
 
 
-PROMPT *** Create  constraint UK6_W4ACC ***
+PROMPT *** Create  constraint SYS_C00139292 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK6_W4ACC UNIQUE (ACC_2207)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint UK7_W4ACC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK7_W4ACC UNIQUE (ACC_3579)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_W4ACC_CARDCODE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_ACC MODIFY (CARD_CODE CONSTRAINT CC_W4ACC_CARDCODE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.W4_ACC MODIFY (ND NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -150,7 +225,7 @@ exception when others then
 PROMPT *** Create  constraint CC_W4ACC_ACCPK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_ACC MODIFY (ACC_PK CONSTRAINT CC_W4ACC_ACCPK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.W4_ACC MODIFY (ACC_PK CONSTRAINT CC_W4ACC_ACCPK_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -159,61 +234,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_W4ACC_ND_NN ***
+PROMPT *** Create  constraint CC_W4ACC_CARDCODE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_ACC MODIFY (ND CONSTRAINT CC_W4ACC_ND_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_W4ACC_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT FK_W4ACC_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_W4ACC_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_ACC MODIFY (KF CONSTRAINT CC_W4ACC_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint UK8_W4ACC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK8_W4ACC UNIQUE (ACC_2209)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_W4ACC_DATEND_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT CC_W4ACC_DATEND_NN CHECK (dat_end is not null) ENABLE';
+  ALTER TABLE BARS.W4_ACC MODIFY (CARD_CODE CONSTRAINT CC_W4ACC_CARDCODE_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -225,7 +249,7 @@ exception when others then
 PROMPT *** Create  constraint CC_W4ACC_DATBEGIN_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT CC_W4ACC_DATBEGIN_NN CHECK (dat_begin is not null) ENABLE';
+  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT CC_W4ACC_DATBEGIN_NN CHECK (dat_begin is not null) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -234,12 +258,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK9_W4ACC ***
+PROMPT *** Create  constraint CC_W4ACC_DATEND_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK9_W4ACC UNIQUE (ACC_2625X)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT CC_W4ACC_DATEND_NN CHECK (dat_end is not null) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -248,40 +270,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK10_W4ACC ***
+PROMPT *** Create  constraint CC_W4ACC_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK10_W4ACC UNIQUE (ACC_2627X)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint UK11_W4ACC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK11_W4ACC UNIQUE (ACC_2625D)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint UK12_W4ACC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK12_W4ACC UNIQUE (ACC_2203)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.W4_ACC MODIFY (KF CONSTRAINT CC_W4ACC_KF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -304,12 +296,40 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_W4ACC ***
+PROMPT *** Create  constraint UK10_W4ACC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK_W4ACC UNIQUE (ACC_PK)
+  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK10_W4ACC UNIQUE (ACC_2627X)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint UK11_W4ACC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK11_W4ACC UNIQUE (ACC_2625D)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint UK12_W4ACC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK12_W4ACC UNIQUE (ACC_2203)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -323,7 +343,7 @@ begin
  execute immediate '
   ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK1_W4ACC UNIQUE (ACC_OVR)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -337,7 +357,7 @@ begin
  execute immediate '
   ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK2_W4ACC UNIQUE (ACC_9129)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -351,7 +371,7 @@ begin
  execute immediate '
   ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK3_W4ACC UNIQUE (ACC_3570)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -365,7 +385,7 @@ begin
  execute immediate '
   ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK4_W4ACC UNIQUE (ACC_2208)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -379,7 +399,7 @@ begin
  execute immediate '
   ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK5_W4ACC UNIQUE (ACC_2627)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -388,11 +408,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_W4ACC_STANFIN23 ***
+PROMPT *** Create  constraint UK6_W4ACC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT FK_W4ACC_STANFIN23 FOREIGN KEY (FIN23)
-	  REFERENCES BARS.STAN_FIN23 (FIN) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK6_W4ACC UNIQUE (ACC_2207)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -401,11 +422,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_W4ACC_STANOBS23 ***
+PROMPT *** Create  constraint UK7_W4ACC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT FK_W4ACC_STANOBS23 FOREIGN KEY (OBS23)
-	  REFERENCES BARS.STAN_OBS23 (OBS) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK7_W4ACC UNIQUE (ACC_3579)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -414,11 +436,40 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_W4ACC_STANKAT23 ***
+PROMPT *** Create  constraint UK8_W4ACC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT FK_W4ACC_STANKAT23 FOREIGN KEY (KAT23)
-	  REFERENCES BARS.STAN_KAT23 (KAT) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK8_W4ACC UNIQUE (ACC_2209)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint UK9_W4ACC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK9_W4ACC UNIQUE (ACC_2625X)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint UK_W4ACC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_ACC ADD CONSTRAINT UK_W4ACC UNIQUE (ACC_PK)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -623,6 +674,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  W4_ACC ***
+grant SELECT                                                                 on W4_ACC          to BARSREADER_ROLE;
 grant SELECT                                                                 on W4_ACC          to BARSUPL;
 grant INSERT,SELECT,UPDATE                                                   on W4_ACC          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_ACC          to BARS_DM;

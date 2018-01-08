@@ -83,8 +83,10 @@ COMMENT ON COLUMN BARS.TMP_CCK_REP.NMK IS '';
 
 
 PROMPT *** Create  grants  TMP_CCK_REP ***
+grant SELECT                                                                 on TMP_CCK_REP     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_CCK_REP     to BARS_ACCESS_DEFROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_CCK_REP     to RCC_DEAL;
+grant SELECT                                                                 on TMP_CCK_REP     to UPLD;
 
 
 

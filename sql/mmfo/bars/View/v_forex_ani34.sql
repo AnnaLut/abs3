@@ -37,7 +37,9 @@ PROMPT *** Create  view V_FOREX_ANI34 ***
     FROM TMP_ANI34;
 
 PROMPT *** Create  grants  V_FOREX_ANI34 ***
+grant SELECT                                                                 on V_FOREX_ANI34   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FOREX_ANI34   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_FOREX_ANI34   to UPLD;
 
 
 

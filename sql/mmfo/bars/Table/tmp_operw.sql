@@ -55,10 +55,12 @@ COMMENT ON COLUMN BARS.TMP_OPERW.OPT IS '';
 
 
 PROMPT *** Create  grants  TMP_OPERW ***
+grant SELECT                                                                 on TMP_OPERW       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OPERW       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OPERW       to PYOD001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OPERW       to R_KP;
 grant SELECT                                                                 on TMP_OPERW       to START1;
+grant SELECT                                                                 on TMP_OPERW       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_OPERW       to WR_ALL_RIGHTS;
 
 

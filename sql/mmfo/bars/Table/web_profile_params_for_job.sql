@@ -82,7 +82,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  WEB_PROFILE_PARAMS_FOR_JOB ***
+grant SELECT                                                                 on WEB_PROFILE_PARAMS_FOR_JOB to BARSREADER_ROLE;
 grant SELECT                                                                 on WEB_PROFILE_PARAMS_FOR_JOB to BARS_DM;
+grant SELECT                                                                 on WEB_PROFILE_PARAMS_FOR_JOB to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_PROFILE_PARAMS_FOR_JOB to WR_ALL_RIGHTS;
 
 

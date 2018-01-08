@@ -67,6 +67,10 @@ COMMENT ON COLUMN BARS.ERR$_VOB.KOD IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_VOB ***
+grant SELECT                                                                 on ERR$_VOB        to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_VOB        to UPLD;
+
 
 
 PROMPT ===================================================================================== 

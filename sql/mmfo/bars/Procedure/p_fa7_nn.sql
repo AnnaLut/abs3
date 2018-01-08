@@ -1,4 +1,13 @@
-CREATE OR REPLACE PROCEDURE BARS.p_fa7_nn (
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FA7_NN.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_FA7_NN ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_FA7_NN (
    pdat_    DATE,
    pmode_   NUMBER DEFAULT 0,
    type_    NUMBER DEFAULT 1,
@@ -4617,3 +4626,15 @@ BEGIN
 --        logger.info ('P_FA7_NN: Error: '||sqlerrm);
 END p_fa7_nn;
 /
+show err;
+
+PROMPT *** Create  grants  P_FA7_NN ***
+grant EXECUTE                                                                on P_FA7_NN        to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on P_FA7_NN        to RPBN002;
+grant EXECUTE                                                                on P_FA7_NN        to WR_ALL_RIGHTS;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FA7_NN.sql =========*** End *** 
+PROMPT ===================================================================================== 

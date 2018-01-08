@@ -137,9 +137,11 @@ COMMENT ON COLUMN BARS.TMP_CCK5.S52 IS '';
 
 
 PROMPT *** Create  grants  TMP_CCK5 ***
+grant SELECT                                                                 on TMP_CCK5        to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_CCK5        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_CCK5        to RCC_DEAL;
 grant SELECT                                                                 on TMP_CCK5        to SALGL;
+grant SELECT                                                                 on TMP_CCK5        to UPLD;
 
 
 

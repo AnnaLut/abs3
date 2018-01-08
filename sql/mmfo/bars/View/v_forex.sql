@@ -23,8 +23,10 @@ from ( SELECT d.B, x.ref, refa, refb, x.sos,
     ) y ;
 
 PROMPT *** Create  grants  V_FOREX ***
+grant SELECT                                                                 on V_FOREX         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FOREX         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FOREX         to START1;
+grant SELECT                                                                 on V_FOREX         to UPLD;
 
 
 

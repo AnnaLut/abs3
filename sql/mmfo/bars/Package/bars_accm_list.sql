@@ -1,4 +1,10 @@
-create or replace package BARS_ACCM_LIST
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_accm_list.sql =========*** Run 
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.BARS_ACCM_LIST 
 is
 
     -----------------------------------------------------------------
@@ -58,10 +64,7 @@ is
 
 end BARS_ACCM_LIST;
 /
-
-show errors;
-
-create or replace package body BARS_ACCM_LIST
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_ACCM_LIST 
 is
 
     -----------------------------------------------------------------
@@ -114,7 +117,7 @@ is
         select ref bulk collect into l_listref
           from accm_queue_corrdocs;
         bars_audit.trace('%s: corr docs count in queue is %s',p, to_char(l_listref.count));
-       
+
         -- ѕроходим по очереди документов
         for i in 1..l_listref.count
         loop
@@ -144,7 +147,7 @@ is
                          when (s.tt like 'ZG%' and vob not in (96, 99) and to_char(c2.bankdt_date, 'ddmm') = '0101')  then
                               c2.bankdt_id - 1
                          else c2.bankdt_id
-                        end)                         caldt_id, 
+                        end)                         caldt_id,
                        (case
                          when (s.tt like 'ZG%' and vob not in (96, 99))  then
                               c2.bankdt_id
@@ -158,14 +161,14 @@ is
                        s.acc                         acc,
                        s.dos                         dos,
                        s.dosq                        dosq,
-                       s.kos                         kos, 
+                       s.kos                         kos,
                        s.kosq                        kosq,
                        s.ref
                   from (select o.ref, o.vob, o.tt,
-                               add_months(add_months(trunc(p2.fdat, 'month'), -1), 1)-1 cor_date, 
+                               add_months(add_months(trunc(p2.fdat, 'month'), -1), 1)-1 cor_date,
                                p1.fdat, p1.acc, p1.dos, p1.dosq, p1.kos, p1.kosq
                           from oper o,
-                               (select p.fdat, p.acc, 
+                               (select p.fdat, p.acc,
                                        sum(nvl(decode(p.dk, 0, p.s),  0)) dos,
                                        sum(nvl(decode(p.dk, 0, p.sq), 0)) dosq,
                                        sum(nvl(decode(p.dk, 1, p.s),  0)) kos,
@@ -185,9 +188,9 @@ is
                 bars_audit.trace('%s: document ref %s inserted in list, row(s) count %s', p, to_char(l_listref(i)), to_char(sql%rowcount));
 
                 -- ѕолучаем список дат по данному документу
-                for c in (select distinct value 
+                for c in (select distinct value
                             from (select decode(lv, 1, caldt_date1, caldt_date2) value
-                                    from (select c1.caldt_date caldt_date1, c2.caldt_date caldt_date2, d.acc 
+                                    from (select c1.caldt_date caldt_date1, c2.caldt_date caldt_date2, d.acc
                                             from accm_list_corrdocs d, accm_calendar c1, accm_calendar c2
                                            where d.ref = l_listref(i)
                                              and d.caldt_id = c1.caldt_id
@@ -257,5 +260,11 @@ is
 
 end bars_accm_list;
 /
-
-show errors;
+ show err;
+ 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_accm_list.sql =========*** End 
+ PROMPT ===================================================================================== 
+ 

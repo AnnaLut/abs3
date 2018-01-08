@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.ERR$_CP_ACCP.ORA_ERR_OPTYP$ IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CP_ACCP ***
+grant SELECT                                                                 on ERR$_CP_ACCP    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CP_ACCP    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -25,8 +25,10 @@ WHERE s.acc=d.accs  AND
       n.sos=k.sos;
 
 PROMPT *** Create  grants  KU_103 ***
+grant SELECT                                                                 on KU_103          to BARSREADER_ROLE;
 grant SELECT                                                                 on KU_103          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KU_103          to START1;
+grant SELECT                                                                 on KU_103          to UPLD;
 
 
 

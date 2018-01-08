@@ -85,6 +85,10 @@ COMMENT ON COLUMN BARS.ERR$_CIM_VMD_BOUND.BORG_REASON IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIM_VMD_BOUND ***
+grant SELECT                                                                 on ERR$_CIM_VMD_BOUND to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIM_VMD_BOUND to UPLD;
+
 
 
 PROMPT ===================================================================================== 

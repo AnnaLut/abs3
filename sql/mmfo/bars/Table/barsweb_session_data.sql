@@ -69,19 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BARSWEB_SESSION_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BARSWEB_SESSION_DATA ADD CONSTRAINT FK_BARSWEB_SESSION_STAFF FOREIGN KEY (STAFF_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C006041 ***
 begin   
  execute immediate '
@@ -132,7 +119,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BARSWEB_SESSION_DATA ***
+grant SELECT                                                                 on BARSWEB_SESSION_DATA to BARSREADER_ROLE;
 grant SELECT                                                                 on BARSWEB_SESSION_DATA to BARS_DM;
+grant SELECT                                                                 on BARSWEB_SESSION_DATA to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BARSWEB_SESSION_DATA to WR_ALL_RIGHTS;
 
 

@@ -79,47 +79,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_METAEXTRNVAL_METACOLUMNS ***
+PROMPT *** Create  constraint CC_METAEXTRNVAL_TABID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.META_EXTRNVAL ADD CONSTRAINT FK_METAEXTRNVAL_METACOLUMNS FOREIGN KEY (TABID, COLID)
-	  REFERENCES BARS.META_COLUMNS (TABID, COLID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_METAEXTRNVAL_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_EXTRNVAL MODIFY (BRANCH CONSTRAINT CC_METAEXTRNVAL_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_METAEXTRNVAL_SRCCOLID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_EXTRNVAL MODIFY (SRCCOLID CONSTRAINT CC_METAEXTRNVAL_SRCCOLID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_METAEXTRNVAL_SRCTABID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_EXTRNVAL MODIFY (SRCTABID CONSTRAINT CC_METAEXTRNVAL_SRCTABID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.META_EXTRNVAL MODIFY (TABID CONSTRAINT CC_METAEXTRNVAL_TABID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -140,10 +103,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_METAEXTRNVAL_TABID_NN ***
+PROMPT *** Create  constraint CC_METAEXTRNVAL_SRCTABID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.META_EXTRNVAL MODIFY (TABID CONSTRAINT CC_METAEXTRNVAL_TABID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.META_EXTRNVAL MODIFY (SRCTABID CONSTRAINT CC_METAEXTRNVAL_SRCTABID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -152,11 +115,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_METAEXTRNVAL_BRANCH ***
+PROMPT *** Create  constraint CC_METAEXTRNVAL_SRCCOLID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.META_EXTRNVAL ADD CONSTRAINT FK_METAEXTRNVAL_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
+  ALTER TABLE BARS.META_EXTRNVAL MODIFY (SRCCOLID CONSTRAINT CC_METAEXTRNVAL_SRCCOLID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -165,11 +127,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_METAEXTRNVAL_METACOLUMNS2 ***
+PROMPT *** Create  constraint CC_METAEXTRNVAL_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.META_EXTRNVAL ADD CONSTRAINT FK_METAEXTRNVAL_METACOLUMNS2 FOREIGN KEY (SRCTABID, SRCCOLID)
-	  REFERENCES BARS.META_COLUMNS (TABID, COLID) ENABLE';
+  ALTER TABLE BARS.META_EXTRNVAL MODIFY (BRANCH CONSTRAINT CC_METAEXTRNVAL_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -193,9 +154,11 @@ exception when others then
 
 PROMPT *** Create  grants  META_EXTRNVAL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_EXTRNVAL   to ABS_ADMIN;
+grant SELECT                                                                 on META_EXTRNVAL   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_EXTRNVAL   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on META_EXTRNVAL   to BARS_DM;
 grant SELECT                                                                 on META_EXTRNVAL   to START1;
+grant SELECT                                                                 on META_EXTRNVAL   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on META_EXTRNVAL   to WR_ALL_RIGHTS;
 grant SELECT                                                                 on META_EXTRNVAL   to WR_FILTER;
 grant SELECT                                                                 on META_EXTRNVAL   to WR_METATAB;

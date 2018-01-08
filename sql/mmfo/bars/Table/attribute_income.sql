@@ -84,10 +84,12 @@ exception when others then
 
 PROMPT *** Create  grants  ATTRIBUTE_INCOME ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ATTRIBUTE_INCOME to ABS_ADMIN;
+grant SELECT                                                                 on ATTRIBUTE_INCOME to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ATTRIBUTE_INCOME to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ATTRIBUTE_INCOME to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ATTRIBUTE_INCOME to DPT_ADMIN;
 grant SELECT                                                                 on ATTRIBUTE_INCOME to START1;
+grant SELECT                                                                 on ATTRIBUTE_INCOME to UPLD;
 grant FLASHBACK,SELECT                                                       on ATTRIBUTE_INCOME to WR_REFREAD;
 
 

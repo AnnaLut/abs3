@@ -52,9 +52,11 @@ COMMENT ON COLUMN BARS.RNBU_1_INT.KOD IS 'Спосiб консолiдацiї';
 
 PROMPT *** Create  grants  RNBU_1_INT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_1_INT      to ABS_ADMIN;
+grant SELECT                                                                 on RNBU_1_INT      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RNBU_1_INT      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RNBU_1_INT      to BARS_DM;
 grant SELECT                                                                 on RNBU_1_INT      to START1;
+grant SELECT                                                                 on RNBU_1_INT      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RNBU_1_INT      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on RNBU_1_INT      to WR_REFREAD;
 

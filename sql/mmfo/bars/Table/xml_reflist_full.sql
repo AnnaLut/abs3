@@ -61,19 +61,6 @@ COMMENT ON COLUMN BARS.XML_REFLIST_FULL.ISACTIVE IS 'Активность выгрузки';
 
 
 
-PROMPT *** Create  constraint FK_XMLREFFULL_TABLE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML_REFLIST_FULL ADD CONSTRAINT FK_XMLREFFULL_TABLE FOREIGN KEY (KLTABLE_NAME)
-	  REFERENCES BARS.XML_REFLIST (KLTABLE_NAME) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NN_XMLREFFULL_TABLE ***
 begin   
  execute immediate '
@@ -102,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_REFLIST_FULL ***
+grant SELECT                                                                 on XML_REFLIST_FULL to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_REFLIST_FULL to BARS_DM;
 grant SELECT                                                                 on XML_REFLIST_FULL to KLBX;
+grant SELECT                                                                 on XML_REFLIST_FULL to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_REFLIST_FULL to WR_ALL_RIGHTS;
 
 

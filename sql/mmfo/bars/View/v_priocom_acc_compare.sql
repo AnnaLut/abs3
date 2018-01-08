@@ -15,8 +15,10 @@ PROMPT *** Create  view V_PRIOCOM_ACC_COMPARE ***
 from accounts a;
 
 PROMPT *** Create  grants  V_PRIOCOM_ACC_COMPARE ***
+grant SELECT                                                                 on V_PRIOCOM_ACC_COMPARE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PRIOCOM_ACC_COMPARE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PRIOCOM_ACC_COMPARE to START1;
+grant SELECT                                                                 on V_PRIOCOM_ACC_COMPARE to UPLD;
 
 
 

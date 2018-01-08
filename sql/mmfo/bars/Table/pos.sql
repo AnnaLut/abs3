@@ -102,11 +102,13 @@ exception when others then
 
 PROMPT *** Create  grants  POS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on POS             to ABS_ADMIN;
+grant SELECT                                                                 on POS             to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on POS             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on POS             to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on POS             to POS;
 grant SELECT                                                                 on POS             to START1;
 grant SELECT                                                                 on POS             to TECH001;
+grant SELECT                                                                 on POS             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on POS             to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on POS             to WR_REFREAD;
 grant SELECT                                                                 on POS             to WR_VIEWACC;

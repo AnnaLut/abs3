@@ -25,7 +25,9 @@ PROMPT *** Create  view V_USERADM_USER_RESOURCES ***
 
 PROMPT *** Create  grants  V_USERADM_USER_RESOURCES ***
 grant SELECT                                                                 on V_USERADM_USER_RESOURCES to ABS_ADMIN;
+grant SELECT                                                                 on V_USERADM_USER_RESOURCES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USERADM_USER_RESOURCES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_USERADM_USER_RESOURCES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USERADM_USER_RESOURCES to WR_ALL_RIGHTS;
 
 

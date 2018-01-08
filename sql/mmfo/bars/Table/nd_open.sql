@@ -64,19 +64,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_NDOPEN_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ND_OPEN ADD CONSTRAINT FK_NDOPEN_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_NDOPEN_KF_NN ***
 begin   
  execute immediate '
@@ -103,9 +90,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ND_OPEN ***
+grant SELECT                                                                 on ND_OPEN         to BARSREADER_ROLE;
 grant SELECT                                                                 on ND_OPEN         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ND_OPEN         to RCC_DEAL;
 grant SELECT                                                                 on ND_OPEN         to START1;
+grant SELECT                                                                 on ND_OPEN         to UPLD;
 
 
 

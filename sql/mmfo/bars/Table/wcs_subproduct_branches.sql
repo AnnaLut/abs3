@@ -55,32 +55,6 @@ COMMENT ON COLUMN BARS.WCS_SUBPRODUCT_BRANCHES.APPLY_HIERARCHY IS 'Применять иер
 
 
 
-PROMPT *** Create  constraint FK_SBPBRANCHES_SBPID_SBPS_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SUBPRODUCT_BRANCHES ADD CONSTRAINT FK_SBPBRANCHES_SBPID_SBPS_ID FOREIGN KEY (SUBPRODUCT_ID)
-	  REFERENCES BARS.WCS_SUBPRODUCTS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SBPBRANCHES_B_BRANCH_B ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SUBPRODUCT_BRANCHES ADD CONSTRAINT FK_SBPBRANCHES_B_BRANCH_B FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SBPBRANCHES_SDATE_NN ***
 begin   
  execute immediate '
@@ -133,9 +107,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SUBPRODUCT_BRANCHES ***
+grant SELECT                                                                 on WCS_SUBPRODUCT_BRANCHES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SUBPRODUCT_BRANCHES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_SUBPRODUCT_BRANCHES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SUBPRODUCT_BRANCHES to START1;
+grant SELECT                                                                 on WCS_SUBPRODUCT_BRANCHES to UPLD;
 
 
 

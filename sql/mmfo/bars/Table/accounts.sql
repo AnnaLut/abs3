@@ -1,501 +1,1212 @@
--- ======================================================================================
--- Module : CAC
--- Author : unknown genius
--- Date   : 29.08.2017
--- ======================================================================================
--- create table ACCOUNTS
--- ======================================================
 
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET FEEDBACK     OFF
-SET TIMING       OFF
-SET DEFINE       OFF
-SET LINES        200
-SET PAGES        200
-SET TERMOUT      ON
-SET TRIMSPOOL    ON
 
-prompt -- ======================================================
-prompt -- create table ACCOUNTS
-prompt -- ======================================================
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/ACCOUNTS.sql =========*** Run *** ====
+PROMPT ===================================================================================== 
 
-begin
-  bpa.alter_policy_info( 'ACCOUNTS', 'CENTER', null, null, null, null );
-  bpa.alter_policy_info( 'ACCOUNTS', 'FILIAL',  'M',  'M',  'M',  'M' );
-  bpa.alter_policy_info( 'ACCOUNTS', 'WHOLE' , null,  'E',  'E',  'E' );
-end;
+
+PROMPT *** ALTER_POLICY_INFO to ACCOUNTS ***
+
+
+BEGIN 
+        execute immediate  
+          'begin  
+               bpa.alter_policy_info(''ACCOUNTS'', ''CENTER'' , null, null, null, null);
+               bpa.alter_policy_info(''ACCOUNTS'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''ACCOUNTS'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
+               null;
+           end; 
+          '; 
+END; 
 /
 
-declare
-  e_tab_exists exception;
-  pragma exception_init( e_tab_exists, -00955 );
-begin
-  execute immediate 'create table ACCOUNTS
-( ACC          NUMBER(38)   constraint CC_ACCOUNTS_ACC_NN    NOT NULL
-, KF           VARCHAR2(6)  default SYS_CONTEXT(''BARS_CONTEXT'',''USER_MFO'')
-                            constraint CC_ACCOUNTS_KF_NN     NOT NULL
-, NLS          VARCHAR2(15) constraint CC_ACCOUNTS_NLS_NN    NOT NULL
-, KV           NUMBER(3)    constraint CC_ACCOUNTS_KV_NN     NOT NULL
-, BRANCH       VARCHAR2(30) default SYS_CONTEXT(''BARS_CONTEXT'',''USER_BRANCH'')
-                            constraint CC_ACCOUNTS_BRANCH_NN NOT NULL
-, TOBO         VARCHAR2(30) default SYS_CONTEXT(''BARS_CONTEXT'',''USER_BRANCH'')
-                            constraint CC_ACCOUNTS_TOBO_NN   NOT NULL
-, NLSALT       VARCHAR2(15)
-, NBS          CHAR(4)
-, OB22         CHAR(2)
-, NBS2         CHAR(4)
-, DAOS         DATE         default TRUNC(SYSDATE)
-                            constraint CC_ACCOUNTS_DAOS_NN   NOT NULL
-, MDATE        DATE
-, DAZS         DATE
-, ISP          NUMBER(38)   constraint CC_ACCOUNTS_ISP_NN    NOT NULL
-, NMS          VARCHAR2(70) constraint CC_ACCOUNTS_NMS_NN    NOT NULL
-, LIM          NUMBER(24)   default 0
-                            constraint CC_ACCOUNTS_LIM_NN    NOT NULL
-, OSTB         NUMBER(24)   default 0
-                            constraint CC_ACCOUNTS_OSTB_NN   NOT NULL
-, OSTC         NUMBER(24)   default 0
-                            constraint CC_ACCOUNTS_OSTC_NN   NOT NULL
-, OSTF         NUMBER(24)   default 0
-                            constraint CC_ACCOUNTS_OSTF_NN   NOT NULL
-, OSTQ         NUMBER(24)   default 0
-                            constraint CC_ACCOUNTS_OSTQ_NN   NOT NULL
-, DOS          NUMBER(24)   default 0
-                            constraint CC_ACCOUNTS_DOS_NN    NOT NULL
-, KOS          NUMBER(24)   default 0
-                            constraint CC_ACCOUNTS_KOS_NN    NOT NULL
-, DOSQ         NUMBER(24)   default 0
-                            constraint CC_ACCOUNTS_DOSQ_NN   NOT NULL
-, KOSQ         NUMBER(24)   default 0
-                            constraint CC_ACCOUNTS_KOSQ_NN   NOT NULL
-, PAP          NUMBER(1)    constraint CC_ACCOUNTS_PAP_NN    NOT NULL
-, TIP          CHAR(3)      default ''ODB''
-                            constraint CC_ACCOUNTS_TIP_NN    NOT NULL
-, VID          NUMBER(2)    constraint CC_ACCOUNTS_VID_NN    NOT NULL
-, TRCN         NUMBER(24)   default 0
-                            constraint CC_ACCOUNTS_TRCN_NN   NOT NULL
-, SEC          RAW(64)
-, ACCC         NUMBER(38)
-, BLKD         NUMBER(3)    default 0
-                            constraint CC_ACCOUNTS_BLKD_NN   NOT NULL
-, BLKK         NUMBER(3)    default 0
-                            constraint CC_ACCOUNTS_BLKK_NN   NOT NULL
-, POS          NUMBER(38)   constraint CC_ACCOUNTS_POS_NN    NOT NULL
-, SECI         NUMBER(38)
-, SECO         NUMBER(38)
-, GRP          NUMBER(38)
-, OSTX         NUMBER(24)
-, RNK          NUMBER(38)   constraint CC_ACCOUNTS_RNK_NN  NOT NULL
-, NOTIFIER_REF NUMBER(38)
-, DAPP         DATE
-, DAPPQ        DATE
-, BDATE        DATE
-, OPT          INTEGER
-, SEND_SMS     VARCHAR2(1)
-, DAT_ALT      DATE
-, constraint PK_ACCOUNTS primary key (ACC) using index tablespace BRSBIGI
-, constraint UK_ACCOUNTS unique ( KF, ACC) using index tablespace BRSBIGI local compress 1
-, constraint FK_ACCOUNT_ACCOUNT foreign key ( ACCC ) references ACCOUNTS ( ACC )
-, constraint CC_ACCOUNTS_BRANCH check ( BRANCH like ''/''||KF||''/%'')
-, constraint CC_ACCOUNTS_TOBO   check ( BRANCH = TOBO ) deferrable
-, constraint CC_ACCOUNTS_DAZS   check ( OSTC = nvl2(DAZS,0,OSTC) )
-) TABLESPACE BRSBIGD 
-  PARTITION BY LIST (KF)
-  ( PARTITION P_01_300465  VALUES (''300465'')
-  , PARTITION P_02_324805  VALUES (''324805'')
-  , PARTITION P_03_302076  VALUES (''302076'')
-  , PARTITION P_04_303398  VALUES (''303398'')
-  , PARTITION P_05_305482  VALUES (''305482'')
-  , PARTITION P_06_335106  VALUES (''335106'')
-  , PARTITION P_07_311647  VALUES (''311647'')
-  , PARTITION P_08_312356  VALUES (''312356'')
-  , PARTITION P_09_313957  VALUES (''313957'')
-  , PARTITION P_10_336503  VALUES (''336503'')
-  , PARTITION P_11_322669  VALUES (''322669'')
-  , PARTITION P_12_323475  VALUES (''323475'')
-  , PARTITION P_13_304665  VALUES (''304665'')
-  , PARTITION P_14_325796  VALUES (''325796'')
-  , PARTITION P_15_326461  VALUES (''326461'')
-  , PARTITION P_16_328845  VALUES (''328845'')
-  , PARTITION P_17_331467  VALUES (''331467'')
-  , PARTITION P_18_333368  VALUES (''333368'')
-  , PARTITION P_19_337568  VALUES (''337568'')
-  , PARTITION P_20_338545  VALUES (''338545'')
-  , PARTITION P_21_351823  VALUES (''351823'')
-  , PARTITION P_22_352457  VALUES (''352457'')
-  , PARTITION P_23_315784  VALUES (''315784'')
-  , PARTITION P_24_354507  VALUES (''354507'')
-  , PARTITION P_25_356334  VALUES (''356334'')
-  , PARTITION P_26_353553  VALUES (''353553'')
-  )';
-  
-  dbms_output.put_line( 'Table "ACCOUNTS" created.' );
-  
-exception
-  when e_tab_exists then
-    dbms_output.put_line( 'Table "ACCOUNTS" already exists.' );
-end;
-/
-
-SET FEEDBACK ON
-
-
-begin  EXECUTE IMMEDIATE 'ALTER TABLE  bars.accounts  ADD  (DAT_ALT date ) ' ;
-exception when others then   if SQLCODE = - 01430 then null;   else raise; end if; -- ORA-01430: column being added already exists in table
-end;
-/
-
-COMMENT ON COLUMN BARS.ACCOUNTS.DAT_ALT IS 'Дата заміни NLS->NLSALT';
-
-
-prompt -- ======================================================
-prompt -- Apply policies
-prompt -- ======================================================
-
-begin
-  bpa.alter_policies( 'ACCOUNTS' );
-end;
-/
-
-commit;
-
-prompt -- ======================================================
-prompt -- Comments
-prompt -- ======================================================
-
-COMMENT ON TABLE  ACCOUNTS              IS 'Счета банка';
-
-COMMENT ON COLUMN ACCOUNTS.ACC          IS 'Внутренний номер счета';
-COMMENT ON COLUMN ACCOUNTS.KF           IS 'Код филиала';
-COMMENT ON COLUMN ACCOUNTS.NLS          IS 'Номер лицевого счета (внешний)';
-COMMENT ON COLUMN ACCOUNTS.KV           IS 'Код валюты';
-COMMENT ON COLUMN ACCOUNTS.BRANCH       IS 'Код безбалансового отделения';
-COMMENT ON COLUMN ACCOUNTS.NLSALT       IS 'Альтернативный номер счета';
-COMMENT ON COLUMN ACCOUNTS.NBS          IS 'Номер балансового счета';
-COMMENT ON COLUMN ACCOUNTS.NBS2         IS 'Номер альтернат. балансового счета';
-COMMENT ON COLUMN ACCOUNTS.DAOS         IS 'Дата открытия счета';
-COMMENT ON COLUMN ACCOUNTS.DAPP         IS 'Дата последнего движения';
-COMMENT ON COLUMN ACCOUNTS.ISP          IS 'Код исполнителя';
-COMMENT ON COLUMN ACCOUNTS.NMS          IS 'Наименование счета';
-COMMENT ON COLUMN ACCOUNTS.LIM          IS 'Лимит';
-COMMENT ON COLUMN ACCOUNTS.OSTB         IS 'Остаток плановый';
-COMMENT ON COLUMN ACCOUNTS.OSTC         IS 'Остаток фактический';
-COMMENT ON COLUMN ACCOUNTS.OSTF         IS 'Остаток будущий';
-COMMENT ON COLUMN ACCOUNTS.OSTQ         IS 'Эквивалент OSTF в нац. валюте';
-COMMENT ON COLUMN ACCOUNTS.DOS          IS 'Обороты дебет';
-COMMENT ON COLUMN ACCOUNTS.KOS          IS 'Обороты кредит';
-COMMENT ON COLUMN ACCOUNTS.DOSQ         IS 'Дебетовые обороты за текущий день';
-COMMENT ON COLUMN ACCOUNTS.KOSQ         IS 'Кредитовые обороты за текущий день';
-COMMENT ON COLUMN ACCOUNTS.PAP          IS 'Признак Атива-Пассива';
-COMMENT ON COLUMN ACCOUNTS.TIP          IS 'Тип счета';
-COMMENT ON COLUMN ACCOUNTS.VID          IS 'Код вида счета';
-COMMENT ON COLUMN ACCOUNTS.TRCN         IS 'Счетчик транзакций по данному счету';
-COMMENT ON COLUMN ACCOUNTS.MDATE        IS 'Дата погашения счета';
-COMMENT ON COLUMN ACCOUNTS.DAZS         IS 'Дата закрытия счета';
-COMMENT ON COLUMN ACCOUNTS.SEC          IS 'Код доступа (obsolete)';
-COMMENT ON COLUMN ACCOUNTS.ACCC         IS 'Внутренний номер счета';
-COMMENT ON COLUMN ACCOUNTS.BLKD         IS 'Код блокировки дебет';
-COMMENT ON COLUMN ACCOUNTS.BLKK         IS 'Код блокировки кредит';
-COMMENT ON COLUMN ACCOUNTS.POS          IS 'Признак главного счета';
-COMMENT ON COLUMN ACCOUNTS.SECI         IS 'Код доступа исполнителя';
-COMMENT ON COLUMN ACCOUNTS.SECO         IS 'Код доступа остальных';
-COMMENT ON COLUMN ACCOUNTS.GRP          IS 'Код группы счета';
-COMMENT ON COLUMN ACCOUNTS.OSTX         IS 'Максимальный остаток на счете(верхний лимит)';
-COMMENT ON COLUMN ACCOUNTS.RNK          IS 'Регистрационный номер клиента';
-COMMENT ON COLUMN ACCOUNTS.NOTIFIER_REF IS 'способ уведомления клиента об изменении факт остатка';
-COMMENT ON COLUMN ACCOUNTS.BDATE        IS 'Дата';
-COMMENT ON COLUMN ACCOUNTS.OPT          IS '1 - Признак пакетной оплаты';
-COMMENT ON COLUMN ACCOUNTS.OB22         IS 'Аналiтика рах. Розширення БР.';
-COMMENT ON COLUMN ACCOUNTS.DAPPQ        IS 'Дата расчета эквивалента';
-COMMENT ON COLUMN ACCOUNTS.SEND_SMS     IS '';
-
-prompt -- ======================================================
-prompt -- Constraints ( foreign keys )
-prompt -- ======================================================
-
-PROMPT *** Create  constraint FK_ACCOUNTS_BANKS ***
-begin
- execute immediate 'ALTER TABLE ACCOUNTS ADD CONSTRAINT FK_ACCOUNTS_BANKS FOREIGN KEY (KF)
-	  REFERENCES BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+PROMPT *** Create  table ACCOUNTS ***
+begin 
+  execute immediate '
+  CREATE TABLE BARS.ACCOUNTS 
+   (	ACC NUMBER(38,0), 
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
+	NLS VARCHAR2(15), 
+	KV NUMBER(3,0), 
+	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch''), 
+	NLSALT VARCHAR2(15), 
+	NBS CHAR(4), 
+	NBS2 CHAR(4), 
+	DAOS DATE DEFAULT TRUNC(SYSDATE), 
+	DAPP DATE, 
+	ISP NUMBER(38,0), 
+	NMS VARCHAR2(70), 
+	LIM NUMBER(24,0) DEFAULT 0, 
+	OSTB NUMBER(24,0) DEFAULT 0, 
+	OSTC NUMBER(24,0) DEFAULT 0, 
+	OSTF NUMBER(24,0) DEFAULT 0, 
+	OSTQ NUMBER(24,0) DEFAULT 0, 
+	DOS NUMBER(24,0) DEFAULT 0, 
+	KOS NUMBER(24,0) DEFAULT 0, 
+	DOSQ NUMBER(24,0) DEFAULT 0, 
+	KOSQ NUMBER(24,0) DEFAULT 0, 
+	PAP NUMBER(1,0), 
+	TIP CHAR(3), 
+	VID NUMBER(2,0), 
+	TRCN NUMBER(24,0) DEFAULT 0, 
+	MDATE DATE, 
+	DAZS DATE, 
+	SEC RAW(64), 
+	ACCC NUMBER(38,0), 
+	BLKD NUMBER(3,0) DEFAULT 0, 
+	BLKK NUMBER(3,0) DEFAULT 0, 
+	POS NUMBER(38,0), 
+	SECI NUMBER(38,0), 
+	SECO NUMBER(38,0), 
+	GRP NUMBER(38,0), 
+	OSTX NUMBER(24,0), 
+	RNK NUMBER(38,0), 
+	NOTIFIER_REF NUMBER(38,0), 
+	TOBO VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch''), 
+	BDATE DATE, 
+	OPT NUMBER(*,0), 
+	OB22 CHAR(2), 
+	DAPPQ DATE, 
+	SEND_SMS VARCHAR2(1), 
+	DAT_ALT DATE
+   ) PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+  TABLESPACE BRSBIGD 
+  PARTITION BY LIST (KF) 
+ (PARTITION P_01_300465  VALUES (''300465'') SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_02_324805  VALUES (''324805'') SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_03_302076  VALUES (''302076'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_04_303398  VALUES (''303398'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_05_305482  VALUES (''305482'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_06_335106  VALUES (''335106'') SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_07_311647  VALUES (''311647'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_08_312356  VALUES (''312356'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_09_313957  VALUES (''313957'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_10_336503  VALUES (''336503'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_11_322669  VALUES (''322669'') SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_12_323475  VALUES (''323475'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_13_304665  VALUES (''304665'') SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_14_325796  VALUES (''325796'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_15_326461  VALUES (''326461'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_16_328845  VALUES (''328845'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_17_331467  VALUES (''331467'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_18_333368  VALUES (''333368'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_19_337568  VALUES (''337568'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_20_338545  VALUES (''338545'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_21_351823  VALUES (''351823'') SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_22_352457  VALUES (''352457'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_23_315784  VALUES (''315784'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_24_354507  VALUES (''354507'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_25_356334  VALUES (''356334'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD , 
+ PARTITION P_26_353553  VALUES (''353553'') SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING 
+  TABLESPACE BRSBIGD ) ';
+exception when others then       
+  if sqlcode=-955 then null; else raise; end if; 
+end; 
 /
 
 
-PROMPT *** Create  constraint FK_ACCOUNTS_BRANCH ***
+
+
+PROMPT *** ALTER_POLICIES to ACCOUNTS ***
+ exec bpa.alter_policies('ACCOUNTS');
+
+
+COMMENT ON TABLE BARS.ACCOUNTS IS 'Счета банка';
+COMMENT ON COLUMN BARS.ACCOUNTS.DAT_ALT IS 'Р”Р°С‚Р° Р·Р°РјС–РЅРё NLS->NLSALT';
+COMMENT ON COLUMN BARS.ACCOUNTS.ACC IS 'Внутренний номер счета';
+COMMENT ON COLUMN BARS.ACCOUNTS.KF IS 'Код филиала';
+COMMENT ON COLUMN BARS.ACCOUNTS.NLS IS 'Номер лицевого счета (внешний)';
+COMMENT ON COLUMN BARS.ACCOUNTS.KV IS 'Код валюты';
+COMMENT ON COLUMN BARS.ACCOUNTS.BRANCH IS 'Код безбалансового отделения';
+COMMENT ON COLUMN BARS.ACCOUNTS.NLSALT IS 'Альтернативный номер счета';
+COMMENT ON COLUMN BARS.ACCOUNTS.NBS IS 'Номер балансового счета';
+COMMENT ON COLUMN BARS.ACCOUNTS.NBS2 IS 'Номер альтернат. балансового счета';
+COMMENT ON COLUMN BARS.ACCOUNTS.DAOS IS 'Дата открытия счета';
+COMMENT ON COLUMN BARS.ACCOUNTS.DAPP IS 'Дата последнего движения';
+COMMENT ON COLUMN BARS.ACCOUNTS.ISP IS 'Код исполнителя';
+COMMENT ON COLUMN BARS.ACCOUNTS.NMS IS 'Наименование счета';
+COMMENT ON COLUMN BARS.ACCOUNTS.LIM IS 'Лимит';
+COMMENT ON COLUMN BARS.ACCOUNTS.OSTB IS 'Остаток плановый';
+COMMENT ON COLUMN BARS.ACCOUNTS.OSTC IS 'Остаток фактический';
+COMMENT ON COLUMN BARS.ACCOUNTS.OSTF IS 'Остаток будущий';
+COMMENT ON COLUMN BARS.ACCOUNTS.OSTQ IS 'Эквивалент OSTF в нац. валюте';
+COMMENT ON COLUMN BARS.ACCOUNTS.DOS IS 'Обороты дебет';
+COMMENT ON COLUMN BARS.ACCOUNTS.KOS IS 'Обороты кредит';
+COMMENT ON COLUMN BARS.ACCOUNTS.DOSQ IS 'Дебетовые обороты за текущий день';
+COMMENT ON COLUMN BARS.ACCOUNTS.KOSQ IS 'Кредитовые обороты за текущий день';
+COMMENT ON COLUMN BARS.ACCOUNTS.PAP IS 'Признак Атива-Пассива';
+COMMENT ON COLUMN BARS.ACCOUNTS.TIP IS 'Тип счета';
+COMMENT ON COLUMN BARS.ACCOUNTS.VID IS 'Код вида счета';
+COMMENT ON COLUMN BARS.ACCOUNTS.TRCN IS 'Счетчик транзакций по данному счету';
+COMMENT ON COLUMN BARS.ACCOUNTS.MDATE IS 'Дата погашения счета';
+COMMENT ON COLUMN BARS.ACCOUNTS.DAZS IS 'Дата закрытия счета';
+COMMENT ON COLUMN BARS.ACCOUNTS.SEC IS 'Код доступа (obsolete)';
+COMMENT ON COLUMN BARS.ACCOUNTS.ACCC IS 'Внутренний номер счета';
+COMMENT ON COLUMN BARS.ACCOUNTS.BLKD IS 'Код блокировки дебет';
+COMMENT ON COLUMN BARS.ACCOUNTS.BLKK IS 'Код блокировки кредит';
+COMMENT ON COLUMN BARS.ACCOUNTS.POS IS 'Признак главного счета';
+COMMENT ON COLUMN BARS.ACCOUNTS.SECI IS 'Код доступа исполнителя';
+COMMENT ON COLUMN BARS.ACCOUNTS.SECO IS 'Код доступа остальных';
+COMMENT ON COLUMN BARS.ACCOUNTS.GRP IS 'Код группы счета';
+COMMENT ON COLUMN BARS.ACCOUNTS.OSTX IS 'Максимальный остаток на счете(верхний лимит)';
+COMMENT ON COLUMN BARS.ACCOUNTS.RNK IS 'Регистрационный номер клиента';
+COMMENT ON COLUMN BARS.ACCOUNTS.NOTIFIER_REF IS 'способ уведомления клиента об изменении факт остатка';
+COMMENT ON COLUMN BARS.ACCOUNTS.TOBO IS 'Код подразделения';
+COMMENT ON COLUMN BARS.ACCOUNTS.BDATE IS 'Дата';
+COMMENT ON COLUMN BARS.ACCOUNTS.OPT IS '1 - Признак пакетной оплаты';
+COMMENT ON COLUMN BARS.ACCOUNTS.OB22 IS 'Аналiтика рах. Розширення БР.';
+COMMENT ON COLUMN BARS.ACCOUNTS.DAPPQ IS 'Дата расчета эквивалента';
+COMMENT ON COLUMN BARS.ACCOUNTS.SEND_SMS IS '';
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_DAZS ***
 begin   
- execute immediate 'ALTER TABLE ACCOUNTS ADD CONSTRAINT FK_ACCOUNTS_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS ADD CONSTRAINT CC_ACCOUNTS_DAZS CHECK ( OSTC = nvl2(DAZS,0,OSTC) ) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-PROMPT *** Create  constraint FK_ACCOUNTS_CUSTOMER ***
+
+
+PROMPT *** Create  constraint XUK_ACCOUNTS_KF_ACC ***
 begin   
- execute immediate 'ALTER TABLE ACCOUNTS ADD CONSTRAINT FK_ACCOUNTS_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES CUSTOMER (RNK) ENABLE NOVALIDATE';
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS ADD CONSTRAINT XUK_ACCOUNTS_KF_ACC UNIQUE (KF, ACC)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 
+  TABLESPACE BRSBIGI  LOCAL
+ (PARTITION P_01_300465 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_02_324805 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_03_302076 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_04_303398 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_05_305482 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_06_335106 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_07_311647 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_08_312356 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_09_313957 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_10_336503 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_11_322669 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_12_323475 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_13_304665 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_14_325796 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_15_326461 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_16_328845 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_17_331467 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_18_333368 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_19_337568 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_20_338545 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_21_351823 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_22_352457 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_23_315784 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_24_354507 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_25_356334 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_26_353553 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI )  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-PROMPT *** Create  constraint FK_ACCOUNTS_NOTIFIERS ***
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_BRANCH_CC ***
 begin   
- execute immediate 'ALTER TABLE ACCOUNTS ADD CONSTRAINT FK_ACCOUNTS_NOTIFIERS FOREIGN KEY (NOTIFIER_REF)
-	  REFERENCES NOTIFIERS (ID) ENABLE NOVALIDATE';
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS ADD CONSTRAINT CC_ACCOUNTS_BRANCH_CC CHECK (branch<>''/'') ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-PROMPT *** Create  constraint FK_ACCOUNTS_PAP ***
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_BRANCH_CC2 ***
 begin   
- execute immediate 'ALTER TABLE ACCOUNTS ADD CONSTRAINT FK_ACCOUNTS_PAP FOREIGN KEY (PAP)
-	  REFERENCES PAP (PAP) ENABLE NOVALIDATE';
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS ADD CONSTRAINT CC_ACCOUNTS_BRANCH_CC2 CHECK (branch like ''/''||kf||''/%'') ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-PROMPT *** Create  constraint FK_ACCOUNTS_POS ***
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_BRANCH_TOBO_CC ***
 begin   
- execute immediate 'ALTER TABLE ACCOUNTS ADD CONSTRAINT FK_ACCOUNTS_POS FOREIGN KEY (POS)
-	  REFERENCES POS (POS) ENABLE NOVALIDATE';
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS ADD CONSTRAINT CC_ACCOUNTS_BRANCH_TOBO_CC CHECK (branch=tobo) DEFERRABLE ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-PROMPT *** Create  constraint FK_ACCOUNTS_PS ***
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_ACC_NN ***
 begin   
- execute immediate 'ALTER TABLE ACCOUNTS ADD CONSTRAINT FK_ACCOUNTS_PS FOREIGN KEY (NBS)
-	  REFERENCES PS (NBS) ENABLE NOVALIDATE';
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (ACC CONSTRAINT CC_ACCOUNTS_ACC_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-PROMPT *** Create  constraint FK_ACCOUNTS_RANG ***
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_KF_NN ***
 begin   
- execute immediate 'ALTER TABLE ACCOUNTS ADD CONSTRAINT FK_ACCOUNTS_RANG FOREIGN KEY (BLKD)
-	  REFERENCES RANG (RANG) ENABLE NOVALIDATE';
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (KF CONSTRAINT CC_ACCOUNTS_KF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-PROMPT *** Create  constraint FK_ACCOUNTS_RANG2 ***
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_NLS_NN ***
 begin   
- execute immediate 'ALTER TABLE ACCOUNTS ADD CONSTRAINT FK_ACCOUNTS_RANG2 FOREIGN KEY (BLKK)
-	  REFERENCES RANG (RANG) ENABLE NOVALIDATE';
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (NLS CONSTRAINT CC_ACCOUNTS_NLS_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-PROMPT *** Create  constraint FK_ACCOUNTS_STAFF ***
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_KV_NN ***
 begin   
- execute immediate 'ALTER TABLE ACCOUNTS ADD CONSTRAINT FK_ACCOUNTS_STAFF FOREIGN KEY (ISP)
-	  REFERENCES STAFF$BASE (ID) ENABLE NOVALIDATE';
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (KV CONSTRAINT CC_ACCOUNTS_KV_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-PROMPT *** Create  constraint FK_ACCOUNTS_TABVAL ***
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_BRANCH_NN ***
 begin   
- execute immediate 'ALTER TABLE ACCOUNTS ADD CONSTRAINT FK_ACCOUNTS_TABVAL FOREIGN KEY (KV)
-	  REFERENCES TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (BRANCH CONSTRAINT CC_ACCOUNTS_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-PROMPT *** Create  constraint FK_ACCOUNTS_TIPS ***
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_DAOS_NN ***
 begin   
- execute immediate 'ALTER TABLE ACCOUNTS ADD CONSTRAINT FK_ACCOUNTS_TIPS FOREIGN KEY (TIP)
-	  REFERENCES TIPS (TIP) ENABLE NOVALIDATE';
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (DAOS CONSTRAINT CC_ACCOUNTS_DAOS_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-PROMPT *** Create  constraint FK_ACCOUNTS_VIDS ***
-begin
- execute immediate 'ALTER TABLE ACCOUNTS ADD CONSTRAINT FK_ACCOUNTS_VIDS FOREIGN KEY (VID)
-	  REFERENCES VIDS (VID) ENABLE NOVALIDATE';
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_NMS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (NMS CONSTRAINT CC_ACCOUNTS_NMS_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
-prompt -- ======================================================
-prompt -- Indexes
-prompt -- ======================================================
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_LIM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (LIM CONSTRAINT CC_ACCOUNTS_LIM_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_OSTB_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (OSTB CONSTRAINT CC_ACCOUNTS_OSTB_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_OSTC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (OSTC CONSTRAINT CC_ACCOUNTS_OSTC_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_OSTF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (OSTF CONSTRAINT CC_ACCOUNTS_OSTF_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_OSTQ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (OSTQ CONSTRAINT CC_ACCOUNTS_OSTQ_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_DOS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (DOS CONSTRAINT CC_ACCOUNTS_DOS_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_KOS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (KOS CONSTRAINT CC_ACCOUNTS_KOS_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_DOSQ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (DOSQ CONSTRAINT CC_ACCOUNTS_DOSQ_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_KOSQ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (KOSQ CONSTRAINT CC_ACCOUNTS_KOSQ_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_VID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (VID CONSTRAINT CC_ACCOUNTS_VID_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_TRCN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (TRCN CONSTRAINT CC_ACCOUNTS_TRCN_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_BLKD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (BLKD CONSTRAINT CC_ACCOUNTS_BLKD_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_BLKK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (BLKK CONSTRAINT CC_ACCOUNTS_BLKK_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_POS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (POS CONSTRAINT CC_ACCOUNTS_POS_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_RNK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (RNK CONSTRAINT CC_ACCOUNTS_RNK_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCOUNTS_TOBO_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS MODIFY (TOBO CONSTRAINT CC_ACCOUNTS_TOBO_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint XPK_ACCOUNTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCOUNTS ADD CONSTRAINT XPK_ACCOUNTS PRIMARY KEY (ACC)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index IDX_ACCOUNTS_NLSALT_KV ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_ACCOUNTS_NLSALT_KV ON BARS.ACCOUNTS (NLSALT, KV) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS COMPRESS 2 
+  TABLESPACE BRSBIGI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 
 PROMPT *** Create  index IDX_ACCOUNTS_KF_TIP ***
-begin
-  execute immediate 'create index IDX_ACCOUNTS_TIP_KF on ACCOUNTS ( TIP, KF )
-  tablespace BRSBIGI
-  LOCAL
-  COMPRESS 1';
-exception
-  when others then
-    if sqlcode=-955 then null; else raise; end if;
-end;
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_ACCOUNTS_KF_TIP ON BARS.ACCOUNTS (KF, TIP) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 
+  TABLESPACE BRSBIGI  LOCAL
+ (PARTITION P_01_300465 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_02_324805 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_03_302076 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_04_303398 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_05_305482 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_06_335106 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_07_311647 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_08_312356 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_09_313957 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_10_336503 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_11_322669 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_12_323475 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_13_304665 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_14_325796 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_15_326461 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_16_328845 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_17_331467 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_18_333368 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_19_337568 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_20_338545 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_21_351823 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_22_352457 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_23_315784 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_24_354507 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_25_356334 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_26_353553 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI ) COMPRESS 1 ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
 /
+
+
 
 
 PROMPT *** Create  index XAK_ACCOUNTS_BRANCH ***
 begin   
- execute immediate 'create index IDX_ACCOUNTS_BRANCH ON ACCOUNTS (BRANCH) tablespace BRSBIGI';
+ execute immediate '
+  CREATE INDEX BARS.XAK_ACCOUNTS_BRANCH ON BARS.ACCOUNTS (BRANCH) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+
+
 
 
 PROMPT *** Create  index XAK_ACCOUNTS_ACCC ***
 begin   
- execute immediate 'create index XAK_ACCOUNTS_ACCC ON ACCOUNTS (ACCC) tablespace BRSBIGI';
+ execute immediate '
+  CREATE INDEX BARS.XAK_ACCOUNTS_ACCC ON BARS.ACCOUNTS (ACCC) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+
+
 
 
 PROMPT *** Create  index IDX_ACCOUNTS_KF_NBS_OB22 ***
 begin   
- execute immediate 'create index IDX_ACCOUNTS_NBS_OB22_KF on ACCOUNTS ( NBS, OB22 )
-  tablespace BRSBIGI
-  LOCAL
-  COMPRESS 1 ';
+ execute immediate '
+  CREATE INDEX BARS.IDX_ACCOUNTS_KF_NBS_OB22 ON BARS.ACCOUNTS (KF, NBS, OB22) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 
+  TABLESPACE BRSBIGI  LOCAL
+ (PARTITION P_01_300465 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_02_324805 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_03_302076 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_04_303398 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_05_305482 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_06_335106 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_07_311647 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_08_312356 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_09_313957 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_10_336503 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_11_322669 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_12_323475 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_13_304665 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_14_325796 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_15_326461 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_16_328845 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_17_331467 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_18_333368 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_19_337568 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_20_338545 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_21_351823 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_22_352457 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_23_315784 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_24_354507 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_25_356334 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_26_353553 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI ) COMPRESS 2 ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+
+
 
 
 PROMPT *** Create  index XAK_ACCOUNTS_RNK ***
 begin   
- execute immediate 'create index IDX_ACCOUNTS_RNK ON ACCOUNTS (RNK) tablespace BRSBIGI LOCAL';
+ execute immediate '
+  CREATE INDEX BARS.XAK_ACCOUNTS_RNK ON BARS.ACCOUNTS (RNK) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+
+
 
 
 PROMPT *** Create  index UK_ACCOUNTS_KF_NLS_KV ***
 begin   
- execute immediate 'create unique index UK_ACCOUNTS_KF_NLS_KV ON ACCOUNTS ( NLS, KV ) tablespace BRSBIGI LOCAL';
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.UK_ACCOUNTS_KF_NLS_KV ON BARS.ACCOUNTS (KF, NLS, KV) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 
+  TABLESPACE BRSBIGI  LOCAL
+ (PARTITION P_01_300465 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_02_324805 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_03_302076 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_04_303398 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_05_305482 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_06_335106 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_07_311647 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_08_312356 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_09_313957 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_10_336503 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_11_322669 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_12_323475 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_13_304665 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_14_325796 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_15_326461 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_16_328845 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_17_331467 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_18_333368 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_19_337568 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_20_338545 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_21_351823 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_22_352457 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_23_315784 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_24_354507 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_25_356334 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_26_353553 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI ) ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
 
 
-PROMPT *** Create  index IDX_ACCOUNTS_KF_NLSALT_KV ***
+
+
+PROMPT *** Create  index UK_ACCOUNTS_KF_ACC ***
 begin   
- execute immediate 'create index IDX_ACCOUNTS_KF_NLSALT_KV ON ACCOUNTS ( KV, NLSALT ) tablespace BRSBIGI LOCAL COMPRESS 1';
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.UK_ACCOUNTS_KF_ACC ON BARS.ACCOUNTS (KF, ACC) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 
+  TABLESPACE BRSBIGI  LOCAL
+ (PARTITION P_01_300465 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_02_324805 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_03_302076 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_04_303398 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_05_305482 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_06_335106 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_07_311647 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_08_312356 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_09_313957 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_10_336503 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_11_322669 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_12_323475 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_13_304665 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_14_325796 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_15_326461 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_16_328845 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_17_331467 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_18_333368 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_19_337568 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_20_338545 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_21_351823 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_22_352457 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_23_315784 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_24_354507 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_25_356334 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI , 
+ PARTITION P_26_353553 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
+  TABLESPACE BRSBIGI ) ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+
+
 
 
 PROMPT *** Create  index XAK_ACCOUNTS_NMS ***
-begin 
- execute immediate 'create index IDX_ACCOUNTS_NMS on ACCOUNTS (UPPER(NMS)) tablespace BRSBIGI LOCAL';
+begin   
+ execute immediate '
+  CREATE INDEX BARS.XAK_ACCOUNTS_NMS ON BARS.ACCOUNTS (UPPER(NMS)) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+
+
 
 
 PROMPT *** Create  index XAK_ACCOUNTS_FTIP ***
 begin   
- execute immediate 'create index XAK_ACCOUNTS_FTIP ON ACCOUNTS (CASE  WHEN (TIP=''N00'' OR TIP=''L00'' OR TIP=''L01'' OR TIP=''T00'' OR TIP=''T0D'' OR TIP=''TNB'' OR TIP=''TND'' OR TIP=''L99'' OR TIP=''N99'' OR TIP=''TUR'' OR TIP=''TUD'' OR TIP=''902'' OR TIP=''90D'') THEN TIP ELSE NULL END )
-  TABLESPACE BRSBIGI
-  LOCAL';
+ execute immediate '
+  CREATE INDEX BARS.XAK_ACCOUNTS_FTIP ON BARS.ACCOUNTS (CASE  WHEN (TIP=''N00'' OR TIP=''L00'' OR TIP=''L01'' OR TIP=''T00'' OR TIP=''T0D'' OR TIP=''TNB'' OR TIP=''TND'' OR TIP=''L99'' OR TIP=''N99'' OR TIP=''TUR'' OR TIP=''TUD'' OR TIP=''902'' OR TIP=''90D'') THEN TIP ELSE NULL END ) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
 
-prompt -- ======================================================
-prompt -- Grants
-prompt -- ======================================================
 
-grant SELECT,UPDATE,INSERT                                            on ACCOUNTS to ABS_ADMIN;
-grant SELECT,UPDATE                                                   on ACCOUNTS to BARS009;
-grant SELECT                                                          on ACCOUNTS to BARS010;
-grant SELECT                                                          on ACCOUNTS to BARS015;
-grant REFERENCES,SELECT                                               on ACCOUNTS to BARSAQ with grant option;
-grant REFERENCES,SELECT                                               on ACCOUNTS to BARSAQ_ADM with grant option;
-grant SELECT                                                          on ACCOUNTS to BARSDWH_ACCESS_USER;
-grant SELECT                                                          on ACCOUNTS to BARSUPL;
-grant SELECT,UPDATE,INSERT                                            on ACCOUNTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                          on ACCOUNTS to BARS_DM;
-grant SELECT,UPDATE                                                   on ACCOUNTS to CUST001;
-grant SELECT,UPDATE                                                   on ACCOUNTS to DEP_SKRN;
-grant SELECT                                                          on ACCOUNTS to DM;
-grant SELECT,UPDATE                                                   on ACCOUNTS to DPT;
-grant SELECT                                                          on ACCOUNTS to DPT_ADMIN;
-grant SELECT                                                          on ACCOUNTS to DPT_ROLE;
-grant SELECT,UPDATE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES on ACCOUNTS to FINMON;
-grant SELECT,UPDATE                                                   on ACCOUNTS to FINMON01;
-grant SELECT,UPDATE                                                   on ACCOUNTS to FOREX;
-grant SELECT                                                          on ACCOUNTS to IBSADM_ROLE;
-grant SELECT                                                          on ACCOUNTS to INSPECTOR;
-grant SELECT                                                          on ACCOUNTS to KLBX;
-grant SELECT,UPDATE,INSERT                                            on ACCOUNTS to NALOG;
-grant SELECT,UPDATE                                                   on ACCOUNTS to OBPC;
-grant SELECT                                                          on ACCOUNTS to PFU with grant option;
-grant SELECT                                                          on ACCOUNTS to PYOD001;
-grant SELECT,UPDATE,INSERT                                            on ACCOUNTS to RCC_DEAL;
-grant SELECT                                                          on ACCOUNTS to REF0000;
-grant SELECT                                                          on ACCOUNTS to REFSYNC_USR;
-grant SELECT                                                          on ACCOUNTS to RPBN001;
-grant SELECT                                                          on ACCOUNTS to RPBN002;
-grant SELECT,UPDATE                                                   on ACCOUNTS to SALGL;
-grant SELECT,UPDATE                                                   on ACCOUNTS to SETLIM01;
-grant SELECT                                                          on ACCOUNTS to START1;
-grant SELECT                                                          on ACCOUNTS to SWTOSS;
-grant UPDATE                                                          on ACCOUNTS to TECH001;
-grant SELECT                                                          on ACCOUNTS to TECH005;
-grant SELECT                                                          on ACCOUNTS to TOSS;
-grant SELECT                                                          on ACCOUNTS to WR_ACRINT;
-grant SELECT,UPDATE,INSERT                                            on ACCOUNTS to WR_ALL_RIGHTS;
-grant SELECT,UPDATE                                                   on ACCOUNTS to WR_CUSTLIST;
-grant SELECT,UPDATE                                                   on ACCOUNTS to WR_DEPOSIT_U;
-grant SELECT                                                          on ACCOUNTS to WR_DOCHAND;
-grant SELECT                                                          on ACCOUNTS to WR_DOCVIEW;
-grant SELECT                                                          on ACCOUNTS to WR_DOC_INPUT;
-grant SELECT                                                          on ACCOUNTS to WR_KP;
-grant SELECT                                                          on ACCOUNTS to WR_VIEWACC;
 
-prompt -- ======================================================
-prompt -- Synonyms
-prompt -- ======================================================
 
-create or replace public synonym ACCOUNT1   for ACCOUNTS;
-create or replace public synonym ACCOUNT2   for ACCOUNTS;
-create or replace public synonym ACCOUNT4   for ACCOUNTS;
-create or replace public synonym ACCOUNTS_F for ACCOUNTS;
+PROMPT *** Create  index XPK_ACCOUNTS ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.XPK_ACCOUNTS ON BARS.ACCOUNTS (ACC) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
-prompt -- ======================================================
-prompt -- FINISH
-prompt -- ======================================================
+
+
+PROMPT *** Create  grants  ACCOUNTS ***
+grant DELETE,INSERT,SELECT,UPDATE                                            on ACCOUNTS        to ABS_ADMIN;
+grant SELECT,UPDATE                                                          on ACCOUNTS        to BARS009;
+grant SELECT                                                                 on ACCOUNTS        to BARS010;
+grant SELECT                                                                 on ACCOUNTS        to BARS015;
+grant REFERENCES,SELECT                                                      on ACCOUNTS        to BARSAQ with grant option;
+grant REFERENCES,SELECT                                                      on ACCOUNTS        to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on ACCOUNTS        to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on ACCOUNTS        to BARSREADER_ROLE;
+grant SELECT                                                                 on ACCOUNTS        to BARSUPL;
+grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on ACCOUNTS        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on ACCOUNTS        to BARS_DM;
+grant DELETE,UPDATE                                                          on ACCOUNTS        to CUST001;
+grant SELECT,UPDATE                                                          on ACCOUNTS        to DEP_SKRN;
+grant SELECT                                                                 on ACCOUNTS        to DM;
+grant SELECT,UPDATE                                                          on ACCOUNTS        to DPT;
+grant SELECT                                                                 on ACCOUNTS        to DPT_ADMIN;
+grant SELECT                                                                 on ACCOUNTS        to DPT_ROLE;
+grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on ACCOUNTS        to FINMON;
+grant SELECT,UPDATE                                                          on ACCOUNTS        to FINMON01;
+grant SELECT,UPDATE                                                          on ACCOUNTS        to FOREX;
+grant SELECT                                                                 on ACCOUNTS        to IBSADM_ROLE;
+grant SELECT                                                                 on ACCOUNTS        to INSPECTOR;
+grant SELECT                                                                 on ACCOUNTS        to KLBX;
+grant INSERT,SELECT,UPDATE                                                   on ACCOUNTS        to NALOG;
+grant SELECT,UPDATE                                                          on ACCOUNTS        to OBPC;
+grant SELECT                                                                 on ACCOUNTS        to PFU with grant option;
+grant SELECT                                                                 on ACCOUNTS        to PYOD001;
+grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on ACCOUNTS        to RCC_DEAL;
+grant SELECT                                                                 on ACCOUNTS        to REF0000;
+grant SELECT                                                                 on ACCOUNTS        to REFSYNC_USR;
+grant SELECT                                                                 on ACCOUNTS        to RPBN001;
+grant SELECT                                                                 on ACCOUNTS        to RPBN002;
+grant SELECT,UPDATE                                                          on ACCOUNTS        to SALGL;
+grant SELECT,UPDATE                                                          on ACCOUNTS        to SETLIM01;
+grant SELECT,SELECT                                                          on ACCOUNTS        to START1;
+grant SELECT                                                                 on ACCOUNTS        to SWTOSS;
+grant UPDATE                                                                 on ACCOUNTS        to TECH001;
+grant SELECT                                                                 on ACCOUNTS        to TECH005;
+grant SELECT,UPDATE                                                          on ACCOUNTS        to TEST;
+grant SELECT                                                                 on ACCOUNTS        to TOSS;
+grant SELECT                                                                 on ACCOUNTS        to UPLD;
+grant SELECT                                                                 on ACCOUNTS        to WR_ACRINT;
+grant DELETE,INSERT,SELECT,UPDATE                                            on ACCOUNTS        to WR_ALL_RIGHTS;
+grant SELECT,UPDATE                                                          on ACCOUNTS        to WR_CUSTLIST;
+grant SELECT,UPDATE                                                          on ACCOUNTS        to WR_DEPOSIT_U;
+grant SELECT                                                                 on ACCOUNTS        to WR_DOCHAND;
+grant SELECT                                                                 on ACCOUNTS        to WR_DOCVIEW;
+grant SELECT                                                                 on ACCOUNTS        to WR_DOC_INPUT;
+grant SELECT                                                                 on ACCOUNTS        to WR_KP;
+grant SELECT                                                                 on ACCOUNTS        to WR_VIEWACC;
+
+
+
+PROMPT *** Create SYNONYM  to ACCOUNTS ***
+
+  CREATE OR REPLACE PUBLIC SYNONYM ACCOUNT1 FOR BARS.ACCOUNTS;
+
+
+PROMPT *** Create SYNONYM  to ACCOUNTS ***
+
+  CREATE OR REPLACE PUBLIC SYNONYM ACCOUNT2 FOR BARS.ACCOUNTS;
+
+
+PROMPT *** Create SYNONYM  to ACCOUNTS ***
+
+  CREATE OR REPLACE PUBLIC SYNONYM ACCOUNT4 FOR BARS.ACCOUNTS;
+
+
+PROMPT *** Create SYNONYM  to ACCOUNTS ***
+
+  CREATE OR REPLACE PUBLIC SYNONYM ACCOUNTS_F FOR BARS.ACCOUNTS;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Table/ACCOUNTS.sql =========*** End *** ====
+PROMPT ===================================================================================== 

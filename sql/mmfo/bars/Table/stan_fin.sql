@@ -106,11 +106,13 @@ exception when others then
 
 PROMPT *** Create  grants  STAN_FIN ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAN_FIN        to ABS_ADMIN;
+grant SELECT                                                                 on STAN_FIN        to BARSREADER_ROLE;
 grant SELECT                                                                 on STAN_FIN        to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAN_FIN        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAN_FIN        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAN_FIN        to RCC_DEAL;
 grant SELECT                                                                 on STAN_FIN        to START1;
+grant SELECT                                                                 on STAN_FIN        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAN_FIN        to WR_ALL_RIGHTS;
 grant SELECT                                                                 on STAN_FIN        to WR_CREDIT;
 grant SELECT                                                                 on STAN_FIN        to WR_CUSTREG;

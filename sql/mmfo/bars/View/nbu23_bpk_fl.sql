@@ -15,8 +15,10 @@ select a.RNK,o.ND,a.mdate, 'W4' ,to_number(a.nbs),o.FIN23,o.OBS23,o.KAT23,o.k23,
 from W4_aCC o, v_gl a   where o.ACC_OVR = a.acc and a.dazs is null;
 
 PROMPT *** Create  grants  NBU23_BPK_FL ***
+grant SELECT                                                                 on NBU23_BPK_FL    to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on NBU23_BPK_FL    to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on NBU23_BPK_FL    to START1;
+grant SELECT                                                                 on NBU23_BPK_FL    to UPLD;
 
 
 

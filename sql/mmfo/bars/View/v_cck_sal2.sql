@@ -222,8 +222,10 @@ PROMPT *** Create  view V_CCK_SAL2 ***
       AND i.nd = ad.nd(+);
 
 PROMPT *** Create  grants  V_CCK_SAL2 ***
+grant SELECT                                                                 on V_CCK_SAL2      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CCK_SAL2      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CCK_SAL2      to RCC_DEAL;
+grant SELECT                                                                 on V_CCK_SAL2      to UPLD;
 
 
 

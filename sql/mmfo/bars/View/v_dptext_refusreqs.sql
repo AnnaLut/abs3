@@ -39,8 +39,10 @@ PROMPT *** Create  view V_DPTEXT_REFUSREQS ***
    and r.req_state is null;
 
 PROMPT *** Create  grants  V_DPTEXT_REFUSREQS ***
+grant SELECT                                                                 on V_DPTEXT_REFUSREQS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPTEXT_REFUSREQS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPTEXT_REFUSREQS to DPT_ROLE;
+grant SELECT                                                                 on V_DPTEXT_REFUSREQS to UPLD;
 
 
 

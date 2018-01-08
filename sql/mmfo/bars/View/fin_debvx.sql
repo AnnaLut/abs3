@@ -20,8 +20,10 @@ union all
 ;
 
 PROMPT *** Create  grants  FIN_DEBVX ***
+grant SELECT                                                                 on FIN_DEBVX       to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_DEBVX       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_DEBVX       to START1;
+grant SELECT                                                                 on FIN_DEBVX       to UPLD;
 
 
 

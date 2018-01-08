@@ -123,45 +123,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SPECPARAMINT_DEMANDFILS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPECPARAM_INT ADD CONSTRAINT FK_SPECPARAMINT_DEMANDFILS FOREIGN KEY (DEMAND_BRN)
-	  REFERENCES BARS.DEMAND_FILIALES (CODE) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SPECINT_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPECPARAM_INT ADD CONSTRAINT FK_SPECINT_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SPECINT_ACCOUNTS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPECPARAM_INT ADD CONSTRAINT FK_SPECINT_ACCOUNTS2 FOREIGN KEY (KF, ACC)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SPECINT_ACC_NN ***
 begin   
  execute immediate '
@@ -202,6 +163,7 @@ exception when others then
 PROMPT *** Create  grants  SPECPARAM_INT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPECPARAM_INT   to ABS_ADMIN;
 grant SELECT                                                                 on SPECPARAM_INT   to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on SPECPARAM_INT   to BARSREADER_ROLE;
 grant SELECT                                                                 on SPECPARAM_INT   to BARSUPL;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SPECPARAM_INT   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SPECPARAM_INT   to BARS_DM;

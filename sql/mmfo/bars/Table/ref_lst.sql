@@ -65,19 +65,6 @@ COMMENT ON COLUMN BARS.REF_LST.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_REF_LST_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REF_LST ADD CONSTRAINT FK_REF_LST_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_REF_LST_KF_NN ***
 begin   
  execute immediate '
@@ -128,9 +115,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  REF_LST ***
+grant SELECT                                                                 on REF_LST         to BARSREADER_ROLE;
 grant DELETE                                                                 on REF_LST         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REF_LST         to BARS_DM;
 grant DELETE                                                                 on REF_LST         to PYOD001;
+grant SELECT                                                                 on REF_LST         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REF_LST         to WR_ALL_RIGHTS;
 
 

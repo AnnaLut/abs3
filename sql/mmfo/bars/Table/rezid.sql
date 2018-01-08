@@ -102,11 +102,13 @@ exception when others then
 
 PROMPT *** Create  grants  REZID ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZID           to ABS_ADMIN;
+grant SELECT                                                                 on REZID           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REZID           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZID           to BARS_DM;
 grant SELECT                                                                 on REZID           to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZID           to REZID;
 grant SELECT                                                                 on REZID           to START1;
+grant SELECT                                                                 on REZID           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REZID           to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on REZID           to WR_REFREAD;
 

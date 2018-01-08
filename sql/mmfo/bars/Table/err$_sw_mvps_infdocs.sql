@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_SW_MVPS_INFDOCS.OTM IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_SW_MVPS_INFDOCS ***
+grant SELECT                                                                 on ERR$_SW_MVPS_INFDOCS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_SW_MVPS_INFDOCS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

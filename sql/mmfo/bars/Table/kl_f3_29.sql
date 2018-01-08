@@ -74,10 +74,12 @@ exception when others then
 
 PROMPT *** Create  grants  KL_F3_29 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F3_29        to ABS_ADMIN;
+grant SELECT                                                                 on KL_F3_29        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F3_29        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_F3_29        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F3_29        to KL_F3_29;
 grant SELECT                                                                 on KL_F3_29        to START1;
+grant SELECT                                                                 on KL_F3_29        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F3_29        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KL_F3_29        to WR_REFREAD;
 

@@ -1,7 +1,13 @@
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_cck_otcn.sql =========*** Run ***
+ PROMPT ===================================================================================== 
+ 
   CREATE OR REPLACE FUNCTION BARS.F_CCK_OTCN (FDAT_ DATE, ACC_ INT, MDATE_ DATE,
              VST_ number, FAKT_ varchar2 default '00000000', PDAT_ date default null,
-             typen_ number default 1, 
-             fdatb_ in date default null, 
+             typen_ number default 1,
+             fdatb_ in date default null,
              fdate_ in date default null,
              pnd_ in number default null) RETURN tbl_240 pipelined
 IS
@@ -28,7 +34,7 @@ IS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 11.09.2017 - txt_sql8: для счетов 2701,3660 в портфеле мбдк
-26.08.2016 - txt_sql7: (счета SNO) добавлен ограничительный интервал на дату погашения 
+26.08.2016 - txt_sql7: (счета SNO) добавлен ограничительный интервал на дату погашения
 19.08.2016 - обработка графиков для счетов SNO (скрипт txt_sql7)
 30/07/2012 - будем обрабатывать бал.счет 1418 из табл. OTCN_LIM_SB (ПКБ)
 27/07/2012 - потеряла изменение от 01/12/2011 для Демарка (счет 2618)
@@ -37,11 +43,11 @@ IS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
   N0_  NUMBER := 0;    N1_  NUMBER := 0;
-  N2_  NUMBER := 0;    N3_  NUMBER := 0; 
+  N2_  NUMBER := 0;    N3_  NUMBER := 0;
   N4_  NUMBER := 0;    N5_  NUMBER := 0;
-  N6_  NUMBER := 0;    N7_  NUMBER := 0;     
+  N6_  NUMBER := 0;    N7_  NUMBER := 0;
   N8_  NUMBER := 0;    N9_  NUMBER := 0;
-  N10_ NUMBER := 0;    N11_ NUMBER := 0;     
+  N10_ NUMBER := 0;    N11_ NUMBER := 0;
   N12_ NUMBER := 0;    N13_ NUMBER := 0;
   N14_ NUMBER := 0;    N15_ NUMBER := 0;
 
@@ -88,11 +94,11 @@ IS
 
   txt_sql3         varchar2(1000) := 'select d_plan, sv - nvl(sz, ''0'')
                                        from OTC_ARC_CC_TRANS
-                                       where dat_otc = :dat_ 
+                                       where dat_otc = :dat_
                                          and acc=:acc_
                                          and (d_fakt is null or sv<>sz)
                                          and fdat <= :dat_
-                                       ORDER BY 1 desc'; 
+                                       ORDER BY 1 desc';
 
   txt_sql4         varchar2(1000) := 'select c.dok, c.nom
                                      from cp_deal d, cp_dat c, accounts a
@@ -104,15 +110,15 @@ IS
                                     ORDER BY 1';
 
 
-  txt_sql5         varchar2(1000) := 'SELECT o.fdat, o.s sump, n.nd 
+  txt_sql5         varchar2(1000) := 'SELECT o.fdat, o.s sump, n.nd
                                         FROM nd_acc n, cc_add ad, opldok o
                                         WHERE n.acc = :acc_ and
-                                            n.nd = ad.nd and 
+                                            n.nd = ad.nd and
                                             o.fdat > :dat_ and
                                             o.acc = n.acc and
-                                            o.tt = ''GPP'' AND 
+                                            o.tt = ''GPP'' AND
                                             o.sos = 3 and
-                                            ad.refp = o.REF AND 
+                                            ad.refp = o.REF AND
                                             o.dk = 1'; --
 
   txt_sql7         varchar2(2000) :=
@@ -126,7 +132,7 @@ IS
                 FROM accounts a,
                      sno_gpp x
                WHERE x.acc = a.acc
-                 and x.acc = :acc_ 
+                 and x.acc = :acc_
                  and x.fdat > :dat_ ' ;
 
   TYPE ref_type_curs IS REF CURSOR;
@@ -136,7 +142,7 @@ IS
   sb_curs       ref_type_curs;
   trans_curs    ref_type_curs;
   restr_curs    ref_type_curs;
-  
+
   i_sava    number;
   i_pava    number;
   i_dpava   date;
@@ -162,7 +168,7 @@ IS
 
      BEGIN
         i := tp_240(NULL, NULL, NULL, NULL, NULL, NULL);
-        
+
         NN_ := nvl(N_, 0);
 
         IF odat_ < zm_date_ THEN
@@ -249,7 +255,7 @@ IS
                  END IF;
               END LOOP;
            END IF;
-           
+
            IF Delta_ IS NULL  THEN
               N0_:=N0_+ NN_;
               i.S240 := 0;
@@ -258,7 +264,7 @@ IS
               i.ldate := DAT_;
            ELSIF  delta_<=  0     THEN
               N1_:=N1_+ NN_;
-              
+
               IF odat_ < zm_date2_ THEN
                   i.S240 := '1';
                   i.s242 := '5';
@@ -266,20 +272,20 @@ IS
                   if delta_ < 0 then
                      if fdatb_ is not null and fdate_ is not null and
                         mdate_ between fdatb_ and fdate_ or
-                        dat_ = fdat_ 
-                     then 
-                         i.S240 := '1'; 
+                        dat_ = fdat_
+                     then
+                         i.S240 := '1';
                          i.s242 := '5';
                      else
-                         i.S240 := 'Z'; 
-                         i.S242 := 'Z'; 
+                         i.S240 := 'Z';
+                         i.S242 := 'Z';
                      end if;
                   else
-                     i.S240 := '1'; 
+                     i.S240 := '1';
                      i.s242 := '5';
                   end if;
               end if;
-              
+
               i.ost := NN_;
               i.ldate := DAT_;
            ELSIF  delta_ =  1     THEN
@@ -385,8 +391,8 @@ BEGIN
       WHERE a.acc=acc_;
    EXCEPTION WHEN NO_DATA_FOUND THEN  DEL(VST_,MDATE_, i); pipe ROW(i); RETURN;
    END;
-   
-   mdate_acc_ := nvl(f_mdate_hist(acc_, fdat_), mdate_); 
+
+   mdate_acc_ := nvl(f_mdate_hist(acc_, fdat_), mdate_);
 
    IF kv1_ <> 980 THEN -- в эквиваленте
       ost_ := Gl.P_Icurval(kv1_, vst_, fdat_);
@@ -397,7 +403,7 @@ BEGIN
    if nbs_ = '2030' and substr(fakt_,1,1) = '1' then -- смотрим модуль факторинга
        BEGIN
           ost_ := -1 * ost_;
-          
+
           if pnd_ is not null then
              nd_ := pnd_;
           else
@@ -406,7 +412,7 @@ BEGIN
                 FROM nd_acc n
                WHERE n.acc = acc_;
           end if;
-          
+
           comm_ := 'з модулю факторинга';
 
           open fakt_curs
@@ -451,7 +457,7 @@ BEGIN
                END IF;
        END;
    elsif (nbs_ = '3648'  or
-          nbs_ in ('2701', '3660') and substr(fakt_,8,1) ='0' or
+          nbs_ in ('1623', '1624', '2701', '3660') and substr(fakt_,8,1) ='0' or
           substr(nls_a7_,1,4) in ('1410','1413','1414','3112','3113','3114')) and substr(fakt_,2,1) = '1' then
        open sb_curs
        for txt_sql2 using acc_, odat_;
@@ -482,16 +488,16 @@ BEGIN
 
        close sb_curs;
 
-       IF ost_ >0 THEN 
-          if abs(ost_)<=100 then -- вирівнювання 
-             DEL(zn_ * OST_, i_mdate, i);  
-             pipe ROW(i); 
-          else  
-             DEL(zn_ * OST_, MDATE_, i);  
-             pipe ROW(i); 
+       IF ost_ >0 THEN
+          if abs(ost_)<=100 then -- вирівнювання
+             DEL(zn_ * OST_, i_mdate, i);
+             pipe ROW(i);
+          else
+             DEL(zn_ * OST_, MDATE_, i);
+             pipe ROW(i);
           END IF;
        end if;
-   elsif nbs_ in ('2701', '3660') and substr(fakt_,8,1) = '1' then
+   elsif nbs_ in ('1623', '1624', '2701', '3660') and substr(fakt_,8,1) = '1' then
 
        open cc_curs
        for txt_sql8 using acc_, odat_;
@@ -514,13 +520,13 @@ BEGIN
 
        close cc_curs;
 
-       IF ost_ >0 THEN 
-          if abs(ost_)<=100 then -- вирівнювання 
-             DEL(zn_ * OST_, i_mdate, i);  
-             pipe ROW(i); 
-          else  
-             DEL(zn_ * OST_, MDATE_, i);  
-             pipe ROW(i); 
+       IF ost_ >0 THEN
+          if abs(ost_)<=100 then -- вирівнювання
+             DEL(zn_ * OST_, i_mdate, i);
+             pipe ROW(i);
+          else
+             DEL(zn_ * OST_, MDATE_, i);
+             pipe ROW(i);
           END IF;
        end if;
    elsif substr(fakt_,4,1) = '1' then -- платіжний календар по ЦП
@@ -528,7 +534,7 @@ BEGIN
        for txt_sql4 using acc_, odat_;
 
        comm_ := 'розбивка по платіжному календарю ЦП';
-       
+
        declare
           id_       number;
           nom_      number;
@@ -540,17 +546,17 @@ BEGIN
           where p.acc = acc_ and
                 p.id = c.id and
                 c.id = d.id and
-                c.datp = D.DOK; 
-          
+                c.datp = D.DOK;
+
           if nom_ = 0 then
              select nvl(sum(nom), 0)
              into rizn_
              from cp_dat
              where id = id_ and
                 dok > ldok_;
-             
+
              rizn_ := dost_ - rizn_;
-          end if; 
+          end if;
        exception
           when no_data_found then
              select nvl(sum(c.nom), 0), 0 rizn
@@ -559,19 +565,19 @@ BEGIN
              where p.acc = acc_ and
                 p.id = c.id;
        end;
-       
+
        zn_ := -1;
        ost_ := zn_ * ost_;
-       
+
        if dost_ <> 0 then
            rizn_ := round(ost_ * (rizn_ / dost_), 0);
 
            LOOP
               FETCH sb_curs into i_mdate, pog_;
               EXIT WHEN sb_curs%NOTFOUND;
-              
+
               pr_ := pog_ / dost_;
-              
+
               L_ := round(ost_ * pr_, 0);
 
               IF L_ > 0  AND (OST_ -L_)>=0 THEN
@@ -580,37 +586,37 @@ BEGIN
               END IF;
            END LOOP;
        end if;
-       
+
        close sb_curs;
-       
+
        ost_ := rizn_;
 
-       IF ost_ >0 THEN 
-          if abs(ost_)<=100 then -- вирівнювання 
-             DEL(zn_ * OST_, i_mdate, i);  
-             pipe ROW(i); 
-          else  
-             DEL(zn_ * OST_, MDATE_, i);  
-             pipe ROW(i); 
+       IF ost_ >0 THEN
+          if abs(ost_)<=100 then -- вирівнювання
+             DEL(zn_ * OST_, i_mdate, i);
+             pipe ROW(i);
+          else
+             DEL(zn_ * OST_, MDATE_, i);
+             pipe ROW(i);
           END IF;
        end if;
    elsif substr(fakt_,5,1) = '1' or substr(fakt_,7,1) = '1' then
        if substr(fakt_,5,1) = '1' then
            open restr_curs
            for txt_sql5 using acc_, odat_;
-           
+
            comm_ := 'реструктуризація відсотків v1';
        else
            open restr_curs
            for txt_sql7 using acc_, odat_;
-           
+
            comm_ := 'реструктуризація відсотків v2';
        end if;
-       
+
        zn_ := -1;
 
        ost_ := zn_ * ost_;
-       
+
        LOOP
           FETCH restr_curs into i_mdate, pog_, nd_;
           EXIT WHEN restr_curs%NOTFOUND;
@@ -630,16 +636,16 @@ BEGIN
        IF ost_ >0 THEN DEL(zn_ * OST_, MDATE_, i);  pipe ROW(i); END IF;
    elsif substr(fakt_,6,1) = '1' then --міжбанківські кред/деп
        comm_ := 'міжбанківські кред/деп';
-       
+
        nd_ := pnd_;
-       
+
        zn_ := 1;
 
        ost_ := zn_ * ost_;
 
        BEGIN
           -- код валюты договора
-          SELECT d.kv 
+          SELECT d.kv
           INTO  kv2_
           FROM CC_ADD d
           WHERE d.nd=nd_ AND
@@ -647,19 +653,19 @@ BEGIN
        EXCEPTION WHEN NO_DATA_FOUND THEN  DEL(OST_,MDATE_, i); pipe ROW(i); RETURN;
        END;
 
-       FOR k IN (SELECT Gl.P_Icurval(kv2_, lim2, fdat_) lim2, 
+       FOR k IN (SELECT Gl.P_Icurval(kv2_, lim2, fdat_) lim2,
                         Gl.P_Icurval(kv2_, sumg, fdat_) sumg,
                         FDAT
                  FROM OTC_ARC_CC_LIM
                  WHERE dat_otc = pdat_ and
                        nd=ND_ AND
-                       FDAT BETWEEN FDAT_+1 AND mdate_acc_ 
+                       FDAT BETWEEN FDAT_+1 AND mdate_acc_
                  ORDER BY FDAT)
        LOOP
---          if k.lim2 - ost_ < 0 then 
+--          if k.lim2 - ost_ < 0 then
           i_mdate := k.fdat;
           pog_ := k.sumg;
-     
+
           L_ := Gl.P_Icurval(kv1_, pog_, fdat_);
 
           IF L_ > 0 and  OST_ - L_ >= 0 THEN
@@ -671,13 +677,13 @@ BEGIN
 --          end if;
        END LOOP;
 
-       IF ost_ >0 THEN 
-          if abs(ost_)<=100 then -- вирівнювання 
-             DEL(zn_ * OST_, i_mdate, i);  
-             pipe ROW(i); 
-          else  
-             DEL(zn_ * OST_, MDATE_, i);  
-             pipe ROW(i); 
+       IF ost_ >0 THEN
+          if abs(ost_)<=100 then -- вирівнювання
+             DEL(zn_ * OST_, i_mdate, i);
+             pipe ROW(i);
+          else
+             DEL(zn_ * OST_, MDATE_, i);
+             pipe ROW(i);
           END IF;
        end if;
    else -- смотрим графики погашения
@@ -770,13 +776,13 @@ BEGIN
 
            close trans_curs;
 
-           IF ost_ >0 THEN 
-              if abs(ost_)<=100 then -- вирівнювання 
-                 DEL(zn_ * OST_, i_mdate, i);  
-                 pipe ROW(i); 
-              else  
-                 DEL(zn_ * OST_, MDATE_, i);  
-                 pipe ROW(i); 
+           IF ost_ >0 THEN
+              if abs(ost_)<=100 then -- вирівнювання
+                 DEL(zn_ * OST_, i_mdate, i);
+                 pipe ROW(i);
+              else
+                 DEL(zn_ * OST_, MDATE_, i);
+                 pipe ROW(i);
               END IF;
            end if;
        else -- пробуємо по графіку розбити
@@ -785,11 +791,11 @@ BEGIN
            else
               comm_ := 'не знайдено РЕФ КД';
            end if;
-           
+
            if nd_ is not null then
                BEGIN
                   -- код валюты договора
-                  SELECT d.kv 
+                  SELECT d.kv
                   INTO  kv2_
                   FROM CC_ADD d
                   WHERE d.nd=nd_ AND
@@ -809,7 +815,7 @@ BEGIN
                             s.nbs = t.r020 and
                             trim(s.tip) in ('SS', 'CR9') and
                             s.acc = b.acc and
-                            b.fdat = fdat_ ;      
+                            b.fdat = fdat_ ;
                    else
                       select /*+leading(n)*/
                           sum(b.ostq) ost
@@ -820,7 +826,7 @@ BEGIN
                             s.nbs = t.r020 and
                             trim(s.tip) in ('SS') and
                             s.acc = b.acc and
-                            b.fdat = fdat_ ;                             
+                            b.fdat = fdat_ ;
                    end if;
                EXCEPTION WHEN NO_DATA_FOUND THEN  DEL(OST_,MDATE_, i); pipe ROW(i); RETURN;
                END;
@@ -839,21 +845,21 @@ BEGIN
                      FROM OTC_ARC_CC_LIM
                      WHERE dat_otc = pdat_ and
                            nd=ND_ AND
-                           FDAT BETWEEN FDAT_ AND mdate_acc_ 
+                           FDAT BETWEEN FDAT_ AND mdate_acc_
                      ORDER BY FDAT)
            LOOP
               L_:= nvl(ROUND(LEAST(0, k.LIM2 + DOST_) * pr_ , 0),0);
               i_lim := k.LIM2;
-              
-              if (nvl(L_, 0) <> 0 or nvl(OST_ - L_, 0) <> 0) and 
-                 (nvl(i_lim, 0) <> 0 or nvl(i_limp, 0) <> 0) 
+
+              if (nvl(L_, 0) <> 0 or nvl(OST_ - L_, 0) <> 0) and
+                 (nvl(i_lim, 0) <> 0 or nvl(i_limp, 0) <> 0)
               then
                  i_mdate := k.fdat;
               end if;
-              
+
               IF L_ < 0 AND (OST_ - L_)<=0 THEN
                  DEL(L_,k.FDAT, i);
-                 
+
                  pipe ROW(i);
 
                  OST_:= OST_ - L_;
@@ -886,4 +892,10 @@ BEGIN
 END;
 /
  show err;
-
+ 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_cck_otcn.sql =========*** End ***
+ PROMPT ===================================================================================== 
+ 

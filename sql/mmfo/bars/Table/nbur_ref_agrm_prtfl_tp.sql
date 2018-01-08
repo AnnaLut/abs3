@@ -61,12 +61,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_REFAGRMPRTFLTP ***
+PROMPT *** Create  constraint CC_REFAGRMPRTFLTP_PRTFLNM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_REF_AGRM_PRTFL_TP ADD CONSTRAINT PK_REFAGRMPRTFLTP PRIMARY KEY (PRTFL_TP_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLD  ENABLE';
+  ALTER TABLE BARS.NBUR_REF_AGRM_PRTFL_TP MODIFY (PRTFL_TP_NM CONSTRAINT CC_REFAGRMPRTFLTP_PRTFLNM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -75,10 +73,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_REFAGRMPRTFLTP_PRTFLNM_NN ***
+PROMPT *** Create  constraint PK_REFAGRMPRTFLTP ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_REF_AGRM_PRTFL_TP MODIFY (PRTFL_TP_NM CONSTRAINT CC_REFAGRMPRTFLTP_PRTFLNM_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_REF_AGRM_PRTFL_TP ADD CONSTRAINT PK_REFAGRMPRTFLTP PRIMARY KEY (PRTFL_TP_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -101,8 +101,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_REF_AGRM_PRTFL_TP ***
+grant SELECT                                                                 on NBUR_REF_AGRM_PRTFL_TP to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_REF_AGRM_PRTFL_TP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_REF_AGRM_PRTFL_TP to BARS_DM;
+grant SELECT                                                                 on NBUR_REF_AGRM_PRTFL_TP to UPLD;
 
 
 

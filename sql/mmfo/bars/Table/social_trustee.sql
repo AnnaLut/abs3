@@ -95,82 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SOCTRUSTEE_BRANCH_NN ***
+PROMPT *** Create  constraint CC_SOCTRUSTEE_TRUSTID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (BRANCH CONSTRAINT CC_SOCTRUSTEE_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SOCTRUSTEE_FLACT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (FL_ACT CONSTRAINT CC_SOCTRUSTEE_FLACT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SOCTRUSTEE_ADDDAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (ADD_DAT CONSTRAINT CC_SOCTRUSTEE_ADDDAT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SOCTRUSTEE_ADDNUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (ADD_NUM CONSTRAINT CC_SOCTRUSTEE_ADDNUM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SOCTRUSTEE_RNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (RNK CONSTRAINT CC_SOCTRUSTEE_RNK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SOCTRUSTEE_CONTRACTID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (CONTRACT_ID CONSTRAINT CC_SOCTRUSTEE_CONTRACTID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SOCTRUSTEE_TRUSTRNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (TRUST_RNK CONSTRAINT CC_SOCTRUSTEE_TRUSTRNK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (TRUST_ID CONSTRAINT CC_SOCTRUSTEE_TRUSTID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -191,11 +119,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SOCTRUSTEE_BRANCH ***
+PROMPT *** Create  constraint CC_SOCTRUSTEE_TRUSTRNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE ADD CONSTRAINT FK_SOCTRUSTEE_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (TRUST_RNK CONSTRAINT CC_SOCTRUSTEE_TRUSTRNK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -204,11 +131,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SOCTRUSTEE_DPTTRUSTEETYPE ***
+PROMPT *** Create  constraint CC_SOCTRUSTEE_CONTRACTID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE ADD CONSTRAINT FK_SOCTRUSTEE_DPTTRUSTEETYPE FOREIGN KEY (TRUST_TYPE)
-	  REFERENCES BARS.DPT_TRUSTEE_TYPE (ID) ENABLE';
+  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (CONTRACT_ID CONSTRAINT CC_SOCTRUSTEE_CONTRACTID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -217,11 +143,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SOCTRUSTEE_SOCIALCONTRACTS ***
+PROMPT *** Create  constraint CC_SOCTRUSTEE_RNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE ADD CONSTRAINT FK_SOCTRUSTEE_SOCIALCONTRACTS FOREIGN KEY (CONTRACT_ID)
-	  REFERENCES BARS.SOCIAL_CONTRACTS (CONTRACT_ID) ENABLE';
+  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (RNK CONSTRAINT CC_SOCTRUSTEE_RNK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -230,11 +155,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SOCTRUSTEE_SOCTRUSTEE ***
+PROMPT *** Create  constraint CC_SOCTRUSTEE_ADDNUM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE ADD CONSTRAINT FK_SOCTRUSTEE_SOCTRUSTEE FOREIGN KEY (UNDO_ID)
-	  REFERENCES BARS.SOCIAL_TRUSTEE (TRUST_ID) ON DELETE CASCADE ENABLE';
+  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (ADD_NUM CONSTRAINT CC_SOCTRUSTEE_ADDNUM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -243,11 +167,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SOCTRUSTEE_CUSTOMER ***
+PROMPT *** Create  constraint CC_SOCTRUSTEE_ADDDAT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE ADD CONSTRAINT FK_SOCTRUSTEE_CUSTOMER FOREIGN KEY (TRUST_RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
+  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (ADD_DAT CONSTRAINT CC_SOCTRUSTEE_ADDDAT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -256,11 +179,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SOCTRUSTEE_CUSTOMER2 ***
+PROMPT *** Create  constraint CC_SOCTRUSTEE_FLACT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE ADD CONSTRAINT FK_SOCTRUSTEE_CUSTOMER2 FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
+  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (FL_ACT CONSTRAINT CC_SOCTRUSTEE_FLACT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -269,23 +191,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SOCTRUSTEE_DOCSCHEME ***
+PROMPT *** Create  constraint CC_SOCTRUSTEE_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE ADD CONSTRAINT FK_SOCTRUSTEE_DOCSCHEME FOREIGN KEY (TEMPLATE_ID)
-	  REFERENCES BARS.DOC_SCHEME (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SOCTRUSTEE_TRUSTID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (TRUST_ID CONSTRAINT CC_SOCTRUSTEE_TRUSTID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SOCIAL_TRUSTEE MODIFY (BRANCH CONSTRAINT CC_SOCTRUSTEE_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -322,8 +231,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SOCIAL_TRUSTEE ***
+grant SELECT                                                                 on SOCIAL_TRUSTEE  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SOCIAL_TRUSTEE  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SOCIAL_TRUSTEE  to DPT_ROLE;
+grant SELECT                                                                 on SOCIAL_TRUSTEE  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SOCIAL_TRUSTEE  to WR_ALL_RIGHTS;
 
 

@@ -38,7 +38,9 @@ order by 1
 ;
 
 PROMPT *** Create  grants  V_REC ***
+grant SELECT                                                                 on V_REC           to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REC           to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_REC           to UPLD;
 
 
 

@@ -59,8 +59,7 @@ BEGIN
                                           REF,
                                           nd,
                                           branch)
-          SELECT /*+ parallel(8) */
-                 p_report_date,
+          SELECT p_report_date,
                  p_kod_filii,
                  p_file_code,
                  (case when l_type = 0 then l_nbuc else nbuc end) nbuc,
@@ -91,7 +90,8 @@ BEGIN
                          nbuc,
                          colname,
                          ABS (VALUE) field_value
-                    FROM (SELECT b.cust_id,
+                    FROM (SELECT  /*+ ordered*/
+                                 b.cust_id,
                                  b.acc_id,
                                  a.maturity_date,
                                  a.kf,

@@ -27,7 +27,9 @@ PROMPT *** Create  view V_WCS_VISA_BIDS ***
    and sh.id = b.branch_hierarchy;
 
 PROMPT *** Create  grants  V_WCS_VISA_BIDS ***
+grant SELECT                                                                 on V_WCS_VISA_BIDS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_VISA_BIDS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_VISA_BIDS to UPLD;
 
 
 

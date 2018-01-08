@@ -78,9 +78,24 @@ exception when others then
 
 PROMPT *** Create  constraint CC_ESCR_REG_OBJ_STATE_ID ***
 begin   
- execute immediate '  ALTER TABLE BARS.ESCR_REG_OBJ_STATE ADD CONSTRAINT CC_ESCR_REG_OBJ_STATE_ID CHECK (ID IS NOT NULL) ENABLE';
+ execute immediate '
+  ALTER TABLE BARS.ESCR_REG_OBJ_STATE ADD CONSTRAINT CC_ESCR_REG_OBJ_STATE_ID CHECK (ID IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index I_ESCR_REGOBJSTATE_OBJ_STATUS ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I_ESCR_REGOBJSTATE_OBJ_STATUS ON BARS.ESCR_REG_OBJ_STATE (OBJ_ID, STATUS_ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYNI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
  end;
 /
 
@@ -99,17 +114,11 @@ exception when others then
 /
 
 
-begin
-    execute immediate 'create index I_ESCR_REGOBJSTATE_OBJ_STATUS on ESCR_REG_OBJ_STATE (OBJ_ID, STATUS_ID) tablespace BRSDYNI compute statistics';
-exception
-    when others then
-        if sqlcode = -955 then null; else raise; end if;
-end;
-/
-
 
 PROMPT *** Create  grants  ESCR_REG_OBJ_STATE ***
+grant SELECT                                                                 on ESCR_REG_OBJ_STATE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ESCR_REG_OBJ_STATE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on ESCR_REG_OBJ_STATE to UPLD;
 
 
 

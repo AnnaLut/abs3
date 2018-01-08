@@ -91,19 +91,6 @@ COMMENT ON COLUMN BARS.OBPC_TRAN_HIST.IDN IS '¹';
 
 
 
-PROMPT *** Create  constraint FK_OBPCTRANHIST_OBPCFILES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OBPC_TRAN_HIST ADD CONSTRAINT FK_OBPCTRANHIST_OBPCFILES FOREIGN KEY (ID)
-	  REFERENCES BARS.OBPC_FILES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_OBPCTRANHIST ***
 begin   
  execute immediate '
@@ -174,10 +161,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_TRAN_HIST ***
+grant SELECT                                                                 on OBPC_TRAN_HIST  to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on OBPC_TRAN_HIST  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_TRAN_HIST  to BARS_DM;
 grant INSERT,SELECT                                                          on OBPC_TRAN_HIST  to OBPC;
 grant SELECT                                                                 on OBPC_TRAN_HIST  to RPBN001;
+grant SELECT                                                                 on OBPC_TRAN_HIST  to UPLD;
 
 
 

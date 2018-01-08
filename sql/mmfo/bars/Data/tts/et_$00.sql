@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции !$V
-prompt Наименование операции: STOP правило для облігацій заповнення доп реквізитів
+prompt Наименование операции: !$V STOP правило для облігацій заповнення доп реквізитів
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!$V', 'STOP правило для облігацій заповнення доп реквізитів', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'f_stop(80840,#(ref),'''',0)', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('!$V', '!$V STOP правило для облігацій заповнення доп реквізитів', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'f_stop(80840,#(ref),'''',0)', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!$V', name='STOP правило для облігацій заповнення доп реквізитів', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='f_stop(80840,#(ref),'''',0)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='!$V', name='!$V STOP правило для облігацій заповнення доп реквізитів', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='f_stop(80840,#(ref),'''',0)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='!$V';
   end;
   --------------------------------
@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции $09
-prompt Наименование операции: 4.9.Погаш.Ном+Ост.Купону:кiлькiсть
+prompt Наименование операции: $09 4.9.Погаш.Ном+Ост.Купону:кiлькiсть
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('$09', '4.9.Погаш.Ном+Ост.Купону:кiлькiсть', 1, '#(f_dop(#(REF), ''O9819''))', 980, '#(branch_usr.get_branch_param2(''NLS_9910'',0))', 980, null, null, null, null, 0, 0, 0, 0, ' #(S_KIL) *100', null, null, null, null, null, '0000000000000000000000000000000000000000000000000000000000000000', null);
+    values ('$09', '$09 4.9.Погаш.Ном+Ост.Купону:кiлькiсть', 1, '#(f_dop(#(REF), ''O9819''))', 980, '#(branch_usr.get_branch_param2(''NLS_9910'',0))', 980, null, null, null, null, 0, 0, 0, 0, ' #(S_KIL) *100', null, null, null, null, null, '0000000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='$09', name='4.9.Погаш.Ном+Ост.Купону:кiлькiсть', dk=1, nlsm='#(f_dop(#(REF), ''O9819''))', kv=980, nlsk='#(branch_usr.get_branch_param2(''NLS_9910'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=' #(S_KIL) *100', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='$09', name='$09 4.9.Погаш.Ном+Ост.Купону:кiлькiсть', dk=1, nlsm='#(f_dop(#(REF), ''O9819''))', kv=980, nlsk='#(branch_usr.get_branch_param2(''NLS_9910'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=' #(S_KIL) *100', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='$09';
   end;
   --------------------------------
@@ -98,11 +98,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('$VZ', 'Військоий збір від погашення купону', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0)) ', 980, '362290138041', 980, null, null, null, null, 0, 0, 0, 0, 'round( gl.p_icurval(#(KVA), #(S_KUT)*100, gl.bd) * #(S_KIL) *0.015)', 'round( gl.p_icurval(#(KVA), #(S_KUT)*100, gl.bd) * #(S_KIL) *0.015)', 12, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('$VZ', 'Військоий збір від погашення купону', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0)) ', 980, '#(get_nls_tt(''$VZ'',''NLSK''))', 980, null, null, null, null, 0, 0, 0, 0, 'round( gl.p_icurval(#(KVA), #(S_KUT)*100, gl.bd) * #(S_KIL) *0.015)', 'round( gl.p_icurval(#(KVA), #(S_KUT)*100, gl.bd) * #(S_KIL) *0.015)', 12, null, '0', null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='$VZ', name='Військоий збір від погашення купону', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0)) ', kv=980, nlsk='362290138041', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='round( gl.p_icurval(#(KVA), #(S_KUT)*100, gl.bd) * #(S_KIL) *0.015)', s2='round( gl.p_icurval(#(KVA), #(S_KUT)*100, gl.bd) * #(S_KIL) *0.015)', sk=12, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='$VZ', name='Військоий збір від погашення купону', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0)) ', kv=980, nlsk='#(get_nls_tt(''$VZ'',''NLSK''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='round( gl.p_icurval(#(KVA), #(S_KUT)*100, gl.bd) * #(S_KIL) *0.015)', s2='round( gl.p_icurval(#(KVA), #(S_KUT)*100, gl.bd) * #(S_KIL) *0.015)', sk=12, proc=null, s3800='0', rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='$VZ';
   end;
   --------------------------------
@@ -132,7 +132,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции $00
-prompt Наименование операции: 4.2.Погаш.Ном+Ост.Купону
+prompt Наименование операции: $00 4.2.Погаш.Ном+Ост.Купону
 declare
   cnt_  number;
 begin
@@ -141,11 +141,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('$00', '4.2.Погаш.Ном+Ост.Купону', 0, '#(bpk_get_transit(''10'',#(NLSB),#(NLSA),#(KVA)))', null, null, null, null, null, null, null, 1, 0, 0, 0, '#(S_NOM) * #(S_KIL)', null, null, null, null, null, '0000000000000001100000000001000000010000000000000000000000000000', 'Погаш.ном+ост.купону сертифiкатiв казначейських зобов`язань у фiзичних осiб:кiлькiсть #(S_KIL) шт.');
+    values ('$00', '$00 4.2.Погаш.Ном+Ост.Купону', 0, '#(bpk_get_transit(''10'',#(NLSB),#(NLSA),#(KVA)))', null, null, null, null, null, null, null, 1, 0, 0, 0, '#(S_NOM) * #(S_KIL)', null, null, null, null, null, '0000000000000001100000000001000000010000000000000000000000000000', 'Погаш.ном+ост.купону сертифiкатiв казначейських зобов`язань у фiзичних осiб:кiлькiсть #(S_KIL) шт.');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='$00', name='4.2.Погаш.Ном+Ост.Купону', dk=0, nlsm='#(bpk_get_transit(''10'',#(NLSB),#(NLSA),#(KVA)))', kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s='#(S_NOM) * #(S_KIL)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000001100000000001000000010000000000000000000000000000', nazn='Погаш.ном+ост.купону сертифiкатiв казначейських зобов`язань у фiзичних осiб:кiлькiсть #(S_KIL) шт.'
+         set tt='$00', name='$00 4.2.Погаш.Ном+Ост.Купону', dk=0, nlsm='#(bpk_get_transit(''10'',#(NLSB),#(NLSA),#(KVA)))', kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s='#(S_NOM) * #(S_KIL)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000001100000000001000000010000000000000000000000000000', nazn='Погаш.ном+ост.купону сертифiкатiв казначейських зобов`язань у фiзичних осiб:кiлькiсть #(S_KIL) шт.'
        where tt='$00';
   end;
   --------------------------------

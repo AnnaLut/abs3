@@ -75,6 +75,10 @@ COMMENT ON COLUMN BARS.ERR$_XOZ_REF.DATZ IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_XOZ_REF ***
+grant SELECT                                                                 on ERR$_XOZ_REF    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_XOZ_REF    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -578,8 +578,7 @@ from (
                                                             c.vid_restr in (1, 3, 6)) -- нет реструктуризация %%-в и всего
                                        )
                                 ) and
-                         f.ostq <> 0 and
-                         (length(trim(f.cc))=2 or f.cc like '__2')-- счета осн. задож-сти и прострочки по осн. задолж-ти
+                         f.ostq <> 0 --and (length(trim(f.cc))=2 or f.cc like '__2')-- счета осн. задож-сти и прострочки по осн. задолж-ти
                   group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'),
                            f.nd, rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
     select nls, kv, dt, '05'||kodp, cnt znap, nd, rnk, comm, nbuc, tobo
@@ -635,8 +634,7 @@ from (
                                                             c.vid_restr in (3, 6)) -- есть реструктуризация %%-в
                                        )
                                  ) and
-                           f.ostq <> 0 and 
-                           (f.cc like '__1' or f.cc like '__3') -- счета начисл. %% -в и простроченных %% -в
+                           f.ostq <> 0 --and  (f.cc like '__1' or f.cc like '__3') -- счета начисл. %% -в и простроченных %% -в
                   group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'),
                            f.nd, rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
     select nls, kv, dt, '06'||kodp, cnt znap, nd, rnk, comm, nbuc, tobo
@@ -1291,15 +1289,17 @@ from (
                           and f.tpa = 1
                           and (f.ostq_kd <> 0 or (f.ostq_kd=0 and f.dosq+f.kosq<>0))
                           and daos <> to_date('01012011','ddmmyyyy')
-                          and not exists
-                          (select 1 from OTC_FF7_HISTORY_ACC f1 where nvl(f.nkd, f.nd) = nvl(f1.nkd, f1.nd) and f1.datf=datp_
+                          and nvl(f.nkd, f.nd) not in
+                          (select nvl(f1.nkd, f1.nd) from OTC_FF7_HISTORY_ACC f1 where f1.datf=datp_
                           -- если в прошлом месяце сумма по договору = 0, а в этом <> 0  - договор новый
                                    and (f1.ostq_kd <> 0
                                             or
                                        (f1.nbs in ('2202','2203') and f1.ostq_kd = 0 ))
                           )
-                          and not (daos >= trunc(dat_, 'mm') and 
-                                   exists (select 1 
+                          and (mfo_ = '300465' and
+                               not (daos >= trunc(dat_, 'mm') and 
+                                    instr(f.cc_id, ' (980)') > 0 and
+                                    exists (select 1 
                                            from OTC_FF7_HISTORY_ACC f1 
                                            where f1.datf = datp_ and 
                                                  f1.rnk = f.rnk and
@@ -1308,6 +1308,7 @@ from (
                                                  f1.ostq_kd <> 0
                                            )
                                    )
+                                 or mfo_ <> '300465')
                     group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), nvl(nkd,nd), rnk,
                              decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), s080
                     order by 1)
@@ -1504,22 +1505,24 @@ logger.info ('P_FF8: etap 12-6 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
                     from OTC_FF7_HISTORY_ACC f
                     where f.datf=dat_
                       and f.tpa in (2, 3)
-                      and not exists
-                      (select 1 from OTC_FF7_HISTORY_ACC f1 where nvl(f.nkd, f.nd) = nvl(f1.nkd, f1.nd) and f1.datf=datp_
+                      and nvl(f.nkd, f.nd) not in
+                      (select nvl(f1.nkd, f1.nd) from OTC_FF7_HISTORY_ACC f1 where f1.datf=datp_
                                and ((f1.ostq_kd <> 0 ) -- если в прошлом месяце сумма по договору = 0, а в этом <> 0  - договор новый
                                      OR (f1.nbs in ('2202','2203') and f1.ostq_kd = 0 ) )
                       )
-                      and not (daos >= trunc(dat_, 'mm') and 
-                               exists (select 1 
-                                       from OTC_FF7_HISTORY_ACC f1 
-                                       where f1.datf = datp_ and 
-                                             f1.rnk = f.rnk and
-                                             f1.nd <> f.nd and
-                                             f1.cc_id = rtrim(f.cc_id, ' (980)') and
-                                             f1.ostq_kd <> 0
-                                       )
-                               )
-                           --and f.nd not in (select nd from otcn_ff8_migr_nd where vid = 2)
+                          and (mfo_ = '300465' and
+                               not (daos >= trunc(dat_, 'mm') and 
+                                    instr(f.cc_id, ' (980)') > 0 and
+                                    exists (select 1 
+                                           from OTC_FF7_HISTORY_ACC f1 
+                                           where f1.datf = datp_ and 
+                                                 f1.rnk = f.rnk and
+                                                 f1.nd <> f.nd and
+                                                 f1.cc_id = rtrim(f.cc_id, ' (980)') and
+                                                 f1.ostq_kd <> 0
+                                           )
+                                   )
+                                 or mfo_ <> '300465')
                     group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), nvl(nkd,nd), rnk,
                              decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), s080
                     order by 1)
@@ -1901,7 +1904,7 @@ where kodp like '20%' and
               f.WDATE <= dat_);
 
 -- видалення перенесених (реструктуризованих) кредитів           
-delete from rnbu_trace where kodp like '20%' and nd in (select nd from otcn_ff8_migr_nd where vid = 2);
+delete from rnbu_trace where kodp like '20%' and kv = 980 and nd in (select nd from otcn_ff8_migr_nd where vid = 2);
 
 ----------------------------------------------------
 if mfo_ = 380764 then

@@ -20,8 +20,10 @@ PROMPT *** Create  view V_OW_FORM_REVERS ***
     WHERE t.tt IN ('WO5', 'WO6') AND t.vdat = TRUNC (SYSDATE) AND t.sos in(0,1);
 
 PROMPT *** Create  grants  V_OW_FORM_REVERS ***
+grant SELECT                                                                 on V_OW_FORM_REVERS to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_OW_FORM_REVERS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_FORM_REVERS to START1;
+grant SELECT                                                                 on V_OW_FORM_REVERS to UPLD;
 grant FLASHBACK,SELECT                                                       on V_OW_FORM_REVERS to WR_REFREAD;
 
 

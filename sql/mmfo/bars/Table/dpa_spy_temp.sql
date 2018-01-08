@@ -91,9 +91,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPA_SPY_TEMP ***
+grant SELECT                                                                 on DPA_SPY_TEMP    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPA_SPY_TEMP    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPA_SPY_TEMP    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPA_SPY_TEMP    to START1;
+grant SELECT                                                                 on DPA_SPY_TEMP    to UPLD;
 
 
 

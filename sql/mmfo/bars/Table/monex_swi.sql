@@ -83,9 +83,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  MONEX_SWI ***
+grant SELECT                                                                 on MONEX_SWI       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MONEX_SWI       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MONEX_SWI       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MONEX_SWI       to START1;
+grant SELECT                                                                 on MONEX_SWI       to UPLD;
 
 
 

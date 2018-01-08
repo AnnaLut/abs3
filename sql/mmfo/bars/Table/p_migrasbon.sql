@@ -55,7 +55,9 @@ COMMENT ON COLUMN BARS.P_MIGRASBON.PROV_SQL IS 'Имя вюшки - Проверочный SQL';
 
 
 PROMPT *** Create  grants  P_MIGRASBON ***
+grant SELECT                                                                 on P_MIGRASBON     to BARSREADER_ROLE;
 grant SELECT                                                                 on P_MIGRASBON     to BARS_DM;
+grant SELECT                                                                 on P_MIGRASBON     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on P_MIGRASBON     to WR_ALL_RIGHTS;
 
 

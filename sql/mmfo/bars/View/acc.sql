@@ -11,8 +11,10 @@ PROMPT *** Create  view ACC ***
   select acc,nls,kv,pap from accounts;
 
 PROMPT *** Create  grants  ACC ***
+grant SELECT                                                                 on ACC             to BARSREADER_ROLE;
 grant SELECT                                                                 on ACC             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC             to START1;
+grant SELECT                                                                 on ACC             to UPLD;
 
 
 

@@ -77,7 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMS_TASK_GROUPS ***
+grant SELECT                                                                 on TMS_TASK_GROUPS to BARSREADER_ROLE;
 grant SELECT                                                                 on TMS_TASK_GROUPS to BARS_DM;
+grant SELECT                                                                 on TMS_TASK_GROUPS to UPLD;
 
 
 

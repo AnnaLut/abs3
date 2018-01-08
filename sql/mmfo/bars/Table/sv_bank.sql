@@ -93,70 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SVBANK_ISPMBTLF_NN ***
+PROMPT *** Create  constraint CC_SVBANK_MANFIONM2_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SV_BANK MODIFY (ISP_MB_TLF CONSTRAINT CC_SVBANK_ISPMBTLF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SVBANK_ISPFIONM3_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_BANK MODIFY (ISP_FIO_NM3 CONSTRAINT CC_SVBANK_ISPFIONM3_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SVBANK_ISPFIONM2_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_BANK MODIFY (ISP_FIO_NM2 CONSTRAINT CC_SVBANK_ISPFIONM2_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SVBANK_ISPFIONM1_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_BANK MODIFY (ISP_FIO_NM1 CONSTRAINT CC_SVBANK_ISPFIONM1_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SVBANK_MANMBDT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_BANK MODIFY (MAN_MB_DT CONSTRAINT CC_SVBANK_MANMBDT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SVBANK_MANMBPOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_BANK MODIFY (MAN_MB_POS CONSTRAINT CC_SVBANK_MANMBPOS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SV_BANK MODIFY (MAN_FIO_NM2 CONSTRAINT CC_SVBANK_MANFIONM2_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -177,10 +117,70 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SVBANK_MANFIONM2_NN ***
+PROMPT *** Create  constraint CC_SVBANK_MANMBPOS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SV_BANK MODIFY (MAN_FIO_NM2 CONSTRAINT CC_SVBANK_MANFIONM2_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SV_BANK MODIFY (MAN_MB_POS CONSTRAINT CC_SVBANK_MANMBPOS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SVBANK_MANMBDT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_BANK MODIFY (MAN_MB_DT CONSTRAINT CC_SVBANK_MANMBDT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SVBANK_ISPFIONM1_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_BANK MODIFY (ISP_FIO_NM1 CONSTRAINT CC_SVBANK_ISPFIONM1_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SVBANK_ISPFIONM2_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_BANK MODIFY (ISP_FIO_NM2 CONSTRAINT CC_SVBANK_ISPFIONM2_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SVBANK_ISPFIONM3_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_BANK MODIFY (ISP_FIO_NM3 CONSTRAINT CC_SVBANK_ISPFIONM3_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SVBANK_ISPMBTLF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_BANK MODIFY (ISP_MB_TLF CONSTRAINT CC_SVBANK_ISPMBTLF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -189,9 +189,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SV_BANK ***
+grant SELECT                                                                 on SV_BANK         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_BANK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SV_BANK         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_BANK         to RPBN002;
+grant SELECT                                                                 on SV_BANK         to UPLD;
 
 
 

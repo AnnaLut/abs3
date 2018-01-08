@@ -71,10 +71,12 @@ PROMPT *** Create  view BR_TIER ***
                                         AND e.s = c.s));
 
 PROMPT *** Create  grants  BR_TIER ***
+grant SELECT                                                                 on BR_TIER         to BARSREADER_ROLE;
 grant SELECT                                                                 on BR_TIER         to BARSUPL;
 grant SELECT                                                                 on BR_TIER         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BR_TIER         to KLBX;
 grant SELECT                                                                 on BR_TIER         to START1;
+grant SELECT                                                                 on BR_TIER         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BR_TIER         to WR_ALL_RIGHTS;
 
 

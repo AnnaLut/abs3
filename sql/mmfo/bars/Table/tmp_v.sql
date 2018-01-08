@@ -73,8 +73,10 @@ COMMENT ON COLUMN BARS.TMP_V.O IS '';
 
 
 PROMPT *** Create  grants  TMP_V ***
+grant SELECT                                                                 on TMP_V           to BARSREADER_ROLE;
 grant INSERT                                                                 on TMP_V           to BARS_ACCESS_DEFROLE;
 grant INSERT                                                                 on TMP_V           to TOSS;
+grant SELECT                                                                 on TMP_V           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_V           to WR_ALL_RIGHTS;
 
 

@@ -24,7 +24,7 @@ PROMPT *** Create  table W4_ACC_UPDATE ***
 begin 
   execute immediate '
   CREATE TABLE BARS.W4_ACC_UPDATE 
-   (	IDUPD NUMBER(15,0), 
+   (	IDUPD NUMBER(38,0), 
 	CHGACTION CHAR(1), 
 	EFFECTDATE DATE, 
 	CHGDATE DATE, 
@@ -247,6 +247,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  W4_ACC_UPDATE ***
+grant SELECT                                                                 on W4_ACC_UPDATE   to BARSREADER_ROLE;
 grant SELECT                                                                 on W4_ACC_UPDATE   to BARSUPL;
 grant SELECT                                                                 on W4_ACC_UPDATE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_ACC_UPDATE   to BARS_DM;

@@ -101,8 +101,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SSR_TMP_COUNT ***
+grant SELECT                                                                 on SSR_TMP_COUNT   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SSR_TMP_COUNT   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SSR_TMP_COUNT   to START1;
+grant SELECT                                                                 on SSR_TMP_COUNT   to UPLD;
 
 
 

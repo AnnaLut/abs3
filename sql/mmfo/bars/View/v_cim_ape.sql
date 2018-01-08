@@ -16,7 +16,9 @@ PROMPT *** Create  view V_CIM_APE ***
    from cim_contracts_ape a where delete_date is null;
 
 PROMPT *** Create  grants  V_CIM_APE ***
+grant SELECT                                                                 on V_CIM_APE       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_APE       to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_APE       to UPLD;
 
 
 

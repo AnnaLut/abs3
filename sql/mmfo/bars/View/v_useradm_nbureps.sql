@@ -12,7 +12,9 @@ PROMPT *** Create  view V_USERADM_NBUREPS ***
 
 PROMPT *** Create  grants  V_USERADM_NBUREPS ***
 grant SELECT                                                                 on V_USERADM_NBUREPS to ABS_ADMIN;
+grant SELECT                                                                 on V_USERADM_NBUREPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USERADM_NBUREPS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_USERADM_NBUREPS to UPLD;
 
 
 

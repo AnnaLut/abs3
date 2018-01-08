@@ -104,36 +104,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OPERLIST_ROLES ***
+PROMPT *** Create  constraint CC_OPERLIST_CODEOPER_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPERLIST ADD CONSTRAINT FK_OPERLIST_ROLES FOREIGN KEY (ROLENAME)
-	  REFERENCES BARS.ROLES$BASE (ROLE_NAME) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_OPERLIST_FRONTEND ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPERLIST ADD CONSTRAINT FK_OPERLIST_FRONTEND FOREIGN KEY (FRONTEND)
-	  REFERENCES BARS.FRONTEND (FID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPERLIST_USEARC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPERLIST MODIFY (USEARC CONSTRAINT CC_OPERLIST_USEARC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.OPERLIST MODIFY (CODEOPER CONSTRAINT CC_OPERLIST_CODEOPER_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -190,10 +164,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OPERLIST_CODEOPER_NN ***
+PROMPT *** Create  constraint CC_OPERLIST_USEARC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPERLIST MODIFY (CODEOPER CONSTRAINT CC_OPERLIST_CODEOPER_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.OPERLIST MODIFY (USEARC CONSTRAINT CC_OPERLIST_USEARC_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -231,10 +205,12 @@ exception when others then
 
 PROMPT *** Create  grants  OPERLIST ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPERLIST        to ABS_ADMIN;
+grant SELECT                                                                 on OPERLIST        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OPERLIST        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OPERLIST        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPERLIST        to OPERLIST;
 grant SELECT                                                                 on OPERLIST        to START1;
+grant SELECT                                                                 on OPERLIST        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OPERLIST        to WR_ALL_RIGHTS;
 grant SELECT                                                                 on OPERLIST        to WR_DIAGNOSTICS;
 grant FLASHBACK,SELECT                                                       on OPERLIST        to WR_REFREAD;

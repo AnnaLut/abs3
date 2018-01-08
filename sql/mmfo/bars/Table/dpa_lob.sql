@@ -98,8 +98,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPA_LOB ***
+grant SELECT                                                                 on DPA_LOB         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPA_LOB         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPA_LOB         to RPBN002;
+grant SELECT                                                                 on DPA_LOB         to UPLD;
 
 
 

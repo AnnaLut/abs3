@@ -74,7 +74,9 @@ COMMENT ON COLUMN BARS.ERR$_SALDOA.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_SALDOA ***
+grant SELECT                                                                 on ERR$_SALDOA     to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_SALDOA     to BARS_DM;
+grant SELECT                                                                 on ERR$_SALDOA     to UPLD;
 
 
 

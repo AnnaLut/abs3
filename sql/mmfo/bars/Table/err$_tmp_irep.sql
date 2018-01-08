@@ -67,6 +67,10 @@ COMMENT ON COLUMN BARS.ERR$_TMP_IREP.FL_MOD IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_TMP_IREP ***
+grant SELECT                                                                 on ERR$_TMP_IREP   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_TMP_IREP   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -24,7 +24,9 @@ PROMPT *** Create  view V_DPU_AGREEMENTS_VISA ***
 ;
 
 PROMPT *** Create  grants  V_DPU_AGREEMENTS_VISA ***
+grant SELECT                                                                 on V_DPU_AGREEMENTS_VISA to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPU_AGREEMENTS_VISA to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DPU_AGREEMENTS_VISA to UPLD;
 
 
 

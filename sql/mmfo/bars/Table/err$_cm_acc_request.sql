@@ -75,6 +75,10 @@ COMMENT ON COLUMN BARS.ERR$_CM_ACC_REQUEST.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CM_ACC_REQUEST ***
+grant SELECT                                                                 on ERR$_CM_ACC_REQUEST to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CM_ACC_REQUEST to UPLD;
+
 
 
 PROMPT ===================================================================================== 

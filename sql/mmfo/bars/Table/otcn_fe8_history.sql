@@ -130,25 +130,13 @@ exception when others then
 
 
 
-
-PROMPT *** Create  index I1_OTCN_FE8_HISTORY ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.I1_OTCN_FE8_HISTORY ON BARS.OTCN_FE8_HISTORY (DATF, ACC) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
 PROMPT *** Create  grants  OTCN_FE8_HISTORY ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_FE8_HISTORY to ABS_ADMIN;
+grant SELECT                                                                 on OTCN_FE8_HISTORY to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_FE8_HISTORY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_FE8_HISTORY to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_FE8_HISTORY to RPBN002;
+grant SELECT                                                                 on OTCN_FE8_HISTORY to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_FE8_HISTORY to WR_ALL_RIGHTS;
 
 

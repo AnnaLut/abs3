@@ -81,10 +81,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  BU_PLAN ***
+grant SELECT                                                                 on BU_PLAN         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BU_PLAN         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BU_PLAN         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BU_PLAN         to BU;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BU_PLAN         to SALGL;
+grant SELECT                                                                 on BU_PLAN         to UPLD;
 grant FLASHBACK,SELECT                                                       on BU_PLAN         to WR_REFREAD;
 
 

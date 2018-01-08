@@ -77,6 +77,10 @@ COMMENT ON COLUMN BARS.ERR$_ACC_DEB_23.KOL_VZ IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ACC_DEB_23 ***
+grant SELECT                                                                 on ERR$_ACC_DEB_23 to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ACC_DEB_23 to UPLD;
+
 
 
 PROMPT ===================================================================================== 

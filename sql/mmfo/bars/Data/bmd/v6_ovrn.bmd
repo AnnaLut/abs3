@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'OVRN-6) Підсумкові ЧКО ';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V6_OVRN';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,17 +124,17 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'рах. 2600~ACC ', null, null, 99, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DATM', 'D', 'Дата(мic)~ЧКО', null, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'PR', 'N', '№ групи~ 0 із АБС', null, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'S', 'N', 'Врахована~Сума', null, null, 3, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', 'FunNSIEditF("V7_OVRN"||IifS(:SOS=0,"[NSIFUNCTION][PROC=>PUL_DAT(''"||SalFmtFormatDateTime(:DATM,"dd.MM.yyyy")||"'',STRING_Null)][EXEC=>BEFORE]",""),IifN(:SOS=0,4,1))', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NLS', 'C', 'Рах. 2600~учасника', null, null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=V7_OVRN[NSIFUNCTION][PROC=>OVRN.PUL_OVRD(:ND,:ACC,to_char(:DATM,''dd.mm.yyyy''), Null)][EXEC=>BEFORE][ACCESSCODE=>4]', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'RNK', 'N', 'РНК~учасника', null, null, 30, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'OKPO', 'C', 'Ід.код~учасника', null, null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NMK', 'C', 'Назва~учасника', null, null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'ND', 'N', 'Реф~дог', null, null, 80, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'SOS', 'N', 'Сос~дог', null, null, 70, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'DATS', 'C', 'Дата,симв ', null, null, 85, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'рах. 2600~ACC ', '', null, 99, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DATM', 'D', 'Дата(мic)~ЧКО', '', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'PR', 'N', '№ групи~ 0 із АБС', '', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'S', 'N', 'Врахована~Сума', '', null, 3, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', 'FunNSIEditF("V7_OVRN"||IifS(:SOS=0,"[NSIFUNCTION][PROC=>PUL_DAT(''"||SalFmtFormatDateTime(:DATM,"dd.MM.yyyy")||"'',STRING_Null)][EXEC=>BEFORE]",""),IifN(:SOS=0,4,1))', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NLS', 'C', 'Рах. 2600~учасника', '', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=V7_OVRN[NSIFUNCTION][PROC=>OVRN.PUL_OVRD(:ND,:ACC,to_char(:DATM,''dd.mm.yyyy''), Null)][EXEC=>BEFORE][ACCESSCODE=>4]', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'RNK', 'N', 'РНК~учасника', '', null, 30, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'OKPO', 'C', 'Ід.код~учасника', '', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NMK', 'C', 'Назва~учасника', '', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'ND', 'N', 'Реф~дог', '', null, 80, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'SOS', 'N', 'Сос~дог', '', null, 70, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'DATS', 'C', 'Дата,симв ', '', null, 85, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CC_SOS');

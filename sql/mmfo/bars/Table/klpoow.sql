@@ -77,19 +77,6 @@ COMMENT ON COLUMN BARS.KLPOOW.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_KLPOOW_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLPOOW ADD CONSTRAINT FK_KLPOOW_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_KLPOOW_MFOA_NN ***
 begin   
  execute immediate '
@@ -102,70 +89,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_KLPOOW_KF_NN ***
+PROMPT *** Create  constraint CC_KLPOOW_NLSA_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.KLPOOW MODIFY (KF CONSTRAINT CC_KLPOOW_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLPOOW_NAZN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLPOOW MODIFY (NAZN CONSTRAINT CC_KLPOOW_NAZN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLPOOW_ND_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLPOOW MODIFY (ND CONSTRAINT CC_KLPOOW_ND_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLPOOW_S_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLPOOW MODIFY (S CONSTRAINT CC_KLPOOW_S_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLPOOW_NAMB_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLPOOW MODIFY (NAMB CONSTRAINT CC_KLPOOW_NAMB_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KLPOOW_NLSB_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLPOOW MODIFY (NLSB CONSTRAINT CC_KLPOOW_NLSB_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.KLPOOW MODIFY (NLSA CONSTRAINT CC_KLPOOW_NLSA_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -186,10 +113,70 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_KLPOOW_NLSA_NN ***
+PROMPT *** Create  constraint CC_KLPOOW_NLSB_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.KLPOOW MODIFY (NLSA CONSTRAINT CC_KLPOOW_NLSA_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.KLPOOW MODIFY (NLSB CONSTRAINT CC_KLPOOW_NLSB_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLPOOW_NAMB_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLPOOW MODIFY (NAMB CONSTRAINT CC_KLPOOW_NAMB_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLPOOW_S_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLPOOW MODIFY (S CONSTRAINT CC_KLPOOW_S_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLPOOW_ND_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLPOOW MODIFY (ND CONSTRAINT CC_KLPOOW_ND_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLPOOW_NAZN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLPOOW MODIFY (NAZN CONSTRAINT CC_KLPOOW_NAZN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KLPOOW_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLPOOW MODIFY (KF CONSTRAINT CC_KLPOOW_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -213,10 +200,12 @@ exception when others then
 
 PROMPT *** Create  grants  KLPOOW ***
 grant INSERT                                                                 on KLPOOW          to BARS014;
+grant SELECT                                                                 on KLPOOW          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLPOOW          to BARS_ACCESS_DEFROLE;
 grant INSERT                                                                 on KLPOOW          to OPERKKK;
 grant INSERT                                                                 on KLPOOW          to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLPOOW          to TECH_MOM1;
+grant SELECT                                                                 on KLPOOW          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLPOOW          to WR_ALL_RIGHTS;
 
 

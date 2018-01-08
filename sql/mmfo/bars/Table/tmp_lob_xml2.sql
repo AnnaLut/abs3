@@ -47,8 +47,10 @@ COMMENT ON COLUMN BARS.TMP_LOB_XML2.TELO IS '';
 
 
 PROMPT *** Create  grants  TMP_LOB_XML2 ***
+grant SELECT                                                                 on TMP_LOB_XML2    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_LOB_XML2    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_LOB_XML2    to START1;
+grant SELECT                                                                 on TMP_LOB_XML2    to UPLD;
 
 
 

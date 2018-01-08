@@ -86,6 +86,18 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint SYS_C00119196 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_W4_NBS_OB22 MODIFY (OB22 NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C00119197 ***
 begin   
  execute immediate '
@@ -97,17 +109,9 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint SYS_C00119196 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_W4_NBS_OB22 MODIFY (OB22 NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
+PROMPT *** Create  grants  TMP_W4_NBS_OB22 ***
+grant SELECT                                                                 on TMP_W4_NBS_OB22 to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_W4_NBS_OB22 to UPLD;
 
 
 

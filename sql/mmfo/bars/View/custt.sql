@@ -11,7 +11,9 @@ PROMPT *** Create  view CUSTT ***
   select "CUSTTYPE","NAME" from custtype union all (select 4, 'тно' from dual);
 
 PROMPT *** Create  grants  CUSTT ***
+grant SELECT                                                                 on CUSTT           to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTT           to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CUSTT           to UPLD;
 
 
 

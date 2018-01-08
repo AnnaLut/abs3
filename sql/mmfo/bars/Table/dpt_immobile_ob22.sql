@@ -78,10 +78,12 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_IMMOBILE_OB22 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_IMMOBILE_OB22 to ABS_ADMIN;
+grant SELECT                                                                 on DPT_IMMOBILE_OB22 to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_IMMOBILE_OB22 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_IMMOBILE_OB22 to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_IMMOBILE_OB22 to DPT_ADMIN;
 grant SELECT                                                                 on DPT_IMMOBILE_OB22 to START1;
+grant SELECT                                                                 on DPT_IMMOBILE_OB22 to UPLD;
 
 
 

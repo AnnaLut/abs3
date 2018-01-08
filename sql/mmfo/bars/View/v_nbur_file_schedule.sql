@@ -23,9 +23,11 @@ PROMPT *** Create  view V_NBUR_FILE_SCHEDULE ***
         r.PERIOD_TYPE = P.PERIOD_TYPE;
 
 PROMPT *** Create  grants  V_NBUR_FILE_SCHEDULE ***
+grant SELECT                                                                 on V_NBUR_FILE_SCHEDULE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_FILE_SCHEDULE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_FILE_SCHEDULE to RPBN002;
 grant SELECT                                                                 on V_NBUR_FILE_SCHEDULE to START1;
+grant SELECT                                                                 on V_NBUR_FILE_SCHEDULE to UPLD;
 
 
 

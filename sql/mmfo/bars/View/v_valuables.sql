@@ -14,9 +14,11 @@ PROMPT *** Create  view V_VALUABLES ***
  ;
 
 PROMPT *** Create  grants  V_VALUABLES ***
+grant SELECT                                                                 on V_VALUABLES     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_VALUABLES     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_VALUABLES     to PYOD001;
 grant SELECT                                                                 on V_VALUABLES     to RPBN001;
+grant SELECT                                                                 on V_VALUABLES     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_VALUABLES     to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_VALUABLES     to WR_DOC_INPUT;
 

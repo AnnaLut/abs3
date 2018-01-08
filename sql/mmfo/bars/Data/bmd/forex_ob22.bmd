@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'ФОРЕКС: Схема облiку по продуктах';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'FOREX_OB22';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,17 +124,17 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'Числовий~код', null, null, 1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KOD', 'C', 'Символьний~код', null, null, 2, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'S1T', 'C', 'БР/Об22~Торг.рах', null, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"a.BRANCH=sys_context(''bars_context'',''user_branch'')  AND (a.NBS=Substr(:S1T,1,4) and a.ob22=Substr(:S1T,-2) OR a.NBS=''3800'' and a.ob22=Substr(:S38,-2))" )', 0);
-  bars_metabase.add_column(l_tabid, 4, 'S38', 'C', 'БР/Об22~Вал.поз', null, null, 4, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'S3D', 'C', 'БР/Об22~Деб.для переоц.9*', null, null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"a.BRANCH=sys_context(''bars_context'',''user_branch'') AND a.KV=980 AND a.NBS||''/''||a.OB22 in (:S62, :S3D, :S3K) ")', 0);
-  bars_metabase.add_column(l_tabid, 6, 'S3K', 'C', 'БР/Об22~Крд.для переоц.9*', null, null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"a.BRANCH=sys_context(''bars_context'',''user_branch'') AND a.KV=980 AND a.NBS||''/''||a.OB22 in (:S62, :S3D, :S3K) ")', 0);
-  bars_metabase.add_column(l_tabid, 7, 'S62', 'C', 'БР/Об22~Резул.переоц.9*', null, null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"a.BRANCH=sys_context(''bars_context'',''user_branch'') AND a.KV=980 AND a.NBS||''/''||a.OB22 in (:S62, :S3D, :S3K) ")', 0);
-  bars_metabase.add_column(l_tabid, 8, 'S9A', 'C', 'БР/Об22~позаб.вимоги', null, null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'S9P', 'C', 'БР/Об22~позаб.зобов.', null, null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'P_SPOT', 'B', 'Призн.розрахунку~РКР від СЗККВ/СЗКПВ~по рах.ВалПоз', null, null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NAME', 'C', '"Умовна" назва', null, null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'Числовий~код', '', null, 1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KOD', 'C', 'Символьний~код', '', null, 2, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'S1T', 'C', 'БР/Об22~Торг.рах', '', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"a.BRANCH=sys_context(''bars_context'',''user_branch'')  AND (a.NBS=Substr(:S1T,1,4) and a.ob22=Substr(:S1T,-2) OR a.NBS=''3800'' and a.ob22=Substr(:S38,-2))" )', 0);
+  bars_metabase.add_column(l_tabid, 4, 'S38', 'C', 'БР/Об22~Вал.поз', '', null, 4, 0, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'S3D', 'C', 'БР/Об22~Деб.для переоц.9*', '', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"a.BRANCH=sys_context(''bars_context'',''user_branch'') AND a.KV=980 AND a.NBS||''/''||a.OB22 in (:S62, :S3D, :S3K) ")', 0);
+  bars_metabase.add_column(l_tabid, 6, 'S3K', 'C', 'БР/Об22~Крд.для переоц.9*', '', null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"a.BRANCH=sys_context(''bars_context'',''user_branch'') AND a.KV=980 AND a.NBS||''/''||a.OB22 in (:S62, :S3D, :S3K) ")', 0);
+  bars_metabase.add_column(l_tabid, 7, 'S62', 'C', 'БР/Об22~Резул.переоц.9*', '', null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"a.BRANCH=sys_context(''bars_context'',''user_branch'') AND a.KV=980 AND a.NBS||''/''||a.OB22 in (:S62, :S3D, :S3K) ")', 0);
+  bars_metabase.add_column(l_tabid, 8, 'S9A', 'C', 'БР/Об22~позаб.вимоги', '', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'S9P', 'C', 'БР/Об22~позаб.зобов.', '', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'P_SPOT', 'B', 'Призн.розрахунку~РКР від СЗККВ/СЗКПВ~по рах.ВалПоз', '', null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NAME', 'C', '"Умовна" назва', '', null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание вложенных таблиц
   l_newtabid := bars_metabase.get_tabid('V_VPLIST');

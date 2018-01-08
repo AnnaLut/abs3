@@ -24,8 +24,10 @@ PROMPT *** Create  view LORO_SWT_SWT ***
  where k57||k58 like '%/1600%COSBUAUK%'  or k57||k58 not like '%COSBUAUK%';
 
 PROMPT *** Create  grants  LORO_SWT_SWT ***
+grant SELECT                                                                 on LORO_SWT_SWT    to BARSREADER_ROLE;
 grant SELECT                                                                 on LORO_SWT_SWT    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LORO_SWT_SWT    to START1;
+grant SELECT                                                                 on LORO_SWT_SWT    to UPLD;
 
 
 

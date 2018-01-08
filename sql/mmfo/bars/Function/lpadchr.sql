@@ -30,6 +30,7 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on LPADCHR         to BARSUPL;
 grant EXECUTE                                                                on LPADCHR         to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on LPADCHR         to RPBN001;
+grant EXECUTE                                                                on LPADCHR         to UPLD;
 grant EXECUTE                                                                on LPADCHR         to WR_ALL_RIGHTS;
 
  

@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_INS_PARTNER_TYPE_ATTRS.IS_REQUIRED IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_INS_PARTNER_TYPE_ATTRS ***
+grant SELECT                                                                 on ERR$_INS_PARTNER_TYPE_ATTRS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_INS_PARTNER_TYPE_ATTRS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

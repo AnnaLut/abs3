@@ -31,7 +31,9 @@ PROMPT *** Create  view V_CC_PAWN ***
  order by pawn;
 
 PROMPT *** Create  grants  V_CC_PAWN ***
+grant SELECT                                                                 on V_CC_PAWN       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CC_PAWN       to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CC_PAWN       to UPLD;
 
 
 

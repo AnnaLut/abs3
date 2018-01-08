@@ -1,13 +1,15 @@
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mbk.sql =========*** Run *** =======
-PROMPT ===================================================================================== 
 
-create or replace package mbk
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mbk.sql =========*** Run *** =======
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.MBK 
 is
 /*
  15.12.2017 ВВод сделки - снова Proc-dr
  08.12.2017 Sta ОТСутствие в Proc-dr
- 17.11.2017 Трансфер-2017 ПОДМЕНА ПРОЦЕДУРЫ ОТКР.СЧЕТА  На уровне бал.счетов - без учета об22 
+ 17.11.2017 Трансфер-2017 ПОДМЕНА ПРОЦЕДУРЫ ОТКР.СЧЕТА  На уровне бал.счетов - без учета об22
 
 */
     MBK_HEAD_VERS  constant varchar2(64)  := 'version 55.0 02.01.2017';
@@ -129,7 +131,7 @@ PROCEDURE op_reg_ex_2017(
     ----------------------------------------------------------------------
     --    Процедура обновления даты заключения сделки
     --
-    procedure upd_cc_deal (p_nd number, p_sdate date, p_prod varchar2, p_n_nbu varchar2, p_d_nbu date);
+    procedure upd_cc_deal (p_nd number, p_sdate date);
     ----------------------------------------------------------------------
     procedure inp_deal (
               cc_id_      varchar2,
@@ -412,7 +414,7 @@ PROCEDURE op_reg_ex_2017(
     function body_version return varchar2;
 end;
 /
-create or replace package body mbk is
+CREATE OR REPLACE PACKAGE BODY BARS.MBK is
 
     MBK_BODY_VERS   CONSTANT VARCHAR2(64)  := 'version 1 15.12.2017';
 /*
@@ -486,13 +488,13 @@ PROCEDURE op_reg_ex_2017(
      accc_           NUMBER   DEFAULT NULL)
 IS  L_NLS accounts.nLs%type := NLS_ ;
     l_NBS accounts.nBs%type := Substr(NLS_,1,4) ;
-begin 
+begin
 
   -- пробуем открыть в "лоб" с заданныс счетом    |-----|
   begin op_reg_ex ( mod_, p1_, p2_, p3_, p4_, rnk_, L_NLS, kv_, nms_, tip_, isp_, accR_, nbsnull_, pap_, vid_, pos_, sec_, seci_, seco_, blkd_, blkk_, lim_ , ostx_,   nlsalt_, tobo_, accc_ ) ;
   exception when others then                 --   |-----|
         -- при любой ош
-        if  newnbs.g_state  = 1   then -- если включен признак НБУ_2017 , то пытаемся трансформировать Здесь взят фрагмент ( для скорости зашили в текст. т.к. это константы от НБУ, не меняются) 
+        if  newnbs.g_state  = 1   then -- если включен признак НБУ_2017 , то пытаемся трансформировать Здесь взят фрагмент ( для скорости зашили в текст. т.к. это константы от НБУ, не меняются)
                                       -- select distinct r020_old, r020_new  from transfer_2017 where r020_old like '15%' or  r020_old like '16%'
 
            If    l_NBS = '1509'  then  l_NBS := '1508' ;
@@ -511,9 +513,9 @@ begin
        ----L_NLS := Vkrzn( Substr( gl.aMfo,1,5), L_NBS || '0' || Substr (l_NLS,6,9) );
            l_NLS := F_NEWNLS2(null, 'MBK', L_NBS , RNK_,null);
 
-        end if; 
+        end if;
         ----------- пробуем открыть с обновл.сч.  |-----|
-        op_reg_ex( mod_, p1_, p2_, p3_, p4_, rnk_, L_NLS, kv_, nms_, tip_, isp_, accR_, nbsnull_, pap_, vid_, pos_, sec_, seci_, seco_, blkd_, blkk_, lim_ , ostx_,   nlsalt_, tobo_, accc_ ) ;                                    
+        op_reg_ex( mod_, p1_, p2_, p3_, p4_, rnk_, L_NLS, kv_, nms_, tip_, isp_, accR_, nbsnull_, pap_, vid_, pos_, sec_, seci_, seco_, blkd_, blkk_, lim_ , ostx_,   nlsalt_, tobo_, accc_ ) ;
                                              --   |-----|
   end;
 
@@ -622,7 +624,7 @@ END    op_reg_ex_2017;
 
            insert into nd_acc (nd,acc) select ND_NEW, acc from nd_acc where nd=ND_;
         END IF;
-       
+
      EXCEPTION WHEN NO_DATA_FOUND THEN return;
      END;
 
@@ -1226,7 +1228,7 @@ END    op_reg_ex_2017;
         BEGIN SELECT nbsn INTO nbsn_ FROM proc_dr WHERE nbs=nbs_ and ROWNUM=1; -- если несколько записей - берем первую
         exception when NO_DATA_FOUND THEN  nbsN_ := sUBSTR(nbs_,1,3) ||'8';
         end;
-      
+
          BEGIN
             if nbs_ like '39%' then  MASK_ := 'MFK';
             else                     MASK_ := 'MBK';
@@ -1292,7 +1294,7 @@ END    op_reg_ex_2017;
     end;
 
     return (substr(SS_||'               ', 1, 15) ||      substr(SN_||'               ', 1, 15)        );
-   
+
 
   END F_NLS_MB ;
 
@@ -1972,11 +1974,10 @@ END    op_reg_ex_2017;
     ----------------------------------------------------------------------
     --    Процедура обновления даты заключения сделки
     --
-    procedure upd_cc_deal (p_nd number, p_sdate date, p_prod varchar2, p_n_nbu varchar2, p_d_nbu date)
+    procedure upd_cc_deal (p_nd number, p_sdate date)
     is
     begin
-      update cc_deal set sdate = p_sdate, prod  = p_prod  where nd = p_nd;
-      update cc_add  set n_nbu = p_n_nbu, d_nbu = p_d_nbu where nd = p_nd and adds=0;
+      update cc_deal set sdate = p_sdate where nd = p_nd;
     end upd_cc_deal;
 
     ----------------------------------------------------------------------
@@ -2062,7 +2063,7 @@ END    op_reg_ex_2017;
 
     BEGIN
 
-	   
+
       bars_audit.info( SubStr( title || ': Entry with( CC_ID_ => ' || CC_ID_
            || chr(10) || ', nVidd_ => '      || nVidd_
            || chr(10) || ', nTipd_ => '      || nTipd_
@@ -2151,14 +2152,6 @@ END    op_reg_ex_2017;
         UPDATE accounts SET mdate=DAT4_            WHERE acc=ACC2_;
         UPDATE accounts SET mdate=DAT4_            WHERE acc=ACC4_;
 
-        -- Внесение РНК в CUSTBANK для сделок (2700,2701,3660)
-        if mbdk_tip(nVidd_) = 1 THEN 
-           update custbank set bki = 1 where rnk = RNKB_ ;
-           if SQL%rowcount = 0 then
-              insert into custbank (rnk, bki) values (RNKB_, 1);
-           end if;
-        end if;
-
         -- Artem Yurchenko, 24.11.2014
         -- для кредитных ресурсов необходимо использовать другие операции
         if (check_if_deal_belong_to_crsour(nVidd_) = 'Y') then
@@ -2243,7 +2236,7 @@ END    op_reg_ex_2017;
 
         begin l_clt_amnt := to_number( bars.pul.get_mas_ini_val('COLLATERAL_AMOUNT') );
            if l_clt_amnt > 0  and  NLSZ_ is Not Null    then
-              collateral_payments( p_mbk_id   => ND_   , p_mbk_num  => CC_ID_  , p_beg_dt   => DAT2_  , p_end_dt   => DAT4_  , p_clt_amnt => l_clt_amnt, 
+              collateral_payments( p_mbk_id   => ND_   , p_mbk_num  => CC_ID_  , p_beg_dt   => DAT2_  , p_end_dt   => DAT4_  , p_clt_amnt => l_clt_amnt,
                                    p_acc_num  => NLSZ_ , p_ccy_id   => nKVZ_   , p_rnk      => RNKB_  , p_dk       => case when l_tipd = 1 then 1 else 0 end   );
           end if;
 ------- exception  when OTHERS then      bars_audit.info( 'mbk.inp_deal: collateral_payments_error => '|| dbms_utility.format_error_stack()   || dbms_utility.format_error_backtrace() );
@@ -4063,7 +4056,7 @@ SELECT a.nls, a.ostc/power(10,:nDig) INTO :sDB_1819, :ost_DB_1819
     end;
 end;
 /
-show err;
+ show err;
  
 PROMPT *** Create  grants  MBK ***
 grant EXECUTE                                                                on MBK             to BARS_ACCESS_DEFROLE;

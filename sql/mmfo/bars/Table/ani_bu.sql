@@ -62,9 +62,11 @@ COMMENT ON COLUMN BARS.ANI_BU.K7 IS '';
 
 PROMPT *** Create  grants  ANI_BU ***
 grant SELECT                                                                 on ANI_BU          to ABS_ADMIN;
+grant SELECT                                                                 on ANI_BU          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANI_BU          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANI_BU          to BARS_DM;
 grant SELECT                                                                 on ANI_BU          to START1;
+grant SELECT                                                                 on ANI_BU          to UPLD;
 grant SELECT                                                                 on ANI_BU          to WR_ALL_RIGHTS;
 
 

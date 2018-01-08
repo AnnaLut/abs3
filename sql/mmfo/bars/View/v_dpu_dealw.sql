@@ -27,7 +27,9 @@ PROMPT *** Create  view V_DPU_DEALW ***
 ;
 
 PROMPT *** Create  grants  V_DPU_DEALW ***
+grant SELECT                                                                 on V_DPU_DEALW     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPU_DEALW     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DPU_DEALW     to UPLD;
 
 
 

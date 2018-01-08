@@ -61,9 +61,11 @@ COMMENT ON COLUMN BARS.DPT_INDIVIDD.DELTA IS '';
 
 
 PROMPT *** Create  grants  DPT_INDIVIDD ***
+grant SELECT                                                                 on DPT_INDIVIDD    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_INDIVIDD    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_INDIVIDD    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_INDIVIDD    to START1;
+grant SELECT                                                                 on DPT_INDIVIDD    to UPLD;
 
 
 

@@ -93,9 +93,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DOP_F42 ***
+grant SELECT                                                                 on DOP_F42         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DOP_F42         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DOP_F42         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DOP_F42         to START1;
+grant SELECT                                                                 on DOP_F42         to UPLD;
 
 
 

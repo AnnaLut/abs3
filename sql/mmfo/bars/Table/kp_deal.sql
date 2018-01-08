@@ -117,9 +117,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  KP_DEAL ***
+grant SELECT                                                                 on KP_DEAL         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KP_DEAL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KP_DEAL         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KP_DEAL         to R_KP;
+grant SELECT                                                                 on KP_DEAL         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KP_DEAL         to WR_ALL_RIGHTS;
 
 

@@ -87,7 +87,9 @@ PROMPT *** Create  view E_DEAL_META ***
              AND e.accp = ap.acc(+));
 
 PROMPT *** Create  grants  E_DEAL_META ***
+grant SELECT                                                                 on E_DEAL_META     to BARSREADER_ROLE;
 grant SELECT                                                                 on E_DEAL_META     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on E_DEAL_META     to UPLD;
 
 
 

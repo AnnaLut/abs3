@@ -90,24 +90,13 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint FK_ZAYDEBTKLB_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAY_DEBT_KLB ADD CONSTRAINT FK_ZAYDEBTKLB_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
 PROMPT *** Create  grants  ZAY_DEBT_KLB ***
+grant SELECT                                                                 on ZAY_DEBT_KLB    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on ZAY_DEBT_KLB    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAY_DEBT_KLB    to BARS_DM;
 grant SELECT                                                                 on ZAY_DEBT_KLB    to START1;
 grant INSERT                                                                 on ZAY_DEBT_KLB    to TECH_MOM1;
+grant SELECT                                                                 on ZAY_DEBT_KLB    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAY_DEBT_KLB    to WR_ALL_RIGHTS;
 grant DELETE,SELECT                                                          on ZAY_DEBT_KLB    to ZAY;
 

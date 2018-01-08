@@ -77,10 +77,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  CCK_RESTR_VID ***
+grant SELECT                                                                 on CCK_RESTR_VID   to BARSREADER_ROLE;
 grant SELECT                                                                 on CCK_RESTR_VID   to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_RESTR_VID   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_RESTR_VID   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_RESTR_VID   to RCC_DEAL;
+grant SELECT                                                                 on CCK_RESTR_VID   to UPLD;
 grant FLASHBACK,SELECT                                                       on CCK_RESTR_VID   to WR_REFREAD;
 
 

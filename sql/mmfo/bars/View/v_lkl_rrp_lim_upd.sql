@@ -14,7 +14,9 @@ PROMPT *** Create  view V_LKL_RRP_LIM_UPD ***
    ORDER BY l.DAT_SYS desc;
 
 PROMPT *** Create  grants  V_LKL_RRP_LIM_UPD ***
+grant SELECT                                                                 on V_LKL_RRP_LIM_UPD to BARSREADER_ROLE;
 grant SELECT                                                                 on V_LKL_RRP_LIM_UPD to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_LKL_RRP_LIM_UPD to UPLD;
 
 
 

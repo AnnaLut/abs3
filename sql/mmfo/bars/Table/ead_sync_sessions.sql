@@ -81,8 +81,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  EAD_SYNC_SESSIONS ***
+grant SELECT                                                                 on EAD_SYNC_SESSIONS to BARSREADER_ROLE;
 grant SELECT                                                                 on EAD_SYNC_SESSIONS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EAD_SYNC_SESSIONS to BARS_DM;
+grant SELECT                                                                 on EAD_SYNC_SESSIONS to UPLD;
 
 
 

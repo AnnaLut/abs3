@@ -18,7 +18,9 @@ PROMPT *** Create  view V_CBIREP_REPFOLDERSLIST ***
  ;
 
 PROMPT *** Create  grants  V_CBIREP_REPFOLDERSLIST ***
+grant SELECT                                                                 on V_CBIREP_REPFOLDERSLIST to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CBIREP_REPFOLDERSLIST to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CBIREP_REPFOLDERSLIST to UPLD;
 grant SELECT                                                                 on V_CBIREP_REPFOLDERSLIST to WR_CBIREP;
 
 

@@ -127,9 +127,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FX_IN_MT ***
+grant SELECT                                                                 on FX_IN_MT        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FX_IN_MT        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FX_IN_MT        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FX_IN_MT        to START1;
+grant SELECT                                                                 on FX_IN_MT        to UPLD;
 
 
 

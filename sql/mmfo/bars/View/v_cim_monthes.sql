@@ -33,7 +33,9 @@ union
 select 'C',      'грудень'  from dual;
 
 PROMPT *** Create  grants  V_CIM_MONTHES ***
+grant SELECT                                                                 on V_CIM_MONTHES   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_MONTHES   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_MONTHES   to UPLD;
 
 
 

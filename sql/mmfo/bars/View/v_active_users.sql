@@ -12,8 +12,10 @@ PROMPT *** Create  view V_ACTIVE_USERS ***
 
 PROMPT *** Create  grants  V_ACTIVE_USERS ***
 grant SELECT                                                                 on V_ACTIVE_USERS  to ABS_ADMIN;
+grant SELECT                                                                 on V_ACTIVE_USERS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACTIVE_USERS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ACTIVE_USERS  to START1;
+grant SELECT                                                                 on V_ACTIVE_USERS  to UPLD;
 grant SELECT                                                                 on V_ACTIVE_USERS  to WR_ALL_RIGHTS;
 
 

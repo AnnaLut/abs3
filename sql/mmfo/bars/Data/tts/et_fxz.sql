@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции FXZ
-prompt Наименование операции: ЦП: Збільш/Зменш. резерву
+prompt Наименование операции: FXZ ЦП: Збільш/Зменш. резерву
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('FXZ', 'ЦП: Збільш/Зменш. резерву', 1, '77006', null, '67005', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000000000000000000000000000000000000000000000000000000000000000', null);
+    values ('FXZ', 'FXZ ЦП: Збільш/Зменш. резерву', 1, '77006', null, '67005', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='FXZ', name='ЦП: Збільш/Зменш. резерву', dk=1, nlsm='77006', kv=null, nlsk='67005', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='FXZ', name='FXZ ЦП: Збільш/Зменш. резерву', dk=1, nlsm='77006', kv=null, nlsk='67005', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='FXZ';
   end;
   --------------------------------

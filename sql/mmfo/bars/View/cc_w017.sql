@@ -182,7 +182,9 @@ PROMPT *** Create  view CC_W017 ***
 ;
 
 PROMPT *** Create  grants  CC_W017 ***
+grant SELECT                                                                 on CC_W017         to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_W017         to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CC_W017         to UPLD;
 
 
 

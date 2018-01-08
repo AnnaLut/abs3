@@ -16,6 +16,7 @@ DECLARE
  BR_ int:=0;
  gl_bd date:=gl.bd;
  l_IR varchar2(24);
+ l_acc number(24);
 --gl_bd date:=gl.bd;
 BEGIN
  if  inserting or updating  then
@@ -25,15 +26,22 @@ BEGIN
       l_IR:=null;
    end if;
    begin
-     select min(nd) into nd_ from nd_acc n where acc=:new.acc;
+    select acc into l_acc 
+        from accounts where nls = :NEW.nls 
+                    and kv = :NEW.kv;
+   exception when no_data_found then
+      raise_application_error(-(20721), 'PENY_START: Рахунок  '||:NEW.nls||' не знайдений.',TRUE);
+   end;   
+   begin
+     select min(nd) into nd_ from nd_acc n where acc=l_acc;
      insert into cc_peny_start (acc,ostc,branch,nd,ir)
-                        values (:NEW.acc,cck_app.to_number2(:NEW.OSTC)*100
+                        values (l_acc,cck_app.to_number2(:NEW.OSTC)*100
                                ,:new.branch, nd_,l_IR);
    exception when DUP_VAL_ON_INDEX then
-    update cc_peny_start set ostc=:NEW.ostc*100, IR=cck_app.TO_number2 (l_IR) where acc=:new.acc;
+    update cc_peny_start set ostc=:NEW.ostc*100, IR=cck_app.TO_number2 (l_IR) where acc=l_acc;
    end;
       begin
-      select max(bdat) into gl_bd from int_ratn where id=2 and acc=:NEW.acc;
+      select max(bdat) into gl_bd from int_ratn where id=2 and acc=l_acc;
       exception when no_data_found then
        gl_bd:=gl.bd;
       end;
@@ -53,9 +61,6 @@ BEGIN
  end if;
 
 end TGR_v_cc_peny_start;
-
-
-
 /
 ALTER TRIGGER BARS.TGR_V_CC_PENY_START ENABLE;
 

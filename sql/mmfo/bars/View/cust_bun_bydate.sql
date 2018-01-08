@@ -35,8 +35,10 @@ select r.rel_rnk, r.rnk, r.rel_id, r.rel_rnk, c.nmk,
    and c.rnk = u.rnk(+);
 
 PROMPT *** Create  grants  CUST_BUN_BYDATE ***
+grant SELECT                                                                 on CUST_BUN_BYDATE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_BUN_BYDATE to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_BUN_BYDATE to CUST001;
+grant SELECT                                                                 on CUST_BUN_BYDATE to UPLD;
 
 
 

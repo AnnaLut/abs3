@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Перегляд списку сформованих файлів';
   l_tablinesdef := '30';
+  l_tabselect_statement := '';
   l_tabname     := 'V_NBUR_FORM_FINISHED_USER';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,18 +124,18 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'FILE_CODE', 'C', 'Код~файлу', 1, 3, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/reporting/nbu/index?id=:FILE_ID'||chr(38)||'date=:RPT_DT'||chr(38)||'kf=:KF'||chr(38)||'versionId=:VERSION_ID', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'FILE_ID', 'N', 'Ідентифікатор~файлу', 1, 22, 4, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'FILE_NAME', 'C', 'Назва~файлу', 6, 255, 6, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'FILE_TYPE', 'C', 'Тип~файлу', 2, 1, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'FINISH_TIME', 'C', 'Дата закінчення~формування', 2.5, 20, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'FIO', 'C', 'Ініціатор~формування', 6, 60, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'KF', 'C', 'Код філії', 1, 6, 2, 1, 1, 0, 0, '', '', 1, 0, '', 0, 1, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'PERIOD', 'C', 'Періодичність~ ', 2, 70, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'REPORT_DATE', 'D', 'Звітна дата', 2, 10, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'START_TIME', 'C', 'Дата початку~формування', 2.5, 20, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'VERSION_ID', 'N', 'Номер~версії', 1, 22, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'RPT_DT', 'C', 'RPT_DT', 1, 10, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'FILE_CODE', 'C', 'Код~файлу', '1', 3, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/reporting/nbu/index?id=:FILE_ID'||chr(38)||'date=:RPT_DT'||chr(38)||'kf=:KF'||chr(38)||'versionId=:VERSION_ID', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'FILE_ID', 'N', 'Ідентифікатор~файлу', '1', 22, 4, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'FILE_NAME', 'C', 'Назва~файлу', '6', 255, 6, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'FILE_TYPE', 'C', 'Тип~файлу', '2', 1, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'FINISH_TIME', 'C', 'Дата закінчення~формування', '2.5', 20, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'FIO', 'C', 'Ініціатор~формування', '6', 60, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'KF', 'C', 'Код філії', '1', 6, 2, 1, 1, 0, 0, '', '', 1, 0, '', 0, 1, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'PERIOD', 'C', 'Періодичність~ ', '2', 70, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'REPORT_DATE', 'D', 'Звітна дата', '2', 10, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'START_TIME', 'C', 'Дата початку~формування', '2.5', 20, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'VERSION_ID', 'N', 'Номер~версії', '1', 22, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'RPT_DT', 'C', 'RPT_DT', '1', 10, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 4, 'ASC ');

@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  NAL_ZG ***
+grant SELECT                                                                 on NAL_ZG          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAL_ZG          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAL_ZG          to START1;
+grant SELECT                                                                 on NAL_ZG          to UPLD;
 
 
 

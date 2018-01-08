@@ -42,8 +42,10 @@ PROMPT *** Create  view V_REZ_9100 ***
           AND ost_korr(a.acc, Dat_last (v.b - 4, v.b - 1),null,'9001') < 0;
 
 PROMPT *** Create  grants  V_REZ_9100 ***
+grant SELECT                                                                 on V_REZ_9100      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REZ_9100      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_REZ_9100      to START1;
+grant SELECT                                                                 on V_REZ_9100      to UPLD;
 
 
 

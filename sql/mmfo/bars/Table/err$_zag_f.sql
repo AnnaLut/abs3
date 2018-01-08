@@ -69,6 +69,10 @@ COMMENT ON COLUMN BARS.ERR$_ZAG_F.TXTK IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ZAG_F ***
+grant SELECT                                                                 on ERR$_ZAG_F      to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ZAG_F      to UPLD;
+
 
 
 PROMPT ===================================================================================== 

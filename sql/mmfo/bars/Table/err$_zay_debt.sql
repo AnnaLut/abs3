@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.ERR$_ZAY_DEBT.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ZAY_DEBT ***
+grant SELECT                                                                 on ERR$_ZAY_DEBT   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ZAY_DEBT   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

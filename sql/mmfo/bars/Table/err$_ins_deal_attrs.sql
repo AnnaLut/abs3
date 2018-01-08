@@ -57,6 +57,10 @@ COMMENT ON COLUMN BARS.ERR$_INS_DEAL_ATTRS.VAL IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_INS_DEAL_ATTRS ***
+grant SELECT                                                                 on ERR$_INS_DEAL_ATTRS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_INS_DEAL_ATTRS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

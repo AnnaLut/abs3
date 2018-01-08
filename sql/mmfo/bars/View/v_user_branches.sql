@@ -16,8 +16,10 @@ PROMPT *** Create  view V_USER_BRANCHES ***
   order by 1;
 
 PROMPT *** Create  grants  V_USER_BRANCHES ***
+grant SELECT                                                                 on V_USER_BRANCHES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USER_BRANCHES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_USER_BRANCHES to START1;
+grant SELECT                                                                 on V_USER_BRANCHES to UPLD;
 
 
 

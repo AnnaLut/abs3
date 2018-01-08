@@ -51,7 +51,9 @@ COMMENT ON COLUMN BARS.ATTRIBUTE_NUMBER_VALUE_BAK.VALUE IS '';
 
 
 PROMPT *** Create  grants  ATTRIBUTE_NUMBER_VALUE_BAK ***
+grant SELECT                                                                 on ATTRIBUTE_NUMBER_VALUE_BAK to BARSREADER_ROLE;
 grant SELECT                                                                 on ATTRIBUTE_NUMBER_VALUE_BAK to BARS_DM;
+grant SELECT                                                                 on ATTRIBUTE_NUMBER_VALUE_BAK to UPLD;
 
 
 

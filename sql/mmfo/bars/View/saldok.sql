@@ -44,8 +44,10 @@ PROMPT *** Create  view SALDOK ***
 
 PROMPT *** Create  grants  SALDOK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDOK          to ABS_ADMIN;
+grant SELECT                                                                 on SALDOK          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDOK          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALDOK          to START1;
+grant SELECT                                                                 on SALDOK          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SALDOK          to WR_ALL_RIGHTS;
 grant SELECT                                                                 on SALDOK          to WR_DOCHAND;
 grant SELECT                                                                 on SALDOK          to WR_DOC_INPUT;

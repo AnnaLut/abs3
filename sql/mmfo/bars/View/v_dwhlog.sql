@@ -26,7 +26,9 @@ PROMPT *** Create  view V_DWHLOG ***
    ORDER BY 1 DESC;
 
 PROMPT *** Create  grants  V_DWHLOG ***
+grant SELECT                                                                 on V_DWHLOG        to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_DWHLOG        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DWHLOG        to UPLD;
 
 
 

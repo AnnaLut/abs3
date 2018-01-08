@@ -101,6 +101,10 @@ COMMENT ON COLUMN BARS.ERR$_INS_DEALS.RENEW_NEWID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_INS_DEALS ***
+grant SELECT                                                                 on ERR$_INS_DEALS  to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_INS_DEALS  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

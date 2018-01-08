@@ -52,10 +52,10 @@ COMMENT ON COLUMN BARS.PFU_EPP_KILLED.STATE IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C00109508 ***
+PROMPT *** Create  constraint SYS_C00109506 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PFU_EPP_KILLED MODIFY (KILL_DATE NOT NULL ENABLE)';
+  ALTER TABLE BARS.PFU_EPP_KILLED MODIFY (EPP_NUMBER NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -76,10 +76,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00109506 ***
+PROMPT *** Create  constraint SYS_C00109508 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PFU_EPP_KILLED MODIFY (EPP_NUMBER NOT NULL ENABLE)';
+  ALTER TABLE BARS.PFU_EPP_KILLED MODIFY (KILL_DATE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -99,47 +99,10 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint FK_PFU_EPP_KILLED_EPPNUMBER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PFU_EPP_KILLED ADD CONSTRAINT FK_PFU_EPP_KILLED_EPPNUMBER FOREIGN KEY (EPP_NUMBER)
-	  REFERENCES BARS.PFU_EPP_LINE_PROCESSING (EPP_NUMBER) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_PFU_EPP_KILLED_STATEID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PFU_EPP_KILLED ADD CONSTRAINT FK_PFU_EPP_KILLED_STATEID FOREIGN KEY (STATE)
-	  REFERENCES BARS.PFU_EPP_KILL_STATE (ID_STATE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_PFU_EPP_KILLED_TYPEID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PFU_EPP_KILLED ADD CONSTRAINT FK_PFU_EPP_KILLED_TYPEID FOREIGN KEY (KILL_TYPE)
-	  REFERENCES BARS.PFU_EPP_KILL_TYPE (ID_TYPE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
 PROMPT *** Create  grants  PFU_EPP_KILLED ***
+grant SELECT                                                                 on PFU_EPP_KILLED  to BARSREADER_ROLE;
 grant SELECT                                                                 on PFU_EPP_KILLED  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on PFU_EPP_KILLED  to UPLD;
 
 
 

@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.TMP_FM_TURN_ARC.TURN_OUTQ IS '';
 
 
 
+PROMPT *** Create  grants  TMP_FM_TURN_ARC ***
+grant SELECT                                                                 on TMP_FM_TURN_ARC to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_FM_TURN_ARC to UPLD;
+
 
 
 PROMPT ===================================================================================== 

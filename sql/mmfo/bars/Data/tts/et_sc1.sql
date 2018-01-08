@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции SC1
-prompt Наименование операции: Плата за РКО при надходженні безготівкових коштів
+prompt Наименование операции: SC1 Плата за РКО при надходженні безготівкових коштів
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('SC1', 'Плата за РКО при надходженні безготівкових коштів', 0, null, 980, null, 980, null, '#(tobopack.GetTOBOParam(''SOC_096''))', null, null, 0, 0, 0, 0, null, null, 16, null, null, null, '0000100001000000000000000000000000000000000000000000000000000000', 'Плата за РКО при надходженні безготівкових коштів. Без ПДВ');
+    values ('SC1', 'SC1 Плата за РКО при надходженні безготівкових коштів', 0, null, 980, null, 980, null, '#(tobopack.GetTOBOParam(''SOC_096''))', null, null, 0, 0, 0, 0, null, null, 16, null, null, null, '0000100001000000000000000000000000000000000000000000000000000000', 'Плата за РКО при надходженні безготівкових коштів. Без ПДВ');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='SC1', name='Плата за РКО при надходженні безготівкових коштів', dk=0, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa='#(tobopack.GetTOBOParam(''SOC_096''))', nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=16, proc=null, s3800=null, rang=null, flags='0000100001000000000000000000000000000000000000000000000000000000', nazn='Плата за РКО при надходженні безготівкових коштів. Без ПДВ'
+         set tt='SC1', name='SC1 Плата за РКО при надходженні безготівкових коштів', dk=0, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa='#(tobopack.GetTOBOParam(''SOC_096''))', nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=16, proc=null, s3800=null, rang=null, flags='0000100001000000000000000000000000000000000000000000000000000000', nazn='Плата за РКО при надходженні безготівкових коштів. Без ПДВ'
        where tt='SC1';
   end;
   --------------------------------

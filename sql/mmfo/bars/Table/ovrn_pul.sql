@@ -51,6 +51,10 @@ COMMENT ON COLUMN BARS.OVRN_PUL.ACC IS '';
 
 
 
+PROMPT *** Create  grants  OVRN_PUL ***
+grant SELECT                                                                 on OVRN_PUL        to BARSREADER_ROLE;
+grant SELECT                                                                 on OVRN_PUL        to UPLD;
+
 
 
 PROMPT ===================================================================================== 

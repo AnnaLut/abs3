@@ -85,38 +85,12 @@ COMMENT ON COLUMN BARS.CIM_CONTRACTS.BANK_CHANGE IS 'Інформація про перехід з ін
 
 
 
-PROMPT *** Create  constraint FK_CIMCONTRACTS_OWNERUID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIM_CONTRACTS ADD CONSTRAINT FK_CIMCONTRACTS_OWNERUID FOREIGN KEY (OWNER_UID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_CIMCONTRACTS ***
 begin   
  execute immediate '
   ALTER TABLE BARS.CIM_CONTRACTS ADD CONSTRAINT PK_CIMCONTRACTS PRIMARY KEY (CONTR_ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CIMCONTRACTS_CUSTOMER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIM_CONTRACTS ADD CONSTRAINT FK_CIMCONTRACTS_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -137,36 +111,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CIMCONTRACTS_BRANCH ***
+PROMPT *** Create  constraint CC_CIMCONTRACTS_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_CONTRACTS ADD CONSTRAINT FK_CIMCONTRACTS_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CIMCONTRACTS_TABVAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIM_CONTRACTS ADD CONSTRAINT FK_CIMCONTRACTS_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CIMCONTRACTS_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIM_CONTRACTS MODIFY (BRANCH CONSTRAINT CC_CIMCONTRACTS_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_CONTRACTS MODIFY (CONTR_ID CONSTRAINT CC_CIMCONTRACTS_ID_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -247,10 +195,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMCONTRACTS_ID_NN ***
+PROMPT *** Create  constraint CC_CIMCONTRACTS_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_CONTRACTS MODIFY (CONTR_ID CONSTRAINT CC_CIMCONTRACTS_ID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_CONTRACTS MODIFY (BRANCH CONSTRAINT CC_CIMCONTRACTS_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -272,10 +220,40 @@ exception when others then
 
 
 
+
+PROMPT *** Create  index I1_CIM_CONTRACTS ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I1_CIM_CONTRACTS ON BARS.CIM_CONTRACTS (RNK, UPPER(NUM), OPEN_DATE) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index I2_CIM_CONTRACTS ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I2_CIM_CONTRACTS ON BARS.CIM_CONTRACTS (CONTR_TYPE) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  CIM_CONTRACTS ***
+grant SELECT                                                                 on CIM_CONTRACTS   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONTRACTS   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_CONTRACTS   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONTRACTS   to CIM_ROLE;
+grant SELECT                                                                 on CIM_CONTRACTS   to UPLD;
 
 
 

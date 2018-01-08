@@ -21,9 +21,11 @@ PROMPT *** Create  view OPER_OB40 ***
  ;
 
 PROMPT *** Create  grants  OPER_OB40 ***
+grant SELECT                                                                 on OPER_OB40       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPER_OB40       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPER_OB40       to PYOD001;
 grant UPDATE                                                                 on OPER_OB40       to START1;
+grant SELECT                                                                 on OPER_OB40       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OPER_OB40       to WR_ALL_RIGHTS;
 
 

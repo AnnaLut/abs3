@@ -44,10 +44,10 @@ COMMENT ON COLUMN BARS.TMP_SBBSPEC.REF IS '';
 
 
 
-PROMPT *** Create  constraint CC_TMPSBBSPEC_NN ***
+PROMPT *** Create  constraint PK_TMPSBBSPEC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_SBBSPEC MODIFY (REF CONSTRAINT CC_TMPSBBSPEC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_SBBSPEC ADD CONSTRAINT PK_TMPSBBSPEC PRIMARY KEY (REF) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -56,10 +56,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_TMPSBBSPEC ***
+PROMPT *** Create  constraint CC_TMPSBBSPEC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_SBBSPEC ADD CONSTRAINT PK_TMPSBBSPEC PRIMARY KEY (REF) ENABLE';
+  ALTER TABLE BARS.TMP_SBBSPEC MODIFY (REF CONSTRAINT CC_TMPSBBSPEC_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -80,8 +80,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_SBBSPEC ***
+grant SELECT                                                                 on TMP_SBBSPEC     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SBBSPEC     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SBBSPEC     to START1;
+grant SELECT                                                                 on TMP_SBBSPEC     to UPLD;
 
 
 

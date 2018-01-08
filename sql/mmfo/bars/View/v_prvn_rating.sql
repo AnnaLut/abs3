@@ -12,6 +12,10 @@ PROMPT *** Create  view V_PRVN_RATING ***
     from cck_rating r
    order by ord;
 
+PROMPT *** Create  grants  V_PRVN_RATING ***
+grant SELECT                                                                 on V_PRVN_RATING   to BARSREADER_ROLE;
+grant SELECT                                                                 on V_PRVN_RATING   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

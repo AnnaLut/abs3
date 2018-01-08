@@ -60,8 +60,10 @@ COMMENT ON COLUMN BARS.TMP_ROZNICABUSINESS.ID IS '';
 
 
 PROMPT *** Create  grants  TMP_ROZNICABUSINESS ***
+grant SELECT                                                                 on TMP_ROZNICABUSINESS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_ROZNICABUSINESS to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_ROZNICABUSINESS to START1;
+grant SELECT                                                                 on TMP_ROZNICABUSINESS to UPLD;
 
 
 

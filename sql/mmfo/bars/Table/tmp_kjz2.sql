@@ -70,9 +70,11 @@ COMMENT ON COLUMN BARS.TMP_KJZ2.SOS IS '';
 
 
 PROMPT *** Create  grants  TMP_KJZ2 ***
+grant SELECT                                                                 on TMP_KJZ2        to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_KJZ2        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_KJZ2        to BARS_DM;
 grant SELECT                                                                 on TMP_KJZ2        to RPBN001;
+grant SELECT                                                                 on TMP_KJZ2        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_KJZ2        to WR_ALL_RIGHTS;
 
 

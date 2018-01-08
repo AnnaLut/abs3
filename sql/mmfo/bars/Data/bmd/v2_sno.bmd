@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'SNO-2) Портфель : SNO + GPP';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V2_SNO';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,25 +124,25 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC_~SNO', null, null, 90, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Бранч~КД', null, null, 85, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'CC_ID', 'C', 'Зовніш.№ ~КД~ПЕРЕГЛЯД~КАРТИ КД ', null, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/CreditUi/NewCredit/?custtype=2'||chr(38)||'nd=:ND', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Вал~SNO', null, null, 18, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'LIM', 'N', 'Факт.Залиш~осн.боргу', null, null, 30, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'ND', 'N', 'Внутр.Реф~КД~ПЕРЕГЛЯД~РАХУНКІВ', null, null, 7, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/customerlist/custacc.aspx?type=0'||chr(38)||'rnk=:RNK'||chr(38)||'mod=ro', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"exists(select 1 from nd_acc where nd=:ND and acc=a.acc)")', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NDI', 'N', 'Реф~пов`яз КД', null, null, 88, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NLS', 'C', 'Рахунок~SNO', null, null, 19, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=0', 'Show_Sal_Day_P(:ACC, STRING_Null, NUMBER_Null, GetBankDate()-10, GetBankDate())', 0);
-  bars_metabase.add_column(l_tabid, 9, 'RNK', 'N', 'РНК~позич', null, null, 81, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'SDATE', 'D', 'Дата~початку КД', null, null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'SNO', 'N', 'Факт-Залиш~рах.SNO~ПЕРЕГЛЯД~його ГПП', null, null, 25, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, 'sPar=VC_SNO[NSIFUNCTION][ACCESSCODE=>1][PROC=>PUL.Set_Mas_Ini(''ACC'', :ACC, ''X'' )][EXEC=>BEFORE]', 'FunNSIEditF("VC_SNO[NSIFUNCTION][PROC=>PUL.Set_Mas_Ini(''ACC'', ''"|| Str(:ACC) ||"'' , ''X'' )][EXEC=>BEFORE]", 1 )', 0);
-  bars_metabase.add_column(l_tabid, 12, 'SOS', 'N', 'Сос', null, null, 91, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'WDATE', 'D', 'Дата~заверш КД~ПЕРЕГЛЯД~ГПК+ГПП', null, null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=CC_W_LIM1[NSIFUNCTION][ACCESSCODE=>1][PROC=>PUL.Set_Mas_Ini(''ND'',:ND, ''X'' )][EXEC=>BEFORE]', 'FunNSIEditF("CC_W_LIM1[NSIFUNCTION][PROC=>PUL.Set_Mas_Ini(''ND'', ''"|| Str(:ND) ||"'' , ''X'' )][EXEC=>BEFORE]", 1 )', 0);
-  bars_metabase.add_column(l_tabid, 16, 'REFP', 'N', 'Реф.док.~в АБС~ПЕРЕГЛЯД~ДОК ГПП', null, null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFP', 'DocViewContentsEx(hWndForm, :REFP)', 0);
-  bars_metabase.add_column(l_tabid, 17, 'VDAT', 'D', 'Дата побуд~ГПП', null, null, 21, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'SNOB', 'N', 'Відхилен~SNO - GPP~ВИРІВНЯТИ~SNO = GPP', null, null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, 'sPar=[PROC=>SNO.DEL1(1,0,:B,:ACC)][PAR=>:B(SEM=Балансувати,TYPE=N,REF=VY_SNO)][EXEC=>BEFORE][QST=>Вирівняти ГПП ?][MSG=>ОК][DESCR=>Метод балансування]', 'FunNSIEdit("[PROC=>SNO.DEL1(1,0,"||IifS(:SNOB >0,":B,:ACC)][PAR=>:B(SEM=Зменшити,TYPE=N,REF=VY_SNO)","-1,:ACC)]")||"][EXEC=>BEFORE][QST=>Вирівняти ГПП = SNO ?][MSG=>ОК]")', 0);
-  bars_metabase.add_column(l_tabid, 21, 'VIDD', 'N', 'Вид~КД~', null, null, 95, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'SNO_PLAN', 'N', 'План-Залиш~рах.SNO', null, null, 26, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'SNO_GPP', 'N', 'Майбутнй~залиш~ВІДМІНИТИ~ГПП', null, null, 27, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, 'sPar=[PROC=>SNO.DEL1(0,1,1,:ACC)][EXEC=>BEFORE][QST=>Анулювати весь залишковий ГПП ?][MSG=>ОК, Рах.:NLS тепер знаходиться в SNO-1)Претенденты на ГПП:SNO=>GPP]', 'FunNSIEdit("[PROC=>SNO.DEL1 ( 0, 1,1, :ACC) ][EXEC=>BEFORE][QST=>Анулювати весь залишковий ГПП ?][MSG=>ОК,Рах."||:NLS||" тепер знаходиться в SNO-1)Претенденты на ГПП:SNO=>GPP]" )', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC_~SNO', '', null, 90, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Бранч~КД', '', null, 85, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'CC_ID', 'C', 'Зовніш.№ ~КД~ПЕРЕГЛЯД~КАРТИ КД ', '', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/CreditUi/NewCredit/?custtype=2'||chr(38)||'nd=:ND', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Вал~SNO', '', null, 18, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'LIM', 'N', 'Факт.Залиш~осн.боргу', '', null, 30, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'ND', 'N', 'Внутр.Реф~КД~ПЕРЕГЛЯД~РАХУНКІВ', '', null, 7, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/customerlist/custacc.aspx?type=0'||chr(38)||'rnk=:RNK'||chr(38)||'mod=ro', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"exists(select 1 from nd_acc where nd=:ND and acc=a.acc)")', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NDI', 'N', 'Реф~пов`яз КД', '', null, 88, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NLS', 'C', 'Рахунок~SNO', '', null, 19, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=0', 'Show_Sal_Day_P(:ACC, STRING_Null, NUMBER_Null, GetBankDate()-10, GetBankDate())', 0);
+  bars_metabase.add_column(l_tabid, 9, 'RNK', 'N', 'РНК~позич', '', null, 81, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'SDATE', 'D', 'Дата~початку КД', '', null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'SNO', 'N', 'Факт-Залиш~рах.SNO~ПЕРЕГЛЯД~його ГПП', '', null, 25, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, 'sPar=VC_SNO[NSIFUNCTION][ACCESSCODE=>1][PROC=>PUL.Set_Mas_Ini(''ACC'', :ACC, ''X'' )][EXEC=>BEFORE]', 'FunNSIEditF("VC_SNO[NSIFUNCTION][PROC=>PUL.Set_Mas_Ini(''ACC'', ''"|| Str(:ACC) ||"'' , ''X'' )][EXEC=>BEFORE]", 1 )', 0);
+  bars_metabase.add_column(l_tabid, 12, 'SOS', 'N', 'Сос', '', null, 91, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'WDATE', 'D', 'Дата~заверш КД~ПЕРЕГЛЯД~ГПК+ГПП', '', null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=CC_W_LIM1[NSIFUNCTION][ACCESSCODE=>1][PROC=>PUL.Set_Mas_Ini(''ND'',:ND, ''X'' )][EXEC=>BEFORE]', 'FunNSIEditF("CC_W_LIM1[NSIFUNCTION][PROC=>PUL.Set_Mas_Ini(''ND'', ''"|| Str(:ND) ||"'' , ''X'' )][EXEC=>BEFORE]", 1 )', 0);
+  bars_metabase.add_column(l_tabid, 16, 'REFP', 'N', 'Реф.док.~в АБС~ПЕРЕГЛЯД~ДОК ГПП', '', null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFP', 'DocViewContentsEx(hWndForm, :REFP)', 0);
+  bars_metabase.add_column(l_tabid, 17, 'VDAT', 'D', 'Дата побуд~ГПП', '', null, 21, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'SNOB', 'N', 'Відхилен~SNO - GPP~ВИРІВНЯТИ~SNO = GPP', '', null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, 'sPar=[PROC=>SNO.DEL1(1,0,:B,:ACC)][PAR=>:B(SEM=Балансувати,TYPE=N,REF=VY_SNO)][EXEC=>BEFORE][QST=>Вирівняти ГПП ?][MSG=>ОК][DESCR=>Метод балансування]', 'FunNSIEdit("[PROC=>SNO.DEL1(1,0,"||IifS(:SNOB >0,":B,:ACC)][PAR=>:B(SEM=Зменшити,TYPE=N,REF=VY_SNO)","-1,:ACC)]")||"][EXEC=>BEFORE][QST=>Вирівняти ГПП = SNO ?][MSG=>ОК]")', 0);
+  bars_metabase.add_column(l_tabid, 21, 'VIDD', 'N', 'Вид~КД~', '', null, 95, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'SNO_PLAN', 'N', 'План-Залиш~рах.SNO', '', null, 26, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'SNO_GPP', 'N', 'Майбутнй~залиш~ВІДМІНИТИ~ГПП', '', null, 27, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, 'sPar=[PROC=>SNO.DEL1(0,1,1,:ACC)][EXEC=>BEFORE][QST=>Анулювати весь залишковий ГПП ?][MSG=>ОК, Рах.:NLS тепер знаходиться в SNO-1)Претенденты на ГПП:SNO=>GPP]', 'FunNSIEdit("[PROC=>SNO.DEL1 ( 0, 1,1, :ACC) ][EXEC=>BEFORE][QST=>Анулювати весь залишковий ГПП ?][MSG=>ОК,Рах."||:NLS||" тепер знаходиться в SNO-1)Претенденты на ГПП:SNO=>GPP]" )', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

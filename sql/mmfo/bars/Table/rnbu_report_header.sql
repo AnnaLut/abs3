@@ -73,8 +73,10 @@ COMMENT ON COLUMN BARS.RNBU_REPORT_HEADER.SPARE2 IS '';
 
 
 PROMPT *** Create  grants  RNBU_REPORT_HEADER ***
+grant SELECT                                                                 on RNBU_REPORT_HEADER to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_REPORT_HEADER to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_REPORT_HEADER to START1;
+grant SELECT                                                                 on RNBU_REPORT_HEADER to UPLD;
 
 
 

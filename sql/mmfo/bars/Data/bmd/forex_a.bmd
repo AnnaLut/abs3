@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'FOREX: Архiв щоденних знiмкiв';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'FOREX_A';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,19 +124,19 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'RNK', 'N', 'Реєстр.№~контраг.', null, null, 1, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DAT_A', 'D', 'Дата~вал-А', null, null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DAT_B', 'D', 'Дата~вал-Б', null, null, 21, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DEAL_TAG', 'N', 'Реф~угоди', null, null, 30, 0, 1, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KVA', 'N', 'Вал-А', null, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'KVB', 'N', 'Вал-Б', null, null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NLSA', 'C', 'Рахунок-А', null, null, 41, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NLSB', 'C', 'Рахунок-Б', null, null, 42, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SA', 'N', 'Сума-А', null, null, 13, 0, 0, 0, 0, '', '# ##0.00', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SB', 'N', 'Сума-Б', null, null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'NTIK', 'C', '№~тiкету', null, null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'DAT', 'D', 'Дата~угоди', null, null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'FDAT', 'C', 'Банк-Дата~знiмку', null, null, 0, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'RNK', 'N', 'Реєстр.№~контраг.', '', null, 1, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAT_A', 'D', 'Дата~вал-А', '', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DAT_B', 'D', 'Дата~вал-Б', '', null, 21, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DEAL_TAG', 'N', 'Реф~угоди', '', null, 30, 0, 1, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KVA', 'N', 'Вал-А', '', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'KVB', 'N', 'Вал-Б', '', null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NLSA', 'C', 'Рахунок-А', '', null, 41, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NLSB', 'C', 'Рахунок-Б', '', null, 42, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SA', 'N', 'Сума-А', '', null, 13, 0, 0, 0, 0, '', '# ##0.00', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SB', 'N', 'Сума-Б', '', null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'NTIK', 'C', '№~тiкету', '', null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'DAT', 'D', 'Дата~угоди', '', null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'FDAT', 'C', 'Банк-Дата~знiмку', '', null, 0, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

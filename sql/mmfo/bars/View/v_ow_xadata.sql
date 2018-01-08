@@ -16,8 +16,10 @@ PROMPT *** Create  view V_OW_XADATA ***
    and x.acc = a.acc;
 
 PROMPT *** Create  grants  V_OW_XADATA ***
+grant SELECT                                                                 on V_OW_XADATA     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_XADATA     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_XADATA     to OW;
+grant SELECT                                                                 on V_OW_XADATA     to UPLD;
 
 
 

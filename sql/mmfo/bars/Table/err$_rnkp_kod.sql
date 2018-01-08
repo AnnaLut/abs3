@@ -57,6 +57,10 @@ COMMENT ON COLUMN BARS.ERR$_RNKP_KOD.KODU IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_RNKP_KOD ***
+grant SELECT                                                                 on ERR$_RNKP_KOD   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_RNKP_KOD   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

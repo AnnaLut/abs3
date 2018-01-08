@@ -37,8 +37,10 @@ PROMPT *** Create  view V_RKO_SIGNATORY ***
    ORDER BY branch, full_nm_nom;
 
 PROMPT *** Create  grants  V_RKO_SIGNATORY ***
+grant SELECT                                                                 on V_RKO_SIGNATORY to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_RKO_SIGNATORY to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_RKO_SIGNATORY to START1;
+grant SELECT                                                                 on V_RKO_SIGNATORY to UPLD;
 
 
 

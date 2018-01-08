@@ -99,6 +99,10 @@ COMMENT ON COLUMN BARS.ERR$_CIG_DOG_GENERAL.PAY_METHOD_ID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIG_DOG_GENERAL ***
+grant SELECT                                                                 on ERR$_CIG_DOG_GENERAL to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIG_DOG_GENERAL to UPLD;
+
 
 
 PROMPT ===================================================================================== 

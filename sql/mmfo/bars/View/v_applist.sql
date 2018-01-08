@@ -20,9 +20,11 @@ PROMPT *** Create  view V_APPLIST ***
 
 PROMPT *** Create  grants  V_APPLIST ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_APPLIST       to ABS_ADMIN;
+grant SELECT                                                                 on V_APPLIST       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_APPLIST       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_APPLIST       to BASIC_INFO;
 grant SELECT                                                                 on V_APPLIST       to START1;
+grant SELECT                                                                 on V_APPLIST       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_APPLIST       to WR_ALL_RIGHTS;
 
 

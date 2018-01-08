@@ -73,11 +73,10 @@ COMMENT ON COLUMN BARS.BANK_MON_UPD.ACTION_ID IS 'Код зміни (0-додано новий запи
 
 
 
-PROMPT *** Create  constraint FK_BANKMONUPD_BRANCH ***
+PROMPT *** Create  constraint CC_BANKMONUPD_NAMEMON_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BANK_MON_UPD ADD CONSTRAINT FK_BANKMONUPD_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
+  ALTER TABLE BARS.BANK_MON_UPD MODIFY (NAME_MON CONSTRAINT CC_BANKMONUPD_NAMEMON_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -86,11 +85,58 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BANKMONUPD_METALACTION ***
+PROMPT *** Create  constraint CC_BANKMONUPD_NOMMON_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BANK_MON_UPD ADD CONSTRAINT FK_BANKMONUPD_METALACTION FOREIGN KEY (ACTION_ID)
-	  REFERENCES BARS.BANK_METALS_ACTION (ID) ENABLE';
+  ALTER TABLE BARS.BANK_MON_UPD MODIFY (NOM_MON CONSTRAINT CC_BANKMONUPD_NOMMON_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BANKMONUPD_CENANBU_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BANK_MON_UPD MODIFY (CENA_NBU CONSTRAINT CC_BANKMONUPD_CENANBU_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BANKMONUPD_KOD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BANK_MON_UPD MODIFY (KOD CONSTRAINT CC_BANKMONUPD_KOD_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BANKMONUPD_TYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BANK_MON_UPD MODIFY (TYPE CONSTRAINT CC_BANKMONUPD_TYPE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BANKMONUPD_CENAOTP_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BANK_MON_UPD MODIFY (CENA_NBU_OTP CONSTRAINT CC_BANKMONUPD_CENAOTP_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -113,78 +159,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BANKMONUPD_CENAOTP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BANK_MON_UPD MODIFY (CENA_NBU_OTP CONSTRAINT CC_BANKMONUPD_CENAOTP_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BANKMONUPD_TYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BANK_MON_UPD MODIFY (TYPE CONSTRAINT CC_BANKMONUPD_TYPE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BANKMONUPD_KOD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BANK_MON_UPD MODIFY (KOD CONSTRAINT CC_BANKMONUPD_KOD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BANKMONUPD_CENANBU_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BANK_MON_UPD MODIFY (CENA_NBU CONSTRAINT CC_BANKMONUPD_CENANBU_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BANKMONUPD_NOMMON_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BANK_MON_UPD MODIFY (NOM_MON CONSTRAINT CC_BANKMONUPD_NOMMON_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BANKMONUPD_NAMEMON_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BANK_MON_UPD MODIFY (NAME_MON CONSTRAINT CC_BANKMONUPD_NAMEMON_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_BANKMONUPD ***
 begin   
  execute immediate '
@@ -199,6 +173,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  BANK_MON_UPD ***
+grant SELECT                                                                 on BANK_MON_UPD    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BANK_MON_UPD    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BANK_MON_UPD    to BARS_DM;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BANK_MON_UPD    to START1;

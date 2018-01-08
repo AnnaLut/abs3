@@ -90,7 +90,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции %%%
-prompt Наименование операции: :p Начисление %
+prompt Наименование операции: %%% :p Начисление %
 declare
   cnt_  number;
 begin
@@ -99,11 +99,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('%%%', ':p Начисление %', 1, null, null, null, 980, null, null, null, null, 1, 0, 1, 0, null, null, null, null, null, null, '0100000000000000000000000000000000000200000000000000000000000000', null);
+    values ('%%%', '%%% :p Начисление %', 1, null, null, null, 980, null, null, null, null, 1, 0, 1, 0, null, null, null, null, null, null, '0100000000000000000000000000000000000200000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='%%%', name=':p Начисление %', dk=1, nlsm=null, kv=null, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000200000000000000000000000000', nazn=null
+         set tt='%%%', name='%%% :p Начисление %', dk=1, nlsm=null, kv=null, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000200000000000000000000000000', nazn=null
        where tt='%%%';
   end;
   --------------------------------

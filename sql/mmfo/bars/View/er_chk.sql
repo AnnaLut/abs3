@@ -17,8 +17,10 @@ id not in (select id from STAFF_CHK      )               and
 id     in (select id from APPLIST_STAFF where codeapp='VIZA');
 
 PROMPT *** Create  grants  ER_CHK ***
+grant SELECT                                                                 on ER_CHK          to BARSREADER_ROLE;
 grant SELECT                                                                 on ER_CHK          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ER_CHK          to START1;
+grant SELECT                                                                 on ER_CHK          to UPLD;
 
 
 

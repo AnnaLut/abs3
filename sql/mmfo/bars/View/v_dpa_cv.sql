@@ -52,8 +52,10 @@ PROMPT *** Create  view V_DPA_CV ***
           AND arc.dat_b(+) <= gl.bd + 1;
 
 PROMPT *** Create  grants  V_DPA_CV ***
+grant SELECT                                                                 on V_DPA_CV        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPA_CV        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPA_CV        to START1;
+grant SELECT                                                                 on V_DPA_CV        to UPLD;
 
 
 

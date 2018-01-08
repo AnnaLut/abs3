@@ -1,4 +1,13 @@
-CREATE OR REPLACE procedure BARS.P_CCK_DU
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_CCK_DU.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_CCK_DU ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_CCK_DU 
 (p_dat1 date,  -- период пересчета % :Дата С  включительно
  p_dat2 date,  -- период пересчета % :Дата ПО включительно
  p_mode int    -- =0 только протокол, =1 - протокол с проводками
@@ -73,11 +82,11 @@ select  substr(TOBO,1,15), sum(S)/100  from s_ARJK_DATF group by   substr(TOBO,1
  dd cc_deal%rowtype;
  jj arjk%rowtype   ;
  BBBBoo_  char(6)  ;
- l_newnbs number; 
+ l_newnbs number;
 BEGIN
 
-   l_newnbs := NEWNBS.GET_STATE;  
-    
+   l_newnbs := NEWNBS.GET_STATE;
+
  if p_dat1 is null or p_dat2 is null or p_dat2 < p_dat1 then
      raise_application_error(-20203,'\      Недопустимi дати', TRUE);
  end if;
@@ -125,7 +134,7 @@ BEGIN
  for k in (SELECT * from TMP_ARJK_OPER )
  loop
     If NOT (k.vdat >= p_dat1  and k.vdat <= p_dat2) then  goto RecNext;  end if;
-                       
+
     If    k.nlsb like case when l_newnbs = 0 then '6046%' else '6055%' end then     BBBBoo_  := case when l_newnbs = 0 then '604665' else '605534' end;
     ElsIf k.nlsb like case when l_newnbs = 0 then '6042%' else '6052%'end then     BBBBoo_  :=  case when l_newnbs = 0 then '6042F5' else '605256' end;
     elsIf k.nlsb like case when l_newnbs = 0 then '6111%' else '' end then  BBBBoo_  :=  case when l_newnbs = 0 then '611137' else '' end;
@@ -226,3 +235,14 @@ end if;
 
 end  P_CCK_DU ;
 /
+show err;
+
+PROMPT *** Create  grants  P_CCK_DU ***
+grant EXECUTE                                                                on P_CCK_DU        to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on P_CCK_DU        to RCC_DEAL;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_CCK_DU.sql =========*** End *** 
+PROMPT ===================================================================================== 

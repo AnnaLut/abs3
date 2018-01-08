@@ -29,8 +29,10 @@ PROMPT *** Create  view V_PAY_FOR_CASH_META2 ***
                        pul.get_mas_ini_val ('P_NLS'));
 
 PROMPT *** Create  grants  V_PAY_FOR_CASH_META2 ***
+grant SELECT                                                                 on V_PAY_FOR_CASH_META2 to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PAY_FOR_CASH_META2 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PAY_FOR_CASH_META2 to START1;
+grant SELECT                                                                 on V_PAY_FOR_CASH_META2 to UPLD;
 
 
 

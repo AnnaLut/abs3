@@ -14,11 +14,11 @@ PROMPT *** Create  procedure P_F33SB ***
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
 % VERSION     : 13/11/2017 (30/03/2017, 24/01/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 13.11.2017 - удалил ненужные строки и изменил некоторые блоки формирования 
+% 13.11.2017 - удалил ненужные строки и изменил некоторые блоки формирования
 % 30.03.2017 - для остатков добалены годовые корректирующие проводки
 % 24.01.2017 - для Dos96_ и Kos96_ не будем вычитать обороты перекрытия
 %              на 5040(5041) (операции ZG8,ZG9) если Dos96_, Kos96_
-%              имеют нулевые значения 
+%              имеют нулевые значения
 % 13.01.2016 - убрал мусор
 % 17.01.2014 - исключаем проводки перекрытия корректирующих за декабрь
 % 23.01.2014 - для ГОУ(300465) код МФО банка клиента выбираем из таблицы
@@ -147,7 +147,7 @@ OPEN Saldo;
                     Dos96_, Dosq96_, Kos96_, Kosq96_,
                     Dos99_, Dosq99_, Kos99_, Kosq99_,
                     Doszg_, Koszg_, Dos96zg_, Kos96zg_,
-                    Dos99zg_, Kos99zg_,   
+                    Dos99zg_, Kos99zg_,
                     tobo_, nms_, zz_, mfo_;
    EXIT WHEN Saldo%NOTFOUND;
 
@@ -175,11 +175,11 @@ OPEN Saldo;
             acc  = acc_   AND
             (tt like 'ZG8%'  or tt like 'ZG9%');
 
-      if Dos96_ > 0 
+      if Dos96_ > 0
       then
          Dos96_ := Dos96_ - d_sum_;
       end if;
-      if Kos96_ > 0 
+      if Kos96_ > 0
       then
          Kos96_ := Kos96_ - k_sum_;
       end if;
@@ -189,7 +189,7 @@ OPEN Saldo;
       if to_char(Dat_,'MM') = '12' and nls_ like '390%'
       then
          se_ := Ostn_ - Dos96_ + Kos96_ - Dos99_ + Kos99_ - Dos99zg_ + Kos99zg_;
-      else 
+      else
          se_ := Ostn_ - Dos96_ + Kos96_ - Dos99_ + Kos99_;
       end if;
    else

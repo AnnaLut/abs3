@@ -21,8 +21,10 @@ PROMPT *** Create  view LORO_SEP_SWT ***
   ;
 
 PROMPT *** Create  grants  LORO_SEP_SWT ***
+grant SELECT                                                                 on LORO_SEP_SWT    to BARSREADER_ROLE;
 grant SELECT                                                                 on LORO_SEP_SWT    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LORO_SEP_SWT    to START1;
+grant SELECT                                                                 on LORO_SEP_SWT    to UPLD;
 
 
 

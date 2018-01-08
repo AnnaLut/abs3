@@ -1,4 +1,13 @@
-CREATE OR REPLACE procedure BARS.p_lic_blob_nls (p_rnk customer.rnk%type,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_LIC_BLOB_NLS.sql =========*** Ru
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_LIC_BLOB_NLS ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_LIC_BLOB_NLS (p_rnk customer.rnk%type,
                                                  p_nls varchar2,
                                                  p_dat1 date,
                                                  p_dat2 date,
@@ -11,7 +20,7 @@ l_sql varchar2(2000);
 l_blob blob;
 l_txt varchar2(32000);
 l_chr varchar2(2) := chr(13)||chr(10);
-l_mfo varchar2(6) := f_ourmfo; 
+l_mfo varchar2(6) := f_ourmfo;
 l_dos number;   l_dosq number;
 l_kos number;   l_kosq number;
 l_ost number;   l_ostq number;
@@ -32,12 +41,12 @@ begin
  bars_audit.info ('p_lic_blob_rnk    p_rnk='||p_rnk||l_chr||'p_nls='||p_nls||l_chr||'p_dat1='||to_char(p_dat1,'dd/mm/yyyy')||'p_dat2='||to_char(p_dat2,'dd/mm/yyyy')||l_chr||'p_kv='||p_kv);
   -- 'VPGRN'||substr(:sFdat1,1,2)||substr(:sFdat1,4,2)||'.'||:NLS
  SELECT 'VP'|| case when p_kv = 980 then'GRN' else 'VAL' end||'_'||BARS_REPORT.FRMT_DATE(p_dat1,'DDMM')||'_'||p_kv||'_'||p_nls||'.txt'
-   into  p_filemask 
+   into  p_filemask
    FROM  customer
   where  rnk = p_rnk;
 
 
-  
+
 execute immediate 'truncate table tmp_lic';
 execute immediate 'truncate table tmp_licM';
 
@@ -80,32 +89,32 @@ execute immediate  l_sql;
                             P_SQLID   =>3);
 
    dbms_lob.createtemporary(l_blob,  true);
-   l_txt := 'Виписка по рахункам виконавця :      '||'Надруковано  '||to_char(sysdate,'dd/mm/yyyy  hh24:mi:ss')||l_chr;               
+   l_txt := 'Виписка по рахункам виконавця :      '||'Надруковано  '||to_char(sysdate,'dd/mm/yyyy  hh24:mi:ss')||l_chr;
    dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-     
+
    l_txt := lpad('-',125,'-')||l_chr;
    dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-      
+
    l_txt := '                            Виписка за період: '||to_char( p_dat1,'dd/mm/yyyy') ||' - '||to_char( p_dat2,'dd/mm/yyyy')||l_chr||l_chr;
    dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-        
+
    l_txt := 'АТ "ОЩАДБАНК '||l_mfo||l_chr;
     dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-    
+
    select '        '||rpad(rnk,14,' ')||'    '||nmk||l_chr into l_txt from customer where rnk = p_rnk;
    l_txt :='Клієнт: '||l_txt;
    dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-      
+
    l_txt := lpad('-',125,'-')||l_chr;
    dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-    
-      
+
+
    for x in (
    select acc, min(fdat)mfdat, max(fdat)maxfdat, nms, nmk,nls,kv from tmp_licm  --where  (acc, fdat) in (select acc,fdat from tmp_licm where rowtype = BARS_RPTLIC.G_ROWTYPE_DOC)
     group by acc,substr(nls,1,4), nls, kv, nms, nmk order by substr(nls,1,4), nls, kv
             )
  LOOP
-     
+
     l_dos := 0; l_kos := 0; l_dosq := 0; l_kosq := 0;
     ----  Zaujkjdjr
     /*l_txt := '  '||rpad(l_mfo,18,' ')||'АТ "ОЩАДБАНК'||l_chr;
@@ -118,10 +127,10 @@ execute immediate  l_sql;
     -- select '  '||rpad(nls,14,' ')|| lpad(kv,3,' ')||' '||nms||l_chr into l_txt from accounts where acc = x.acc;
      select nlsalt into l_nlsalt from accounts where acc = x.acc;
     l_txt :='Рахунок: '||rpad(x.nls,14,' ')||' ('||rpad(l_nlsalt,14,' ')||') '||'('||lpad(x.kv,3,' ')||') '||x.nms||l_chr;
-    dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));    
-    
-        
-    --вход остаток    
+    dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
+
+
+    --вход остаток
     FOR h  IN (SELECT * FROM tmp_licm WHERE acc = x.acc AND fdat = x.mfdat AND ROWTYPE = BARS_RPTLIC.G_ROWTYPE_ACC)
         LOOP
             CASE WHEN h.ostf < 0
@@ -130,11 +139,11 @@ execute immediate  l_sql;
                 ELSE l_ost :=  h.ostf; l_ost_t := ' Кр:';
                     l_ostq := h.ostfq;
             END CASE;
-            
+
             IF l_ost=0 THEN
                l_ost_t := ' ';
             END IF;
-            
+
             l_kv := iif(h.kv,GL.BASEVAL,1,0,1);
 
             IF l_kv = 1 THEN
@@ -157,7 +166,7 @@ execute immediate  l_sql;
             l_txt := 'Попередня дата руху: '||to_char(h.dapp,'dd/mm/yyyy');
             DBMS_LOB.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt||l_chr));
 
-            CASE WHEN l_kv = 0 THEN                    
+            CASE WHEN l_kv = 0 THEN
                     l_txt := 'Вхiдний залишок на : '||to_char(h.fdat,'dd/mm/yyyy')||' '||to_char(l_ost/100, g_number_format,g_number_nlsparam)||l_ost_t||l_chr;
                  ELSE
                     l_txt := 'Вхiдний залишок на : '||to_char(h.fdat,'dd/mm/yyyy')||l_ost_t||lpad(to_char(l_ost/100, g_number_format,g_number_nlsparam)||' (екв. '||to_char(abs(h.ostfq)/100, g_number_format,g_number_nlsparam),40,' ')||')'||l_chr;
@@ -169,28 +178,28 @@ execute immediate  l_sql;
 
             l_txt := ': МФО :    рахунок    :  № Док-та  :    ДЕБЕТ    :     КРЕДИТ   :  Дата проведення :   Вхiдний залишок :   Вихiдний залишок :'||l_chr;
             DBMS_LOB.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-            
+
             l_txt := lpad('-',125,'-')||l_chr;
             DBMS_LOB.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-            
+
         END LOOP;
-            
+
         --dokument
         FOR d  IN (--SELECT * FROM tmp_licm WHERE acc = x.acc AND fdat = x.fdat AND ROWTYPE = BARS_RPTLIC.G_ROWTYPE_DOC ORDER BY dk, s )
                 SELECT /*a.tt, a.mfo2, a.nls2, a.nd, a.datp, fdat,ostf,s,dk,*/
-                a.*, a.ostf+sum(a.s) over(partition by a.acc, a.fdat order by a.acc,a.fdat)  ostc, a.ostfq+sum(a.sq) over(partition by a.acc, a.fdat order by a.acc,a.fdat) ostcq  
-                FROM tmp_licm a 
+                a.*, a.ostf+sum(a.s) over(partition by a.acc, a.fdat order by a.acc,a.fdat)  ostc, a.ostfq+sum(a.sq) over(partition by a.acc, a.fdat order by a.acc,a.fdat) ostcq
+                FROM tmp_licm a
                 --WHERE  ROWTYPE = 20
-                WHERE acc = x.acc /*AND fdat = x.fdat*/ AND ROWTYPE = BARS_RPTLIC.G_ROWTYPE_DOC 
-                ORDER BY fdat        
+                WHERE acc = x.acc /*AND fdat = x.fdat*/ AND ROWTYPE = BARS_RPTLIC.G_ROWTYPE_DOC
+                ORDER BY fdat
         )
         LOOP
             l_txt := lpad(d.mfo2,7,' ')--mfo
                    ||lpad(d.nls2,15,' ')--account
                    /*||rpad(d.ref,14,' ')*/ --ref
-                   ||lpad(d.nd,12,' ')-- num doc                   
+                   ||lpad(d.nd,12,' ')-- num doc
                    ||lpad(case when d.dk = 0 then to_char(-d.s/100, g_number_format,g_number_nlsparam) else '0.00' end,15,' ') --сумма
-                   ||lpad(case when d.dk = 1 then to_char(d.s/100, g_number_format,g_number_nlsparam) else '0.00' end,15,' ') --сумма 
+                   ||lpad(case when d.dk = 1 then to_char(d.s/100, g_number_format,g_number_nlsparam) else '0.00' end,15,' ') --сумма
                    ||lpad(to_char(d.fdat,'dd/mm/yyyy'),12,' ') --дата проводки
                    ||lpad('->'||d.okpo2, 11,' ') --окпо
                    ||lpad(to_char(d.ostf/100 , g_number_format,g_number_nlsparam),16,' ') --вх. остаток
@@ -198,14 +207,14 @@ execute immediate  l_sql;
                    --||rpad(d.nb2,30,' ')--назв банка
                    ||l_chr;
             DBMS_LOB.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-            
+
             --l_txt := lpad(d.nmk2,90,' ')||l_chr||lpad(d.nb2,90,' ')||l_chr;
             --DBMS_LOB.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
             l_txt := '       '||lpad(' ',90,' ')||substr(d.nmk2,1,30)||l_chr;
             DBMS_LOB.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
             l_txt := '       '||lpad(' ',90,' ')||substr(d.nb2,1,30)||l_chr;
             DBMS_LOB.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-            
+
             CASE WHEN l_kv = 0 THEN
                 l_txt := '       '||lpad(' ',90,' ')||substr(d.nazn,1,30)||l_chr;
             ELSE
@@ -214,42 +223,42 @@ execute immediate  l_sql;
 
             l_nazn := substr(d.nazn,31);
             L_ := length(l_nazn);
-     
+
             WHILE l_ > 0  LOOP
                 l_txt := l_txt||'       '||lpad(' ',90,' ')||trim(substr(l_nazn,1,30))||l_chr;
                 l_ := l_-30;
                 l_nazn := substr(l_nazn,31);
-            end loop; 
+            end loop;
             dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-    
+
             l_txt := l_chr;
             dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-    
-            if d.dk = 0 
+
+            if d.dk = 0
                 then  l_dos := l_dos + -d.s; l_dosq := l_dosq + -d.sq;
             elsif d.dk = 1
                 then  l_kos := l_kos + d.s;  l_kosq := l_kosq + d.sq;
             end if;
-    
+
     end loop;
-     
+
     -- Itog
      l_txt := lpad('-',125,'-')||l_chr;
     dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-   
-    
+
+
      l_txt := 'Оборотiв за період:'||lpad(to_char(l_dos/100, g_number_format,g_number_nlsparam),30,' ')||lpad(to_char(l_kos/100, g_number_format,g_number_nlsparam),15,' ')||l_chr;
      dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-     
+
     case when l_kv = 0 then
       null;
          else
-     l_txt := lpad(' ',14,' ')||'(екв)'||lpad(to_char(l_dosq/100, g_number_format,g_number_nlsparam),30,' ')||lpad(to_char(l_kosq/100, g_number_format,g_number_nlsparam),15,' ')||l_chr;  
-     dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));  
+     l_txt := lpad(' ',14,' ')||'(екв)'||lpad(to_char(l_dosq/100, g_number_format,g_number_nlsparam),30,' ')||lpad(to_char(l_kosq/100, g_number_format,g_number_nlsparam),15,' ')||l_chr;
+     dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
     end case;
-    
 
-    begin    
+
+    begin
         SELECT ostf + ss
           INTO l_ost
           FROM (SELECT DISTINCT ostf
@@ -261,30 +270,37 @@ execute immediate  l_sql;
       exception when no_data_found then
           l_ost := fost(x.acc,x.maxfdat);-- l_ost := 0;
     end;
-    
+
     IF l_ost=0 THEN
        l_ost_t := ' ';
     ELSE
-        case when l_ost > 0  
+        case when l_ost > 0
             then l_ost_t := ' Дб:';
             else l_ost_t := ' Кт:';
         End case;
     END IF;
-            
-    case when l_kv = 0 
+
+    case when l_kv = 0
           then
      l_txt := 'Вихiдний залишок на: '||to_char(x.maxfdat,'dd/mm/yyyy')||'  '||to_char(l_ost/100, g_number_format,g_number_nlsparam)||l_ost_t||l_chr;
-          else 
+          else
      l_txt := 'Вихiдний залишок на: '||to_char(x.maxfdat,'dd/mm/yyyy')||'  '||to_char(l_ost/100, g_number_format,g_number_nlsparam)||' (екв. '||to_char(l_ostq/100, g_number_format,g_number_nlsparam)||')'||l_ost_t||l_chr;
      end case;
      dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
- 
+
      l_txt := lpad('-',125,'-')||l_chr||l_chr;
     dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
-    
+
  end LOOP;
 
  p_blob := l_blob;
 dbms_lob.freetemporary(l_blob);
 end;
 /
+show err;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_LIC_BLOB_NLS.sql =========*** En
+PROMPT ===================================================================================== 

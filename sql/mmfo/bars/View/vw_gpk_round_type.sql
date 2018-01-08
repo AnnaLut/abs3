@@ -27,7 +27,9 @@ SELECT 5 TYPE, '5.100000 "Коп" 1000.00' NAME
   FROM dual;
 
 PROMPT *** Create  grants  VW_GPK_ROUND_TYPE ***
+grant SELECT                                                                 on VW_GPK_ROUND_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_GPK_ROUND_TYPE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VW_GPK_ROUND_TYPE to UPLD;
 
 
 

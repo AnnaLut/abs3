@@ -15,10 +15,12 @@ where inuse=1
  ;
 
 PROMPT *** Create  grants  V_NBS_PROFTAG ***
+grant SELECT                                                                 on V_NBS_PROFTAG   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_NBS_PROFTAG   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBS_PROFTAG   to CUST001;
 grant SELECT                                                                 on V_NBS_PROFTAG   to NBS_PROF;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_NBS_PROFTAG   to START1;
+grant SELECT                                                                 on V_NBS_PROFTAG   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_NBS_PROFTAG   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_NBS_PROFTAG   to WR_REFREAD;
 

@@ -4,16 +4,18 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_dop.sql =========*** Run *** ====
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE FUNCTION BARS.F_DOP (REF_ INTEGER, TT_ CHAR) RETURN VARCHAR2 IS
-  KK_ VARCHAR2(250);
-BEGIN
- begin
-   SELECT max(substr( TRIM(value),1,250))
-   INTO KK_
-   FROM operw WHERE REF=REF_ AND TAG=TT_;
-   EXCEPTION WHEN NO_DATA_FOUND THEN  KK_:= null; -- ' ';
- end;
- RETURN kk_;
+  CREATE OR REPLACE FUNCTION BARS.F_DOP (REF_ INTEGER, TT_ CHAR) 
+RETURN VARCHAR2 
+IS   KK_ VARCHAR2(250);  -- 28.07.2017 Sta По умолчанию - текущий реф
+BEGIN 
+  BEGIN  
+    SELECT max(substr( TRIM(value),1,250))   
+      INTO KK_   
+      FROM operw 
+     WHERE REF = nvl (REF_, gl.aRef)  AND TAG = TT_;
+  EXCEPTION WHEN NO_DATA_FOUND THEN  KK_:= null; -- ' ';
+  END;
+  RETURN kk_;
 END F_DOP;
 /
  show err;

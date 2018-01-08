@@ -14,7 +14,9 @@ PROMPT *** Create  view V_WCS_SUBPRODUCT_PAYMENTS ***
  order by sp.subproduct_id, sp.payment_id;
 
 PROMPT *** Create  grants  V_WCS_SUBPRODUCT_PAYMENTS ***
+grant SELECT                                                                 on V_WCS_SUBPRODUCT_PAYMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SUBPRODUCT_PAYMENTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_SUBPRODUCT_PAYMENTS to UPLD;
 
 
 

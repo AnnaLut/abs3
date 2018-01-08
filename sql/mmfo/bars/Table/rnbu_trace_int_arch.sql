@@ -96,10 +96,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_RNBUTRACEINTARCH_KODP_NN ***
+PROMPT *** Create  constraint CC_RNBUTRACEINTARCH_DATF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.RNBU_TRACE_INT_ARCH MODIFY (KODP CONSTRAINT CC_RNBUTRACEINTARCH_KODP_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.RNBU_TRACE_INT_ARCH MODIFY (DATF CONSTRAINT CC_RNBUTRACEINTARCH_DATF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -120,10 +120,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_RNBUTRACEINTARCH_DATF_NN ***
+PROMPT *** Create  constraint CC_RNBUTRACEINTARCH_KODP_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.RNBU_TRACE_INT_ARCH MODIFY (DATF CONSTRAINT CC_RNBUTRACEINTARCH_DATF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.RNBU_TRACE_INT_ARCH MODIFY (KODP CONSTRAINT CC_RNBUTRACEINTARCH_KODP_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -166,11 +166,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  RNBU_TRACE_INT_ARCH ***
+grant SELECT                                                                 on RNBU_TRACE_INT_ARCH to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_TRACE_INT_ARCH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RNBU_TRACE_INT_ARCH to BARS_DM;
 grant SELECT                                                                 on RNBU_TRACE_INT_ARCH to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_TRACE_INT_ARCH to RPBN002;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_TRACE_INT_ARCH to START1;
+grant SELECT                                                                 on RNBU_TRACE_INT_ARCH to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_TRACE_INT_ARCH to WR_ALL_RIGHTS;
 
 

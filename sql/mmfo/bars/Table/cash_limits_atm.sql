@@ -130,10 +130,12 @@ exception when others then
 
 PROMPT *** Create  grants  CASH_LIMITS_ATM ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CASH_LIMITS_ATM to ABS_ADMIN;
+grant SELECT                                                                 on CASH_LIMITS_ATM to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CASH_LIMITS_ATM to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CASH_LIMITS_ATM to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CASH_LIMITS_ATM to RPBN001;
 grant SELECT                                                                 on CASH_LIMITS_ATM to START1;
+grant SELECT                                                                 on CASH_LIMITS_ATM to UPLD;
 
 
 

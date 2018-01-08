@@ -104,6 +104,7 @@ exception when others then
 
 PROMPT *** Create  grants  SK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SK              to ABS_ADMIN;
+grant SELECT                                                                 on SK              to BARSREADER_ROLE;
 grant SELECT                                                                 on SK              to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SK              to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SK              to BARS_DM;

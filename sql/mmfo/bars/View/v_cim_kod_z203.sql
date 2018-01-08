@@ -13,7 +13,9 @@ from CIM_CREDIT_TYPE
 where delete_date is null;
 
 PROMPT *** Create  grants  V_CIM_KOD_Z203 ***
+grant SELECT                                                                 on V_CIM_KOD_Z203  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_KOD_Z203  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_KOD_Z203  to UPLD;
 
 
 

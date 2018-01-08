@@ -118,6 +118,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ADR_AREAS ***
+grant SELECT                                                                 on ADR_AREAS       to BARSREADER_ROLE;
 grant SELECT                                                                 on ADR_AREAS       to BARSUPL;
 grant SELECT                                                                 on ADR_AREAS       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ADR_AREAS       to START1;

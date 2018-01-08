@@ -105,8 +105,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_OPERW_110 ***
+grant SELECT                                                                 on SW_OPERW_110    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_OPERW_110    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_OPERW_110    to START1;
+grant SELECT                                                                 on SW_OPERW_110    to UPLD;
 
 
 

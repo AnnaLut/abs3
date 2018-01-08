@@ -20,8 +20,10 @@ PROMPT *** Create  view V_CC_FLAGS ***
       );
 
 PROMPT *** Create  grants  V_CC_FLAGS ***
+grant SELECT                                                                 on V_CC_FLAGS      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CC_FLAGS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CC_FLAGS      to RCC_DEAL;
+grant SELECT                                                                 on V_CC_FLAGS      to UPLD;
 
 
 

@@ -41,7 +41,7 @@
      p_pob in doc_scheme.print_on_blank%type,
      p_template in clob);
 
-   -- uplins_tbl - добавляет новый или обновляет существующий 
+   -- uplins_tbl - добавляет новый или обновляет существующий
    --
    -- @p_id - ідентифікатор шаблона
    -- @p_name - назва шаблона
@@ -149,7 +149,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.DOC_TPL_MGR is
      bars_audit.trace('%s: done', l_th);
    end upload_template;
 
-   -- uplins_tbl - добавляет новый или обновляет существующий 
+   -- uplins_tbl - добавляет новый или обновляет существующий
    --
    -- @p_id - ідентифікатор шаблона
    -- @p_name - назва шаблона
@@ -167,12 +167,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.DOC_TPL_MGR is
    begin
      bars_audit.trace('%s: entry point', l_th);
      bars_audit.trace('%s: p_id=> %s, p_name=>%s, p_pob=>%s', l_th, p_id, p_name, to_char(p_pob));
-	 
+
 	  if length(p_file_name) = 0
               then 	 l_fr := 0;
-              else 	 l_fr := 1;		  
+              else 	 l_fr := 1;
 	  END IF;
-	  
+
      update doc_scheme set
        name = p_name,
        print_on_blank = p_pob,
@@ -184,8 +184,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.DOC_TPL_MGR is
          values (p_id, p_name, p_pob, p_file_name, l_fr);
      end if;
      bars_audit.trace('%s: done', l_th);
-   end uplins_tbl;  
-  
+   end uplins_tbl;
+
   --------------------------------------------------------------------------------
   -- disable_template - изымает шаблон с работы
   --
@@ -241,7 +241,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.DOC_TPL_MGR is
     bars_audit.trace('%s: done', l_th);
   end delete_template;
 
-  
+
 Procedure get_template ( p_id       in doc_scheme.id%type,
                          p_template out doc_scheme.template%type)
 is
@@ -249,16 +249,16 @@ is
 begin
     bars_audit.trace('%s: entry point', l_th);
     bars_audit.trace('%s: p_id=>%s', l_th, p_id);
-   
+
    Select template
      into p_template
      from doc_scheme
     where id = p_id;
-  	
+
 exception when no_data_found then
      bars_error.raise_nerror(g_modcode, 'TPL_NOTFOUND', p_id);
-end get_template;  
-  
+end get_template;
+
 begin
   -- Initialization
   null;

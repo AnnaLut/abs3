@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Прогноз доходу за місяць по боргових ЦП ';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'TMP_CP_REP_DOX';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,22 +124,22 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'SD', 'N', 'Прогноз-сума~амортизації~номінал', null, null, 24, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CENA_KUP', 'N', 'Розмір~купона~на 1 шт.', null, null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'CP_ID', 'C', 'Код ЦП~ISIN', null, null, 4, 0, 0, 0, 0, '', '', 1, 0, 'count(CP_ID) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'D31', 'D', 'Кінець~Звітного~періоду', null, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DATP', 'D', 'Дата~погашення', null, null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'DAT_UG', 'D', 'Дата~угоди~купівлі', null, null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'ID', 'N', 'Код в АБС~ЦП', null, null, 32, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'KOL', 'N', 'Кількість~в пакеті~ шт.', null, null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'SR', 'N', 'Прогроз-сума~купону~номінал', null, null, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'KV', 'N', 'Код~вал', null, null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NBS', 'C', 'Вид~угоди', null, null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'NMS', 'C', 'Назва~СубПортфеля', null, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions," exists (select 1 from cp_deal where ref= :REF and a.acc in (ACC,nvl(ACCD,acc),nvl(ACCP,acc),nvl(ACCR,acc),nvl(ACCS,acc),nvl(ACCR2,acc))) ")', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'REF', 'N', 'Референс~угоди~в АБС', null, null, 30, 0, 1, 0, 0, '', '', 1, 0, 'count( REF) ', 0, 0, 0, 'DocViewContentsEx(hWndForm, :REF)', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SRQ', 'N', 'Прогноз-сума~купону~грн. екв-т', null, null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum( SRQ ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'SDQ', 'N', 'Прогноз-сума~амортизації~грн. екв-т', null, null, 26, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum( SDQ ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'D01', 'D', 'Початок~Звітного~періоду', null, null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'SD', 'N', 'Прогноз-сума~амортизації~номінал', '', null, 24, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CENA_KUP', 'N', 'Розмір~купона~на 1 шт.', '', null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'CP_ID', 'C', 'Код ЦП~ISIN', '', null, 4, 0, 0, 0, 0, '', '', 1, 0, 'count(CP_ID) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'D31', 'D', 'Кінець~Звітного~періоду', '', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DATP', 'D', 'Дата~погашення', '', null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'DAT_UG', 'D', 'Дата~угоди~купівлі', '', null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'ID', 'N', 'Код в АБС~ЦП', '', null, 32, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'KOL', 'N', 'Кількість~в пакеті~ шт.', '', null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'SR', 'N', 'Прогроз-сума~купону~номінал', '', null, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'KV', 'N', 'Код~вал', '', null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NBS', 'C', 'Вид~угоди', '', null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'NMS', 'C', 'Назва~СубПортфеля', '', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions," exists (select 1 from cp_deal where ref= :REF and a.acc in (ACC,nvl(ACCD,acc),nvl(ACCP,acc),nvl(ACCR,acc),nvl(ACCS,acc),nvl(ACCR2,acc))) ")', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'REF', 'N', 'Референс~угоди~в АБС', '', null, 30, 0, 1, 0, 0, '', '', 1, 0, 'count( REF) ', 0, 0, 0, 'DocViewContentsEx(hWndForm, :REF)', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SRQ', 'N', 'Прогноз-сума~купону~грн. екв-т', '', null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum( SRQ ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'SDQ', 'N', 'Прогноз-сума~амортизації~грн. екв-т', '', null, 26, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum( SDQ ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'D01', 'D', 'Початок~Звітного~періоду', '', null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 3, 2, 'ASC ');

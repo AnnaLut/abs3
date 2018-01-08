@@ -68,7 +68,9 @@ COMMENT ON COLUMN BARS.ERR$_INT_RATN.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_INT_RATN ***
+grant SELECT                                                                 on ERR$_INT_RATN   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_INT_RATN   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on ERR$_INT_RATN   to UPLD;
 
 
 

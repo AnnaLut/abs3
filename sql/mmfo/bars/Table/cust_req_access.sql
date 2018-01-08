@@ -53,19 +53,6 @@ COMMENT ON COLUMN BARS.CUST_REQ_ACCESS.FLAGS IS 'Флаги запиту (доручення)';
 
 
 
-PROMPT *** Create  constraint FK_CUSTREQACCESS_CONTRACT_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUST_REQ_ACCESS ADD CONSTRAINT FK_CUSTREQACCESS_CONTRACT_ID FOREIGN KEY (CONTRACT_ID)
-	  REFERENCES BARS.DPT_DEPOSIT_ALL (DEPOSIT_ID) ON DELETE CASCADE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_CUSTREQACCESS ***
 begin   
  execute immediate '
@@ -84,19 +71,6 @@ PROMPT *** Create  constraint CC_CUSTREQACCESS_FLAGS ***
 begin   
  execute immediate '
   ALTER TABLE BARS.CUST_REQ_ACCESS ADD CONSTRAINT CC_CUSTREQACCESS_FLAGS CHECK (regexp_like(FLAGS,''^\d+$'')) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTREQACCESS_REQID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUST_REQ_ACCESS ADD CONSTRAINT FK_CUSTREQACCESS_REQID FOREIGN KEY (REQ_ID)
-	  REFERENCES BARS.CUST_REQUESTS (REQ_ID) ON DELETE CASCADE ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -155,10 +129,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUST_REQ_ACCESS ***
+grant SELECT                                                                 on CUST_REQ_ACCESS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_REQ_ACCESS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUST_REQ_ACCESS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_REQ_ACCESS to DPT_ADMIN;
 grant SELECT                                                                 on CUST_REQ_ACCESS to START1;
+grant SELECT                                                                 on CUST_REQ_ACCESS to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_REQ_ACCESS to WR_ALL_RIGHTS;
 
 

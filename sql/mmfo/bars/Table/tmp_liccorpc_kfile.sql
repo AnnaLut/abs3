@@ -127,7 +127,9 @@ COMMENT ON COLUMN BARS.TMP_LICCORPC_KFILE.KF IS '';
 
 
 PROMPT *** Create  grants  TMP_LICCORPC_KFILE ***
+grant SELECT                                                                 on TMP_LICCORPC_KFILE to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on TMP_LICCORPC_KFILE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on TMP_LICCORPC_KFILE to UPLD;
 
 
 

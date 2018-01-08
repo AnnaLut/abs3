@@ -101,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_DOC_STATES ***
+grant SELECT                                                                 on CC_DOC_STATES   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_DOC_STATES   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_DOC_STATES   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_DOC_STATES   to DPT_ADMIN;
+grant SELECT                                                                 on CC_DOC_STATES   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_DOC_STATES   to WR_ALL_RIGHTS;
 
 

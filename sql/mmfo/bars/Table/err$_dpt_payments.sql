@@ -62,7 +62,9 @@ COMMENT ON COLUMN BARS.ERR$_DPT_PAYMENTS.RNK IS '';
 
 
 PROMPT *** Create  grants  ERR$_DPT_PAYMENTS ***
+grant SELECT                                                                 on ERR$_DPT_PAYMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_DPT_PAYMENTS to BARS_DM;
+grant SELECT                                                                 on ERR$_DPT_PAYMENTS to UPLD;
 
 
 

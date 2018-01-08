@@ -91,7 +91,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  KLOP_CREF ***
+grant SELECT                                                                 on KLOP_CREF       to BARSREADER_ROLE;
 grant SELECT                                                                 on KLOP_CREF       to BARS_DM;
+grant SELECT                                                                 on KLOP_CREF       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLOP_CREF       to WR_ALL_RIGHTS;
 
 

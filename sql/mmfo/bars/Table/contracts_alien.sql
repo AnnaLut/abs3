@@ -63,19 +63,6 @@ COMMENT ON COLUMN BARS.CONTRACTS_ALIEN.BANK_CODE IS 'Код банка нерезидента';
 
 
 
-PROMPT *** Create  constraint FK_CONTRACTSALIEN_CUSTOMER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CONTRACTS_ALIEN ADD CONSTRAINT FK_CONTRACTSALIEN_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_CONTRACTSALIEN ***
 begin   
  execute immediate '
@@ -104,7 +91,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CONTRACTS_ALIEN ***
+grant SELECT                                                                 on CONTRACTS_ALIEN to BARSREADER_ROLE;
 grant SELECT                                                                 on CONTRACTS_ALIEN to BARS_DM;
+grant SELECT                                                                 on CONTRACTS_ALIEN to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CONTRACTS_ALIEN to WR_ALL_RIGHTS;
 
 

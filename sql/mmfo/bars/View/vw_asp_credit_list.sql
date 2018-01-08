@@ -1,20 +1,14 @@
-CREATE OR REPLACE FORCE VIEW BARS.VW_ASP_CREDIT_LIST
-(
-   DPLAN,
-   FDAT,
-   NPP,
-   ACC,
-   TIP,
-   KV,
-   NLS,
-   NMS,
-   OSTB,
-   OSTC,
-   ND,
-   NDG
-)
-AS
-   SELECT DPLAN,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/VW_ASP_CREDIT_LIST.sql =========*** Run
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view VW_ASP_CREDIT_LIST ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.VW_ASP_CREDIT_LIST ("DPLAN", "FDAT", "NPP", "ACC", "TIP", "KV", "NLS", "NMS", "OSTB", "OSTC", "ND", "NDG") AS 
+  SELECT DPLAN,
           FDAT,
           NPP,
           ACC,
@@ -107,7 +101,13 @@ AS
                   AND a.acc = ct.acc
                   AND (a.ostc / 100 + ct.ss / 100) > 0);
 
+PROMPT *** Create  grants  VW_ASP_CREDIT_LIST ***
+grant SELECT                                                                 on VW_ASP_CREDIT_LIST to BARSREADER_ROLE;
+grant SELECT                                                                 on VW_ASP_CREDIT_LIST to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VW_ASP_CREDIT_LIST to UPLD;
 
-GRANT SELECT ON BARS.VW_ASP_CREDIT_LIST TO BARSREADER_ROLE;
 
-GRANT SELECT ON BARS.VW_ASP_CREDIT_LIST TO BARS_ACCESS_DEFROLE;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/VW_ASP_CREDIT_LIST.sql =========*** End
+PROMPT ===================================================================================== 

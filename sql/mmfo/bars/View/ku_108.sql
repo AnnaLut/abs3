@@ -15,6 +15,10 @@ WHERE z.nd =d.nd     AND        z.rnk=c.rnk    AND
       z.acc=a.acc    AND        a.dazs is null AND
       k.rnk=d.rnk    AND d.vidd in (1,2);
 
+PROMPT *** Create  grants  KU_108 ***
+grant SELECT                                                                 on KU_108          to BARSREADER_ROLE;
+grant SELECT                                                                 on KU_108          to UPLD;
+
 
 
 PROMPT ===================================================================================== 

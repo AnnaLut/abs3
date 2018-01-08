@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции W45
-prompt Наименование операции: Дочерняя оплата PK!
+prompt Наименование операции: Дочерняя оплата PKO
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('W45', 'Дочерняя оплата PK!', 1, '#(bpk_get_transit(''20'',#(NLSB),#(NLSA),#(KVA)))', null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0100000000000000000000000000000000000010000000000000000000000000', null);
+    values ('W45', 'Дочерняя оплата PKO', 1, '#(bpk_get_transit(''20'',#(NLSB),#(NLSA),#(KVA)))', null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0100000000000000000000000000000000000010000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='W45', name='Дочерняя оплата PK!', dk=1, nlsm='#(bpk_get_transit(''20'',#(NLSB),#(NLSA),#(KVA)))', kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000010000000000000000000000000', nazn=null
+         set tt='W45', name='Дочерняя оплата PKO', dk=1, nlsm='#(bpk_get_transit(''20'',#(NLSB),#(NLSA),#(KVA)))', kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000010000000000000000000000000', nazn=null
        where tt='W45';
   end;
   --------------------------------
@@ -112,6 +112,17 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (chklist_tts: 30, ''W4N'', 2, null, null, 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
+    values (31, 'W4N', 3, null, 'bpk_visa30(ref, 1)=1 and bpk_visa30(ref, 0)=1', null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 31, ''W4N'', 3, null, ''bpk_visa30(ref, 1)=1 and bpk_visa30(ref, 0)=1'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

@@ -116,9 +116,11 @@ exception when others then
 
 PROMPT *** Create  grants  DJER_ND ***
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DJER_ND         to ABS_ADMIN;
+grant SELECT                                                                 on DJER_ND         to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DJER_ND         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DJER_ND         to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DJER_ND         to START1;
+grant SELECT                                                                 on DJER_ND         to UPLD;
 grant FLASHBACK,SELECT                                                       on DJER_ND         to WR_REFREAD;
 
 

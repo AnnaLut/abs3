@@ -68,28 +68,15 @@ COMMENT ON COLUMN BARS.SB_P0853.GR_IN IS '';
 
 
 
-
-PROMPT *** Create  constraint CC_SB_P0853 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SB_P0853 ADD CONSTRAINT CC_SB_P0853 CHECK ((ASCII(substr(ob22,1,1)) between 48 and 57
-               or ASCII(substr(ob22,1,1)) between 65 and 90 )
-              and ASCII(substr(ob22,2,1)) between 48 and 57
-             ) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
 PROMPT *** Create  grants  SB_P0853 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_P0853        to ABS_ADMIN;
+grant SELECT                                                                 on SB_P0853        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SB_P0853        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SB_P0853        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_P0853        to NALOG;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_P0853        to SB_P0853;
 grant SELECT                                                                 on SB_P0853        to START1;
+grant SELECT                                                                 on SB_P0853        to UPLD;
 grant FLASHBACK,SELECT                                                       on SB_P0853        to WR_REFREAD;
 
 

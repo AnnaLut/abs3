@@ -498,7 +498,7 @@ begin
             decode(a.dk, 0, a.nls, d.nls) nlsd, a.s, a.sq, a.fdat,
             c.nazn, decode(a.dk, 1, a.acc, b.acc) acck,
              decode(a.dk, 1, a.nls, d.nls) nlsk
-        from (select /*+parallel(o1) */
+        from (select /*+parallel(8) */
                     o1.fdat, o1.ref, o1.stmt, o1.dk, o1.tt, 
                     o1.acc, o1.s / 100 s, o1.sq / 100 sq, a.nls, a.kv
                 from opldok o1, accounts a

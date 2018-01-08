@@ -29,7 +29,9 @@ PROMPT *** Create  view V_CPDEAL_EXPPAY ***
            AND (aR.ostC <> 0 OR aN.ostC <> 0);
 
 PROMPT *** Create  grants  V_CPDEAL_EXPPAY ***
+grant SELECT                                                                 on V_CPDEAL_EXPPAY to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_CPDEAL_EXPPAY to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CPDEAL_EXPPAY to UPLD;
 
 
 

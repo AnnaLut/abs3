@@ -51,9 +51,11 @@ COMMENT ON COLUMN BARS.KD_S_PR.NLS IS '';
 
 
 PROMPT *** Create  grants  KD_S_PR ***
+grant SELECT                                                                 on KD_S_PR         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KD_S_PR         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KD_S_PR         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KD_S_PR         to KD_888;
+grant SELECT                                                                 on KD_S_PR         to UPLD;
 grant FLASHBACK,SELECT                                                       on KD_S_PR         to WR_REFREAD;
 
 

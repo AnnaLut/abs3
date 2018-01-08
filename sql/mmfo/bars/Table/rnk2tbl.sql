@@ -87,8 +87,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  RNK2TBL ***
+grant SELECT                                                                 on RNK2TBL         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNK2TBL         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNK2TBL         to START1;
+grant SELECT                                                                 on RNK2TBL         to UPLD;
 
 
 

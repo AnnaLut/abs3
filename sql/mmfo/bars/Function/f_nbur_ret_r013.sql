@@ -1,4 +1,10 @@
-CREATE OR REPLACE FUNCTION BARS.f_nbur_ret_r013 (
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_nbur_ret_r013.sql =========*** Ru
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE FUNCTION BARS.F_NBUR_RET_R013 (
   p_dat         in      date,
   p_nbs         IN      VARCHAR2,
   p_kv          IN      NUMBER,
@@ -257,3 +263,11 @@ BEGIN
 
 END;
 /
+ show err;
+ 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_nbur_ret_r013.sql =========*** En
+ PROMPT ===================================================================================== 
+ 

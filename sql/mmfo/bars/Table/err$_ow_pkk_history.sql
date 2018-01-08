@@ -73,6 +73,10 @@ COMMENT ON COLUMN BARS.ERR$_OW_PKK_HISTORY.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_OW_PKK_HISTORY ***
+grant SELECT                                                                 on ERR$_OW_PKK_HISTORY to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_OW_PKK_HISTORY to UPLD;
+
 
 
 PROMPT ===================================================================================== 

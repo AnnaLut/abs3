@@ -11,8 +11,8 @@ PROMPT *** ALTER_POLICY_INFO to KL_FF1 ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''KL_FF1'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''KL_FF1'', ''FILIAL'' , null, ''E'', ''E'', ''E'');
+               bpa.alter_policy_info(''KL_FF1'', ''CENTER'' , null, ''E'', ''E'', ''E'');
+               bpa.alter_policy_info(''KL_FF1'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''KL_FF1'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -59,19 +59,6 @@ COMMENT ON COLUMN BARS.KL_FF1.OB22 IS '';
 
 
 
-PROMPT *** Create  constraint FK_KLFF1_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KL_FF1 ADD CONSTRAINT FK_KLFF1_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_KLFF1_KF_NN ***
 begin   
  execute immediate '
@@ -85,9 +72,11 @@ exception when others then
 
 PROMPT *** Create  grants  KL_FF1 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_FF1          to ABS_ADMIN;
+grant SELECT                                                                 on KL_FF1          to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_FF1          to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_FF1          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_FF1          to BARS_DM;
+grant SELECT                                                                 on KL_FF1          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_FF1          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KL_FF1          to WR_REFREAD;
 

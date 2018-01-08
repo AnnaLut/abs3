@@ -53,9 +53,11 @@ PROMPT *** Create  view V_TAB_1 ***
           n.fdat=TO_DATE (pul.get_mas_ini_val ('sFdat1'), 'dd.mm.yyyy');
 
 PROMPT *** Create  grants  V_TAB_1 ***
+grant SELECT                                                                 on V_TAB_1         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TAB_1         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TAB_1         to RCC_DEAL;
 grant SELECT                                                                 on V_TAB_1         to START1;
+grant SELECT                                                                 on V_TAB_1         to UPLD;
 
 
 

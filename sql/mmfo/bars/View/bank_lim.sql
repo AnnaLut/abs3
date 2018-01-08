@@ -15,8 +15,10 @@ PROMPT *** Create  view BANK_LIM ***
         and nvl(b.mfo,0)<>f_ourmfo;
 
 PROMPT *** Create  grants  BANK_LIM ***
+grant SELECT                                                                 on BANK_LIM        to BARSREADER_ROLE;
 grant SELECT                                                                 on BANK_LIM        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BANK_LIM        to FOREX;
+grant SELECT                                                                 on BANK_LIM        to UPLD;
 
 
 

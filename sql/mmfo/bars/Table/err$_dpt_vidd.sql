@@ -157,6 +157,10 @@ COMMENT ON COLUMN BARS.ERR$_DPT_VIDD.IRREVOCABLE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DPT_VIDD ***
+grant SELECT                                                                 on ERR$_DPT_VIDD   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DPT_VIDD   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

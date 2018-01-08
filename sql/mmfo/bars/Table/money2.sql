@@ -53,19 +53,6 @@ COMMENT ON COLUMN BARS.MONEY2.TXT IS 'Призначення';
 
 
 
-PROMPT *** Create  constraint FK_MONEY2_OB22 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MONEY2 ADD CONSTRAINT FK_MONEY2_OB22 FOREIGN KEY (NBS, OB22)
-	  REFERENCES BARS.SB_OB22 (R020, OB22) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_MONEY2 ***
 begin   
  execute immediate '
@@ -95,9 +82,11 @@ exception when others then
 
 PROMPT *** Create  grants  MONEY2 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on MONEY2          to ABS_ADMIN;
+grant SELECT                                                                 on MONEY2          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MONEY2          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MONEY2          to BARS_DM;
 grant SELECT                                                                 on MONEY2          to START1;
+grant SELECT                                                                 on MONEY2          to UPLD;
 
 
 

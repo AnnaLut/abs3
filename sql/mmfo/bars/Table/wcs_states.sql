@@ -109,9 +109,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_STATES ***
+grant SELECT                                                                 on WCS_STATES      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_STATES      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_STATES      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_STATES      to START1;
+grant SELECT                                                                 on WCS_STATES      to UPLD;
 
 
 

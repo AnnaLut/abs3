@@ -33,7 +33,9 @@ PROMPT *** Create  view V_BRATES_LAST_VALUE_KF ***
                                   group by br_id, kv );
 
 PROMPT *** Create  grants  V_BRATES_LAST_VALUE_KF ***
+grant SELECT                                                                 on V_BRATES_LAST_VALUE_KF to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BRATES_LAST_VALUE_KF to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_BRATES_LAST_VALUE_KF to UPLD;
 
 
 

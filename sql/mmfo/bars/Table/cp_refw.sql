@@ -6,6 +6,8 @@ PROMPT =========================================================================
 
 
 PROMPT *** ALTER_POLICY_INFO to CP_REFW ***
+
+
 BEGIN 
         execute immediate  
           'begin  
@@ -22,9 +24,9 @@ PROMPT *** Create  table CP_REFW ***
 begin 
   execute immediate '
   CREATE TABLE BARS.CP_REFW 
-   (  REF NUMBER, 
-  TAG VARCHAR2(7), 
-  VALUE VARCHAR2(500)
+   (	REF NUMBER, 
+	TAG VARCHAR2(7), 
+	VALUE VARCHAR2(500)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -38,10 +40,8 @@ end;
 
 
 PROMPT *** ALTER_POLICIES to CP_REFW ***
- begin
-    bpa.alter_policies('CP_REFW');
-end;
-/
+ exec bpa.alter_policies('CP_REFW');
+
 
 COMMENT ON TABLE BARS.CP_REFW IS 'дод. реквізити угод';
 COMMENT ON COLUMN BARS.CP_REFW.REF IS 'REF сделки по ЦБ';
@@ -62,11 +62,7 @@ exception when others then
  end;
 /
 
-PROMPT *** MODIFY COLUMN  TAG***
-begin   
- execute immediate 'ALTER TABLE BARS.CP_REFW MODIFY TAG VARCHAR2(7)';
- end;
-/
+
 
 
 PROMPT *** Create  index XPK_CPREFW ***
@@ -83,6 +79,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_REFW ***
+grant SELECT                                                                 on CP_REFW         to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_REFW         to BARSUPL;
 grant SELECT                                                                 on CP_REFW         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_REFW         to BARS_DM;

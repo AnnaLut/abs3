@@ -112,7 +112,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DOC_ERROR_BEHAVIOR ***
+grant SELECT                                                                 on DOC_ERROR_BEHAVIOR to BARSREADER_ROLE;
 grant SELECT                                                                 on DOC_ERROR_BEHAVIOR to BARS_DM;
+grant SELECT                                                                 on DOC_ERROR_BEHAVIOR to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DOC_ERROR_BEHAVIOR to WR_ALL_RIGHTS;
 
 

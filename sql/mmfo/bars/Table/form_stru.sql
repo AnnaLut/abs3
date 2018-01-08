@@ -124,11 +124,13 @@ exception when others then
 
 PROMPT *** Create  grants  FORM_STRU ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on FORM_STRU       to ABS_ADMIN;
+grant SELECT                                                                 on FORM_STRU       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FORM_STRU       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FORM_STRU       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FORM_STRU       to FORM_STRU;
 grant SELECT                                                                 on FORM_STRU       to RPBN002;
 grant SELECT                                                                 on FORM_STRU       to START1;
+grant SELECT                                                                 on FORM_STRU       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FORM_STRU       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on FORM_STRU       to WR_REFREAD;
 

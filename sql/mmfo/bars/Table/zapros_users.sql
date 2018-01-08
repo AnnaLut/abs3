@@ -49,19 +49,6 @@ COMMENT ON COLUMN BARS.ZAPROS_USERS.USER_ID IS 'Пользователь';
 
 
 
-PROMPT *** Create  constraint FK_ZAPROS_USERS_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAPROS_USERS ADD CONSTRAINT FK_ZAPROS_USERS_ID FOREIGN KEY (USER_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XPK_ZAPROS_USERS ***
 begin   
  execute immediate '
@@ -90,11 +77,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAPROS_USERS ***
+grant SELECT                                                                 on ZAPROS_USERS    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAPROS_USERS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAPROS_USERS    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAPROS_USERS    to QUERY_EDITOR;
 grant SELECT                                                                 on ZAPROS_USERS    to RPBN001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAPROS_USERS    to START1;
+grant SELECT                                                                 on ZAPROS_USERS    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAPROS_USERS    to WR_ALL_RIGHTS;
 
 

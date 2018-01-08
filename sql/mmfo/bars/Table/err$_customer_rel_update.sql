@@ -108,7 +108,9 @@ COMMENT ON COLUMN BARS.ERR$_CUSTOMER_REL_UPDATE.GLOBAL_BDATE IS '';
 
 
 PROMPT *** Create  grants  ERR$_CUSTOMER_REL_UPDATE ***
+grant SELECT                                                                 on ERR$_CUSTOMER_REL_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CUSTOMER_REL_UPDATE to BARS_DM;
+grant SELECT                                                                 on ERR$_CUSTOMER_REL_UPDATE to UPLD;
 
 
 

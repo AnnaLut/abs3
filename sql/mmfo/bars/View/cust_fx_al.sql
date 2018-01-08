@@ -49,7 +49,9 @@ PROMPT *** Create  view CUST_FX_AL ***
            OR x1.KOD_B = x2.KOD_B);
 
 PROMPT *** Create  grants  CUST_FX_AL ***
+grant SELECT                                                                 on CUST_FX_AL      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_FX_AL      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CUST_FX_AL      to UPLD;
 
 
 

@@ -62,19 +62,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_KFRU_BANKS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KF_RU ADD CONSTRAINT FK_KFRU_BANKS FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_KFRU_KF_NN ***
 begin   
  execute immediate '
@@ -141,6 +128,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  KF_RU ***
+grant SELECT                                                                 on KF_RU           to BARSREADER_ROLE;
+grant SELECT                                                                 on KF_RU           to CDB;
 grant SELECT                                                                 on KF_RU           to FINMON;
 
 

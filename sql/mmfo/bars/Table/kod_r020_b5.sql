@@ -94,10 +94,12 @@ exception when others then
 
 PROMPT *** Create  grants  KOD_R020_B5 ***
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on KOD_R020_B5     to ABS_ADMIN;
+grant SELECT                                                                 on KOD_R020_B5     to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on KOD_R020_B5     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_R020_B5     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_R020_B5     to RPBN002;
 grant SELECT                                                                 on KOD_R020_B5     to START1;
+grant SELECT                                                                 on KOD_R020_B5     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KOD_R020_B5     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KOD_R020_B5     to WR_REFREAD;
 

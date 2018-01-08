@@ -77,10 +77,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  SP_S200 ***
+grant SELECT                                                                 on SP_S200         to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on SP_S200         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SP_S200         to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on SP_S200         to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SP_S200         to SP_S200;
+grant SELECT                                                                 on SP_S200         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SP_S200         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SP_S200         to WR_REFREAD;
 

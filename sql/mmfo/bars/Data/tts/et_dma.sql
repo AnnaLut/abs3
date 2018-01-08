@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции DMA
-prompt Наименование операции: Первиний внесок на поточний металевий рахунок (готів.)
+prompt Наименование операции: DMA Первиний внесок на поточний металевий рахунок (готів.)
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DMA', 'Первиний внесок на поточний металевий рахунок (готів.)', 0, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', null, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000100000000000000000', 'Внесення банківських металів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DMA', 'DMA Первиний внесок на поточний металевий рахунок (готів.)', 0, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', null, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000100000000000000000', 'Внесення банківських металів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DMA', name='Первиний внесок на поточний металевий рахунок (готів.)', dk=0, nlsm=null, kv=null, nlsk='#(tobopack.GetTOBOParam(''CASH11''))', kvk=null, nlss=null, nlsa=null, nlsb='#(tobopack.GetTOBOParam(''CASH11''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000100000000000000000', nazn='Внесення банківських металів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DMA', name='DMA Первиний внесок на поточний металевий рахунок (готів.)', dk=0, nlsm=null, kv=null, nlsk='#(tobopack.GetTOBOParam(''CASH11''))', kvk=null, nlss=null, nlsa=null, nlsb='#(tobopack.GetTOBOParam(''CASH11''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000100000000000000000', nazn='Внесення банківських металів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DMA';
   end;
   --------------------------------

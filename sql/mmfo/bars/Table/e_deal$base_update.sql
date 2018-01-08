@@ -185,6 +185,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  E_DEAL$BASE_UPDATE ***
+grant SELECT                                                                 on E_DEAL$BASE_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on E_DEAL$BASE_UPDATE to BARSUPL;
 grant SELECT                                                                 on E_DEAL$BASE_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on E_DEAL$BASE_UPDATE to BARS_DM;

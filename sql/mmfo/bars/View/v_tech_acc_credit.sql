@@ -27,9 +27,11 @@ PROMPT *** Create  view V_TECH_ACC_CREDIT ***
  ;
 
 PROMPT *** Create  grants  V_TECH_ACC_CREDIT ***
+grant SELECT                                                                 on V_TECH_ACC_CREDIT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TECH_ACC_CREDIT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TECH_ACC_CREDIT to DPT_ROLE;
 grant SELECT                                                                 on V_TECH_ACC_CREDIT to RPBN001;
+grant SELECT                                                                 on V_TECH_ACC_CREDIT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_TECH_ACC_CREDIT to WR_ALL_RIGHTS;
 
 

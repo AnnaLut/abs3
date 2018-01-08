@@ -153,9 +153,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_RATES_UPDATE ***
+grant SELECT                                                                 on CP_RATES_UPDATE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_RATES_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_RATES_UPDATE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_RATES_UPDATE to CP_ROLE;
+grant SELECT                                                                 on CP_RATES_UPDATE to UPLD;
 
 
 

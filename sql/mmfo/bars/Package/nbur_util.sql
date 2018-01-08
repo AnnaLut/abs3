@@ -1,11 +1,17 @@
-create or replace package BARS.NBUR_UTIL
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/nbur_util.sql =========*** Run *** =
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.NBUR_UTIL 
 is
-  
+
   --
   -- Constants
   --
   g_header_version   constant varchar2(64) := 'version 1.4  2017.10.06';
-  
+
     --
   -- HEADER_VERSION
   --
@@ -15,7 +21,7 @@ is
   -- BODY_VERSION
   --
   function body_version return varchar2;
-  
+
   --
   --
   --
@@ -26,7 +32,7 @@ is
   , p_dflt_val      in     varchar2 default null -- column default value
   , p_col_cmnt      in     varchar2 default null -- column comment
   );
-  
+
   --
   -- NORMALIZATION_SEQUENCE
   --
@@ -34,7 +40,7 @@ is
   ( p_seq_name      in     all_sequences.sequence_name%type -- назва таблиці
   , p_last_val      in     pls_integer                      -- значення сіквенса (якщо треба поставити своє)
   );
-  
+
   --
   -- NORMALIZATION_SEQUENCE
   --
@@ -43,7 +49,7 @@ is
   , p_tab_name     in     all_tab_cols.table_name%type     -- назва таблиці
   , p_col_name     in     all_tab_cols.column_name%type    -- назва поля
   );
-  
+
   --
   -- EXPORT_FILE
   --
@@ -61,26 +67,21 @@ is
 
 end NBUR_UTIL;
 /
-
-show errors
-
-----------------------------------------------------------------------------------------------------
-
-create or replace package body NBUR_UTIL
+CREATE OR REPLACE PACKAGE BODY BARS.NBUR_UTIL 
 is
   --
   -- constants
   --
   g_body_version  constant varchar2(64)  := 'version 1.5  2017.08.08';
-  
+
   --
   -- types
   --
-  
+
   --
   -- variables
   --
-  
+
   --
   -- повертає версію заголовка пакета
   --
@@ -98,7 +99,7 @@ is
   begin
     return 'Package ' || $$PLSQL_UNIT || ' body '   || g_body_version;
   end body_version;
-  
+
   --
   --
   --
@@ -115,7 +116,7 @@ is
     -- Column to be modified must be empty to decrease precision or scale
     e_col_not_empty        exception;
     pragma exception_init( e_col_not_empty,      -01440 );
-    -- 
+    --
     e_tab_not_exists       exception;
     pragma exception_init( e_tab_not_exists,     -00942 );
     --
@@ -136,14 +137,14 @@ is
     l_obj_ddl              clob;
     ---
   begin
-    
+
     if ( p_dflt_val Is Null )
     then
       l_dflt_val := '';
     else
       l_dflt_val := ' default '|| p_dflt_val;
     end if;
-    
+
     begin
       l_ddl_stmt := 'alter table BARS.'||p_tab_nm||' add '||p_col_nm||' '||p_data_tp||l_dflt_val;
       execute immediate l_ddl_stmt;
@@ -160,9 +161,9 @@ is
             null;
           when E_IDX_IS_DFND_ON_COL then
             begin
-              
+
               DBMS_METADATA.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'STORAGE', false );
-              
+
               -- 1) serch index name and ddl
               select INDEX_NAME, DBMS_METADATA.GET_DDL('INDEX',INDEX_NAME,OWNER) as DDL_STMT
                 into l_idx_nm, l_obj_ddl
@@ -174,28 +175,28 @@ is
               select c.INDEX_NAME, DBMS_METADATA.GET_DDL('INDEX',INDEX_NAME,OWNER) as DDL_STMT
                 into l_idx_nm, l_obj_ddl
                 from ALL_IND_COLUMNS c
-                join ALL_INDEXES     i 
+                join ALL_INDEXES     i
                   on ( i.TABLE_OWNER = c.TABLE_OWNER and
                        i.TABLE_NAME  = c.TABLE_NAME  )
-               where c.TABLE_OWNER = 'BARS' 
+               where c.TABLE_OWNER = 'BARS'
                  and c.TABLE_NAME  = upper(p_tab_nm)
                  and c.COLUMN_NAME = upper(p_col_nm)
                  and i.INDEX_TYPE  = ANY('BITMAP','FUNCTION-BASED NORMAL','FUNCTION-BASED BITMAP');
 */
-              
+
               -- 2) drop index
               execute immediate 'drop index '||l_idx_nm;
               dbms_output.put_line( 'Index "'||l_idx_nm||'" dropped.' );
-              
+
               -- 3) alter column
               SET_COL( p_tab_nm, p_col_nm, p_data_tp, p_dflt_val, p_col_cmnt );
-              
-              -- 4) recreate index 
+
+              -- 4) recreate index
               execute immediate l_obj_ddl;
               dbms_output.put_line( 'Index "'||l_idx_nm||'" created.' );
-              
+
               -- 5) Gather Statistics on that index
-              
+
             exception
               when NO_DATA_FOUND then
                 dbms_output.put_line( sqlerrm );
@@ -203,9 +204,9 @@ is
           when E_ then
             null;
             -- begin
-            --   -- 1) check 
+            --   -- 1) check
             --   select case
-            --          when exists ( select /*+ NO_PARALLEL( t ) */ 1 
+            --          when exists ( select /*+ NO_PARALLEL( t ) */ 1
             --                         from NBUR_DM_CHRON_AVG_BALS_ARCH t
             --                        where rownum = 1 )
             --          then 1
@@ -213,13 +214,13 @@ is
             --        end
             --   into l_
             --   from dual;
-            --   
+            --
             --   -- 2) get table ddl
             --   DBMS_METADATA.SET_TRANSFORM_PARAM( DBMS_METADATA.SESSION_TRANSFORM, 'STORAGE', false );
             --   l_obj_ddl := DBMS_METADATA.GET_DDL( 'TABLE', p_tab_nm, 'BARS' );
-            --   
-            --   -- 3) change 
-            --   
+            --
+            --   -- 3) change
+            --
             -- end;
           when OTHERS then
             dbms_output.put_line( 'Error' || chr(10) || sqlerrm || chr(10) || l_ddl_stmt );
@@ -231,7 +232,7 @@ is
       when OTHERS then
         dbms_output.put_line( 'Error' || chr(10) || sqlerrm || chr(10) || l_ddl_stmt );
     end;
-    
+
     if ( l_scss = 1 and p_col_cmnt Is Not Null )
     then
       begin
@@ -242,9 +243,9 @@ is
           dbms_output.put_line( sqlerrm );
       end;
     end if;
-    
+
   end SET_COL;
-  
+
   --
   --
   --
@@ -259,37 +260,37 @@ is
     e_seq_not_exists       exception;
     pragma exception_init( e_seq_not_exists, -02289 );
   begin
-    
+
     bars_audit.trace( $$PLSQL_UNIT||'.NORMALIZATION_SEQUENCE: Entry with ( p_seq_name=%s, p_last_val=%s ).', p_seq_name, to_char(p_last_val) );
-    
+
     begin
-      
+
       execute immediate 'select '||p_seq_name||'.nextval from dual'
          into l_seq_id;
-      
-      if ( p_last_val is null ) 
+
+      if ( p_last_val is null )
       then
-      
+
         begin
-          
+
           select TABLE_NAME
             into l_tab_nm
-            from ALL_TRIGGERS 
+            from ALL_TRIGGERS
            where BASE_OBJECT_TYPE = 'TABLE'
-             and ( OWNER, TRIGGER_NAME ) in ( select OWNER, NAME  
+             and ( OWNER, TRIGGER_NAME ) in ( select OWNER, NAME
                                                 from ALL_DEPENDENCIES
-                                               where REFERENCED_OWNER = 'BARS' 
+                                               where REFERENCED_OWNER = 'BARS'
                                                  and REFERENCED_TYPE  = 'SEQUENCE'
                                                  and REFERENCED_NAME  = upper(p_seq_name)
                                                  and OWNER            = 'BARS'
                                                  and TYPE             = 'TRIGGER' );
-          
+
           begin
-            
+
             select COLUMN_NAME
               into l_col_nm
               from ALL_CONS_COLUMNS
-             where (OWNER,CONSTRAINT_NAME,TABLE_NAME) in ( select OWNER, CONSTRAINT_NAME, TABLE_NAME 
+             where (OWNER,CONSTRAINT_NAME,TABLE_NAME) in ( select OWNER, CONSTRAINT_NAME, TABLE_NAME
                                                              from ALL_CONSTRAINTS
                                                             where OWNER           = 'BARS'
                                                               and TABLE_NAME      = l_tab_nm
@@ -298,50 +299,50 @@ is
             when NO_DATA_FOUND then
               bars_audit.error( $$PLSQL_UNIT||'.NORMALIZATION_SEQUENCE: not found column for sequence '||p_seq_name );
           end;
-          
+
         exception
           when NO_DATA_FOUND then
             bars_audit.error( $$PLSQL_UNIT||'.NORMALIZATION_SEQUENCE: not found table for sequence '||p_seq_name );
         end;
-        
+
         if ( l_tab_nm Is Not Null and l_col_nm Is Not Null)
         then
-          
+
           NBUR_UTIL.NORMALIZATION_SEQUENCE
           ( p_seq_name => p_seq_name
           , p_tab_name => l_tab_nm
           , p_col_name => l_col_nm
           );
-          
+
         end if;
-      
+
       else
-      
-        if ( p_last_val != l_seq_id ) 
+
+        if ( p_last_val != l_seq_id )
         then
-          
+
           execute immediate 'alter sequence ' || p_seq_name || ' increment by ' || to_char(p_last_val - l_seq_id);
-        
+
           execute immediate 'select '         || p_seq_name || '.nextval from dual'
              into l_seq_id;
-            
+
           execute immediate 'alter sequence ' || p_seq_name || ' increment by 1';
-          
+
           bars_audit.trace( $$PLSQL_UNIT||'.NORMALIZATION_SEQUENCE: SEQUENCE NEW VALUE = %s', to_char(l_seq_id) );
-          
+
         end if;
-      
+
       end if;
-      
+
     exception
       when E_SEQ_NOT_EXISTS then
         bars_audit.error( $$PLSQL_UNIT||'.NORMALIZATION_SEQUENCE: sequence '||p_seq_name||' does not exist.' );
     end;
-    
+
     bars_audit.trace( $$PLSQL_UNIT||'.NORMALIZATION_SEQUENCE: Exit.' );
-    
+
   end NORMALIZATION_SEQUENCE;
-  
+
   --
   --
   --
@@ -352,21 +353,21 @@ is
   ) is
     l_max_id           pls_integer;
   begin
-    
+
     bars_audit.trace( $$PLSQL_UNIT||'.NORMALIZATION_SEQUENCE: Entry with ( p_seq_name=%s, p_tab_name=%s, p_col_name=%s ).', p_seq_name, p_tab_name, p_col_name );
-    
+
     begin
-      
+
       execute immediate 'select max('||p_col_name||') from '||p_tab_name
          into l_max_id;
-      
+
       bars_audit.trace( $$PLSQL_UNIT||'.NORMALIZATION_SEQUENCE: column %s.%s max value=%s', p_tab_name, p_col_name, to_char(l_max_id) );
-      
+
       NORMALIZATION_SEQUENCE
       ( p_seq_name => p_seq_name
       , p_last_val => l_max_id
       );
-      
+
     exception
       when OTHERS then
         case sqlcode
@@ -377,26 +378,26 @@ is
         else bars_audit.error( $$PLSQL_UNIT||'.NORMALIZATION_SEQUENCE: '||sqlerrm );
         end case;
     end;
-    
+
     bars_audit.trace( $$PLSQL_UNIT||'.NORMALIZATION_SEQUENCE: Exit.' );
-    
+
   end NORMALIZATION_SEQUENCE;
-  
+
   --
   --
   --
   procedure EXPORT_FILE
-  ( p_file_id          in     nbur_lnk_files_objects.file_id%type  
+  ( p_file_id          in     nbur_lnk_files_objects.file_id%type
   , p_sql_stmt            out clob
   ) is
     title        constant     varchar2(64) := $$PLSQL_UNIT||'.EXPORT_FILE';
     l_sql                     clob;
   begin
-    
+
     bars_audit.trace( '%s: Entry with ( file_id=%s ).', title, to_char(p_file_id) );
-    
+
     dbms_lob.createtemporary( l_sql, TRUE );
-    
+
     l_sql := '-- ======================================================================================' || chr(10)
           || '-- Author : BAA'                                                                           || chr(10)
           || '-- Date   : ' || to_char(sysdate,'dd/mm/yyyy')                                             || chr(10)
@@ -414,9 +415,9 @@ is
           || 'begin'                                                                                     || chr(10)
           || chr(10)
           ;
-    
+
     l_sql := l_sql || '  -- NBUR_REF_FORM_STRU' || chr(10);
-    
+
     for k in ( select '  NBUR_FILES.SET_FILE_STC'              ||chr(10)||
                       '  ( p_file_id       => l_file_id'       ||chr(10)||
                       '  , p_seg_num       => '         ||SEGMENT_NUMBER||chr(10)||
@@ -426,21 +427,21 @@ is
                       '  , p_key_attr      => '         ||KEY_ATTRIBUTE ||chr(10)||
                       '  , p_sort_attr     => '         ||SORT_ATTRIBUTE||chr(10)||
                       '  );'                   ||chr(10) as STMT
-                 from NBUR_REF_FORM_STRU 
+                 from NBUR_REF_FORM_STRU
                 where file_id = 16555
                 order by SEGMENT_NUMBER )
     loop
       l_sql := l_sql || k.STMT;
     end loop;
-    
+
     l_sql := l_sql || 'end;' || chr(10) || '/' ||chr(10) || chr(10) || 'commit;' || chr(10) || chr(10);
-    
+
     p_sql_stmt := l_sql;
-    
+
     dbms_lob.freetemporary( l_sql );
-    
+
     bars_audit.trace( '%s: Exit.', title );
-    
+
   end EXPORT_FILE;
 
   --
@@ -537,7 +538,14 @@ begin
   null;
 end NBUR_UTIL;
 /
+ show err;
+ 
+PROMPT *** Create  grants  NBUR_UTIL ***
+grant EXECUTE                                                                on NBUR_UTIL       to BARS_ACCESS_DEFROLE;
 
-grant execute on NBUR_UTIL to BARS_ACCESS_DEFROLE;
-
-show errors;
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/nbur_util.sql =========*** End *** =
+ PROMPT ===================================================================================== 
+ 

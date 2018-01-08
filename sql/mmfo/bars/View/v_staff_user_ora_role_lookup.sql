@@ -12,7 +12,9 @@ PROMPT *** Create  view V_STAFF_USER_ORA_ROLE_LOOKUP ***
 ;
 
 PROMPT *** Create  grants  V_STAFF_USER_ORA_ROLE_LOOKUP ***
+grant SELECT                                                                 on V_STAFF_USER_ORA_ROLE_LOOKUP to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFF_USER_ORA_ROLE_LOOKUP to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STAFF_USER_ORA_ROLE_LOOKUP to UPLD;
 
 
 

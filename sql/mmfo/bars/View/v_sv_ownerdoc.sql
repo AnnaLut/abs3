@@ -12,8 +12,10 @@ PROMPT *** Create  view V_SV_OWNERDOC ***
   from sv_owner;
 
 PROMPT *** Create  grants  V_SV_OWNERDOC ***
+grant SELECT                                                                 on V_SV_OWNERDOC   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SV_OWNERDOC   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SV_OWNERDOC   to RPBN002;
+grant SELECT                                                                 on V_SV_OWNERDOC   to UPLD;
 
 
 

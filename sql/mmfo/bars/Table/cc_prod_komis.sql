@@ -71,19 +71,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CC_PROD_KOMIS_K ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_PROD_KOMIS ADD CONSTRAINT FK_CC_PROD_KOMIS_K FOREIGN KEY (KOMIS)
-	  REFERENCES BARS.CC_RAZ_KOMIS (KOMIS) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_CC_PROD_KOMIS_P ***
 begin   
  execute immediate '
@@ -135,9 +122,11 @@ exception when others then
 
 PROMPT *** Create  grants  CC_PROD_KOMIS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_PROD_KOMIS   to ABS_ADMIN;
+grant SELECT                                                                 on CC_PROD_KOMIS   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_PROD_KOMIS   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_PROD_KOMIS   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_PROD_KOMIS   to RCC_DEAL;
+grant SELECT                                                                 on CC_PROD_KOMIS   to UPLD;
 grant FLASHBACK,SELECT                                                       on CC_PROD_KOMIS   to WR_REFREAD;
 
 

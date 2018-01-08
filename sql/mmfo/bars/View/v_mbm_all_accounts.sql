@@ -40,7 +40,9 @@ PROMPT *** Create  view V_MBM_ALL_ACCOUNTS ***
 		and a.rnk = c.rnk;
 
 PROMPT *** Create  grants  V_MBM_ALL_ACCOUNTS ***
+grant SELECT                                                                 on V_MBM_ALL_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBM_ALL_ACCOUNTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_MBM_ALL_ACCOUNTS to UPLD;
 
 
 

@@ -51,6 +51,10 @@ COMMENT ON COLUMN BARS.ESCR_LIMITS.DATE_TO IS '';
 
 
 
+PROMPT *** Create  grants  ESCR_LIMITS ***
+grant SELECT                                                                 on ESCR_LIMITS     to BARSREADER_ROLE;
+grant SELECT                                                                 on ESCR_LIMITS     to UPLD;
+
 
 
 PROMPT ===================================================================================== 

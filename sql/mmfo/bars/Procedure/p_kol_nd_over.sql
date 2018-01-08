@@ -1,15 +1,19 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_KOL_ND_OVER.sql =========*** Run
 PROMPT ===================================================================================== 
+
+
 PROMPT *** Create  procedure P_KOL_ND_OVER ***
 
-CREATE OR REPLACE PROCEDURE BARS.P_KOL_ND_OVER (p_dat01 date, p_mode integer) IS
+  CREATE OR REPLACE PROCEDURE BARS.P_KOL_ND_OVER (p_dat01 date, p_mode integer) IS
 
 /* Версия 4.2  16-11-2017  17-10-2017 22-06-2017  24-01-2017 18-01-2017  10-10-2016
    Кількість днів прострочки по договорам ОВЕРДРАФТА
    -------------------------------------
 
-  5) 16-11-2017(4.2) - Убрала отладку logg (проверена по новый план счетов) 
+  5) 16-11-2017(4.2) - Убрала отладку logg (проверена по новый план счетов)
   4) 17-10-2017(4.1) - Овердрафт холдинга + бал.счета через REZ_DEB
   3) 22-06-2017 - NVL при определении фин.класа
   2) 24-01-2017 - Добавлен параметр S080 в p_get_nd_val
@@ -19,7 +23,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_KOL_ND_OVER (p_dat01 date, p_mode integer) IS
  l_s080 specparam.s080%type;
 
  l_kol   integer; l_custtype  integer;  l_fin      integer; l_f    integer; l_fin23     integer;
- l_tip   integer; fl_    integer; l_cls       integer;  
+ l_tip   integer; fl_    integer; l_cls       integer;
  l_dat31 date   ; l_txt  varchar2(1000);
 
  TYPE CurTyp IS REF CURSOR;
@@ -49,9 +53,9 @@ begin
       if F_MMFO THEN
          OPEN c0 FOR
          SELECT c.nd, c.rnk, c.fin23  FROM  cc_deal c, nd_open n  where vidd = 110 and c.nd = n.nd and n.fdat = p_dat01;
-      else 
+      else
          OPEN c0 FOR
-         select o.nd, a.rnk, o.fin23  from acc_over o, nd_open n, accounts a where n.fdat = p_dat01 and o.nd = n.nd and o.acco = a.acc; 
+         select o.nd, a.rnk, o.fin23  from acc_over o, nd_open n, accounts a where n.fdat = p_dat01 and o.nd = n.nd and o.acco = a.acc;
       end if;
       LOOP
          FETCH c0 INTO k;
@@ -65,14 +69,14 @@ begin
          begin
             if F_MMFO THEN
             --OPEN c1 FOR
-               SELECT max(nvl(f_days_past_due(p_DAT01, a.acc,decode(c.custtype,3,25000,50000)),0)) into l_kol  FROM  nd_acc d, accounts a, customer c  
+               SELECT max(nvl(f_days_past_due(p_DAT01, a.acc,decode(c.custtype,3,25000,50000)),0)) into l_kol  FROM  nd_acc d, accounts a, customer c
                where d.nd = k.nd and d.acc = a.acc and a.rnk=c.rnk  and a.tip in ('SP ','SPN');
-            else 
+            else
             --OPEN c1 FOR
                select max(nvl(f_days_past_due(p_DAT01, acc,decode(custtype,3,25000,50000)),0)) into l_kol
                from  (select ost_korr(a.acc,l_dat31,null,a.nbs) ost, acc, custtype
                       from accounts a, customer c
-                      where a.acc in (select acco from acc_over where nd=k.nd) 
+                      where a.acc in (select acco from acc_over where nd=k.nd)
                         AND ( NBS IN (select nbs from rez_deb  where grupa = 4 and ( d_close is null or d_close > p_dat01)) or a.tip in ('SP ','SPN') ) and a.rnk=c.rnk   --2067, 2069
                       union all
                       select ost_korr(acc,l_dat31,null,nbs) ost, acc, custtype from accounts a  , customer c
@@ -122,7 +126,7 @@ begin
             --END LOOP;
          end;
       end LOOP;
-   end; 
+   end;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец К-во дней ОВЕРДРАФТЫ 351 ');
 end;
 /

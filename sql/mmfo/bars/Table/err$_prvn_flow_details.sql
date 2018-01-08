@@ -89,6 +89,10 @@ COMMENT ON COLUMN BARS.ERR$_PRVN_FLOW_DETAILS.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_PRVN_FLOW_DETAILS ***
+grant SELECT                                                                 on ERR$_PRVN_FLOW_DETAILS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_PRVN_FLOW_DETAILS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

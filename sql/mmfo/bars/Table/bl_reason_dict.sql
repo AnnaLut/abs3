@@ -77,8 +77,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  BL_REASON_DICT ***
+grant SELECT                                                                 on BL_REASON_DICT  to BARSREADER_ROLE;
 grant SELECT                                                                 on BL_REASON_DICT  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BL_REASON_DICT  to RBL;
+grant SELECT                                                                 on BL_REASON_DICT  to UPLD;
 
 
 

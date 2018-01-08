@@ -24,7 +24,9 @@ PROMPT *** Create  view V_EBKC_QUEUE_COUNT ***
   group by ct.txt, ct.cust_type;
 
 PROMPT *** Create  grants  V_EBKC_QUEUE_COUNT ***
+grant SELECT                                                                 on V_EBKC_QUEUE_COUNT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_EBKC_QUEUE_COUNT to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_EBKC_QUEUE_COUNT to UPLD;
 
 
 

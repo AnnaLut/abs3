@@ -70,7 +70,9 @@ COMMENT ON COLUMN BARS.ERR$_ACCOUNTSW_UPDATE.CHGACTION IS '';
 
 
 PROMPT *** Create  grants  ERR$_ACCOUNTSW_UPDATE ***
+grant SELECT                                                                 on ERR$_ACCOUNTSW_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_ACCOUNTSW_UPDATE to BARS_DM;
+grant SELECT                                                                 on ERR$_ACCOUNTSW_UPDATE to UPLD;
 
 
 

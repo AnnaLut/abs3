@@ -93,19 +93,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BANKSUPDHDR_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BANKS_UPDATE_HDR ADD CONSTRAINT FK_BANKSUPDHDR_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C008078 ***
 begin   
  execute immediate '
@@ -195,11 +182,13 @@ exception when others then
 
 PROMPT *** Create  grants  BANKS_UPDATE_HDR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANKS_UPDATE_HDR to ABS_ADMIN;
+grant SELECT                                                                 on BANKS_UPDATE_HDR to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANKS_UPDATE_HDR to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BANKS_UPDATE_HDR to BARS_DM;
 grant SELECT                                                                 on BANKS_UPDATE_HDR to START1;
 grant INSERT                                                                 on BANKS_UPDATE_HDR to TECH020;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANKS_UPDATE_HDR to TOSS;
+grant SELECT                                                                 on BANKS_UPDATE_HDR to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BANKS_UPDATE_HDR to WR_ALL_RIGHTS;
 
 

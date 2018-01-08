@@ -47,8 +47,10 @@ select 2, 'Î' status, q.card_acct, q.f_n, q.f_d,
  where q.rec = o.rec ;
 
 PROMPT *** Create  grants  V_OBPC_PKKQUE ***
+grant SELECT                                                                 on V_OBPC_PKKQUE   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OBPC_PKKQUE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OBPC_PKKQUE   to OBPC;
+grant SELECT                                                                 on V_OBPC_PKKQUE   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_PKKQUE   to WR_ALL_RIGHTS;
 
 

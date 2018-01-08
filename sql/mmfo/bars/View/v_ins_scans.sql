@@ -14,7 +14,9 @@ PROMPT *** Create  view V_INS_SCANS ***
  order by s.id;
 
 PROMPT *** Create  grants  V_INS_SCANS ***
+grant SELECT                                                                 on V_INS_SCANS     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_SCANS     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_INS_SCANS     to UPLD;
 
 
 

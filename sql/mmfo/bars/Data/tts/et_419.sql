@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('419', '419 Комісія банку за прийняті платежі на користь бюд уст 6110/24 УМВС', 0, '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_6110241'',0))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_6110241'',0))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, null, null, 5, null, null, null, '0100100001000000000000000000000000010000000000000000000000000000', 'Комісія банку за прийняті платежі на користь бюджетних установ');
+    values ('419', '419 Комісія банку за прийняті платежі на користь бюд уст 6110/24 УМВС', 0, '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_6510241'',0))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_6510241'',0))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, null, null, 5, null, null, null, '0100100001000000000000000000000000010000000000000000000000000000', 'Комісія банку за прийняті платежі на користь бюджетних установ');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='419', name='419 Комісія банку за прийняті платежі на користь бюд уст 6110/24 УМВС', dk=0, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_6110241'',0))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_6110241'',0))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100001000000000000000000000000010000000000000000000000000000', nazn='Комісія банку за прийняті платежі на користь бюджетних установ'
+         set tt='419', name='419 Комісія банку за прийняті платежі на користь бюд уст 6110/24 УМВС', dk=0, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_6510241'',0))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_6510241'',0))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100001000000000000000000000000010000000000000000000000000000', nazn='Комісія банку за прийняті платежі на користь бюджетних установ'
        where tt='419';
   end;
   --------------------------------
@@ -127,6 +127,17 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''419'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
+    values ('6510', '419', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''419'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;

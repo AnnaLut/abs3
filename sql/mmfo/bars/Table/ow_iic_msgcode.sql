@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''OW_IIC_MSGCODE'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''OW_IIC_MSGCODE'', ''FILIAL'' , null, ''E'', ''E'', ''E'');
+               bpa.alter_policy_info(''OW_IIC_MSGCODE'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''OW_IIC_MSGCODE'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -129,9 +129,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_IIC_MSGCODE ***
+grant SELECT                                                                 on OW_IIC_MSGCODE  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_IIC_MSGCODE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_IIC_MSGCODE  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_IIC_MSGCODE  to OW;
+grant SELECT                                                                 on OW_IIC_MSGCODE  to UPLD;
+grant FLASHBACK,SELECT                                                       on OW_IIC_MSGCODE  to WR_REFREAD;
 
 
 

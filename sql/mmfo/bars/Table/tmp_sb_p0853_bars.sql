@@ -78,9 +78,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_SB_P0853_BARS ***
+grant SELECT                                                                 on TMP_SB_P0853_BARS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_SB_P0853_BARS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_SB_P0853_BARS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SB_P0853_BARS to NALOG;
+grant SELECT                                                                 on TMP_SB_P0853_BARS to UPLD;
 grant FLASHBACK,SELECT                                                       on TMP_SB_P0853_BARS to WR_REFREAD;
 
 

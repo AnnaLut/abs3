@@ -64,6 +64,18 @@ COMMENT ON COLUMN BARS.TMP_2501_OPERAPP.GRANTOR IS '';
 
 
 
+PROMPT *** Create  constraint SYS_C00109340 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_2501_OPERAPP MODIFY (CODEAPP NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C00109341 ***
 begin   
  execute immediate '
@@ -75,17 +87,9 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint SYS_C00109340 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_2501_OPERAPP MODIFY (CODEAPP NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
+PROMPT *** Create  grants  TMP_2501_OPERAPP ***
+grant SELECT                                                                 on TMP_2501_OPERAPP to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_2501_OPERAPP to UPLD;
 
 
 

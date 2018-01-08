@@ -53,19 +53,6 @@ COMMENT ON COLUMN BARS.META_FILTERCODES.BRANCH IS 'Hierarchical Branch Code';
 
 
 
-PROMPT *** Create  constraint FK_METAFILTERCODES_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_FILTERCODES ADD CONSTRAINT FK_METAFILTERCODES_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_METAFILTERCODES_CODE_NN ***
 begin   
  execute immediate '
@@ -118,9 +105,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  META_FILTERCODES ***
+grant SELECT                                                                 on META_FILTERCODES to BARSREADER_ROLE;
 grant SELECT                                                                 on META_FILTERCODES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on META_FILTERCODES to BARS_DM;
 grant SELECT                                                                 on META_FILTERCODES to START1;
+grant SELECT                                                                 on META_FILTERCODES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on META_FILTERCODES to WR_ALL_RIGHTS;
 grant SELECT                                                                 on META_FILTERCODES to WR_METATAB;
 

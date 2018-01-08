@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции GO3
-prompt Наименование операции: БО: Комиссия банка
+prompt Наименование операции: GO3 БО: Комиссия банка
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('GO3', 'БО: Комиссия банка', 1, null, null, '61145010101078', null, null, null, '61145010101078', null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('GO3', 'GO3 БО: Комиссия банка', 1, null, null, '#(get_zay_nls29(3))', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='GO3', name='БО: Комиссия банка', dk=1, nlsm=null, kv=null, nlsk='61145010101078', kvk=null, nlss=null, nlsa=null, nlsb='61145010101078', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='GO3', name='GO3 БО: Комиссия банка', dk=1, nlsm=null, kv=null, nlsk='#(get_zay_nls29(3))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='GO3';
   end;
   --------------------------------

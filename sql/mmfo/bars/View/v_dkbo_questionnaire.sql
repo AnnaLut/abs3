@@ -57,7 +57,9 @@ SELECT
     order by t.quest_group_id,t.quest_code;
 
 PROMPT *** Create  grants  V_DKBO_QUESTIONNAIRE ***
+grant SELECT                                                                 on V_DKBO_QUESTIONNAIRE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DKBO_QUESTIONNAIRE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DKBO_QUESTIONNAIRE to UPLD;
 
 
 

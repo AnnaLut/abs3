@@ -28,7 +28,7 @@ PROMPT *** Create  procedure KAZ_ZOBP ***
   br0_ branch.branch%type;
 
   VDAT_ oper.VDAT%type;
-  opr   oper%rowtype; 
+  opr   oper%rowtype;
   l_sos number;
 procedure f_search_nls (nbs_      accounts.nbs%type,
                         ob22_     accounts.ob22%type,
@@ -98,7 +98,7 @@ begin
   end;
 
   ro.ref := 0  ;
-  
+
 
   for k in (select trunc(pdat) PDAT, tt, kv, dk,  nlsb, nam_b ,  sum(s) S, f_dop(REF, 'KODCP') as ser
             from oper o
@@ -270,15 +270,15 @@ begin
   end loop;
 
   -- оплата
-  
+
   for x0 in (
          select DK, D_REC, NLSA, KVA, MFOB, NLSB, KVB, TT, VOB, ND, DATD, S, NAM_A, NAM_B, NAZN, OKPOA, OKPOB, GRP, REF, SOS, ID
 		   from KAZ_ZOBT
 		  where grp = ro.grp
-            ) 
+            )
   loop
-  
-    
+
+
                 gl.ref (opr.REF);
 
                 gl.in_doc3 (ref_   => opr.REF,
@@ -330,19 +330,20 @@ begin
                           sq_    => null,
                           nom_   => null);
 
-  
-  
-  
-  end loop;  
-  
-  
-  
+
+
+
+  end loop;
+
+
+
 end KAZ_ZOBP;
 /
 show err;
 
+PROMPT *** Create  grants  KAZ_ZOBP ***
+grant EXECUTE                                                                on KAZ_ZOBP        to BARS_ACCESS_DEFROLE;
 
-grant execute on KAZ_ZOBP to BARS_ACCESS_DEFROLE;
 
 
 PROMPT ===================================================================================== 

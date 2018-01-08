@@ -94,10 +94,12 @@ PROMPT *** Create  view V_DPT_PORTFOLIO_OTHER ***
           AND d.branch = b.branch;
 
 PROMPT *** Create  grants  V_DPT_PORTFOLIO_OTHER ***
+grant SELECT                                                                 on V_DPT_PORTFOLIO_OTHER to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_PORTFOLIO_OTHER to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_PORTFOLIO_OTHER to DPT_ADMIN;
 grant SELECT                                                                 on V_DPT_PORTFOLIO_OTHER to DPT_ROLE;
 grant SELECT                                                                 on V_DPT_PORTFOLIO_OTHER to START1;
+grant SELECT                                                                 on V_DPT_PORTFOLIO_OTHER to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_PORTFOLIO_OTHER to WR_ALL_RIGHTS;
 
 

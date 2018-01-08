@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CO4', 'CO4 Комісія банку за прийом переказу "CONTACT" (залишок)', 1, '#(nbs_ob22 (''2909'',''64''))', 980, '#(nbs_ob22 (''6110'',''B3''))', 980, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', 'Комісія банку за прийом переказу "CONTACT" (залишок), що належить установі банку (ВИКЛЮЧЕННЯ)');
+    values ('CO4', 'CO4 Комісія банку за прийом переказу "CONTACT" (залишок)', 1, '#(nbs_ob22 (''2909'',''64''))', 980, '#(nbs_ob22 (''6510'',''B3''))', 980, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', 'Комісія банку за прийом переказу "CONTACT" (залишок), що належить установі банку (ВИКЛЮЧЕННЯ)');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CO4', name='CO4 Комісія банку за прийом переказу "CONTACT" (залишок)', dk=1, nlsm='#(nbs_ob22 (''2909'',''64''))', kv=980, nlsk='#(nbs_ob22 (''6110'',''B3''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='Комісія банку за прийом переказу "CONTACT" (залишок), що належить установі банку (ВИКЛЮЧЕННЯ)'
+         set tt='CO4', name='CO4 Комісія банку за прийом переказу "CONTACT" (залишок)', dk=1, nlsm='#(nbs_ob22 (''2909'',''64''))', kv=980, nlsk='#(nbs_ob22 (''6510'',''B3''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='Комісія банку за прийом переказу "CONTACT" (залишок), що належить установі банку (ВИКЛЮЧЕННЯ)'
        where tt='CO4';
   end;
   --------------------------------

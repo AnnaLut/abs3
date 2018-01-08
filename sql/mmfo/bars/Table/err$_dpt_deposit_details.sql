@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_DPT_DEPOSIT_DETAILS.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DPT_DEPOSIT_DETAILS ***
+grant SELECT                                                                 on ERR$_DPT_DEPOSIT_DETAILS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DPT_DEPOSIT_DETAILS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

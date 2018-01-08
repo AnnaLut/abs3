@@ -75,7 +75,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  REF_QUEUE_SWT ***
+grant SELECT                                                                 on REF_QUEUE_SWT   to BARSREADER_ROLE;
 grant SELECT                                                                 on REF_QUEUE_SWT   to BARS_DM;
+grant SELECT                                                                 on REF_QUEUE_SWT   to UPLD;
 
 
 

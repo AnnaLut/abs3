@@ -65,6 +65,10 @@ COMMENT ON COLUMN BARS.ERR$_DPT_VIDD_RATE.DAT IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DPT_VIDD_RATE ***
+grant SELECT                                                                 on ERR$_DPT_VIDD_RATE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DPT_VIDD_RATE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

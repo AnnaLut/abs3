@@ -79,10 +79,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRP_REZ_NBS ***
+grant SELECT                                                                 on GRP_REZ_NBS     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRP_REZ_NBS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRP_REZ_NBS     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRP_REZ_NBS     to RCC_DEAL;
 grant SELECT                                                                 on GRP_REZ_NBS     to START1;
+grant SELECT                                                                 on GRP_REZ_NBS     to UPLD;
 
 
 

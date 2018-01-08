@@ -99,7 +99,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  MBM_ACSK_REQUESTS_HISTORY ***
+grant SELECT                                                                 on MBM_ACSK_REQUESTS_HISTORY to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MBM_ACSK_REQUESTS_HISTORY to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on MBM_ACSK_REQUESTS_HISTORY to UPLD;
 
 
 

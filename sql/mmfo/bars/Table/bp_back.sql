@@ -69,45 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BPBACK_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BP_BACK ADD CONSTRAINT FK_BPBACK_STAFF FOREIGN KEY (USERID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_BPBACK_BPREASON ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BP_BACK ADD CONSTRAINT FK_BPBACK_BPREASON FOREIGN KEY (ID)
-	  REFERENCES BARS.BP_REASON (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_BPBACK_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BP_BACK ADD CONSTRAINT FK_BPBACK_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C008671 ***
 begin   
  execute immediate '
@@ -132,10 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPBACK_KF_NN ***
+PROMPT *** Create  constraint SYS_C008673 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BP_BACK MODIFY (KF CONSTRAINT CC_BPBACK_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BP_BACK MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -144,10 +105,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C008673 ***
+PROMPT *** Create  constraint CC_BPBACK_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BP_BACK MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.BP_BACK MODIFY (KF CONSTRAINT CC_BPBACK_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -171,11 +132,13 @@ exception when others then
 
 PROMPT *** Create  grants  BP_BACK ***
 grant INSERT                                                                 on BP_BACK         to BARS014;
+grant SELECT                                                                 on BP_BACK         to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on BP_BACK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BP_BACK         to BARS_DM;
 grant SELECT,UPDATE                                                          on BP_BACK         to CHCK002;
 grant INSERT                                                                 on BP_BACK         to PYOD001;
 grant SELECT                                                                 on BP_BACK         to START1;
+grant SELECT                                                                 on BP_BACK         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BP_BACK         to WR_ALL_RIGHTS;
 
 

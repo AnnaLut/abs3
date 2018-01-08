@@ -73,7 +73,10 @@ begin
 	ZAL_CP NUMBER, 
 	PAWN NUMBER(*,0), 
 	HIERARCHY_ID NUMBER(*,0), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
+	FIN_351 NUMBER, 
+	PD NUMBER, 
+	FAIR_METHOD_ID NUMBER(2,0)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -92,6 +95,9 @@ PROMPT *** ALTER_POLICIES to CP_KOD_UPDATE ***
 
 COMMENT ON TABLE BARS.CP_KOD_UPDATE IS 'Справочник кодов ЦБ';
 COMMENT ON COLUMN BARS.CP_KOD_UPDATE.KF IS '';
+COMMENT ON COLUMN BARS.CP_KOD_UPDATE.FIN_351 IS '';
+COMMENT ON COLUMN BARS.CP_KOD_UPDATE.PD IS '';
+COMMENT ON COLUMN BARS.CP_KOD_UPDATE.FAIR_METHOD_ID IS '';
 COMMENT ON COLUMN BARS.CP_KOD_UPDATE.IDUPD IS 'Первичный ключ для таблицы обновления';
 COMMENT ON COLUMN BARS.CP_KOD_UPDATE.CHGACTION IS 'Код обновления (I/U/D)';
 COMMENT ON COLUMN BARS.CP_KOD_UPDATE.EFFECTDATE IS 'Банковская дата начала действия параметров';
@@ -174,19 +180,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CPKODUPDATE_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CP_KOD_UPDATE ADD CONSTRAINT FK_CPKODUPDATE_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C009603 ***
 begin   
  execute immediate '
@@ -199,12 +192,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_CPKOD_UPDATE ***
+PROMPT *** Create  constraint SYS_C009601 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CP_KOD_UPDATE ADD CONSTRAINT PK_CPKOD_UPDATE PRIMARY KEY (IDUPD)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.CP_KOD_UPDATE MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -261,10 +252,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C009601 ***
+PROMPT *** Create  constraint PK_CPKOD_UPDATE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CP_KOD_UPDATE MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.CP_KOD_UPDATE ADD CONSTRAINT PK_CPKOD_UPDATE PRIMARY KEY (IDUPD)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -312,34 +305,10 @@ exception when others then
  end;
 /
 
-begin
-    execute immediate 'alter table CP_KOD_UPDATE add fin_351 number';
- exception when others then 
-    if sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/ 
-
-begin
-    execute immediate 'alter table CP_KOD_UPDATE add pd number';
- exception when others then 
-    if sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/ 
-
-
-begin
-    execute immediate 'alter table CP_KOD_UPDATE add fair_method_id number(2)';
- exception when others then 
-    if sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/ 
-
 
 
 PROMPT *** Create  grants  CP_KOD_UPDATE ***
+grant SELECT                                                                 on CP_KOD_UPDATE   to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_KOD_UPDATE   to BARSUPL;
 grant SELECT                                                                 on CP_KOD_UPDATE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_KOD_UPDATE   to BARS_DM;

@@ -31,7 +31,9 @@ PROMPT *** Create  view VB_SNO ***
  WHERE acc = to_number(pul.get_mas_ini_val('ACC'));
 
 PROMPT *** Create  grants  VB_SNO ***
+grant SELECT                                                                 on VB_SNO          to BARSREADER_ROLE;
 grant SELECT                                                                 on VB_SNO          to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VB_SNO          to UPLD;
 
 
 

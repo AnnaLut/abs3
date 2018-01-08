@@ -19,8 +19,10 @@ PROMPT *** Create  view V_STAFF_TIPS ***
     WHERE sb.tip = st.id;
 
 PROMPT *** Create  grants  V_STAFF_TIPS ***
+grant SELECT                                                                 on V_STAFF_TIPS    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFF_TIPS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_STAFF_TIPS    to START1;
+grant SELECT                                                                 on V_STAFF_TIPS    to UPLD;
 
 
 

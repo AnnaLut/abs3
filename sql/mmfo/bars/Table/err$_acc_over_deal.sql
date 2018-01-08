@@ -69,6 +69,10 @@ COMMENT ON COLUMN BARS.ERR$_ACC_OVER_DEAL.DT_ACTION IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ACC_OVER_DEAL ***
+grant SELECT                                                                 on ERR$_ACC_OVER_DEAL to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ACC_OVER_DEAL to UPLD;
+
 
 
 PROMPT ===================================================================================== 

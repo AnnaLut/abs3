@@ -107,9 +107,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_KUPON_HIST ***
+grant SELECT                                                                 on CP_KUPON_HIST   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_KUPON_HIST   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_KUPON_HIST   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_KUPON_HIST   to START1;
+grant SELECT                                                                 on CP_KUPON_HIST   to UPLD;
 
 
 

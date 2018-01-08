@@ -1,4 +1,13 @@
-CREATE OR REPLACE PROCEDURE p_add_zal
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_ADD_ZAL.sql =========*** Run ***
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_ADD_ZAL ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_ADD_ZAL 
 (
   p_nd   NUMBER
  , --המד.חאילא חאילא
@@ -259,7 +268,7 @@ BEGIN
 SELECT t.nls,substr(t.nms ,1,38) INTO oo.nlsb, oo.nam_b
       FROM accounts t
      WHERE t.kv =az.kv
-      and t.nls = BRANCH_USR.GET_BRANCH_PARAM2('NLS_9900',0);   
+      and t.nls = BRANCH_USR.GET_BRANCH_PARAM2('NLS_9900',0);
   EXCEPTION
     WHEN no_data_found THEN
       raise_application_error(g_errn
@@ -355,3 +364,12 @@ END p_add_zal;
 /
 show err;
 
+PROMPT *** Create  grants  P_ADD_ZAL ***
+grant EXECUTE                                                                on P_ADD_ZAL       to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on P_ADD_ZAL       to START1;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_ADD_ZAL.sql =========*** End ***
+PROMPT ===================================================================================== 

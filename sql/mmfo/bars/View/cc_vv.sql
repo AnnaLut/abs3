@@ -296,8 +296,10 @@ PROMPT *** Create  view CC_VV ***
                   AND ad.adds = 0);
 
 PROMPT *** Create  grants  CC_VV ***
+grant SELECT                                                                 on CC_VV           to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on CC_VV           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_VV           to RCC_DEAL;
+grant SELECT                                                                 on CC_VV           to UPLD;
 grant FLASHBACK,SELECT                                                       on CC_VV           to WR_REFREAD;
 
 

@@ -83,8 +83,10 @@ COMMENT ON COLUMN BARS.TMP_DPT_INV.PRIZN IS '';
 
 
 PROMPT *** Create  grants  TMP_DPT_INV ***
+grant SELECT                                                                 on TMP_DPT_INV     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DPT_INV     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DPT_INV     to RPBN001;
+grant SELECT                                                                 on TMP_DPT_INV     to UPLD;
 
 
 

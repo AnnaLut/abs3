@@ -81,8 +81,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  KOD_70_4 ***
+grant SELECT                                                                 on KOD_70_4        to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on KOD_70_4        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_70_4        to BARS_DM;
+grant SELECT                                                                 on KOD_70_4        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KOD_70_4        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KOD_70_4        to WR_REFREAD;
 grant SELECT                                                                 on KOD_70_4        to ZAY;

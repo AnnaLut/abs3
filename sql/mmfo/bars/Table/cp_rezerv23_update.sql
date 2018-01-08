@@ -79,8 +79,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_REZERV23_UPDATE ***
+grant SELECT                                                                 on CP_REZERV23_UPDATE to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CP_REZERV23_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_REZERV23_UPDATE to BARS_DM;
+grant SELECT                                                                 on CP_REZERV23_UPDATE to UPLD;
 
 
 

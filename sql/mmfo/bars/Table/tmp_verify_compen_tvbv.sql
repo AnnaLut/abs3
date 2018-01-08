@@ -56,7 +56,9 @@ COMMENT ON COLUMN BARS.TMP_VERIFY_COMPEN_TVBV.DIFF IS '';
 
 
 PROMPT *** Create  grants  TMP_VERIFY_COMPEN_TVBV ***
+grant SELECT                                                                 on TMP_VERIFY_COMPEN_TVBV to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_VERIFY_COMPEN_TVBV to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on TMP_VERIFY_COMPEN_TVBV to UPLD;
 
 
 

@@ -40,7 +40,9 @@ select o."REF",o."DK",o."TT",o."KV",o."S",o."VDAT",o."NAM_A",o."NLSA",o."MFOA",o
  where o.direct is not null;
 
 PROMPT *** Create  grants  V_CIM_ALL_PAYMENTS ***
+grant SELECT                                                                 on V_CIM_ALL_PAYMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_ALL_PAYMENTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_ALL_PAYMENTS to UPLD;
 
 
 

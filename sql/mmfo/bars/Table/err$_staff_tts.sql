@@ -70,7 +70,9 @@ COMMENT ON COLUMN BARS.ERR$_STAFF_TTS.GRANTOR IS '';
 
 
 PROMPT *** Create  grants  ERR$_STAFF_TTS ***
+grant SELECT                                                                 on ERR$_STAFF_TTS  to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_STAFF_TTS  to BARS_DM;
+grant SELECT                                                                 on ERR$_STAFF_TTS  to UPLD;
 
 
 

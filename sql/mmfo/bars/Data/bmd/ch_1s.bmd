@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Папки прийнятих та сплачених чеків';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'CH_1S';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,17 +124,17 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'IDS', 'N', 'Код~ папки', .5, 22, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'NAME', 'C', 'Назва~папки', 2, 25, 2, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'S2909', 'C', 'Рах.по замовч. ~отримувача~коштів', 1.5, 25, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'S3739', 'C', 'Поч.рах~ для прийнятих~коштів по покриттю ', 1.5, 25, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'S9830', 'C', 'Внеб.рах для ~прийнятих~ чеків', 1.5, 25, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'S9831', 'C', 'Внеб.рах для~відправлених ~чеків ', 1.5, 25, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'S9910', 'C', 'Внеб.контр~Рахунок', 1.5, 15, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'K3739', 'C', 'Поч.рах~стягнутої~комісії~(транз.в ГОУ)', 1.5, 15, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'K2909', 'C', 'Рах.по замовч.~для Деб~комісії~(транз.в РУ)~АЛЕГРО', 1.5, 15, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'TT6', 'C', 'Код опер.~по стягненню~прибутків', 1.5, 15, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NLS6 ', 'C', 'Рах по~стягненим~приб.~(в ГОУ для РУ)~АЛЕГРО', 1.5, 15, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'IDS', 'N', 'Код~ папки', '.5', 22, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'NAME', 'C', 'Назва~папки', '2', 25, 2, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'S2909', 'C', 'Рах.по замовч. ~отримувача~коштів', '1.5', 25, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'S3739', 'C', 'Поч.рах~ для прийнятих~коштів по покриттю ', '1.5', 25, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'S9830', 'C', 'Внеб.рах для ~прийнятих~ чеків', '1.5', 25, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'S9831', 'C', 'Внеб.рах для~відправлених ~чеків ', '1.5', 25, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'S9910', 'C', 'Внеб.контр~Рахунок', '1.5', 15, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'K3739', 'C', 'Поч.рах~стягнутої~комісії~(транз.в ГОУ)', '1.5', 15, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'K2909', 'C', 'Рах.по замовч.~для Деб~комісії~(транз.в РУ)~АЛЕГРО', '1.5', 15, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'TT6', 'C', 'Код опер.~по стягненню~прибутків', '1.5', 15, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NLS6 ', 'C', 'Рах по~стягненим~приб.~(в ГОУ для РУ)~АЛЕГРО', '1.5', 15, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

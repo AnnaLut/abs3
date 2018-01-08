@@ -21,11 +21,10 @@ PROMPT *** Create  procedure P_ERROR_351 ***
           p_nls         VARCHAR2) is
   PRAGMA AUTONOMOUS_TRANSACTION;
 
-/* Версия 1.0 18-01-2017
+/* Версия 1.1  18-09-2017  18-01-2017
    Формирование файла ошибок
-
+   1) 18-09-2017 - Добавлено условие в update  and TIP = p_tip;
 */
-
 
 l_txt varchar2(1000);
 
@@ -38,7 +37,7 @@ begin
 
    update errors_351 set id = p_id, custtype =p_custtype, branch = p_branch, nls = p_nls, kv = p_kv, TIP = p_tip,
           ERROR_TXT = substr( p_error_txt || ' ' || l_txt , 1, 999)
-   where  fdat = p_dat01 and nd = p_nd and rnk = p_rnk;
+   where  fdat = p_dat01 and nd = p_nd and rnk = p_rnk and TIP = p_tip;
    IF SQL%ROWCOUNT=0 then
       insert into errors_351 (fdat   , nd  , id  , custtype  , branch  , acc  , rnk  , nls  , kv  , TIP  , ERROR_TXT)
                       values (p_dat01, p_nd, p_id, p_custtype, p_branch, p_acc, p_rnk, p_nls, p_kv, p_TIP, substr( p_error_txt || ' ' || l_txt , 1, 999));

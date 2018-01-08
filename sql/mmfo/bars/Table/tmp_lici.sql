@@ -107,8 +107,10 @@ COMMENT ON COLUMN BARS.TMP_LICI.FN_A IS '';
 
 
 PROMPT *** Create  grants  TMP_LICI ***
+grant SELECT                                                                 on TMP_LICI        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_LICI        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_LICI        to START1;
+grant SELECT                                                                 on TMP_LICI        to UPLD;
 
 
 

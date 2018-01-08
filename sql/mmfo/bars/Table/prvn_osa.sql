@@ -77,19 +77,6 @@ COMMENT ON COLUMN BARS.PRVN_OSA.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_PRVNOSA_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRVN_OSA ADD CONSTRAINT FK_PRVNOSA_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_PRVNOSA_KF_NN ***
 begin   
  execute immediate '
@@ -102,9 +89,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRVN_OSA ***
+grant SELECT                                                                 on PRVN_OSA        to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on PRVN_OSA        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRVN_OSA        to BARS_DM;
 grant SELECT,UPDATE                                                          on PRVN_OSA        to START1;
+grant SELECT                                                                 on PRVN_OSA        to UPLD;
 
 
 

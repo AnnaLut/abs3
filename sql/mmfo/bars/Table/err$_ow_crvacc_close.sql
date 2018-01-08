@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_OW_CRVACC_CLOSE.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_OW_CRVACC_CLOSE ***
+grant SELECT                                                                 on ERR$_OW_CRVACC_CLOSE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_OW_CRVACC_CLOSE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

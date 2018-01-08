@@ -131,32 +131,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SPECPARAMUPD_ACCOUNTS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPECPARAM_UPDATE ADD CONSTRAINT FK_SPECPARAMUPD_ACCOUNTS2 FOREIGN KEY (KF, ACC)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SPECPARAMUPD_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPECPARAM_UPDATE ADD CONSTRAINT FK_SPECPARAMUPD_STAFF FOREIGN KEY (USER_NAME)
-	  REFERENCES BARS.STAFF$BASE (LOGNAME) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SPECPARAMUPD_ACC_NN ***
 begin   
  execute immediate '
@@ -274,11 +248,13 @@ exception when others then
 
 PROMPT *** Create  grants  SPECPARAM_UPDATE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPECPARAM_UPDATE to ABS_ADMIN;
+grant SELECT                                                                 on SPECPARAM_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on SPECPARAM_UPDATE to BARSUPL;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SPECPARAM_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SPECPARAM_UPDATE to BARS_DM;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SPECPARAM_UPDATE to RCC_DEAL;
 grant SELECT                                                                 on SPECPARAM_UPDATE to START1;
+grant SELECT                                                                 on SPECPARAM_UPDATE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPECPARAM_UPDATE to WR_ALL_RIGHTS;
 
 

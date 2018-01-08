@@ -13,8 +13,10 @@ from accounts a, OVR_LIM l
 where l.acc = a.acc  and l.ND  =      to_number( pul.Get_Mas_Ini_Val('ND' ) ) ;
 
 PROMPT *** Create  grants  V30_OVRN ***
+grant SELECT                                                                 on V30_OVRN        to BARSREADER_ROLE;
 grant SELECT                                                                 on V30_OVRN        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V30_OVRN        to START1;
+grant SELECT                                                                 on V30_OVRN        to UPLD;
 
 
 

@@ -65,19 +65,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SWMSGTAG_SWMSGBLK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_MSGTAG ADD CONSTRAINT FK_SWMSGTAG_SWMSGBLK FOREIGN KEY (MSGBLK)
-	  REFERENCES BARS.SW_MSGBLK (MSGBLK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SWMSGTAG_MSGBLK_NN ***
 begin   
  execute immediate '
@@ -128,7 +115,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_MSGTAG ***
+grant SELECT                                                                 on SW_MSGTAG       to BARSREADER_ROLE;
 grant SELECT                                                                 on SW_MSGTAG       to BARS_DM;
+grant SELECT                                                                 on SW_MSGTAG       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_MSGTAG       to WR_ALL_RIGHTS;
 
 

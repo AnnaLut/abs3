@@ -92,7 +92,9 @@ COMMENT ON COLUMN BARS.ERR$_RNBU_HISTORY.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_RNBU_HISTORY ***
+grant SELECT                                                                 on ERR$_RNBU_HISTORY to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_RNBU_HISTORY to BARS_DM;
+grant SELECT                                                                 on ERR$_RNBU_HISTORY to UPLD;
 
 
 

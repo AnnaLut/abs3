@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.ERR$_POS.NAME IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_POS ***
+grant SELECT                                                                 on ERR$_POS        to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_POS        to UPLD;
+
 
 
 PROMPT ===================================================================================== 

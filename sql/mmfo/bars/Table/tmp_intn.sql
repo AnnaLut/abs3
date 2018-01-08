@@ -69,10 +69,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPINTN_OTM_NN ***
+PROMPT *** Create  constraint CC_TMPINTN_DAT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_INTN MODIFY (OTM CONSTRAINT CC_TMPINTN_OTM_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_INTN MODIFY (DAT CONSTRAINT CC_TMPINTN_DAT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -81,10 +81,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPINTN_DAT_NN ***
+PROMPT *** Create  constraint CC_TMPINTN_OTM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_INTN MODIFY (DAT CONSTRAINT CC_TMPINTN_DAT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_INTN MODIFY (OTM CONSTRAINT CC_TMPINTN_OTM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -106,8 +106,10 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_INTN ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INTN        to ABS_ADMIN;
+grant SELECT                                                                 on TMP_INTN        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INTN        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_INTN        to START1;
+grant SELECT                                                                 on TMP_INTN        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_INTN        to WR_ALL_RIGHTS;
 
 

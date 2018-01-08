@@ -1,4 +1,10 @@
-CREATE OR REPLACE PACKAGE CCT IS
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cct.sql =========*** Run *** =======
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.CCT IS
 
 /******************************************************************************
    NAME:       CCT
@@ -154,7 +160,7 @@ procedure StartIO (p_mode int );
 
 END CCT;
 /
-CREATE OR REPLACE PACKAGE BODY CCT IS
+CREATE OR REPLACE PACKAGE BODY BARS.CCT IS
 
   G_BODY_VERSION CONSTANT VARCHAR2(64) := 'version 14.2 12/02/2016';
 
@@ -895,10 +901,10 @@ CREATE OR REPLACE PACKAGE BODY CCT IS
                  l_nms
             from accounts a, nd_acc n, cc_deal d, specparam s
            where a.ostc = a.ostb
+             and d.sos<15
              and a.acc = m.acc
              and a.acc = n.acc
              and n.nd = d.nd
-             and d.sos<14
              and a.acc = s.acc(+);
           l_acc := m.acc;
         EXCEPTION
@@ -993,3 +999,15 @@ CREATE OR REPLACE PACKAGE BODY CCT IS
 
 END CCT;
 /
+ show err;
+ 
+PROMPT *** Create  grants  CCT ***
+grant EXECUTE                                                                on CCT             to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on CCT             to RCC_DEAL;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/cct.sql =========*** End *** =======
+ PROMPT ===================================================================================== 
+ 

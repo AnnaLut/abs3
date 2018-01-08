@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Рахунки застави по договорах МБДК';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'V_MBDK_PAWN_ACCOUNT';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,22 +124,22 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'DEAL_NUMBER', 'C', 'Номер угоди', null, 50, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DEPOSIT_ID', 'N', 'Депозитний договір', null, 22, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'FAIR_VALUE', 'N', 'Справедл. вартість', null, 22, 6, 0, 0, 0, 0, '', '# 0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'ND', 'N', 'Ідентифікатор угоди', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'PAWN_ACCOUNT_ID', 'N', 'Ідентфікатор рахунку застави', null, 22, null, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'PAWN_ACCOUNT_NUMBER', 'C', 'Рахунок застави', null, 15, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'PAWN_AMOUNT', 'N', 'Сума застави', null, 22, 3, 0, 0, 0, 0, '', '# 0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'PAWN_CONTRACT_NUMBER', 'C', 'Номер договору застави', 1.5, 20, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'PAWN_CURRENCY_ID', 'N', 'Валюта', .5, 22, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'PAWN_EXPIRY_DATE', 'D', 'Дата завершення дії', null, 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'PAWN_KIND_ID', 'N', 'Вид забезпечення', .5, 22, 7, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'PAWN_LOCATION_ID', 'N', 'Місцезнаходження', .5, 22, 8, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'PAWN_START_DATE', 'D', 'Дата початку дії', null, 10, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'PRIMARY_PAWN_FLAG', 'N', 'Первинна застава', .8, 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'REGISTRY_NUMBER', 'C', 'Номер в реєстрі', null, 45, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'USER_NAME', 'C', 'Користувач', null, 4000, 13, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'DEAL_NUMBER', 'C', 'Номер угоди', '', 50, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DEPOSIT_ID', 'N', 'Депозитний договір', '', 22, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'FAIR_VALUE', 'N', 'Справедл. вартість', '', 22, 6, 0, 0, 0, 0, '', '# 0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ND', 'N', 'Ідентифікатор угоди', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'PAWN_ACCOUNT_ID', 'N', 'Ідентфікатор рахунку застави', '', 22, null, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'PAWN_ACCOUNT_NUMBER', 'C', 'Рахунок застави', '', 15, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'PAWN_AMOUNT', 'N', 'Сума застави', '', 22, 3, 0, 0, 0, 0, '', '# 0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'PAWN_CONTRACT_NUMBER', 'C', 'Номер договору застави', '1.5', 20, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'PAWN_CURRENCY_ID', 'N', 'Валюта', '.5', 22, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'PAWN_EXPIRY_DATE', 'D', 'Дата завершення дії', '', 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'PAWN_KIND_ID', 'N', 'Вид забезпечення', '.5', 22, 7, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'PAWN_LOCATION_ID', 'N', 'Місцезнаходження', '.5', 22, 8, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'PAWN_START_DATE', 'D', 'Дата початку дії', '', 10, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'PRIMARY_PAWN_FLAG', 'N', 'Первинна застава', '.8', 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'REGISTRY_NUMBER', 'C', 'Номер в реєстрі', '', 45, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'USER_NAME', 'C', 'Користувач', '', 4000, 13, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('V_CC_PAWN');

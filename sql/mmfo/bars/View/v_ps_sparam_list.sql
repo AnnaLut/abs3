@@ -19,7 +19,9 @@ PROMPT *** Create  view V_PS_SPARAM_LIST ***
    ORDER BY a.nbs, b.spid;
 
 PROMPT *** Create  grants  V_PS_SPARAM_LIST ***
+grant SELECT                                                                 on V_PS_SPARAM_LIST to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PS_SPARAM_LIST to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_PS_SPARAM_LIST to UPLD;
 
 
 

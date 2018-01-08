@@ -18,8 +18,10 @@ PROMPT *** Create  view V_OBPC_BAD_FIO ***
    and a.nbs <> '3550' ;
 
 PROMPT *** Create  grants  V_OBPC_BAD_FIO ***
+grant SELECT                                                                 on V_OBPC_BAD_FIO  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_BAD_FIO  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OBPC_BAD_FIO  to OBPC;
+grant SELECT                                                                 on V_OBPC_BAD_FIO  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_BAD_FIO  to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_OBPC_BAD_FIO  to WR_REFREAD;
 

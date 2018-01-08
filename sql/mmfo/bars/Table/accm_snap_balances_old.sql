@@ -92,70 +92,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCMSNAPBALS_KOSQ_NN ***
+PROMPT *** Create  constraint CC_ACCMSNAPBALS_ACC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_BALANCES_OLD MODIFY (KOSQ CONSTRAINT CC_ACCMSNAPBALS_KOSQ_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMSNAPBALS_KOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_BALANCES_OLD MODIFY (KOS CONSTRAINT CC_ACCMSNAPBALS_KOS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMSNAPBALS_DOSQ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_BALANCES_OLD MODIFY (DOSQ CONSTRAINT CC_ACCMSNAPBALS_DOSQ_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMSNAPBALS_DOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_BALANCES_OLD MODIFY (DOS CONSTRAINT CC_ACCMSNAPBALS_DOS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMSNAPBALS_OSTQ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_BALANCES_OLD MODIFY (OSTQ CONSTRAINT CC_ACCMSNAPBALS_OSTQ_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMSNAPBALS_OST_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_BALANCES_OLD MODIFY (OST CONSTRAINT CC_ACCMSNAPBALS_OST_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACCM_SNAP_BALANCES_OLD MODIFY (ACC CONSTRAINT CC_ACCMSNAPBALS_ACC_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -176,10 +116,70 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCMSNAPBALS_ACC_NN ***
+PROMPT *** Create  constraint CC_ACCMSNAPBALS_OST_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCM_SNAP_BALANCES_OLD MODIFY (ACC CONSTRAINT CC_ACCMSNAPBALS_ACC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACCM_SNAP_BALANCES_OLD MODIFY (OST CONSTRAINT CC_ACCMSNAPBALS_OST_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMSNAPBALS_OSTQ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_SNAP_BALANCES_OLD MODIFY (OSTQ CONSTRAINT CC_ACCMSNAPBALS_OSTQ_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMSNAPBALS_DOS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_SNAP_BALANCES_OLD MODIFY (DOS CONSTRAINT CC_ACCMSNAPBALS_DOS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMSNAPBALS_DOSQ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_SNAP_BALANCES_OLD MODIFY (DOSQ CONSTRAINT CC_ACCMSNAPBALS_DOSQ_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMSNAPBALS_KOS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_SNAP_BALANCES_OLD MODIFY (KOS CONSTRAINT CC_ACCMSNAPBALS_KOS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMSNAPBALS_KOSQ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_SNAP_BALANCES_OLD MODIFY (KOSQ CONSTRAINT CC_ACCMSNAPBALS_KOSQ_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -206,10 +206,12 @@ exception when others then
 
 PROMPT *** Create  grants  ACCM_SNAP_BALANCES_OLD ***
 grant SELECT                                                                 on ACCM_SNAP_BALANCES_OLD to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on ACCM_SNAP_BALANCES_OLD to BARSREADER_ROLE;
 grant SELECT                                                                 on ACCM_SNAP_BALANCES_OLD to BARSUPL;
 grant SELECT                                                                 on ACCM_SNAP_BALANCES_OLD to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCM_SNAP_BALANCES_OLD to BARS_DM;
 grant SELECT                                                                 on ACCM_SNAP_BALANCES_OLD to START1;
+grant SELECT                                                                 on ACCM_SNAP_BALANCES_OLD to UPLD;
 
 
 

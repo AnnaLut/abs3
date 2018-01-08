@@ -94,8 +94,10 @@ PROMPT *** Create  view AUD_CCK ***
                              AND ob22 = SUBSTR (d.prod, 5, 2));
 
 PROMPT *** Create  grants  AUD_CCK ***
+grant SELECT                                                                 on AUD_CCK         to BARSREADER_ROLE;
 grant SELECT                                                                 on AUD_CCK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AUD_CCK         to SALGL;
+grant SELECT                                                                 on AUD_CCK         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on AUD_CCK         to WR_ALL_RIGHTS;
 
 

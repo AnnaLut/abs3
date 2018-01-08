@@ -105,6 +105,10 @@ COMMENT ON COLUMN BARS.ERR$_FX_IN_MT.DAY IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_FX_IN_MT ***
+grant SELECT                                                                 on ERR$_FX_IN_MT   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_FX_IN_MT   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

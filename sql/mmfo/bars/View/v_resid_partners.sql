@@ -31,7 +31,9 @@ PROMPT *** Create  view V_RESID_PARTNERS ***
    ORDER BY u.mfo, c.rnk;
 
 PROMPT *** Create  grants  V_RESID_PARTNERS ***
+grant SELECT                                                                 on V_RESID_PARTNERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RESID_PARTNERS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_RESID_PARTNERS to UPLD;
 
 
 

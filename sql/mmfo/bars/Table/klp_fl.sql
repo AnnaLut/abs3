@@ -76,9 +76,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  KLP_FL ***
+grant SELECT                                                                 on KLP_FL          to BARSREADER_ROLE;
 grant SELECT                                                                 on KLP_FL          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KLP_FL          to BARS_DM;
 grant SELECT                                                                 on KLP_FL          to PYOD001;
+grant SELECT                                                                 on KLP_FL          to UPLD;
 
 
 

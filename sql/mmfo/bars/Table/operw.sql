@@ -4400,19 +4400,6 @@ COMMENT ON COLUMN BARS.OPERW.KF IS '';
 
 
 
-PROMPT *** Create  constraint R_OPER_OPERW ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPERW ADD CONSTRAINT R_OPER_OPERW FOREIGN KEY (REF)
-	  REFERENCES BARS.OPER (REF) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_OPERW ***
 begin   
  execute immediate '
@@ -4842,45 +4829,6 @@ begin
  PARTITION P_MAXVALUE  VALUES LESS THAN (MAXVALUE, MAXVALUE) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 LOGGING 
   TABLESPACE BRSBIGI ) COMPRESS 1  ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_OPERW_OPER2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPERW ADD CONSTRAINT FK_OPERW_OPER2 FOREIGN KEY (KF, REF)
-	  REFERENCES BARS.OPER (KF, REF) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_OPERW_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPERW ADD CONSTRAINT FK_OPERW_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_OPERW_OPFIELD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPERW ADD CONSTRAINT FK_OPERW_OPFIELD FOREIGN KEY (TAG)
-	  REFERENCES BARS.OP_FIELD (TAG) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -5366,6 +5314,7 @@ grant DELETE,INSERT,SELECT,UPDATE                                            on 
 grant FLASHBACK                                                              on OPERW           to BARSAQ;
 grant INSERT,REFERENCES,SELECT,UPDATE                                        on OPERW           to BARSAQ with grant option;
 grant INSERT,REFERENCES,SELECT                                               on OPERW           to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on OPERW           to BARSREADER_ROLE;
 grant SELECT                                                                 on OPERW           to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPERW           to BARS_ACCESS_DEFROLE;
 grant INSERT                                                                 on OPERW           to CHCK;
@@ -5381,6 +5330,7 @@ grant SELECT                                                                 on 
 grant INSERT                                                                 on OPERW           to SBB_LZ;
 grant INSERT                                                                 on OPERW           to SBB_NC;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPERW           to START1;
+grant SELECT                                                                 on OPERW           to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPERW           to WR_ALL_RIGHTS;
 grant SELECT                                                                 on OPERW           to WR_DOCVIEW;
 grant INSERT                                                                 on OPERW           to WR_DOC_INPUT;

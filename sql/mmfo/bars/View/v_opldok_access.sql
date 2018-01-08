@@ -18,6 +18,8 @@ where (dacc, kacc) in (select a.acc, b.acc from saldo a, saldo b)
  ;
 
 PROMPT *** Create  grants  V_OPLDOK_ACCESS ***
+grant SELECT                                                                 on V_OPLDOK_ACCESS to BARSREADER_ROLE;
+grant SELECT                                                                 on V_OPLDOK_ACCESS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OPLDOK_ACCESS to WR_ALL_RIGHTS;
 
 

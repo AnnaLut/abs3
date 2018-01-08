@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.ERR$_WCS_BCK_RESULTS.SEQ_ID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_WCS_BCK_RESULTS ***
+grant SELECT                                                                 on ERR$_WCS_BCK_RESULTS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_WCS_BCK_RESULTS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

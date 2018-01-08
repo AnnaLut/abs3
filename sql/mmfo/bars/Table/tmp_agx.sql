@@ -67,6 +67,8 @@ COMMENT ON COLUMN BARS.TMP_AGX.OST IS '';
 
 PROMPT *** Create  grants  TMP_AGX ***
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on TMP_AGX         to BARS009;
+grant SELECT                                                                 on TMP_AGX         to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_AGX         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_AGX         to WR_ALL_RIGHTS;
 
 

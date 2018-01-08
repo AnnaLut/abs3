@@ -79,10 +79,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  TIP_AKTIV ***
+grant SELECT                                                                 on TIP_AKTIV       to BARSREADER_ROLE;
 grant SELECT                                                                 on TIP_AKTIV       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TIP_AKTIV       to BARS_DM;
 grant SELECT                                                                 on TIP_AKTIV       to RCC_DEAL;
 grant SELECT                                                                 on TIP_AKTIV       to START1;
+grant SELECT                                                                 on TIP_AKTIV       to UPLD;
 
 
 

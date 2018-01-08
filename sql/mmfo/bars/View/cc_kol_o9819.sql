@@ -17,8 +17,10 @@ PROMPT *** Create  view CC_KOL_O9819 ***
  ;
 
 PROMPT *** Create  grants  CC_KOL_O9819 ***
+grant SELECT                                                                 on CC_KOL_O9819    to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_KOL_O9819    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_KOL_O9819    to RCC_DEAL;
+grant SELECT                                                                 on CC_KOL_O9819    to UPLD;
 
 
 

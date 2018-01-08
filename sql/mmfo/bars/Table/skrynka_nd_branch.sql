@@ -59,19 +59,6 @@ COMMENT ON COLUMN BARS.SKRYNKA_ND_BRANCH.RENTER_NAME IS '';
 
 
 
-PROMPT *** Create  constraint FK_SKR_ND_BRN_REF_TIP_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ND_BRANCH ADD CONSTRAINT FK_SKR_ND_BRN_REF_TIP_BRANCH FOREIGN KEY (O_SK, BRANCH)
-	  REFERENCES BARS.SKRYNKA_TIP_BRANCH (O_SK, BRANCH) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C0010121 ***
 begin   
  execute immediate '
@@ -120,7 +107,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_ND_BRANCH ***
+grant SELECT                                                                 on SKRYNKA_ND_BRANCH to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_ND_BRANCH to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on SKRYNKA_ND_BRANCH to UPLD;
 
 
 

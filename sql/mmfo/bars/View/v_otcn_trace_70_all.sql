@@ -19,11 +19,17 @@ PROMPT *** Create  view V_OTCN_TRACE_70_ALL ***
                   AND REF = o.REF
                   AND KODF = o.KODF
                   AND DATF = o.DATF
-                  AND KV = o.KV)
+                  AND KV = o.KV
+                  AND rownum=1)
              AS SumVal,
           TO_CHAR (NVL (o.ND, o.REF)) comm
      FROM otcn_trace_70 o
-    WHERE o.kodp LIKE '100%' AND o.KODF = 'E2' and not exists (select 1 from NBUR_TMP_DEL_70 where kodf = O.KODF and (ref = o.ref or to_char(ref) = o.COMM))
+    WHERE o.kodp LIKE '100%' AND o.KODF = 'E2'
+          AND NOT EXISTS
+                     (SELECT 1
+                        FROM NBUR_TMP_DEL_70
+                       WHERE kodf = O.KODF
+                             AND (REF = o.REF OR TO_CHAR (REF) = o.COMM))
    UNION ALL
    SELECT DISTINCT
           o.REF AS REF,
@@ -40,7 +46,12 @@ PROMPT *** Create  view V_OTCN_TRACE_70_ALL ***
              AS SumVal,
           TO_CHAR (NVL (o.ND, o.REF)) comm
      FROM otcn_trace_70 o
-    WHERE o.kodp LIKE '100%' AND o.KODF = '70' and not exists (select 1 from NBUR_TMP_DEL_70 where kodf = O.KODF and (ref = o.ref or to_char(ref) = o.COMM))
+    WHERE o.kodp LIKE '100%' AND o.KODF = '70'
+          AND NOT EXISTS
+                     (SELECT 1
+                        FROM NBUR_TMP_DEL_70
+                       WHERE kodf = O.KODF
+                             AND (REF = o.REF OR TO_CHAR (REF) = o.COMM))
    UNION ALL
    SELECT DISTINCT
           o.REF AS REF,
@@ -57,7 +68,12 @@ PROMPT *** Create  view V_OTCN_TRACE_70_ALL ***
              AS SumVal,
           TO_CHAR (NVL (o.ND, o.REF)) comm
      FROM otcn_trace_70 o
-    WHERE o.kodp LIKE '100%' AND o.KODF = 'D3' and not exists (select 1 from NBUR_TMP_DEL_70 where kodf = O.KODF and (ref = o.ref or to_char(ref) = o.COMM))
+    WHERE o.kodp LIKE '100%' AND o.KODF = 'D3'
+          AND NOT EXISTS
+                     (SELECT 1
+                        FROM NBUR_TMP_DEL_70
+                       WHERE kodf = O.KODF
+                             AND (REF = o.REF OR TO_CHAR (REF) = o.COMM))
    UNION ALL
    SELECT DISTINCT
           o.REF AS REF,
@@ -74,7 +90,12 @@ PROMPT *** Create  view V_OTCN_TRACE_70_ALL ***
              AS SumVal,
           TO_CHAR (NVL (o.ND, o.REF)) comm
      FROM otcn_trace_70 o
-    WHERE o.kodp LIKE '100%' AND o.KODF = '2D' and not exists (select 1 from NBUR_TMP_DEL_70 where kodf = O.KODF and (ref = o.ref or to_char(ref) = o.COMM))
+    WHERE o.kodp LIKE '100%' AND o.KODF = '2D'
+          AND NOT EXISTS
+                     (SELECT 1
+                        FROM NBUR_TMP_DEL_70
+                       WHERE kodf = O.KODF
+                             AND (REF = o.REF OR TO_CHAR (REF) = o.COMM))
    UNION ALL
    SELECT DISTINCT o.REF AS REF,
                    o.KODF AS KODF,
@@ -83,7 +104,12 @@ PROMPT *** Create  view V_OTCN_TRACE_70_ALL ***
                    o.ZNAP AS SumVal,
                    TO_CHAR (NVL (o.ND, o.REF)) comm
      FROM otcn_trace_70 o
-    WHERE o.kodp LIKE '71%' AND o.KODF = '2C' AND o.REF IS NOT NULL and not exists (select 1 from NBUR_TMP_DEL_70 where kodf = O.KODF and (ref = o.ref or to_char(ref) = o.COMM))
+    WHERE o.kodp LIKE '71%' AND o.KODF = '2C' AND o.REF IS NOT NULL
+          AND NOT EXISTS
+                     (SELECT 1
+                        FROM NBUR_TMP_DEL_70
+                       WHERE kodf = O.KODF
+                             AND (REF = o.REF OR TO_CHAR (REF) = o.COMM))
    UNION ALL
    SELECT DISTINCT R.REF AS REF,
                    o.KODF AS KODF,
@@ -92,14 +118,18 @@ PROMPT *** Create  view V_OTCN_TRACE_70_ALL ***
                    TO_CHAR (ROUND (r.s / 100, 0)),
                    TO_CHAR (R.REF) COMM
      FROM otcn_trace_70 o, oper r
-    WHERE     o.kodp LIKE '100%'
-          AND o.KODF = 'C9'
-          AND o.REF = r.REF
+    WHERE o.kodp LIKE '100%' AND o.KODF = 'C9' AND o.REF = r.REF
           AND gl.p_icurval (r.kv, r.s, r.vdat) >
-                 gl.p_icurval (840, 100000, r.vdat) and not exists (select 1 from NBUR_TMP_DEL_70 where kodf = O.KODF and ref = r.ref);
+                 gl.p_icurval (840, 100000, r.vdat)
+          AND NOT EXISTS
+                 (SELECT 1
+                    FROM NBUR_TMP_DEL_70
+                   WHERE kodf = O.KODF AND REF = r.REF);
 
 PROMPT *** Create  grants  V_OTCN_TRACE_70_ALL ***
+grant SELECT                                                                 on V_OTCN_TRACE_70_ALL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OTCN_TRACE_70_ALL to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_OTCN_TRACE_70_ALL to UPLD;
 
 
 

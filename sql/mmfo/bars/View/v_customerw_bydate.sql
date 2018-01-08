@@ -22,6 +22,10 @@ PROMPT *** Create  view V_CUSTOMERW_BYDATE ***
                                 and trunc(chgdate) <= to_date(pul.get_mas_ini_val('DAT'), 'dd/mm/yyyy') )
           group by rnk, tag );
 
+PROMPT *** Create  grants  V_CUSTOMERW_BYDATE ***
+grant SELECT                                                                 on V_CUSTOMERW_BYDATE to BARSREADER_ROLE;
+grant SELECT                                                                 on V_CUSTOMERW_BYDATE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

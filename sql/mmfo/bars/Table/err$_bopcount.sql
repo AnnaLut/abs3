@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_BOPCOUNT.A2 IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_BOPCOUNT ***
+grant SELECT                                                                 on ERR$_BOPCOUNT   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_BOPCOUNT   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

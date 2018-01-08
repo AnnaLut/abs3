@@ -11,8 +11,9 @@ PROMPT *** ALTER_POLICY_INFO to ESCR_REGISTER ***
 BEGIN 
         execute immediate  
           'begin  
+               bpa.alter_policy_info(''ESCR_REGISTER'', ''CENTER'' , null, null, null, null);
                bpa.alter_policy_info(''ESCR_REGISTER'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
-               bpa.alter_policy_info(''ESCR_REGISTER'', ''WHOLE'' , null, null, null, null);
+               bpa.alter_policy_info(''ESCR_REGISTER'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
           '; 
@@ -76,18 +77,6 @@ COMMENT ON COLUMN BARS.ESCR_REGISTER.KF IS '';
 
 
 
-PROMPT *** Create  constraint CC_ESCR_REGISTER_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ESCR_REGISTER ADD CONSTRAINT CC_ESCR_REGISTER_ID CHECK (ID IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_REG_ID ***
 begin   
  execute immediate '
@@ -102,11 +91,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_REG_STATUS_ID ***
+PROMPT *** Create  constraint CC_ESCR_REGISTER_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ESCR_REGISTER ADD CONSTRAINT FK_REG_STATUS_ID FOREIGN KEY (STATUS_ID)
-	  REFERENCES BARS.ESCR_REG_STATUS (ID) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.ESCR_REGISTER ADD CONSTRAINT CC_ESCR_REGISTER_ID CHECK (ID IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -119,19 +107,6 @@ PROMPT *** Create  constraint CC_ESCR_REGISTER_INNER_NUMBER ***
 begin   
  execute immediate '
   ALTER TABLE BARS.ESCR_REGISTER ADD CONSTRAINT CC_ESCR_REGISTER_INNER_NUMBER CHECK (INNER_NUMBER IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_REG_KIND_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ESCR_REGISTER ADD CONSTRAINT FK_REG_KIND_ID FOREIGN KEY (REG_KIND_ID)
-	  REFERENCES BARS.ESCR_REG_KIND (ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -154,7 +129,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ESCR_REGISTER ***
+grant SELECT                                                                 on ESCR_REGISTER   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ESCR_REGISTER   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on ESCR_REGISTER   to UPLD;
 
 
 

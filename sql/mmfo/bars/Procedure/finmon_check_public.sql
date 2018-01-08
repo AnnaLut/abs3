@@ -1,11 +1,17 @@
 
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/FINMON_CHECK_PUBLIC.sql =========*
+PROMPT ===================================================================================== 
+
+
 PROMPT *** Create  procedure FINMON_CHECK_PUBLIC ***
 
-create or replace procedure finmon_check_public (p_n int)
+  CREATE OR REPLACE PROCEDURE BARS.FINMON_CHECK_PUBLIC (p_n int)
  /*
  version 4.0.2 (2017-07-21)
  -- адаптировано под ММФО
- 
+
  RNK,
  ПІБ/Назва клієнта,
  № особи в переліку публічних осіб,
@@ -113,3 +119,9 @@ show err;
 
 PROMPT *** Create  grants  FINMON_CHECK_PUBLIC ***
 grant EXECUTE                                                                on FINMON_CHECK_PUBLIC to BARS_ACCESS_DEFROLE;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/FINMON_CHECK_PUBLIC.sql =========*
+PROMPT ===================================================================================== 

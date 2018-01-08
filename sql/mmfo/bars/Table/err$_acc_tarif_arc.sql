@@ -89,6 +89,10 @@ COMMENT ON COLUMN BARS.ERR$_ACC_TARIF_ARC.EFFECTDATE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ACC_TARIF_ARC ***
+grant SELECT                                                                 on ERR$_ACC_TARIF_ARC to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ACC_TARIF_ARC to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -81,6 +81,10 @@ COMMENT ON COLUMN BARS.ERR$_SREZERV_ERRORS.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_SREZERV_ERRORS ***
+grant SELECT                                                                 on ERR$_SREZERV_ERRORS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_SREZERV_ERRORS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

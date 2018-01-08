@@ -24,7 +24,9 @@ PROMPT *** Create  view V_CUST_REL_TYPES ***
  order by cr.id;
 
 PROMPT *** Create  grants  V_CUST_REL_TYPES ***
+grant SELECT                                                                 on V_CUST_REL_TYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUST_REL_TYPES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CUST_REL_TYPES to UPLD;
 
 
 

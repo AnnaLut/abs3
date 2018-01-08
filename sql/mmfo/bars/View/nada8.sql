@@ -42,8 +42,10 @@ PROMPT *** Create  view NADA8 ***
      FROM tmp_nada8;
 
 PROMPT *** Create  grants  NADA8 ***
+grant SELECT                                                                 on NADA8           to BARSREADER_ROLE;
 grant SELECT                                                                 on NADA8           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NADA8           to SALGL;
+grant SELECT                                                                 on NADA8           to UPLD;
 
 
 

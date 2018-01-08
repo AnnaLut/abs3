@@ -110,11 +110,13 @@ exception when others then
 
 PROMPT *** Create  grants  CC_SOURCE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_SOURCE       to ABS_ADMIN;
+grant SELECT                                                                 on CC_SOURCE       to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on CC_SOURCE       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_SOURCE       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_SOURCE       to CC_SOURCE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CC_SOURCE       to RCC_DEAL;
 grant SELECT                                                                 on CC_SOURCE       to START1;
+grant SELECT                                                                 on CC_SOURCE       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_SOURCE       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CC_SOURCE       to WR_REFREAD;
 

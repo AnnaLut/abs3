@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DMJ
-prompt Наименование операции: Повернення суми вкладу в ін.валюті (міжбанк)
+prompt Наименование операции: DMJ Повернення суми вкладу в ін.валюті (міжбанк)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DMJ', 'Повернення суми вкладу в ін.валюті (міжбанк)', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 0, 1, 0, 0, null, null, null, null, null, 0, '0300100000000000000000000000000000010000000000000000000000000000', 'Повернення згідно договору № #{DPTіWEB.FіNAZN(''U'',#(ND))}');
+    values ('DMJ', 'DMJ Повернення суми вкладу в ін.валюті (міжбанк)', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 0, 1, 0, 0, null, null, null, null, null, 0, '0300100000000000000000000000000000010000000000000000000000000000', 'Повернення згідно договору № #{DPTіWEB.FіNAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DMJ', name='Повернення суми вкладу в ін.валюті (міжбанк)', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0300100000000000000000000000000000010000000000000000000000000000', nazn='Повернення згідно договору № #{DPTіWEB.FіNAZN(''U'',#(ND))}'
+         set tt='DMJ', name='DMJ Повернення суми вкладу в ін.валюті (міжбанк)', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0300100000000000000000000000000000010000000000000000000000000000', nazn='Повернення згідно договору № #{DPTіWEB.FіNAZN(''U'',#(ND))}'
        where tt='DMJ';
   end;
   --------------------------------

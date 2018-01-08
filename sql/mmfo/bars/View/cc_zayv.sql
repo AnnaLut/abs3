@@ -21,8 +21,10 @@ WHERE z.rnk=0 and z.id=s.id(+) and z.nz=n.ND(+) and n.tag(+)='ZAY'
  ;
 
 PROMPT *** Create  grants  CC_ZAYV ***
+grant SELECT                                                                 on CC_ZAYV         to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_ZAYV         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_ZAYV         to RCC_DEAL;
+grant SELECT                                                                 on CC_ZAYV         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_ZAYV         to WR_ALL_RIGHTS;
 
 

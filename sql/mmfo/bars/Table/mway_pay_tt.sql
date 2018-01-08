@@ -105,7 +105,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  MWAY_PAY_TT ***
+grant SELECT                                                                 on MWAY_PAY_TT     to BARSREADER_ROLE;
 grant SELECT                                                                 on MWAY_PAY_TT     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on MWAY_PAY_TT     to UPLD;
 
 
 

@@ -73,19 +73,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ARCSIGN_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ARC_SIGN ADD CONSTRAINT FK_ARCSIGN_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C005913 ***
 begin   
  execute immediate '
@@ -151,9 +138,11 @@ exception when others then
 
 PROMPT *** Create  grants  ARC_SIGN ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ARC_SIGN        to ABS_ADMIN;
+grant SELECT                                                                 on ARC_SIGN        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ARC_SIGN        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ARC_SIGN        to BARS_DM;
 grant SELECT                                                                 on ARC_SIGN        to START1;
+grant SELECT                                                                 on ARC_SIGN        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ARC_SIGN        to WR_ALL_RIGHTS;
 
 

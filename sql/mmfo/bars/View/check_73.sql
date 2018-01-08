@@ -61,8 +61,10 @@ WHERE o.sos=5 and (o.kv<>980 or o.kv2<>980) and
       aux1.ref=o.ref and o.dk=0);
 
 PROMPT *** Create  grants  CHECK_73 ***
+grant SELECT                                                                 on CHECK_73        to BARSREADER_ROLE;
 grant SELECT                                                                 on CHECK_73        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHECK_73        to START1;
+grant SELECT                                                                 on CHECK_73        to UPLD;
 
 
 

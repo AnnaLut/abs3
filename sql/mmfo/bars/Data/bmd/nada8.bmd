@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'ДЕФ-8.Задолженность и доходы по КП (за период)';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'NADA8';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,35 +124,35 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Бранч~КД', null, null, 2, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CC_ID', 'C', 'Идентиф.~КД', null, null, 7, 0, 0, 0, 0, '', '', 0, 0, 'to_char( count (*))', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DAT1', 'D', 'Начальная~дата', null, null, 80, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DAT2', 'D', 'Конечная~дата', null, null, 81, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'FINS', 'C', 'Ф~И~Н', null, null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'ID1', 'C', 'ID1 в ~LOANS', null, null, 92, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'ID2', 'C', 'ID2 в~ LOANS', null, null, 93, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'KV', 'N', 'Вал', null, null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'MFO_OLD', 'C', 'Старое~МФО', null, null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'ND', 'N', 'Реф.КД~в АБС', null, null, 91, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NLS', 'C', 'Начальный~Лицевой~счет', null, null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'NMK', 'C', 'Клиент', null, null, 5, 0, 0, 0, 0, '', '', 0, 0, '''Количество и Сумма''', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'OBS', 'N', 'О~Б~С', null, null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'OST', 'N', 'Q-Остаток~по телу~на дату-2', null, null, 10, 0, 0, 1, 0, '', '# ##0.00', 0, 0, 'Sum(NADA8.OST) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'PROD', 'C', 'Код~прод~в АБС', null, null, 90, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'SPOK', 'C', 'Спок', null, null, 0, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'ZN50', 'C', 'Параметр~банк/прод~5050', null, null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'S6020', 'N', 'Начис~проц~602*', null, null, 20, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6020 ,0 ) ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'S6040', 'N', 'Начис~проц~604*', null, null, 21, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6040 ,0 ) ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'S6110', 'N', 'Комис~Доход~6110*', null, null, 22, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6110 ,0 ) ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'S6111', 'N', 'Комис~Доход~6111*', null, null, 23, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6111 ,0 ) ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'S6113', 'N', 'Комис~Доход~6113*', null, null, 24, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6113 ,0 ) ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'S6114', 'N', 'Комис~Доход~6114*', null, null, 25, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6114 ,0 ) ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'S6116', 'N', 'Комис~Доход~6116*', null, null, 26, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6116 ,0 ) ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'S6118', 'N', 'Комис~Доход~6118*', null, null, 27, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6118 ,0 ) ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'S6119', 'N', 'Комис~Доход~6119*', null, null, 28, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6119 ,0 ) ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'S6397', 'N', 'Штрафы~пени~6397*', null, null, 29, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6397 ,0 ) ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'S6399', 'N', 'Другие~доходы~63997*', null, null, 30, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6399 ,0 ) ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'OSTQS', 'N', 'Q-Ср.Остаток~по телу~за период', null, null, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(NADA8.OSTQS) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Бранч~КД', '', null, 2, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CC_ID', 'C', 'Идентиф.~КД', '', null, 7, 0, 0, 0, 0, '', '', 0, 0, 'to_char( count (*))', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAT1', 'D', 'Начальная~дата', '', null, 80, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DAT2', 'D', 'Конечная~дата', '', null, 81, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'FINS', 'C', 'Ф~И~Н', '', null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'ID1', 'C', 'ID1 в ~LOANS', '', null, 92, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'ID2', 'C', 'ID2 в~ LOANS', '', null, 93, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'KV', 'N', 'Вал', '', null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'MFO_OLD', 'C', 'Старое~МФО', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'ND', 'N', 'Реф.КД~в АБС', '', null, 91, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NLS', 'C', 'Начальный~Лицевой~счет', '', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'NMK', 'C', 'Клиент', '', null, 5, 0, 0, 0, 0, '', '', 0, 0, '''Количество и Сумма''', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'OBS', 'N', 'О~Б~С', '', null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'OST', 'N', 'Q-Остаток~по телу~на дату-2', '', null, 10, 0, 0, 1, 0, '', '# ##0.00', 0, 0, 'Sum(NADA8.OST) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'PROD', 'C', 'Код~прод~в АБС', '', null, 90, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'SPOK', 'C', 'Спок', '', null, 0, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'ZN50', 'C', 'Параметр~банк/прод~5050', '', null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'S6020', 'N', 'Начис~проц~602*', '', null, 20, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6020 ,0 ) ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'S6040', 'N', 'Начис~проц~604*', '', null, 21, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6040 ,0 ) ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'S6110', 'N', 'Комис~Доход~6110*', '', null, 22, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6110 ,0 ) ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'S6111', 'N', 'Комис~Доход~6111*', '', null, 23, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6111 ,0 ) ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'S6113', 'N', 'Комис~Доход~6113*', '', null, 24, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6113 ,0 ) ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'S6114', 'N', 'Комис~Доход~6114*', '', null, 25, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6114 ,0 ) ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'S6116', 'N', 'Комис~Доход~6116*', '', null, 26, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6116 ,0 ) ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'S6118', 'N', 'Комис~Доход~6118*', '', null, 27, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6118 ,0 ) ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'S6119', 'N', 'Комис~Доход~6119*', '', null, 28, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6119 ,0 ) ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'S6397', 'N', 'Штрафы~пени~6397*', '', null, 29, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6397 ,0 ) ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'S6399', 'N', 'Другие~доходы~63997*', '', null, 30, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( nvl ( NADA8.S6399 ,0 ) ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'OSTQS', 'N', 'Q-Ср.Остаток~по телу~за период', '', null, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(NADA8.OSTQS) ', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('BRANCH');

@@ -13,8 +13,10 @@ PROMPT *** Create  view V_TTSCHK ***
        WHERE (((((x0.id =  x1.id) AND (x1.chkid =  x2.idchk)) AND (x2.idchk =  x3.idchk)) AND (x3.tt =  x4.tt)) AND (x0.id =  (SELECT x5.id FROM staff x5 WHERE (upper(x5.logname) =  USER))));
 
 PROMPT *** Create  grants  V_TTSCHK ***
+grant SELECT                                                                 on V_TTSCHK        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TTSCHK        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TTSCHK        to START1;
+grant SELECT                                                                 on V_TTSCHK        to UPLD;
 
 
 

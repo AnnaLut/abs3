@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure INT_CP_P ***
 
-CREATE OR REPLACE PROCEDURE INT_CP_P
+  CREATE OR REPLACE PROCEDURE BARS.INT_CP_P 
 (p_METR int   , --код методики
  p_Acc  int   , -- для передачи в
  p_Id   int   , -- acrn.p_int(nAcc,nId,dDat1,dDat2,nInt,nOst,nMode)
@@ -88,7 +88,7 @@ CREATE OR REPLACE PROCEDURE INT_CP_P
  pnt int :=0; l_fl int; fl_pg int;
  l_accr cp_deal.accr%type;
  l_accr2 cp_deal.accr%type;
- l_accr3 cp_deal.accr3%type; 
+ l_accr3 cp_deal.accr3%type;
  l_sint number;  l_sint_dok number;
  l_kupon number; l_kupon0 number;
  l_kv int;
@@ -548,7 +548,7 @@ begin
          l_ostr3:=0;
        end;
        p_Int := p_Int + l_ostr3; --P_int тут очікується таке що з мінусом, тому посуті робиться віднімання R3
-    end if;  
+    end if;
 
     <<ZAP>> NULL;
     if p_mode=0 then return; end if;

@@ -1,8 +1,10 @@
+
+ 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/neruhomi.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
  
-CREATE OR REPLACE PACKAGE BARS.NERUHOMI
+  CREATE OR REPLACE PACKAGE BARS.NERUHOMI 
 IS
    g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.1  13/02/2013';
    g_transfer_timeout constant number := 15;
@@ -92,8 +94,6 @@ PROCEDURE PAY_JOB;
 -------------------
 END NERUHOMI;
 /
-
-
 CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
   g_body_version CONSTANT VARCHAR2(64) := 'version 1.24mmfo  22/11/2017';
   g_is_error     boolean := false;
@@ -1407,7 +1407,7 @@ PROCEDURE before_pay_to_6(p_key number) is
   --------------
 END NERUHOMI;
 /
-show err;
+ show err;
  
 PROMPT *** Create  grants  NERUHOMI ***
 grant EXECUTE                                                                on NERUHOMI        to BARS_ACCESS_DEFROLE;

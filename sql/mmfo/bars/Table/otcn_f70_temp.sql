@@ -65,8 +65,10 @@ COMMENT ON COLUMN BARS.OTCN_F70_TEMP.ACCD IS '';
 
 
 PROMPT *** Create  grants  OTCN_F70_TEMP ***
+grant SELECT                                                                 on OTCN_F70_TEMP   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F70_TEMP   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F70_TEMP   to RPBN002;
+grant SELECT                                                                 on OTCN_F70_TEMP   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_F70_TEMP   to WR_ALL_RIGHTS;
 
 

@@ -103,10 +103,12 @@ COMMENT ON COLUMN BARS.CIN_KOM1.S3 IS '';
 
 
 PROMPT *** Create  grants  CIN_KOM1 ***
+grant SELECT                                                                 on CIN_KOM1        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIN_KOM1        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIN_KOM1        to BARS_DM;
 grant SELECT                                                                 on CIN_KOM1        to PYOD001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIN_KOM1        to START1;
+grant SELECT                                                                 on CIN_KOM1        to UPLD;
 
 
 

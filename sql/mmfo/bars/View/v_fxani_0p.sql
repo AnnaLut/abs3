@@ -15,8 +15,10 @@ PROMPT *** Create  view V_FXANI_0P ***
    where f.dat >= d.B   and f.dat <= d.E    and f.ref  = o.ref and  o.acc = a.acc and a.kv = 980   and a.nls like '6%' ;
 
 PROMPT *** Create  grants  V_FXANI_0P ***
+grant SELECT                                                                 on V_FXANI_0P      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FXANI_0P      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FXANI_0P      to START1;
+grant SELECT                                                                 on V_FXANI_0P      to UPLD;
 
 
 

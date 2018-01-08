@@ -143,19 +143,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OTCFF7HISTORYACC_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OTC_FF7_HISTORY_ACC ADD CONSTRAINT FK_OTCFF7HISTORYACC_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_OTC_FF7_KV_NN ***
 begin   
  execute immediate '
@@ -221,7 +208,7 @@ exception when others then
 PROMPT *** Create  index OTC_FF7_HISTORY_ACC_I1 ***
 begin   
  execute immediate '
-  CREATE INDEX BARS.OTC_FF7_HISTORY_ACC_I1 ON BARS.OTC_FF7_HISTORY_ACC (KF, DATF, ACC) 
+  CREATE INDEX BARS.OTC_FF7_HISTORY_ACC_I1 ON BARS.OTC_FF7_HISTORY_ACC (KF, ACC, DATF) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND ';
 exception when others then
@@ -246,8 +233,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OTC_FF7_HISTORY_ACC ***
+grant SELECT                                                                 on OTC_FF7_HISTORY_ACC to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTC_FF7_HISTORY_ACC to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTC_FF7_HISTORY_ACC to RPBN002;
+grant SELECT                                                                 on OTC_FF7_HISTORY_ACC to UPLD;
 grant FLASHBACK,SELECT                                                       on OTC_FF7_HISTORY_ACC to WR_REFREAD;
 
 

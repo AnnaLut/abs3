@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_NIGHT_LIM.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_NIGHT_LIM ***
+grant SELECT                                                                 on ERR$_NIGHT_LIM  to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_NIGHT_LIM  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

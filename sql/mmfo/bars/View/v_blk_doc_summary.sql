@@ -19,7 +19,9 @@ PROMPT *** Create  view V_BLK_DOC_SUMMARY ***
    ORDER BY SUM (S) DESC;
 
 PROMPT *** Create  grants  V_BLK_DOC_SUMMARY ***
+grant SELECT                                                                 on V_BLK_DOC_SUMMARY to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BLK_DOC_SUMMARY to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_BLK_DOC_SUMMARY to UPLD;
 
 
 

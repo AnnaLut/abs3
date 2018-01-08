@@ -15,8 +15,10 @@ where substr(a.nls,1,1)<>'2' and
        a.acc=i.acc and a.dazs is null;
 
 PROMPT *** Create  grants  BAZA_PR1 ***
+grant SELECT                                                                 on BAZA_PR1        to BARSREADER_ROLE;
 grant SELECT                                                                 on BAZA_PR1        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BAZA_PR1        to START1;
+grant SELECT                                                                 on BAZA_PR1        to UPLD;
 
 
 

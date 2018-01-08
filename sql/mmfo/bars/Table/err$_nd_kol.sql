@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_ND_KOL.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ND_KOL ***
+grant SELECT                                                                 on ERR$_ND_KOL     to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ND_KOL     to UPLD;
+
 
 
 PROMPT ===================================================================================== 

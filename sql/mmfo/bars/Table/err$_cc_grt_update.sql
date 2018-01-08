@@ -65,6 +65,10 @@ COMMENT ON COLUMN BARS.ERR$_CC_GRT_UPDATE.GRT_DEAL_ID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CC_GRT_UPDATE ***
+grant SELECT                                                                 on ERR$_CC_GRT_UPDATE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CC_GRT_UPDATE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -14,8 +14,10 @@ PROMPT *** Create  view PSR ***
  ;
 
 PROMPT *** Create  grants  PSR ***
+grant SELECT                                                                 on PSR             to BARSREADER_ROLE;
 grant SELECT                                                                 on PSR             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PSR             to START1;
+grant SELECT                                                                 on PSR             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PSR             to WR_ALL_RIGHTS;
 
 

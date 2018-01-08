@@ -90,9 +90,11 @@ COMMENT ON COLUMN BARS.TMP_OB22_FUNU_AUTO.NMSN_K IS '';
 
 
 PROMPT *** Create  grants  TMP_OB22_FUNU_AUTO ***
+grant SELECT                                                                 on TMP_OB22_FUNU_AUTO to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OB22_FUNU_AUTO to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_OB22_FUNU_AUTO to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OB22_FUNU_AUTO to START1;
+grant SELECT                                                                 on TMP_OB22_FUNU_AUTO to UPLD;
 
 
 

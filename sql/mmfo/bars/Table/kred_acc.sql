@@ -92,9 +92,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  KRED_ACC ***
+grant SELECT                                                                 on KRED_ACC        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KRED_ACC        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KRED_ACC        to BARS_DM;
 grant INSERT,SELECT,UPDATE                                                   on KRED_ACC        to START1;
+grant SELECT                                                                 on KRED_ACC        to UPLD;
 
 
 

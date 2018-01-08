@@ -83,19 +83,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OBJECT_TYPE_REF_PARENT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OBJECT_TYPE ADD CONSTRAINT FK_OBJECT_TYPE_REF_PARENT FOREIGN KEY (PARENT_TYPE_ID)
-	  REFERENCES BARS.OBJECT_TYPE (ID) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C008809 ***
 begin   
  execute immediate '
@@ -172,8 +159,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBJECT_TYPE ***
+grant SELECT                                                                 on OBJECT_TYPE     to BARSREADER_ROLE;
 grant SELECT                                                                 on OBJECT_TYPE     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBJECT_TYPE     to BARS_DM;
+grant SELECT                                                                 on OBJECT_TYPE     to UPLD;
 
 
 
