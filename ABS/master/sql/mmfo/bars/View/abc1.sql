@@ -19,8 +19,10 @@ PROMPT *** Create  view ABC1 ***
  order by s.p080, s.R020_FA, s.ob22;
 
 PROMPT *** Create  grants  ABC1 ***
+grant SELECT                                                                 on ABC1            to BARSREADER_ROLE;
 grant SELECT                                                                 on ABC1            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ABC1            to START1;
+grant SELECT                                                                 on ABC1            to UPLD;
 
 
 

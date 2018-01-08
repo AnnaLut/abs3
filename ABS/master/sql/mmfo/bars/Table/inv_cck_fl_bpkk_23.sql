@@ -218,23 +218,12 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint FK_INVCCKFLBPKK23_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INV_CCK_FL_BPKK_23 ADD CONSTRAINT FK_INVCCKFLBPKK23_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
 PROMPT *** Create  grants  INV_CCK_FL_BPKK_23 ***
+grant SELECT                                                                 on INV_CCK_FL_BPKK_23 to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INV_CCK_FL_BPKK_23 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INV_CCK_FL_BPKK_23 to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INV_CCK_FL_BPKK_23 to RCC_DEAL;
+grant SELECT                                                                 on INV_CCK_FL_BPKK_23 to UPLD;
 
 
 

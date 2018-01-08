@@ -18,8 +18,10 @@ from o59
  where (vost<>0 or dos<>0 or kos<>0 or iost<>0);
 
 PROMPT *** Create  grants  O59S ***
+grant SELECT                                                                 on O59S            to BARSREADER_ROLE;
 grant SELECT                                                                 on O59S            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on O59S            to START1;
+grant SELECT                                                                 on O59S            to UPLD;
 
 
 

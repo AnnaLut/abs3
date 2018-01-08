@@ -13,8 +13,10 @@ PROMPT *** Create  view V_ACC262005 ***
   WHERE  a.ACC=b.ACC;
 
 PROMPT *** Create  grants  V_ACC262005 ***
+grant SELECT                                                                 on V_ACC262005     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACC262005     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ACC262005     to START1;
+grant SELECT                                                                 on V_ACC262005     to UPLD;
 
 
 

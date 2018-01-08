@@ -13,8 +13,10 @@ from arc_rrp a, zag_a za where a.fn_a = za.fn and a.dat_a = za.dat
 ;
 
 PROMPT *** Create  grants  V_DOCUMENTVIEW_TECH_ZAG_A ***
+grant SELECT                                                                 on V_DOCUMENTVIEW_TECH_ZAG_A to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOCUMENTVIEW_TECH_ZAG_A to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DOCUMENTVIEW_TECH_ZAG_A to START1;
+grant SELECT                                                                 on V_DOCUMENTVIEW_TECH_ZAG_A to UPLD;
 
 
 

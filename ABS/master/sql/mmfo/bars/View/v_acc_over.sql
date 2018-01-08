@@ -15,6 +15,8 @@ from acc_over v
  ;
 
 PROMPT *** Create  grants  V_ACC_OVER ***
+grant SELECT                                                                 on V_ACC_OVER      to BARSREADER_ROLE;
+grant SELECT                                                                 on V_ACC_OVER      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ACC_OVER      to WR_ALL_RIGHTS;
 
 

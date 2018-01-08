@@ -18,8 +18,10 @@ GROUP BY vdat, id
 ;
 
 PROMPT *** Create  grants  DOK_DN0 ***
+grant SELECT                                                                 on DOK_DN0         to BARSREADER_ROLE;
 grant SELECT                                                                 on DOK_DN0         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DOK_DN0         to START1;
+grant SELECT                                                                 on DOK_DN0         to UPLD;
 
 
 

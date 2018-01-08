@@ -53,7 +53,7 @@ COMMENT ON COLUMN BARS.KL_S190.DATA_C IS '';
 
 
 PROMPT *** Create  grants  KL_S190 ***
-grant SELECT                                                                 on KL_S190         to BARS_DM;
+grant SELECT                                                                 on KL_S190         to UPLD;
 
 
 

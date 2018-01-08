@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.ERR$_SB_PS44.D_CLOSE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_SB_PS44 ***
+grant SELECT                                                                 on ERR$_SB_PS44    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_SB_PS44    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

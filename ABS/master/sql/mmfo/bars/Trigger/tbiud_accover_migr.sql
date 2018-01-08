@@ -8,13 +8,13 @@ PROMPT =========================================================================
 PROMPT *** Create  trigger TBIUD_ACCOVER_MIGR ***
 
   CREATE OR REPLACE TRIGGER BARS.TBIUD_ACCOVER_MIGR 
-                          BEFORE DELETE OR INSERT OR UPDATE ON ACC_OVER 
+                          BEFORE DELETE OR INSERT OR UPDATE ON ACC_OVER
                           REFERENCING NEW AS New OLD AS Old
                           FOR EACH ROW
         BEGIN  raise_application_error(-20203, ' Заборонено модифікувати табл ACC_OVER, Її мігровао в нові OVRN' );
         END TBIUD_ACCOVER_MIGR;
 /
-ALTER TRIGGER BARS.TBIUD_ACCOVER_MIGR DISABLE;
+ALTER TRIGGER BARS.TBIUD_ACCOVER_MIGR ENABLE;
 
 
 PROMPT ===================================================================================== 

@@ -78,11 +78,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  NAL_DEC ***
+grant SELECT                                                                 on NAL_DEC         to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on NAL_DEC         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NAL_DEC         to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on NAL_DEC         to NALOG;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAL_DEC         to NAL_DEC;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on NAL_DEC         to START1;
+grant SELECT                                                                 on NAL_DEC         to UPLD;
 grant FLASHBACK,SELECT                                                       on NAL_DEC         to WR_REFREAD;
 
 

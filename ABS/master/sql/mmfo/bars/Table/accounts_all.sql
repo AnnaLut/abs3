@@ -81,32 +81,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ACCOUNTSALL_BANKS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_ALL ADD CONSTRAINT FK_ACCOUNTSALL_BANKS FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ACCOUNTSALL_TABVAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_ALL ADD CONSTRAINT FK_ACCOUNTSALL_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_ACCOUNTSALL_ACC_NN ***
 begin   
  execute immediate '
@@ -131,10 +105,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCOUNTSALL_KV_NN ***
+PROMPT *** Create  constraint CC_ACCOUNTSALL_NLS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_ALL MODIFY (KV CONSTRAINT CC_ACCOUNTSALL_KV_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACCOUNTS_ALL MODIFY (NLS CONSTRAINT CC_ACCOUNTSALL_NLS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -143,10 +117,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCOUNTSALL_NLS_NN ***
+PROMPT *** Create  constraint CC_ACCOUNTSALL_KV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_ALL MODIFY (NLS CONSTRAINT CC_ACCOUNTSALL_NLS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACCOUNTS_ALL MODIFY (KV CONSTRAINT CC_ACCOUNTSALL_KV_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -183,8 +157,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACCOUNTS_ALL ***
+grant SELECT                                                                 on ACCOUNTS_ALL    to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on ACCOUNTS_ALL    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCOUNTS_ALL    to BARS_DM;
+grant SELECT                                                                 on ACCOUNTS_ALL    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACCOUNTS_ALL    to WR_ALL_RIGHTS;
 
 

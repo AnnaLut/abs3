@@ -67,19 +67,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_MIGRDPTPROGRES_TABVAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MIGR_DPT_PROGRES ADD CONSTRAINT FK_MIGRDPTPROGRES_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_MIGRDPTPROGRES_DATEON_NN ***
 begin   
  execute immediate '
@@ -142,8 +129,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  MIGR_DPT_PROGRES ***
+grant SELECT                                                                 on MIGR_DPT_PROGRES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MIGR_DPT_PROGRES to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MIGR_DPT_PROGRES to DPT_ADMIN;
+grant SELECT                                                                 on MIGR_DPT_PROGRES to UPLD;
 grant FLASHBACK,SELECT                                                       on MIGR_DPT_PROGRES to WR_REFREAD;
 
 

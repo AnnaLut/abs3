@@ -22,7 +22,9 @@ from ope_lot
 where  ob22 = '~~' ;
 
 PROMPT *** Create  grants  V_DYNAMIC_LAYOUT ***
+grant SELECT                                                                 on V_DYNAMIC_LAYOUT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DYNAMIC_LAYOUT to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DYNAMIC_LAYOUT to UPLD;
 
 
 

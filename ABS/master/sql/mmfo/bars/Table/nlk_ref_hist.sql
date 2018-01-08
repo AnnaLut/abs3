@@ -96,7 +96,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  NLK_REF_HIST ***
+grant SELECT                                                                 on NLK_REF_HIST    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NLK_REF_HIST    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on NLK_REF_HIST    to UPLD;
 
 
 

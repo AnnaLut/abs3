@@ -51,8 +51,10 @@ COMMENT ON COLUMN BARS.S_ER_.K_TASK IS '';
 
 
 PROMPT *** Create  grants  S_ER_ ***
+grant SELECT                                                                 on S_ER_           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S_ER_           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S_ER_           to START1;
+grant SELECT                                                                 on S_ER_           to UPLD;
 
 
 

@@ -65,19 +65,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SCORINGS_RQID_QUESTS_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SCORINGS ADD CONSTRAINT FK_SCORINGS_RQID_QUESTS_ID FOREIGN KEY (RESULT_QID)
-	  REFERENCES BARS.WCS_QUESTIONS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SCORINGS_NAME_NN ***
 begin   
  execute immediate '
@@ -116,9 +103,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SCORINGS ***
+grant SELECT                                                                 on WCS_SCORINGS    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SCORINGS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_SCORINGS    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SCORINGS    to START1;
+grant SELECT                                                                 on WCS_SCORINGS    to UPLD;
 
 
 

@@ -74,7 +74,9 @@ COMMENT ON COLUMN BARS.ERR$_APP_REP.ACODE IS '';
 
 
 PROMPT *** Create  grants  ERR$_APP_REP ***
+grant SELECT                                                                 on ERR$_APP_REP    to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_APP_REP    to BARS_DM;
+grant SELECT                                                                 on ERR$_APP_REP    to UPLD;
 
 
 

@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.ERR$_FIN_KVED.FLAG IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_FIN_KVED ***
+grant SELECT                                                                 on ERR$_FIN_KVED   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_FIN_KVED   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

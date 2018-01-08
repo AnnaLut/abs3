@@ -73,6 +73,10 @@ COMMENT ON COLUMN BARS.ERR$_DPT_INHERITORS.ATTR_INCOME IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DPT_INHERITORS ***
+grant SELECT                                                                 on ERR$_DPT_INHERITORS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DPT_INHERITORS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

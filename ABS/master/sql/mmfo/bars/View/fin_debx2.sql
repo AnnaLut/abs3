@@ -26,8 +26,10 @@ select 6, a.nbs||a.ob22,a.acc,a.kv,a.nls,a.ostc,a.branch from accounts a,cin_cus
 ;
 
 PROMPT *** Create  grants  FIN_DEBX2 ***
+grant SELECT                                                                 on FIN_DEBX2       to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_DEBX2       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_DEBX2       to START1;
+grant SELECT                                                                 on FIN_DEBX2       to UPLD;
 
 
 

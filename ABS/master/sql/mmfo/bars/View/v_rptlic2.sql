@@ -1,5 +1,14 @@
-CREATE OR REPLACE VIEW V_RPTLIC2 AS
-SELECT NVL (srt, '2') srt,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_RPTLIC2.sql =========*** Run *** ====
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_RPTLIC2 ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_RPTLIC2 ("SRT", "DKSRT", "VOBSRT", "MFO", "NB", "FDAT", "TIP", "ACC", "NLS", "KV", "NMS", "OKPO", "NMK", "ISP", "DAPP", "OSTF", "OSTFQ", "REF", "S", "SQ", "DOSS", "KOSS", "DOSSQ", "KOSSQ", "NLS2", "MFO2", "NB2", "NMK2", "OKPO2", "DK", "ND", "TT", "NAZN", "DATD", "BIS", "BRANCH", "DOSR", "KOSR", "OSTFR", "GRPLIST", "VOB", "PAYDATE") AS 
+  SELECT NVL (srt, '2') srt,
           NVL (dksrt, '1') dksrt,
           DECODE (vob,  96, 2,  99, 2,  1) vobsrt,
           mfo,
@@ -40,8 +49,7 @@ SELECT NVL (srt, '2') srt,
           ostfr,
           grplist,
           vob,
-          paydate,
-          nlsalt
+          paydate
      FROM (                                                              -----
                     -- строка с параметрами счета, параметрами его контрагента
                                                                -- и платежками
@@ -153,9 +161,19 @@ SELECT NVL (srt, '2') srt,
                   dapp,
                   ostf,
                   ostfq,
-                  grplist,
-                  nlsalt
+                  grplist
              FROM tmp_licm
             WHERE ROWTYPE = bars_rptlic.rowtype_acc) o
-    WHERE o.acc = t.acc(+) AND o.fdat = t.fdat(+)
-;
+    WHERE o.acc = t.acc(+) AND o.fdat = t.fdat(+);
+
+PROMPT *** Create  grants  V_RPTLIC2 ***
+grant SELECT                                                                 on V_RPTLIC2       to BARSREADER_ROLE;
+grant SELECT                                                                 on V_RPTLIC2       to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_RPTLIC2       to RPBN001;
+grant SELECT                                                                 on V_RPTLIC2       to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_RPTLIC2.sql =========*** End *** ====
+PROMPT ===================================================================================== 

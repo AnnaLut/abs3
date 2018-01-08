@@ -57,6 +57,10 @@ COMMENT ON COLUMN BARS.ERR$_DPT_VIDD_FIELD.OBZ IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DPT_VIDD_FIELD ***
+grant SELECT                                                                 on ERR$_DPT_VIDD_FIELD to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DPT_VIDD_FIELD to UPLD;
+
 
 
 PROMPT ===================================================================================== 

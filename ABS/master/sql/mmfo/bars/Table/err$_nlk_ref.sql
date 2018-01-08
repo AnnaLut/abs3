@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.ERR$_NLK_REF.ACC IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_NLK_REF ***
+grant SELECT                                                                 on ERR$_NLK_REF    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_NLK_REF    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

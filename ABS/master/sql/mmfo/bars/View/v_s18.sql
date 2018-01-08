@@ -27,8 +27,10 @@ WHERE d.vidd in (1,2,3,11,12,13)
  ;
 
 PROMPT *** Create  grants  V_S18 ***
+grant SELECT                                                                 on V_S18           to BARSREADER_ROLE;
 grant SELECT                                                                 on V_S18           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_S18           to START1;
+grant SELECT                                                                 on V_S18           to UPLD;
 
 
 

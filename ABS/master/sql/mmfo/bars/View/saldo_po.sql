@@ -16,8 +16,10 @@ FROM saldod
  ;
 
 PROMPT *** Create  grants  SALDO_PO ***
+grant SELECT                                                                 on SALDO_PO        to BARSREADER_ROLE;
 grant SELECT                                                                 on SALDO_PO        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALDO_PO        to PYOD001;
+grant SELECT                                                                 on SALDO_PO        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SALDO_PO        to WR_ALL_RIGHTS;
 
 

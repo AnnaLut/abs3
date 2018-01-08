@@ -57,7 +57,9 @@ COMMENT ON COLUMN BARS.CUR_RATES_BACKUP.FILE_BODY IS '';
 
 
 PROMPT *** Create  grants  CUR_RATES_BACKUP ***
+grant SELECT                                                                 on CUR_RATES_BACKUP to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUR_RATES_BACKUP to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CUR_RATES_BACKUP to UPLD;
 
 
 

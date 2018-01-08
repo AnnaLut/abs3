@@ -75,19 +75,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_PRODUCTS_DEALS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_PRODUCTS ADD CONSTRAINT FK_PRODUCTS_DEALS FOREIGN KEY (DEAL_ID)
-	  REFERENCES BARS.GRT_DEALS (DEAL_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_GRTPRODUCTS_NAME_NN ***
 begin   
  execute immediate '
@@ -126,9 +113,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRT_PRODUCTS ***
+grant SELECT                                                                 on GRT_PRODUCTS    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRT_PRODUCTS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRT_PRODUCTS    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRT_PRODUCTS    to START1;
+grant SELECT                                                                 on GRT_PRODUCTS    to UPLD;
 
 
 

@@ -51,12 +51,10 @@ COMMENT ON COLUMN BARS.BPK_TAGS.TYPE IS '';
 
 
 
-PROMPT *** Create  constraint PK_BPKTAGS ***
+PROMPT *** Create  constraint CC_BPKTAGS_TYPE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_TAGS ADD CONSTRAINT PK_BPKTAGS PRIMARY KEY (TAG)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.BPK_TAGS ADD CONSTRAINT CC_BPKTAGS_TYPE CHECK (type in (''C'', ''N'', ''D'')) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -65,10 +63,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKTAGS_TYPE ***
+PROMPT *** Create  constraint PK_BPKTAGS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_TAGS ADD CONSTRAINT CC_BPKTAGS_TYPE CHECK (type in (''C'', ''N'', ''D'')) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.BPK_TAGS ADD CONSTRAINT PK_BPKTAGS PRIMARY KEY (TAG)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -91,9 +91,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_TAGS ***
+grant SELECT                                                                 on BPK_TAGS        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_TAGS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_TAGS        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_TAGS        to OW;
+grant SELECT                                                                 on BPK_TAGS        to UPLD;
 
 
 

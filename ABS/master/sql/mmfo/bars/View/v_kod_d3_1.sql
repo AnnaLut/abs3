@@ -14,8 +14,10 @@ PROMPT *** Create  view V_KOD_D3_1 ***
    ORDER BY p40;
 
 PROMPT *** Create  grants  V_KOD_D3_1 ***
+grant SELECT                                                                 on V_KOD_D3_1      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_KOD_D3_1      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_KOD_D3_1      to START1;
+grant SELECT                                                                 on V_KOD_D3_1      to UPLD;
 
 
 

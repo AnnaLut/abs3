@@ -83,8 +83,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  PKK_QUE_ARC ***
+grant SELECT                                                                 on PKK_QUE_ARC     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PKK_QUE_ARC     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PKK_QUE_ARC     to START1;
+grant SELECT                                                                 on PKK_QUE_ARC     to UPLD;
 
 
 

@@ -75,8 +75,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CRSOUR_DEAL_RATES ***
+grant SELECT                                                                 on CRSOUR_DEAL_RATES to BARSREADER_ROLE;
 grant SELECT                                                                 on CRSOUR_DEAL_RATES to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on CRSOUR_DEAL_RATES to CDB;
+grant SELECT                                                                 on CRSOUR_DEAL_RATES to UPLD;
 
 
 

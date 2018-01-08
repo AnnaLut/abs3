@@ -71,19 +71,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTIMMOBILE_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_IMMOBILE ADD CONSTRAINT FK_DPTIMMOBILE_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DPTIMMOBILE_DPTID_NN ***
 begin   
  execute immediate '
@@ -184,9 +171,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_IMMOBILE ***
+grant SELECT                                                                 on DPT_IMMOBILE    to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_IMMOBILE    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_IMMOBILE    to BARS_DM;
 grant SELECT                                                                 on DPT_IMMOBILE    to START1;
+grant SELECT                                                                 on DPT_IMMOBILE    to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_IMMOBILE    to WR_ALL_RIGHTS;
 
 

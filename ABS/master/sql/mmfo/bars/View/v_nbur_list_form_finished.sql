@@ -36,9 +36,11 @@ PROMPT *** Create  view V_NBUR_LIST_FORM_FINISHED ***
     WHERE l.FILE_STATUS in ('FINISHED', 'BLOCKED', 'STOPPED');
 
 PROMPT *** Create  grants  V_NBUR_LIST_FORM_FINISHED ***
+grant SELECT                                                                 on V_NBUR_LIST_FORM_FINISHED to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_LIST_FORM_FINISHED to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_LIST_FORM_FINISHED to RPBN002;
 grant SELECT                                                                 on V_NBUR_LIST_FORM_FINISHED to START1;
+grant SELECT                                                                 on V_NBUR_LIST_FORM_FINISHED to UPLD;
 
 
 

@@ -25,6 +25,10 @@ join   bms_message_type mt on mt.id = t.message_type_id and
 where  t.effective_time <= sysdate
 ;
 
+PROMPT *** Create  grants  USER_MESSAGES ***
+grant SELECT                                                                 on USER_MESSAGES   to BARSREADER_ROLE;
+grant SELECT                                                                 on USER_MESSAGES   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

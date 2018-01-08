@@ -1,4 +1,13 @@
-create or replace procedure p_fm_set_params (
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FM_SET_PARAMS.sql =========*** R
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_FM_SET_PARAMS ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_FM_SET_PARAMS (
   p_id    finmon_que.id%type,
   p_ref   finmon_que.ref%type,
   p_rec   finmon_que.rec%type,
@@ -43,3 +52,14 @@ begin
 
 end p_fm_set_params;
 /
+show err;
+
+PROMPT *** Create  grants  P_FM_SET_PARAMS ***
+grant EXECUTE                                                                on P_FM_SET_PARAMS to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on P_FM_SET_PARAMS to FINMON01;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FM_SET_PARAMS.sql =========*** E
+PROMPT ===================================================================================== 

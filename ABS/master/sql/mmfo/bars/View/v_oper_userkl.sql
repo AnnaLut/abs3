@@ -14,8 +14,10 @@ where userid=user_id
    or (tt like 'KL%' and substr(chk,3,4)=LPAD(chk.TO_HEX(user_id),4,'0'));
 
 PROMPT *** Create  grants  V_OPER_USERKL ***
+grant SELECT                                                                 on V_OPER_USERKL   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OPER_USERKL   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OPER_USERKL   to START1;
+grant SELECT                                                                 on V_OPER_USERKL   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OPER_USERKL   to WR_ALL_RIGHTS;
 
 

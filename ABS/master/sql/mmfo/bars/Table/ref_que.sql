@@ -67,19 +67,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_REFQUE_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REF_QUE ADD CONSTRAINT FK_REFQUE_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C008704 ***
 begin   
  execute immediate '
@@ -119,10 +106,12 @@ exception when others then
 
 PROMPT *** Create  grants  REF_QUE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on REF_QUE         to ABS_ADMIN;
+grant SELECT                                                                 on REF_QUE         to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on REF_QUE         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REF_QUE         to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on REF_QUE         to START1;
 grant SELECT                                                                 on REF_QUE         to TOSS;
+grant SELECT                                                                 on REF_QUE         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REF_QUE         to WR_ALL_RIGHTS;
 
 

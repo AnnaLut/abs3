@@ -56,6 +56,7 @@ PROMPT *** Create  view SALDO ***
 PROMPT *** Create  grants  SALDO ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDO           to ABS_ADMIN;
 grant SELECT                                                                 on SALDO           to BARS010;
+grant SELECT                                                                 on SALDO           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDO           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALDO           to DPT;
 grant SELECT                                                                 on SALDO           to DPT_ROLE;
@@ -65,6 +66,7 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on SALDO           to RPBN001;
 grant SELECT                                                                 on SALDO           to START1;
 grant SELECT                                                                 on SALDO           to TOSS;
+grant SELECT                                                                 on SALDO           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SALDO           to WR_ALL_RIGHTS;
 grant SELECT                                                                 on SALDO           to WR_CREDIT;
 grant SELECT                                                                 on SALDO           to WR_CREPORTS;

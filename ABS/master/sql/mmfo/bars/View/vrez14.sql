@@ -11,8 +11,10 @@ PROMPT *** Create  view VREZ14 ***
   select rowid RI, r."MFO",r."RNK",r."ND",r."KV",r."Z14",r."P14",r."Z15",r."P15",r."EVENT",r."REF",r."P152",r."Z14N",r."Z15N",r."PF",r."V14",r."V15",r."V14N",r."V15N",r."VIDD",r."NZ15",r."NV15",r."QZ15",r."QV15",r."NZ15U",r."NV15U",r."QZ15U",r."QV15U",r."Z14U",r."V14U",r."REF15",r."BVQ14",r."BVQ15",r."B9Q14",r."B9Q15",r."REFP14",r."REFP15",r."REF152",r."P153",r."REF153",r."TIPA",r."NLS",r."ID" from REZ14 r;
 
 PROMPT *** Create  grants  VREZ14 ***
+grant SELECT                                                                 on VREZ14          to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on VREZ14          to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on VREZ14          to START1;
+grant SELECT                                                                 on VREZ14          to UPLD;
 
 
 

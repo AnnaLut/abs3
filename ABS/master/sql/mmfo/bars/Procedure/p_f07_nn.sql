@@ -141,12 +141,12 @@ p_proc_set(kodf_,sheme_,nbuc1_,typ_);
 
 dati_ := f_snap_dati(dat_, 2);
 
-if mfou_ in (300205, 300465, 380623) then
-   sql_acc_ := 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''07'') or '||
+if mfou_= 300465 then
+   sql_acc_ := 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''07'' and d_close is null) or '||
                '(nbs is null and substr(nls,1,4) in
-                (select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''07'')';
+                (select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''07''  and d_close is null )';
 else
-   sql_acc_ := 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''07'' ';
+   sql_acc_ := 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''07'' and d_close is null ';
 end if;
 
 ret_ := f_pop_otcn(Dat_, 2, sql_acc_,null,1); -- после перехода на SNAP таблицы

@@ -11,8 +11,10 @@ PROMPT *** Create  view LOM_234 ***
   SELECT id, nazn, s, s  FROM lom_nazn   where id in (2,3,4);
 
 PROMPT *** Create  grants  LOM_234 ***
+grant SELECT                                                                 on LOM_234         to BARSREADER_ROLE;
 grant FLASHBACK,SELECT,UPDATE                                                on LOM_234         to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on LOM_234         to RCC_DEAL;
+grant SELECT                                                                 on LOM_234         to UPLD;
 grant FLASHBACK,SELECT,UPDATE                                                on LOM_234         to WR_REFREAD;
 
 

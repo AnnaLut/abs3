@@ -129,32 +129,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DISCLAIM_ID_UPD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_DET_UPDATE ADD CONSTRAINT FK_DISCLAIM_ID_UPD FOREIGN KEY (DISCLAIM_ID)
-	  REFERENCES BARS.STO_DISCLAIMER (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_STATUS_ID_UPD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_DET_UPDATE ADD CONSTRAINT FK_STATUS_ID_UPD FOREIGN KEY (STATUS_ID)
-	  REFERENCES BARS.STO_STATUS (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C006201 ***
 begin   
  execute immediate '
@@ -179,10 +153,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C006209 ***
+PROMPT *** Create  constraint SYS_C006203 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STO_DET_UPDATE MODIFY (IDD NOT NULL ENABLE)';
+  ALTER TABLE BARS.STO_DET_UPDATE MODIFY (NAZN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -251,10 +225,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C006203 ***
+PROMPT *** Create  constraint SYS_C006209 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STO_DET_UPDATE MODIFY (NAZN NOT NULL ENABLE)';
+  ALTER TABLE BARS.STO_DET_UPDATE MODIFY (IDD NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -263,10 +237,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  STO_DET_UPDATE ***
+grant SELECT                                                                 on STO_DET_UPDATE  to BARSREADER_ROLE;
 grant SELECT                                                                 on STO_DET_UPDATE  to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_DET_UPDATE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STO_DET_UPDATE  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_DET_UPDATE  to STO;
+grant SELECT                                                                 on STO_DET_UPDATE  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STO_DET_UPDATE  to WR_ALL_RIGHTS;
 
 

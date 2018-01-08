@@ -73,6 +73,10 @@ COMMENT ON COLUMN BARS.ERR$_INS_PARTNERS.CUSTTYPE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_INS_PARTNERS ***
+grant SELECT                                                                 on ERR$_INS_PARTNERS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_INS_PARTNERS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

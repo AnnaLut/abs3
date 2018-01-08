@@ -19,7 +19,9 @@ group by a.tobo, a.fdat, a.nbs, a.kv, t.name, t.dig
  ;
 
 PROMPT *** Create  grants  V_BALANS_TOBO_VAL ***
+grant SELECT                                                                 on V_BALANS_TOBO_VAL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BALANS_TOBO_VAL to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_BALANS_TOBO_VAL to UPLD;
 grant SELECT                                                                 on V_BALANS_TOBO_VAL to WEB_BALANS;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BALANS_TOBO_VAL to WR_ALL_RIGHTS;
 

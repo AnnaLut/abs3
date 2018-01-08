@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Ресурс по термінах погашення (щомісячний)';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_DPU_RESOURCE_MONTHLY';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,12 +124,12 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'CCY_CODE', 'C', 'Код валюти', null, 3, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CCY_ID', 'N', 'Валюта', null, 22, 2, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=V_DPU_RESOURCE_DAILY[CONDITIONS=>V_DPU_RESOURCE_DAILY.CCY_ID = :CCY_ID][ACCESSCODE=>1]', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DEP_AMT', 'N', 'Сума', null, 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DEP_QTY', 'N', 'К-ть депозитів', null, 22, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'MAT_MO', 'D', 'Місяць', null, 10, 1, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=V_DPU_RESOURCE_DAILY[CONDITIONS=>V_DPU_RESOURCE_DAILY.MAT_DT between :MAT_MO and last_day(:MAT_MO)][ACCESSCODE=>1]', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KF', 'C', 'Код~філіалу', null, 6, 0, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'CCY_CODE', 'C', 'Код валюти', '', 3, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CCY_ID', 'N', 'Валюта', '', 22, 2, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=V_DPU_RESOURCE_DAILY[CONDITIONS=>V_DPU_RESOURCE_DAILY.CCY_ID = :CCY_ID][ACCESSCODE=>1]', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DEP_AMT', 'N', 'Сума', '', 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DEP_QTY', 'N', 'К-ть депозитів', '', 22, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'MAT_MO', 'D', 'Місяць', '', 10, 1, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=V_DPU_RESOURCE_DAILY[CONDITIONS=>V_DPU_RESOURCE_DAILY.MAT_DT between :MAT_MO and last_day(:MAT_MO)][ACCESSCODE=>1]', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KF', 'C', 'Код~філіалу', '', 6, 0, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

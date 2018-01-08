@@ -64,18 +64,6 @@ COMMENT ON COLUMN BARS.APP_REP_BAK.ACODE IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C0025778 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.APP_REP_BAK MODIFY (CODEREP NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C0025777 ***
 begin   
  execute immediate '
@@ -87,8 +75,22 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint SYS_C0025778 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.APP_REP_BAK MODIFY (CODEREP NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  APP_REP_BAK ***
+grant SELECT                                                                 on APP_REP_BAK     to BARSREADER_ROLE;
 grant SELECT                                                                 on APP_REP_BAK     to BARS_DM;
+grant SELECT                                                                 on APP_REP_BAK     to UPLD;
 
 
 

@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции CDC
-prompt Наименование операции: (доч.CD1) Комісія банку за прийом переказу для Вестерн Юніон
+prompt Наименование операции: CDC (доч.CD1) Комісія банку за прийом переказу для Вестерн Юніон
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CDC', '(доч.CD1) Комісія банку за прийом переказу для Вестерн Юніон', 1, '#(nbs_ob22 (''2909'',''27''))', 980, '#(nbs_ob22 (''6110'',''75''))', 980, null, null, null, null, 0, 0, 0, 0, ' F_TARIF_OP(5, 47, #(KVA), #(S), #(NLSA),''CD1'', 0.786)', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('CDC', 'CDC (доч.CD1) Комісія банку за прийом переказу для Вестерн Юніон', 1, '#(nbs_ob22 (''2909'',''27''))', 980, '#(nbs_ob22 (''6510'',''75''))', 980, null, null, null, null, 0, 0, 0, 0, ' F_TARIF_OP(5, 47, #(KVA), #(S), #(NLSA),''CD1'', 0.786)', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CDC', name='(доч.CD1) Комісія банку за прийом переказу для Вестерн Юніон', dk=1, nlsm='#(nbs_ob22 (''2909'',''27''))', kv=980, nlsk='#(nbs_ob22 (''6110'',''75''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=' F_TARIF_OP(5, 47, #(KVA), #(S), #(NLSA),''CD1'', 0.786)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='CDC', name='CDC (доч.CD1) Комісія банку за прийом переказу для Вестерн Юніон', dk=1, nlsm='#(nbs_ob22 (''2909'',''27''))', kv=980, nlsk='#(nbs_ob22 (''6510'',''75''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=' F_TARIF_OP(5, 47, #(KVA), #(S), #(NLSA),''CD1'', 0.786)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='CDC';
   end;
   --------------------------------
@@ -111,7 +111,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции K47
-prompt Наименование операции: (доч.CD1) Комісія за прийом переказу для Вестерн Юніон
+prompt Наименование операции: K47 (доч.CD1) Комісія за прийом переказу для Вестерн Юніон
 declare
   cnt_  number;
 begin
@@ -120,11 +120,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K47', '(доч.CD1) Комісія за прийом переказу для Вестерн Юніон', 0, '#(nbs_ob22 (''2909'',''27''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF_OP(2, 47, #(KVA), #(S), #(NLSA),''CD1'', 0.786)', null, 5, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('K47', 'K47 (доч.CD1) Комісія за прийом переказу для Вестерн Юніон', 0, '#(nbs_ob22 (''2909'',''27''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF_OP(2, 47, #(KVA), #(S), #(NLSA),''CD1'', 0.786)', null, 5, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K47', name='(доч.CD1) Комісія за прийом переказу для Вестерн Юніон', dk=0, nlsm='#(nbs_ob22 (''2909'',''27''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF_OP(2, 47, #(KVA), #(S), #(NLSA),''CD1'', 0.786)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='K47', name='K47 (доч.CD1) Комісія за прийом переказу для Вестерн Юніон', dk=0, nlsm='#(nbs_ob22 (''2909'',''27''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF_OP(2, 47, #(KVA), #(S), #(NLSA),''CD1'', 0.786)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='K47';
   end;
   --------------------------------
@@ -154,7 +154,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции CD1
-prompt Наименование операции: Прийом ГРН готівки для переказу по Вестерн Юніон з коміс.
+prompt Наименование операции: CD1 Прийом ГРН готівки для переказу по Вестерн Юніон з коміс.
 declare
   cnt_  number;
 begin
@@ -163,11 +163,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CD1', 'Прийом ГРН готівки для переказу по Вестерн Юніон з коміс.', 0, '#(nbs_ob22 (''2909'',''27''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(nbs_ob22 (''2909'',''27''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 1, 0, 0, 0, null, null, 32, null, null, null, '0000100001000000000000000000000000010000000000000000000000000000', 'Прийом ГРН готівки для переказу по Вестерн Юніон з комісією');
+    values ('CD1', 'CD1 Прийом ГРН готівки для переказу по Вестерн Юніон з коміс.', 0, '#(nbs_ob22 (''2909'',''27''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(nbs_ob22 (''2909'',''27''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 1, 0, 0, 0, null, null, 32, null, null, null, '0000100001000000000000000000000000010000000000000000000000000000', 'Прийом ГРН готівки для переказу по Вестерн Юніон з комісією');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CD1', name='Прийом ГРН готівки для переказу по Вестерн Юніон з коміс.', dk=0, nlsm='#(nbs_ob22 (''2909'',''27''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''2909'',''27''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=32, proc=null, s3800=null, rang=null, flags='0000100001000000000000000000000000010000000000000000000000000000', nazn='Прийом ГРН готівки для переказу по Вестерн Юніон з комісією'
+         set tt='CD1', name='CD1 Прийом ГРН готівки для переказу по Вестерн Юніон з коміс.', dk=0, nlsm='#(nbs_ob22 (''2909'',''27''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''2909'',''27''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=32, proc=null, s3800=null, rang=null, flags='0000100001000000000000000000000000010000000000000000000000000000', nazn='Прийом ГРН готівки для переказу по Вестерн Юніон з комісією'
        where tt='CD1';
   end;
   --------------------------------

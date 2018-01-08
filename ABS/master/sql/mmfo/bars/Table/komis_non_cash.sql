@@ -101,8 +101,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  KOMIS_NON_CASH ***
+grant SELECT                                                                 on KOMIS_NON_CASH  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on KOMIS_NON_CASH  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT                                                   on KOMIS_NON_CASH  to START1;
+grant SELECT                                                                 on KOMIS_NON_CASH  to UPLD;
 
 
 

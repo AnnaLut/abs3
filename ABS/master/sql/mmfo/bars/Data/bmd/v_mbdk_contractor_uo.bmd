@@ -59,7 +59,7 @@ declare
 begin
 
   l_tabsemantic := 'МБДК: Контрагенти (ЮО)';
-  l_tablinesdef := '500';
+  l_tablinesdef := '10';
   l_tabselect_statement := '';
   l_tabname     := 'V_MBDK_CONTRACTOR_UO';
 

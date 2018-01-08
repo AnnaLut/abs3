@@ -1,3 +1,5 @@
+
+ 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/wcs_register.sql =========*** Run **
  PROMPT ===================================================================================== 
@@ -2579,7 +2581,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.WCS_REGISTER is
 
 end wcs_register;
 /
-show err;
+ show err;
  
 PROMPT *** Create  grants  WCS_REGISTER ***
 grant EXECUTE                                                                on WCS_REGISTER    to BARS_ACCESS_DEFROLE;
@@ -2590,3 +2592,4 @@ grant EXECUTE                                                                on 
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/wcs_register.sql =========*** End **
  PROMPT ===================================================================================== 
+ 

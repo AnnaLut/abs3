@@ -57,6 +57,10 @@ COMMENT ON COLUMN BARS.ERR$_DPT_DEPOSIT_ALL.BRANCH IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DPT_DEPOSIT_ALL ***
+grant SELECT                                                                 on ERR$_DPT_DEPOSIT_ALL to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DPT_DEPOSIT_ALL to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -58,73 +58,12 @@ COMMENT ON COLUMN BARS.INS_PARTNER_TYPES.ACTIVE IS 'Флаг активності відносин по 
 
 
 
-PROMPT *** Create  constraint FK_INSPARTNERTPS_FID_FEES ***
+PROMPT *** Create  constraint PK_INSPARTNERTPS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INS_PARTNER_TYPES ADD CONSTRAINT FK_INSPARTNERTPS_FID_FEES FOREIGN KEY (FEE_ID, KF)
-	  REFERENCES BARS.INS_FEES (ID, KF) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_INSPARTNERTPS_LID_LIMITS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_PARTNER_TYPES ADD CONSTRAINT FK_INSPARTNERTPS_LID_LIMITS FOREIGN KEY (LIMIT_ID, KF)
-	  REFERENCES BARS.INS_LIMITS (ID, KF) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INSPARTNERTYPES_ACTIVE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_PARTNER_TYPES ADD CONSTRAINT CC_INSPARTNERTYPES_ACTIVE CHECK (active in (0, 1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_INSPARTNERTPS_TID_TYPES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_PARTNER_TYPES ADD CONSTRAINT FK_INSPARTNERTPS_TID_TYPES FOREIGN KEY (TYPE_ID)
-	  REFERENCES BARS.INS_TYPES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INSPRTTPS_ACT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_PARTNER_TYPES MODIFY (ACTIVE CONSTRAINT CC_INSPRTTPS_ACT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INSPRTTPS_TID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_PARTNER_TYPES MODIFY (TYPE_ID CONSTRAINT CC_INSPRTTPS_TID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.INS_PARTNER_TYPES ADD CONSTRAINT PK_INSPARTNERTPS PRIMARY KEY (PARTNER_ID, TYPE_ID, KF)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -145,12 +84,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_INSPARTNERTPS ***
+PROMPT *** Create  constraint CC_INSPRTTPS_TID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INS_PARTNER_TYPES ADD CONSTRAINT PK_INSPARTNERTPS PRIMARY KEY (PARTNER_ID, TYPE_ID, KF)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.INS_PARTNER_TYPES MODIFY (TYPE_ID CONSTRAINT CC_INSPRTTPS_TID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -159,11 +96,22 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_INSPARTNERTPS_TID_TARIFFS ***
+PROMPT *** Create  constraint CC_INSPRTTPS_ACT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INS_PARTNER_TYPES ADD CONSTRAINT FK_INSPARTNERTPS_TID_TARIFFS FOREIGN KEY (TARIFF_ID, KF)
-	  REFERENCES BARS.INS_TARIFFS (ID, KF) ENABLE';
+  ALTER TABLE BARS.INS_PARTNER_TYPES MODIFY (ACTIVE CONSTRAINT CC_INSPRTTPS_ACT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INSPARTNERTYPES_ACTIVE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_PARTNER_TYPES ADD CONSTRAINT CC_INSPARTNERTYPES_ACTIVE CHECK (active in (0, 1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -184,6 +132,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  INS_PARTNER_TYPES ***
+grant SELECT                                                                 on INS_PARTNER_TYPES to BARSREADER_ROLE;
+grant SELECT                                                                 on INS_PARTNER_TYPES to UPLD;
 
 
 

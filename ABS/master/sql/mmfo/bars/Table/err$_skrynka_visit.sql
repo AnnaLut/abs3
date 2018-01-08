@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.ERR$_SKRYNKA_VISIT.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_SKRYNKA_VISIT ***
+grant SELECT                                                                 on ERR$_SKRYNKA_VISIT to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_SKRYNKA_VISIT to UPLD;
+
 
 
 PROMPT ===================================================================================== 

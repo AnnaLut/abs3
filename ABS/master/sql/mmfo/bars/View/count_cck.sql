@@ -17,8 +17,10 @@ from CCK_AN_TMP
 order by pr, prs, kv;
 
 PROMPT *** Create  grants  COUNT_CCK ***
+grant SELECT                                                                 on COUNT_CCK       to BARSREADER_ROLE;
 grant SELECT                                                                 on COUNT_CCK       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on COUNT_CCK       to START1;
+grant SELECT                                                                 on COUNT_CCK       to UPLD;
 
 
 

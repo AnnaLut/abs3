@@ -12,8 +12,10 @@ PROMPT *** Create  view DEBREG_FILES ***
 from zag_pf;
 
 PROMPT *** Create  grants  DEBREG_FILES ***
+grant SELECT                                                                 on DEBREG_FILES    to BARSREADER_ROLE;
 grant SELECT                                                                 on DEBREG_FILES    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEBREG_FILES    to START1;
+grant SELECT                                                                 on DEBREG_FILES    to UPLD;
 
 
 

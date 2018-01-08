@@ -38,8 +38,10 @@ PROMPT *** Create  view V_STO_DET_HIST ***
 ORDER BY sdu.idd, sdu.when;
 
 PROMPT *** Create  grants  V_STO_DET_HIST ***
+grant SELECT                                                                 on V_STO_DET_HIST  to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_STO_DET_HIST  to BARS_ACCESS_DEFROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_STO_DET_HIST  to STO;
+grant SELECT                                                                 on V_STO_DET_HIST  to UPLD;
 grant FLASHBACK,SELECT                                                       on V_STO_DET_HIST  to WR_REFREAD;
 
 

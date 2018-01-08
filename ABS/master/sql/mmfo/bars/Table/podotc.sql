@@ -116,10 +116,12 @@ exception when others then
 
 PROMPT *** Create  grants  PODOTC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PODOTC          to ABS_ADMIN;
+grant SELECT                                                                 on PODOTC          to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on PODOTC          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PODOTC          to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on PODOTC          to REF0000;
 grant SELECT                                                                 on PODOTC          to START1;
+grant SELECT                                                                 on PODOTC          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PODOTC          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on PODOTC          to WR_REFREAD;
 

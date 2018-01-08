@@ -52,9 +52,11 @@ COMMENT ON COLUMN BARS.KOD_D5_1.D_CLOSE IS '';
 
 
 PROMPT *** Create  grants  KOD_D5_1 ***
+grant SELECT                                                                 on KOD_D5_1        to BARSREADER_ROLE;
 grant SELECT                                                                 on KOD_D5_1        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_D5_1        to BARS_DM;
 grant SELECT                                                                 on KOD_D5_1        to START1;
+grant SELECT                                                                 on KOD_D5_1        to UPLD;
 
 
 

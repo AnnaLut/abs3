@@ -14,8 +14,10 @@ PROMPT *** Create  view V_TECHACCTEMPLATES ***
  ;
 
 PROMPT *** Create  grants  V_TECHACCTEMPLATES ***
+grant SELECT                                                                 on V_TECHACCTEMPLATES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TECHACCTEMPLATES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TECHACCTEMPLATES to DPT_ROLE;
+grant SELECT                                                                 on V_TECHACCTEMPLATES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_TECHACCTEMPLATES to WR_ALL_RIGHTS;
 
 

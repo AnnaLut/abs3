@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_LOCPAY_FEE ***
 
-CREATE OR REPLACE procedure BARS.p_locpay_fee (p_date date) is
+  CREATE OR REPLACE PROCEDURE BARS.P_LOCPAY_FEE (p_date date) is
 
  --процедура по списанию комисии
  aa1 accounts%rowtype ;
@@ -36,9 +36,9 @@ begin
        l_last_date := ADD_MONTHS(LAST_DAY(p_date),-1);
 
        bars_audit.info('locpay_fee_1 l_first_date = '||l_first_date||' l_last_date = '||l_last_date);
-       
+
     SAVEPOINT before_pay;
-    
+
     BEGIN
        SELECT a.*
          INTO ab
@@ -67,11 +67,11 @@ begin
                  -20203,
                  'Не знайдено транзитний рахунок NBS = 2924 OB22 = 28');
         END;
-        
+
         BEGIN
            SELECT 1
              INTO l_check
-             FROM LOCPAY_FEE_LOG 
+             FROM LOCPAY_FEE_LOG
             WHERE dat = to_date(l_last_date,'dd/mm/yyyy') and NLSTR = aa1.nls and kf = sys_context('bars_context','user_mfo');
         EXCEPTION
            WHEN NO_DATA_FOUND
@@ -114,11 +114,11 @@ begin
                  -20203,
                  'Не знайдено транзитний рахунок NBS = 3739 OB22 = 15');
         END;
-        
+
         BEGIN
            SELECT 1
              INTO l_check
-             FROM LOCPAY_FEE_LOG 
+             FROM LOCPAY_FEE_LOG
             WHERE dat = to_date(l_last_date,'dd/mm/yyyy') and NLSTR = aa2.nls and kf = sys_context('bars_context','user_mfo');
         EXCEPTION
            WHEN NO_DATA_FOUND
@@ -126,7 +126,7 @@ begin
              l_check := 0;
         END;
 
-       
+
       l_sum_3739 := fost(aa2.acc,l_last_date);
 
       If aa2.ostc >= l_sum_3739 and l_sum_3739 <>0  and l_check = 0 then

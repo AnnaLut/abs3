@@ -67,6 +67,10 @@ COMMENT ON COLUMN BARS.ERR$_ZAY_TRACK_RU.VIZA_NAME IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ZAY_TRACK_RU ***
+grant SELECT                                                                 on ERR$_ZAY_TRACK_RU to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ZAY_TRACK_RU to UPLD;
+
 
 
 PROMPT ===================================================================================== 

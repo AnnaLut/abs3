@@ -36,9 +36,11 @@ PROMPT *** Create  view PROVNU_96 ***
  ;
 
 PROMPT *** Create  grants  PROVNU_96 ***
+grant SELECT                                                                 on PROVNU_96       to BARSREADER_ROLE;
 grant SELECT                                                                 on PROVNU_96       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PROVNU_96       to NALOG;
 grant SELECT                                                                 on PROVNU_96       to RPBN001;
+grant SELECT                                                                 on PROVNU_96       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PROVNU_96       to WR_ALL_RIGHTS;
 
 

@@ -153,19 +153,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ANB1_NREP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ANB1 ADD CONSTRAINT FK_ANB1_NREP FOREIGN KEY (NREP)
-	  REFERENCES BARS.ANB0 (NREP) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C006664 ***
 begin   
  execute immediate '
@@ -192,10 +179,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  ANB1 ***
+grant SELECT                                                                 on ANB1            to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANB1            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANB1            to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANB1            to RPBN001;
 grant SELECT                                                                 on ANB1            to SALGL;
+grant SELECT                                                                 on ANB1            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ANB1            to WR_ALL_RIGHTS;
 
 

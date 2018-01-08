@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -58,7 +59,8 @@ declare
 begin
 
   l_tabsemantic := 'Реєстр довіреностей на підписання договорів';
-  l_tablinesdef := '50';
+  l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'DPT_POAS';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,19 +124,16 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 6, 'FIO', 'C', 'ПІБ підписанта', 3, 500, 3, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'FIO_R', 'C', 'ПІБ підписанта у р.в.', 4, 500, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'POA_DATE', 'D', 'Дата док.', 1.1, 10, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'POA_DOC', 'C', 'Док. що підтв. повн. у р.в.', 3, 500, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'POA_NOTARY', 'C', 'Зв. та ПІБ нотар.', 3, 500, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'POA_NOTARY_NUM', 'C', 'Номер в реєстрі нотар. який посв. док.', 2, 500, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'POST', 'C', 'Посада підписанта', 3, 500, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'POST_R', 'C', 'Посада підписанта у р.в.', 3, 500, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'STAFF_ID', 'N', 'Ід. користувача~ підписанта', 1, 22, 2, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'ID', 'N', 'Ід.', 1, 22, 1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'POST_ENG', 'C', 'Посада на англ.', 3, null, 12, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'TVBV_NUM', 'C', 'Номер~ТВБВ', 1, 15, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'DOC_BASIS', 'C', 'Документ на англ.~(наказ/довіреність)', 3, null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'FIO', 'C', 'ПІБ підписанта', '', 500, 3, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'FIO_R', 'C', 'ПІБ підписанта у р.в.', '', 500, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'POA_DATE', 'D', 'Дата док.', '', 10, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'POA_DOC', 'C', 'Док. що підтв. повн. у р.в.', '', 500, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'POA_NOTARY', 'C', 'Зв. та ПІБ нотар.', '', 500, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'POA_NOTARY_NUM', 'C', 'Номер в реєстрі нотар. який посв. док.', '', 500, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'POST', 'C', 'Посада підписанта', '', 500, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'POST_R', 'C', 'Посада підписанта у р.в.', '', 500, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'STAFF_ID', 'N', 'Ід. користувача підписанта', '', 22, 2, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'ID', 'N', 'Ідентифікатор', '', 22, 1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('STAFF$BASE');
@@ -140,15 +142,6 @@ begin
     bars_metabase.add_extrnval(l_tabid, 15, l_newtabid, l_newcolid, 'sb', '', '', '');
   else
     dbms_output.put_line('В БМД не описана таблица STAFF$BASE для описания сложного поля таблицы DPT_POAS.');
-  end if;
-
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('POST_BANK_ENG');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'POST_ENG');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 17, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица POST_BANK_ENG для описания сложного поля таблицы DPT_POAS.');
   end if;
 
   -- очищаем описание функций на справочник

@@ -46,23 +46,12 @@ COMMENT ON COLUMN BARS.KP_TTS.TT IS 'Код операции';
 
 
 
-
-PROMPT *** Create  constraint SYS_C0014957 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KP_TTS ADD FOREIGN KEY (TT)
-	  REFERENCES BARS.TTS (TT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
 PROMPT *** Create  grants  KP_TTS ***
+grant SELECT                                                                 on KP_TTS          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KP_TTS          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KP_TTS          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KP_TTS          to START1;
+grant SELECT                                                                 on KP_TTS          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KP_TTS          to WR_ALL_RIGHTS;
 
 

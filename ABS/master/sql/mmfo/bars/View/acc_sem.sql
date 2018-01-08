@@ -13,8 +13,10 @@ substr(nls||'          ',1,14)||'/'||substr(1000+kv,2,3)||' '||nms
 from accounts;
 
 PROMPT *** Create  grants  ACC_SEM ***
+grant SELECT                                                                 on ACC_SEM         to BARSREADER_ROLE;
 grant SELECT                                                                 on ACC_SEM         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_SEM         to START1;
+grant SELECT                                                                 on ACC_SEM         to UPLD;
 
 
 

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Документи РУ через котловий 2909 (для 1ПБ)';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_CIM_1PB_DOC';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,21 +124,21 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'REF_CA', 'N', ' Реф. у ЦА ', null, 38, 1, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'REF_RU', 'N', ' Реф. у РУ ', null, 38, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NLSA', 'C', 'Рах. відправника', null, 15, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KF', 'C', 'МФО РУ', null, 6, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'VDAT', 'D', 'Дата вал.', null, 10, 7, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'KV', 'N', 'Валюта', null, 3, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'S', 'N', '            Сума            ', null, 24, 9, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NAZN', 'C', 'Призначення', null, 160, 10, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'KOD_N_CA', 'C', 'Код призн. ЦА', null, 12, 12, 1, 0, 1, 1, '', '', 1, 1, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'DECLARATION', 'C', 'Декларування', null, 160, 15, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'KOD_N_RU', 'C', 'Код призн. РУ', null, 12, 13, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'CHANGED', 'N', 'Змінено у ЦА', null, 1, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'KOD_N_RU_TXT', 'C', 'Код призн. РУ', null, 110, 14, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'MD', 'N', 'Автозаміна', null, 1, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'OUR_IPN', 'N', 'ІПН нашого Банку', null, 1, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'REF_CA', 'N', ' Реф. у ЦА ', '', 38, 1, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'REF_RU', 'N', ' Реф. у РУ ', '', 38, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NLSA', 'C', 'Рах. відправника', '', 15, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KF', 'C', 'МФО РУ', '', 6, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'VDAT', 'D', 'Дата вал.', '', 10, 7, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'KV', 'N', 'Валюта', '', 3, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'S', 'N', '            Сума            ', '', 24, 9, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NAZN', 'C', 'Призначення', '', 160, 10, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'KOD_N_CA', 'C', 'Код призн. ЦА', '', 12, 12, 1, 0, 1, 1, '', '', 1, 1, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'DECLARATION', 'C', 'Декларування', '', 160, 15, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'KOD_N_RU', 'C', 'Код призн. РУ', '', 12, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'CHANGED', 'N', 'Змінено у ЦА', '', 1, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'KOD_N_RU_TXT', 'C', 'Код призн. РУ', '', 110, 14, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'MD', 'N', 'Автозаміна', '', 1, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'OUR_IPN', 'N', 'ІПН нашого Банку', '', 1, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('BOPCODE');

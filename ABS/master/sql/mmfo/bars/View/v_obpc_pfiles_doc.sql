@@ -78,8 +78,10 @@ select k.f_n, f_d, k.card_acct, k.rec, k.tt,
    and k.branch like sys_context ('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  V_OBPC_PFILES_DOC ***
+grant SELECT                                                                 on V_OBPC_PFILES_DOC to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OBPC_PFILES_DOC to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OBPC_PFILES_DOC to OBPC;
+grant SELECT                                                                 on V_OBPC_PFILES_DOC to UPLD;
 
 
 

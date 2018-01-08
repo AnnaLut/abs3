@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.ERR$_SW_MSGFIELD.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_SW_MSGFIELD ***
+grant SELECT                                                                 on ERR$_SW_MSGFIELD to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_SW_MSGFIELD to UPLD;
+
 
 
 PROMPT ===================================================================================== 

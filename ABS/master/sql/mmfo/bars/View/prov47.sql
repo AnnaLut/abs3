@@ -205,6 +205,8 @@ PROMPT *** Create  view PROV47 ***
   order  by kk,kv;
 
 PROMPT *** Create  grants  PROV47 ***
+grant SELECT                                                                 on PROV47          to BARSREADER_ROLE;
+grant SELECT                                                                 on PROV47          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PROV47          to WR_ALL_RIGHTS;
 
 

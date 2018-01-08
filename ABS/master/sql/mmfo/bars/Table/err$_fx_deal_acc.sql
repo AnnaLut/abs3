@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.ERR$_FX_DEAL_ACC.ACC9 IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_FX_DEAL_ACC ***
+grant SELECT                                                                 on ERR$_FX_DEAL_ACC to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_FX_DEAL_ACC to UPLD;
+
 
 
 PROMPT ===================================================================================== 

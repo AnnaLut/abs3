@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_CM_SALARY_CARD.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CM_SALARY_CARD ***
+grant SELECT                                                                 on ERR$_CM_SALARY_CARD to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CM_SALARY_CARD to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -78,9 +78,11 @@ exception when others then
 
 PROMPT *** Create  grants  NBS_KNYGA ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBS_KNYGA       to ABS_ADMIN;
+grant SELECT                                                                 on NBS_KNYGA       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBS_KNYGA       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBS_KNYGA       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBS_KNYGA       to START1;
+grant SELECT                                                                 on NBS_KNYGA       to UPLD;
 grant FLASHBACK,SELECT                                                       on NBS_KNYGA       to WR_REFREAD;
 
 

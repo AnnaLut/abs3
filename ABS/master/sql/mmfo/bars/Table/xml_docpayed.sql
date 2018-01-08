@@ -103,82 +103,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005788 ***
+PROMPT *** Create  constraint SYS_C005780 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.XML_DOCPAYED MODIFY (KF NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005787 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML_DOCPAYED MODIFY (ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005786 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML_DOCPAYED MODIFY (SOS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005785 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML_DOCPAYED MODIFY (STMT NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005784 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML_DOCPAYED MODIFY (SQ NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005783 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML_DOCPAYED MODIFY (S NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005782 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML_DOCPAYED MODIFY (FDAT NOT NULL ENABLE)';
+  ALTER TABLE BARS.XML_DOCPAYED MODIFY (DK NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -199,10 +127,82 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005780 ***
+PROMPT *** Create  constraint SYS_C005782 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.XML_DOCPAYED MODIFY (DK NOT NULL ENABLE)';
+  ALTER TABLE BARS.XML_DOCPAYED MODIFY (FDAT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005783 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.XML_DOCPAYED MODIFY (S NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005784 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.XML_DOCPAYED MODIFY (SQ NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005785 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.XML_DOCPAYED MODIFY (STMT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005786 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.XML_DOCPAYED MODIFY (SOS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005787 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.XML_DOCPAYED MODIFY (ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005788 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.XML_DOCPAYED MODIFY (KF NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -213,8 +213,10 @@ exception when others then
 PROMPT *** Create  grants  XML_DOCPAYED ***
 grant REFERENCES,SELECT                                                      on XML_DOCPAYED    to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on XML_DOCPAYED    to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on XML_DOCPAYED    to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_DOCPAYED    to BARS_DM;
 grant SELECT                                                                 on XML_DOCPAYED    to REFSYNC_USR;
+grant SELECT                                                                 on XML_DOCPAYED    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_DOCPAYED    to WR_ALL_RIGHTS;
 
 

@@ -1,4 +1,10 @@
-create or replace package ow_files_proc is
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ow_files_proc.sql =========*** Run *
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.OW_FILES_PROC is
 
   -- Author  : VITALII.KHOMIDA
   -- Created : 09.08.2017 14:10:37
@@ -13,7 +19,7 @@ create or replace package ow_files_proc is
                         offsetexpire varchar2(8)
                         );
   type t_files is table of t_file;
-  
+
   procedure load_file(p_filename in varchar2,
                       p_filebody in blob,
                       p_origin   in number,
@@ -27,7 +33,7 @@ create or replace package ow_files_proc is
   procedure parse_files(p_files out t_files);
   procedure parse_file(p_fileid in number);
   function lock_file (p_id in number) return boolean;
-  procedure pay_file(p_fileid in number);  
+  procedure pay_file(p_fileid in number);
   type docs_buffers_rec is record
    (
       ref              oper.ref%type,
@@ -42,10 +48,10 @@ create or replace package ow_files_proc is
   procedure put_doc_sign(p_ref      in integer,
                          p_key       in varchar2,
                          p_int_sign  in varchar2,
-                         p_sep_sign  in varchar2);  
+                         p_sep_sign  in varchar2);
 end;
 /
-CREATE OR REPLACE package body BARS.ow_files_proc is
+CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
 
   g_modcode       constant varchar2(3) := 'BPK';
   g_filetype_atrn constant varchar2(30) := 'ATRANSFERS';
@@ -167,7 +173,7 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
 
   end init;
 
-  
+
   function get_file_state(p_fileid in number) return number is
     l_state ow_files.file_status%type;
   begin
@@ -570,7 +576,8 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
 
     l_parser := dbms_xmlparser.newparser;
 
-    dbms_xmlparser.parseclob(l_parser, p_filebody);
+    dbms_xmlparser.parseclob(l_parser, p_filebody);
+
 
     bars_audit.info(h || 'clob loaded p_fileid=' || p_fileid || '(' || p_file_name || ')');
 
@@ -2477,8 +2484,8 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
     l_changbd      boolean := false;
     l_err          varchar2(254);
     l_status       ow_files.file_status%type;
-    l_fn           ow_files.file_name%type; 
-    h varchar2(100) := 'ow_files_proc.pay_file. ';    
+    l_fn           ow_files.file_name%type;
+    h varchar2(100) := 'ow_files_proc.pay_file. ';
   begin
     select tt.offset, trim(tt.offsetexpire), t.file_type, t.file_status, t.file_name
       into l_offset, l_offsetexpire, l_filetype, l_status, l_fn
@@ -2495,7 +2502,7 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
         l_offsetexpire := null;
         l_expiredate   := null;
     end;
-    
+
     -- Для ATRANSFERS намагаємось проплатити в дату постінгу
     if nvl(l_offset, 0) <> 0 and l_filetype <>  g_filetype_atrn then
       if l_offsetexpire is null or sysdate <= l_expiredate then
@@ -2513,7 +2520,7 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
              and rownum = 1 and t.anl_postingdate is not null;
         exception
           when no_data_found then
-            l_paydate := null; 
+            l_paydate := null;
         end;
         if l_paydate is not null then
           gl.pl_dat(l_paydate);
@@ -2521,24 +2528,24 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
         end if;
       end if;
     end if;
-  
+
     bars_ow.pay_oic_file(p_fileid);
-  
+
     if l_changbd then
       gl.pl_dat(l_current_bd);
     end if;
-  exception 
+  exception
     when others then
       l_err := substr(dbms_utility.format_error_stack() || chr(10) ||
                 dbms_utility.format_error_backtrace(), 1, 254);
-                
+
       if l_status <> 3 then
         set_file_status(p_fileid, null, 3, substr('Pay error: ' || l_err, 1, 254));
       end if;
 
       bars_audit.info(h || 'Pay error#'||l_fn||'#: ' ||
          dbms_utility.format_error_stack() || chr(10) ||
-         dbms_utility.format_error_backtrace());    
+         dbms_utility.format_error_backtrace());
   end;
 
   procedure pay_files(p_files in t_files, p_parallel_enable in boolean default true)
@@ -2622,7 +2629,7 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
     end if;
 
   end;
- 
+
   procedure files_processing(p_kf     in varchar2,
                              p_userid in number default 1) is
     l_files t_files := t_files();
@@ -2642,11 +2649,11 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
       pay_files(l_files, false);
 
     end if;
-    
+
     bars_login.logout_user;
 
   end;
-  
+
   function get_docs_buffers (p_key in varchar2)
         return docs_buffers_set
         pipelined
@@ -2734,7 +2741,7 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
 
       select * into l_oper from oper where ref=p_ref;
 
-      if l_oper.sos between 0 and 4 
+      if l_oper.sos between 0 and 4
       then
          savepoint sp_pay;
 
@@ -2746,7 +2753,7 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
             sgn_mgr.store_sep_sign(p_ref       => p_ref,
                                    p_sign_type => 'VG2',
                                    p_key_id    => p_key,
-                                   p_sign_hex  => p_sep_sign); 
+                                   p_sign_hex  => p_sep_sign);
          end if;
 
          sgn_mgr.store_int_sign(p_ref       => p_ref,
@@ -2754,7 +2761,7 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
                                 p_sign_type => 'VG2',
                                 p_key_id    => p_key,
                                 p_sign_hex  => p_int_sign);
-                                
+
 
          gl.pay( 2,p_ref,gl.bdate);
 
@@ -2778,12 +2785,12 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
                        NULL,nazns_,id_a_,id_b_,id_o_,refA_,0,sign_,
                        NULL,NULL,datA_,d_rec_,0,p_ref,0);
 
-       
+
 
         --уточнить, нужно ли
          --p_fm_extdoccheck(rec_);
          end if;
-            
+
          update ow_oic_ref
          set sign_state=1
          where ref=p_ref;
@@ -2800,3 +2807,14 @@ begin
   init;
 end;
 /
+ show err;
+ 
+PROMPT *** Create  grants  OW_FILES_PROC ***
+grant EXECUTE                                                                on OW_FILES_PROC   to BARS_ACCESS_DEFROLE;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/ow_files_proc.sql =========*** End *
+ PROMPT ===================================================================================== 
+ 

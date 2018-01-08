@@ -160,32 +160,6 @@ COMMENT ON COLUMN BARS.NBUR_LST_BLC_OBJECTS.USER_NAME IS 'Логін користувача, що 
 
 
 
-PROMPT *** Create  constraint FK_NBURLSTBLCOBJS_LSTVRSN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBUR_LST_BLC_OBJECTS ADD CONSTRAINT FK_NBURLSTBLCOBJS_LSTVRSN FOREIGN KEY (REPORT_DATE, KF, VERSION_ID)
-	  REFERENCES BARS.NBUR_LST_VERSIONS (REPORT_DATE, KF, VERSION_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_NBURLSTBLCOBJS_LSTOBJECTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBUR_LST_BLC_OBJECTS ADD CONSTRAINT FK_NBURLSTBLCOBJS_LSTOBJECTS FOREIGN KEY (REPORT_DATE, KF, VERSION_ID, OBJECT_ID)
-	  REFERENCES BARS.NBUR_LST_OBJECTS (REPORT_DATE, KF, VERSION_ID, OBJECT_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint UK_NBURLSTBLCOBJS ***
 begin   
  execute immediate '
@@ -290,11 +264,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_NBURLSTBLCOBJS_REFOBJECTS ***
+PROMPT *** Create  constraint CC_NBURLSTBLCOBJS_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_LST_BLC_OBJECTS ADD CONSTRAINT FK_NBURLSTBLCOBJS_REFOBJECTS FOREIGN KEY (OBJECT_ID)
-	  REFERENCES BARS.NBUR_REF_OBJECTS (ID) ENABLE';
+  ALTER TABLE BARS.NBUR_LST_BLC_OBJECTS MODIFY (KF CONSTRAINT CC_NBURLSTBLCOBJS_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -343,18 +316,6 @@ PROMPT *** Create  constraint CC_NBURLSTBLCOBJS_USERNM_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.NBUR_LST_BLC_OBJECTS MODIFY (USER_NAME CONSTRAINT CC_NBURLSTBLCOBJS_USERNM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NBURLSTBLCOBJS_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBUR_LST_BLC_OBJECTS MODIFY (KF CONSTRAINT CC_NBURLSTBLCOBJS_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -455,9 +416,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_LST_BLC_OBJECTS ***
+grant SELECT                                                                 on NBUR_LST_BLC_OBJECTS to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_LST_BLC_OBJECTS to BARSUPL;
 grant SELECT                                                                 on NBUR_LST_BLC_OBJECTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_LST_BLC_OBJECTS to BARS_DM;
+grant SELECT                                                                 on NBUR_LST_BLC_OBJECTS to UPLD;
 
 
 

@@ -102,12 +102,14 @@ exception when others then
 
 PROMPT *** Create  grants  PAP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PAP             to ABS_ADMIN;
+grant SELECT                                                                 on PAP             to BARSREADER_ROLE;
 grant SELECT                                                                 on PAP             to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PAP             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PAP             to BARS_DM;
 grant SELECT                                                                 on PAP             to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PAP             to PAP;
 grant SELECT                                                                 on PAP             to START1;
+grant SELECT                                                                 on PAP             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PAP             to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on PAP             to WR_REFREAD;
 grant SELECT                                                                 on PAP             to WR_VIEWACC;

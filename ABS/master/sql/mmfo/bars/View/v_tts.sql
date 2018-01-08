@@ -13,8 +13,10 @@ PROMPT *** Create  view V_TTS ***
        WHERE (substr(x0.flags, 1, 1) =  '1') AND (x0.tt =  x1.tt) AND (x1.id =  x2.id) AND upper(rtrim(ltrim(x2.logname))) =  USER;
 
 PROMPT *** Create  grants  V_TTS ***
+grant SELECT                                                                 on V_TTS           to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TTS           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TTS           to START1;
+grant SELECT                                                                 on V_TTS           to UPLD;
 
 
 

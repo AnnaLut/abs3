@@ -20,8 +20,10 @@ PROMPT *** Create  view V_STODEALS ***
     WHERE c.rnk = l.rnk;
 
 PROMPT *** Create  grants  V_STODEALS ***
+grant SELECT                                                                 on V_STODEALS      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STODEALS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_STODEALS      to STO;
+grant SELECT                                                                 on V_STODEALS      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_STODEALS      to WR_ALL_RIGHTS;
 
 

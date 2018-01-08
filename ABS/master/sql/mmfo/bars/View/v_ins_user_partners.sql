@@ -20,7 +20,9 @@ PROMPT *** Create  view V_INS_USER_PARTNERS ***
  order by p.partner_id;
 
 PROMPT *** Create  grants  V_INS_USER_PARTNERS ***
+grant SELECT                                                                 on V_INS_USER_PARTNERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_USER_PARTNERS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_INS_USER_PARTNERS to UPLD;
 
 
 

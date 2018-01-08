@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Параметри фыльтру для Перегляду проводок';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'PAR_PROVODKI';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,15 +124,16 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 2, 'D', 'C', 'Маска~рах.ДЕБ%', 2, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'K', 'C', 'Маска~рах.КРД%', 2, null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'T', 'C', 'Тільки T~ДОД.РЕКВ', 2, null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=VAL_PROVODKI_T[ACCESSCODE=>1][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'V', 'C', 'Тільки V~ВАЛ.ПОЗ.', 2, null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=VAL_PROVODKI_V[ACCESSCODE=>1][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'X', 'C', 'Тільки X~СТОРНО', 2, null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=VAL_PROVODKI_X[ACCESSCODE=>1][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NAZN', 'C', '%Признач~Платежу%', 2, null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'Z', 'C', 'Тільки Z~КОРРИГ.', 2, null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=VAL_PROVODKI_Z[ACCESSCODE=>1][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'Y', 'C', 'Тільки Y~ПРИЗНАЧ.ПЛ', 2, null, 17, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=VAL_PROVODKI_Y[ACCESSCODE=>1][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'TAG', 'C', 'ТЕГ дод~реквізиту', 1, null, 13, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BD', 'D', 'Банк-дата', '2', null, 1, 0, 0, 0, 1, '', 'dd.MM.yyyy', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'D', 'C', 'Маска~рах.ДЕБ%', '2', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'K', 'C', 'Маска~рах.КРД%', '2', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'T', 'C', 'T', '2', null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, 'sPar=VAL_PROVODKI_T[ACCESSCODE=>1][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'V', 'C', 'V', '2', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, 'sPar=VAL_PROVODKI_V[ACCESSCODE=>1][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'X', 'C', 'X', '2', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, 'sPar=VAL_PROVODKI_X[ACCESSCODE=>1][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NAZN', 'C', '%Признач~Платежу%', '2', null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'Z', 'C', 'Z', '2', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, 'sPar=VAL_PROVODKI_Z[ACCESSCODE=>1][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'Y', 'C', 'Y', '2', null, 17, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, 'sPar=VAL_PROVODKI_Y[ACCESSCODE=>1][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'TAG', 'C', 'ТЕГ дод~реквізиту', '1', null, 13, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('OP_FIELD');
@@ -139,13 +145,31 @@ begin
   end if;
 
   -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'PUL.PUT(''D'',:D);PUL.PUT(''K'',:K);PUL.PUT(''Y'',:NAZN);PUL.PUT(''T'',:TAG)');
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'PUL.PUT(''D'',:D); PUL.PUT(''K'',:K); PUL.PUT(''Y'',:NAZN); PUL.PUT(''T'',:TAG); PUL.PUT(''BD'', to_char( :BD , ''dd.mm.yyyy'') ) ');
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Очистити параметри вибору проводок', 'PUL.PUT(''D'',NULL);PUL.PUT(''K'',NULL);PUL.PUT(''Y'',NULL);PUL.PUT(''T'',NULL)', '', 'ONCE', '', '', '', '', '', 3);
+  bars_metabase.add_nsifunction(l_tabid, 0, 'Очистити параметри вибору проводок', 'PUL.PUT(''D'',NULL);PUL.PUT(''K'',NULL);PUL.PUT(''Y'',NULL);PUL.PUT(''T'',NULL); PUL.PUT(''BD'',NULL)', '', 'ONCE', '', '', '', '', '', 3);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Всі по "масці" ранунків Деб та Крд', '', '', 'ONCE', '', '', '', '', 'sPar=VAL_PROVODKI_Y[ACCESSCODE=>1][showDialogWindow=>false]', 51);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 2, 'Тільки КОРРИГГУЮЧІ', '', '', 'ONCE', '', '', '', '', 'sPar=VAL_PROVODKI_Z[ACCESSCODE=>1][showDialogWindow=>false]', 34);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 3, 'Тільки СТОРНО', '', '', 'ONCE', '', '', '', '', 'sPar=VAL_PROVODKI_X[ACCESSCODE=>1][showDialogWindow=>false]', 61);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 4, 'Тільки ВАЛ.ПОЗ.', '', '', 'ONCE', '', '', '', '', 'sPar=VAL_PROVODKI_V[ACCESSCODE=>1][showDialogWindow=>false]', 84);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 5, 'Тільки ДОД.РЕКВІЗ.', '', '', 'ONCE', '', '', '', '', 'sPar=VAL_PROVODKI_T[ACCESSCODE=>1][showDialogWindow=>false]', 63);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 7, 'Тільки ПРИЗНАЧ.ПЛ.', '', '', 'ONCE', '', '', '', '', 'sPar=VAL_PROVODKI_YY[ACCESSCODE=>1][showDialogWindow=>false]', 111);
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop

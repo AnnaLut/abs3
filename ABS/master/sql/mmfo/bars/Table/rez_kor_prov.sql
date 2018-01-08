@@ -60,7 +60,9 @@ COMMENT ON COLUMN BARS.REZ_KOR_PROV.SQ IS '';
 
 
 PROMPT *** Create  grants  REZ_KOR_PROV ***
+grant SELECT                                                                 on REZ_KOR_PROV    to BARSREADER_ROLE;
 grant SELECT                                                                 on REZ_KOR_PROV    to BARS_DM;
+grant SELECT                                                                 on REZ_KOR_PROV    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REZ_KOR_PROV    to WR_ALL_RIGHTS;
 
 

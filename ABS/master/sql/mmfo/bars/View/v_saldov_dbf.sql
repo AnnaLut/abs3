@@ -37,8 +37,10 @@ x0.nms from  accounts x0,  cust_acc x1
         (x0.nls < '90000000000000'));
 
 PROMPT *** Create  grants  V_SALDOV_DBF ***
+grant SELECT                                                                 on V_SALDOV_DBF    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SALDOV_DBF    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SALDOV_DBF    to START1;
+grant SELECT                                                                 on V_SALDOV_DBF    to UPLD;
 
 
 

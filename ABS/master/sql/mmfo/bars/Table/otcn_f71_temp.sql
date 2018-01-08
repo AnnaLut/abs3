@@ -25,7 +25,7 @@ begin
 	ACC NUMBER, 
 	TP NUMBER, 
 	ND NUMBER, 
-	P090 VARCHAR2(40), 
+	P090 VARCHAR2(50), 
 	P080 VARCHAR2(70), 
 	P081 NUMBER, 
 	P110 NUMBER, 
@@ -95,10 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010221 ***
+PROMPT *** Create  constraint SYS_C0010220 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OTCN_F71_TEMP MODIFY (ACC NOT NULL ENABLE)';
+  ALTER TABLE BARS.OTCN_F71_TEMP MODIFY (RNK NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -107,10 +107,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010220 ***
+PROMPT *** Create  constraint SYS_C0010221 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OTCN_F71_TEMP MODIFY (RNK NOT NULL ENABLE)';
+  ALTER TABLE BARS.OTCN_F71_TEMP MODIFY (ACC NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -144,8 +144,10 @@ exception when others then
 
 PROMPT *** Create  grants  OTCN_F71_TEMP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F71_TEMP   to ABS_ADMIN;
+grant SELECT                                                                 on OTCN_F71_TEMP   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F71_TEMP   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F71_TEMP   to RPBN002;
+grant SELECT                                                                 on OTCN_F71_TEMP   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_F71_TEMP   to WR_ALL_RIGHTS;
 
 

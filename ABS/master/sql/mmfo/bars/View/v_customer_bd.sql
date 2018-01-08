@@ -25,8 +25,10 @@ PROMPT *** Create  view V_CUSTOMER_BD ***
     WHERE c.custtype = 2 AND c.rnk = cb.rnka;
 
 PROMPT *** Create  grants  V_CUSTOMER_BD ***
+grant SELECT                                                                 on V_CUSTOMER_BD   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTOMER_BD   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUSTOMER_BD   to START1;
+grant SELECT                                                                 on V_CUSTOMER_BD   to UPLD;
 
 
 

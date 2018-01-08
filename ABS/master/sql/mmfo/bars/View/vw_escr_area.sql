@@ -25,7 +25,9 @@ PROMPT *** Create  view VW_ESCR_AREA ***
    AND t3.settlement_tp_id = t.settlement_type_id;
 
 PROMPT *** Create  grants  VW_ESCR_AREA ***
+grant SELECT                                                                 on VW_ESCR_AREA    to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_AREA    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VW_ESCR_AREA    to UPLD;
 
 
 

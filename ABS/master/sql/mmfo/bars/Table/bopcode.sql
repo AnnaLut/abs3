@@ -70,11 +70,13 @@ exception when others then
 
 PROMPT *** Create  grants  BOPCODE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BOPCODE         to ABS_ADMIN;
+grant SELECT                                                                 on BOPCODE         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BOPCODE         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BOPCODE         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BOPCODE         to BOPCODE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BOPCODE         to PB1;
 grant SELECT                                                                 on BOPCODE         to START1;
+grant SELECT                                                                 on BOPCODE         to UPLD;
 grant FLASHBACK,SELECT                                                       on BOPCODE         to WR_REFREAD;
 
 

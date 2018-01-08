@@ -37,7 +37,9 @@ PROMPT *** Create  view V_TMP_STATIC_LAYOUT_DETAIL_A ***
    order by m.ord;
 
 PROMPT *** Create  grants  V_TMP_STATIC_LAYOUT_DETAIL_A ***
+grant SELECT                                                                 on V_TMP_STATIC_LAYOUT_DETAIL_A to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TMP_STATIC_LAYOUT_DETAIL_A to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_TMP_STATIC_LAYOUT_DETAIL_A to UPLD;
 
 
 

@@ -17,8 +17,10 @@ PROMPT *** Create  view V_STAFF_UPRKLIROZR ***
    ORDER BY   s.id;
 
 PROMPT *** Create  grants  V_STAFF_UPRKLIROZR ***
+grant SELECT                                                                 on V_STAFF_UPRKLIROZR to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFF_UPRKLIROZR to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_STAFF_UPRKLIROZR to START1;
+grant SELECT                                                                 on V_STAFF_UPRKLIROZR to UPLD;
 
 
 

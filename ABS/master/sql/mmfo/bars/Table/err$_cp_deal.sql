@@ -105,6 +105,10 @@ COMMENT ON COLUMN BARS.ERR$_CP_DEAL.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CP_DEAL ***
+grant SELECT                                                                 on ERR$_CP_DEAL    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CP_DEAL    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

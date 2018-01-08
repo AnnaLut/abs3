@@ -57,6 +57,10 @@ COMMENT ON COLUMN BARS.ERR$_PFU_FILETYPES.CODE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_PFU_FILETYPES ***
+grant SELECT                                                                 on ERR$_PFU_FILETYPES to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_PFU_FILETYPES to UPLD;
+
 
 
 PROMPT ===================================================================================== 

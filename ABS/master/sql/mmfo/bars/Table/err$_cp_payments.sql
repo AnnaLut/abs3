@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.ERR$_CP_PAYMENTS.OP_REF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CP_PAYMENTS ***
+grant SELECT                                                                 on ERR$_CP_PAYMENTS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CP_PAYMENTS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

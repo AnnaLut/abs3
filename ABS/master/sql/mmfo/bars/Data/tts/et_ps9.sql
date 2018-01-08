@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции PS9
-prompt Наименование операции: p) Перекриття(розщіплення) міжбанк ГРН (Дебет)
+prompt Наименование операции: PS9 p) Перекриття(розщіплення) міжбанк ГРН (Дебет)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('PS9', 'p) Перекриття(розщіплення) міжбанк ГРН (Дебет)', 0, null, null, '#(get_proc_nls(''T0D'',#(KVA)))', null, null, null, null, null, 0, 1, 0, 0, null, null, null, null, null, null, '0300100000000000000000000000000000000000000000000010000000000000', null);
+    values ('PS9', 'PS9 p) Перекриття(розщіплення) міжбанк ГРН (Дебет)', 0, null, null, '#(get_proc_nls(''T0D'',#(KVA)))', null, null, null, null, null, 0, 1, 0, 0, null, null, null, null, null, null, '0300100000000000000000000000000000000000000000000010000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='PS9', name='p) Перекриття(розщіплення) міжбанк ГРН (Дебет)', dk=0, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T0D'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0300100000000000000000000000000000000000000000000010000000000000', nazn=null
+         set tt='PS9', name='PS9 p) Перекриття(розщіплення) міжбанк ГРН (Дебет)', dk=0, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T0D'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0300100000000000000000000000000000000000000000000010000000000000', nazn=null
        where tt='PS9';
   end;
   --------------------------------

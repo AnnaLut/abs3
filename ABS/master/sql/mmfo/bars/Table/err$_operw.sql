@@ -60,7 +60,9 @@ COMMENT ON COLUMN BARS.ERR$_OPERW.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_OPERW ***
+grant SELECT                                                                 on ERR$_OPERW      to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_OPERW      to BARS_DM;
+grant SELECT                                                                 on ERR$_OPERW      to UPLD;
 
 
 

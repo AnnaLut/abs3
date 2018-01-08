@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_blk_val_corp.sql =========*** Run
  PROMPT ===================================================================================== 
  
-CREATE OR REPLACE function BARS.f_blk_val_corp(
+  CREATE OR REPLACE FUNCTION BARS.F_BLK_VAL_CORP (
     p_nlsa   in varchar2,
     p_nlsb   in varchar2,
     p_kv     in integer,
@@ -46,8 +46,9 @@ begin
 
     return l_block_flag;
 end;
-/ 
-
+/
+ show err;
+ 
 PROMPT *** Create  grants  F_BLK_VAL_CORP ***
 grant EXECUTE                                                                on F_BLK_VAL_CORP  to BARS014;
 grant EXECUTE                                                                on F_BLK_VAL_CORP  to BARS_ACCESS_DEFROLE;

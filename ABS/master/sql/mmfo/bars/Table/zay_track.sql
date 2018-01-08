@@ -63,10 +63,10 @@ COMMENT ON COLUMN BARS.ZAY_TRACK.BRANCH IS '';
 
 
 
-PROMPT *** Create  constraint CC_ZAYTRACK_ID_NN ***
+PROMPT *** Create  constraint CC_ZAYTRACK_TRACKID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAY_TRACK MODIFY (ID CONSTRAINT CC_ZAYTRACK_ID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ZAY_TRACK MODIFY (TRACK_ID CONSTRAINT CC_ZAYTRACK_TRACKID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -75,10 +75,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ZAYTRACK_TRACKID_NN ***
+PROMPT *** Create  constraint CC_ZAYTRACK_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAY_TRACK MODIFY (TRACK_ID CONSTRAINT CC_ZAYTRACK_TRACKID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ZAY_TRACK MODIFY (ID CONSTRAINT CC_ZAYTRACK_ID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -111,11 +111,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ZAYTRACK_ZAYAVKA ***
+PROMPT *** Create  constraint CC_ZAYTRACK_CHTIME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAY_TRACK ADD CONSTRAINT FK_ZAYTRACK_ZAYAVKA FOREIGN KEY (ID)
-	  REFERENCES BARS.ZAYAVKA (ID) ENABLE';
+  ALTER TABLE BARS.ZAY_TRACK MODIFY (CHANGE_TIME CONSTRAINT CC_ZAYTRACK_CHTIME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -142,31 +141,6 @@ begin
   ALTER TABLE BARS.ZAY_TRACK ADD CONSTRAINT PK_ZAYTRACK PRIMARY KEY (TRACK_ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLD  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAYTRACK_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAY_TRACK ADD CONSTRAINT FK_ZAYTRACK_STAFF FOREIGN KEY (USERID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ZAYTRACK_CHTIME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAY_TRACK MODIFY (CHANGE_TIME CONSTRAINT CC_ZAYTRACK_CHTIME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -204,6 +178,7 @@ exception when others then
 
 PROMPT *** Create  grants  ZAY_TRACK ***
 grant FLASHBACK,REFERENCES,SELECT                                            on ZAY_TRACK       to BARSAQ with grant option;
+grant SELECT                                                                 on ZAY_TRACK       to BARSREADER_ROLE;
 grant SELECT                                                                 on ZAY_TRACK       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAY_TRACK       to BARS_DM;
 grant SELECT                                                                 on ZAY_TRACK       to ZAY;

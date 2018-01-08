@@ -35,8 +35,10 @@ from  STAFF_ROLE r ,
 where  r.id = d.GRANTEE_ID (+);
 
 PROMPT *** Create  grants  M_ROLE ***
+grant SELECT                                                                 on M_ROLE          to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on M_ROLE          to START1;
+grant SELECT                                                                 on M_ROLE          to UPLD;
 
 
 

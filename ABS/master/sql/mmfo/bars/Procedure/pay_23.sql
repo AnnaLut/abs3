@@ -1,10 +1,13 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/PAY_23.sql =========*** Run *** ==
 PROMPT ===================================================================================== 
 
+
 PROMPT *** Create  procedure PAY_23 ***
 
-CREATE OR REPLACE PROCEDURE BARS.PAY_23 (P_dat01_ DATE, mode_ NUMBER DEFAULT 0, p_user number default null, nal_ number)  IS
+  CREATE OR REPLACE PROCEDURE BARS.PAY_23 (P_dat01_ DATE, mode_ NUMBER DEFAULT 0, p_user number default null, nal_ number)  IS
 
 /* Версия 3.0 19-06-2017 20-01-2017   26-07-2016  18-05-2016 (24-02-2016, 04-01-2016, 18-09-2015)
 
@@ -265,6 +268,8 @@ PROMPT *** Create  grants  PAY_23 ***
 grant EXECUTE                                                                on PAY_23          to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on PAY_23          to RCC_DEAL;
 grant EXECUTE                                                                on PAY_23          to START1;
+
+
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/PAY_23.sql =========*** End *** ==

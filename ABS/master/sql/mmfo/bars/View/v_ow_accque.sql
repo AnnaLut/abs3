@@ -15,8 +15,10 @@ PROMPT *** Create  view V_OW_ACCQUE ***
    and q.f_n = f.file_name(+);
 
 PROMPT *** Create  grants  V_OW_ACCQUE ***
+grant SELECT                                                                 on V_OW_ACCQUE     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_ACCQUE     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_ACCQUE     to OW;
+grant SELECT                                                                 on V_OW_ACCQUE     to UPLD;
 
 
 

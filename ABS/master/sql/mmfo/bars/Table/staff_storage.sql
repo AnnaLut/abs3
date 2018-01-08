@@ -69,32 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_STAFFSTG_STAFF2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_STORAGE ADD CONSTRAINT FK_STAFFSTG_STAFF2 FOREIGN KEY (GRANTOR)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_STAFFSTG_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_STORAGE ADD CONSTRAINT FK_STAFFSTG_STAFF FOREIGN KEY (ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_STAFFSTG_ID_NN ***
 begin   
  execute immediate '
@@ -122,9 +96,11 @@ exception when others then
 
 PROMPT *** Create  grants  STAFF_STORAGE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_STORAGE   to ABS_ADMIN;
+grant SELECT                                                                 on STAFF_STORAGE   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_STORAGE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF_STORAGE   to BARS_DM;
 grant SELECT                                                                 on STAFF_STORAGE   to START1;
+grant SELECT                                                                 on STAFF_STORAGE   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF_STORAGE   to WR_ALL_RIGHTS;
 
 

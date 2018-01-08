@@ -66,7 +66,9 @@ COMMENT ON COLUMN BARS.TMP_CC_LIM_104271_2.TYPM IS '';
 
 
 PROMPT *** Create  grants  TMP_CC_LIM_104271_2 ***
+grant SELECT                                                                 on TMP_CC_LIM_104271_2 to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_CC_LIM_104271_2 to BARS_DM;
+grant SELECT                                                                 on TMP_CC_LIM_104271_2 to UPLD;
 
 
 

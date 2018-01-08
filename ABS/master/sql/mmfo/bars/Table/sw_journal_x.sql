@@ -136,8 +136,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_JOURNAL_X ***
+grant SELECT                                                                 on SW_JOURNAL_X    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_JOURNAL_X    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_JOURNAL_X    to START1;
+grant SELECT                                                                 on SW_JOURNAL_X    to UPLD;
 
 
 

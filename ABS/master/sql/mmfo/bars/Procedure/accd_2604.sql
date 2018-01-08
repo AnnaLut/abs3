@@ -15,41 +15,37 @@ PROMPT *** Create  procedure ACCD_2604 ***
  OB22_     varchar2(2);
  nls_      accounts.NLS%type;
  tag_      varchar2(15);
- l_corp_income_nbs varchar2(4 char);
 begin
 -------------------------------------------------------------------------
 --                 "Плата за РО" и Проц.Карточки по 2600.
 --             Процедура включена в список Закрытия Дня:
 --
---  1). Удаляем ACCD, если он неГривневый или Закрыт.
+--  1). Удаляем RKO_LST.ACCD - счет списания, если он неГривневый или Закрыт.
 --
 --  2). Проставляем счетам 2603,2604,2600/не01 в качестве "Рахункiв
 --      списання" счет 2600/01 (2650) этого же Клиента (берем 2600/01 с
 --      максимальным остатком)
 --
 --  3). Довносим в RKO_LST вновь-открывшиеся 2620\07,32
---      Удаляем из RKO_LST закрывшиеся 2620
 --      Обнуляем 70 тариф для по всем 2620\07.
 --
 --  4). Удаляем 3570 у счетов, которые сидят в "Плате за РО", если этот же
 --      3570 встречается в счетах, сидящих в "Плате за РО-только 3570"
 --
---  5). УДАЛЯЕМ из PROC_DR$BASE записи с закрывшимися 7020 (G67).
---      ДОВНОСИМ записи для тех бранчей, по которым они отсутствуют.
 --
 --  6). В проц.карточках ЗАКРЫТЫХ счетов 2600,2603,2604,2650,2620/07
 --      проставляем      "Дата закiнчення" = Дата "Нараховано по"
 --      Это для того, что бы закрытые счета 2600 с недоначисленными %%
 --      не "лезли" в последующие начисления %%
 --
---  7). Проставление ИНДИВИДУАЛЬНЫХ 6110 по Корпор.Клиентам
+--  7). Проставление ИНДИВИДУАЛЬНЫХ 6510 по Корпор.Клиентам
 --
 --  8). Счета 2603 Клиентов, у которых нет 2600,2650, автом-ки
 --      вносим в справочник RKO_3570
 --
 --  9). Дозаполнение парметра CASH02 - счета кассы 1001/02, 1002/02.
 --
--- 10). Удаляем из RKO_LST счета c ОКПО банка
+-- 10). Удаляем из RKO_LST счета, закрывшиеся более 2-ух месяцев назад.
 --
 ----=========================================================================
 
@@ -167,7 +163,6 @@ begin
 ----=========================================================================
 
 --  3). Довносим в RKO_LST вновь-открывшиеся 2620\07,32
---      Удаляем из RKO_LST закрывшиеся       2620
 
 
  For k in (Select ACC From ACCOUNTS
@@ -177,17 +172,6 @@ begin
           )
  Loop
     INSERT INTO rko_lst (ACC) values (k.ACC);
- End Loop;
-
--------------------------------------------
-
- For k in (Select ACC From RKO_LST  Where
-                  ACC in (Select ACC from Accounts where
-                                 DAZS is not NULL
-                         )
-          )
- Loop
-    DELETE from  RKO_LST where ACC=k.ACC;
  End Loop;
 
 -------------------------------------------
@@ -213,226 +197,9 @@ UPDATE RKO_LST set ACC1=null where
    ACC1 in (Select ACC1 from RKO_LST where ACC in (Select ACC from RKO_3570));
 
 
----=======================================================================
-
---  5). Удаляем из PROC_DR$BASE записи с закрывшимися 7020 (G67)
---      и ДОВНОСИМ их для тех бранчей, по которым они отсутствуют.
-
-DELETE from PROC_DR$BASE p
- where p.NBS in ('2560','2600','2604','2650','2620')
-   and p.REZID=0
-   and p.IO=0
-   and exists (Select 1 from Accounts a where a.NLS = p.G67
-                  and a.DAZS is not NULL);
-
-
- for k in ( Select BRANCH From BRANCH Where length(BRANCH) > 8)
-
- LOOP
-
----   2560  -  7030/06  ---------------------------------------------
-
-     BEGIN
-
-       Select NLS into nls_7 from Accounts
-              where  DAZS is NULL                  and
-                     BRANCH=substr(k.BRANCH,1,15)  and
-                     NBS='7030' and OB22='06'      and
-                     rownum=1 ;
-
-
-       Insert into PROC_DR$BASE
-          (NBS, G67, V67, SOUR,
-           NBSN,
-           G67N, V67N, NBSZ,  REZID,
-           TT, TTV, IO, BRANCH
-           )
-       Values
-          ('2560', nls_7, NULL, 4,
-           '2568',
-           nls_7, NULL, NULL,   0,
-           NULL, NULL, 0, k.BRANCH
-          );
-
-     EXCEPTION WHEN OTHERS then
-       null;
-     END;
-
-
----   2600  -  7020/06  ---------------------------------------------
-
-     BEGIN
-
-       Select NLS into nls_7 from Accounts
-              where  DAZS is NULL                  and
-                     BRANCH=substr(k.BRANCH,1,15)  and
-                     NBS='7020' and OB22='06'      and
-                     rownum=1 ;
-
-       Insert into PROC_DR$BASE
-          (NBS, G67, V67, SOUR,
-           NBSN,
-           G67N, V67N, NBSZ,  REZID,
-           TT, TTV, IO, BRANCH
-           )
-       Values
-          ('2600', nls_7, NULL, 4,
-           '2608',
-           nls_7, NULL, NULL,   0,
-           NULL, NULL, 0, k.BRANCH
-          );
-
-     EXCEPTION WHEN OTHERS then
-       null;
-     END;
-
----   2604  - 7020/03  ---------------------------------------------
-
-     BEGIN
-
-       Select NLS into nls_7 from Accounts
-              where  DAZS is NULL                  and
-                     BRANCH=substr(k.BRANCH,1,15)  and
-                     NBS='7020' and OB22='03'      and
-                     rownum=1 ;
-
-
-       Insert into PROC_DR$BASE
-          (NBS, G67, V67, SOUR,
-           NBSN,
-           G67N, V67N, NBSZ,  REZID,
-           TT, TTV, IO, BRANCH
-           )
-       Values
-          ('2604', nls_7, NULL, 4,
-           '2608',
-           nls_7, NULL, NULL,   0,
-           NULL, NULL, 0, k.BRANCH
-          );
-
-     EXCEPTION WHEN OTHERS then
-       null;
-     END;
-
----   2620/07  - 7040/08  ---------------------------------------------
-
-     BEGIN
-
-       Select NLS into nls_7 from Accounts
-              where  DAZS is NULL                  and
-                     BRANCH=substr(k.BRANCH,1,15)  and
-                     NBS='7040' and OB22='08'      and
-                     rownum=1 ;
-
-
-       Insert into PROC_DR$BASE
-          (NBS, G67, V67, SOUR,
-           NBSN,
-           G67N, V67N, NBSZ,  REZID,
-           TT, TTV, IO, BRANCH
-           )
-       Values
-          ('2620', nls_7, NULL, 4,
-           '2628',
-           nls_7, NULL, NULL,   0,
-           NULL, NULL, 0, k.BRANCH
-          );
-
-     EXCEPTION WHEN OTHERS then
-       null;
-     END;
-
----------  2650 - 7070/01   -----------------------------------------
-
-     BEGIN
-
-       Select NLS into nls_7 from Accounts
-              where  DAZS is NULL                  and
-                     BRANCH=substr(k.BRANCH,1,15)  and
-                     NBS='7070' and OB22='01'      and
-                     rownum=1 ;
-
-
-       Insert into PROC_DR$BASE
-          (NBS, G67, V67, SOUR,
-           NBSN,
-           G67N, V67N, NBSZ,  REZID,
-           TT, TTV, IO, BRANCH
-           )
-       Values
-          ('2650', nls_7, NULL, 4,
-           '2658',
-           nls_7, NULL, NULL,   0,
-           NULL, NULL, 0, k.BRANCH
-          );
-
-     EXCEPTION WHEN OTHERS then
-       null;
-     END;
-
----------  2530 - 7030/08   -----------------------------------------
-
-     BEGIN
-
-       Select NLS into nls_7 from Accounts
-              where  DAZS is NULL                  and
-                     BRANCH=substr(k.BRANCH,1,15)  and
-                     NBS='7030' and OB22='08'      and
-                     rownum=1 ;
-
-
-       Insert into PROC_DR$BASE
-          (NBS, G67, V67, SOUR,
-           NBSN,
-           G67N, V67N, NBSZ,  REZID,
-           TT, TTV, IO, BRANCH
-           )
-       Values
-          ('2530', nls_7, NULL, 4,
-           '2538',
-           nls_7, NULL, NULL,   0,
-           NULL, NULL, 0, k.BRANCH
-          );
-
-     EXCEPTION WHEN OTHERS then
-       null;
-     END;
-
-
- End Loop;
-
----------------------   По валюте:
-
- For k in ( Select BRANCH From BRANCH Where length(BRANCH) > 8)
-
- LOOP
-
----   2600-ВАЛ  -  7020/07  ---------------------------------------------
-     BEGIN
-
-       Select NLS into nls_7 from Accounts
-              where  DAZS is NULL                  and
-                     BRANCH=substr(k.BRANCH,1,15)  and
-                     NBS='7020' and OB22='07'      and
-                     abs(ostc) =
-                         (Select max(abs(ostc)) from Accounts  where
-                           DAZS is NULL                  and
-                           BRANCH=substr(k.BRANCH,1,15)  and
-                           NBS='7020' and OB22='07'
-                         )                         and
-                     rownum=1 ;
-
-       Update PROC_DR$BASE set V67=nls_7, V67N=nls_7 where
-               NBS='2600' and NBSN='2608' and SOUR=4 and REZID=0 and
-               IO=0 and BRANCH=k.BRANCH and
-               V67 is NULL;
-
-     EXCEPTION WHEN OTHERS then
-       null;
-     END;
-
- End Loop;
-
+UPDATE RKO_LST set ACC2=null where
+   ACC not in (Select ACC from RKO_3570)   and
+   ACC2 in (Select ACC2 from RKO_LST where ACC in (Select ACC from RKO_3570));
 
 ---======================================================================
 --  6). В проц.карточках ЗАКРЫТЫХ счетов 2600,2603,2604,2650,2620/07
@@ -461,13 +228,8 @@ DELETE from PROC_DR$BASE p
 
 ---======================================================================
 
---  7).  Проставление ИНДИВИДУАЛЬНЫХ 6110 по Корпор.Клиентам
+--  7).  Проставление ИНДИВИДУАЛЬНЫХ 6510 по Корпор.Клиентам
 
- if newnbs.g_state= 1 then
-     l_corp_income_nbs := '6510';
- else
-     l_corp_income_nbs := '6110';
- end if;
 
  For n in ( Select KOD_CLI
             From   KOD_CLI
@@ -490,7 +252,7 @@ DELETE from PROC_DR$BASE p
               Where  NBS  in ('2560','2565','2600','2603','2604')
                 and  DAZS is NULL and   KV=980
                 and  RNK in (Select nvl(RNK,-1) from RNKP_KOD where KODK=n.KOD_CLI)
-                and  ACC not in (Select ACC from AccountsW where TAG='S6110' and substr(trim(VALUE),1,4) = l_corp_income_nbs)
+                and  ACC not in (Select ACC from AccountsW where TAG='S6110' and substr(trim(VALUE),1,4)='6510')
              )
     LOOP
 
@@ -500,7 +262,7 @@ DELETE from PROC_DR$BASE p
          from   Accounts
          where  DAZS is NULL                   and
                 BRANCH = substr(k.BRANCH,1,15) and
-                NBS = l_corp_income_nbs and OB22=OB22_      and
+                NBS='6510' and OB22=OB22_      and
                 rownum=1;
 
          Begin
@@ -518,7 +280,7 @@ DELETE from PROC_DR$BASE p
             from   Accounts
             where  DAZS is NULL                   and
                    BRANCH like '/______/000000/'  and
-                   NBS = l_corp_income_nbs and OB22=OB22_      and
+                   NBS='6510' and OB22=OB22_      and
                    rownum=1;
 
             Begin
@@ -642,13 +404,13 @@ DELETE from PROC_DR$BASE p
 
 ---================================================================
 --
--- 10). Удаляем из RKO_LST счета c ОКПО банка
+-- 10). Удаляем из RKO_LST счета, закрывшиеся более 2-ух месяцев назад 
 --
 
   FOR k IN  ( Select r.ACC
               FROM   RKO_LST r, ACCOUNTS a
               WHERE  r.ACC = a.ACC
-                 and a.RNK in (Select RNK from Customer where OKPO=gl.aOKPO)
+                 and a.DAZS is not NULL and a.DAZS < gl.BD - 60
             )
   LOOP
      DELETE from  RKO_LST where ACC=k.ACC;

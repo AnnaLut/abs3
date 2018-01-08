@@ -65,19 +65,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_PEREKRS_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PEREKR_S ADD CONSTRAINT FK_PEREKRS_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_PEREKRS_NAME_NN ***
 begin   
  execute immediate '
@@ -130,6 +117,7 @@ exception when others then
 PROMPT *** Create  grants  PEREKR_S ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PEREKR_S        to ABS_ADMIN;
 grant SELECT                                                                 on PEREKR_S        to BARS015;
+grant SELECT                                                                 on PEREKR_S        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PEREKR_S        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PEREKR_S        to BARS_DM;
 grant SELECT                                                                 on PEREKR_S        to DPT;
@@ -137,6 +125,7 @@ grant SELECT                                                                 on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on PEREKR_S        to PEREKR_S;
 grant SELECT                                                                 on PEREKR_S        to REF0000;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PEREKR_S        to START1;
+grant SELECT                                                                 on PEREKR_S        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PEREKR_S        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on PEREKR_S        to WR_REFREAD;
 

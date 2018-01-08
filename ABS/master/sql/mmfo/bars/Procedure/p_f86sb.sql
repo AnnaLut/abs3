@@ -63,7 +63,7 @@ nbuc_   VARCHAR2(12);
 
 ---ќстатки на отчетную дату (грн. + валюта)
 CURSOR SaldoASeekOstf IS
-   SELECT /*  INDEX(L XIE_K040_KL_K040) INDEX (C XPK_CUSTOMER) */ 
+   SELECT /*  INDEX(L XIE_K040_KL_K040) INDEX (C XPK_CUSTOMER) */
          a.acc, a.nls, a.kv, a.fdat, a.nbs, a.ostf-a.dos+a.kos,
          a.tobo, a.nms
 ---         GL.P_ICURVAL(a.kv, a.ostf-a.dos+a.kos, Dat_)
@@ -101,7 +101,7 @@ CURSOR SaldoASeekOstf IS
 
 ---ќбороты (по грн. + по валюте номиналы)
 CURSOR SaldoASeekOs IS
-   SELECT /*  INDEX(L XIE_K040_KL_K040) INDEX (C XPK_CUSTOMER) */ 
+   SELECT /*  INDEX(L XIE_K040_KL_K040) INDEX (C XPK_CUSTOMER) */
       a.acc, a.nls, a.kv, a.nbs, SUM(s.dos), SUM(s.kos), a.tobo, a.nms
      FROM saldoa s, accounts a, specparam_int i,
         (select distinct r020,p080

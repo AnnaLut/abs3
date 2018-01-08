@@ -15,8 +15,10 @@ PROMPT *** Create  view V_CASH_LIMITS_ATM ***
      and a.dazs is Null;
 
 PROMPT *** Create  grants  V_CASH_LIMITS_ATM ***
+grant SELECT                                                                 on V_CASH_LIMITS_ATM to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on V_CASH_LIMITS_ATM to BARS_ACCESS_DEFROLE;
 grant INSERT,SELECT,UPDATE                                                   on V_CASH_LIMITS_ATM to RPBN001;
+grant SELECT                                                                 on V_CASH_LIMITS_ATM to UPLD;
 
 
 

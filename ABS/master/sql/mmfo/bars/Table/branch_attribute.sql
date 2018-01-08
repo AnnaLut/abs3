@@ -66,10 +66,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BRANCH_ATTRIBUTES_DTTYPE ***
+PROMPT *** Create  constraint PK_BRANCH_ATTRIBUTE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BRANCH_ATTRIBUTE ADD CONSTRAINT CC_BRANCH_ATTRIBUTES_DTTYPE CHECK (attribute_datatype in (''N'',''C'',''D'')) ENABLE';
+  ALTER TABLE BARS.BRANCH_ATTRIBUTE ADD CONSTRAINT PK_BRANCH_ATTRIBUTE PRIMARY KEY (ATTRIBUTE_CODE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -78,12 +80,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_BRANCH_ATTRIBUTE ***
+PROMPT *** Create  constraint CC_BRANCH_ATTRIBUTES_DTTYPE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BRANCH_ATTRIBUTE ADD CONSTRAINT PK_BRANCH_ATTRIBUTE PRIMARY KEY (ATTRIBUTE_CODE)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.BRANCH_ATTRIBUTE ADD CONSTRAINT CC_BRANCH_ATTRIBUTES_DTTYPE CHECK (attribute_datatype in (''N'',''C'',''D'')) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -106,8 +106,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  BRANCH_ATTRIBUTE ***
+grant SELECT                                                                 on BRANCH_ATTRIBUTE to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRANCH_ATTRIBUTE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH_ATTRIBUTE to BARS_DM;
+grant SELECT                                                                 on BRANCH_ATTRIBUTE to UPLD;
 
 
 

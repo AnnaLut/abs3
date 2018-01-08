@@ -69,10 +69,12 @@ COMMENT ON COLUMN BARS.TMP_ANI.N6 IS '';
 
 
 PROMPT *** Create  grants  TMP_ANI ***
+grant SELECT                                                                 on TMP_ANI         to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_ANI         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_ANI         to BARS_DM;
 grant SELECT                                                                 on TMP_ANI         to RPBN001;
 grant SELECT                                                                 on TMP_ANI         to SALGL;
+grant SELECT                                                                 on TMP_ANI         to UPLD;
 
 
 

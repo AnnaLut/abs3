@@ -112,10 +112,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  CB_TIP ***
+grant SELECT                                                                 on CB_TIP          to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on CB_TIP          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CB_TIP          to BARS_DM;
 grant SELECT                                                                 on CB_TIP          to CB;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CB_TIP          to CB_TIP;
+grant SELECT                                                                 on CB_TIP          to UPLD;
 grant FLASHBACK,SELECT                                                       on CB_TIP          to WR_REFREAD;
 
 

@@ -33,8 +33,10 @@ FROM cc_deal d,    customer c,
 WHERE d.vidd IN (1,2,3,11,12,13) AND d.nd=p.nd AND c.rnk=d.rnk AND (p.sp<>0 OR p.spn<>0 OR p.spn_30<>0 OR p.sl<>0 OR p.sln<>0);
 
 PROMPT *** Create  grants  CCK_PROBL ***
+grant SELECT                                                                 on CCK_PROBL       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_PROBL       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_PROBL       to RCC_DEAL;
+grant SELECT                                                                 on CCK_PROBL       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_PROBL       to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CCK_PROBL       to WR_REFREAD;
 

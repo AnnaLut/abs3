@@ -35,8 +35,10 @@ PROMPT *** Create  view ACC_88_NEW ***
  ;
 
 PROMPT *** Create  grants  ACC_88_NEW ***
+grant SELECT                                                                 on ACC_88_NEW      to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on ACC_88_NEW      to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on ACC_88_NEW      to NALOG;
+grant SELECT                                                                 on ACC_88_NEW      to UPLD;
 
 
 

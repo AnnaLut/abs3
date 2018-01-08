@@ -67,6 +67,10 @@ COMMENT ON COLUMN BARS.ERR$_CM_CREDITS.DDATE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CM_CREDITS ***
+grant SELECT                                                                 on ERR$_CM_CREDITS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CM_CREDITS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

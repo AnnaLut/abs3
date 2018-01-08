@@ -83,6 +83,10 @@ COMMENT ON COLUMN BARS.ERR$_OTCN_TRACE_91.TOBO IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_OTCN_TRACE_91 ***
+grant SELECT                                                                 on ERR$_OTCN_TRACE_91 to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_OTCN_TRACE_91 to UPLD;
+
 
 
 PROMPT ===================================================================================== 

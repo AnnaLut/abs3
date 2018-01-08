@@ -18,8 +18,10 @@ WHERE a.acc =d.accs AND
       c.custtype<>3;
 
 PROMPT *** Create  grants  KU_101 ***
+grant SELECT                                                                 on KU_101          to BARSREADER_ROLE;
 grant SELECT                                                                 on KU_101          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KU_101          to START1;
+grant SELECT                                                                 on KU_101          to UPLD;
 
 
 

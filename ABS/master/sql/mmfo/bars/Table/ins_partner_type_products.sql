@@ -106,19 +106,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_PTNTYPEPRDS_TID_TYPES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_PARTNER_TYPE_PRODUCTS ADD CONSTRAINT FK_PTNTYPEPRDS_TID_TYPES FOREIGN KEY (TYPE_ID)
-	  REFERENCES BARS.INS_TYPES (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_PTNTYPEPRODS ***
 begin   
  execute immediate '
@@ -145,6 +132,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  INS_PARTNER_TYPE_PRODUCTS ***
+grant SELECT                                                                 on INS_PARTNER_TYPE_PRODUCTS to BARSREADER_ROLE;
+grant SELECT                                                                 on INS_PARTNER_TYPE_PRODUCTS to UPLD;
 
 
 

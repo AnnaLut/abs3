@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_CIM_CREDGRAPH_PAYMENT.PAY_FLAG IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIM_CREDGRAPH_PAYMENT ***
+grant SELECT                                                                 on ERR$_CIM_CREDGRAPH_PAYMENT to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIM_CREDGRAPH_PAYMENT to UPLD;
+
 
 
 PROMPT ===================================================================================== 

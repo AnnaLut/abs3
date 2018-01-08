@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TI_ACCOUNTS_RKO ***
 
- CREATE OR REPLACE TRIGGER "BARS".ti_accounts_rko after insert on accounts
+  CREATE OR REPLACE TRIGGER BARS.TI_ACCOUNTS_RKO after insert on accounts
 for each row
 declare
   stmp_ char(4);
@@ -22,6 +22,8 @@ begin
   end if;
 end;
 /
+ALTER TRIGGER BARS.TI_ACCOUNTS_RKO ENABLE;
+
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TI_ACCOUNTS_RKO.sql =========*** End

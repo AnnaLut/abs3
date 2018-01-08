@@ -81,8 +81,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  VP_LIM ***
+grant SELECT                                                                 on VP_LIM          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VP_LIM          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VP_LIM          to SALGL;
+grant SELECT                                                                 on VP_LIM          to UPLD;
 
 
 

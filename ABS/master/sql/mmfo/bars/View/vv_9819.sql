@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view VV_9819 ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.VV_9819 ("BRANCH", "ND", "CC_ID", "SDATE", "RNK", "NMK", "ISP", "K_02", "K_03", "K_79", "K_83", "K_I3", "K_B8", "PRIM", branch_cx) AS 
+  CREATE OR REPLACE FORCE VIEW BARS.VV_9819 ("BRANCH", "ND", "CC_ID", "SDATE", "RNK", "NMK", "ISP", "K_02", "K_03", "K_79", "K_83", "K_I3", "K_B8", "PRIM", "BRANCH_CX") AS 
   SELECT d.branch,
           d.nd,
           d.cc_id,
@@ -35,6 +35,7 @@ PROMPT *** Create  grants  VV_9819 ***
 grant SELECT                                                                 on VV_9819         to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on VV_9819         to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on VV_9819         to RCC_DEAL;
+grant SELECT                                                                 on VV_9819         to UPLD;
 
 
 

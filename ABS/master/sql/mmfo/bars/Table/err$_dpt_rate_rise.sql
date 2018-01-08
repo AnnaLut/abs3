@@ -65,6 +65,10 @@ COMMENT ON COLUMN BARS.ERR$_DPT_RATE_RISE.ID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DPT_RATE_RISE ***
+grant SELECT                                                                 on ERR$_DPT_RATE_RISE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DPT_RATE_RISE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

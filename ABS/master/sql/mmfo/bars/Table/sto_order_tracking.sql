@@ -54,32 +54,6 @@ COMMENT ON COLUMN BARS.STO_ORDER_TRACKING.SYS_TIME IS '';
 
 
 
-PROMPT *** Create  constraint FK_STO_ORDER_TRACKING_ORDER_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_ORDER_TRACKING ADD CONSTRAINT FK_STO_ORDER_TRACKING_ORDER_ID FOREIGN KEY (ORDER_ID)
-	  REFERENCES BARS.STO_ORDER (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_STO_ORDER_TRACKING_USER_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_ORDER_TRACKING ADD CONSTRAINT FK_STO_ORDER_TRACKING_USER_ID FOREIGN KEY (USER_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C0010048 ***
 begin   
  execute immediate '
@@ -170,9 +144,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  STO_ORDER_TRACKING ***
+grant SELECT                                                                 on STO_ORDER_TRACKING to BARSREADER_ROLE;
 grant SELECT                                                                 on STO_ORDER_TRACKING to BARSUPL;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on STO_ORDER_TRACKING to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STO_ORDER_TRACKING to BARS_DM;
+grant SELECT                                                                 on STO_ORDER_TRACKING to UPLD;
 
 
 

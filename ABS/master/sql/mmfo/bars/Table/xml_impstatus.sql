@@ -79,9 +79,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_IMPSTATUS ***
+grant SELECT                                                                 on XML_IMPSTATUS   to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_IMPSTATUS   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on XML_IMPSTATUS   to BARS_DM;
 grant SELECT                                                                 on XML_IMPSTATUS   to OPER000;
+grant SELECT                                                                 on XML_IMPSTATUS   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_IMPSTATUS   to WR_ALL_RIGHTS;
 
 

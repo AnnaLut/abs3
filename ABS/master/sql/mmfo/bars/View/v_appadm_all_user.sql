@@ -19,7 +19,9 @@ select a.id, a.fio, null
 
 PROMPT *** Create  grants  V_APPADM_ALL_USER ***
 grant SELECT                                                                 on V_APPADM_ALL_USER to ABS_ADMIN;
+grant SELECT                                                                 on V_APPADM_ALL_USER to BARSREADER_ROLE;
 grant SELECT                                                                 on V_APPADM_ALL_USER to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_APPADM_ALL_USER to UPLD;
 
 
 

@@ -75,6 +75,10 @@ COMMENT ON COLUMN BARS.ERR$_PRVN_AUTOEVENT_ARC.VIDD IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_PRVN_AUTOEVENT_ARC ***
+grant SELECT                                                                 on ERR$_PRVN_AUTOEVENT_ARC to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_PRVN_AUTOEVENT_ARC to UPLD;
+
 
 
 PROMPT ===================================================================================== 

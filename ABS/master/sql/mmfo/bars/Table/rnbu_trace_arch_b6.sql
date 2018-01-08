@@ -77,8 +77,10 @@ COMMENT ON COLUMN BARS.RNBU_TRACE_ARCH_B6.TOBO IS '';
 
 
 PROMPT *** Create  grants  RNBU_TRACE_ARCH_B6 ***
+grant SELECT                                                                 on RNBU_TRACE_ARCH_B6 to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_TRACE_ARCH_B6 to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_TRACE_ARCH_B6 to START1;
+grant SELECT                                                                 on RNBU_TRACE_ARCH_B6 to UPLD;
 
 
 

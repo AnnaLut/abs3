@@ -32,6 +32,10 @@ PROMPT *** Create  view OPL_OTC ***
      FROM accounts a, opldok o, oper p
     WHERE a.acc = o.acc AND o.REF = p.REF;
 
+PROMPT *** Create  grants  OPL_OTC ***
+grant SELECT                                                                 on OPL_OTC         to BARSREADER_ROLE;
+grant SELECT                                                                 on OPL_OTC         to UPLD;
+
 
 
 PROMPT ===================================================================================== 

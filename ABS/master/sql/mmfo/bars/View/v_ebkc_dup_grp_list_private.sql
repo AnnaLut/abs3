@@ -1,25 +1,29 @@
-prompt ==================================
-prompt Create view v_ebkc_dup_grp_list_private
-prompt ==================================
 
-create or replace view BARS.V_EBKC_DUP_GRP_LIST_PRIVATE
-as
-select a.m_rnk, 
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_EBKC_DUP_GRP_LIST_PRIVATE.sql =======
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_EBKC_DUP_GRP_LIST_PRIVATE ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_EBKC_DUP_GRP_LIST_PRIVATE ("M_RNK", "QTY_D_RNK", "CARD_QUALITY", "OKPO", "NMK", "GROUP_ID", "PRODUCT", "LAST_MODIFC_DATE", "BRANCH") AS 
+  select a.m_rnk,
        a.qty_d_rnk,
        a.card_quality,
-       a.okpo, 
-       a.nmk, 
-       a.group_id, 
+       a.okpo,
+       a.nmk,
+       a.group_id,
        (select name from ebkc_groups where id = a.group_id and cust_type = 'P') as product,
        a.last_modifc_date,
-       a.branch       
-  from ( select edg.m_rnk,  
+       a.branch
+  from ( select edg.m_rnk,
                 edg.qty_d_rnk,
        (select max(quality) from ebkc_qualityattr_groups
          where kf  = edg.kf
            and rnk = edg.m_rnk
            and name = 'card'
-           and cust_type = 'P') as card_quality,  
+           and cust_type = 'P') as card_quality,
        c.okpo,
        c.nmk,
       ebkc_pack.get_group_id( edg.m_rnk, edg.kf ) as group_id,
@@ -37,8 +41,13 @@ select a.m_rnk,
  where c.rnk = edg.m_rnk
    and edg.qty_d_rnk > 0 ) a;
 
-prompt ==================================
-prompt Grants
-prompt ==================================
+PROMPT *** Create  grants  V_EBKC_DUP_GRP_LIST_PRIVATE ***
+grant SELECT                                                                 on V_EBKC_DUP_GRP_LIST_PRIVATE to BARSREADER_ROLE;
+grant SELECT                                                                 on V_EBKC_DUP_GRP_LIST_PRIVATE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_EBKC_DUP_GRP_LIST_PRIVATE to UPLD;
 
-grant select on bars.v_ebkc_dup_grp_list_private to bars_access_defrole;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_EBKC_DUP_GRP_LIST_PRIVATE.sql =======
+PROMPT ===================================================================================== 

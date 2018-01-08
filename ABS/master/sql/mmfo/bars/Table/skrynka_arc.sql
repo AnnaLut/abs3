@@ -87,22 +87,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SKRYNKAARC_KF_NN ***
+PROMPT *** Create  constraint UK_SKRYNKAARC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ARC MODIFY (KF CONSTRAINT CC_SKRYNKAARC_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SKRYNKAARC_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ARC MODIFY (BRANCH CONSTRAINT CC_SKRYNKAARC_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SKRYNKA_ARC ADD CONSTRAINT UK_SKRYNKAARC UNIQUE (KF, N_SK)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -123,11 +113,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SKRYNKAARC_SKRYNKATIP ***
+PROMPT *** Create  constraint CC_SKRYNKAARC_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ARC ADD CONSTRAINT FK_SKRYNKAARC_SKRYNKATIP FOREIGN KEY (KF, O_SK)
-	  REFERENCES BARS.SKRYNKA_TIP (KF, O_SK) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.SKRYNKA_ARC MODIFY (BRANCH CONSTRAINT CC_SKRYNKAARC_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -136,51 +125,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SKRYNKAARC_BRANCH ***
+PROMPT *** Create  constraint CC_SKRYNKAARC_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ARC ADD CONSTRAINT FK_SKRYNKAARC_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint UK_SKRYNKAARC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ARC ADD CONSTRAINT UK_SKRYNKAARC UNIQUE (KF, N_SK)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SKRYNKAARC_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ARC ADD CONSTRAINT FK_SKRYNKAARC_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SKRYNKAARC_SKRYNKAALL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ARC ADD CONSTRAINT FK_SKRYNKAARC_SKRYNKAALL FOREIGN KEY (KF, N_SK)
-	  REFERENCES BARS.SKRYNKA_ALL (KF, N_SK) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.SKRYNKA_ARC MODIFY (KF CONSTRAINT CC_SKRYNKAARC_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -217,9 +165,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_ARC ***
+grant SELECT                                                                 on SKRYNKA_ARC     to BARSREADER_ROLE;
 grant SELECT                                                                 on SKRYNKA_ARC     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SKRYNKA_ARC     to BARS_DM;
 grant SELECT                                                                 on SKRYNKA_ARC     to DEP_SKRN;
+grant SELECT                                                                 on SKRYNKA_ARC     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_ARC     to WR_ALL_RIGHTS;
 
 

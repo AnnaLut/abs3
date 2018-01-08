@@ -73,6 +73,10 @@ COMMENT ON COLUMN BARS.ERR$_FIN_ND_UPDATE.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_FIN_ND_UPDATE ***
+grant SELECT                                                                 on ERR$_FIN_ND_UPDATE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_FIN_ND_UPDATE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

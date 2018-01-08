@@ -25,9 +25,11 @@ where t.tt=a.tt (+) and      t.tt=v.tt (+) and      t.tt=p.tt (+) and
 
 PROMPT *** Create  grants  TT_V ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TT_V            to ABS_ADMIN;
+grant SELECT                                                                 on TT_V            to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TT_V            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TT_V            to SALGL;
 grant SELECT                                                                 on TT_V            to START1;
+grant SELECT                                                                 on TT_V            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TT_V            to WR_ALL_RIGHTS;
 
 

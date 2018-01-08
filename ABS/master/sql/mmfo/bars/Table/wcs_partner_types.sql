@@ -49,10 +49,12 @@ COMMENT ON COLUMN BARS.WCS_PARTNER_TYPES.NAME IS 'Наименование';
 
 
 
-PROMPT *** Create  constraint CC_PARTNERTYPES_NAME_NN ***
+PROMPT *** Create  constraint PK_PARTNERTYPES ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_PARTNER_TYPES MODIFY (NAME CONSTRAINT CC_PARTNERTYPES_NAME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_PARTNER_TYPES ADD CONSTRAINT PK_PARTNERTYPES PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -61,12 +63,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_PARTNERTYPES ***
+PROMPT *** Create  constraint CC_PARTNERTYPES_NAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_PARTNER_TYPES ADD CONSTRAINT PK_PARTNERTYPES PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD  ENABLE';
+  ALTER TABLE BARS.WCS_PARTNER_TYPES MODIFY (NAME CONSTRAINT CC_PARTNERTYPES_NAME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_PARTNER_TYPES ***
+grant SELECT                                                                 on WCS_PARTNER_TYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_PARTNER_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_PARTNER_TYPES to BARS_DM;
+grant SELECT                                                                 on WCS_PARTNER_TYPES to UPLD;
 grant SELECT                                                                 on WCS_PARTNER_TYPES to WCS_SYNC_USER;
 
 

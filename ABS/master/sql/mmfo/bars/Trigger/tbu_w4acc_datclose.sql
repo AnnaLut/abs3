@@ -7,10 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TBU_W4ACC_DATCLOSE ***
 
-  CREATE OR REPLACE TRIGGER BARS.TBU_W4ACC_DATCLOSE 
-before update of DAT_CLOSE ON BARS.W4_ACC
-for each row
-   WHEN ( old.DAT_CLOSE is Null AND new.DAT_CLOSE is Not Null ) declare
+  CREATE OR REPLACE TRIGGER BARS.TBU_W4ACC_DATCLOSE BEFORE UPDATE OF "DAT_CLOSE" ON "BARS"."W4_ACC" FOR EACH ROW 
+  WHEN ( old.DAT_CLOSE is Null AND new.DAT_CLOSE is Not Null ) declare
   l_qty pls_integer;
 begin
 
@@ -31,6 +29,7 @@ begin
   end if;
 
 end TBU_W4ACC_DATCLOSE;
+
 
 
 /

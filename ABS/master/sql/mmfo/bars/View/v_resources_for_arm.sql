@@ -38,7 +38,9 @@ left join adm_resource r on r.grantee_type_id = t.grantee_type_id and
 							);
 
 PROMPT *** Create  grants  V_RESOURCES_FOR_ARM ***
+grant SELECT                                                                 on V_RESOURCES_FOR_ARM to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RESOURCES_FOR_ARM to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_RESOURCES_FOR_ARM to UPLD;
 
 
 

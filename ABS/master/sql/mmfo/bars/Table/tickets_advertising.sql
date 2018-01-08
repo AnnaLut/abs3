@@ -101,10 +101,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0011617 ***
+PROMPT *** Create  constraint PK_TICKETS_ADVERTISING ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TICKETS_ADVERTISING ADD CHECK (def_flag in(''Y'',''N'')) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.TICKETS_ADVERTISING ADD CONSTRAINT PK_TICKETS_ADVERTISING PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -125,12 +127,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_TICKETS_ADVERTISING ***
+PROMPT *** Create  constraint SYS_C0011617 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TICKETS_ADVERTISING ADD CONSTRAINT PK_TICKETS_ADVERTISING PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.TICKETS_ADVERTISING ADD CHECK (def_flag in(''Y'',''N'')) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -153,7 +153,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TICKETS_ADVERTISING ***
+grant SELECT                                                                 on TICKETS_ADVERTISING to BARSREADER_ROLE;
 grant SELECT                                                                 on TICKETS_ADVERTISING to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on TICKETS_ADVERTISING to UPLD;
 
 
 

@@ -175,8 +175,8 @@ begin
   --------------------------------
   delete from ps_tts where tt='207';
   begin
-    insert into ps_tts(nbs, tt, dk, ob22)
-    values ('1001', '207', 1, '01');
+    insert into ps_tts(nbs, tt, dk)
+    values ('1001', '207', 1);
   exception
     when dup_val_on_index then null;
     when others then
@@ -197,8 +197,8 @@ begin
       end if;
   end;
   begin
-    insert into ps_tts(nbs, tt, dk, ob22)
-    values ('2924', '207', 0, '11');
+    insert into ps_tts(nbs, tt, dk)
+    values ('2924', '207', 0);
   exception
     when dup_val_on_index then null;
     when others then
@@ -207,18 +207,6 @@ begin
       else raise;
       end if;
   end;
-  begin
-    insert into ps_tts(nbs, tt, dk, ob22)
-    values ('2924', '207', 0, '15');
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2924'', ''207'', 0) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-
   --------------------------------
   -------- Виды документов -------
   --------------------------------
@@ -249,17 +237,6 @@ begin
   -------- Группы контроля -------
   --------------------------------
   delete from chklist_tts where tt='207';
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (1, '207', 2, null, 'f_universal_box2(USERID)=1 and branch_edit.get_branch_parameter_ex(branch, ''NOT2VISA'', ''0'') = ''0''', null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 1, ''207'', 2, null, ''f_universal_box2(USERID)=1 and branch_edit.get_branch_parameter_ex(branch, ''''NOT2VISA'''', ''''0'''') = ''''0'''''', null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
     values (5, '207', 1, null, null, null);

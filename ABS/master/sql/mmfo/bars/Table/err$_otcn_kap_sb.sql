@@ -57,6 +57,10 @@ COMMENT ON COLUMN BARS.ERR$_OTCN_KAP_SB.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_OTCN_KAP_SB ***
+grant SELECT                                                                 on ERR$_OTCN_KAP_SB to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_OTCN_KAP_SB to UPLD;
+
 
 
 PROMPT ===================================================================================== 

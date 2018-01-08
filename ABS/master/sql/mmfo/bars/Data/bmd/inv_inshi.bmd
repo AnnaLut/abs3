@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Данi по iнв.вiдомостi(щомiс) ФО - Iншi';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'INV_INSHI';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,21 +124,21 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'G00', 'D', 'Дата формування', .5, 10, 1, 1, 1, 0, 0, '', 'dd.MM.yyyy', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'G01', 'C', '01~Назва РУ', .5, 70, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'G02', 'C', '02~МФО установи~(вiддiлення)', .5, 30, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'G03', 'C', '03~Номер ТВБВ', 1, 30, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'G04', 'C', '04~ПIБ позичальника', 1, 70, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'G07', 'N', '07~Валюта кредиту', .2, 3, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'G19', 'C', '19~Номер БР,~на якому обл-ся~кредит на~звiт.дату', .2, 4, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'G20', 'C', '20~Частина~№ аналiтичного~рахунку', .2, 9, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'G21', 'N', '21~Сума залишку~на звiтну дату~в валютi~кредиту', .5, 22, 9, 1, 0, 0, 0, '', '# #00.00', 1, 0, 'sum(INV_INSHI.G21)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'G22', 'N', '22~Сума залишку~на звiтну дату~в нац.валютi', .5, 22, 10, 1, 0, 0, 0, '', '# #00.00', 1, 0, 'sum(INV_INSHI.G22)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'G25', 'N', '25~Сума~позабал.зобов"язань', .5, 22, 10, 1, 0, 0, 0, '', '# #00.00', 1, 0, 'sum(INV_INSHI.G25)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'G28', 'N', '28~Нар.неспл.непр.доходи~(осн.борг вч або пр<180дн)', .5, 22, 11, 1, 0, 0, 0, '', '# #00.00', 1, 0, 'sum(INV_INSHI.G28)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'G30', 'N', '30~Нар.пр.<31дня доходи~(осн.борг вч або пр<180дн)', .5, 22, 12, 1, 0, 0, 0, '', '# #00.00', 1, 0, 'sum(INV_INSHI.G30)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'NLS', 'C', 'Номер~рахунку', 1, 15, 13, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'RNK', 'N', 'Реєстр.№~клієнта', .5, 10, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'G00', 'D', 'Дата формування', '.5', 10, 1, 1, 1, 0, 0, '', 'dd.MM.yyyy', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'G01', 'C', '01~Назва РУ', '.5', 70, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'G02', 'C', '02~МФО установи~(вiддiлення)', '.5', 30, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'G03', 'C', '03~Номер ТВБВ', '1', 30, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'G04', 'C', '04~ПIБ позичальника', '1', 70, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'G07', 'N', '07~Валюта кредиту', '.2', 3, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'G19', 'C', '19~Номер БР,~на якому обл-ся~кредит на~звiт.дату', '.2', 4, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'G20', 'C', '20~Частина~№ аналiтичного~рахунку', '.2', 9, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'G21', 'N', '21~Сума залишку~на звiтну дату~в валютi~кредиту', '.5', 22, 9, 1, 0, 0, 0, '', '# #00.00', 1, 0, 'sum(INV_INSHI.G21)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'G22', 'N', '22~Сума залишку~на звiтну дату~в нац.валютi', '.5', 22, 10, 1, 0, 0, 0, '', '# #00.00', 1, 0, 'sum(INV_INSHI.G22)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'G25', 'N', '25~Сума~позабал.зобов"язань', '.5', 22, 10, 1, 0, 0, 0, '', '# #00.00', 1, 0, 'sum(INV_INSHI.G25)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'G28', 'N', '28~Нар.неспл.непр.доходи~(осн.борг вч або пр<180дн)', '.5', 22, 11, 1, 0, 0, 0, '', '# #00.00', 1, 0, 'sum(INV_INSHI.G28)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'G30', 'N', '30~Нар.пр.<31дня доходи~(осн.борг вч або пр<180дн)', '.5', 22, 12, 1, 0, 0, 0, '', '# #00.00', 1, 0, 'sum(INV_INSHI.G30)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'NLS', 'C', 'Номер~рахунку', '1', 15, 13, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'RNK', 'N', 'Реєстр.№~клієнта', '.5', 10, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

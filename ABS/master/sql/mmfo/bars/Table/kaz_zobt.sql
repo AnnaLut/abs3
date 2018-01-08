@@ -87,8 +87,10 @@ COMMENT ON COLUMN BARS.KAZ_ZOBT.ID IS '';
 
 
 PROMPT *** Create  grants  KAZ_ZOBT ***
+grant SELECT                                                                 on KAZ_ZOBT        to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on KAZ_ZOBT        to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on KAZ_ZOBT        to PYOD001;
+grant SELECT                                                                 on KAZ_ZOBT        to UPLD;
 
 
 

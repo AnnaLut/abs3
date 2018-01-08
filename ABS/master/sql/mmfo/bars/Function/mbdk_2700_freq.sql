@@ -1,4 +1,10 @@
-CREATE OR REPLACE function BARS.MBDK_2700_FREQ (p_nd integer) RETURN number is
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/function/mbdk_2700_freq.sql =========*** Run
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE FUNCTION BARS.MBDK_2700_FREQ (p_nd integer) RETURN number is
 
 /* Версия 1.0 28-07-2017
    Определение переодичноть погашения % для 2700
@@ -15,8 +21,15 @@ begin
    return(l_freq);
 end;
 /
+ show err;
+ 
+PROMPT *** Create  grants  MBDK_2700_FREQ ***
+grant EXECUTE                                                                on MBDK_2700_FREQ  to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on MBDK_2700_FREQ  to START1;
 
-grant execute on MBDK_2700_FREQ to bars_access_defrole;
-grant execute on MBDK_2700_FREQ to start1;
-
-
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/function/mbdk_2700_freq.sql =========*** End
+ PROMPT ===================================================================================== 
+ 

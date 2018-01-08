@@ -74,8 +74,10 @@ PROMPT *** Create  view V_CCK_MES3 ***
                AND m.caldt_id = b.caldt_id;
 
 PROMPT *** Create  grants  V_CCK_MES3 ***
+grant SELECT                                                                 on V_CCK_MES3      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CCK_MES3      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CCK_MES3      to RCC_DEAL;
+grant SELECT                                                                 on V_CCK_MES3      to UPLD;
 
 
 

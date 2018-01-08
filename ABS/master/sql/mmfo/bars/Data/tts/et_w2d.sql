@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции W2D
-prompt Наименование операции: Перерахування коштів з транзиту(2924) на депозитний рах.
+prompt Наименование операции: W2D Перерахування коштів з транзиту(2924) на депозитний рах.
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('W2D', 'Перерахування коштів з транзиту(2924) на депозитний рах.', 1, null, null, null, null, null, null, null, null, 0, 0, 1, 0, null, null, null, null, null, null, '0100100000000000000000000000000000000100000000000000000000000000', 'Зарахування коштів на депозитний рахунок');
+    values ('W2D', 'W2D Перерахування коштів з транзиту(2924) на депозитний рах.', 1, null, null, null, null, null, null, null, null, 0, 0, 1, 0, null, null, null, null, null, null, '0100100000000000000000000000000000000100000000000000000000000000', 'Зарахування коштів на депозитний рахунок');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='W2D', name='Перерахування коштів з транзиту(2924) на депозитний рах.', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000100000000000000000000000000', nazn='Зарахування коштів на депозитний рахунок'
+         set tt='W2D', name='W2D Перерахування коштів з транзиту(2924) на депозитний рах.', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000100000000000000000000000000', nazn='Зарахування коштів на депозитний рахунок'
        where tt='W2D';
   end;
   --------------------------------

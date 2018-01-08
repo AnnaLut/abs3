@@ -42,7 +42,7 @@ begin
 	S_POROG VARCHAR2(4000), 
 	S_TAR_POR1 VARCHAR2(4000), 
 	S_TAR_POR2 VARCHAR2(4000)
-   ) SEGMENT CREATION DEFERRED 
+   ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSDYND ';
@@ -82,6 +82,10 @@ COMMENT ON COLUMN BARS.ERR$_E_TAR_ND.S_TAR_POR1 IS '';
 COMMENT ON COLUMN BARS.ERR$_E_TAR_ND.S_TAR_POR2 IS '';
 
 
+
+PROMPT *** Create  grants  ERR$_E_TAR_ND ***
+grant SELECT                                                                 on ERR$_E_TAR_ND   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_E_TAR_ND   to UPLD;
 
 
 

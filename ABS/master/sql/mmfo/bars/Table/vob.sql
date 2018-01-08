@@ -151,6 +151,7 @@ exception when others then
 
 PROMPT *** Create  grants  VOB ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on VOB             to ABS_ADMIN;
+grant SELECT                                                                 on VOB             to BARSREADER_ROLE;
 grant SELECT                                                                 on VOB             to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VOB             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VOB             to BARS_DM;

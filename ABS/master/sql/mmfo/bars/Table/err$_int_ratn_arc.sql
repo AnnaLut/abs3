@@ -76,7 +76,9 @@ COMMENT ON COLUMN BARS.ERR$_INT_RATN_ARC.EFFECTDATE IS '';
 
 
 PROMPT *** Create  grants  ERR$_INT_RATN_ARC ***
+grant SELECT                                                                 on ERR$_INT_RATN_ARC to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_INT_RATN_ARC to BARS_DM;
+grant SELECT                                                                 on ERR$_INT_RATN_ARC to UPLD;
 
 
 

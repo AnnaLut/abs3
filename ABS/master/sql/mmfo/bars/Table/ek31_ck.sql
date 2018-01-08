@@ -51,9 +51,11 @@ COMMENT ON COLUMN BARS.EK31_CK.PAP IS '';
 
 
 PROMPT *** Create  grants  EK31_CK ***
+grant SELECT                                                                 on EK31_CK         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on EK31_CK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EK31_CK         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EK31_CK         to EK31_CK;
+grant SELECT                                                                 on EK31_CK         to UPLD;
 grant FLASHBACK,SELECT                                                       on EK31_CK         to WR_REFREAD;
 
 

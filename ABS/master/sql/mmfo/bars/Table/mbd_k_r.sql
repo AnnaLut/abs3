@@ -49,19 +49,6 @@ COMMENT ON COLUMN BARS.MBD_K_R.REF IS '';
 
 
 
-PROMPT *** Create  constraint R_MB_ND ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MBD_K_R ADD CONSTRAINT R_MB_ND FOREIGN KEY (ND)
-	  REFERENCES BARS.CC_DEAL (ND) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C005097 ***
 begin   
  execute immediate '
@@ -114,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  MBD_K_R ***
+grant SELECT                                                                 on MBD_K_R         to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on MBD_K_R         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MBD_K_R         to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on MBD_K_R         to FOREX;
+grant SELECT                                                                 on MBD_K_R         to UPLD;
 
 
 

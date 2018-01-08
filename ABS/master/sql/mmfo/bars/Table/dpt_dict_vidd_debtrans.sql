@@ -59,7 +59,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_DICT_VIDD_DEBTRANS ***
+grant SELECT                                                                 on DPT_DICT_VIDD_DEBTRANS to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_DICT_VIDD_DEBTRANS to BARS_DM;
+grant SELECT                                                                 on DPT_DICT_VIDD_DEBTRANS to UPLD;
 
 
 

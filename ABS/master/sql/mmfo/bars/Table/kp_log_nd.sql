@@ -63,9 +63,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  KP_LOG_ND ***
+grant SELECT                                                                 on KP_LOG_ND       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KP_LOG_ND       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KP_LOG_ND       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KP_LOG_ND       to R_KP;
+grant SELECT                                                                 on KP_LOG_ND       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KP_LOG_ND       to WR_ALL_RIGHTS;
 
 

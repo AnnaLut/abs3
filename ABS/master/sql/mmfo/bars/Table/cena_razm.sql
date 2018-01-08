@@ -55,7 +55,9 @@ COMMENT ON COLUMN BARS.CENA_RAZM.KUPON IS '';
 
 
 PROMPT *** Create  grants  CENA_RAZM ***
+grant SELECT                                                                 on CENA_RAZM       to BARSREADER_ROLE;
 grant SELECT                                                                 on CENA_RAZM       to BARS_DM;
+grant SELECT                                                                 on CENA_RAZM       to UPLD;
 grant SELECT                                                                 on CENA_RAZM       to WR_ALL_RIGHTS;
 
 

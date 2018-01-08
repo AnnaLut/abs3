@@ -137,6 +137,10 @@ COMMENT ON COLUMN BARS.ERR$_CC_ADD_UPDATE.FIELD_58D IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CC_ADD_UPDATE ***
+grant SELECT                                                                 on ERR$_CC_ADD_UPDATE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CC_ADD_UPDATE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

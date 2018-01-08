@@ -20,7 +20,9 @@ where  tt.id in (select distinct t.grantee_type_id
 ;
 
 PROMPT *** Create  grants  V_APPROVABLE_RESOURCE_GROUP ***
+grant SELECT                                                                 on V_APPROVABLE_RESOURCE_GROUP to BARSREADER_ROLE;
 grant SELECT                                                                 on V_APPROVABLE_RESOURCE_GROUP to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_APPROVABLE_RESOURCE_GROUP to UPLD;
 
 
 

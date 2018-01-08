@@ -59,19 +59,6 @@ COMMENT ON COLUMN BARS.RNK2NLS.ID IS '';
 
 
 
-PROMPT *** Create  constraint FK_RNK2NLS_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.RNK2NLS ADD CONSTRAINT FK_RNK2NLS_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_RNK2NLS_KF_NN ***
 begin   
  execute immediate '
@@ -112,9 +99,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  RNK2NLS ***
+grant SELECT                                                                 on RNK2NLS         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNK2NLS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RNK2NLS         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNK2NLS         to START1;
+grant SELECT                                                                 on RNK2NLS         to UPLD;
 
 
 

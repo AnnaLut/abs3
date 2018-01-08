@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  VAL_QUEUE ***
+grant SELECT                                                                 on VAL_QUEUE       to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on VAL_QUEUE       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VAL_QUEUE       to BARS_DM;
 grant INSERT,SELECT,UPDATE                                                   on VAL_QUEUE       to START1;
+grant SELECT                                                                 on VAL_QUEUE       to UPLD;
 
 
 

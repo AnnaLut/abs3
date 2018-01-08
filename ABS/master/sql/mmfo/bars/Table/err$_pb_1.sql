@@ -93,6 +93,10 @@ COMMENT ON COLUMN BARS.ERR$_PB_1.KOD IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_PB_1 ***
+grant SELECT                                                                 on ERR$_PB_1       to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_PB_1       to UPLD;
+
 
 
 PROMPT ===================================================================================== 

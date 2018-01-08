@@ -1,4 +1,5 @@
 
+ 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/coin_invoice_mgr.sql =========*** Ru
  PROMPT ===================================================================================== 
@@ -71,7 +72,7 @@
 
 end coin_invoice_mgr;
 /
-create or replace package body bars.coin_invoice_mgr is
+CREATE OR REPLACE PACKAGE BODY BARS.COIN_INVOICE_MGR is
 
   --
   -- Автор  : VIT
@@ -310,10 +311,7 @@ begin
       if(l_type_id = 1) then
       l_total_with_vat      := l_total_with_vat + (c.cnt * c.unit_price_vat);
       else
-        l_total_with_vat := l_total_with_vat + (c.cnt * c.unit_price) ;
-	--  http://jira.unity-bars.com.ua:11000/browse/COBUSUPMMFO-751
-	-- and http://jira.unity-bars.com.ua:11000/browse/COBUSUPMMFO-770
-	-- was:       l_total_with_vat := l_total_with_vat + (c.cnt * c.unit_price)  + l_total_nominal_price;
+        l_total_with_vat := l_total_with_vat + (c.cnt * c.unit_price) + l_total_nominal_price;
       end if;
       l_total_without_vat   := l_total_without_vat + (c.cnt * c.unit_price);
     end loop;
@@ -391,7 +389,7 @@ begin
       l_unit_price     := (p_price - l_nominal_price) / 1.2;
       l_nominal_sum    := (p_price - l_nominal_price) / 1.2 * p_count;
       l_unit_price_vat := p_price;
-    elsif (p_type_id = 0) then 
+    elsif (p_type_id = 0) then
       l_unit_price     := p_price;
       --l_nominal_sum    := (p_price - l_nominal_price) * p_count;
       l_nominal_sum    := p_price * p_count ;
@@ -521,3 +519,4 @@ grant EXECUTE                                                                on 
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/coin_invoice_mgr.sql =========*** En
  PROMPT ===================================================================================== 
+ 

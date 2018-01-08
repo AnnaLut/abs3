@@ -67,6 +67,10 @@ COMMENT ON COLUMN BARS.ERR$_CC_SWTRACE.NLS IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CC_SWTRACE ***
+grant SELECT                                                                 on ERR$_CC_SWTRACE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CC_SWTRACE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

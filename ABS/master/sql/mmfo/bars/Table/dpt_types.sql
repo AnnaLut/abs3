@@ -111,11 +111,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_TYPES ***
+grant SELECT                                                                 on DPT_TYPES       to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_TYPES       to BARSUPL;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DPT_TYPES       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_TYPES       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_TYPES       to DPT_ADMIN;
 grant SELECT                                                                 on DPT_TYPES       to DPT_ROLE;
+grant SELECT                                                                 on DPT_TYPES       to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_TYPES       to VKLAD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_TYPES       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_TYPES       to WR_REFREAD;

@@ -101,8 +101,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  EAD_STRUCT_CODES ***
+grant SELECT                                                                 on EAD_STRUCT_CODES to BARSREADER_ROLE;
 grant SELECT                                                                 on EAD_STRUCT_CODES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EAD_STRUCT_CODES to BARS_DM;
+grant SELECT                                                                 on EAD_STRUCT_CODES to UPLD;
 
 
 

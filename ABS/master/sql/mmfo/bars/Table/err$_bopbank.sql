@@ -65,6 +65,10 @@ COMMENT ON COLUMN BARS.ERR$_BOPBANK.REGNUM_N IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_BOPBANK ***
+grant SELECT                                                                 on ERR$_BOPBANK    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_BOPBANK    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

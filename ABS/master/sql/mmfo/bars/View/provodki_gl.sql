@@ -28,8 +28,10 @@ PROMPT *** Create  view PROVODKI_GL ***
  ;
 
 PROMPT *** Create  grants  PROVODKI_GL ***
+grant SELECT                                                                 on PROVODKI_GL     to BARSREADER_ROLE;
 grant SELECT                                                                 on PROVODKI_GL     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PROVODKI_GL     to RPBN001;
+grant SELECT                                                                 on PROVODKI_GL     to UPLD;
 
 
 

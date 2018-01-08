@@ -1,4 +1,13 @@
-create or replace procedure P_BAL_SNP
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_BAL_SNP.sql =========*** Run ***
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_BAL_SNP ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_BAL_SNP 
 ( p_id    number    -- режим (разрез)
 , p_DAT   date      -- дата
 , Param0  varchar2  -- Param0= Бранч (%-вс_)
@@ -7,7 +16,7 @@ create or replace procedure P_BAL_SNP
 ) is
 /*
   29/11/2017 Virko
-  23.08.2017 BAA 
+  23.08.2017 BAA
   19.07.2012 Sta Рiвень користувача = 1 для синхр снапiв
   17-06-2011 Sta Бал з корр - 61 запрос и он же 61 отчет
   22-01-2010 Sta Все то же самое. но з корр
@@ -66,11 +75,11 @@ begin
 
   execute immediate 'truncate table TMP_BAL';
 
-  If length(Param1)>0 and Param1 <>'%' 
+  If length(Param1)>0 and Param1 <>'%'
   then
     l_Sql1 := ' and a.nbs >= '''|| Param1 ||'''';
   end if;
-  
+
   If length(Param2)>0 and Param2 <>'%'
   then
     l_Sql2 := ' and a.nbs <= '''|| Param2 ||'''';
@@ -88,7 +97,7 @@ begin
      end if;
   end if;
 
-  IF l_id1 = -1 and l_id2 = 0 
+  IF l_id1 = -1 and l_id2 = 0
   then
      -- разрез БАЛ+ОБ22
      -- kodz=2354(131), БАЛАНС + ОБ22  оборотiв i залишкiв в ГРН-еквiвалентi
@@ -96,7 +105,7 @@ begin
      l_Sql := 'insert into tmp_bal (NBS,DOS,KOS,OSTD,OSTK)
       select nbs, sum(dos), sum(kos), sum(ostd), sum(ostk)
       from (
-         select a.nbs|| '' ''||a.OB22 nbs, 
+         select a.nbs|| '' ''||a.OB22 nbs,
                 sum( b.dosq ) DOS, sum( b.kosq ) KOS ,
                 sum(decode( sign(b.ostq),-1, -b.ostq, 0 )) OSTD,
                 sum(decode( sign(b.ostq), 1,  b.ostq, 0 )) OSTK
@@ -108,9 +117,9 @@ begin
            and (b.dosq>0 or b.kosq>0 or b.ostq<>0)
            and nvl(a.dat_alt, :l_DAT1 - 1) <> :l_DAT1
            and a.BRANCH like sys_context(''bars_context'',''user_branch_mask'')
-         group by a.nbs|| '' ''||a.OB22 
+         group by a.nbs|| '' ''||a.OB22
             union all
-         select substr(b.acc_num, 1, 4)|| '' ''||b.acc_OB22, 
+         select substr(b.acc_num, 1, 4)|| '' ''||b.acc_OB22,
                 sum( b.dosq_repd ) DOS, sum( b.kosq_repd ) KOS ,
                 sum(decode( sign(b.ostq_rep),-1, -b.ostq_rep, 0 )) OSTD,
                 sum(decode( sign(b.ostq_rep), 1,  b.ostq_rep, 0 )) OSTK
@@ -125,9 +134,9 @@ begin
          group by substr(b.acc_num, 1, 4)|| '' ''||b.acc_OB22 )
       group by nbs ';
 
-  ElsIF l_id1 = -1 and l_id2 = 1 
+  ElsIF l_id1 = -1 and l_id2 = 1
   then -- пока не сделано
-    
+
     NULL;
 
   ElsIF l_id1 = -3 and l_id2 = 0 then
@@ -137,7 +146,7 @@ begin
      l_Sql := 'insert into tmp_bal (KV,NBS,DOS,KOS,OSTD,OSTK)
       select kv, nbs, sum(dos), sum(kos), sum(ostd), sum(ostk)
       from (
-         select a.KV, a.nbs|| '' ''||a.OB22 nbs, 
+         select a.KV, a.nbs|| '' ''||a.OB22 nbs,
                  sum( b.dos ) DOS, sum( b.kos ) KOS ,
                  sum(decode( sign(b.ost),-1, -b.ost, 0 )) OSTD,
                  sum(decode( sign(b.ost), 1,  b.ost, 0 )) OSTK
@@ -149,9 +158,9 @@ begin
            and ( b.dos>0 or b.kos>0 or b.ost<>0 )
            and nvl(a.dat_alt, :l_DAT1 - 1) <> :l_DAT1
            and a.BRANCH like sys_context(''bars_context'',''user_branch_mask'')
-         group by a.KV, a.nbs|| '' ''||a.OB22 
+         group by a.KV, a.nbs|| '' ''||a.OB22
             union all
-         select a.kv, substr(b.acc_num, 1, 4)|| '' ''||b.acc_OB22, 
+         select a.kv, substr(b.acc_num, 1, 4)|| '' ''||b.acc_OB22,
                 sum( b.dos_repd ) DOS, sum( b.kos_repd ) KOS ,
                 sum(decode( sign(b.ost_rep),-1, -b.ost_rep, 0 )) OSTD,
                 sum(decode( sign(b.ost_rep), 1,  b.ost_rep, 0 )) OSTK
@@ -166,9 +175,9 @@ begin
          group by a.kv, substr(b.acc_num, 1, 4)|| '' ''||b.acc_OB22 )
       group by kv, nbs ';
 
-  ElsIF l_id1 = -3 and l_id2 = 1 
+  ElsIF l_id1 = -3 and l_id2 = 1
   then -- пока не сделано
-    
+
     NULL;
 
   elsif l_id1 = -2 and l_id2 = 0 then
@@ -191,7 +200,7 @@ begin
            and ( b.dosq>0 or b.kosq>0 or b.ostq<>0 )
            and nvl(a.dat_alt, :l_DAT1 - 1) <> :l_DAT1
            and a.BRANCH like sys_context(''bars_context'',''user_branch_mask'')
-         group by a.nbs|| ''/''||substr(substr(a.branch,1,15),-4) 
+         group by a.nbs|| ''/''||substr(substr(a.branch,1,15),-4)
             union all
          select substr(b.acc_num, 1, 4)|| ''/''||substr(substr(a.branch,1,15),-4),
                 sum( b.dosq_repd ) DOS, sum( b.kosq_repd ) KOS ,
@@ -208,19 +217,19 @@ begin
          group by substr(b.acc_num, 1, 4)|| ''/''||substr(substr(a.branch,1,15),-4) )
       group by nbs ';
 
-  ElsIF l_id1 = -2 and l_id2 = 1 
+  ElsIF l_id1 = -2 and l_id2 = 1
   then -- пока не сделано
-    
-    NULL; 
 
-  elsif l_id1 =  0 and l_id2 = 0 
+    NULL;
+
+  elsif l_id1 =  0 and l_id2 = 0
   then -- kodz=15 (отчет 31) БАЛАНС оборотiв i залишкiв в ГРН-еквiвалентi
-    
+
     -- moved to function RPT_UTL.GET_BALANCES
     l_Sql := 'insert into tmp_bal ( NBS,DOS,KOS,OSTD,OSTK )
       select nbs, sum(dos), sum(kos), sum(ostd), sum(ostk)
       from (
-          select a.nbs, 
+          select a.nbs,
                sum(b.dosq) DOS, sum(b.kosq) KOS ,
                sum(decode( sign(b.ostq),-1, -b.ostq, 0 )) OSTD,
                sum(decode( sign(b.ostq), 1,  b.ostq, 0 )) OSTK
@@ -251,12 +260,12 @@ begin
 
   ElsIF l_id1 = 0 and l_id2 = 1
   then -- kodz=61 (отчет 61) БАЛ на конец мес з корр
-     
+
      l_Sql := 'insert into tmp_bal (NBS,DOS,KOS,OSTD,OSTK)
       select nbs, sum(dos), sum(kos), sum(ostd), sum(ostk)
       from (
-          select a.nbs, 
-               sum(b.dosq-b.cudosq+b.crdosq ) DOS, 
+          select a.nbs,
+               sum(b.dosq-b.cudosq+b.crdosq ) DOS,
                sum(b.kosq-b.cukosq+b.crkosq ) KOS ,
                sum(decode( sign(b.ostq-b.crdosq+b.crkos),-1, -(b.ostq-b.crdosq+b.crkos), 0 )) OSTD,
                sum(decode( sign(b.ostq-b.crdosq+b.crkos), 1,  b.ostq-b.crdosq+b.crkosq, 0 )) OSTK
@@ -269,27 +278,27 @@ begin
              and a.BRANCH like sys_context(''bars_context'',''user_branch_mask'')
           group by a.nbs
            union all
-          select substr(d.acc_num, 1, 4) nbs, 
-                   sum((case when d.acc_type = ''OLD'' then d.dosq_repm-b.cudosq+b.crdosq else b.dosq-d.dosq_repm-b.cudosq+b.crdosq end)) DOS, 
+          select substr(d.acc_num, 1, 4) nbs,
+                   sum((case when d.acc_type = ''OLD'' then d.dosq_repm-b.cudosq+b.crdosq else b.dosq-d.dosq_repm-b.cudosq+b.crdosq end)) DOS,
                    sum((case when d.acc_type = ''OLD'' then d.kosq_repm-b.cukosq+b.crkosq else b.kosq-d.kosq_repm-b.cukosq+b.crkosq end)) KOS ,
                    sum((case when d.acc_type = ''OLD'' then 0 else decode( sign(b.ostq-b.crdosq+b.crkos),-1, -(b.ostq-b.crdosq+b.crkos), 0 ) end)) OSTD,
                    sum((case when d.acc_type = ''OLD'' then 0 else decode( sign(b.ostq-b.crdosq+b.crkos), 1,  b.ostq-b.crdosq+b.crkosq, 0 ) end)) OSTK
             from AGG_MONBALS b, nbur_kor_balances d, accounts a
-            where   b.fdat  = :l_DAT1 
+            where   b.fdat  = :l_DAT1
                 and b.acc = a.acc ' || l_Sql1 || l_Sql2 || '
-                and d.report_date between trunc(:l_DAT1 , ''mm'') and :l_DAT1 
+                and d.report_date between trunc(:l_DAT1 , ''mm'') and :l_DAT1
                 and b.acc = d.acc_id
                 and a.nbs not like ''8%''
                 and ( b.dosq > 0 or b.kosq > 0 or b.ostq <> 0 )
                 and trunc(nvl(a.dat_alt, :l_DAT1 - 1), ''mm'') <> trunc(:l_DAT1, ''mm'')
                 and a.BRANCH like sys_context(''bars_context'',''user_branch_mask'')
-            group by substr(d.acc_num, 1, 4) 
+            group by substr(d.acc_num, 1, 4)
       )
       group by nbs ';
-    
+
   end if;
 
-  if l_id1 = 0 and l_id2 = 1 then 
+  if l_id1 = 0 and l_id2 = 1 then
      execute immediate l_Sql using l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1 ;
   else
      execute immediate l_Sql using l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1 ;
@@ -302,7 +311,7 @@ begin
   l_sk := ' ';
   l_sr := ' ';
   l_sg := ' ';
-  
+
   FOR p in ( select distinct substr(nbs,1,3) nbs3 from tmp_bal order by 1 )
   loop
 
@@ -315,13 +324,13 @@ begin
         exception when NO_DATA_FOUND THEN l_sK := to_char(l_K);
         end;
         -- внебаланс-баланс
-        if l_K = 9  
+        if l_K = 9
         then l_sB1 :='Позабалансовий облiк'; l_b1:=9;
         else l_sB1 :='Балансовий облiк'    ; l_b1:=7;
         end if;
      end if;
 
-     If l_R<>to_number(substr(p.nbs3,1,2)) 
+     If l_R<>to_number(substr(p.nbs3,1,2))
      then
         l_R:=to_number(substr(p.nbs3,1,2));
         -- название раздела
@@ -343,7 +352,7 @@ begin
         end;
      end if;
 
-     update tmp_bal 
+     update tmp_bal
         set id  = l_id1, DAT = l_DAT2,
             B1  = l_b1 , SB1 = l_sb1 ,
             K   = l_K  , SK  = l_sK  ,
@@ -355,7 +364,14 @@ begin
 
 end P_BAL_SNP;
 /
-
 show err;
 
-grant EXECUTE on P_BAL_SNP to BARS_ACCESS_DEFROLE;
+PROMPT *** Create  grants  P_BAL_SNP ***
+grant EXECUTE                                                                on P_BAL_SNP       to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on P_BAL_SNP       to RPBN001;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_BAL_SNP.sql =========*** End ***
+PROMPT ===================================================================================== 

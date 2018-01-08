@@ -1,11 +1,13 @@
+
+
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TAIU_CP_REFW_UPDATE.sql =========*
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TAIU_CP_REFW_UPDATE.sql =========***
 PROMPT ===================================================================================== 
 
 
 PROMPT *** Create  trigger TAIU_CP_REFW_UPDATE ***
 
- CREATE OR REPLACE TRIGGER TAIU_CP_REFW_UPDATE
+  CREATE OR REPLACE TRIGGER BARS.TAIU_CP_REFW_UPDATE 
    AFTER INSERT OR DELETE OR UPDATE OF value, tag, ref
    ON CP_REFW
    FOR EACH ROW
@@ -27,7 +29,7 @@ BEGIN
    IF DELETING
    THEN
       l_chgaction := 'D';
-      l_idupd     := BARS_SQNC.GET_NEXTVAL('S_CP_REFW_UPDATE');
+      l_idupd     := bars.s_cp_refw_update.nextval;
       INSERT INTO cp_refw_update (idupd,
                                     chgaction,
                                     effectdate,
@@ -47,7 +49,7 @@ BEGIN
    ELSIF INSERTING
    THEN
       l_chgaction := 'I';
-      l_idupd     := BARS_SQNC.GET_NEXTVAL('S_CP_REFW_UPDATE');
+      l_idupd     := bars.s_cp_refw_update.nextval;
       INSERT INTO cp_refw_update (idupd,
                                     chgaction,
                                     effectdate,
@@ -67,7 +69,7 @@ BEGIN
    ELSIF UPDATING AND (:old.tag <> :new.tag OR :old.ref <> :new.ref)
    THEN
       l_chgaction := 'D';
-      l_idupd     := BARS_SQNC.GET_NEXTVAL('S_CP_REFW_UPDATE');
+      l_idupd     := bars.s_cp_refw_update.nextval;
       INSERT INTO cp_refw_update (idupd,
                                     chgaction,
                                     effectdate,
@@ -86,7 +88,7 @@ BEGIN
                    :old.VALUE);
 
       l_chgaction := 'I';
-      l_idupd     := BARS_SQNC.GET_NEXTVAL('S_CP_REFW_UPDATE');
+      l_idupd     := bars.s_cp_refw_update.nextval;
       INSERT INTO cp_refw_update (idupd,
                                     chgaction,
                                     effectdate,
@@ -106,7 +108,7 @@ BEGIN
    ELSIF UPDATING AND :old.VALUE <> :new.VALUE
    THEN
       l_chgaction := 'U';
-      l_idupd     := BARS_SQNC.GET_NEXTVAL('S_CP_REFW_UPDATE');
+      l_idupd     := bars.s_cp_refw_update.nextval;
       INSERT INTO cp_refw_update (idupd,
                                     chgaction,
                                     effectdate,
@@ -125,6 +127,11 @@ BEGIN
                    :new.VALUE);
    END IF;
 END;
-/
 
-show errors;
+/
+ALTER TRIGGER BARS.TAIU_CP_REFW_UPDATE ENABLE;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TAIU_CP_REFW_UPDATE.sql =========***
+PROMPT ===================================================================================== 

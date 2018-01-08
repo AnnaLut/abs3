@@ -17,8 +17,10 @@ where ref_repo is not null --and op<>2
       and o.ref=ar.ref and a.acc(+)=ar.acc;
 
 PROMPT *** Create  grants  CP_V_REPO ***
+grant SELECT                                                                 on CP_V_REPO       to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_V_REPO       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_V_REPO       to START1;
+grant SELECT                                                                 on CP_V_REPO       to UPLD;
 
 
 

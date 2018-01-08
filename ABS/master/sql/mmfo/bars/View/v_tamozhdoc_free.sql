@@ -50,8 +50,10 @@ select k.rnk, k.nmk, k.okpo, k.nd, decode(to_number(v.cmode_code), 40, 1, 0),
                 where par = 'MC2EIK' and nvl(to_number(val),0) = 1);
 
 PROMPT *** Create  grants  V_TAMOZHDOC_FREE ***
+grant SELECT                                                                 on V_TAMOZHDOC_FREE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TAMOZHDOC_FREE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TAMOZHDOC_FREE to START1;
+grant SELECT                                                                 on V_TAMOZHDOC_FREE to UPLD;
 
 
 

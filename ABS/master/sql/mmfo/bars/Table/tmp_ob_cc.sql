@@ -93,8 +93,10 @@ COMMENT ON COLUMN BARS.TMP_OB_CC.NLS IS '';
 
 
 PROMPT *** Create  grants  TMP_OB_CC ***
+grant SELECT                                                                 on TMP_OB_CC       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OB_CC       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OB_CC       to START1;
+grant SELECT                                                                 on TMP_OB_CC       to UPLD;
 
 
 

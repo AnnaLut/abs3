@@ -48,7 +48,9 @@ PROMPT *** Create  view V_PAY_INTEREST_DEPOS ***
    ORDER BY a.nls, a.kv;
 
 PROMPT *** Create  grants  V_PAY_INTEREST_DEPOS ***
+grant SELECT                                                                 on V_PAY_INTEREST_DEPOS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PAY_INTEREST_DEPOS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_PAY_INTEREST_DEPOS to UPLD;
 
 
 

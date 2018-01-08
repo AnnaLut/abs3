@@ -71,32 +71,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_STAFFTIPGRP_STAFFTIPS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFFTIP_GRP ADD CONSTRAINT FK_STAFFTIPGRP_STAFFTIPS FOREIGN KEY (IDU)
-	  REFERENCES BARS.STAFF_TIPS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_STAFFTIPGRP_GROUPS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFFTIP_GRP ADD CONSTRAINT FK_STAFFTIPGRP_GROUPS FOREIGN KEY (IDG)
-	  REFERENCES BARS.GROUPS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_STAFFTIPGRP_IDU_NN ***
 begin   
  execute immediate '
@@ -136,8 +110,10 @@ exception when others then
 
 PROMPT *** Create  grants  STAFFTIP_GRP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFFTIP_GRP    to ABS_ADMIN;
+grant SELECT                                                                 on STAFFTIP_GRP    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFFTIP_GRP    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFFTIP_GRP    to BARS_DM;
+grant SELECT                                                                 on STAFFTIP_GRP    to UPLD;
 
 
 

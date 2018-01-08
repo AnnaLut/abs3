@@ -12,8 +12,10 @@ PROMPT *** Create  view V_ROOT_CORPORATION ***
 ;
 
 PROMPT *** Create  grants  V_ROOT_CORPORATION ***
+grant SELECT                                                                 on V_ROOT_CORPORATION to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ROOT_CORPORATION to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ROOT_CORPORATION to CORP_CLIENT;
+grant SELECT                                                                 on V_ROOT_CORPORATION to UPLD;
 grant FLASHBACK,SELECT                                                       on V_ROOT_CORPORATION to WR_REFREAD;
 
 

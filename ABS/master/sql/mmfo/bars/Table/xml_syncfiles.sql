@@ -71,19 +71,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint XFK_XMLSYNCFILESTYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML_SYNCFILES ADD CONSTRAINT XFK_XMLSYNCFILESTYPE FOREIGN KEY (SYNCTYPE)
-	  REFERENCES BARS.XML_SYNCTYPES (SYNCTYPE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_XMLSYNFILES_KF_NN ***
 begin   
  execute immediate '
@@ -110,9 +97,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_SYNCFILES ***
+grant SELECT                                                                 on XML_SYNCFILES   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on XML_SYNCFILES   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on XML_SYNCFILES   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on XML_SYNCFILES   to START1;
+grant SELECT                                                                 on XML_SYNCFILES   to UPLD;
 
 
 

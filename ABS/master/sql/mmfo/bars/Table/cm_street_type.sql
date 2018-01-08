@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CM_STREET_TYPE ***
+grant SELECT                                                                 on CM_STREET_TYPE  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CM_STREET_TYPE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CM_STREET_TYPE  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CM_STREET_TYPE  to OW;
+grant SELECT                                                                 on CM_STREET_TYPE  to UPLD;
 
 
 

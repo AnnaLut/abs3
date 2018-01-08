@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_SEC ***
+grant SELECT                                                                 on CC_SEC          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_SEC          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_SEC          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_SEC          to RCC_DEAL;
+grant SELECT                                                                 on CC_SEC          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_SEC          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CC_SEC          to WR_REFREAD;
 

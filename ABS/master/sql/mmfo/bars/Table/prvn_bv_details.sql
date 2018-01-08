@@ -101,8 +101,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRVN_BV_DETAILS ***
+grant SELECT                                                                 on PRVN_BV_DETAILS to BARSREADER_ROLE;
 grant SELECT                                                                 on PRVN_BV_DETAILS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRVN_BV_DETAILS to START1;
+grant SELECT                                                                 on PRVN_BV_DETAILS to UPLD;
 
 
 

@@ -56,6 +56,8 @@ PROMPT *** Create  view PODOTW_OLD ***
  ;
 
 PROMPT *** Create  grants  PODOTW_OLD ***
+grant SELECT                                                                 on PODOTW_OLD      to BARSREADER_ROLE;
+grant SELECT                                                                 on PODOTW_OLD      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PODOTW_OLD      to WR_ALL_RIGHTS;
 
 

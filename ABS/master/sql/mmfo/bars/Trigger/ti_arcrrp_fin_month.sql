@@ -8,10 +8,11 @@ PROMPT =========================================================================
 PROMPT *** Create  trigger TI_ARCRRP_FIN_MONTH ***
 
   CREATE OR REPLACE TRIGGER BARS.TI_ARCRRP_FIN_MONTH 
-  AFTER INSERT ON "BARS"."ARC_RRP"
-  REFERENCING FOR EACH ROW
-    WHEN (
-new.kv=980 and new.fn_a like '$A%'
+   AFTER INSERT
+   ON "BARS"."ARC_RRP"
+   REFERENCING FOR EACH ROW
+ WHEN (
+new.kv=980 and new.fn_a like '$A%' and new.kf='300465'
       ) declare
   l_mfo_b     banks.mfo%type;
 begin
@@ -27,11 +28,10 @@ begin
          (select mfo from banks
          where mfop=gl.kf and kodn=6)
     );
-exception when no_data_found then
-  raise_application_error(-20000, '\0977 - Блокування початкових від учасника забороняє цей платіж', TRUE);
+  exception when no_data_found then
+    raise_application_error(-20000, '\0977 - Блокування початкових від учасника забороняє цей платіж', TRUE);
+
 end;
-
-
 /
 ALTER TRIGGER BARS.TI_ARCRRP_FIN_MONTH DISABLE;
 

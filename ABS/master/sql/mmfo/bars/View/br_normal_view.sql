@@ -13,8 +13,10 @@ PROMPT *** Create  view BR_NORMAL_VIEW ***
  where d.br_id=s.br_id;
 
 PROMPT *** Create  grants  BR_NORMAL_VIEW ***
+grant SELECT                                                                 on BR_NORMAL_VIEW  to BARSREADER_ROLE;
 grant SELECT                                                                 on BR_NORMAL_VIEW  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BR_NORMAL_VIEW  to START1;
+grant SELECT                                                                 on BR_NORMAL_VIEW  to UPLD;
 
 
 

@@ -1,23 +1,9 @@
-begin
-  
-  begin
-    SYS.DBMS_SCHEDULER.DROP_JOB( job_name  => 'TRANSFER_FORECAST_NEW' );
-  exception
-    when others then
-      null;
-  end;
-  
-  SYS.DBMS_SCHEDULER.CREATE_JOB
-  ( job_name        => 'TRANSFER_FORECAST_NEW'
-  , start_date      => sysdate
-  , repeat_interval => 'FREQ=HOURLY;'
-  , job_class       => 'DEFAULT_JOB_CLASS'
-  , job_type        => 'PLSQL_BLOCK'
-  , job_action      => 'begin p_transform_forecast_newacc; end;'
-  , comments        => 'Джоб для внесения прогнозируемых счетов'
-  , enabled         => true
-  );
-  
-  
-end;
-/
+ORA-31604: invalid NAME parameter "NAME" for object type JOB in function SET_FILTER
+----- PL/SQL Call Stack -----
+  object      line  object
+  handle    number  name
+7000130e5a76610       575  package body SYS.PACK_SCRIPT
+7000130e5a76610       152  package body SYS.PACK_SCRIPT
+700013124bc8a90        31  anonymous block
+7000128bcccfd90       306  package body BARS.DWH_CBIREP
+70001314d859d08         2  anonymous block

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции Д35
-prompt Наименование операции: БЕЗГОТІВКОВІ. Відсотки: нарахування(поточні вклади)
+prompt Наименование операции: Д35 БЕЗГОТІВКОВІ. Відсотки: нарахування(поточні вклади)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('Д35', 'БЕЗГОТІВКОВІ. Відсотки: нарахування(поточні вклади)', 0, null, null, null, 980, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''03''))', null, '1100100000000000000000000000000000000000000000000000000000000000', 'Нараховано відсотки депозити, поточні вклади');
+    values ('Д35', 'Д35 БЕЗГОТІВКОВІ. Відсотки: нарахування(поточні вклади)', 0, null, null, null, 980, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''03''))', null, '1100100000000000000000000000000000000000000000000000000000000000', 'Нараховано відсотки депозити, поточні вклади');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='Д35', name='БЕЗГОТІВКОВІ. Відсотки: нарахування(поточні вклади)', dk=0, nlsm=null, kv=null, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='1100100000000000000000000000000000000000000000000000000000000000', nazn='Нараховано відсотки депозити, поточні вклади'
+         set tt='Д35', name='Д35 БЕЗГОТІВКОВІ. Відсотки: нарахування(поточні вклади)', dk=0, nlsm=null, kv=null, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='1100100000000000000000000000000000000000000000000000000000000000', nazn='Нараховано відсотки депозити, поточні вклади'
        where tt='Д35';
   end;
   --------------------------------

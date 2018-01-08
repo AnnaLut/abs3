@@ -33,7 +33,9 @@ PROMPT *** Create  view V_WCS_VISA_BIDS_ARCHIVE ***
    and s.id = 'VISA';
 
 PROMPT *** Create  grants  V_WCS_VISA_BIDS_ARCHIVE ***
+grant SELECT                                                                 on V_WCS_VISA_BIDS_ARCHIVE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_VISA_BIDS_ARCHIVE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_VISA_BIDS_ARCHIVE to UPLD;
 
 
 

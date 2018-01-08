@@ -99,6 +99,10 @@ COMMENT ON COLUMN BARS.ERR$_V_REZ_BPK.BRANCH IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_V_REZ_BPK ***
+grant SELECT                                                                 on ERR$_V_REZ_BPK  to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_V_REZ_BPK  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

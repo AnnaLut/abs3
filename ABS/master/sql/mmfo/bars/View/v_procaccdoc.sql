@@ -254,7 +254,9 @@ PROMPT *** Create  view V_PROCACCDOC ***
 
 PROMPT *** Create  grants  V_PROCACCDOC ***
 grant SELECT                                                                 on V_PROCACCDOC    to BARS014;
+grant SELECT                                                                 on V_PROCACCDOC    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PROCACCDOC    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_PROCACCDOC    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_PROCACCDOC    to WR_ALL_RIGHTS;
 
 

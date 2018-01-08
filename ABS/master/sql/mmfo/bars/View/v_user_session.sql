@@ -24,7 +24,9 @@ where s.logout_time is null
 group by s.user_id, u.logname, u.fio, s.client_host;
 
 PROMPT *** Create  grants  V_USER_SESSION ***
+grant SELECT                                                                 on V_USER_SESSION  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USER_SESSION  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_USER_SESSION  to UPLD;
 
 
 

@@ -20,8 +20,10 @@ PROMPT *** Create  view V_MBDK_CC_SWTRACE ***
 FROM cc_swtrace;
 
 PROMPT *** Create  grants  V_MBDK_CC_SWTRACE ***
+grant SELECT                                                                 on V_MBDK_CC_SWTRACE to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_MBDK_CC_SWTRACE to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_MBDK_CC_SWTRACE to START1;
+grant SELECT                                                                 on V_MBDK_CC_SWTRACE to UPLD;
 grant FLASHBACK,SELECT                                                       on V_MBDK_CC_SWTRACE to WR_REFREAD;
 
 

@@ -65,10 +65,10 @@ COMMENT ON COLUMN BARS.NBUR_REF_PROCS.DATE_FINISH IS 'Дата виключення';
 
 
 
-PROMPT *** Create  constraint SYS_C0084957 ***
+PROMPT *** Create  constraint CC_NBURREFPROCS_PROCTYPE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_REF_PROCS MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_REF_PROCS ADD CONSTRAINT CC_NBURREFPROCS_PROCTYPE CHECK ( PROC_TYPE in ( ''F'', ''C'', ''O'' ) ) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -77,11 +77,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_FILES_LINKPROCS ***
+PROMPT *** Create  constraint SYS_C0084957 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_REF_PROCS ADD CONSTRAINT FK_FILES_LINKPROCS FOREIGN KEY (FILE_ID)
-	  REFERENCES BARS.NBUR_REF_FILES (ID) ENABLE';
+  ALTER TABLE BARS.NBUR_REF_PROCS MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -146,7 +145,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_REF_PROCS ***
+grant SELECT                                                                 on NBUR_REF_PROCS  to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_REF_PROCS  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on NBUR_REF_PROCS  to UPLD;
 
 
 

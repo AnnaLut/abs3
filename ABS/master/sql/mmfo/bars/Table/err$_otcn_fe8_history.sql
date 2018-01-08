@@ -74,7 +74,9 @@ COMMENT ON COLUMN BARS.ERR$_OTCN_FE8_HISTORY.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_OTCN_FE8_HISTORY ***
+grant SELECT                                                                 on ERR$_OTCN_FE8_HISTORY to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_OTCN_FE8_HISTORY to BARS_DM;
+grant SELECT                                                                 on ERR$_OTCN_FE8_HISTORY to UPLD;
 
 
 

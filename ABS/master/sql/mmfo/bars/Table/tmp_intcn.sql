@@ -69,10 +69,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010443 ***
+PROMPT *** Create  constraint SYS_C0010441 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_INTCN MODIFY (FDAT NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_INTCN MODIFY (ACC NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -93,10 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010441 ***
+PROMPT *** Create  constraint SYS_C0010443 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_INTCN MODIFY (ACC NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_INTCN MODIFY (FDAT NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -118,9 +118,11 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_INTCN ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INTCN       to ABS_ADMIN;
+grant SELECT                                                                 on TMP_INTCN       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INTCN       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_INTCN       to BARS_DM;
 grant SELECT                                                                 on TMP_INTCN       to START1;
+grant SELECT                                                                 on TMP_INTCN       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_INTCN       to WR_ALL_RIGHTS;
 
 

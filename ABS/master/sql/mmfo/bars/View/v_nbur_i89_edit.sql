@@ -18,7 +18,9 @@ PROMPT *** Create  view V_NBUR_I89_EDIT ***
           p.datf >= to_date('17032017','ddmmyyyy');
 
 PROMPT *** Create  grants  V_NBUR_I89_EDIT ***
+grant SELECT                                                                 on V_NBUR_I89_EDIT to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_NBUR_I89_EDIT to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_NBUR_I89_EDIT to UPLD;
 grant FLASHBACK,SELECT                                                       on V_NBUR_I89_EDIT to WR_REFREAD;
 
 

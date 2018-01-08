@@ -20,8 +20,10 @@ PROMPT *** Create  view V_OW_KLBAD ***
    and q.sos = 0 and q.f_n is null;
 
 PROMPT *** Create  grants  V_OW_KLBAD ***
+grant SELECT                                                                 on V_OW_KLBAD      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_KLBAD      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_KLBAD      to OW;
+grant SELECT                                                                 on V_OW_KLBAD      to UPLD;
 
 
 

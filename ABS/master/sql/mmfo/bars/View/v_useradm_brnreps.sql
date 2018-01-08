@@ -12,7 +12,9 @@ PROMPT *** Create  view V_USERADM_BRNREPS ***
 
 PROMPT *** Create  grants  V_USERADM_BRNREPS ***
 grant SELECT                                                                 on V_USERADM_BRNREPS to ABS_ADMIN;
+grant SELECT                                                                 on V_USERADM_BRNREPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USERADM_BRNREPS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_USERADM_BRNREPS to UPLD;
 
 
 

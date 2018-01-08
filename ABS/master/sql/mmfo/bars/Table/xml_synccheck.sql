@@ -79,7 +79,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_SYNCCHECK ***
+grant SELECT                                                                 on XML_SYNCCHECK   to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_SYNCCHECK   to BARS_DM;
+grant SELECT                                                                 on XML_SYNCCHECK   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_SYNCCHECK   to WR_ALL_RIGHTS;
 
 

@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('202', '202-Оприбуткування надлишків готівки (ВАЛ)', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', null, '#(nbs_ob22 (''6399'',''01''))', 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', '#(nbs_ob22 (''6399'',''01''))', null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''03''))', null, '1001100000000000000000000000000000010000000000000000000000000000', null);
+    values ('202', '202-Оприбуткування надлишків готівки (ВАЛ)', 1, '#(get_nls_tt(''202'',''NLSM''))', null, '#(NBS_OB22(''6399'',''01''))', 980, null, '#(get_nls_tt(''202'',''NLSA''))', '#(NBS_OB22(''6399'',''01''))', null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''03''))', null, '1001100000000000000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='202', name='202-Оприбуткування надлишків готівки (ВАЛ)', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', kv=null, nlsk='#(nbs_ob22 (''6399'',''01''))', kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', nlsb='#(nbs_ob22 (''6399'',''01''))', mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='1001100000000000000000000000000000010000000000000000000000000000', nazn=null
+         set tt='202', name='202-Оприбуткування надлишків готівки (ВАЛ)', dk=1, nlsm='#(get_nls_tt(''202'',''NLSM''))', kv=null, nlsk='#(NBS_OB22(''6399'',''01''))', kvk=980, nlss=null, nlsa='#(get_nls_tt(''202'',''NLSA''))', nlsb='#(NBS_OB22(''6399'',''01''))', mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='1001100000000000000000000000000000010000000000000000000000000000', nazn=null
        where tt='202';
   end;
   --------------------------------

@@ -69,6 +69,10 @@ COMMENT ON COLUMN BARS.ERR$_CC_PROL.PROL_TYPE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CC_PROL ***
+grant SELECT                                                                 on ERR$_CC_PROL    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CC_PROL    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

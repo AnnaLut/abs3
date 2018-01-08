@@ -285,6 +285,10 @@ COMMENT ON COLUMN BARS.ERR$_NBU23_REZ_OTCN.REZQ IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_NBU23_REZ_OTCN ***
+grant SELECT                                                                 on ERR$_NBU23_REZ_OTCN to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_NBU23_REZ_OTCN to UPLD;
+
 
 
 PROMPT ===================================================================================== 

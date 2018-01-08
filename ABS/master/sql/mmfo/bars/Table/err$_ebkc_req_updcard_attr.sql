@@ -67,6 +67,10 @@ COMMENT ON COLUMN BARS.ERR$_EBKC_REQ_UPDCARD_ATTR.QUALITY IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_EBKC_REQ_UPDCARD_ATTR ***
+grant SELECT                                                                 on ERR$_EBKC_REQ_UPDCARD_ATTR to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_EBKC_REQ_UPDCARD_ATTR to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -31,12 +31,16 @@ select  'N',a.kv, t.lcv, aa.nls, aa.ostc, sum(a.ostc),
  from accounts where nbs in (3800,3801,9920);
 
 PROMPT *** Create  grants  V3800T ***
+grant SELECT                                                                 on V3800T          to BARSREADER_ROLE;
 grant SELECT                                                                 on V3800T          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V3800T          to SALGL;
+grant SELECT                                                                 on V3800T          to UPLD;
 
 PROMPT *** Create  grants  V3800_ ***
+grant SELECT                                                                 on V3800_          to BARSREADER_ROLE;
 grant SELECT                                                                 on V3800_          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V3800_          to START1;
+grant SELECT                                                                 on V3800_          to UPLD;
 
 
 

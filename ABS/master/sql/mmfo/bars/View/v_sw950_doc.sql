@@ -46,7 +46,9 @@ PROMPT *** Create  view V_SW950_DOC ***
 
 PROMPT *** Create  grants  V_SW950_DOC ***
 grant SELECT                                                                 on V_SW950_DOC     to BARS013;
+grant SELECT                                                                 on V_SW950_DOC     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW950_DOC     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_SW950_DOC     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SW950_DOC     to WR_ALL_RIGHTS;
 
 

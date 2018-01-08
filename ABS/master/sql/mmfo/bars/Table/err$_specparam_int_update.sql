@@ -72,7 +72,9 @@ COMMENT ON COLUMN BARS.ERR$_SPECPARAM_INT_UPDATE.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_SPECPARAM_INT_UPDATE ***
+grant SELECT                                                                 on ERR$_SPECPARAM_INT_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_SPECPARAM_INT_UPDATE to BARS_DM;
+grant SELECT                                                                 on ERR$_SPECPARAM_INT_UPDATE to UPLD;
 
 
 

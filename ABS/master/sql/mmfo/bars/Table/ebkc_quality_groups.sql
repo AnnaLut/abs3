@@ -102,8 +102,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBKC_QUALITY_GROUPS ***
+grant SELECT                                                                 on EBKC_QUALITY_GROUPS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBKC_QUALITY_GROUPS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBKC_QUALITY_GROUPS to BARS_DM;
+grant SELECT                                                                 on EBKC_QUALITY_GROUPS to UPLD;
 
 
 

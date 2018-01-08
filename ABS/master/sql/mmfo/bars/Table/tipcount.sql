@@ -91,10 +91,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  TIPCOUNT ***
+grant SELECT                                                                 on TIPCOUNT        to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on TIPCOUNT        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TIPCOUNT        to BARS_DM;
 grant INSERT,SELECT                                                          on TIPCOUNT        to OPERKKK;
 grant INSERT,SELECT                                                          on TIPCOUNT        to TECH_MOM1;
+grant SELECT                                                                 on TIPCOUNT        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TIPCOUNT        to WR_ALL_RIGHTS;
 
 

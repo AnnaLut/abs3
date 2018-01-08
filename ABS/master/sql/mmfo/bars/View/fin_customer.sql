@@ -45,7 +45,9 @@ PROMPT *** Create  view FIN_CUSTOMER ***
      FROM customer;
 
 PROMPT *** Create  grants  FIN_CUSTOMER ***
+grant SELECT                                                                 on FIN_CUSTOMER    to BARSREADER_ROLE;
 grant DELETE,SELECT,UPDATE                                                   on FIN_CUSTOMER    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on FIN_CUSTOMER    to UPLD;
 
 
 

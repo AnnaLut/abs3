@@ -16,7 +16,9 @@ PROMPT *** Create  view V_STAFF ***
 
 PROMPT *** Create  grants  V_STAFF ***
 grant SELECT                                                                 on V_STAFF         to ABS_ADMIN;
+grant SELECT                                                                 on V_STAFF         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFF         to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STAFF         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_STAFF         to WR_ALL_RIGHTS;
 
 

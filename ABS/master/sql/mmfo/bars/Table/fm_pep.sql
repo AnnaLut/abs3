@@ -76,7 +76,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_PEP ***
+grant SELECT                                                                 on FM_PEP          to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on FM_PEP          to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on FM_PEP          to UPLD;
 
 
 

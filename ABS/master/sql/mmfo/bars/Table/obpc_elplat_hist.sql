@@ -73,19 +73,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OBPCELPLATHIST_TABVAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OBPC_ELPLAT_HIST ADD CONSTRAINT FK_OBPCELPLATHIST_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_OBPCELPLATHIST_ID_NN ***
 begin   
  execute immediate '
@@ -136,9 +123,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_ELPLAT_HIST ***
+grant SELECT                                                                 on OBPC_ELPLAT_HIST to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_ELPLAT_HIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_ELPLAT_HIST to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_ELPLAT_HIST to OBPC;
+grant SELECT                                                                 on OBPC_ELPLAT_HIST to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_ELPLAT_HIST to WR_ALL_RIGHTS;
 
 

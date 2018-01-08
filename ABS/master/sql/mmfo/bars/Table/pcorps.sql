@@ -85,8 +85,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  PCORPS ***
+grant SELECT                                                                 on PCORPS          to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on PCORPS          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PCORPS          to BARS_DM;
+grant SELECT                                                                 on PCORPS          to UPLD;
 grant FLASHBACK,SELECT                                                       on PCORPS          to WR_REFREAD;
 
 

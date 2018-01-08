@@ -54,6 +54,7 @@ COMMENT ON COLUMN BARS.KL_S580.DATA_M IS '';
 
 
 PROMPT *** Create  grants  KL_S580 ***
+grant SELECT                                                                 on KL_S580         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_S580         to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_S580         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_S580         to RPBN002;

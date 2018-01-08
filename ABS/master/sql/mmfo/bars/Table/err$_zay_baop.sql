@@ -65,6 +65,10 @@ COMMENT ON COLUMN BARS.ERR$_ZAY_BAOP.OTM IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ZAY_BAOP ***
+grant SELECT                                                                 on ERR$_ZAY_BAOP   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ZAY_BAOP   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

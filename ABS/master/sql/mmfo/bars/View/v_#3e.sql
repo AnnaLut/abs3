@@ -58,7 +58,9 @@ PROMPT *** Create  view V_#3E ***
 ;
 
 PROMPT *** Create  grants  V_#3E ***
+grant SELECT                                                                 on V_#3E           to BARSREADER_ROLE;
 grant SELECT                                                                 on V_#3E           to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_#3E           to UPLD;
 
 
 

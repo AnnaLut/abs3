@@ -72,19 +72,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00110784 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PLSQL_PROFILER_UNITS ADD FOREIGN KEY (RUNID)
-	  REFERENCES BARS.PLSQL_PROFILER_RUNS (RUNID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C00110783 ***
 begin   
  execute immediate '
@@ -111,6 +98,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  PLSQL_PROFILER_UNITS ***
+grant SELECT                                                                 on PLSQL_PROFILER_UNITS to BARSREADER_ROLE;
+grant SELECT                                                                 on PLSQL_PROFILER_UNITS to UPLD;
 
 
 

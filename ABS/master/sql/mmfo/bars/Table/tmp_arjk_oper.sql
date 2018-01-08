@@ -65,8 +65,10 @@ COMMENT ON COLUMN BARS.TMP_ARJK_OPER.DIN IS '';
 
 
 PROMPT *** Create  grants  TMP_ARJK_OPER ***
+grant SELECT                                                                 on TMP_ARJK_OPER   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_ARJK_OPER   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_ARJK_OPER   to START1;
+grant SELECT                                                                 on TMP_ARJK_OPER   to UPLD;
 
 
 

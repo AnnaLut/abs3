@@ -37,8 +37,10 @@ and c.rnk = p.rnk
 and not exists (select 1 from customerw where rnk = a.rnk and tag = 'RV_XA' and value like 'XA%');
 
 PROMPT *** Create  grants  V_OW_XA_ACCOUNTS ***
+grant SELECT                                                                 on V_OW_XA_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_XA_ACCOUNTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_XA_ACCOUNTS to OW;
+grant SELECT                                                                 on V_OW_XA_ACCOUNTS to UPLD;
 
 
 

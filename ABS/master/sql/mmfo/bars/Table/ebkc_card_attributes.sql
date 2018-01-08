@@ -64,19 +64,6 @@ COMMENT ON COLUMN BARS.EBKC_CARD_ATTRIBUTES.PAGE_ITEM_VIEW IS '';
 
 
 
-PROMPT *** Create  constraint FK_EBKCCARDATTR_CUSTTYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.EBKC_CARD_ATTRIBUTES ADD CONSTRAINT FK_EBKCCARDATTR_CUSTTYPE FOREIGN KEY (CUST_TYPE)
-	  REFERENCES BARS.EBKC_CUST_TYPES (CUST_TYPE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_EBKC_CARDATTR ***
 begin   
  execute immediate '
@@ -105,8 +92,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBKC_CARD_ATTRIBUTES ***
+grant SELECT                                                                 on EBKC_CARD_ATTRIBUTES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBKC_CARD_ATTRIBUTES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBKC_CARD_ATTRIBUTES to BARS_DM;
+grant SELECT                                                                 on EBKC_CARD_ATTRIBUTES to UPLD;
 
 
 

@@ -69,45 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CP_ACCOUNTSTYPES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CP_ACCOUNTS ADD CONSTRAINT FK_CP_ACCOUNTSTYPES FOREIGN KEY (CP_ACCTYPE)
-	  REFERENCES BARS.CP_ACCTYPES (TYPE) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CP_REF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CP_ACCOUNTS ADD CONSTRAINT FK_CP_REF FOREIGN KEY (CP_REF)
-	  REFERENCES BARS.CP_DEAL (REF) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CP_ACC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CP_ACCOUNTS ADD CONSTRAINT FK_CP_ACC FOREIGN KEY (CP_ACC)
-	  REFERENCES BARS.ACCOUNTS (ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C007460 ***
 begin   
  execute immediate '
@@ -157,7 +118,22 @@ exception when others then
 
 
 
+
+PROMPT *** Create  index I1_CP_ACCOUNTS ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I1_CP_ACCOUNTS ON BARS.CP_ACCOUNTS (CP_ACC) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  CP_ACCOUNTS ***
+grant SELECT                                                                 on CP_ACCOUNTS     to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_ACCOUNTS     to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_ACCOUNTS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_ACCOUNTS     to BARS_DM;

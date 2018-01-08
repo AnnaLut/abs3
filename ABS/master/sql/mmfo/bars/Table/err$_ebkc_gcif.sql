@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_EBKC_GCIF.INSERT_DATE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_EBKC_GCIF ***
+grant SELECT                                                                 on ERR$_EBKC_GCIF  to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_EBKC_GCIF  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

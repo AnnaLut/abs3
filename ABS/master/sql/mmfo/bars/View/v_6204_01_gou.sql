@@ -46,8 +46,10 @@ PROMPT *** Create  view V_6204_01_GOU ***
    GROUP BY B, E, nls;
 
 PROMPT *** Create  grants  V_6204_01_GOU ***
+grant SELECT                                                                 on V_6204_01_GOU   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_6204_01_GOU   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_6204_01_GOU   to START1;
+grant SELECT                                                                 on V_6204_01_GOU   to UPLD;
 
 
 

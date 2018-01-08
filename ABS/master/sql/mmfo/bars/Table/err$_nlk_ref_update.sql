@@ -69,6 +69,10 @@ COMMENT ON COLUMN BARS.ERR$_NLK_REF_UPDATE.IDUPD IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_NLK_REF_UPDATE ***
+grant SELECT                                                                 on ERR$_NLK_REF_UPDATE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_NLK_REF_UPDATE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

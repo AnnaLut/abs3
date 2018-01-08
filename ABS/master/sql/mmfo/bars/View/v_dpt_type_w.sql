@@ -29,8 +29,10 @@ and v.flag = 1
  ;
 
 PROMPT *** Create  grants  V_DPT_TYPE_W ***
+grant SELECT                                                                 on V_DPT_TYPE_W    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_TYPE_W    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_TYPE_W    to DPT_ROLE;
+grant SELECT                                                                 on V_DPT_TYPE_W    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_TYPE_W    to WR_ALL_RIGHTS;
 
 

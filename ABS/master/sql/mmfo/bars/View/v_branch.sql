@@ -26,9 +26,11 @@ where    b.mfo=l.mfo
   and    to_number(b.mfo) = c.mfo  ;
 
 PROMPT *** Create  grants  V_BRANCH ***
+grant SELECT                                                                 on V_BRANCH        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BRANCH        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BRANCH        to NALOG;
 grant SELECT                                                                 on V_BRANCH        to RPBN002;
+grant SELECT                                                                 on V_BRANCH        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BRANCH        to WR_ALL_RIGHTS;
 
 

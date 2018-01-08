@@ -73,19 +73,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SWCHKLIST_CHKLIST ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_CHKLIST ADD CONSTRAINT FK_SWCHKLIST_CHKLIST FOREIGN KEY (IDCHK)
-	  REFERENCES BARS.CHKLIST (IDCHK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_SWCHKLIST ***
 begin   
  execute immediate '
@@ -101,6 +88,7 @@ exception when others then
 
 PROMPT *** Create  grants  SW_CHKLIST ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_CHKLIST      to BARS013;
+grant SELECT                                                                 on SW_CHKLIST      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_CHKLIST      to BARS_ACCESS_DEFROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_CHKLIST      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SW_CHKLIST      to WR_REFREAD;

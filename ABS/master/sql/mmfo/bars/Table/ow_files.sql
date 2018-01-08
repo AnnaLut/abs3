@@ -24,16 +24,16 @@ PROMPT *** Create  table OW_FILES ***
 begin 
   execute immediate '
   CREATE TABLE BARS.OW_FILES 
-   (    ID NUMBER(22,0), 
-    FILE_TYPE VARCHAR2(30), 
-    FILE_NAME VARCHAR2(100), 
-    FILE_DATE DATE DEFAULT sysdate, 
-    FILE_N NUMBER(22,0), 
-    FILE_STATUS NUMBER(1,0), 
-    FILE_BODY BLOB, 
-    ORIGIN NUMBER(1,0), 
-    ERR_TEXT VARCHAR2(254), 
-    KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+   (	ID NUMBER(22,0), 
+	FILE_TYPE VARCHAR2(30), 
+	FILE_NAME VARCHAR2(100), 
+	FILE_DATE DATE DEFAULT sysdate, 
+	FILE_N NUMBER(22,0), 
+	FILE_STATUS NUMBER(2,0), 
+	FILE_BODY BLOB, 
+	ORIGIN NUMBER(1,0), 
+	ERR_TEXT VARCHAR2(254), 
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -57,7 +57,7 @@ COMMENT ON TABLE BARS.OW_FILES IS 'W4. Импортированные файлы';
 COMMENT ON COLUMN BARS.OW_FILES.KF IS '';
 COMMENT ON COLUMN BARS.OW_FILES.ID IS 'Ід.';
 COMMENT ON COLUMN BARS.OW_FILES.FILE_TYPE IS 'Тип файла';
-COMMENT ON COLUMN BARS.OW_FILES.FILE_NAME IS 'Ім''я файлу';
+COMMENT ON COLUMN BARS.OW_FILES.FILE_NAME IS 'Ім'я файлу';
 COMMENT ON COLUMN BARS.OW_FILES.FILE_DATE IS 'Дата імпорту іайлу';
 COMMENT ON COLUMN BARS.OW_FILES.FILE_N IS 'Кількість документів';
 COMMENT ON COLUMN BARS.OW_FILES.FILE_STATUS IS 'Статус файла: 0-тело файла (clob) помещено в БД, 1-строки файла помещены в таблицу, 2-строки файла обработаны, 3-ошибка разбора тела файла';
@@ -68,120 +68,22 @@ COMMENT ON COLUMN BARS.OW_FILES.ERR_TEXT IS '';
 
 
 
+PROMPT *** Create  constraint CC_OWFILES_FILESTATUS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_FILES ADD CONSTRAINT CC_OWFILES_FILESTATUS CHECK (file_status between 0 and 99) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OWFILES_KF_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.OW_FILES MODIFY (KF CONSTRAINT CC_OWFILES_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_OWFILES_OWFILETYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_FILES ADD CONSTRAINT FK_OWFILES_OWFILETYPE FOREIGN KEY (FILE_TYPE)
-      REFERENCES BARS.OW_FILE_TYPE (FILE_TYPE) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OWFILES_FILEDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_FILES MODIFY (FILE_DATE CONSTRAINT CC_OWFILES_FILEDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OWFILES_FILENAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_FILES MODIFY (FILE_NAME CONSTRAINT CC_OWFILES_FILENAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OWFILES_FILETYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_FILES MODIFY (FILE_TYPE CONSTRAINT CC_OWFILES_FILETYPE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OWFILES_ID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_FILES MODIFY (ID CONSTRAINT CC_OWFILES_ID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OWFILES_ORIGIN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_FILES ADD CONSTRAINT CC_OWFILES_ORIGIN CHECK (origin in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OWFILES_ORIGIN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_FILES ADD CONSTRAINT CC_OWFILES_ORIGIN_NN CHECK (origin is not null) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-alter table OW_FILES modify file_status NUMBER(2);
-PROMPT *** Create  constraint CC_OWFILES_FILESTATUS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_FILES ADD CONSTRAINT CC_OWFILES_FILESTATUS CHECK (file_status between 0 and 99) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_OWFILES_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_FILES ADD CONSTRAINT FK_OWFILES_KF FOREIGN KEY (KF)
-      REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -216,6 +118,78 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_OWFILES_ORIGIN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_FILES ADD CONSTRAINT CC_OWFILES_ORIGIN_NN CHECK (origin is not null) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OWFILES_ORIGIN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_FILES ADD CONSTRAINT CC_OWFILES_ORIGIN CHECK (origin in (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OWFILES_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_FILES MODIFY (ID CONSTRAINT CC_OWFILES_ID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OWFILES_FILETYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_FILES MODIFY (FILE_TYPE CONSTRAINT CC_OWFILES_FILETYPE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OWFILES_FILENAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_FILES MODIFY (FILE_NAME CONSTRAINT CC_OWFILES_FILENAME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OWFILES_FILEDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_FILES MODIFY (FILE_DATE CONSTRAINT CC_OWFILES_FILEDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_OWOICFILES ***
 begin   
  execute immediate '
@@ -242,31 +216,13 @@ exception when others then
 /
 
 
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_FILES
-  DROP CONSTRAINT CC_OWFILES_FILESTATUS';
-exception when others then
-  if  sqlcode=-2443  then null; else raise; end if;
- end;
-/
-
-
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_FILES ADD (
-  CONSTRAINT CC_OWFILES_FILESTATUS
-  CHECK (file_status between 0 and 99)
-  DISABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2264  then null; else raise; end if;
- end;
-/
 
 PROMPT *** Create  grants  OW_FILES ***
+grant SELECT                                                                 on OW_FILES        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_FILES        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_FILES        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_FILES        to OW;
+grant SELECT                                                                 on OW_FILES        to UPLD;
 
 
 

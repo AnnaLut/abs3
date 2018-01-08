@@ -19,8 +19,10 @@ PROMPT *** Create  view SALOTC ***
            c.fdat <= B.fdat);
 
 PROMPT *** Create  grants  SALOTC ***
+grant SELECT                                                                 on SALOTC          to BARSREADER_ROLE;
 grant SELECT                                                                 on SALOTC          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALOTC          to START1;
+grant SELECT                                                                 on SALOTC          to UPLD;
 
 
 

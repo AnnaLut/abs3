@@ -60,10 +60,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010055 ***
+PROMPT *** Create  constraint SYS_C0011589 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STO_STATUS MODIFY (NAME NOT NULL ENABLE)';
+  ALTER TABLE BARS.STO_STATUS ADD PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -84,12 +86,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0011589 ***
+PROMPT *** Create  constraint SYS_C0010055 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STO_STATUS ADD PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.STO_STATUS MODIFY (NAME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -112,9 +112,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  STO_STATUS ***
+grant SELECT                                                                 on STO_STATUS      to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on STO_STATUS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STO_STATUS      to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on STO_STATUS      to STO;
+grant SELECT                                                                 on STO_STATUS      to UPLD;
 
 
 

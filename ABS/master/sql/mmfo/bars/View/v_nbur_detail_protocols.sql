@@ -38,8 +38,10 @@ PROMPT *** Create  view V_NBUR_DETAIL_PROTOCOLS ***
           LEFT OUTER JOIN cc_deal a ON (p.kf = a.kf AND P.nd = a.nd);
 
 PROMPT *** Create  grants  V_NBUR_DETAIL_PROTOCOLS ***
+grant SELECT                                                                 on V_NBUR_DETAIL_PROTOCOLS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_DETAIL_PROTOCOLS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_DETAIL_PROTOCOLS to RPBN002;
+grant SELECT                                                                 on V_NBUR_DETAIL_PROTOCOLS to UPLD;
 
 
 

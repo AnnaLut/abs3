@@ -106,7 +106,12 @@ begin
 	TIP_FIN NUMBER(*,0), 
 	DDD_6B CHAR(3), 
 	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
-	LGD_LONG NUMBER
+	LGD_LONG NUMBER, 
+	Z NUMBER, 
+	FIN_KOL NUMBER(*,0), 
+	RNK_SK NUMBER(*,0), 
+	FIN_SK NUMBER(*,0), 
+	FIN_PK NUMBER(*,0)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -125,6 +130,11 @@ PROMPT *** ALTER_POLICIES to REZ_CR ***
 
 COMMENT ON TABLE BARS.REZ_CR IS 'Кредитний ризик за активними банківськими операціями';
 COMMENT ON COLUMN BARS.REZ_CR.LGD_LONG IS '';
+COMMENT ON COLUMN BARS.REZ_CR.Z IS 'Інтегральний показник';
+COMMENT ON COLUMN BARS.REZ_CR.FIN_KOL IS 'Клас боржника-юридичної особи (визначений на підставі оцінки фінансового стану) з урахуванням своєчасності сплати ним боргу';
+COMMENT ON COLUMN BARS.REZ_CR.RNK_SK IS 'Боржник належить до групи юридичних осіб під спільним контролем';
+COMMENT ON COLUMN BARS.REZ_CR.FIN_SK IS 'Скоригований клас боржника з урахуванням належності до групи під спільним контрорлем';
+COMMENT ON COLUMN BARS.REZ_CR.FIN_PK IS 'Скоригований клас боржника з урахуванням належності до групи належності до групи пов"язаних контрагентів';
 COMMENT ON COLUMN BARS.REZ_CR.FDAT IS 'Звітна дата';
 COMMENT ON COLUMN BARS.REZ_CR.RNK IS 'Код (номер) контрагента';
 COMMENT ON COLUMN BARS.REZ_CR.CUSTTYPE IS 'Тип контрагента';
@@ -212,19 +222,6 @@ COMMENT ON COLUMN BARS.REZ_CR.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_REZCR_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REZ_CR ADD CONSTRAINT FK_REZCR_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_REZCR_KF_NN ***
 begin   
  execute immediate '
@@ -279,9 +276,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_CR ***
+grant SELECT                                                                 on REZ_CR          to BARSREADER_ROLE;
 grant SELECT                                                                 on REZ_CR          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ_CR          to RCC_DEAL;
 grant SELECT                                                                 on REZ_CR          to START1;
+grant SELECT                                                                 on REZ_CR          to UPLD;
 
 
 

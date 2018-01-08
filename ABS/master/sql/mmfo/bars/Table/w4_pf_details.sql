@@ -62,9 +62,11 @@ exception when others then
 
 PROMPT *** Create  grants  W4_PF_DETAILS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on W4_PF_DETAILS   to ABS_ADMIN;
+grant SELECT                                                                 on W4_PF_DETAILS   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on W4_PF_DETAILS   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on W4_PF_DETAILS   to DPT_ADMIN;
 grant SELECT                                                                 on W4_PF_DETAILS   to START1;
+grant SELECT                                                                 on W4_PF_DETAILS   to UPLD;
 
 
 

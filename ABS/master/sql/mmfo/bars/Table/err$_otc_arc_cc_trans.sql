@@ -77,6 +77,10 @@ COMMENT ON COLUMN BARS.ERR$_OTC_ARC_CC_TRANS.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_OTC_ARC_CC_TRANS ***
+grant SELECT                                                                 on ERR$_OTC_ARC_CC_TRANS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_OTC_ARC_CC_TRANS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -69,19 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint R_TIP_CPTT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CP_TT ADD CONSTRAINT R_TIP_CPTT FOREIGN KEY (TIP)
-	  REFERENCES BARS.CC_TIPD (TIPD) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C006069 ***
 begin   
  execute immediate '
@@ -132,10 +119,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_TT ***
+grant SELECT                                                                 on CP_TT           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_TT           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_TT           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_TT           to CP_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_TT           to START1;
+grant SELECT                                                                 on CP_TT           to UPLD;
 
 
 

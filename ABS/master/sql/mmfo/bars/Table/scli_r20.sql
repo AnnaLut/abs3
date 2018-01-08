@@ -47,7 +47,7 @@ COMMENT ON COLUMN BARS.SCLI_R20.R020 IS '';
 
 
 PROMPT *** Create  grants  SCLI_R20 ***
-grant SELECT                                                                 on SCLI_R20        to BARS_DM;
+grant SELECT                                                                 on SCLI_R20        to UPLD;
 
 
 

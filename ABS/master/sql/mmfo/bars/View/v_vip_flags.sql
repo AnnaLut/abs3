@@ -39,7 +39,9 @@ PROMPT *** Create  view V_VIP_FLAGS ***
     WHERE TO_NUMBER (v.rnk) = c.rnk AND v.kvip = t.id;
 
 PROMPT *** Create  grants  V_VIP_FLAGS ***
+grant SELECT                                                                 on V_VIP_FLAGS     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_VIP_FLAGS     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_VIP_FLAGS     to UPLD;
 
 
 

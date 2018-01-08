@@ -14,8 +14,10 @@ PROMPT *** Create  view V_LIMIT_KV ***
    FROM CASH_BRANCH_LIMIT c;
 
 PROMPT *** Create  grants  V_LIMIT_KV ***
+grant SELECT                                                                 on V_LIMIT_KV      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_LIMIT_KV      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_LIMIT_KV      to RPBN001;
+grant SELECT                                                                 on V_LIMIT_KV      to UPLD;
 
 
 

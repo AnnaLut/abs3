@@ -1,10 +1,13 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/UT2.sql =========*** Run *** =====
 PROMPT ===================================================================================== 
 
+
 PROMPT *** Create  procedure UT2 ***
 
-CREATE OR REPLACE PROCEDURE BARS.UT2 ( p_dat01 date ) is l_di number ;     
+  CREATE OR REPLACE PROCEDURE BARS.UT2 ( p_dat01 date ) is l_di number ;
 
 /*
  Процедура урегулирования дисконта/невизнаних доходів для договора в разных валютах

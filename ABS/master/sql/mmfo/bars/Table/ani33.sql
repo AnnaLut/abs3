@@ -85,9 +85,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ANI33 ***
+grant SELECT                                                                 on ANI33           to BARSREADER_ROLE;
 grant SELECT                                                                 on ANI33           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANI33           to BARS_DM;
 grant SELECT                                                                 on ANI33           to START1;
+grant SELECT                                                                 on ANI33           to UPLD;
 
 
 

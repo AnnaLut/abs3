@@ -14,8 +14,10 @@ PROMPT *** Create  view NBU23_2605 ***
 --   and not exists (select 1 from nd_acc where acc=a.acc);
 
 PROMPT *** Create  grants  NBU23_2605 ***
+grant SELECT                                                                 on NBU23_2605      to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on NBU23_2605      to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on NBU23_2605      to START1;
+grant SELECT                                                                 on NBU23_2605      to UPLD;
 
 
 

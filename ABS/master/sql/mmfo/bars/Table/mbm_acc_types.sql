@@ -100,7 +100,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  MBM_ACC_TYPES ***
+grant SELECT                                                                 on MBM_ACC_TYPES   to BARSREADER_ROLE;
 grant SELECT                                                                 on MBM_ACC_TYPES   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on MBM_ACC_TYPES   to UPLD;
 
 
 

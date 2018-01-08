@@ -18,10 +18,10 @@ PROMPT *** Create  procedure P_F56SB ***
 % 26.05.2012 - формируем в разрезе кодов территорий
 % 30.04.2011 - добавил†acc,tobo в протокол
 % 10.03.2011 - в поле комментарий вносим код TOBO и название счета
-%              исключаем корректирующие проводки предыдущего мес€ца и 
+%              исключаем корректирующие проводки предыдущего мес€ца и
 %              включаем корректирующие проводки отчетного мес€ца
 % 15.02.2011 - вместо кл-ра SB_OB22 будем использовать SB_OB22N т.к.
-%              поле A010 в табл. SB_OB22 не будет заполн€тьс€. 
+%              поле A010 в табл. SB_OB22 не будет заполн€тьс€.
 %              ¬ табл. SB_OB22 должна быть одна запись по бал.сч и OB22.
 % 19.03.2010 - убрал блок внесени€ параметра OB22 в SPECPARAM_INT
 % 24.04.2009 - не будем включать 2909 с OB22='09'
@@ -55,7 +55,7 @@ userid_ Number;
 tobo_   accounts.tobo%TYPE;
 nms_    accounts.nms%TYPE;
 comm_   rnbu_trace.comm%TYPE;
-typ_     Number; 
+typ_     Number;
 nbuc1_   VARCHAR2(12);
 nbuc_    VARCHAR2(12);
 sql_acc_ varchar2(2000):='';
@@ -65,13 +65,13 @@ ret_    number;
 ---ќбороты (по грн. 2902)
 CURSOR SaldoASeekOs IS
    SELECT /* + INDEX(L XIE_K040_KL_K040) INDEX (C XPK_CUSTOMER) */
-          a.acc, a.nls, a.kv, a.nbs, SUM(s.dos), SUM(s.kos), 
-          a.tobo, a.nms, NVL(trim(sp.ob22),'00') 
+          a.acc, a.nls, a.kv, a.nbs, SUM(s.dos), SUM(s.kos),
+          a.tobo, a.nms, NVL(trim(sp.ob22),'00')
    FROM saldoa s, accounts a, sb_r020 k, specparam_int sp
    WHERE s.fdat between Dat1_ AND Dat_
-     and a.acc=s.acc                   
-     and a.kv=980                      
-     and a.nbs=k.r020                  
+     and a.acc=s.acc
+     and a.kv=980
+     and a.nbs=k.r020
      and k.f_56='1'
      and a.acc = sp.acc(+)
    GROUP BY a.acc, a.nls, a.kv, a.nbs, a.tobo, a.nms, sp.ob22;
@@ -92,7 +92,7 @@ Dat2_ := TRUNC(Dat_ + 28);
 -- определение начальных параметров
 P_Proc_Set_Int(kodf_,sheme_,nbuc1_,typ_);
 
--- используем классификатор SB_R020 
+-- используем классификатор SB_R020
 sql_acc_ := 'select r020 from sb_r020 where f_56=''1'' ';
 
 ret_ := f_pop_otcn(Dat_, 2, sql_acc_,null,1);
@@ -114,13 +114,13 @@ LOOP
 
 --- отбор корректирующих проводок предыдущего мес€ца
    BEGIN
-      SELECT d.acc, 
+      SELECT d.acc,
          SUM(DECODE(d.dk, 0, d.s, 0)),
          SUM(DECODE(d.dk, 1, d.s, 0))
       INTO acc1_, Dosnk_, Kosnk_
       FROM  kor_prov d
-      WHERE d.acc=acc_                      
-        and d.fdat between Dat1_ AND Dat_ 
+      WHERE d.acc=acc_
+        and d.fdat between Dat1_ AND Dat_
         and d.vob = 96
       GROUP BY d.acc ;
    EXCEPTION WHEN NO_DATA_FOUND THEN
@@ -133,13 +133,13 @@ LOOP
 
 --- отбор корректирующих проводок отчетного мес€ца
    BEGIN
-      SELECT d.acc, 
+      SELECT d.acc,
          SUM(DECODE(d.dk, 0, d.s, 0)),
          SUM(DECODE(d.dk, 1, d.s, 0))
       INTO acc1_, Dosnk_, Kosnk_
       FROM  kor_prov d
-      WHERE d.acc=acc_                      
-        and d.fdat between Dat_+1 AND Dat2_ 
+      WHERE d.acc=acc_
+        and d.fdat between Dat_+1 AND Dat2_
         and d.vob = 96
       GROUP BY d.acc ;
    EXCEPTION WHEN NO_DATA_FOUND THEN
@@ -149,15 +149,15 @@ LOOP
 
    Dosn_ := Dosn_ + Dosnk_;
    Kosn_ := Kosn_ + Kosnk_;
- 
+
    IF Dosn_ > 0 OR Kosn_ > 0 THEN
 
       comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
       f56_:=0;
 
-      SELECT count(*) 
-         INTO f56_ 
-      FROM sb_ob22n 
+      SELECT count(*)
+         INTO f56_
+      FROM sb_ob22n
       WHERE r020=nbs_
         and ob22=zz_
         and a010='56' ;

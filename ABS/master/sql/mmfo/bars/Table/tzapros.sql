@@ -59,19 +59,6 @@ COMMENT ON COLUMN BARS.TZAPROS.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_TZAPROS_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TZAPROS ADD CONSTRAINT FK_TZAPROS_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_TZAPROS_KF_NN ***
 begin   
  execute immediate '
@@ -139,11 +126,13 @@ exception when others then
 
 PROMPT *** Create  grants  TZAPROS ***
 grant UPDATE                                                                 on TZAPROS         to BARS014;
+grant SELECT                                                                 on TZAPROS         to BARSREADER_ROLE;
 grant DELETE,SELECT,UPDATE                                                   on TZAPROS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TZAPROS         to BARS_DM;
 grant DELETE,SELECT                                                          on TZAPROS         to PYOD001;
 grant DELETE                                                                 on TZAPROS         to SBB_NC;
 grant DELETE                                                                 on TZAPROS         to TECH002;
+grant SELECT                                                                 on TZAPROS         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TZAPROS         to WR_ALL_RIGHTS;
 grant DELETE,SELECT                                                          on TZAPROS         to WR_QDOCS;
 

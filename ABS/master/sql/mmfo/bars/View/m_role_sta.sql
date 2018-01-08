@@ -17,7 +17,9 @@ from STAFF$BASE a ,
 where b.GRANTEE_ID = a.id (+);
 
 PROMPT *** Create  grants  M_ROLE_STA ***
+grant SELECT                                                                 on M_ROLE_STA      to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_STA      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on M_ROLE_STA      to UPLD;
 
 
 

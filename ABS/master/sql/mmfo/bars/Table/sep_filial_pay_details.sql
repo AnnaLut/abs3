@@ -71,19 +71,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SEPFLPAYDETAILS_TT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_FILIAL_PAY_DETAILS ADD CONSTRAINT FK_SEPFLPAYDETAILS_TT FOREIGN KEY (TT)
-	  REFERENCES BARS.TTS (TT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SEPFLPAYDETAILS_MFO_NN ***
 begin   
  execute immediate '
@@ -170,8 +157,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SEP_FILIAL_PAY_DETAILS ***
+grant SELECT                                                                 on SEP_FILIAL_PAY_DETAILS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SEP_FILIAL_PAY_DETAILS to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEP_FILIAL_PAY_DETAILS to SEP_RATES_ROLE;
+grant SELECT                                                                 on SEP_FILIAL_PAY_DETAILS to UPLD;
 grant FLASHBACK,SELECT                                                       on SEP_FILIAL_PAY_DETAILS to WR_REFREAD;
 
 

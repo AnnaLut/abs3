@@ -58,8 +58,10 @@ PROMPT *** Create  view NOT_CCK_PK ***
            GROUP BY kv, nbs);
 
 PROMPT *** Create  grants  NOT_CCK_PK ***
+grant SELECT                                                                 on NOT_CCK_PK      to BARSREADER_ROLE;
 grant SELECT                                                                 on NOT_CCK_PK      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NOT_CCK_PK      to RCC_DEAL;
+grant SELECT                                                                 on NOT_CCK_PK      to UPLD;
 
 
 

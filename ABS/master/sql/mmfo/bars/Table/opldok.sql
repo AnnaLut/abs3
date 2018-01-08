@@ -195,7 +195,85 @@ PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255
  NOCOMPRESS , 
  PARTITION OPLDOK_Y2018_Q1  VALUES LESS THAN (TO_DATE('' 2018-04-01 00:00:00'', ''SYYYY-MM-DD HH24:MI:SS'', ''NLS_CALENDAR=GREGORIAN'')) 
 PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
-  TABLESPACE BRSOPLDOK2018D , 
+  TABLESPACE BRSOPLDOK2018D 
+ ( SUBPARTITION OPLDOK_Y2018_Q1_SP300465  VALUES (''300465'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP302076  VALUES (''302076'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP303398  VALUES (''303398'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP304665  VALUES (''304665'') 
+  TABLESPACE BRSOPLDOK2017D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP305482  VALUES (''305482'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP311647  VALUES (''311647'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP312356  VALUES (''312356'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP313957  VALUES (''313957'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP315784  VALUES (''315784'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP322669  VALUES (''322669'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP323475  VALUES (''323475'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP324805  VALUES (''324805'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP325796  VALUES (''325796'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP326461  VALUES (''326461'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP328845  VALUES (''328845'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP331467  VALUES (''331467'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP333368  VALUES (''333368'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP335106  VALUES (''335106'') 
+  TABLESPACE BRSOPLDOK2017D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP336503  VALUES (''336503'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP337568  VALUES (''337568'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP338545  VALUES (''338545'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP351823  VALUES (''351823'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP352457  VALUES (''352457'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP353553  VALUES (''353553'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP354507  VALUES (''354507'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS , 
+  SUBPARTITION OPLDOK_Y2018_Q1_SP356334  VALUES (''356334'') 
+  TABLESPACE BRSOPLDOK2018D 
+ NOCOMPRESS ) , 
  PARTITION OPLDOK_Y2018_Q2  VALUES LESS THAN (TO_DATE('' 2018-07-01 00:00:00'', ''SYYYY-MM-DD HH24:MI:SS'', ''NLS_CALENDAR=GREGORIAN'')) 
 PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
   TABLESPACE BRSOPLDOK2018D , 
@@ -377,157 +455,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OPLDOK_ACCOUNTS2 ***
+PROMPT *** Create  constraint CC_OPLDOK_DK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPLDOK ADD CONSTRAINT FK_OPLDOK_ACCOUNTS2 FOREIGN KEY (KF, ACC)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_OPLDOK_OPER2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPLDOK ADD CONSTRAINT FK_OPLDOK_OPER2 FOREIGN KEY (KF, REF)
-	  REFERENCES BARS.OPER (KF, REF) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_OPLDOK_OPER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPLDOK ADD CONSTRAINT R_OPLDOK_OPER FOREIGN KEY (REF)
-	  REFERENCES BARS.OPER (REF) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPLDOK_ACC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPLDOK MODIFY (ACC CONSTRAINT CC_OPLDOK_ACC_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPLDOK_DK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPLDOK MODIFY (DK CONSTRAINT CC_OPLDOK_DK_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPLDOK_TT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPLDOK MODIFY (TT CONSTRAINT CC_OPLDOK_TT_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPLDOK_REF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPLDOK MODIFY (REF CONSTRAINT CC_OPLDOK_REF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPLDOK_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPLDOK MODIFY (KF CONSTRAINT CC_OPLDOK_KF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPLDOK_SOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPLDOK MODIFY (SOS CONSTRAINT CC_OPLDOK_SOS_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPLDOK_STMT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPLDOK MODIFY (STMT CONSTRAINT CC_OPLDOK_STMT_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPLDOK_SQ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPLDOK MODIFY (SQ CONSTRAINT CC_OPLDOK_SQ_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPLDOK_S_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPLDOK MODIFY (S CONSTRAINT CC_OPLDOK_S_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OPLDOK_FDAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPLDOK MODIFY (FDAT CONSTRAINT CC_OPLDOK_FDAT_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.OPLDOK ADD CONSTRAINT CC_OPLDOK_DK CHECK (dk in (0, 1)) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -548,10 +479,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OPLDOK_DK ***
+PROMPT *** Create  constraint CC_OPLDOK_FDAT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPLDOK ADD CONSTRAINT CC_OPLDOK_DK CHECK (dk in (0, 1)) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.OPLDOK MODIFY (FDAT CONSTRAINT CC_OPLDOK_FDAT_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -560,11 +491,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint R_DK_OPLDOK ***
+PROMPT *** Create  constraint CC_OPLDOK_S_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPLDOK ADD CONSTRAINT R_DK_OPLDOK FOREIGN KEY (DK)
-	  REFERENCES BARS.DK (DK) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.OPLDOK MODIFY (S CONSTRAINT CC_OPLDOK_S_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -573,11 +503,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OPLDOK_KF ***
+PROMPT *** Create  constraint CC_OPLDOK_SQ_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPLDOK ADD CONSTRAINT FK_OPLDOK_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.OPLDOK MODIFY (SQ CONSTRAINT CC_OPLDOK_SQ_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -586,11 +515,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OPLDOK_TTS ***
+PROMPT *** Create  constraint CC_OPLDOK_STMT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPLDOK ADD CONSTRAINT FK_OPLDOK_TTS FOREIGN KEY (TT)
-	  REFERENCES BARS.TTS (TT) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.OPLDOK MODIFY (STMT CONSTRAINT CC_OPLDOK_STMT_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -599,11 +527,70 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OPLDOK_SOS ***
+PROMPT *** Create  constraint CC_OPLDOK_SOS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPLDOK ADD CONSTRAINT FK_OPLDOK_SOS FOREIGN KEY (SOS)
-	  REFERENCES BARS.SOS (SOS) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.OPLDOK MODIFY (SOS CONSTRAINT CC_OPLDOK_SOS_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OPLDOK_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPLDOK MODIFY (KF CONSTRAINT CC_OPLDOK_KF_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OPLDOK_REF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPLDOK MODIFY (REF CONSTRAINT CC_OPLDOK_REF_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OPLDOK_TT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPLDOK MODIFY (TT CONSTRAINT CC_OPLDOK_TT_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OPLDOK_DK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPLDOK MODIFY (DK CONSTRAINT CC_OPLDOK_DK_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OPLDOK_ACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPLDOK MODIFY (ACC CONSTRAINT CC_OPLDOK_ACC_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -617,7 +604,8 @@ begin
  execute immediate '
   CREATE UNIQUE INDEX BARS.PK_OPLDOK ON BARS.OPLDOK (REF, STMT, DK) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS COMPRESS 1 
-  TABLESPACE BRSOPLDOKI ';
+  TABLESPACE BRSOPLDOKI 
+  PARALLEL 24 ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
@@ -631,7 +619,8 @@ begin
  execute immediate '
   CREATE INDEX BARS.IDX_OPLDOK_ACC ON BARS.OPLDOK (ACC) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSOPLDOKI ';
+  TABLESPACE BRSOPLDOKI 
+  PARALLEL 24 ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
@@ -4344,7 +4333,8 @@ begin
  execute immediate '
   CREATE UNIQUE INDEX BARS.UK_ID_OPLDOK ON BARS.OPLDOK (ID) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSOPLDOKI ';
+  TABLESPACE BRSOPLDOKI 
+  PARALLEL 24 ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
@@ -4358,6 +4348,7 @@ grant DELETE,UPDATE                                                          on 
 grant FLASHBACK                                                              on OPLDOK          to BARSAQ;
 grant REFERENCES,SELECT,UPDATE                                               on OPLDOK          to BARSAQ with grant option;
 grant REFERENCES,SELECT,UPDATE                                               on OPLDOK          to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on OPLDOK          to BARSREADER_ROLE;
 grant SELECT                                                                 on OPLDOK          to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPLDOK          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OPLDOK          to BARS_DM;
@@ -4369,6 +4360,7 @@ grant UPDATE                                                                 on 
 grant SELECT                                                                 on OPLDOK          to RPBN002;
 grant SELECT                                                                 on OPLDOK          to START1;
 grant SELECT,UPDATE                                                          on OPLDOK          to TEST;
+grant SELECT                                                                 on OPLDOK          to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPLDOK          to WR_ALL_RIGHTS;
 grant SELECT                                                                 on OPLDOK          to WR_CUSTLIST;
 grant SELECT                                                                 on OPLDOK          to WR_DEPOSIT_U;

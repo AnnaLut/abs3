@@ -49,9 +49,11 @@ COMMENT ON COLUMN BARS.INT_GRP.NAME IS '';
 
 
 PROMPT *** Create  grants  INT_GRP ***
+grant SELECT                                                                 on INT_GRP         to BARSREADER_ROLE;
 grant SELECT                                                                 on INT_GRP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_GRP         to BARS_DM;
 grant SELECT                                                                 on INT_GRP         to RPBN001;
+grant SELECT                                                                 on INT_GRP         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_GRP         to WR_ALL_RIGHTS;
 
 

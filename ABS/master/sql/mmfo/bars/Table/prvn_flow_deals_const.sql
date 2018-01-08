@@ -153,9 +153,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRVN_FLOW_DEALS_CONST ***
+grant SELECT                                                                 on PRVN_FLOW_DEALS_CONST to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on PRVN_FLOW_DEALS_CONST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRVN_FLOW_DEALS_CONST to BARS_DM;
 grant SELECT,UPDATE                                                          on PRVN_FLOW_DEALS_CONST to START1;
+grant SELECT                                                                 on PRVN_FLOW_DEALS_CONST to UPLD;
 
 
 

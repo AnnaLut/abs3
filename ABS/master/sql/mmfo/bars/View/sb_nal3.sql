@@ -23,8 +23,10 @@ group BY D.FDAT,
  ;
 
 PROMPT *** Create  grants  SB_NAL3 ***
+grant SELECT                                                                 on SB_NAL3         to BARSREADER_ROLE;
 grant SELECT                                                                 on SB_NAL3         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SB_NAL3         to NALOG;
+grant SELECT                                                                 on SB_NAL3         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SB_NAL3         to WR_ALL_RIGHTS;
 
 

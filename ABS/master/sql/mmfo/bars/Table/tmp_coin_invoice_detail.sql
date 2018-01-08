@@ -66,8 +66,10 @@ COMMENT ON COLUMN BARS.TMP_COIN_INVOICE_DETAIL.USERID IS '';
 
 
 PROMPT *** Create  grants  TMP_COIN_INVOICE_DETAIL ***
+grant SELECT                                                                 on TMP_COIN_INVOICE_DETAIL to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_COIN_INVOICE_DETAIL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_COIN_INVOICE_DETAIL to BARS_DM;
+grant SELECT                                                                 on TMP_COIN_INVOICE_DETAIL to UPLD;
 
 
 

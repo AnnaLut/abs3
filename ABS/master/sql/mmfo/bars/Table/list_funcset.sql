@@ -59,11 +59,10 @@ COMMENT ON COLUMN BARS.LIST_FUNCSET.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_LISTFUNCSETT_KF ***
+PROMPT *** Create  constraint SYS_C009255 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.LIST_FUNCSET ADD CONSTRAINT FK_LISTFUNCSETT_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+  ALTER TABLE BARS.LIST_FUNCSET MODIFY (REC_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -72,11 +71,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_LISTFUNCSET_OPERLIST ***
+PROMPT *** Create  constraint CC_LISTFUNCSET_SETID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.LIST_FUNCSET ADD CONSTRAINT FK_LISTFUNCSET_OPERLIST FOREIGN KEY (FUNC_ID)
-	  REFERENCES BARS.OPERLIST (CODEOPER) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.LIST_FUNCSET MODIFY (SET_ID CONSTRAINT CC_LISTFUNCSET_SETID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -85,10 +83,22 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_LISTFUNCSET_FUNCACTIVITY ***
+PROMPT *** Create  constraint CC_LISTFUNCSET_FUNCID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.LIST_FUNCSET ADD CONSTRAINT CC_LISTFUNCSET_FUNCACTIVITY CHECK (func_activity in (0,1)) ENABLE';
+  ALTER TABLE BARS.LIST_FUNCSET MODIFY (FUNC_ID CONSTRAINT CC_LISTFUNCSET_FUNCID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_LISTFUNCSET_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.LIST_FUNCSET MODIFY (KF CONSTRAINT CC_LISTFUNCSET_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -111,59 +121,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_LISTFUNCSET_KF_NN ***
+PROMPT *** Create  constraint CC_LISTFUNCSET_FUNCACTIVITY ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.LIST_FUNCSET MODIFY (KF CONSTRAINT CC_LISTFUNCSET_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_LISTFUNCSET_FUNCID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.LIST_FUNCSET MODIFY (FUNC_ID CONSTRAINT CC_LISTFUNCSET_FUNCID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_LISTFUNCSET_SETID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.LIST_FUNCSET MODIFY (SET_ID CONSTRAINT CC_LISTFUNCSET_SETID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009255 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.LIST_FUNCSET MODIFY (REC_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_LISTFUNCSET_LISTSET ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.LIST_FUNCSET ADD CONSTRAINT FK_LISTFUNCSET_LISTSET FOREIGN KEY (SET_ID)
-	  REFERENCES BARS.LIST_SET (ID) ENABLE';
+  ALTER TABLE BARS.LIST_FUNCSET ADD CONSTRAINT CC_LISTFUNCSET_FUNCACTIVITY CHECK (func_activity in (0,1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -201,9 +162,11 @@ exception when others then
 
 PROMPT *** Create  grants  LIST_FUNCSET ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on LIST_FUNCSET    to ABS_ADMIN;
+grant SELECT                                                                 on LIST_FUNCSET    to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on LIST_FUNCSET    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LIST_FUNCSET    to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on LIST_FUNCSET    to START1;
+grant SELECT                                                                 on LIST_FUNCSET    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on LIST_FUNCSET    to WR_ALL_RIGHTS;
 
 

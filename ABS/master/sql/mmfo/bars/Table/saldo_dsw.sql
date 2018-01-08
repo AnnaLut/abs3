@@ -103,9 +103,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SALDO_DSW ***
+grant SELECT                                                                 on SALDO_DSW       to BARSREADER_ROLE;
 grant DELETE,SELECT,UPDATE                                                   on SALDO_DSW       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALDO_DSW       to BARS_DM;
 grant DELETE,SELECT,UPDATE                                                   on SALDO_DSW       to START1;
+grant SELECT                                                                 on SALDO_DSW       to UPLD;
 
 
 

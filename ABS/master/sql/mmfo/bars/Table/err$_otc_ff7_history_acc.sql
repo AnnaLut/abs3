@@ -124,7 +124,9 @@ COMMENT ON COLUMN BARS.ERR$_OTC_FF7_HISTORY_ACC.WDATE IS '';
 
 
 PROMPT *** Create  grants  ERR$_OTC_FF7_HISTORY_ACC ***
+grant SELECT                                                                 on ERR$_OTC_FF7_HISTORY_ACC to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_OTC_FF7_HISTORY_ACC to BARS_DM;
+grant SELECT                                                                 on ERR$_OTC_FF7_HISTORY_ACC to UPLD;
 
 
 

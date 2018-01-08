@@ -65,8 +65,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_FORM ***
+grant SELECT                                                                 on REZ_FORM        to BARSREADER_ROLE;
 grant SELECT                                                                 on REZ_FORM        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ_FORM        to RCC_DEAL;
+grant SELECT                                                                 on REZ_FORM        to UPLD;
 
 
 

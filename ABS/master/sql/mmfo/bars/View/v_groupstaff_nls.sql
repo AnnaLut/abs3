@@ -26,7 +26,9 @@ PROMPT *** Create  view V_GROUPSTAFF_NLS ***
           AND sec.fit_gmask (a.sec, ga.id) > 0;
 
 PROMPT *** Create  grants  V_GROUPSTAFF_NLS ***
+grant SELECT                                                                 on V_GROUPSTAFF_NLS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GROUPSTAFF_NLS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_GROUPSTAFF_NLS to UPLD;
 
 
 

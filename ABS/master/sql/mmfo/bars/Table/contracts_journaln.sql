@@ -59,9 +59,11 @@ COMMENT ON COLUMN BARS.CONTRACTS_JOURNALN.IDP IS '';
 
 
 PROMPT *** Create  grants  CONTRACTS_JOURNALN ***
+grant SELECT                                                                 on CONTRACTS_JOURNALN to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CONTRACTS_JOURNALN to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CONTRACTS_JOURNALN to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CONTRACTS_JOURNALN to START1;
+grant SELECT                                                                 on CONTRACTS_JOURNALN to UPLD;
 
 
 

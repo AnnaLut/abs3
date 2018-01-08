@@ -32,7 +32,9 @@ where  a.resolution_type_id is null
 ;
 
 PROMPT *** Create  grants  V_APPROVABLE_RESOURCE ***
+grant SELECT                                                                 on V_APPROVABLE_RESOURCE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_APPROVABLE_RESOURCE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_APPROVABLE_RESOURCE to UPLD;
 
 
 

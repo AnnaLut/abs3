@@ -22,9 +22,11 @@ PROMPT *** Create  view V_CUSTW_R ***
       order by w.idupd;
 
 PROMPT *** Create  grants  V_CUSTW_R ***
+grant SELECT                                                                 on V_CUSTW_R       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTW_R       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUSTW_R       to CUST001;
 grant SELECT                                                                 on V_CUSTW_R       to FINMON01;
+grant SELECT                                                                 on V_CUSTW_R       to UPLD;
 
 
 

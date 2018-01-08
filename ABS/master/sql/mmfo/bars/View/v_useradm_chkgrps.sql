@@ -12,7 +12,9 @@ PROMPT *** Create  view V_USERADM_CHKGRPS ***
 
 PROMPT *** Create  grants  V_USERADM_CHKGRPS ***
 grant SELECT                                                                 on V_USERADM_CHKGRPS to ABS_ADMIN;
+grant SELECT                                                                 on V_USERADM_CHKGRPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USERADM_CHKGRPS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_USERADM_CHKGRPS to UPLD;
 
 
 

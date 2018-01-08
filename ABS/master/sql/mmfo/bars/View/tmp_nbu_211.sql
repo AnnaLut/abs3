@@ -11,8 +11,10 @@ PROMPT *** Create  view TMP_NBU_211 ***
   select  TMP_NBU."KODP",TMP_NBU."DATF",TMP_NBU."KODF",TMP_NBU."ZNAP",TMP_NBU."NBUC",TMP_NBU."KF",TMP_NBU."ERR_MSG",TMP_NBU."FL_MOD" from TMP_NBU;
 
 PROMPT *** Create  grants  TMP_NBU_211 ***
+grant SELECT                                                                 on TMP_NBU_211     to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_NBU_211     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_NBU_211     to RPBN002;
+grant SELECT                                                                 on TMP_NBU_211     to UPLD;
 
 
 

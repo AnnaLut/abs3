@@ -17,8 +17,10 @@ PROMPT *** Create  view V_RISK_REL ***
                                   AND dat_end IS NULL);
 
 PROMPT *** Create  grants  V_RISK_REL ***
+grant SELECT                                                                 on V_RISK_REL      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RISK_REL      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_RISK_REL      to START1;
+grant SELECT                                                                 on V_RISK_REL      to UPLD;
 
 
 

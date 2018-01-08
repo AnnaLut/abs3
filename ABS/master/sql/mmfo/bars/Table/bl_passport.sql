@@ -79,59 +79,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint BL_PASSPORT_BASE ***
+PROMPT *** Create  constraint NN_BL_PASSPORT_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BL_PASSPORT ADD CONSTRAINT BL_PASSPORT_BASE FOREIGN KEY (BASE_ID)
-	  REFERENCES BARS.BL_BASE_DICT (BASE_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NN_BL_PASSPORT_BASE_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_PASSPORT MODIFY (BASE_ID CONSTRAINT NN_BL_PASSPORT_BASE_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NN_BL_PASSPORT_USER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_PASSPORT MODIFY (USER_ID CONSTRAINT NN_BL_PASSPORT_USER NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NN_BL_PASSPORT_PASS_NUM ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_PASSPORT MODIFY (PASS_NUM CONSTRAINT NN_BL_PASSPORT_PASS_NUM NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NN_BL_PASSPORT_PASS_SER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_PASSPORT MODIFY (PASS_SER CONSTRAINT NN_BL_PASSPORT_PASS_SER NOT NULL ENABLE)';
+  ALTER TABLE BARS.BL_PASSPORT MODIFY (PASSPORT_ID CONSTRAINT NN_BL_PASSPORT_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -152,11 +103,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint BL_PASSPORT_PERSON_FK ***
+PROMPT *** Create  constraint NN_BL_PASSPORT_PASS_SER ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BL_PASSPORT ADD CONSTRAINT BL_PASSPORT_PERSON_FK FOREIGN KEY (BASE_ID, PERSON_ID)
-	  REFERENCES BARS.BL_PERSON (BASE_ID, PERSON_ID) ENABLE';
+  ALTER TABLE BARS.BL_PASSPORT MODIFY (PASS_SER CONSTRAINT NN_BL_PASSPORT_PASS_SER NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -165,11 +115,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint BL_PASSPORT_USER_FK ***
+PROMPT *** Create  constraint NN_BL_PASSPORT_PASS_NUM ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BL_PASSPORT ADD CONSTRAINT BL_PASSPORT_USER_FK FOREIGN KEY (USER_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+  ALTER TABLE BARS.BL_PASSPORT MODIFY (PASS_NUM CONSTRAINT NN_BL_PASSPORT_PASS_NUM NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -178,10 +127,22 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NN_BL_PASSPORT_ID ***
+PROMPT *** Create  constraint NN_BL_PASSPORT_USER ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BL_PASSPORT MODIFY (PASSPORT_ID CONSTRAINT NN_BL_PASSPORT_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.BL_PASSPORT MODIFY (USER_ID CONSTRAINT NN_BL_PASSPORT_USER NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NN_BL_PASSPORT_BASE_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BL_PASSPORT MODIFY (BASE_ID CONSTRAINT NN_BL_PASSPORT_BASE_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -218,8 +179,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  BL_PASSPORT ***
+grant SELECT                                                                 on BL_PASSPORT     to BARSREADER_ROLE;
 grant SELECT                                                                 on BL_PASSPORT     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BL_PASSPORT     to RBL;
+grant SELECT                                                                 on BL_PASSPORT     to UPLD;
 
 
 

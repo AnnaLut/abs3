@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.ERR$_CASH_REFQUE.USERID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CASH_REFQUE ***
+grant SELECT                                                                 on ERR$_CASH_REFQUE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CASH_REFQUE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

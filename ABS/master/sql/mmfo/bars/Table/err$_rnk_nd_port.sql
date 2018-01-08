@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.ERR$_RNK_ND_PORT.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_RNK_ND_PORT ***
+grant SELECT                                                                 on ERR$_RNK_ND_PORT to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_RNK_ND_PORT to UPLD;
+
 
 
 PROMPT ===================================================================================== 

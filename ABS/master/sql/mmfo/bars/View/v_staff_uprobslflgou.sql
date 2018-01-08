@@ -17,7 +17,9 @@ PROMPT *** Create  view V_STAFF_UPROBSLFLGOU ***
    ORDER BY s.id;
 
 PROMPT *** Create  grants  V_STAFF_UPROBSLFLGOU ***
+grant SELECT                                                                 on V_STAFF_UPROBSLFLGOU to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_STAFF_UPROBSLFLGOU to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STAFF_UPROBSLFLGOU to UPLD;
 
 
 

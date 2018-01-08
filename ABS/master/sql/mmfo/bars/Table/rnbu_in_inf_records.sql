@@ -59,45 +59,6 @@ COMMENT ON COLUMN BARS.RNBU_IN_INF_RECORDS.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_RNBU_IN_RECORDS_FILES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.RNBU_IN_INF_RECORDS ADD CONSTRAINT FK_RNBU_IN_RECORDS_FILES FOREIGN KEY (FILE_ID)
-	  REFERENCES BARS.RNBU_IN_FILES (FILE_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_RNBUININFRECORDS_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.RNBU_IN_INF_RECORDS ADD CONSTRAINT FK_RNBUININFRECORDS_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_RNBUININFRECORDS_RNBUINFILE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.RNBU_IN_INF_RECORDS ADD CONSTRAINT FK_RNBUININFRECORDS_RNBUINFILE FOREIGN KEY (KF, FILE_ID)
-	  REFERENCES BARS.RNBU_IN_FILES (KF, FILE_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C0011671 ***
 begin   
  execute immediate '
@@ -153,11 +114,13 @@ exception when others then
 
 PROMPT *** Create  grants  RNBU_IN_INF_RECORDS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_IN_INF_RECORDS to ABS_ADMIN;
+grant SELECT                                                                 on RNBU_IN_INF_RECORDS to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on RNBU_IN_INF_RECORDS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RNBU_IN_INF_RECORDS to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on RNBU_IN_INF_RECORDS to RPBN002;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on RNBU_IN_INF_RECORDS to SALGL;
 grant SELECT                                                                 on RNBU_IN_INF_RECORDS to START1;
+grant SELECT                                                                 on RNBU_IN_INF_RECORDS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RNBU_IN_INF_RECORDS to WR_ALL_RIGHTS;
 
 

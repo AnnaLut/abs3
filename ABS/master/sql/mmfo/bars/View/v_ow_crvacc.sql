@@ -18,8 +18,10 @@ PROMPT *** Create  view V_OW_CRVACC ***
    and a.branch like sys_context ('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  V_OW_CRVACC ***
+grant SELECT                                                                 on V_OW_CRVACC     to BARSREADER_ROLE;
 grant DELETE,SELECT                                                          on V_OW_CRVACC     to BARS_ACCESS_DEFROLE;
 grant DELETE,SELECT                                                          on V_OW_CRVACC     to OW;
+grant SELECT                                                                 on V_OW_CRVACC     to UPLD;
 
 
 

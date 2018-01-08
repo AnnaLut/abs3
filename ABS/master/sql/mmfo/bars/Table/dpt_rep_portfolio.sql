@@ -94,6 +94,7 @@ PROMPT *** Create  grants  DPT_REP_PORTFOLIO ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_REP_PORTFOLIO to ABS_ADMIN;
 grant REFERENCES,SELECT                                                      on DPT_REP_PORTFOLIO to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on DPT_REP_PORTFOLIO to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on DPT_REP_PORTFOLIO to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_REP_PORTFOLIO to BARSUPL;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on DPT_REP_PORTFOLIO to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_REP_PORTFOLIO to BARS_DM;
@@ -104,6 +105,7 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on DPT_REP_PORTFOLIO to REFSYNC_USR;
 grant SELECT                                                                 on DPT_REP_PORTFOLIO to RPBN001;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on DPT_REP_PORTFOLIO to START1;
+grant SELECT                                                                 on DPT_REP_PORTFOLIO to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_REP_PORTFOLIO to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_REP_PORTFOLIO to WR_REFREAD;
 

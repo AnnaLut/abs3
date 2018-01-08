@@ -75,19 +75,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_TMPIREP_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_IREP ADD CONSTRAINT FK_TMPIREP_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_TMP_IREP_KODP ***
 begin   
  execute immediate '
@@ -151,10 +138,12 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_IREP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_IREP        to ABS_ADMIN;
+grant SELECT                                                                 on TMP_IREP        to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TMP_IREP        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_IREP        to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TMP_IREP        to RPBN002;
 grant SELECT                                                                 on TMP_IREP        to START1;
+grant SELECT                                                                 on TMP_IREP        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_IREP        to WR_ALL_RIGHTS;
 
 

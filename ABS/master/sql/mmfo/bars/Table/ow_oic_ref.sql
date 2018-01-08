@@ -26,7 +26,8 @@ begin
   CREATE TABLE BARS.OW_OIC_REF 
    (	ID NUMBER(22,0), 
 	REF NUMBER(38,0), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
+	SIGN_STATE NUMBER DEFAULT 0
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -47,6 +48,7 @@ COMMENT ON TABLE BARS.OW_OIC_REF IS 'W4. Документы файлов';
 COMMENT ON COLUMN BARS.OW_OIC_REF.ID IS 'Ид.файла';
 COMMENT ON COLUMN BARS.OW_OIC_REF.REF IS 'Реф.';
 COMMENT ON COLUMN BARS.OW_OIC_REF.KF IS '';
+COMMENT ON COLUMN BARS.OW_OIC_REF.SIGN_STATE IS '';
 
 
 
@@ -75,11 +77,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OWOICREF_KF ***
+PROMPT *** Create  constraint CC_OWOICREF_REF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OW_OIC_REF ADD CONSTRAINT FK_OWOICREF_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.OW_OIC_REF ADD CONSTRAINT CC_OWOICREF_REF_NN CHECK (ref is not null) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -94,18 +95,6 @@ begin
   ALTER TABLE BARS.OW_OIC_REF ADD CONSTRAINT PK_OWOICREF PRIMARY KEY (ID, REF)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSBIGI  ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OWOICREF_REF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_OIC_REF ADD CONSTRAINT CC_OWOICREF_REF_NN CHECK (ref is not null) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -140,26 +129,13 @@ exception when others then
 /
 
 
-begin
-    execute immediate 'alter table ow_oic_ref add sign_state number ';
- exception when others then 
-    if sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/
-
-begin
-    execute immediate 'alter table ow_oic_ref modify sign_state number default 0 ';
- exception when others then 
-    if sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/
 
 PROMPT *** Create  grants  OW_OIC_REF ***
+grant SELECT                                                                 on OW_OIC_REF      to BARSREADER_ROLE;
 grant SELECT                                                                 on OW_OIC_REF      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_OIC_REF      to BARS_DM;
 grant SELECT                                                                 on OW_OIC_REF      to OW;
+grant SELECT                                                                 on OW_OIC_REF      to UPLD;
 
 
 

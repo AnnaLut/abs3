@@ -25,7 +25,7 @@ begin
   CREATE TABLE BARS.OPERW_TMP_PRL 
    (	REF NUMBER, 
 	TAG CHAR(5), 
-	VALUE VARCHAR2(200), 
+	VALUE VARCHAR2(220), 
 	KF CHAR(6)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
@@ -53,7 +53,7 @@ COMMENT ON COLUMN BARS.OPERW_TMP_PRL.KF IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C00123617 ***
+PROMPT *** Create  constraint SYS_C00139208 ***
 begin   
  execute immediate '
   ALTER TABLE BARS.OPERW_TMP_PRL MODIFY (TAG NOT NULL ENABLE)';
@@ -63,6 +63,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  OPERW_TMP_PRL ***
+grant SELECT                                                                 on OPERW_TMP_PRL   to UPLD;
 
 
 

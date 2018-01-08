@@ -90,7 +90,9 @@ COMMENT ON COLUMN BARS.ERR$_CUSTOMER_ADDRESS.COMM IS '';
 
 
 PROMPT *** Create  grants  ERR$_CUSTOMER_ADDRESS ***
+grant SELECT                                                                 on ERR$_CUSTOMER_ADDRESS to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CUSTOMER_ADDRESS to BARS_DM;
+grant SELECT                                                                 on ERR$_CUSTOMER_ADDRESS to UPLD;
 
 
 

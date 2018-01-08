@@ -73,10 +73,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_1TAX_PERIODS ***
+PROMPT *** Create  constraint PK_TAX_TYPE_TAX_SETTINGS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TAX_SETTINGS ADD CONSTRAINT UK_1TAX_PERIODS UNIQUE (TAX_TYPE, DAT_BEGIN, DAT_END)
+  ALTER TABLE BARS.TAX_SETTINGS ADD CONSTRAINT PK_TAX_TYPE_TAX_SETTINGS PRIMARY KEY (ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSSMLI  ENABLE';
 exception when others then
@@ -87,10 +87,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_TAX_TYPE_TAX_SETTINGS ***
+PROMPT *** Create  constraint UK_1TAX_PERIODS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TAX_SETTINGS ADD CONSTRAINT PK_TAX_TYPE_TAX_SETTINGS PRIMARY KEY (ID)
+  ALTER TABLE BARS.TAX_SETTINGS ADD CONSTRAINT UK_1TAX_PERIODS UNIQUE (TAX_TYPE, DAT_BEGIN, DAT_END)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSSMLI  ENABLE';
 exception when others then
@@ -129,9 +129,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  TAX_SETTINGS ***
+grant SELECT                                                                 on TAX_SETTINGS    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TAX_SETTINGS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TAX_SETTINGS    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TAX_SETTINGS    to START1;
+grant SELECT                                                                 on TAX_SETTINGS    to UPLD;
 
 
 

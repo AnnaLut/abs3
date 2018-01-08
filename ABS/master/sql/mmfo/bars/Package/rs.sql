@@ -613,6 +613,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.RS as
       -- вызов метода прокси-сервиса
       begin
         select val into l_request_url from params$global where par = G_WSPROXY_URL_TAG and rownum = 1;
+        -- ручная балансировка на 2 сервера
+        if mod(p_query_id, 2) = 0 then
+            l_request_url := replace(l_request_url, '10.7.98.30', '10.7.98.11');
+        else
+            l_request_url := replace(l_request_url, '10.7.98.30', '10.7.98.21');
+        end if;
+        logger.info('RS:: p_query_id=' || p_query_id || ', l_request_url=' || l_request_url);
+
         select max(val) into l_wallet_dir from web_barsconfig where key = G_WALLET_DIR_TAG;
         select max(val) into l_wallet_pass from web_barsconfig where key = G_WALLET_PASS_TAG;
         -- подготовить реквест

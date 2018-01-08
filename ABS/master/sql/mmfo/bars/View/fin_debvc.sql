@@ -14,8 +14,10 @@ from fin_debT f, accounts a, nd_acc n, cc_deal d
    and a.nbs||a.ob22 in  ( f.nbs_n, nvl(f.nbs_p,f.nbs_n),  nvl(f.nbs_k,f.nbs_n) ) ;
 
 PROMPT *** Create  grants  FIN_DEBVC ***
+grant SELECT                                                                 on FIN_DEBVC       to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_DEBVC       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_DEBVC       to START1;
+grant SELECT                                                                 on FIN_DEBVC       to UPLD;
 
 
 

@@ -22,6 +22,10 @@ where e.vidd  > 1500 AND e.vidd < 1600
   and e.nd= b.nd and e.nd = p.nd(+) and e.nd = z.nd(+)
 ;
 
+PROMPT *** Create  grants  V_MBK_MANY ***
+grant SELECT                                                                 on V_MBK_MANY      to BARSREADER_ROLE;
+grant SELECT                                                                 on V_MBK_MANY      to UPLD;
+
 
 
 PROMPT ===================================================================================== 

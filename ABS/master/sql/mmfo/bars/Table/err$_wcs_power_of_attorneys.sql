@@ -83,6 +83,10 @@ COMMENT ON COLUMN BARS.ERR$_WCS_POWER_OF_ATTORNEYS.DISTRICT_NAME IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_WCS_POWER_OF_ATTORNEYS ***
+grant SELECT                                                                 on ERR$_WCS_POWER_OF_ATTORNEYS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_WCS_POWER_OF_ATTORNEYS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

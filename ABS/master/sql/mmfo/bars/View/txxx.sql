@@ -53,8 +53,10 @@ WHERE substr(s.nbs,1,1) in ('6','7')
 GROUP by  s.fdat;
 
 PROMPT *** Create  grants  TXXX ***
+grant SELECT                                                                 on TXXX            to BARSREADER_ROLE;
 grant SELECT                                                                 on TXXX            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TXXX            to START1;
+grant SELECT                                                                 on TXXX            to UPLD;
 
 
 

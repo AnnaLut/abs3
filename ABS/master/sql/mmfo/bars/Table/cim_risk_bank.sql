@@ -85,6 +85,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  CIM_RISK_BANK ***
+grant SELECT                                                                 on CIM_RISK_BANK   to BARSREADER_ROLE;
+grant SELECT                                                                 on CIM_RISK_BANK   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

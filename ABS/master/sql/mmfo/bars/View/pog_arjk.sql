@@ -112,8 +112,10 @@ PROMPT *** Create  view POG_ARJK ***
     WHERE c.rnk = e.rnk AND e.nd = x.nd(+) AND e.nd = t.nd;
 
 PROMPT *** Create  grants  POG_ARJK ***
+grant SELECT                                                                 on POG_ARJK        to BARSREADER_ROLE;
 grant SELECT                                                                 on POG_ARJK        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on POG_ARJK        to START1;
+grant SELECT                                                                 on POG_ARJK        to UPLD;
 
 
 

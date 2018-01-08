@@ -81,7 +81,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  KL_F$UUU_ ***
+grant SELECT                                                                 on KL_F$UUU_       to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_F$UUU_       to BARS_DM;
+grant SELECT                                                                 on KL_F$UUU_       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F$UUU_       to WR_ALL_RIGHTS;
 
 

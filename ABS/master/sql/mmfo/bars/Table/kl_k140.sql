@@ -1,75 +1,68 @@
-exec bc.home;
 
-begin
-  bpa.alter_policy_info('KL_K140', 'FILIAL',  null, null, null, null);
-  bpa.alter_policy_info('KL_K140', 'WHOLE',  null, null, null, null);
-  commit;
-exception when others then null;   
-end;
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/KL_K140.sql =========*** Run *** =====
+PROMPT ===================================================================================== 
+
+
+PROMPT *** ALTER_POLICY_INFO to KL_K140 ***
+
+
+BEGIN 
+        execute immediate  
+          'begin  
+               bpa.alter_policy_info(''KL_K140'', ''CENTER'' , null, null, null, null);
+               bpa.alter_policy_info(''KL_K140'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''KL_K140'', ''WHOLE'' , null, null, null, null);
+               null;
+           end; 
+          '; 
+END; 
+/
+
+PROMPT *** Create  table KL_K140 ***
+begin 
+  execute immediate '
+  CREATE TABLE BARS.KL_K140 
+   (	K140 VARCHAR2(1), 
+	TXT VARCHAR2(165), 
+	D_OPEN DATE, 
+	D_CLOSE DATE, 
+	D_MODE DATE, 
+	K140SR VARCHAR2(2)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  TABLESPACE BRSDYND ';
+exception when others then       
+  if sqlcode=-955 then null; else raise; end if; 
+end; 
 /
 
 
-begin
-    execute immediate 'DROP TABLE BARS.kl_k140 CASCADE CONSTRAINTS';
-exception
-    when others then null;
-end;
-/    
 
 
-Prompt Table KL_K140;
-begin
-  execute immediate 
-    'create table BARS.KL_K140
-(
-  K140     VARCHAR2(1 BYTE),
-  TXT      VARCHAR2(165 BYTE),
-  D_OPEN   DATE,
-  D_CLOSE  DATE,
-  D_MODE   DATE,
-  K140SR   VARCHAR2(2 BYTE)
-)';
-exception 
-  when others then
-    if (sqlcode = -955) then null;
-    else raise;
-    end if;
-end;
-/
+PROMPT *** ALTER_POLICIES to KL_K140 ***
+ exec bpa.alter_policies('KL_K140');
 
 
-COMMENT ON TABLE BARS.KL_K140 IS 'Довiдник кодів розміру суб''єктів господарювання';
+COMMENT ON TABLE BARS.KL_K140 IS '';
+COMMENT ON COLUMN BARS.KL_K140.K140 IS '';
+COMMENT ON COLUMN BARS.KL_K140.TXT IS '';
+COMMENT ON COLUMN BARS.KL_K140.D_OPEN IS '';
+COMMENT ON COLUMN BARS.KL_K140.D_CLOSE IS '';
+COMMENT ON COLUMN BARS.KL_K140.D_MODE IS '';
+COMMENT ON COLUMN BARS.KL_K140.K140SR IS '';
 
-COMMENT ON COLUMN BARS.KL_K140.K140 IS 'Код розміру суб''єкта господарювання';
 
-COMMENT ON COLUMN BARS.KL_K140.TXT IS 'Назва коду';
 
-COMMENT ON COLUMN BARS.KL_K140.D_OPEN IS 'Дата відкриття';
+PROMPT *** Create  grants  KL_K140 ***
+grant SELECT                                                                 on KL_K140         to BARSREADER_ROLE;
+grant SELECT                                                                 on KL_K140         to UPLD;
+grant FLASHBACK,SELECT                                                       on KL_K140         to WR_REFREAD;
 
-COMMENT ON COLUMN BARS.KL_K140.D_CLOSE IS 'Дата закриття';
 
-COMMENT ON COLUMN BARS.KL_K140.D_MODE IS 'Дата модифікації';
 
-COMMENT ON COLUMN BARS.KL_K140.K140SR IS 'Код K140SR';
-
-begin
-    execute immediate 'DROP PUBLIC SYNONYM KL_K140';
-exception
-    when others then null;
-end;
-/    
-
-create public synonym KL_K140 for bars.KL_K140;
-
-GRANT DELETE, INSERT, SELECT, UPDATE, FLASHBACK ON BARS.KL_K140 TO BARS_ACCESS_DEFROLE;
-
-GRANT DELETE, INSERT, SELECT, UPDATE ON BARS.KL_K140 TO RPBN002;
-
-GRANT DELETE, INSERT, SELECT, UPDATE, FLASHBACK ON BARS.KL_K140 TO WR_ALL_RIGHTS;
-
-GRANT SELECT, FLASHBACK ON BARS.KL_K140 TO WR_REFREAD;
-
-BEGIN
-   bpa.alter_policies('KL_K140');
-END;
-/
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Table/KL_K140.sql =========*** End *** =====
+PROMPT ===================================================================================== 

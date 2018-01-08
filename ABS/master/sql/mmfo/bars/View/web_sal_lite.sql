@@ -1,47 +1,14 @@
-create or replace force view WEB_SAL_LITE
-( ACC
-, NLS
-, KV
-, LCV
-, DIG
-, DENOM
-, NMS
-, OST
-, DOS
-, KOS
-, OSTC
-, OSTB
-, OSTF
-, DAPP
-, DAOS
-, DAZS
-, TOBO
-, TIP
-, PAP
-, BLKK
-, BLKD
-, MDATE
-, POS
-, NBS
-, ISP
-, RNK
-, KF
-, OB22
-, NLSALT
-, LIM
-, OSTQ
-, DOSQ
-, KOSQ
-, NBS2
-, VID
-, TRCN
-, ACCC
-, SEC
-, BRANCH
-, INTACCN
-, FIO
-) AS
-SELECT a.acc,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/WEB_SAL_LITE.sql =========*** Run *** =
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view WEB_SAL_LITE ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.WEB_SAL_LITE ("ACC", "NLS", "KV", "LCV", "DIG", "DENOM", "NMS", "OST", "DOS", "KOS", "OSTC", "OSTB", "OSTF", "DAPP", "DAOS", "DAZS", "TOBO", "TIP", "PAP", "BLKK", "BLKD", "MDATE", "POS", "NBS", "ISP", "RNK", "KF", "OB22", "NLSALT", "LIM", "OSTQ", "DOSQ", "KOSQ", "NBS2", "VID", "TRCN", "ACCC", "SEC", "BRANCH", "INTACCN", "FIO") AS 
+  SELECT a.acc,
        a.nls,
        a.kv,
        v.lcv,
@@ -88,10 +55,18 @@ SELECT a.acc,
        staff$base sb
  WHERE a.kv = v.kv AND a.isp = sb.id;
 
-show err
+PROMPT *** Create  grants  WEB_SAL_LITE ***
+grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_SAL_LITE    to ABS_ADMIN;
+grant SELECT                                                                 on WEB_SAL_LITE    to BARSREADER_ROLE;
+grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_SAL_LITE    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on WEB_SAL_LITE    to START1;
+grant SELECT                                                                 on WEB_SAL_LITE    to UPLD;
+grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_SAL_LITE    to WR_ALL_RIGHTS;
+grant SELECT                                                                 on WEB_SAL_LITE    to WR_USER_ACCOUNTS_LIST;
+grant SELECT                                                                 on WEB_SAL_LITE    to WR_VIEWACC;
 
-grant SELECT on WEB_SAL_LITE to ABS_ADMIN;
-grant SELECT on WEB_SAL_LITE to BARS_ACCESS_DEFROLE;
-grant SELECT on WEB_SAL_LITE to START1;
-grant SELECT on WEB_SAL_LITE to WR_ALL_RIGHTS;
-grant SELECT on WEB_SAL_LITE to WR_VIEWACC;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/WEB_SAL_LITE.sql =========*** End *** =
+PROMPT ===================================================================================== 

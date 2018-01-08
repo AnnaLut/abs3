@@ -24,6 +24,10 @@ PROMPT *** Create  view V_ROLE_STAFFGROUPS ***
           and t.grantee_id = sr.id
           and g.id = t.resource_id;
 
+PROMPT *** Create  grants  V_ROLE_STAFFGROUPS ***
+grant SELECT                                                                 on V_ROLE_STAFFGROUPS to BARSREADER_ROLE;
+grant SELECT                                                                 on V_ROLE_STAFFGROUPS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -102,11 +102,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_TIPD ***
+grant SELECT                                                                 on CC_TIPD         to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on CC_TIPD         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_TIPD         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_TIPD         to CC_TIPD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_TIPD         to DPT_ADMIN;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CC_TIPD         to RCC_DEAL;
+grant SELECT                                                                 on CC_TIPD         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_TIPD         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CC_TIPD         to WR_REFREAD;
 

@@ -109,19 +109,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BPKIMPPROECTDATA_CUSTOMER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_IMP_PROECT_DATA ADD CONSTRAINT FK_BPKIMPPROECTDATA_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_BPKIMPPROECTDATA_ID_NN ***
 begin   
  execute immediate '
@@ -160,9 +147,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_IMP_PROECT_DATA ***
+grant SELECT                                                                 on BPK_IMP_PROECT_DATA to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_IMP_PROECT_DATA to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_IMP_PROECT_DATA to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_IMP_PROECT_DATA to OBPC;
+grant SELECT                                                                 on BPK_IMP_PROECT_DATA to UPLD;
 
 
 

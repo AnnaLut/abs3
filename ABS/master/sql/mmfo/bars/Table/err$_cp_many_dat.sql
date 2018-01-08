@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_CP_MANY_DAT.SN IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CP_MANY_DAT ***
+grant SELECT                                                                 on ERR$_CP_MANY_DAT to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CP_MANY_DAT to UPLD;
+
 
 
 PROMPT ===================================================================================== 

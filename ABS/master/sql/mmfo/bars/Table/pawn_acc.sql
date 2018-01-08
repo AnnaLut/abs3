@@ -81,63 +81,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_PAWN_ACC_IDZ ***
+PROMPT *** Create  constraint NK_PAWN_ACC_ACC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PAWN_ACC ADD CONSTRAINT FK_PAWN_ACC_IDZ FOREIGN KEY (IDZ)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_PAWN_ACC_MPAWN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PAWN_ACC ADD CONSTRAINT FK_PAWN_ACC_MPAWN FOREIGN KEY (MPAWN)
-	  REFERENCES BARS.CC_MPAWN (MPAWN) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_PAWN_ACC_PAWN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PAWN_ACC ADD CONSTRAINT FK_PAWN_ACC_PAWN FOREIGN KEY (PAWN)
-	  REFERENCES BARS.CC_PAWN (PAWN) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_PAWNACC_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PAWN_ACC ADD CONSTRAINT FK_PAWNACC_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_PAWNACC_ACCOUNTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PAWN_ACC ADD CONSTRAINT FK_PAWNACC_ACCOUNTS FOREIGN KEY (KF, ACC)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.PAWN_ACC MODIFY (ACC CONSTRAINT NK_PAWN_ACC_ACC NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -150,18 +97,6 @@ PROMPT *** Create  constraint CC_PAWNACC_KF_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.PAWN_ACC MODIFY (KF CONSTRAINT CC_PAWNACC_KF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_PAWN_ACC_ACC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PAWN_ACC MODIFY (ACC CONSTRAINT NK_PAWN_ACC_ACC NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -184,10 +119,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  PAWN_ACC ***
+grant SELECT                                                                 on PAWN_ACC        to BARSREADER_ROLE;
 grant SELECT                                                                 on PAWN_ACC        to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PAWN_ACC        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PAWN_ACC        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PAWN_ACC        to RCC_DEAL;
+grant SELECT                                                                 on PAWN_ACC        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PAWN_ACC        to WR_ALL_RIGHTS;
 
 

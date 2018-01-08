@@ -18,8 +18,10 @@ WHERE c.country=804 and c.OKPO =f0.OKPO(+) AND c.OKPO = f4.OKPO(+) and
  ;
 
 PROMPT *** Create  grants  FIN_VR_FL ***
+grant SELECT                                                                 on FIN_VR_FL       to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_VR_FL       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_VR_FL       to R_FIN2;
+grant SELECT                                                                 on FIN_VR_FL       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_VR_FL       to WR_ALL_RIGHTS;
 
 

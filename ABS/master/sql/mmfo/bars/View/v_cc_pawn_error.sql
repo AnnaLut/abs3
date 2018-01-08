@@ -82,8 +82,10 @@ PROMPT *** Create  view V_CC_PAWN_ERROR ***
                                   WHERE p.acc= ac.acc);
 
 PROMPT *** Create  grants  V_CC_PAWN_ERROR ***
+grant SELECT                                                                 on V_CC_PAWN_ERROR to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CC_PAWN_ERROR to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CC_PAWN_ERROR to SALGL;
+grant SELECT                                                                 on V_CC_PAWN_ERROR to UPLD;
 
 
 

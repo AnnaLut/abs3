@@ -89,6 +89,10 @@ COMMENT ON COLUMN BARS.ERR$_OW_OIC_ATRANSFERS_HIST.DOC_ORN IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_OW_OIC_ATRANSFERS_HIST ***
+grant SELECT                                                                 on ERR$_OW_OIC_ATRANSFERS_HIST to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_OW_OIC_ATRANSFERS_HIST to UPLD;
+
 
 
 PROMPT ===================================================================================== 

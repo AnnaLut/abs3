@@ -50,7 +50,7 @@ begin
 	LEGAL_DISTRICT VARCHAR2(100), 
 	LEGAL_SETTLEMENT VARCHAR2(100), 
 	LEGAL_STREET VARCHAR2(100), 
-	LEGAL_HOUSE VARCHAR2(7), 
+	LEGAL_HOUSE VARCHAR2(5), 
 	LEGAL_HOUSE_PART VARCHAR2(2), 
 	LEGAL_APARTMENT VARCHAR2(5), 
 	ACTUAL_COUNTRY VARCHAR2(50), 
@@ -59,7 +59,7 @@ begin
 	ACTUAL_DISTRICT VARCHAR2(100), 
 	ACTUAL_SETTLEMENT VARCHAR2(100), 
 	ACTUAL_STREET VARCHAR2(100), 
-	ACTUAL_HOUSE VARCHAR2(7), 
+	ACTUAL_HOUSE VARCHAR2(5), 
 	ACTUAL_HOUSE_PART VARCHAR2(2), 
 	ACTUAL_APARTMENT VARCHAR2(5), 
 	SIGN RAW(128), 
@@ -68,11 +68,13 @@ begin
 	NLS VARCHAR2(15), 
 	BRANCH VARCHAR2(30), 
 	TYPE_PENS NUMBER(1,0), 
-	REQID NUMBER(38,0)
+	REQID NUMBER(38,0), 
+	DATE_BLK DATE, 
+	IS_BLK NUMBER(1,0)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
-  TABLESPACE BRSDYND ';
+  TABLESPACE BRSMDLD ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
@@ -86,6 +88,8 @@ PROMPT *** ALTER_POLICIES to PFU_EPP_LINE_PROCESSING ***
 
 
 COMMENT ON TABLE BARS.PFU_EPP_LINE_PROCESSING IS '';
+COMMENT ON COLUMN BARS.PFU_EPP_LINE_PROCESSING.DATE_BLK IS '';
+COMMENT ON COLUMN BARS.PFU_EPP_LINE_PROCESSING.IS_BLK IS '';
 COMMENT ON COLUMN BARS.PFU_EPP_LINE_PROCESSING.ID IS 'Ідентифікатор запису в файлі з ФА';
 COMMENT ON COLUMN BARS.PFU_EPP_LINE_PROCESSING.FILE_ID IS 'Ідентифікатор файлу ЦА';
 COMMENT ON COLUMN BARS.PFU_EPP_LINE_PROCESSING.EPP_NUMBER IS 'Ідентифікатор електронного пенсійного посвідчення';
@@ -136,12 +140,10 @@ COMMENT ON COLUMN BARS.PFU_EPP_LINE_PROCESSING.REQID IS 'ИД заявки на CM';
 
 
 
-PROMPT *** Create  constraint UK_PFU_EPP_LINE_PROCESSING ***
+PROMPT *** Create  constraint SYS_C00109503 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PFU_EPP_LINE_PROCESSING ADD CONSTRAINT UK_PFU_EPP_LINE_PROCESSING UNIQUE (EPP_NUMBER)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.PFU_EPP_LINE_PROCESSING MODIFY (ID NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -164,10 +166,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C003087140 ***
+PROMPT *** Create  constraint UK_PFU_EPP_LINE_PROCESSING ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PFU_EPP_LINE_PROCESSING MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.PFU_EPP_LINE_PROCESSING ADD CONSTRAINT UK_PFU_EPP_LINE_PROCESSING UNIQUE (EPP_NUMBER)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -218,26 +222,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  PFU_EPP_LINE_PROCESSING ***
+grant SELECT                                                                 on PFU_EPP_LINE_PROCESSING to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on PFU_EPP_LINE_PROCESSING to BARS_ACCESS_DEFROLE;
-
-PROMPT *** Add field date_blk PFU_EPP_LINE_PROCESSING ***
-begin
-    execute immediate 'alter table PFU_EPP_LINE_PROCESSING add date_blk DATE';
- exception when others then 
-    if sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/ 
-
-PROMPT *** Add field is_blk PFU_EPP_LINE_PROCESSING ***
-begin
-    execute immediate 'alter table PFU_EPP_LINE_PROCESSING add is_blk NUMBER(1)';
- exception when others then 
-    if sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/ 
-
+grant SELECT                                                                 on PFU_EPP_LINE_PROCESSING to UPLD;
 
 
 

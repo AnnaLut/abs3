@@ -1,10 +1,10 @@
 
-
- PROMPT =====================================================================================
+ 
+ PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_zay.sql =========*** Run *** ==
- PROMPT =====================================================================================
-
-  CREATE OR REPLACE PACKAGE BARS.BARS_ZAY
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.BARS_ZAY 
 is
   head_ver  constant varchar2(64)  := 'version 6.0 13.07.2017';
   head_awk  constant varchar2(512) := ''
@@ -604,7 +604,7 @@ is
 
 end BARS_ZAY;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_ZAY
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_ZAY 
 is
 
 body_ver   constant varchar2(64)   := 'version 12.01 13.07.2017';
@@ -2987,7 +2987,7 @@ begin
   select VAL into l_mfo from params where par = 'MFO';
   select v.* into l_vzay from v_zay v where v.id = p_reqest_id;
   select z.url into l_url from zay_recipients z where z.kf = sys_context('bars_context','user_mfo');
-  
+
 if l_vzay.MFO<>'300465' then
 
   if p_flag_klb in (2,3,4) then
@@ -7330,7 +7330,7 @@ is
     function ex_init(p_sqlerrm varchar2)
     return varchar2
     is
-    begin 
+    begin
     return substr(p_sqlerrm,instr(p_sqlerrm,'(')+6,instr(p_sqlerrm,')')-instr(p_sqlerrm,'(')-6);
     end;
 
@@ -7339,9 +7339,9 @@ begin
 --по одному рефу может быть несколько за€вок ќо (когда разбивают суму на несколько за€вок)
     for c in (select id from zayavka where sos=2 and ref=p_ref)
     loop
-      
+
         select * into l_zayavka from zayavka where id=c.id;
-            
+
         update zayavka
         set  meta          = case when p_tag='D1#70' then to_number(p_value) else l_zayavka.meta end,
              contract      = case when p_tag='D2#70' then p_value else l_zayavka.contract end,
@@ -7355,37 +7355,35 @@ begin
              bank_name     = case when p_tag='DA#70' then p_value else l_zayavka.bank_name end,
              product_group = case when p_tag='DB#70' then p_value else l_zayavka.product_group end
          where id=c.id;
-       
+
     end loop;
-exception when ex_parentnotfound then  
-  if    ex_init(sqlerrm)='FK_ZAYAVKA_ZAYAIMS' 
+exception when ex_parentnotfound then
+  if    ex_init(sqlerrm)='FK_ZAYAVKA_ZAYAIMS'
   then
      bars_error.raise_nerror (modcode, 'FK_ZAYAVKA_ZAYAIMS');
-  elsif ex_init(sqlerrm)='XFK_ZAYAVKA_COUNTRY' 
+  elsif ex_init(sqlerrm)='XFK_ZAYAVKA_COUNTRY'
   then
      bars_error.raise_nerror (modcode, 'XFK_ZAYAVKA_COUNTRY');
-  elsif ex_init(sqlerrm)='FK_ZAYAVKA_PRODUCT_GROUP' 
+  elsif ex_init(sqlerrm)='FK_ZAYAVKA_PRODUCT_GROUP'
   then
      bars_error.raise_nerror (modcode, 'FK_ZAYAVKA_PRODUCT_GROUP');
-  else raise; end if;   
+  else raise; end if;
 end;
 
 begin
   init;
 end BARS_ZAY;
 /
-
-
-
  show err;
-
+ 
 PROMPT *** Create  grants  BARS_ZAY ***
 grant EXECUTE                                                                on BARS_ZAY        to BARSAQ with grant option;
 grant EXECUTE                                                                on BARS_ZAY        to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on BARS_ZAY        to ZAY;
 
-
-
- PROMPT =====================================================================================
+ 
+ 
+ PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_zay.sql =========*** End *** ==
- PROMPT =====================================================================================
+ PROMPT ===================================================================================== 
+ 

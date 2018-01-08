@@ -52,11 +52,11 @@ BEGIN
 end;
 /
  show err;
- 
-PROMPT *** Create  grants  FINMON_IS_PUBLIC ***
-grant EXECUTE                                                                on FINMON_IS_PUBLIC to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on FINMON_IS_PUBLIC to CUST001;
-grant EXECUTE                                                                on FINMON_IS_PUBLIC to START1;
+ 
+PROMPT *** Create  grants  FINMON_IS_PUBLIC ***
+grant EXECUTE                                                                on FINMON_IS_PUBLIC to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on FINMON_IS_PUBLIC to CUST001;
+grant EXECUTE                                                                on FINMON_IS_PUBLIC to START1;
 
  
  

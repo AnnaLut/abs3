@@ -117,9 +117,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  WEB_WHERE_CLAUSE ***
+grant SELECT                                                                 on WEB_WHERE_CLAUSE to BARSREADER_ROLE;
 grant SELECT                                                                 on WEB_WHERE_CLAUSE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WEB_WHERE_CLAUSE to BARS_DM;
 grant SELECT                                                                 on WEB_WHERE_CLAUSE to BASIC_INFO;
+grant SELECT                                                                 on WEB_WHERE_CLAUSE to UPLD;
 grant SELECT                                                                 on WEB_WHERE_CLAUSE to WR_ALL_RIGHTS;
 
 

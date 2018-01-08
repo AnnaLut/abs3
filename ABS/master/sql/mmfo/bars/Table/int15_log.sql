@@ -57,9 +57,11 @@ COMMENT ON COLUMN BARS.INT15_LOG.MESS IS '';
 
 
 PROMPT *** Create  grants  INT15_LOG ***
+grant SELECT                                                                 on INT15_LOG       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT15_LOG       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT15_LOG       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT15_LOG       to START1;
+grant SELECT                                                                 on INT15_LOG       to UPLD;
 
 
 

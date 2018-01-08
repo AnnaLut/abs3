@@ -57,7 +57,9 @@ COMMENT ON COLUMN BARS.AQ$_BARS_MSG_QT_L.FLAGS IS '';
 
 
 PROMPT *** Create  grants  AQ$_BARS_MSG_QT_L ***
+grant SELECT                                                                 on AQ$_BARS_MSG_QT_L to BARSREADER_ROLE;
 grant SELECT                                                                 on AQ$_BARS_MSG_QT_L to BARS_DM;
+grant SELECT                                                                 on AQ$_BARS_MSG_QT_L to UPLD;
 
 
 

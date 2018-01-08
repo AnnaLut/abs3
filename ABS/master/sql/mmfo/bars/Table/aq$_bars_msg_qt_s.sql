@@ -123,7 +123,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  AQ$_BARS_MSG_QT_S ***
+grant SELECT                                                                 on AQ$_BARS_MSG_QT_S to BARSREADER_ROLE;
 grant SELECT                                                                 on AQ$_BARS_MSG_QT_S to BARS_DM;
+grant SELECT                                                                 on AQ$_BARS_MSG_QT_S to UPLD;
 
 
 

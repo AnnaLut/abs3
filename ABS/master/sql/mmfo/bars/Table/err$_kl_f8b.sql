@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.ERR$_KL_F8B.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_KL_F8B ***
+grant SELECT                                                                 on ERR$_KL_F8B     to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_KL_F8B     to UPLD;
+
 
 
 PROMPT ===================================================================================== 

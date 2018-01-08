@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.ERR$_DPU_PAYMENTS.REF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DPU_PAYMENTS ***
+grant SELECT                                                                 on ERR$_DPU_PAYMENTS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DPU_PAYMENTS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -67,6 +67,10 @@ COMMENT ON COLUMN BARS.ERR$_OTCN_DEL_3A.TPF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_OTCN_DEL_3A ***
+grant SELECT                                                                 on ERR$_OTCN_DEL_3A to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_OTCN_DEL_3A to UPLD;
+
 
 
 PROMPT ===================================================================================== 

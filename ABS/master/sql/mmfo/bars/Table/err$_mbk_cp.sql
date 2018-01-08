@@ -65,6 +65,10 @@ COMMENT ON COLUMN BARS.ERR$_MBK_CP.TIPD IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_MBK_CP ***
+grant SELECT                                                                 on ERR$_MBK_CP     to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_MBK_CP     to UPLD;
+
 
 
 PROMPT ===================================================================================== 

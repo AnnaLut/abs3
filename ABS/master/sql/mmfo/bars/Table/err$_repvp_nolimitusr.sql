@@ -53,6 +53,10 @@ COMMENT ON COLUMN BARS.ERR$_REPVP_NOLIMITUSR.USERID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_REPVP_NOLIMITUSR ***
+grant SELECT                                                                 on ERR$_REPVP_NOLIMITUSR to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_REPVP_NOLIMITUSR to UPLD;
+
 
 
 PROMPT ===================================================================================== 

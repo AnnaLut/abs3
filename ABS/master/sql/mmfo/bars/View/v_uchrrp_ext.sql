@@ -20,8 +20,10 @@ and l.mfo=b.mfop and b2.mfo=l.mfo
  ;
 
 PROMPT *** Create  grants  V_UCHRRP_EXT ***
+grant SELECT                                                                 on V_UCHRRP_EXT    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_UCHRRP_EXT    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_UCHRRP_EXT    to TOSS;
+grant SELECT                                                                 on V_UCHRRP_EXT    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_UCHRRP_EXT    to WR_ALL_RIGHTS;
 
 

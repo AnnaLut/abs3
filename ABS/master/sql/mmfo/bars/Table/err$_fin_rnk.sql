@@ -33,7 +33,7 @@ begin
 	OKPO VARCHAR2(4000), 
 	BRANCH VARCHAR2(4000), 
 	SS VARCHAR2(4000)
-   ) SEGMENT CREATION DEFERRED 
+   ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSDYND ';
@@ -64,6 +64,10 @@ COMMENT ON COLUMN BARS.ERR$_FIN_RNK.BRANCH IS '';
 COMMENT ON COLUMN BARS.ERR$_FIN_RNK.SS IS '';
 
 
+
+PROMPT *** Create  grants  ERR$_FIN_RNK ***
+grant SELECT                                                                 on ERR$_FIN_RNK    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_FIN_RNK    to UPLD;
 
 
 

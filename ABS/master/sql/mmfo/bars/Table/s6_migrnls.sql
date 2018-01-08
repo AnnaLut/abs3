@@ -51,8 +51,10 @@ COMMENT ON COLUMN BARS.S6_MIGRNLS.FILIAL IS 'Код МФО филиала';
 
 PROMPT *** Create  grants  S6_MIGRNLS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_MIGRNLS      to ABS_ADMIN;
+grant SELECT                                                                 on S6_MIGRNLS      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on S6_MIGRNLS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on S6_MIGRNLS      to BARS_DM;
+grant SELECT                                                                 on S6_MIGRNLS      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on S6_MIGRNLS      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on S6_MIGRNLS      to WR_REFREAD;
 

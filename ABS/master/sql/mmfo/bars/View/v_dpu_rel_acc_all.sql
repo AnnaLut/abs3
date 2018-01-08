@@ -36,9 +36,11 @@ PROMPT *** Create  view V_DPU_REL_ACC_ALL ***
 );
 
 PROMPT *** Create  grants  V_DPU_REL_ACC_ALL ***
+grant SELECT                                                                 on V_DPU_REL_ACC_ALL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPU_REL_ACC_ALL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPU_REL_ACC_ALL to DPT_ROLE;
 grant SELECT                                                                 on V_DPU_REL_ACC_ALL to START1;
+grant SELECT                                                                 on V_DPU_REL_ACC_ALL to UPLD;
 
 
 

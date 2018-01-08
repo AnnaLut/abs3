@@ -30,7 +30,9 @@ PROMPT *** Create  view V_SUMPOG_2N ***
    ORDER BY g.KV, g.ND;
 
 PROMPT *** Create  grants  V_SUMPOG_2N ***
+grant SELECT                                                                 on V_SUMPOG_2N     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SUMPOG_2N     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_SUMPOG_2N     to UPLD;
 
 
 

@@ -52,7 +52,9 @@ PROMPT *** Create  view V_SW950_ALL_HEADER ***
 
 PROMPT *** Create  grants  V_SW950_ALL_HEADER ***
 grant SELECT                                                                 on V_SW950_ALL_HEADER to BARS013;
+grant SELECT                                                                 on V_SW950_ALL_HEADER to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW950_ALL_HEADER to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_SW950_ALL_HEADER to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SW950_ALL_HEADER to WR_ALL_RIGHTS;
 
 

@@ -79,8 +79,10 @@ COMMENT ON COLUMN BARS.VKLAD_FG.KV IS '';
 
 
 PROMPT *** Create  grants  VKLAD_FG ***
+grant SELECT                                                                 on VKLAD_FG        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VKLAD_FG        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VKLAD_FG        to START1;
+grant SELECT                                                                 on VKLAD_FG        to UPLD;
 
 
 

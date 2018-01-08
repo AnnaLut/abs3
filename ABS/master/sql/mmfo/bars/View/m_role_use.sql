@@ -12,7 +12,9 @@ PROMPT *** Create  view M_ROLE_USE ***
 where GRANTEE_TYPE_ID  = resource_utl.get_resource_type_id('STAFF_USER') and RESOURCE_TYPE_ID = resource_utl.get_resource_type_id('STAFF_ROLE');
 
 PROMPT *** Create  grants  M_ROLE_USE ***
+grant SELECT                                                                 on M_ROLE_USE      to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_USE      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on M_ROLE_USE      to UPLD;
 
 
 

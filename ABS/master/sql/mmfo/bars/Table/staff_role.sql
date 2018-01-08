@@ -75,12 +75,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_STAFF_ROLE ***
+PROMPT *** Create  constraint SYS_C0025722 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STAFF_ROLE ADD CONSTRAINT UK_STAFF_ROLE UNIQUE (ROLE_CODE)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.STAFF_ROLE ADD CHECK (ROLE_NAME IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -115,10 +113,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025722 ***
+PROMPT *** Create  constraint UK_STAFF_ROLE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STAFF_ROLE ADD CHECK (ROLE_NAME IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
+  ALTER TABLE BARS.STAFF_ROLE ADD CONSTRAINT UK_STAFF_ROLE UNIQUE (ROLE_CODE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -155,7 +155,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  STAFF_ROLE ***
+grant SELECT                                                                 on STAFF_ROLE      to BARSREADER_ROLE;
 grant SELECT                                                                 on STAFF_ROLE      to BARS_DM;
+grant SELECT                                                                 on STAFF_ROLE      to UPLD;
 
 
 

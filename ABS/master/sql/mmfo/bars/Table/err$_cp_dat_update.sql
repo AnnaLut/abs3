@@ -75,6 +75,10 @@ COMMENT ON COLUMN BARS.ERR$_CP_DAT_UPDATE.IR IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CP_DAT_UPDATE ***
+grant SELECT                                                                 on ERR$_CP_DAT_UPDATE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CP_DAT_UPDATE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

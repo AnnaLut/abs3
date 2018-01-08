@@ -1,22 +1,14 @@
-CREATE OR REPLACE FORCE VIEW BARS.V_XOZ7_CA
-(
-   BR7,
-   OB7,
-   NLS7,
-   NMS7,
-   S7,
-   KODZ,
-   OB40,
-   RI,
-   OB3,
-   TRZ,
-   MFOA,
-   NLSA,
-   S,
-   NAZN
-)
-AS
-   SELECT a7.branch BR7,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_XOZ7_CA.sql =========*** Run *** ====
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_XOZ7_CA ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_XOZ7_CA ("BR7", "OB7", "NLS7", "NMS7", "S7", "KODZ", "OB40", "RI", "OB3", "TRZ", "MFOA", "NLSA", "S", "NAZN") AS 
+  SELECT a7.branch BR7,
           a7.ob22 OB7,
           a7.nls nls7,
           a7.nms nms7,
@@ -85,8 +77,13 @@ AS
                   AND a.kv = 980
                   AND z.rec = TO_NUMBER (pul.get ('RECD_CA'))) a7;
 
-/
+PROMPT *** Create  grants  V_XOZ7_CA ***
+grant SELECT                                                                 on V_XOZ7_CA       to BARSREADER_ROLE;
+grant SELECT                                                                 on V_XOZ7_CA       to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_XOZ7_CA       to UPLD;
 
-ALTER VIEW V_XOZ7_CA
-    COMPILE;
-/ 
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_XOZ7_CA.sql =========*** End *** ====
+PROMPT ===================================================================================== 

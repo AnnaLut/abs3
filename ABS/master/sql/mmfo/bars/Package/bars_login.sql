@@ -1,4 +1,10 @@
-create or replace package bars_login
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_login.sql =========*** Run *** 
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.BARS_LOGIN 
 is
 
 /**
@@ -165,7 +171,7 @@ is
     function is_long_session return boolean;
 end bars_login;
 /
-create or replace package body bars_login
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_LOGIN 
 is
 
 /**
@@ -1395,3 +1401,22 @@ $end
     end;
 end bars_login;
 /
+ show err;
+ 
+PROMPT *** Create  grants  BARS_LOGIN ***
+grant EXECUTE                                                                on BARS_LOGIN      to BARSAQ with grant option;
+grant EXECUTE                                                                on BARS_LOGIN      to BARSREADER_ROLE;
+grant EXECUTE                                                                on BARS_LOGIN      to BARSUPL;
+grant EXECUTE                                                                on BARS_LOGIN      to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on BARS_LOGIN      to SYSTEM;
+grant EXECUTE                                                                on BARS_LOGIN      to UPLD;
+grant EXECUTE                                                                on BARS_LOGIN      to USER100101;
+grant EXECUTE                                                                on BARS_LOGIN      to WCS_SYNC_USER;
+grant EXECUTE                                                                on BARS_LOGIN      to WR_ALL_RIGHTS;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_login.sql =========*** End *** 
+ PROMPT ===================================================================================== 
+ 

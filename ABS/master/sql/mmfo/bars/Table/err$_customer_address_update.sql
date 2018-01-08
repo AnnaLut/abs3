@@ -98,7 +98,9 @@ COMMENT ON COLUMN BARS.ERR$_CUSTOMER_ADDRESS_UPDATE.ROOM IS '';
 
 
 PROMPT *** Create  grants  ERR$_CUSTOMER_ADDRESS_UPDATE ***
+grant SELECT                                                                 on ERR$_CUSTOMER_ADDRESS_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CUSTOMER_ADDRESS_UPDATE to BARS_DM;
+grant SELECT                                                                 on ERR$_CUSTOMER_ADDRESS_UPDATE to UPLD;
 
 
 

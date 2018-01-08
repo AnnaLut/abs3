@@ -19,7 +19,9 @@ PROMPT *** Create  view V_WCS_SCORING_QS_BOOL ***
  order by sq.scoring_id, sq.question_id;
 
 PROMPT *** Create  grants  V_WCS_SCORING_QS_BOOL ***
+grant SELECT                                                                 on V_WCS_SCORING_QS_BOOL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SCORING_QS_BOOL to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_SCORING_QS_BOOL to UPLD;
 
 
 

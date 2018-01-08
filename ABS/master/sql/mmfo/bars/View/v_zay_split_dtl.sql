@@ -62,7 +62,9 @@ PROMPT *** Create  view V_ZAY_SPLIT_DTL ***
    and o.SOS = 5;
 
 PROMPT *** Create  grants  V_ZAY_SPLIT_DTL ***
+grant SELECT                                                                 on V_ZAY_SPLIT_DTL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY_SPLIT_DTL to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ZAY_SPLIT_DTL to UPLD;
 grant SELECT                                                                 on V_ZAY_SPLIT_DTL to ZAY;
 
 

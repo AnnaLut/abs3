@@ -72,9 +72,11 @@ COMMENT ON COLUMN BARS.CIN_BRANCH_RU.DATE_CLOSED IS '';
 
 PROMPT *** Create  grants  CIN_BRANCH_RU ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIN_BRANCH_RU   to ABS_ADMIN;
+grant SELECT                                                                 on CIN_BRANCH_RU   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CIN_BRANCH_RU   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIN_BRANCH_RU   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIN_BRANCH_RU   to START1;
+grant SELECT                                                                 on CIN_BRANCH_RU   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CIN_BRANCH_RU   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CIN_BRANCH_RU   to WR_REFREAD;
 

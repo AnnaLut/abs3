@@ -1,4 +1,10 @@
-create or replace package BARS_DBO
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_dbo.sql =========*** Run *** ==
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.BARS_DBO 
 is
 
   -- Author  : LVO
@@ -214,10 +220,7 @@ is
                           p_errmessage    out varchar2);
 end bars_dbo;
 /
-
-show errors;
-
-create or replace package body BARS_DBO
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_DBO 
 is
 
   -- Author  : LVO
@@ -2414,5 +2417,11 @@ procedure pay_operation(p_rnk           in     number,
 
 end bars_dbo;
 /
-
-show errors;
+ show err;
+ 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_dbo.sql =========*** End *** ==
+ PROMPT ===================================================================================== 
+ 

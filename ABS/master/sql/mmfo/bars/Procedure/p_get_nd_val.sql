@@ -15,11 +15,13 @@ PROMPT *** Create  procedure P_GET_ND_VAL ***
        p_rnk     integer,
        p_tip_fin integer,
        p_fin     integer,
-       p_s080    varchar2) IS
+       p_s080    varchar2,
+       p_s180    varchar2 default null) IS
 
-/* Версия 3.0 23-01-2017  05-12-2016
+/* Версия 3.1 11-09-2017  23-01-2017  05-12-2016
    Запись в таблицу кількість днів прострочки по договору
    -------------------------------------
+ 4) 11-09-2017 - Добавлен параметр S180
  3) 23-01-2017 - Добавлен параметр S080
  2) 05-12-2016 - l_ISTVAL := 1; (параметр отключен згідно листа НБУ від 23.11.2016 №22-0003/96212), было 1 - есть валютная выручка или гривна, 0 - нет выручки
  1) 27-10-2016 - В условие добавлено and rnk  = p_rnk
@@ -42,12 +44,12 @@ BEGIN
    end;
 */
    update nd_val    set fdat   = p_dat01 , nd   = p_nd  , tipa = p_tipa, kol = p_kol, rnk = p_rnk, tip_fin = p_tip_fin, fin = p_fin,
-                        istval = l_istval, s080 = p_s080
+                        istval = l_istval, s080 = p_s080, s180 = p_s180
    where  nd = p_nd and rnk  = p_rnk and fdat = p_dat01;
 
    IF SQL%ROWCOUNT=0 then
-      Insert into BARS.nd_val (fdat   , nd  , tipa  , kol  , rnk  , tip_fin  , fin  , istval  , s080  )
-                       Values (p_dat01, p_nd, p_tipa, p_kol, p_rnk, p_tip_fin, p_fin, l_istval, p_s080);
+      Insert into BARS.nd_val (fdat   , nd  , tipa  , kol  , rnk  , tip_fin  , fin  , istval  , s080  , s180   )
+                       Values (p_dat01, p_nd, p_tipa, p_kol, p_rnk, p_tip_fin, p_fin, l_istval, p_s080, p_s180);
    END IF;
 END;
 /

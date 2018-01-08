@@ -56,7 +56,9 @@ COMMENT ON COLUMN BARS.ANALIT.REM IS '';
 
 
 PROMPT *** Create  grants  ANALIT ***
+grant SELECT                                                                 on ANALIT          to BARSREADER_ROLE;
 grant SELECT                                                                 on ANALIT          to BARS_DM;
+grant SELECT                                                                 on ANALIT          to UPLD;
 
 
 

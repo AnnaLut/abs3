@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Фiнансовi результати по Контрагентам';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_FIN_REZ_RNK';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,14 +124,14 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'RNK', 'N', '№ кл', null, null, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DAT1', 'D', 'Початк~Дата перiоду', null, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DAT2', 'D', 'Кiнцев~Дата перiоду', null, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'N1', 'N', 'Сума~Витрат', null, null, 17, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(N1)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'N2', 'N', 'Сума~Доходiв', null, null, 16, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(N2)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'PROD', 'C', 'Аналiтика~Дох/Витр', null, null, 23, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'OKPO', 'C', 'Iд.код', null, null, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NMK', 'C', 'Назва  Контрагенту', null, null, 4, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'RNK', 'N', '№ кл', '', null, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DAT1', 'D', 'Початк~Дата перiоду', '', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAT2', 'D', 'Кiнцев~Дата перiоду', '', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'N1', 'N', 'Сума~Витрат', '', null, 17, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(N1)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'N2', 'N', 'Сума~Доходiв', '', null, 16, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(N2)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'PROD', 'C', 'Аналiтика~Дох/Витр', '', null, 23, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'OKPO', 'C', 'Iд.код', '', null, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NMK', 'C', 'Назва  Контрагенту', '', null, 4, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('V_NBSOB22');

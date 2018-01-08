@@ -14,8 +14,10 @@ PROMPT *** Create  view V_FX_SWAP ***
 from fx_swap;
 
 PROMPT *** Create  grants  V_FX_SWAP ***
+grant SELECT                                                                 on V_FX_SWAP       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_FX_SWAP       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_FX_SWAP       to FOREX;
+grant SELECT                                                                 on V_FX_SWAP       to UPLD;
 
 
 

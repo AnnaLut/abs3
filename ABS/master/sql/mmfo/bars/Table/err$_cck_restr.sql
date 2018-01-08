@@ -89,6 +89,10 @@ COMMENT ON COLUMN BARS.ERR$_CCK_RESTR.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CCK_RESTR ***
+grant SELECT                                                                 on ERR$_CCK_RESTR  to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CCK_RESTR  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

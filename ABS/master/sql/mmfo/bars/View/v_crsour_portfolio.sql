@@ -46,7 +46,9 @@ where d.vidd in (3902, 3903) and
       a.dazs is null;
 
 PROMPT *** Create  grants  V_CRSOUR_PORTFOLIO ***
+grant SELECT                                                                 on V_CRSOUR_PORTFOLIO to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CRSOUR_PORTFOLIO to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CRSOUR_PORTFOLIO to UPLD;
 
 
 

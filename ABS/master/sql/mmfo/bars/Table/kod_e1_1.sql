@@ -53,8 +53,10 @@ COMMENT ON COLUMN BARS.KOD_E1_1.DATA_C IS '';
 
 
 PROMPT *** Create  grants  KOD_E1_1 ***
+grant SELECT                                                                 on KOD_E1_1        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_E1_1        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_E1_1        to START1;
+grant SELECT                                                                 on KOD_E1_1        to UPLD;
 
 
 

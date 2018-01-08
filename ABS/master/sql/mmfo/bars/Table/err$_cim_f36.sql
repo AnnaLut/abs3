@@ -105,6 +105,10 @@ COMMENT ON COLUMN BARS.ERR$_CIM_F36.CREATE_DATE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIM_F36 ***
+grant SELECT                                                                 on ERR$_CIM_F36    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIM_F36    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -18,7 +18,9 @@ PROMPT *** Create  view V_BRATES_KF ***
       on ( bt.BR_TYPE = br.BR_TYPE );
 
 PROMPT *** Create  grants  V_BRATES_KF ***
+grant SELECT                                                                 on V_BRATES_KF     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BRATES_KF     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_BRATES_KF     to UPLD;
 
 
 

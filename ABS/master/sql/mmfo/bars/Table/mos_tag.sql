@@ -81,10 +81,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  MOS_TAG ***
+grant SELECT                                                                 on MOS_TAG         to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MOS_TAG         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MOS_TAG         to BARS_DM;
 grant SELECT                                                                 on MOS_TAG         to CIG_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MOS_TAG         to RCC_DEAL;
+grant SELECT                                                                 on MOS_TAG         to UPLD;
 grant FLASHBACK,SELECT                                                       on MOS_TAG         to WR_REFREAD;
 
 

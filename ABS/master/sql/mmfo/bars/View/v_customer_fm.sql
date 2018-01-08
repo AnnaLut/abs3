@@ -11,7 +11,9 @@ PROMPT *** Create  view V_CUSTOMER_FM ***
   SELECT rnk, nmk, okpo FROM customer;
 
 PROMPT *** Create  grants  V_CUSTOMER_FM ***
+grant SELECT                                                                 on V_CUSTOMER_FM   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTOMER_FM   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CUSTOMER_FM   to UPLD;
 
 
 

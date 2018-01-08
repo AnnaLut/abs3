@@ -1,8 +1,11 @@
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ACCT_STATEMENTS.sql =========*** Run 
-PROMPT ===================================================================================== 
-PROMPT *** Create  view V_ACCT_STATEMENTS ***
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ACCT_STATEMENTS.sql =========*** Run 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_ACCT_STATEMENTS ***
 
   CREATE OR REPLACE FORCE VIEW BARS.V_ACCT_STATEMENTS ("STMT", "SOS", "TT", "REF", "DK", "DOS", "KOS", "COMM", "PDAT", "MFOA", "NLSA", "IDA", "KV", "NAM_A", "MFOB", "NLSB", "IDB", "KV2", "NAM_B", "ND", "FDAT", "ACC", "DKP") AS 
   SELECT o.stmt,
@@ -35,9 +38,15 @@ PROMPT *** Create  view V_ACCT_STATEMENTS ***
             tabval d
       WHERE o.REF = p.REF AND d.kv = a.kv AND a.acc = o.acc AND t.tt = o.tt
    ORDER BY fdat DESC, o.dk, o.s
-;
-PROMPT *** Create  grants  V_ACCT_STATEMENTS ***
-grant SELECT                                                                 on V_ACCT_STATEMENTS to BARS_ACCESS_DEFROLE;
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ACCT_STATEMENTS.sql =========*** End 
-PROMPT ===================================================================================== 
+;
+
+PROMPT *** Create  grants  V_ACCT_STATEMENTS ***
+grant SELECT                                                                 on V_ACCT_STATEMENTS to BARSREADER_ROLE;
+grant SELECT                                                                 on V_ACCT_STATEMENTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ACCT_STATEMENTS to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ACCT_STATEMENTS.sql =========*** End 
+PROMPT ===================================================================================== 

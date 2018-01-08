@@ -26,7 +26,9 @@ PROMPT *** Create  view V_WCS_BID_CARDACCOUNTS ***
  order by b.id, a.nls;
 
 PROMPT *** Create  grants  V_WCS_BID_CARDACCOUNTS ***
+grant SELECT                                                                 on V_WCS_BID_CARDACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_BID_CARDACCOUNTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_BID_CARDACCOUNTS to UPLD;
 
 
 

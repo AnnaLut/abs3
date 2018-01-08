@@ -83,19 +83,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CHKLIST_INCHARGE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CHKLIST ADD CONSTRAINT FK_CHKLIST_INCHARGE FOREIGN KEY (F_IN_CHARGE)
-	  REFERENCES BARS.IN_CHARGE_LIST (IN_CHARGE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C008396 ***
 begin   
  execute immediate '
@@ -173,6 +160,7 @@ exception when others then
 
 PROMPT *** Create  grants  CHKLIST ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CHKLIST         to ABS_ADMIN;
+grant SELECT                                                                 on CHKLIST         to BARSREADER_ROLE;
 grant SELECT                                                                 on CHKLIST         to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CHKLIST         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHKLIST         to BARS_DM;

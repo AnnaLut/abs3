@@ -11,12 +11,13 @@ PROMPT *** Create  view V_SXO ***
   select distinct CASH_SXO.GET_SXO(b.branch) branch_sxo, b1.name
  from branch b, branch b1
  where B.DATE_CLOSED is null
-   and CASH_SXO.GET_SXO(b.branch) = b1.branch 
+   and CASH_SXO.GET_SXO(b.branch) = b1.branch
  order by 1;
 
 PROMPT *** Create  grants  V_SXO ***
 grant SELECT                                                                 on V_SXO           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SXO           to START1;
+grant SELECT                                                                 on V_SXO           to UPLD;
 
 
 

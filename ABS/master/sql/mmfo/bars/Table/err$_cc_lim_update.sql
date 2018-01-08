@@ -83,6 +83,10 @@ COMMENT ON COLUMN BARS.ERR$_CC_LIM_UPDATE.NOT_SN IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CC_LIM_UPDATE ***
+grant SELECT                                                                 on ERR$_CC_LIM_UPDATE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CC_LIM_UPDATE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

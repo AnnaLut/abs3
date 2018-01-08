@@ -93,22 +93,12 @@ COMMENT ON COLUMN BARS.CIG_DOG_GENERAL.CONTRACT_START_DATE IS 'Дата початку дії 
 
 
 
-PROMPT *** Create  constraint CC_CIGDOGGENERAL_ND_NN ***
+PROMPT *** Create  constraint UK_CIGDOGG_ND_CT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_GENERAL MODIFY (ND CONSTRAINT CC_CIGDOGGENERAL_ND_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CIGDOGGEN_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIG_DOG_GENERAL MODIFY (BRANCH CONSTRAINT CC_CIGDOGGEN_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIG_DOG_GENERAL ADD CONSTRAINT UK_CIGDOGG_ND_CT UNIQUE (ND, CONTRACT_TYPE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -131,12 +121,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_CIGDOGG_ND_CT ***
+PROMPT *** Create  constraint CC_CIGDOGGENERAL_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_GENERAL ADD CONSTRAINT UK_CIGDOGG_ND_CT UNIQUE (ND, CONTRACT_TYPE)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CIG_DOG_GENERAL MODIFY (ID CONSTRAINT CC_CIGDOGGENERAL_ID_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -145,11 +133,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CIGDOGG_CIGCUSTOMERS ***
+PROMPT *** Create  constraint CC_CIGDOGGENERAL_ND_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_GENERAL ADD CONSTRAINT FK_CIGDOGG_CIGCUSTOMERS FOREIGN KEY (CUST_ID, BRANCH)
-	  REFERENCES BARS.CIG_CUSTOMERS (CUST_ID, BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CIG_DOG_GENERAL MODIFY (ND CONSTRAINT CC_CIGDOGGENERAL_ND_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -290,10 +277,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIGDOGGENERAL_ID_NN ***
+PROMPT *** Create  constraint CC_CIGDOGGEN_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_GENERAL MODIFY (ID CONSTRAINT CC_CIGDOGGENERAL_ID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIG_DOG_GENERAL MODIFY (BRANCH CONSTRAINT CC_CIGDOGGEN_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -330,9 +317,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_DOG_GENERAL ***
+grant SELECT                                                                 on CIG_DOG_GENERAL to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on CIG_DOG_GENERAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_DOG_GENERAL to BARS_DM;
 grant SELECT,UPDATE                                                          on CIG_DOG_GENERAL to CIG_ROLE;
+grant SELECT                                                                 on CIG_DOG_GENERAL to UPLD;
 
 
 

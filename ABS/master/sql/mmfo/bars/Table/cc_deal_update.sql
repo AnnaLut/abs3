@@ -107,10 +107,10 @@ COMMENT ON COLUMN BARS.CC_DEAL_UPDATE.GRP IS 'група активу портфельного методу';
 
 
 
-PROMPT *** Create  constraint SYS_C009612 ***
+PROMPT *** Create  constraint SYS_C009611 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_DEAL_UPDATE MODIFY (SOS NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CC_DEAL_UPDATE MODIFY (ND NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -119,10 +119,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C009611 ***
+PROMPT *** Create  constraint SYS_C009612 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_DEAL_UPDATE MODIFY (ND NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CC_DEAL_UPDATE MODIFY (SOS NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -247,8 +247,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_DEAL_UPDATE ***
+grant SELECT                                                                 on CC_DEAL_UPDATE  to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_DEAL_UPDATE  to BARSUPL;
 grant SELECT                                                                 on CC_DEAL_UPDATE  to BARS_DM;
+grant SELECT                                                                 on CC_DEAL_UPDATE  to UPLD;
 
 
 

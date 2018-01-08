@@ -24,56 +24,100 @@ PROMPT *** Create  table NBUR_LNK_TYPE_R020 ***
 begin 
   execute immediate '
   CREATE TABLE BARS.NBUR_LNK_TYPE_R020 
-   (ACC_TYPE     VARCHAR2(3) CONSTRAINT СС_NBURLNKTYPER020_TYPE_NN NOT NULL, 
-    ACC_R020     VARCHAR2(4) CONSTRAINT СС_NBURLNKTYPER020_R020_NN NOT NULL, 
-	START_DATE   DATE        CONSTRAINT СС_NBURLNKTYPER020_DATE_NN NOT NULL,
-    FINISH_DATE  DATE
+   (	ACC_TYPE VARCHAR2(3), 
+	ACC_R020 VARCHAR2(4), 
+	START_DATE DATE, 
+	FINISH_DATE DATE
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
-  NOCOMPRESS LOGGING
+ NOCOMPRESS LOGGING
   TABLESPACE BRSDYND ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
 
+
+
+
 PROMPT *** ALTER_POLICIES to NBUR_LNK_TYPE_R020 ***
  exec bpa.alter_policies('NBUR_LNK_TYPE_R020');
 
 
 COMMENT ON TABLE BARS.NBUR_LNK_TYPE_R020 IS 'Довідник для визначення переліку R020 по визначеному типу для звітності';
+COMMENT ON COLUMN BARS.NBUR_LNK_TYPE_R020.ACC_TYPE IS 'Тип рахунку для звітності';
+COMMENT ON COLUMN BARS.NBUR_LNK_TYPE_R020.ACC_R020 IS 'Параметр R020 рахунку';
+COMMENT ON COLUMN BARS.NBUR_LNK_TYPE_R020.START_DATE IS 'Дата початку дії';
+COMMENT ON COLUMN BARS.NBUR_LNK_TYPE_R020.FINISH_DATE IS 'Дата закінчення дії';
 
-COMMENT ON COLUMN BARS.NBUR_LNK_TYPE_R020.ACC_TYPE     IS 'Тип рахунку для звітності';
-COMMENT ON COLUMN BARS.NBUR_LNK_TYPE_R020.ACC_R020     IS 'Параметр R020 рахунку';
-COMMENT ON COLUMN BARS.NBUR_LNK_TYPE_R020.START_DATE   IS 'Дата початку дії';
-COMMENT ON COLUMN BARS.NBUR_LNK_TYPE_R020.FINISH_DATE  IS 'Дата закінчення дії';
 
 
-PROMPT *** Create  constraint FK_NBURLNKTYPER020_REFACCTYPES ***
+
+PROMPT *** Create  constraint СС_NBURLNKTYPER020_TYPE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_LNK_TYPE_R020 ADD CONSTRAINT FK_NBURLNKTYPER020_REFACCTYPES FOREIGN KEY (ACC_TYPE)
-	  REFERENCES BARS.NBUR_REF_ACC_TYPES (ACC_TYPE) ENABLE';
+  ALTER TABLE BARS.NBUR_LNK_TYPE_R020 MODIFY (ACC_TYPE CONSTRAINT СС_NBURLNKTYPER020_TYPE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
-begin 
-  execute immediate '
-  ALTER TABLE BARS.NBUR_LNK_TYPE_R020 ADD (
-  CONSTRAINT PK_NBURLNKTYPER020
-  PRIMARY KEY
-  (ACC_TYPE, ACC_R020, START_DATE)
-  USING INDEX 
-  ENABLE VALIDATE)';
-exception when others then       
-  if sqlcode=-2260 then null; else raise; end if; 
-end; 
+
+
+
+PROMPT *** Create  constraint СС_NBURLNKTYPER020_R020_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NBUR_LNK_TYPE_R020 MODIFY (ACC_R020 CONSTRAINT СС_NBURLNKTYPER020_R020_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
 /
 
+
+
+
+PROMPT *** Create  constraint СС_NBURLNKTYPER020_DATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NBUR_LNK_TYPE_R020 MODIFY (START_DATE CONSTRAINT СС_NBURLNKTYPER020_DATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_NBURLNKTYPER020 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NBUR_LNK_TYPE_R020 ADD CONSTRAINT PK_NBURLNKTYPER020 PRIMARY KEY (ACC_TYPE, ACC_R020, START_DATE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index PK_NBURLNKTYPER020 ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.PK_NBURLNKTYPER020 ON BARS.NBUR_LNK_TYPE_R020 (ACC_TYPE, ACC_R020, START_DATE) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  NBUR_LNK_TYPE_R020 ***
-grant SELECT on NBUR_LNK_TYPE_R020 to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on NBUR_LNK_TYPE_R020 to BARS_ACCESS_DEFROLE;
 
 
 

@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.ERR$_PFU_EPP_KILL_TYPE.NAME IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_PFU_EPP_KILL_TYPE ***
+grant SELECT                                                                 on ERR$_PFU_EPP_KILL_TYPE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_PFU_EPP_KILL_TYPE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

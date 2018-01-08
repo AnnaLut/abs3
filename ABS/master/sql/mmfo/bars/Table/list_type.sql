@@ -158,8 +158,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  LIST_TYPE ***
+grant SELECT                                                                 on LIST_TYPE       to BARSREADER_ROLE;
 grant SELECT                                                                 on LIST_TYPE       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LIST_TYPE       to BARS_DM;
+grant SELECT                                                                 on LIST_TYPE       to UPLD;
 
 
 

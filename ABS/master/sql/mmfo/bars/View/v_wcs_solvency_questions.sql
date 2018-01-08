@@ -21,7 +21,9 @@ PROMPT *** Create  view V_WCS_SOLVENCY_QUESTIONS ***
  order by sq.solvency_id, sq.question_id;
 
 PROMPT *** Create  grants  V_WCS_SOLVENCY_QUESTIONS ***
+grant SELECT                                                                 on V_WCS_SOLVENCY_QUESTIONS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SOLVENCY_QUESTIONS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_SOLVENCY_QUESTIONS to UPLD;
 
 
 

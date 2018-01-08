@@ -101,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  W4_PRODUCT_DOC ***
+grant SELECT                                                                 on W4_PRODUCT_DOC  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on W4_PRODUCT_DOC  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_PRODUCT_DOC  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on W4_PRODUCT_DOC  to OW;
+grant SELECT                                                                 on W4_PRODUCT_DOC  to UPLD;
 
 
 

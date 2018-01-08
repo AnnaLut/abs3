@@ -78,7 +78,9 @@ COMMENT ON COLUMN BARS.ERR$_CUSTBANK.BKI IS '';
 
 
 PROMPT *** Create  grants  ERR$_CUSTBANK ***
+grant SELECT                                                                 on ERR$_CUSTBANK   to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CUSTBANK   to BARS_DM;
+grant SELECT                                                                 on ERR$_CUSTBANK   to UPLD;
 
 
 

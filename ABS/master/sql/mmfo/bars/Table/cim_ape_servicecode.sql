@@ -79,9 +79,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_APE_SERVICECODE ***
+grant SELECT                                                                 on CIM_APE_SERVICECODE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_APE_SERVICECODE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_APE_SERVICECODE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_APE_SERVICECODE to CIM_ROLE;
+grant SELECT                                                                 on CIM_APE_SERVICECODE to UPLD;
 
 
 

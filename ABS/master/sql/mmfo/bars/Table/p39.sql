@@ -76,9 +76,11 @@ COMMENT ON COLUMN BARS.P39.DAPP IS '';
 
 
 PROMPT *** Create  grants  P39 ***
+grant SELECT                                                                 on P39             to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on P39             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on P39             to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on P39             to PROC_DR;
+grant SELECT                                                                 on P39             to UPLD;
 grant FLASHBACK,SELECT                                                       on P39             to WR_REFREAD;
 
 

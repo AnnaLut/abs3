@@ -16,7 +16,9 @@ select to_char(COUNTRY,'FM000') || '0000000', NULL
 ;
 
 PROMPT *** Create  grants  V_RC_BNK ***
+grant SELECT                                                                 on V_RC_BNK        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RC_BNK        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_RC_BNK        to UPLD;
 grant SELECT                                                                 on V_RC_BNK        to ZAY;
 
 

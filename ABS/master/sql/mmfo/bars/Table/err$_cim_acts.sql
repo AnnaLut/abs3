@@ -85,6 +85,10 @@ COMMENT ON COLUMN BARS.ERR$_CIM_ACTS.FILE_DATE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIM_ACTS ***
+grant SELECT                                                                 on ERR$_CIM_ACTS   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIM_ACTS   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

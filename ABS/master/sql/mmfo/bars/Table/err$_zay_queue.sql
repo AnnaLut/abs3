@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.ERR$_ZAY_QUEUE.ORA_ERR_OPTYP$ IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ZAY_QUEUE ***
+grant SELECT                                                                 on ERR$_ZAY_QUEUE  to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ZAY_QUEUE  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -101,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_KOL_TBLANK ***
+grant SELECT                                                                 on CC_KOL_TBLANK   to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CC_KOL_TBLANK   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_KOL_TBLANK   to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CC_KOL_TBLANK   to RCC_DEAL;
+grant SELECT                                                                 on CC_KOL_TBLANK   to UPLD;
 
 
 

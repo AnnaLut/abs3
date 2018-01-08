@@ -13,7 +13,9 @@ PROMPT *** Create  view VAL_9821 ***
 
 PROMPT *** Create  grants  VAL_9821 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on VAL_9821        to ABS_ADMIN;
+grant SELECT                                                                 on VAL_9821        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VAL_9821        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VAL_9821        to UPLD;
 grant FLASHBACK,SELECT                                                       on VAL_9821        to WR_REFREAD;
 
 

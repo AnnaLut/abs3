@@ -4,7 +4,65 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_sms_clearance.sql =========*** 
  PROMPT ===================================================================================== 
  
-CREATE OR REPLACE PACKAGE BODY bars_sms_clearance
+  CREATE OR REPLACE PACKAGE BARS.BARS_SMS_CLEARANCE 
+IS
+   ----
+   -- Package bars_sms_clearance - пакет процедур для подготовки дебиторской задолженности за  SMS-сообщения
+   --
+
+   g_header_version    CONSTANT VARCHAR2 (64) := 'version 1.2 03/08/2015';
+
+   g_awk_header_defs   CONSTANT VARCHAR2 (512) := '';
+
+   ----
+   -- header_version
+   --
+   FUNCTION header_version
+      RETURN VARCHAR2;
+
+   ----
+   -- body_version
+   --
+   FUNCTION body_version
+      RETURN VARCHAR2;
+
+   ----
+   -- знаходить рахунок для виставлення заборгованості для клієнта(для одного 3570 на всі рахунки клієнта)
+   --, при відсутності рахунку створює його
+   ----
+   PROCEDURE set_clearance_acc (p_acc_parent IN accounts.acc%TYPE);
+
+   ----
+   -- виставляє дебіторську заборгованість за СМС по конкретному рахунку клієнта. якщо  acc = null - по всіх
+   --
+   ----
+   PROCEDURE pay_for_sms_by_acc (p_acc IN accounts.acc%TYPE DEFAULT 0);
+
+
+   ----
+   -- виставляє дебіторську заборгованість за СМС по конкретному клієнту. якщо  rnk = null - по всіх клієнтах
+   --
+
+   PROCEDURE pay_for_sms_by_rnk (p_rnk IN customer.rnk%TYPE DEFAULT 0);
+
+   ----
+   --оплачує дебіторську заборгованість за СМС по конкретному рахунку клієнта
+   --
+
+   PROCEDURE pay_clearance (p_acc_parent IN accounts.acc%TYPE);
+
+ ----
+   --переносить заборгованість на рахунок прострочки
+   --
+
+   PROCEDURE transfer_clearance ( p_acc   IN     accounts.acc%TYPE);
+   ----
+   -- init
+   --
+   PROCEDURE init;
+END bars_sms_clearance;
+/
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_SMS_CLEARANCE 
 IS
    ----
    --  Package bars_sms_clearance - пакет процедур для подготовки дебиторской задолженности за  SMS-сообщения
@@ -458,14 +516,14 @@ IS
       END;
 
       p_acc_clearance := acc1_;
-      
-      
-    
+
+
+
 
       --заносимо дані в таблицю зв'язку рахунок=рахунок оплати за СМС
       INSERT INTO SMS_ACC_CLEARANCE (acc, ACC_CLEARANCE)
            VALUES (p_acc_parent, p_acc_clearance);
-      Exception when dup_val_on_index then null;     
+      Exception when dup_val_on_index then null;
 
       logger.info (
             'open_3570. для счета ACC='
@@ -1253,6 +1311,9 @@ END bars_sms_clearance;
 /
  show err;
  
+PROMPT *** Create  grants  BARS_SMS_CLEARANCE ***
+grant EXECUTE                                                                on BARS_SMS_CLEARANCE to BARS_ACCESS_DEFROLE;
+
  
  
  PROMPT ===================================================================================== 

@@ -49,9 +49,11 @@ COMMENT ON COLUMN BARS.EN_ATOM.NAME_EN_AT IS '';
 
 
 PROMPT *** Create  grants  EN_ATOM ***
+grant SELECT                                                                 on EN_ATOM         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EN_ATOM         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EN_ATOM         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EN_ATOM         to START1;
+grant SELECT                                                                 on EN_ATOM         to UPLD;
 
 
 

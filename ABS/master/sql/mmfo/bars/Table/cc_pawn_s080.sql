@@ -73,32 +73,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CC_PS1 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_PAWN_S080 ADD CONSTRAINT FK_CC_PS1 FOREIGN KEY (PAWN)
-	  REFERENCES BARS.CC_PAWN (PAWN) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CC_PS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_PAWN_S080 ADD CONSTRAINT FK_CC_PS2 FOREIGN KEY (S080)
-	  REFERENCES BARS.CRISK (CRISK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_CC_PAWN_S080_PAWN ***
 begin   
  execute immediate '
@@ -137,9 +111,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_PAWN_S080 ***
+grant SELECT                                                                 on CC_PAWN_S080    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_PAWN_S080    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_PAWN_S080    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_PAWN_S080    to RCC_DEAL;
+grant SELECT                                                                 on CC_PAWN_S080    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_PAWN_S080    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CC_PAWN_S080    to WR_REFREAD;
 

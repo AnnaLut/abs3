@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_CIM_BOUND_DATA.C_DATE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIM_BOUND_DATA ***
+grant SELECT                                                                 on ERR$_CIM_BOUND_DATA to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIM_BOUND_DATA to UPLD;
+
 
 
 PROMPT ===================================================================================== 

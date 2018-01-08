@@ -79,6 +79,10 @@ COMMENT ON COLUMN BARS.ERR$_CIN_TK.S_B3 IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIN_TK ***
+grant SELECT                                                                 on ERR$_CIN_TK     to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIN_TK     to UPLD;
+
 
 
 PROMPT ===================================================================================== 

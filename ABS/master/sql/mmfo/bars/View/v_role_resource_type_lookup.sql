@@ -14,7 +14,9 @@ where  t.id in (select rt.resource_type_id from adm_resource_type_relation rt wh
 ;
 
 PROMPT *** Create  grants  V_ROLE_RESOURCE_TYPE_LOOKUP ***
+grant SELECT                                                                 on V_ROLE_RESOURCE_TYPE_LOOKUP to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ROLE_RESOURCE_TYPE_LOOKUP to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ROLE_RESOURCE_TYPE_LOOKUP to UPLD;
 
 
 

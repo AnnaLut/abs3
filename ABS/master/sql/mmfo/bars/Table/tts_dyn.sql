@@ -63,32 +63,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_TTSDYN_TIPS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS_DYN ADD CONSTRAINT FK_TTSDYN_TIPS FOREIGN KEY (TIP)
-	  REFERENCES BARS.TIPS (TIP) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_TTSDYN_TTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS_DYN ADD CONSTRAINT FK_TTSDYN_TTS FOREIGN KEY (TT)
-	  REFERENCES BARS.TTS (TT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_TTSDYN_TIP_NN ***
 begin   
  execute immediate '
@@ -128,9 +102,11 @@ exception when others then
 
 PROMPT *** Create  grants  TTS_DYN ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TTS_DYN         to ABS_ADMIN;
+grant SELECT                                                                 on TTS_DYN         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TTS_DYN         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TTS_DYN         to BARS_DM;
 grant SELECT                                                                 on TTS_DYN         to START1;
+grant SELECT                                                                 on TTS_DYN         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TTS_DYN         to WR_ALL_RIGHTS;
 
 

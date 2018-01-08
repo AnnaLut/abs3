@@ -69,19 +69,6 @@ COMMENT ON COLUMN BARS.WCS_CC_MEMBERS.MBR10 IS 'Ï²Á ÷ëåíà ÊÊ ¹10';
 
 
 
-PROMPT *** Create  constraint FK_WCSCCMBRS_B_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_CC_MEMBERS ADD CONSTRAINT FK_WCSCCMBRS_B_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_WCSCCMEMBERS ***
 begin   
  execute immediate '
@@ -110,9 +97,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_CC_MEMBERS ***
+grant SELECT                                                                 on WCS_CC_MEMBERS  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WCS_CC_MEMBERS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_CC_MEMBERS  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_CC_MEMBERS  to START1;
+grant SELECT                                                                 on WCS_CC_MEMBERS  to UPLD;
 grant FLASHBACK,SELECT                                                       on WCS_CC_MEMBERS  to WR_REFREAD;
 
 

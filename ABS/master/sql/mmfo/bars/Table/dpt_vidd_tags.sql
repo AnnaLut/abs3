@@ -155,9 +155,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_VIDD_TAGS ***
+grant SELECT                                                                 on DPT_VIDD_TAGS   to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_VIDD_TAGS   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VIDD_TAGS   to BARS_DM;
 grant SELECT                                                                 on DPT_VIDD_TAGS   to DPT_ADMIN;
+grant SELECT                                                                 on DPT_VIDD_TAGS   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VIDD_TAGS   to WR_ALL_RIGHTS;
 
 

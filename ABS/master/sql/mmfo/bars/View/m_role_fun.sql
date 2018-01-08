@@ -13,6 +13,10 @@ from operlist   o
 where frontend = PUL.GET('FRO')  
  and exists (select 1 from operapp where codeapp  = PUL.GET('ARM') and  codeoper = o.codeoper);
 
+PROMPT *** Create  grants  M_ROLE_FUN ***
+grant SELECT                                                                 on M_ROLE_FUN      to BARSREADER_ROLE;
+grant SELECT                                                                 on M_ROLE_FUN      to UPLD;
+
 
 
 PROMPT ===================================================================================== 

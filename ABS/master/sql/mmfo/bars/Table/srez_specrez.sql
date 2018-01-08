@@ -61,9 +61,11 @@ COMMENT ON COLUMN BARS.SREZ_SPECREZ.DESCRIPTION IS '';
 
 
 PROMPT *** Create  grants  SREZ_SPECREZ ***
+grant SELECT                                                                 on SREZ_SPECREZ    to BARSREADER_ROLE;
 grant SELECT                                                                 on SREZ_SPECREZ    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SREZ_SPECREZ    to BARS_DM;
 grant SELECT                                                                 on SREZ_SPECREZ    to RCC_DEAL;
+grant SELECT                                                                 on SREZ_SPECREZ    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SREZ_SPECREZ    to WR_ALL_RIGHTS;
 
 

@@ -49,8 +49,10 @@ COMMENT ON COLUMN BARS.STAFF_BANKDATES.BANKDATE IS '';
 
 
 PROMPT *** Create  grants  STAFF_BANKDATES ***
+grant SELECT                                                                 on STAFF_BANKDATES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_BANKDATES to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_BANKDATES to START1;
+grant SELECT                                                                 on STAFF_BANKDATES to UPLD;
 
 
 

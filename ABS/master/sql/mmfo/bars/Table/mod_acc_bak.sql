@@ -44,8 +44,10 @@ COMMENT ON COLUMN BARS.MOD_ACC_BAK.ACC IS '';
 
 
 PROMPT *** Create  grants  MOD_ACC_BAK ***
+grant SELECT                                                                 on MOD_ACC_BAK     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MOD_ACC_BAK     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MOD_ACC_BAK     to START1;
+grant SELECT                                                                 on MOD_ACC_BAK     to UPLD;
 
 
 

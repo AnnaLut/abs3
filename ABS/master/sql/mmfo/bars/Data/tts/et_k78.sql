@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K78', 'K78 Комісія за поповнення ПК MasterCard в USD', 0, '#(nbs_ob22 (''6110'',''61''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(nbs_ob22 (''6110'',''61''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, 'GL.P_ICURVAL(#(KVA),F_TARIF(78,#(KVA),#(NLSA),#(S)),SYSDATE)', null, 5, null, null, null, '0100100001000000000000000000000000010000000000000000000000000000', 'Комісія за поповнення ПК МПС VISA в USD');
+    values ('K78', 'K78 Комісія за поповнення ПК MasterCard в USD', 0, '#(nbs_ob22 (''6510'',''61''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(nbs_ob22 (''6510'',''61''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, 'GL.P_ICURVAL(#(KVA),F_TARIF(78,#(KVA),#(NLSA),#(S)),SYSDATE)', null, 5, null, null, null, '0100100001000000000000000000000000010000000000000000000000000000', 'Комісія за поповнення ПК МПС VISA в USD');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K78', name='K78 Комісія за поповнення ПК MasterCard в USD', dk=0, nlsm='#(nbs_ob22 (''6110'',''61''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''6110'',''61''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s='GL.P_ICURVAL(#(KVA),F_TARIF(78,#(KVA),#(NLSA),#(S)),SYSDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100001000000000000000000000000010000000000000000000000000000', nazn='Комісія за поповнення ПК МПС VISA в USD'
+         set tt='K78', name='K78 Комісія за поповнення ПК MasterCard в USD', dk=0, nlsm='#(nbs_ob22 (''6510'',''61''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''6510'',''61''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s='GL.P_ICURVAL(#(KVA),F_TARIF(78,#(KVA),#(NLSA),#(S)),SYSDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100001000000000000000000000000010000000000000000000000000000', nazn='Комісія за поповнення ПК МПС VISA в USD'
        where tt='K78';
   end;
   --------------------------------

@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''KL_F13_ZBSK'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''KL_F13_ZBSK'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''KL_F13_ZBSK'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''KL_F13_ZBSK'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -57,19 +57,6 @@ COMMENT ON COLUMN BARS.KL_F13_ZBSK.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_KLF13ZBSK_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KL_F13_ZBSK ADD CONSTRAINT FK_KLF13ZBSK_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_KLF13ZBSK_KF_NN ***
 begin   
  execute immediate '
@@ -81,13 +68,29 @@ exception when others then
 
 
 
+
+PROMPT *** Create  index I1_KL_F13_ZBSK ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I1_KL_F13_ZBSK ON BARS.KL_F13_ZBSK (KF, TRIM(NBSD), TRIM(NBSK)) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  KL_F13_ZBSK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F13_ZBSK     to ABS_ADMIN;
+grant SELECT                                                                 on KL_F13_ZBSK     to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on KL_F13_ZBSK     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_F13_ZBSK     to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on KL_F13_ZBSK     to RPBN001;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on KL_F13_ZBSK     to SALGL;
 grant SELECT                                                                 on KL_F13_ZBSK     to START1;
+grant SELECT                                                                 on KL_F13_ZBSK     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F13_ZBSK     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KL_F13_ZBSK     to WR_REFREAD;
 

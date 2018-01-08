@@ -79,9 +79,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BSB ***
+grant SELECT                                                                 on BSB             to BARSREADER_ROLE;
 grant SELECT                                                                 on BSB             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BSB             to BARS_DM;
 grant SELECT                                                                 on BSB             to SALGL;
+grant SELECT                                                                 on BSB             to UPLD;
 
 
 

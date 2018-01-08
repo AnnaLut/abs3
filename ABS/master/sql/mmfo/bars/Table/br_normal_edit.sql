@@ -85,34 +85,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BRNORMALEDIT_BDATE ***
+PROMPT *** Create  constraint CC_BRNORMALEDIT_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BR_NORMAL_EDIT ADD CONSTRAINT CC_BRNORMALEDIT_BDATE CHECK (bdate = trunc(bdate)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BRNORMALEDIT_KV_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BR_NORMAL_EDIT MODIFY (KV CONSTRAINT CC_BRNORMALEDIT_KV_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BRNORMALEDIT_BDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BR_NORMAL_EDIT MODIFY (BDATE CONSTRAINT CC_BRNORMALEDIT_BDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BR_NORMAL_EDIT MODIFY (KF CONSTRAINT CC_BRNORMALEDIT_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -133,11 +109,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BRNORMALEDIT_BRATES2 ***
+PROMPT *** Create  constraint CC_BRNORMALEDIT_BDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BR_NORMAL_EDIT ADD CONSTRAINT FK_BRNORMALEDIT_BRATES2 FOREIGN KEY (BR_ID, BR_TP)
-	  REFERENCES BARS.BRATES (BR_ID, BR_TP) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.BR_NORMAL_EDIT MODIFY (BDATE CONSTRAINT CC_BRNORMALEDIT_BDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -146,10 +121,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BRNORMALEDIT_KF_NN ***
+PROMPT *** Create  constraint CC_BRNORMALEDIT_KV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BR_NORMAL_EDIT MODIFY (KF CONSTRAINT CC_BRNORMALEDIT_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BR_NORMAL_EDIT MODIFY (KV CONSTRAINT CC_BRNORMALEDIT_KV_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -158,11 +133,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BRNORMALEDIT_TABVAL ***
+PROMPT *** Create  constraint CC_BRNORMALEDIT_BDATE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BR_NORMAL_EDIT ADD CONSTRAINT FK_BRNORMALEDIT_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.BR_NORMAL_EDIT ADD CONSTRAINT CC_BRNORMALEDIT_BDATE CHECK (bdate = trunc(bdate)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -186,6 +160,7 @@ exception when others then
 
 PROMPT *** Create  grants  BR_NORMAL_EDIT ***
 grant SELECT                                                                 on BR_NORMAL_EDIT  to BARSAQ with grant option;
+grant SELECT                                                                 on BR_NORMAL_EDIT  to BARSREADER_ROLE;
 grant SELECT                                                                 on BR_NORMAL_EDIT  to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BR_NORMAL_EDIT  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BR_NORMAL_EDIT  to BARS_DM;
@@ -193,6 +168,7 @@ grant INSERT,SELECT                                                          on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on BR_NORMAL_EDIT  to DPT_ADMIN;
 grant SELECT,SELECT                                                          on BR_NORMAL_EDIT  to KLBX;
 grant SELECT                                                                 on BR_NORMAL_EDIT  to REFSYNC_USR;
+grant SELECT                                                                 on BR_NORMAL_EDIT  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BR_NORMAL_EDIT  to WR_ALL_RIGHTS;
 
 

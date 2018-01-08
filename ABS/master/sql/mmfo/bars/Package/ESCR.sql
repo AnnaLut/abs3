@@ -1,4 +1,10 @@
-CREATE OR REPLACE PACKAGE ESCR IS
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/escr.sql =========*** Run *** ======
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.ESCR IS
 
   /*
   Бизнес-логика модуля Кредиты ФЛ на энергосбережение , слоган КОТЛЫ
@@ -54,7 +60,7 @@ CREATE OR REPLACE PACKAGE ESCR IS
 
 end ESCR;
 /
-CREATE OR REPLACE PACKAGE BODY escr IS
+CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
   g_body_version CONSTANT VARCHAR2(64) := 'ver.4.1.6 20/12/2017';
   nlchr CHAR(2) := chr(13) || chr(10);
 
@@ -283,7 +289,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
                   p_R1      => p_R1, --OUT number, -- Общий ресурс (ост на SG(262*)
                   p_R2      => p_R2, --OUT number, --  Свободный ресурс R2 =  R1 - z4
                   p_P1      => p_P1 --OUT number  --  Реф.платежа
-                  
+
                   );
       escr.p_cc_lim_count(deal_id      => i.nd,
                           cc_lim_count => l_lim_count_after);
@@ -934,3 +940,14 @@ BEGIN
   NULL;
 END escr;
 /
+ show err;
+ 
+PROMPT *** Create  grants  ESCR ***
+grant EXECUTE                                                                on ESCR            to BARS_ACCESS_DEFROLE;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/escr.sql =========*** End *** ======
+ PROMPT ===================================================================================== 
+ 

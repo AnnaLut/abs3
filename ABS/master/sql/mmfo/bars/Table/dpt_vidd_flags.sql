@@ -63,32 +63,6 @@ COMMENT ON COLUMN BARS.DPT_VIDD_FLAGS.USED_EBP IS 'Ознака використання ДУ при ро
 
 
 
-PROMPT *** Create  constraint FK_DPTVIDDFLAGS_TTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_FLAGS ADD CONSTRAINT FK_DPTVIDDFLAGS_TTS FOREIGN KEY (MAIN_TT)
-	  REFERENCES BARS.TTS (TT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTVIDDFLAGS_DPTREQTYPES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_FLAGS ADD CONSTRAINT FK_DPTVIDDFLAGS_DPTREQTYPES FOREIGN KEY (REQUEST_TYPECODE)
-	  REFERENCES BARS.DPT_REQ_TYPES (REQTYPE_CODE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DPTVIDDFLAGS_ID_NN ***
 begin   
  execute immediate '
@@ -139,10 +113,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTVIDDFLAGS_ACTIVITY_NN ***
+PROMPT *** Create  constraint CC_DPTVIDDFLAGS_ACTIVITY ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_FLAGS ADD CONSTRAINT CC_DPTVIDDFLAGS_ACTIVITY_NN CHECK (activity is not null) ENABLE';
+  ALTER TABLE BARS.DPT_VIDD_FLAGS ADD CONSTRAINT CC_DPTVIDDFLAGS_ACTIVITY CHECK (activity in (0,1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -151,10 +125,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTVIDDFLAGS_ACTIVITY ***
+PROMPT *** Create  constraint CC_DPTVIDDFLAGS_ACTIVITY_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_FLAGS ADD CONSTRAINT CC_DPTVIDDFLAGS_ACTIVITY CHECK (activity in (0,1)) ENABLE';
+  ALTER TABLE BARS.DPT_VIDD_FLAGS ADD CONSTRAINT CC_DPTVIDDFLAGS_ACTIVITY_NN CHECK (activity is not null) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -177,11 +151,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_VIDD_FLAGS ***
+grant SELECT                                                                 on DPT_VIDD_FLAGS  to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_VIDD_FLAGS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VIDD_FLAGS  to BARS_DM;
 grant SELECT                                                                 on DPT_VIDD_FLAGS  to DPT_ADMIN;
 grant SELECT                                                                 on DPT_VIDD_FLAGS  to DPT_ROLE;
 grant SELECT                                                                 on DPT_VIDD_FLAGS  to KLBX;
+grant SELECT                                                                 on DPT_VIDD_FLAGS  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VIDD_FLAGS  to WR_ALL_RIGHTS;
 
 

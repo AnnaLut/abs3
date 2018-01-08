@@ -17,9 +17,11 @@ PROMPT *** Create  view V_DPT_JOBS_LOG ***
     FROM BARS.DPT_JOBS_LOG_ARCH;
 
 PROMPT *** Create  grants  V_DPT_JOBS_LOG ***
+grant SELECT                                                                 on V_DPT_JOBS_LOG  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_JOBS_LOG  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_JOBS_LOG  to DPT_ADMIN;
 grant SELECT                                                                 on V_DPT_JOBS_LOG  to RPBN001;
+grant SELECT                                                                 on V_DPT_JOBS_LOG  to UPLD;
 grant SELECT                                                                 on V_DPT_JOBS_LOG  to WR_ALL_RIGHTS;
 
 

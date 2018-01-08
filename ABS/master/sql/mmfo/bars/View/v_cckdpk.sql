@@ -72,8 +72,10 @@ PROMPT *** Create  view V_CCKDPK ***
 --where NOT ( Z1> 0 and  NBS ='2525') --  НЕ выполнять досрочное погашение с 2625 с перестроением ГПК при наличии ПРОСРОЧЕК.;
 
 PROMPT *** Create  grants  V_CCKDPK ***
+grant SELECT                                                                 on V_CCKDPK        to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_CCKDPK        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CCKDPK        to START1;
+grant SELECT                                                                 on V_CCKDPK        to UPLD;
 
 
 

@@ -61,12 +61,10 @@ COMMENT ON COLUMN BARS.SYNC_METADATA.POST_FUNC IS 'Скрипт виклику функції після 
 
 
 
-PROMPT *** Create  constraint PK_SYNCMETADATA_SNAME ***
+PROMPT *** Create  constraint CC_SYNCMETADATA_DIRECT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SYNC_METADATA ADD CONSTRAINT PK_SYNCMETADATA_SNAME PRIMARY KEY (SERVICE_NAME)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD  ENABLE';
+  ALTER TABLE BARS.SYNC_METADATA ADD CONSTRAINT CC_SYNCMETADATA_DIRECT CHECK (direct in (''INIT'', ''RESPONSE'')) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -75,10 +73,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SYNCMETADATA_DIRECT ***
+PROMPT *** Create  constraint PK_SYNCMETADATA_SNAME ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SYNC_METADATA ADD CONSTRAINT CC_SYNCMETADATA_DIRECT CHECK (direct in (''INIT'', ''RESPONSE'')) ENABLE';
+  ALTER TABLE BARS.SYNC_METADATA ADD CONSTRAINT PK_SYNCMETADATA_SNAME PRIMARY KEY (SERVICE_NAME)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -101,8 +101,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SYNC_METADATA ***
+grant SELECT                                                                 on SYNC_METADATA   to BARSREADER_ROLE;
 grant SELECT                                                                 on SYNC_METADATA   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SYNC_METADATA   to BARS_DM;
+grant SELECT                                                                 on SYNC_METADATA   to UPLD;
 
 
 

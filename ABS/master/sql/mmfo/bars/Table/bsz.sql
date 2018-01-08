@@ -89,9 +89,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BSZ ***
+grant SELECT                                                                 on BSZ             to BARSREADER_ROLE;
 grant SELECT                                                                 on BSZ             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BSZ             to BARS_DM;
 grant SELECT                                                                 on BSZ             to SALGL;
+grant SELECT                                                                 on BSZ             to UPLD;
 
 
 

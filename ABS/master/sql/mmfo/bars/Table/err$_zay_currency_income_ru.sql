@@ -79,6 +79,10 @@ COMMENT ON COLUMN BARS.ERR$_ZAY_CURRENCY_INCOME_RU.TXT IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ZAY_CURRENCY_INCOME_RU ***
+grant SELECT                                                                 on ERR$_ZAY_CURRENCY_INCOME_RU to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ZAY_CURRENCY_INCOME_RU to UPLD;
+
 
 
 PROMPT ===================================================================================== 

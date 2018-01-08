@@ -1,3 +1,5 @@
+
+ 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_days_past_due.sql =========*** Ru
  PROMPT ===================================================================================== 
@@ -15,17 +17,17 @@
    22-08-2016 - К-во дней визнання (параметр на счете для дебиторки)
    Расчет к-ва дней просрочки по счету
  */
-  
-l_nd    cc_deal.nd%type    ; l_tip   accounts.tip%type; l_nbs   accounts.nbs%type; l_daos  accounts.daos%type; 
+
+l_nd    cc_deal.nd%type    ; l_tip   accounts.tip%type; l_nbs   accounts.nbs%type; l_daos  accounts.daos%type;
 l_s180  specparam.s180%type;
 l_ostc  number             ; l_KOS   number           ; l_kol   number           ; l_s180k number            ;
-l_DATSP date               ; l_DASPN date             ; l_datvz date             ; l_mdate date              ;  
+l_DATSP date               ; l_DASPN date             ; l_datvz date             ; l_mdate date              ;
 
 begin
-   if p_acc is not null THEN 
-      begin 
-         select - nvl(ost_korr(p_acc,p_dat,null,a.nbs),0), a.mdate, tip, nvl(nbs,substr(nls,1,4)), daos, s.s180  
-         into   l_ostc, l_mdate, l_tip, l_nbs, l_daos, l_s180 
+   if p_acc is not null THEN
+      begin
+         select - nvl(ost_korr(p_acc,p_dat,null,a.nbs),0), a.mdate, tip, nvl(nbs,substr(nls,1,4)), daos, s.s180
+         into   l_ostc, l_mdate, l_tip, l_nbs, l_daos, l_s180
          from accounts a, specparam s where a.acc = p_acc and a.acc = s.acc (+);
       EXCEPTION WHEN NO_DATA_FOUND THEN l_kol := 0; l_ostc := 0; return l_kol;
       END;
@@ -38,7 +40,7 @@ begin
                     else to_date(value,'dd-mon-yyyy')
                     end  into l_datvz from accountsw aw where tag='DATVZ' and aw.acc=p_acc;
          EXCEPTION WHEN NO_DATA_FOUND THEN l_datvz := null;
-         end; 
+         end;
          /*  еще не утверждено
          If    l_s180 is null then l_s180k :=    0 ;
          ElsIf l_s180 = '3'   then l_s180k :=    7 ;       -- Вiд   2 до 7 дня
@@ -64,9 +66,9 @@ begin
 
       if    l_mdate is not null and rez_f_deb (l_nbs) = 1 THEN  l_KOL := greatest(0,p_DAT - l_mdate);
       elsif l_datvz is not null                           THEN  l_KOL := greatest(0,p_DAT - l_datvz);
-      else 
-         If l_ostc >= 0 THEN l_KOL := 0;  
-            begin 
+      else
+         If l_ostc >= 0 THEN l_KOL := 0;
+            begin
                select max(n.nd) into l_nd from nd_acc n where acc = p_acc;
                if    l_tip   in ('SP ','SL ') THEN l_DATSP := to_date(cck_app.Get_ND_TXT(l_ND,'DATSP'),'dd/mm/yyyy');
                   if l_DATSP is not null      THEN l_KOL   := p_DAT - l_DATSP; return l_kol; end if;
@@ -85,9 +87,9 @@ begin
                       order  by s.fdat)
             loop
                l_KOS := l_KOS - p.DOS;
-               If l_KOS < 0 THEN  
-                  l_KOL := greatest(0,p_DAT - (p.fdat+l_s180k)); 
-                  EXIT;  
+               If l_KOS < 0 THEN
+                  l_KOL := greatest(0,p_DAT - (p.fdat+l_s180k));
+                  EXIT;
                end if;
             end loop;
          else
@@ -100,8 +102,11 @@ end;
 /
  show err;
  
+PROMPT *** Create  grants  F_DAYS_PAST_DUE ***
 grant EXECUTE                                                                on F_DAYS_PAST_DUE to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on F_DAYS_PAST_DUE to START1;
+
+ 
  
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_days_past_due.sql =========*** En

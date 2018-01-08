@@ -79,8 +79,10 @@ PROMPT *** Create  view ACC_AVER ***
             a.kol;
 
 PROMPT *** Create  grants  ACC_AVER ***
+grant SELECT                                                                 on ACC_AVER        to BARSREADER_ROLE;
 grant SELECT                                                                 on ACC_AVER        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_AVER        to START1;
+grant SELECT                                                                 on ACC_AVER        to UPLD;
 
 
 

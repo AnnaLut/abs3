@@ -54,9 +54,9 @@ COMMENT ON COLUMN BARS.INT_OVR_RANG.KF IS '';
 PROMPT *** Create  constraint XPK_INT_OVR_RANG ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_OVR_RANG ADD CONSTRAINT XPK_INT_OVR_RANG PRIMARY KEY (ID)
+  ALTER TABLE BARS.INT_OVR_RANG ADD CONSTRAINT XPK_INT_OVR_RANG PRIMARY KEY (KF, ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  TABLESPACE BRSDYNI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -77,25 +77,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_INTOVRRANG_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_OVR_RANG ADD CONSTRAINT FK_INTOVRRANG_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index XPK_INT_OVR_RANG ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.XPK_INT_OVR_RANG ON BARS.INT_OVR_RANG (ID) 
+  CREATE UNIQUE INDEX BARS.XPK_INT_OVR_RANG ON BARS.INT_OVR_RANG (KF, ID) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI ';
+  TABLESPACE BRSDYNI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
@@ -107,11 +94,13 @@ PROMPT *** Create  grants  INT_OVR_RANG ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_OVR_RANG    to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_OVR_RANG    to BARS009;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_OVR_RANG    to BARS010;
+grant SELECT                                                                 on INT_OVR_RANG    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_OVR_RANG    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_OVR_RANG    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_OVR_RANG    to REF0000;
 grant INSERT                                                                 on INT_OVR_RANG    to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_OVR_RANG    to TECH006;
+grant SELECT                                                                 on INT_OVR_RANG    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_OVR_RANG    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on INT_OVR_RANG    to WR_REFREAD;
 

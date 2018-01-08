@@ -15,8 +15,10 @@ from    oper opr, tabval kva, tabval kvb
 where opr.kv = kva.kv and opr.kv2 = kvb.kv(+);
 
 PROMPT *** Create  grants  V_DOCUMENTVIEW_MAIN ***
+grant SELECT                                                                 on V_DOCUMENTVIEW_MAIN to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOCUMENTVIEW_MAIN to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DOCUMENTVIEW_MAIN to START1;
+grant SELECT                                                                 on V_DOCUMENTVIEW_MAIN to UPLD;
 
 
 

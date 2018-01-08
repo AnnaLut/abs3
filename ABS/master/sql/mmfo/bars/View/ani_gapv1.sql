@@ -12,8 +12,10 @@ PROMPT *** Create  view ANI_GAPV1 ***
 from (SELECT distinct fdat from rnbu_trace1) r;
 
 PROMPT *** Create  grants  ANI_GAPV1 ***
+grant SELECT                                                                 on ANI_GAPV1       to BARSREADER_ROLE;
 grant SELECT                                                                 on ANI_GAPV1       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANI_GAPV1       to SALGL;
+grant SELECT                                                                 on ANI_GAPV1       to UPLD;
 
 
 

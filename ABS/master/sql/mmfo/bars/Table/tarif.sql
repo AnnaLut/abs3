@@ -11,7 +11,7 @@ PROMPT *** ALTER_POLICY_INFO to TARIF ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''TARIF'', ''FILIAL'' , ''M'', ''E'', ''M'', ''E'');
+               bpa.alter_policy_info(''TARIF'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''TARIF'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -78,12 +78,10 @@ COMMENT ON COLUMN BARS.TARIF.KV_SMAX IS 'Валюта максиимальной граничной суммы';
 
 
 
-PROMPT *** Create  constraint PK_TARIF ***
+PROMPT *** Create  constraint CC_TARIF_TIP ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TARIF ADD CONSTRAINT PK_TARIF PRIMARY KEY (KF, KOD)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.TARIF ADD CONSTRAINT CC_TARIF_TIP CHECK (tip in (0,1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -92,10 +90,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TARIF_TIP ***
+PROMPT *** Create  constraint PK_TARIF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TARIF ADD CONSTRAINT CC_TARIF_TIP CHECK (tip in (0,1)) ENABLE';
+  ALTER TABLE BARS.TARIF ADD CONSTRAINT PK_TARIF PRIMARY KEY (KF, KOD)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -128,10 +128,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TARIF_KF_NN ***
+PROMPT *** Create  constraint CC_TARIF_NAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TARIF MODIFY (KF CONSTRAINT CC_TARIF_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TARIF MODIFY (NAME CONSTRAINT CC_TARIF_NAME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -176,10 +176,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TARIF_NAME_NN ***
+PROMPT *** Create  constraint CC_TARIF_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TARIF MODIFY (NAME CONSTRAINT CC_TARIF_NAME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TARIF MODIFY (KF CONSTRAINT CC_TARIF_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -203,10 +203,12 @@ exception when others then
 
 PROMPT *** Create  grants  TARIF ***
 grant SELECT                                                                 on TARIF           to BARSAQ;
+grant SELECT                                                                 on TARIF           to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on TARIF           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TARIF           to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on TARIF           to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TARIF           to TARIF;
+grant SELECT                                                                 on TARIF           to UPLD;
 
 
 

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции ЧЕК
-prompt Наименование операции: 1) Частковi суми ЧЕКА
+prompt Наименование операции: ЧЕК 1) Частковi суми ЧЕКА
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('ЧЕК', '1) Частковi суми ЧЕКА', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(540,#(KVA),#(NLSA),#(S),#(REF))', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('ЧЕК', 'ЧЕК 1) Частковi суми ЧЕКА', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(540,#(KVA),#(NLSA),#(S),#(REF))', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='ЧЕК', name='1) Частковi суми ЧЕКА', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(540,#(KVA),#(NLSA),#(S),#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='ЧЕК', name='ЧЕК 1) Частковi суми ЧЕКА', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(540,#(KVA),#(NLSA),#(S),#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='ЧЕК';
   end;
   --------------------------------

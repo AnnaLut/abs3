@@ -66,7 +66,9 @@ COMMENT ON COLUMN BARS.TMP_IMPKLBX_TBL.ID IS '';
 
 
 PROMPT *** Create  grants  TMP_IMPKLBX_TBL ***
+grant SELECT                                                                 on TMP_IMPKLBX_TBL to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_IMPKLBX_TBL to BARS_DM;
+grant SELECT                                                                 on TMP_IMPKLBX_TBL to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_IMPKLBX_TBL to WR_ALL_RIGHTS;
 
 

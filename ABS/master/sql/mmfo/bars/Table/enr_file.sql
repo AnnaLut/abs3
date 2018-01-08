@@ -91,9 +91,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ENR_FILE ***
+grant SELECT                                                                 on ENR_FILE        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ENR_FILE        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ENR_FILE        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ENR_FILE        to START1;
+grant SELECT                                                                 on ENR_FILE        to UPLD;
 
 
 

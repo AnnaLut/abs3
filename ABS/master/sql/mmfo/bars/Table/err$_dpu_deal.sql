@@ -113,6 +113,10 @@ COMMENT ON COLUMN BARS.ERR$_DPU_DEAL.VIDD IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DPU_DEAL ***
+grant SELECT                                                                 on ERR$_DPU_DEAL   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DPU_DEAL   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

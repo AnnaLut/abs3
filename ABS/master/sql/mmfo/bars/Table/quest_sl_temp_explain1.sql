@@ -100,8 +100,10 @@ COMMENT ON COLUMN BARS.QUEST_SL_TEMP_EXPLAIN1.FILTER_PREDICATES IS '';
 
 
 PROMPT *** Create  grants  QUEST_SL_TEMP_EXPLAIN1 ***
+grant SELECT                                                                 on QUEST_SL_TEMP_EXPLAIN1 to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on QUEST_SL_TEMP_EXPLAIN1 to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on QUEST_SL_TEMP_EXPLAIN1 to START1;
+grant SELECT                                                                 on QUEST_SL_TEMP_EXPLAIN1 to UPLD;
 
 
 

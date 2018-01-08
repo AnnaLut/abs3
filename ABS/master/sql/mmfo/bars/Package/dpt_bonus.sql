@@ -139,8 +139,7 @@ FUNCTION body_version RETURN VARCHAR2;
 
 END dpt_bonus;
 /
-
-CREATE OR REPLACE PACKAGE BODY BARS.dpt_bonus
+CREATE OR REPLACE PACKAGE BODY BARS.DPT_BONUS 
 IS
 g_body_version  CONSTANT varchar2(64)  := 'version 1.14 16/05/2017';
 g_awk_body_defs CONSTANT varchar2(512) := ' ';
@@ -332,11 +331,11 @@ BEGIN
       l_processuser,
       p_branch,
       p_reqid);
-   
+
    bars_audit.trace('%s создан запрос на получение льготы № %s по договору № %s',l_title, to_char(p_bonusid), to_char(p_dptid));
 
-   exception when others then 
-    bars_audit.error(l_title || dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());                      
+   exception when others then
+    bars_audit.error(l_title || dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());
    end;
 
 EXCEPTION
@@ -1167,7 +1166,7 @@ BEGIN
           WHERE acc = l_dptaccid
             AND id = 1
             AND bdat = l_dptrate.bdat;
-       EXCEPTION       
+       EXCEPTION
          WHEN OTHERS THEN
            -- невозможно установить льготную %-ную ставку по договору (размер, дата)
            bars_error.raise_nerror(g_modcode, 'SET_BONUS_RATE_FAILED',
@@ -1188,7 +1187,7 @@ BEGIN
          INSERT INTO int_ratn (acc, id, bdat, ir, br, op)
          VALUES (l_dptaccid, 1, p_bdate, l_indvrate, l_baserate, l_operation);
        EXCEPTION
-        when dup_val_on_index then 
+        when dup_val_on_index then
         UPDATE int_ratn
             SET  br = l_baserate,
                  ir = l_indvrate,

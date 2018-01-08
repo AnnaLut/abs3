@@ -47,7 +47,9 @@ from   (select r.id arm_id,
 ;
 
 PROMPT *** Create  grants  V_ARM_RESOURCE ***
+grant SELECT                                                                 on V_ARM_RESOURCE  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ARM_RESOURCE  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ARM_RESOURCE  to UPLD;
 
 
 

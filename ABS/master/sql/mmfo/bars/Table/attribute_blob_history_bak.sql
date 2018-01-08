@@ -49,7 +49,9 @@ COMMENT ON COLUMN BARS.ATTRIBUTE_BLOB_HISTORY_BAK.VALUE IS '';
 
 
 PROMPT *** Create  grants  ATTRIBUTE_BLOB_HISTORY_BAK ***
+grant SELECT                                                                 on ATTRIBUTE_BLOB_HISTORY_BAK to BARSREADER_ROLE;
 grant SELECT                                                                 on ATTRIBUTE_BLOB_HISTORY_BAK to BARS_DM;
+grant SELECT                                                                 on ATTRIBUTE_BLOB_HISTORY_BAK to UPLD;
 
 
 

@@ -14,8 +14,10 @@ PROMPT *** Create  view V_CUSTOMERW_IDDPL ***
     AND (value like '__/__/____' or value like '__.__.____' or value like '__,__,____');
 
 PROMPT *** Create  grants  V_CUSTOMERW_IDDPL ***
+grant SELECT                                                                 on V_CUSTOMERW_IDDPL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTOMERW_IDDPL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUSTOMERW_IDDPL to START1;
+grant SELECT                                                                 on V_CUSTOMERW_IDDPL to UPLD;
 
 
 

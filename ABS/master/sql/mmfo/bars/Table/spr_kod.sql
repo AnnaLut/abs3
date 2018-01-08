@@ -59,8 +59,10 @@ COMMENT ON COLUMN BARS.SPR_KOD.FILTR_2 IS '';
 
 
 PROMPT *** Create  grants  SPR_KOD ***
+grant SELECT                                                                 on SPR_KOD         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPR_KOD         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPR_KOD         to START1;
+grant SELECT                                                                 on SPR_KOD         to UPLD;
 
 
 

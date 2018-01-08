@@ -79,8 +79,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRP_PORTFEL ***
+grant SELECT                                                                 on GRP_PORTFEL     to BARSREADER_ROLE;
 grant SELECT                                                                 on GRP_PORTFEL     to RCC_DEAL;
 grant SELECT                                                                 on GRP_PORTFEL     to START1;
+grant SELECT                                                                 on GRP_PORTFEL     to UPLD;
 
 
 

@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_CF_LOG.OUT_PAR IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CF_LOG ***
+grant SELECT                                                                 on ERR$_CF_LOG     to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CF_LOG     to UPLD;
+
 
 
 PROMPT ===================================================================================== 

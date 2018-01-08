@@ -87,19 +87,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_HOLIDAY_TABVAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.HOLIDAY ADD CONSTRAINT FK_HOLIDAY_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_HOLIDAY ***
 begin   
  execute immediate '
@@ -117,6 +104,7 @@ PROMPT *** Create  grants  HOLIDAY ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on HOLIDAY         to ABS_ADMIN;
 grant FLASHBACK,REFERENCES,SELECT                                            on HOLIDAY         to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on HOLIDAY         to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on HOLIDAY         to BARSREADER_ROLE;
 grant SELECT                                                                 on HOLIDAY         to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on HOLIDAY         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on HOLIDAY         to BARS_DM;

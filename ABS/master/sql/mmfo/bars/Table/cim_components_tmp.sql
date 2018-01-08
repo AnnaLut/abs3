@@ -70,7 +70,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_COMPONENTS_TMP ***
+grant SELECT                                                                 on CIM_COMPONENTS_TMP to BARSREADER_ROLE;
 grant SELECT                                                                 on CIM_COMPONENTS_TMP to BARS_DM;
+grant SELECT                                                                 on CIM_COMPONENTS_TMP to UPLD;
 
 
 

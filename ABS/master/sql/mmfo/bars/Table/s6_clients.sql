@@ -220,6 +220,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  S6_Clients ***
+grant SELECT                                                                 on S6_Clients      to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

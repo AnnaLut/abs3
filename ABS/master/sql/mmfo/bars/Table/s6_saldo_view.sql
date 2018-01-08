@@ -126,82 +126,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005033 ***
+PROMPT *** Create  constraint SYS_C005025 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (IdContract NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005032 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (BIC NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005031 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (TYPE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005030 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (DOP NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005029 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (ISP_OWNER NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005028 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (DEPART NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005027 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (OSN NOT NULL ENABLE)';
+  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (GROUP_U NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -222,10 +150,82 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005025 ***
+PROMPT *** Create  constraint SYS_C005027 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (GROUP_U NOT NULL ENABLE)';
+  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (OSN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005028 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (DEPART NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005029 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (ISP_OWNER NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005030 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (DOP NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005031 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (TYPE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005032 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (BIC NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005033 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SALDO_VIEW MODIFY (IdContract NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -234,9 +234,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  S6_SALDO_VIEW ***
+grant SELECT                                                                 on S6_SALDO_VIEW   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_SALDO_VIEW   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on S6_SALDO_VIEW   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_SALDO_VIEW   to START1;
+grant SELECT                                                                 on S6_SALDO_VIEW   to UPLD;
 
 
 

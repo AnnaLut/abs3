@@ -44,8 +44,10 @@ COMMENT ON COLUMN BARS.TMP_XML_DATA.DD IS '';
 
 
 PROMPT *** Create  grants  TMP_XML_DATA ***
+grant SELECT                                                                 on TMP_XML_DATA    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_XML_DATA    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_XML_DATA    to START1;
+grant SELECT                                                                 on TMP_XML_DATA    to UPLD;
 
 
 

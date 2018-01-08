@@ -78,7 +78,9 @@ COMMENT ON COLUMN BARS.ERR$_ZAG_A.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_ZAG_A ***
+grant SELECT                                                                 on ERR$_ZAG_A      to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_ZAG_A      to BARS_DM;
+grant SELECT                                                                 on ERR$_ZAG_A      to UPLD;
 
 
 

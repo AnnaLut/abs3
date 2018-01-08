@@ -47,7 +47,9 @@ where teru.kf = ss_kf.kf
   and nvl(teru.cust_type,ebkc_pack.get_custtype(c.rnk)) = 'P') r;
 
 PROMPT *** Create  grants  V_EBKC_PRIV_SUBGRP ***
+grant SELECT                                                                 on V_EBKC_PRIV_SUBGRP to BARSREADER_ROLE;
 grant SELECT                                                                 on V_EBKC_PRIV_SUBGRP to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_EBKC_PRIV_SUBGRP to UPLD;
 
 
 

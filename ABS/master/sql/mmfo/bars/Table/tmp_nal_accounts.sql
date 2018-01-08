@@ -49,8 +49,10 @@ COMMENT ON COLUMN BARS.TMP_NAL_ACCOUNTS.ACCC IS '';
 
 
 PROMPT *** Create  grants  TMP_NAL_ACCOUNTS ***
+grant SELECT                                                                 on TMP_NAL_ACCOUNTS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_NAL_ACCOUNTS to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_NAL_ACCOUNTS to START1;
+grant SELECT                                                                 on TMP_NAL_ACCOUNTS to UPLD;
 
 
 

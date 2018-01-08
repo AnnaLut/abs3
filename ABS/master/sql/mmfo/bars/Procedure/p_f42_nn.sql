@@ -7,14 +7,14 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F42_NN ***
 
-CREATE OR REPLACE PROCEDURE BARS.P_F42_NN (dat_ DATE, type_ NUMBER DEFAULT 0,
+  CREATE OR REPLACE PROCEDURE BARS.P_F42_NN (dat_ DATE, type_ NUMBER DEFAULT 0,
                                       prnk_ NUMBER DEFAULT NULL,
                                       pmode_ number default 0)
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :  Процедура формирование файла #42 для КБ
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 19/10/2017 (17/08/2017)
+% VERSION     : 17/11/2017 (19/10/2017)
 %------------------------------------------------------------------------
 % 02/03/2017 - для МФО=380388 (Платинум банк) изменил признак PR_BANK 
 %              со значения "T" (временнаяй адм.) на "Л" (ликвидация)  
@@ -857,7 +857,8 @@ BEGIN
             end if;
             
             --- резервы нужно отнимать только по определенному набору параметров R013
-            if sum_proc_ <> 0 then
+            if sum_proc_ <> 0 -- se_ <> 0 
+            then
                se_ := se_ + sum_proc_;
                
                if se_ < 0 then
@@ -2116,12 +2117,10 @@ BEGIN
 
          pul_dat(to_char(Dat_,'dd-mm-yyyy'), '');
 
-         --EXECUTE IMMEDIATE 'TRUNCATE TABLE otcn_f42_cp';
-
          -- проверка на наличие VIEW CP_V_ZAL_ACC
          if f_obj_exists('BARS', 'CP_V_ZAL_ACC', 'VIEW') = 1 then
 
-            EXECUTE IMMEDIATE 'TRUNCATE TABLE otcn_f42_cp';
+            EXECUTE IMMEDIATE 'delete from otcn_f42_cp';
 
             sql_ :=
                 'insert into otcn_f42_cp (fdat, acc, nls, kv, sum_zal, dat_zal, rnk, kodp) '
@@ -2377,7 +2376,8 @@ BEGIN
     insert into rnbu_trace (odate, nls, kv, kodp, znap, rnk, nd, ref, acc, comm)
     select /*+ leading(o) */
          dat_ odate, o.nls, o.kv, b.kodp, 
-         (case when abs(NVL(o.znap, 0)) >= abs(t.ost_eqv) then 0 else NVL(o.znap, 0) end) znap, 
+         (case when abs(NVL(o.znap, 0)) >= abs(t.ost_eqv) and substr(o.kodp,2,4) <> '3690'
+            then 0 else NVL(o.znap, 0) end) znap, 
          o.rnk, o.nd, o.acc,b.group_num ref,  
          decode( substr(o.kodp,2,4), '2400', '(резерв з файлу #C5) ',
                                      '2401', '(резерв з файлу #C5) ',
@@ -2415,6 +2415,13 @@ BEGIN
    commit;
 END;
 /
+show err;
+
+PROMPT *** Create  grants  P_F42_NN ***
+grant EXECUTE                                                                on P_F42_NN        to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on P_F42_NN        to RPBN002;
+grant EXECUTE                                                                on P_F42_NN        to START1;
+
 
 
 PROMPT ===================================================================================== 

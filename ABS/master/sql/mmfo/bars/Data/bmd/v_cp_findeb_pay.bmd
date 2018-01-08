@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'ЦП Форма погашения ФДЗ';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_CP_FINDEB_PAY';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,18 +124,18 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'CP_ID', 'C', 'ISIN', null, 20, 1, 1, 0, 1, 1, '', '', 1, 0, '', 1, 0, 1, '', 'FunNSIEditFFiltered("CP_KOD",2, "(CP_KOD.CP_ID = :CP_ID)")', 0);
-  bars_metabase.add_column(l_tabid, 2, 'FLAG_RUNN', 'B', 'Запуск~погашения~номинала', null, 22, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'FLAG_RUNR', 'B', 'Запуск~погашения~купона', null, 22, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'ID', 'N', 'Идентификатор~ЦП', null, 22, 2, 1, 0, 0, 0, '', '', 1, 1, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'INITIAL_REF', 'N', 'Референс~початкової~угоди', null, 22, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NLSFD', 'C', 'Консол.~счет ФД', null, 15, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NLSN', 'C', 'Счет номинала', null, 15, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NLSR', 'C', 'Счет купона', null, 15, 8, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'OSTN', 'N', 'Остаток~номинала', null, 22, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'OSTR', 'N', 'Остаток~купона', null, 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'REF', 'N', 'Референс~сделки', null, 22, 4, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'RYN', 'N', 'Субпортфель', null, 22, -1, 1, 0, 1, 1, '', '', 1, 0, '', 1, 0, 1, '', 'FunNSIEditFFiltered("CP_ACCC",2, "(CP_ACCC.ryn = :RYN)")', 0);
+  bars_metabase.add_column(l_tabid, 1, 'CP_ID', 'C', 'ISIN', '', 20, 1, 1, 0, 1, 1, '', '', 1, 0, '', 1, 0, 1, '', 'FunNSIEditFFiltered("CP_KOD",2, "(CP_KOD.CP_ID = :CP_ID)")', 0);
+  bars_metabase.add_column(l_tabid, 2, 'FLAG_RUNN', 'B', 'Запуск~погашения~номинала', '', 22, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'FLAG_RUNR', 'B', 'Запуск~погашения~купона', '', 22, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ID', 'N', 'Идентификатор~ЦП', '', 22, 2, 1, 0, 0, 0, '', '', 1, 1, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'INITIAL_REF', 'N', 'Референс~початкової~угоди', '', 22, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NLSFD', 'C', 'Консол.~счет ФД', '', 15, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NLSN', 'C', 'Счет номинала', '', 15, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NLSR', 'C', 'Счет купона', '', 15, 8, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'OSTN', 'N', 'Остаток~номинала', '', 22, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'OSTR', 'N', 'Остаток~купона', '', 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'REF', 'N', 'Референс~сделки', '', 22, 4, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'RYN', 'N', 'Субпортфель', '', 22, -1, 1, 0, 1, 1, '', '', 1, 0, '', 1, 0, 1, '', 'FunNSIEditFFiltered("CP_ACCC",2, "(CP_ACCC.ryn = :RYN)")', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CP_KOD');

@@ -78,10 +78,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBS_PROFTAG ***
+grant SELECT                                                                 on NBS_PROFTAG     to BARSREADER_ROLE;
 grant SELECT                                                                 on NBS_PROFTAG     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBS_PROFTAG     to BARS_DM;
 grant SELECT                                                                 on NBS_PROFTAG     to CUST001;
 grant SELECT                                                                 on NBS_PROFTAG     to NBS_PROF;
+grant SELECT                                                                 on NBS_PROFTAG     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBS_PROFTAG     to WR_ALL_RIGHTS;
 
 

@@ -49,6 +49,10 @@ COMMENT ON COLUMN BARS.TMP_STORNO_2103.VDAT IS '';
 
 
 
+PROMPT *** Create  grants  TMP_STORNO_2103 ***
+grant SELECT                                                                 on TMP_STORNO_2103 to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_STORNO_2103 to UPLD;
+
 
 
 PROMPT ===================================================================================== 

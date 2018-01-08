@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ANI331 ***
+grant SELECT                                                                 on ANI331          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANI331          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANI331          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANI331          to START1;
+grant SELECT                                                                 on ANI331          to UPLD;
 
 
 

@@ -22,7 +22,9 @@ PROMPT *** Create  view V_APPADM_APP_REF ***
 
 PROMPT *** Create  grants  V_APPADM_APP_REF ***
 grant SELECT                                                                 on V_APPADM_APP_REF to ABS_ADMIN;
+grant SELECT                                                                 on V_APPADM_APP_REF to BARSREADER_ROLE;
 grant SELECT                                                                 on V_APPADM_APP_REF to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_APPADM_APP_REF to UPLD;
 
 
 

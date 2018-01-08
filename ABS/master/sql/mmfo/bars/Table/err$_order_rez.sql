@@ -67,6 +67,10 @@ COMMENT ON COLUMN BARS.ERR$_ORDER_REZ.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ORDER_REZ ***
+grant SELECT                                                                 on ERR$_ORDER_REZ  to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ORDER_REZ  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

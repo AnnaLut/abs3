@@ -35,8 +35,10 @@ select c.id rnk, 0 intext, c.custtype, c.name, c.okpo, c.adr, c.country, c.regio
   from customer_extern c  ;
 
 PROMPT *** Create  grants  V_CUSTOMERREL_LIST ***
+grant SELECT                                                                 on V_CUSTOMERREL_LIST to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTOMERREL_LIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUSTOMERREL_LIST to CUST001;
+grant SELECT                                                                 on V_CUSTOMERREL_LIST to UPLD;
 
 
 

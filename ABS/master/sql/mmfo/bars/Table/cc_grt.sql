@@ -49,19 +49,6 @@ COMMENT ON COLUMN BARS.CC_GRT.GRT_DEAL_ID IS 'Идентификатор договора обеспечения
 
 
 
-PROMPT *** Create  constraint FK_CCGRT_GRTDEALS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_GRT ADD CONSTRAINT FK_CCGRT_GRTDEALS FOREIGN KEY (GRT_DEAL_ID)
-	  REFERENCES BARS.GRT_DEALS (DEAL_ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_CCGRT_ND_NN ***
 begin   
  execute immediate '
@@ -114,6 +101,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_GRT ***
+grant SELECT                                                                 on CC_GRT          to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_GRT          to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_GRT          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_GRT          to BARS_DM;

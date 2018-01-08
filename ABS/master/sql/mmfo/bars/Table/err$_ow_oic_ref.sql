@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.ERR$_OW_OIC_REF.REF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_OW_OIC_REF ***
+grant SELECT                                                                 on ERR$_OW_OIC_REF to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_OW_OIC_REF to UPLD;
+
 
 
 PROMPT ===================================================================================== 

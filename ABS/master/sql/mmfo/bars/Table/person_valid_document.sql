@@ -113,10 +113,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  PERSON_VALID_DOCUMENT ***
+grant SELECT                                                                 on PERSON_VALID_DOCUMENT to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PERSON_VALID_DOCUMENT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PERSON_VALID_DOCUMENT to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PERSON_VALID_DOCUMENT to DPT_ADMIN;
 grant SELECT                                                                 on PERSON_VALID_DOCUMENT to START1;
+grant SELECT                                                                 on PERSON_VALID_DOCUMENT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PERSON_VALID_DOCUMENT to WR_ALL_RIGHTS;
 
 

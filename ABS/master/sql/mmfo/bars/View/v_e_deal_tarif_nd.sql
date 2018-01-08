@@ -1,5 +1,14 @@
-create or replace view v_e_deal_tarif_nd as
-(select nvl (n.otm, 0) as otm,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_E_DEAL_TARIF_ND.sql =========*** Run 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_E_DEAL_TARIF_ND ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_E_DEAL_TARIF_ND ("OTM", "ID", "NAME", "DAT_BEG", "DAT_END", "DAYS", "N_SUMT", "N_SUMT1", "E_SUMT", "E_SUMT1", "DAT_LB", "DAT_LE", "S_POROG", "S_TAR_POR1", "S_TAR_POR2") AS 
+  (select nvl (n.otm, 0) as otm,
            e.id,
            e.name,
            trunc(n.dat_beg) dat_beg,
@@ -23,3 +32,14 @@ create or replace view v_e_deal_tarif_nd as
            n.s_tar_por2
       from e_tar_nd n, e_tarif e
      where n.id(+) = e.id and n.nd(+) = to_number (pul.get ('DEAL_ND')));
+
+PROMPT *** Create  grants  V_E_DEAL_TARIF_ND ***
+grant SELECT                                                                 on V_E_DEAL_TARIF_ND to BARSREADER_ROLE;
+grant SELECT                                                                 on V_E_DEAL_TARIF_ND to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_E_DEAL_TARIF_ND to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_E_DEAL_TARIF_ND.sql =========*** End 
+PROMPT ===================================================================================== 

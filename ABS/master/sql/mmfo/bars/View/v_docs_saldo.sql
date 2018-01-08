@@ -17,7 +17,9 @@ WHERE s.ACC = o.ACC and o.REF = op.REF and t1.KV = op.KV and t2.KV = op.KV2
  ;
 
 PROMPT *** Create  grants  V_DOCS_SALDO ***
+grant SELECT                                                                 on V_DOCS_SALDO    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOCS_SALDO    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DOCS_SALDO    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DOCS_SALDO    to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_DOCS_SALDO    to WR_DOCLIST_SALDO;
 

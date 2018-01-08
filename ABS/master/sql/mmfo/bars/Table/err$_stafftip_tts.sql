@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.ERR$_STAFFTIP_TTS.TT IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_STAFFTIP_TTS ***
+grant SELECT                                                                 on ERR$_STAFFTIP_TTS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_STAFFTIP_TTS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -103,8 +103,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_WARRANTY_METHOD ***
+grant SELECT                                                                 on CP_WARRANTY_METHOD to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on CP_WARRANTY_METHOD to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_WARRANTY_METHOD to BARS_DM;
+grant SELECT                                                                 on CP_WARRANTY_METHOD to UPLD;
 
 
 

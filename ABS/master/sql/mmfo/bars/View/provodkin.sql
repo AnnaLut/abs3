@@ -26,10 +26,12 @@ PROMPT *** Create  view PROVODKIN ***
 
 PROMPT *** Create  grants  PROVODKIN ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PROVODKIN       to ABS_ADMIN;
+grant SELECT                                                                 on PROVODKIN       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PROVODKIN       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PROVODKIN       to RPBN001;
 grant SELECT                                                                 on PROVODKIN       to SALGL;
 grant SELECT                                                                 on PROVODKIN       to START1;
+grant SELECT                                                                 on PROVODKIN       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PROVODKIN       to WR_ALL_RIGHTS;
 
 

@@ -102,9 +102,11 @@ COMMENT ON COLUMN BARS.ERR$_TTS.NAZN IS '';
 
 
 PROMPT *** Create  grants  ERR$_TTS ***
+grant SELECT                                                                 on ERR$_TTS        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_TTS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ERR$_TTS        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_TTS        to START1;
+grant SELECT                                                                 on ERR$_TTS        to UPLD;
 
 
 

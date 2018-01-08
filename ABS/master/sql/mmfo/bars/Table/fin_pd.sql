@@ -92,8 +92,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_PD ***
+grant SELECT                                                                 on FIN_PD          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_PD          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_PD          to START1;
+grant SELECT                                                                 on FIN_PD          to UPLD;
 
 
 

@@ -61,8 +61,10 @@ COMMENT ON COLUMN BARS.TMP_SAL_ACC.DAPPQ IS '';
 
 
 PROMPT *** Create  grants  TMP_SAL_ACC ***
+grant SELECT                                                                 on TMP_SAL_ACC     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SAL_ACC     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SAL_ACC     to START1;
+grant SELECT                                                                 on TMP_SAL_ACC     to UPLD;
 
 
 

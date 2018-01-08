@@ -84,6 +84,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ADR_HOUSES ***
+grant SELECT                                                                 on ADR_HOUSES      to BARSREADER_ROLE;
 grant SELECT                                                                 on ADR_HOUSES      to BARSUPL;
 grant SELECT                                                                 on ADR_HOUSES      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ADR_HOUSES      to START1;

@@ -113,6 +113,10 @@ COMMENT ON COLUMN BARS.ERR$_ESCR_REG_HEADER.CREDIT_STATUS_ID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ESCR_REG_HEADER ***
+grant SELECT                                                                 on ERR$_ESCR_REG_HEADER to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ESCR_REG_HEADER to UPLD;
+
 
 
 PROMPT ===================================================================================== 

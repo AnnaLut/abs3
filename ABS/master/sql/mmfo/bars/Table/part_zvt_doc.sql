@@ -75,9 +75,11 @@ COMMENT ON COLUMN BARS.PART_ZVT_DOC.SQ IS '≈кв в коп';
 
 
 PROMPT *** Create  grants  PART_ZVT_DOC ***
+grant SELECT                                                                 on PART_ZVT_DOC    to BARSREADER_ROLE;
 grant SELECT                                                                 on PART_ZVT_DOC    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PART_ZVT_DOC    to RPBN001;
 grant SELECT                                                                 on PART_ZVT_DOC    to RPBN002;
+grant SELECT                                                                 on PART_ZVT_DOC    to UPLD;
 
 
 

@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure MAKE_CP_INT ***
 
-CREATE OR REPLACE PROCEDURE BARS.make_cp_int (p_acc    IN accounts.acc%TYPE,
+  CREATE OR REPLACE PROCEDURE BARS.MAKE_CP_INT (p_acc    IN accounts.acc%TYPE,
                                               p_tdat   IN DATE,
                                               p_tt     IN oper.tt%type,
                                               p_id_a   IN oper.id_a%TYPE,
@@ -48,7 +48,7 @@ begin
       update int_accn set acr_dat = p_tdat where acc = p_acc and id = 0;
       --------------------
       -- Вставка записи-истории о начислении процентов, если, в будущем будет необходимость СТОРНО или персчета процентов.
-      ACRN.acr_dati ( p_ACC, 0, oo.REF, p_tdat, 0);  
+      ACRN.acr_dati ( p_ACC, 0, oo.REF, p_tdat, 0);
 
 end make_cp_int;
 /

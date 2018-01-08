@@ -51,32 +51,6 @@ COMMENT ON COLUMN BARS.TTS_VOB.ORD IS 'Порядок сортировки';
 
 
 
-PROMPT *** Create  constraint FK_TTSVOB_TTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS_VOB ADD CONSTRAINT FK_TTSVOB_TTS FOREIGN KEY (TT)
-	  REFERENCES BARS.TTS (TT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_TTSVOB_VOB ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS_VOB ADD CONSTRAINT FK_TTSVOB_VOB FOREIGN KEY (VOB)
-	  REFERENCES BARS.VOB (VOB) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_TTSVOB_TT_NN ***
 begin   
  execute immediate '
@@ -130,6 +104,7 @@ exception when others then
 
 PROMPT *** Create  grants  TTS_VOB ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TTS_VOB         to ABS_ADMIN;
+grant SELECT                                                                 on TTS_VOB         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TTS_VOB         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TTS_VOB         to PYOD001;
 grant SELECT                                                                 on TTS_VOB         to START1;

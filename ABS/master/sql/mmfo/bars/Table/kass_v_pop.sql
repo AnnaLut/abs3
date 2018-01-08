@@ -46,8 +46,10 @@ COMMENT ON COLUMN BARS.KASS_V_POP.IDM IS '';
 
 
 PROMPT *** Create  grants  KASS_V_POP ***
+grant SELECT                                                                 on KASS_V_POP      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KASS_V_POP      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KASS_V_POP      to PYOD001;
+grant SELECT                                                                 on KASS_V_POP      to UPLD;
 
 
 

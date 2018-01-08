@@ -22,9 +22,11 @@ PROMPT *** Create  view DPT_1 ***
 
 PROMPT *** Create  grants  DPT_1 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_1           to ABS_ADMIN;
+grant SELECT                                                                 on DPT_1           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_1           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_1           to DPT;
 grant SELECT                                                                 on DPT_1           to START1;
+grant SELECT                                                                 on DPT_1           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_1           to WR_ALL_RIGHTS;
 
 

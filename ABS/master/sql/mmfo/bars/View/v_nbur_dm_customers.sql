@@ -44,8 +44,10 @@ PROMPT *** Create  view V_NBUR_DM_CUSTOMERS ***
 ;
 
 PROMPT *** Create  grants  V_NBUR_DM_CUSTOMERS ***
+grant SELECT                                                                 on V_NBUR_DM_CUSTOMERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_DM_CUSTOMERS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_DM_CUSTOMERS to RPBN002;
+grant SELECT                                                                 on V_NBUR_DM_CUSTOMERS to UPLD;
 
 
 

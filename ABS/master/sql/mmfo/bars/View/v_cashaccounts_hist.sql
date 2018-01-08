@@ -14,8 +14,10 @@ PROMPT *** Create  view V_CASHACCOUNTS_HIST ***
    and s.acc = a.acc;
 
 PROMPT *** Create  grants  V_CASHACCOUNTS_HIST ***
+grant SELECT                                                                 on V_CASHACCOUNTS_HIST to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CASHACCOUNTS_HIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CASHACCOUNTS_HIST to RPBN001;
+grant SELECT                                                                 on V_CASHACCOUNTS_HIST to UPLD;
 
 
 

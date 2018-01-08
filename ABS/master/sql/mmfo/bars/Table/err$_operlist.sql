@@ -72,7 +72,9 @@ COMMENT ON COLUMN BARS.ERR$_OPERLIST.USEARC IS '';
 
 
 PROMPT *** Create  grants  ERR$_OPERLIST ***
+grant SELECT                                                                 on ERR$_OPERLIST   to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_OPERLIST   to BARS_DM;
+grant SELECT                                                                 on ERR$_OPERLIST   to UPLD;
 
 
 

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'IRR1:Пiдсумковий Протокол нарахування';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'PRVN_BV_ALL';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,18 +124,18 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'AR/100', 'N', 'An~`Нарах. аморт~Номінал', null, null, 15, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ARQ/100', 'N', 'Aq~`Нарах. аморт~Еквівалент', null, null, 5, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(ARQ) /100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'IR/100', 'N', 'Xn~`Визнані  %%~Номінал', null, null, 17, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'IRQ/100', 'N', 'Xq~`Визнані %%~Еквівалент', null, null, 7, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(IRQ) /100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KV', 'N', 'Код~вал', null, null, 2, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'MDAT', 'D', 'Звітна~дата', null, null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NR/100', 'N', 'Rn~`Нарах. %%~Номінал', null, null, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NRQ/100', 'N', 'Rq~`Нарах. %%~Еквівалент', null, null, 6, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(NRQ) /100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'VIDD', 'N', 'Вид~КД', null, null, 20, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'ZRQ/100', 'N', 'Aq + Rq - Xq~Дельта~Еквівалент', null, null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(ZRQ) /100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'ZZQ/100', 'N', 'Zq~Резерв вх~Еквівалент', null, null, 8, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(ZZQ) /100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'ZZ/100', 'N', 'Zq~Резерв вх~Номінал', null, null, 18, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'AR/100', 'N', 'An~`Нарах. аморт~Номінал', '', null, 15, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ARQ/100', 'N', 'Aq~`Нарах. аморт~Еквівалент', '', null, 5, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(ARQ) /100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'IR/100', 'N', 'Xn~`Визнані  %%~Номінал', '', null, 17, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'IRQ/100', 'N', 'Xq~`Визнані %%~Еквівалент', '', null, 7, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(IRQ) /100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KV', 'N', 'Код~вал', '', null, 2, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'MDAT', 'D', 'Звітна~дата', '', null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NR/100', 'N', 'Rn~`Нарах. %%~Номінал', '', null, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NRQ/100', 'N', 'Rq~`Нарах. %%~Еквівалент', '', null, 6, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(NRQ) /100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'VIDD', 'N', 'Вид~КД', '', null, 20, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'ZRQ/100', 'N', 'Aq + Rq - Xq~Дельта~Еквівалент', '', null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(ZRQ) /100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'ZZQ/100', 'N', 'Zq~Резерв вх~Еквівалент', '', null, 8, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(ZZQ) /100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'ZZ/100', 'N', 'Zq~Резерв вх~Номінал', '', null, 18, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CC_VIDD');

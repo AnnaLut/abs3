@@ -69,19 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_REPACCGRP_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REP_ACCGRP ADD CONSTRAINT FK_REPACCGRP_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_REPACCGRP_KF_NN ***
 begin   
  execute immediate '
@@ -110,10 +97,12 @@ exception when others then
 PROMPT *** Create  grants  REP_ACCGRP ***
 grant SELECT                                                                 on REP_ACCGRP      to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REP_ACCGRP      to BARS014;
+grant SELECT                                                                 on REP_ACCGRP      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REP_ACCGRP      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REP_ACCGRP      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REP_ACCGRP      to RPBN001;
 grant SELECT                                                                 on REP_ACCGRP      to TASK_LIST;
+grant SELECT                                                                 on REP_ACCGRP      to UPLD;
 grant FLASHBACK,SELECT                                                       on REP_ACCGRP      to WR_REFREAD;
 
 

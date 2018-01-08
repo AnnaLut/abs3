@@ -67,8 +67,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_ZVT ***
+grant SELECT                                                                 on TMP_ZVT         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_ZVT         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_ZVT         to START1;
+grant SELECT                                                                 on TMP_ZVT         to UPLD;
 
 
 

@@ -60,50 +60,10 @@ COMMENT ON COLUMN BARS.ESCR_REG_BODY.KF IS '';
 
 
 
-PROMPT *** Create  constraint PK_REG_SPEC_ID ***
+PROMPT *** Create  constraint CC_DEAL_EVENT_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ESCR_REG_BODY ADD CONSTRAINT PK_REG_SPEC_ID PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_REG_BODY_BL_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ESCR_REG_BODY ADD CONSTRAINT FK_REG_BODY_BL_ID FOREIGN KEY (DEAL_BUILD_ID)
-	  REFERENCES BARS.ESCR_BUILD_TYPES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DEAL_EVENT_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ESCR_REG_BODY ADD CONSTRAINT FK_DEAL_EVENT_ID FOREIGN KEY (DEAL_EVENT_ID)
-	  REFERENCES BARS.ESCR_EVENTS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DEAL_ADR_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ESCR_REG_BODY ADD CONSTRAINT CC_DEAL_ADR_ID CHECK (DEAL_ADR_ID is not null) ENABLE';
+  ALTER TABLE BARS.ESCR_REG_BODY ADD CONSTRAINT CC_DEAL_EVENT_ID CHECK (DEAL_EVENT_ID is not null) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -124,10 +84,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ESCR_REG_BODY_ID ***
+PROMPT *** Create  constraint CC_DEAL_ADR_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ESCR_REG_BODY ADD CONSTRAINT CC_ESCR_REG_BODY_ID CHECK (ID IS NOT NULL) ENABLE';
+  ALTER TABLE BARS.ESCR_REG_BODY ADD CONSTRAINT CC_DEAL_ADR_ID CHECK (DEAL_ADR_ID is not null) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -136,10 +96,24 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DEAL_EVENT_ID ***
+PROMPT *** Create  constraint PK_REG_SPEC_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ESCR_REG_BODY ADD CONSTRAINT CC_DEAL_EVENT_ID CHECK (DEAL_EVENT_ID is not null) ENABLE';
+  ALTER TABLE BARS.ESCR_REG_BODY ADD CONSTRAINT PK_REG_SPEC_ID PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_BODY_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ESCR_REG_BODY ADD CONSTRAINT CC_ESCR_REG_BODY_ID CHECK (ID IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -162,7 +136,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ESCR_REG_BODY ***
+grant SELECT                                                                 on ESCR_REG_BODY   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ESCR_REG_BODY   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on ESCR_REG_BODY   to UPLD;
 
 
 

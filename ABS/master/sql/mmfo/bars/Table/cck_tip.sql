@@ -89,9 +89,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CCK_TIP ***
+grant SELECT                                                                 on CCK_TIP         to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CCK_TIP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_TIP         to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CCK_TIP         to RCC_DEAL;
+grant SELECT                                                                 on CCK_TIP         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_TIP         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CCK_TIP         to WR_REFREAD;
 

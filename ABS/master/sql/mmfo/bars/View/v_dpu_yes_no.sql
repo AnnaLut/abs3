@@ -16,7 +16,9 @@ select 0, 'N', 'ͳ'
 ;
 
 PROMPT *** Create  grants  V_DPU_YES_NO ***
+grant SELECT                                                                 on V_DPU_YES_NO    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPU_YES_NO    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DPU_YES_NO    to UPLD;
 
 
 

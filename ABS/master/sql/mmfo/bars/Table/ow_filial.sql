@@ -83,19 +83,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OWFILIAL_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_FILIAL ADD CONSTRAINT FK_OWFILIAL_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_OWFILIAL_NLSGOU_NN ***
 begin   
  execute immediate '
@@ -122,9 +109,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_FILIAL ***
+grant SELECT                                                                 on OW_FILIAL       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OW_FILIAL       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_FILIAL       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_FILIAL       to OW;
+grant SELECT                                                                 on OW_FILIAL       to UPLD;
 grant FLASHBACK,SELECT                                                       on OW_FILIAL       to WR_REFREAD;
 
 

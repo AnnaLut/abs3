@@ -23,6 +23,7 @@ PROMPT *** Create  grants  STAFF ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF           to ABS_ADMIN;
 grant SELECT                                                                 on STAFF           to BARSAQ with grant option;
 grant SELECT                                                                 on STAFF           to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on STAFF           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF           to BASIC_INFO;
 grant SELECT                                                                 on STAFF           to DPT;
@@ -37,6 +38,7 @@ grant SELECT                                                                 on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF           to STAFF;
 grant SELECT                                                                 on STAFF           to START1;
 grant SELECT                                                                 on STAFF           to TOSS;
+grant SELECT                                                                 on STAFF           to UPLD;
 grant SELECT                                                                 on STAFF           to WEB_BALANS;
 grant SELECT                                                                 on STAFF           to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF           to WR_ALL_RIGHTS;

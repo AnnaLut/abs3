@@ -34,8 +34,10 @@ PROMPT *** Create  view V_S080 ***
  ;
 
 PROMPT *** Create  grants  V_S080 ***
+grant SELECT                                                                 on V_S080          to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_S080          to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_S080          to RCC_DEAL;
+grant SELECT                                                                 on V_S080          to UPLD;
 
 
 

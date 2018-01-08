@@ -20,7 +20,9 @@ join   list_item li on li.list_type_id = lt.id and li.is_active = 'Y'
 ;
 
 PROMPT *** Create  grants  V_ARM_RESOURCE_ACCESS_MODE ***
+grant SELECT                                                                 on V_ARM_RESOURCE_ACCESS_MODE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ARM_RESOURCE_ACCESS_MODE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ARM_RESOURCE_ACCESS_MODE to UPLD;
 
 
 

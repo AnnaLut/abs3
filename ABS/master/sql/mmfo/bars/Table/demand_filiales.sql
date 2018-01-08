@@ -129,11 +129,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  DEMAND_FILIALES ***
+grant SELECT                                                                 on DEMAND_FILIALES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEMAND_FILIALES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEMAND_FILIALES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEMAND_FILIALES to DEMAND;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEMAND_FILIALES to OBPC;
 grant SELECT                                                                 on DEMAND_FILIALES to START1;
+grant SELECT                                                                 on DEMAND_FILIALES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEMAND_FILIALES to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DEMAND_FILIALES to WR_REFREAD;
 

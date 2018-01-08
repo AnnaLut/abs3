@@ -63,10 +63,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010200 ***
+PROMPT *** Create  constraint SYS_C0010198 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OTCN_FD5_DOCS MODIFY (S NOT NULL ENABLE)';
+  ALTER TABLE BARS.OTCN_FD5_DOCS MODIFY (REF NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -87,16 +87,32 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010198 ***
+PROMPT *** Create  constraint SYS_C0010200 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OTCN_FD5_DOCS MODIFY (REF NOT NULL ENABLE)';
+  ALTER TABLE BARS.OTCN_FD5_DOCS MODIFY (S NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
+
+
+PROMPT *** Create  index I1_OTCN_FD5_DOCS ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I1_OTCN_FD5_DOCS ON BARS.OTCN_FD5_DOCS (ACC) ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
+PROMPT *** Create  grants  OTCN_FD5_DOCS ***
+grant SELECT                                                                 on OTCN_FD5_DOCS   to BARSREADER_ROLE;
+grant SELECT                                                                 on OTCN_FD5_DOCS   to UPLD;
 
 
 

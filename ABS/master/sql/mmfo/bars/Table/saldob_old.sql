@@ -87,10 +87,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SALDOB_KF_NN ***
+PROMPT *** Create  constraint CC_SALDOB_PDAT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SALDOB_OLD MODIFY (KF CONSTRAINT CC_SALDOB_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SALDOB_OLD ADD CONSTRAINT CC_SALDOB_PDAT CHECK (pdat = trunc(pdat)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -99,34 +99,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SALDOB_KOS_NN ***
+PROMPT *** Create  constraint CC_SALDOB_ACC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SALDOB_OLD MODIFY (KOS CONSTRAINT CC_SALDOB_KOS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SALDOB_DOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SALDOB_OLD MODIFY (DOS CONSTRAINT CC_SALDOB_DOS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SALDOB_OSTF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SALDOB_OLD MODIFY (OSTF CONSTRAINT CC_SALDOB_OSTF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SALDOB_OLD MODIFY (ACC CONSTRAINT CC_SALDOB_ACC_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -147,10 +123,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SALDOB_PDAT ***
+PROMPT *** Create  constraint CC_SALDOB_OSTF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SALDOB_OLD ADD CONSTRAINT CC_SALDOB_PDAT CHECK (pdat = trunc(pdat)) ENABLE';
+  ALTER TABLE BARS.SALDOB_OLD MODIFY (OSTF CONSTRAINT CC_SALDOB_OSTF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -159,11 +135,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SALDOB_ACCOUNTS2 ***
+PROMPT *** Create  constraint CC_SALDOB_DOS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SALDOB_OLD ADD CONSTRAINT FK_SALDOB_ACCOUNTS2 FOREIGN KEY (KF, ACC)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
+  ALTER TABLE BARS.SALDOB_OLD MODIFY (DOS CONSTRAINT CC_SALDOB_DOS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -172,11 +147,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SALDOB_KF ***
+PROMPT *** Create  constraint CC_SALDOB_KOS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SALDOB_OLD ADD CONSTRAINT FK_SALDOB_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+  ALTER TABLE BARS.SALDOB_OLD MODIFY (KOS CONSTRAINT CC_SALDOB_KOS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -185,10 +159,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SALDOB_ACC_NN ***
+PROMPT *** Create  constraint CC_SALDOB_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SALDOB_OLD MODIFY (ACC CONSTRAINT CC_SALDOB_ACC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SALDOB_OLD MODIFY (KF CONSTRAINT CC_SALDOB_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -213,9 +187,11 @@ exception when others then
 PROMPT *** Create  grants  SALDOB_OLD ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDOB_OLD      to ABS_ADMIN;
 grant SELECT                                                                 on SALDOB_OLD      to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on SALDOB_OLD      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDOB_OLD      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALDOB_OLD      to RPBN001;
 grant SELECT                                                                 on SALDOB_OLD      to START1;
+grant SELECT                                                                 on SALDOB_OLD      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SALDOB_OLD      to WR_ALL_RIGHTS;
 
 

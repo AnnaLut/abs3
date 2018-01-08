@@ -111,18 +111,9 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint FK_RKO_SIGNATORY_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.RKO_SIGNATORY ADD CONSTRAINT FK_RKO_SIGNATORY_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
+PROMPT *** Create  grants  RKO_SIGNATORY ***
+grant SELECT                                                                 on RKO_SIGNATORY   to BARSREADER_ROLE;
+grant SELECT                                                                 on RKO_SIGNATORY   to UPLD;
 
 
 

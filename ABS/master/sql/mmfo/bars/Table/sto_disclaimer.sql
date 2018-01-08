@@ -60,12 +60,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010908 ***
+PROMPT *** Create  constraint SYS_C0010053 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STO_DISCLAIMER ADD PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.STO_DISCLAIMER MODIFY (NAME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -86,10 +84,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010053 ***
+PROMPT *** Create  constraint SYS_C0010908 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STO_DISCLAIMER MODIFY (NAME NOT NULL ENABLE)';
+  ALTER TABLE BARS.STO_DISCLAIMER ADD PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -112,9 +112,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  STO_DISCLAIMER ***
+grant SELECT                                                                 on STO_DISCLAIMER  to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on STO_DISCLAIMER  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STO_DISCLAIMER  to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on STO_DISCLAIMER  to STO;
+grant SELECT                                                                 on STO_DISCLAIMER  to UPLD;
 
 
 

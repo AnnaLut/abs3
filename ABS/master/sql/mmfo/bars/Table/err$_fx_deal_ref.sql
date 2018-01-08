@@ -57,6 +57,10 @@ COMMENT ON COLUMN BARS.ERR$_FX_DEAL_REF.SOS IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_FX_DEAL_REF ***
+grant SELECT                                                                 on ERR$_FX_DEAL_REF to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_FX_DEAL_REF to UPLD;
+
 
 
 PROMPT ===================================================================================== 

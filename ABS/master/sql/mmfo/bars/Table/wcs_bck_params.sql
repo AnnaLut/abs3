@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_BCK_PARAMS ***
+grant SELECT                                                                 on WCS_BCK_PARAMS  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_BCK_PARAMS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_BCK_PARAMS  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_BCK_PARAMS  to START1;
+grant SELECT                                                                 on WCS_BCK_PARAMS  to UPLD;
 
 
 

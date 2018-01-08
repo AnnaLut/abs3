@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.ERR$_P12_2C.TXT IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_P12_2C ***
+grant SELECT                                                                 on ERR$_P12_2C     to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_P12_2C     to UPLD;
+
 
 
 PROMPT ===================================================================================== 

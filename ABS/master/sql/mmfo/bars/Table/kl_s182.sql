@@ -50,9 +50,11 @@ COMMENT ON COLUMN BARS.KL_S182.TXT IS '';
 
 PROMPT *** Create  grants  KL_S182 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_S182         to ABS_ADMIN;
+grant SELECT                                                                 on KL_S182         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_S182         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_S182         to BARS_DM;
 grant SELECT                                                                 on KL_S182         to START1;
+grant SELECT                                                                 on KL_S182         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_S182         to WR_ALL_RIGHTS;
 
 

@@ -93,6 +93,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  SEC_DDL_AUDIT ***
+grant SELECT                                                                 on SEC_DDL_AUDIT   to BARSREADER_ROLE;
 grant SELECT                                                                 on SEC_DDL_AUDIT   to BARSUPL;
 grant SELECT                                                                 on SEC_DDL_AUDIT   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEC_DDL_AUDIT   to BARS_DM;

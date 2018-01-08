@@ -1,6 +1,10 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_2401.sql =========*** Run *** ==
 PROMPT ===================================================================================== 
+
+
 PROMPT *** Create  procedure P_2401 ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_2401 (DAT01_ date ) IS
@@ -11,10 +15,10 @@ PROMPT *** Create  procedure P_2401 ***
  13) 11-10-2017(2.9) - По Крыму нет портфельного метода
  12) 11-10-2017(2.8) - ('3578','3579','3570') через таблицу REZ_DEB
  11) 11-10-2017(2.7) - Деб.>3 мес. не вклюсать в группу +  поиск в БПК исключить сам счет деб.
- 10) 05-10-2017(2.6) - SP_30_OSBB вынесла из курсора 
+ 10) 05-10-2017(2.6) - SP_30_OSBB вынесла из курсора
   9) 03-10-2017(2.5) - cc_deal убрала из выборки по  RNK (тормозило)
-  8) 02-10-2017(2.4) - Commit 1000 записей 
-  7) 27-09-2017(2.3) - SP_bpk_50(b.nd, dat01_ ) sp_  COBUSUPABS-5466 - не рассматривается просрочка и ресруктуризация 
+  8) 02-10-2017(2.4) - Commit 1000 записей
+  7) 27-09-2017(2.3) - SP_bpk_50(b.nd, dat01_ ) sp_  COBUSUPABS-5466 - не рассматривается просрочка и ресруктуризация
   6) 12-09-2017 - Для ОСББ определение просрочки SP_30_OSBB(d.nd, dat01_ ) >30 дней
   5) 05-09-2017 - По ОСББ добавлен k050 = 320
   4) 06-03-2017 - Индекс rez_w4_bpk по РНК + убрала счет (2620 ? ? зачем был не понятно)
@@ -42,12 +46,12 @@ begin
    z23.to_log_rez (user_id , 1 , dat01_ ,'start - delete from rnk_nd_port;');
    delete from rnk_nd_port;
    z23.to_log_rez (user_id , 1 , dat01_ ,'end   - delete from rnk_nd_port;');
-   if sys_context('bars_context','user_mfo') = '324805' THEN 
+   if sys_context('bars_context','user_mfo') = '324805' THEN
       z23.to_log_rez (user_id , 1 , dat01_ ,'Окончание p_2401 + ОСББ (КРИМ - нет Группы)');
       return;
    end if;
    if REZ_PORT_=1 THEN
-   for k in (select distinct b.nd,b.rnk,decode(b.tip_kart,42,'W4','BPK') tip, b.grp, 0 restr, 
+   for k in (select distinct b.nd,b.rnk,decode(b.tip_kart,42,'W4','BPK') tip, b.grp, 0 restr,
                     0 sp_  --SP_bpk_50(b.nd, dat01_ ) sp_  COBUSUPABS-5466 - не рассматривается просрочка и ресруктуризация
              from   rez_w4_bpk b, accounts a
              where  s250=8 and b.acc = a.acc and a.nbs not in ('3550','3551','9129','3570','3578')
@@ -60,10 +64,10 @@ begin
              from   cc_deal d, nd_open o, tmp_nbs_2401 t, CUSTOMER C
              where  d.nd = o.nd and o.fdat = dat01_ and substr(d.prod,1,6) = t.nbs||t.ob22 and t.grp = 4 and d.rnk = c.rnk and c.k050 in ('855', '320')
              union  all
-             select a.acc nd,a.rnk,'DEB' tip,6 grp, 0 restr, 0 sp_ from accounts a, rez_deb r 
+             select a.acc nd,a.rnk,'DEB' tip,6 grp, 0 restr, 0 sp_ from accounts a, rez_deb r
              where a.nbs=r.nbs and r.deb = 1 and a.nbs is not null and (a.dazs is null or a.dazs >= dat01_)
              and a.acc not in ( select accc from accounts where nbs is null and substr(nls,1,4)='3541' and accc is not null )
-             and ost_korr(a.acc,dat31_,null,a.nbs) <0 
+             and ost_korr(a.acc,dat31_,null,a.nbs) <0
              order by rnk
             )
    LOOP
@@ -88,7 +92,7 @@ begin
             end if;
          --elsif k.tip in ('DEB') and f_days_past_due (dat01_, k.nd, 0) >= 90 THEN l_restr := 1;
 */
-         elsif k.tip in ('OSBB')               THEN 
+         elsif k.tip in ('OSBB')               THEN
                if SP_30_OSBB(k.nd, dat01_ ) = 0 THEN  l_restr := 0;
                else                                   l_restr := 1;
                end if;
@@ -104,11 +108,11 @@ begin
                   SELECT kv, - ost_korr(a.acc,dat31_,null,a.nbs) INTO l_kv, l_ost  FROM ACCOUNTS A  WHERE  a.acc = k.nd;
                EXCEPTION WHEN NO_DATA_FOUND THEN l_kv  := null;
                end;
-   
+
                if l_custtype = 2  THEN l_del := 50000;
                else                    l_del := 25000;
                end if;
-      
+
                if l_kv = 980 THEN l_del_kv := l_del;
                else               l_del_kv := p_ncurval(l_kv,l_del,dat31_);
                end if;
@@ -118,7 +122,7 @@ begin
                end if;
                --logger.info('DEB_351 2 : acc = ' || k.nd || ' l_kol = ' || l_kol  ) ;
                if l_kol >= 90 THEN l_restr := 1;  else l_restr := 0; end if;
-            end if; 
+            end if;
          else
             l_restr := k.restr;
          end if;
@@ -135,7 +139,7 @@ begin
                             and  (dazs is null or dazs>=dat01_) and a.rnk=k.rnk group by a.rnk
                      union all
                      select rnk,sum(-p_icurval(kv,ost_korr(acc,dat31_,null,nbs),dat31_))
-                     from accounts where nbs in (select nbs from rez_deb where grupa = 1 and deb=1 and ( d_close is null or d_close > dat01_ ) ) 
+                     from accounts where nbs in (select nbs from rez_deb where grupa = 1 and deb=1 and ( d_close is null or d_close > dat01_ ) )
                                          and (dazs is null or dazs>=dat01_)  and rnk = k.rnk  --('3578','3579','3570')
                      group by rnk) f
                where  rnk=k.rnk group by rnk; --f.ost<5000000
@@ -156,7 +160,7 @@ begin
                         else raise;
                         end if;
                      end;
-                     l_commit := l_commit + 1; 
+                     l_commit := l_commit + 1;
                      If l_commit >= 1000 then  commit;  l_commit:= 0 ; end if;
 
                      --if k.tip = 'BPK' THEN

@@ -47,9 +47,11 @@ COMMENT ON COLUMN BARS.TMP_BPK_ARSENAL.TARIF IS '';
 
 
 PROMPT *** Create  grants  TMP_BPK_ARSENAL ***
+grant SELECT                                                                 on TMP_BPK_ARSENAL to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_BPK_ARSENAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_BPK_ARSENAL to BARS_DM;
 grant SELECT                                                                 on TMP_BPK_ARSENAL to RPBN001;
+grant SELECT                                                                 on TMP_BPK_ARSENAL to UPLD;
 
 
 

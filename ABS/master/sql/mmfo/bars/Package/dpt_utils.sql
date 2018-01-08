@@ -1,4 +1,10 @@
-create or replace package DPT_UTILS
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpt_utils.sql =========*** Run *** =
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.DPT_UTILS 
 is
   head_ver  constant varchar2(64)  := 'version 1.16 12.04.2016';
   head_awk  constant varchar2(512) := '';
@@ -122,18 +128,16 @@ is
   );
 
 
-END DPT_UTILS;
+END;
 /
-
-show errors;
-
-create or replace package body DPT_UTILS
+CREATE OR REPLACE PACKAGE BODY BARS.DPT_UTILS 
 is
 --
 -- constants
 --
-body_ver  constant varchar2(64)  := 'version 1.25 05.01.2017';
-body_awk  constant varchar2(512) := '';
+body_ver  constant varchar2(64)  := 'version 1.23 12.04.2016';
+body_awk  constant varchar2(512) := ''
+;
 
 modcod    constant varchar2(3)   := 'DPT';
 nlchr     constant char(2)       := chr(13)||chr(10);
@@ -1328,7 +1332,7 @@ end clob2str;
 ---
 -- Повертає insert на заповнення вказаної таблиці 
 ---
-function GET_INSERT4TABLE
+function get_insert4table
 ( p_tab_name    all_tab_cols.table_name%type
 , p_condition   varchar2
 , p_offset      number                  default 0
@@ -1343,7 +1347,7 @@ is
    p_owner     - власник таблиці (назва схеми)
    p_mode      - режим формування DML інструкції (I - only insert, M - insert and update)
   */
-  title   constant  varchar2(32) := 'DPT_UTILS.GET_INSERT4TABLE';
+  title   constant  varchar2(30) := 'DPT_UTILS.GET_INSERT4TABLE: ';
   
   l_cols_list_tab   dbms_utility.uncl_array;
   l_cols_type_tab   dbms_utility.name_array;
@@ -1351,7 +1355,7 @@ is
   l_cols_list_str   VARCHAR2(1000);
   l_pkey_cols_tab   dbms_utility.uncl_array;
   l_pkey_cols_cnt   PLS_INTEGER;
-  l_pkey_column     VARCHAR2(30);
+  l_pkey_column     VARCHAR2(100);
   --
   l_Cursor          integer;
   l_status          integer;
@@ -1376,12 +1380,12 @@ is
   ) is
   begin
     -- якщо поле входить в перв.ключ
-    if (p_col_name = l_pkey_column)
+    if (p_col_name = l_pkey_column) 
     then
       
       l_sTmp3 := case 
-                   when (l_sTmp3 Is Null) then ''
-                   else (l_sTmp3 || nlchr || l_offset || '       and ')
+                   when (l_sTmp3 Is Null) then '' 
+                   else (l_sTmp3 || nlchr || l_offset || '   and ')
                  end || p_col_name || ' = ' || chr(39) || dblquote(p_col_value) || chr(39);
     else
       
@@ -1392,7 +1396,7 @@ is
         l_sTmp2 := l_sTmp2 || p_col_name || ' = ' || chr(39) || dblquote(p_col_value) || chr(39);
       end if;
     
-      l_sTmp2 := l_sTmp2|| ',' || nlchr || l_offset || '           ';
+      l_sTmp2 := l_sTmp2|| ', ' || nlchr || l_offset || '           ';
       
     end if;
     
@@ -1406,12 +1410,12 @@ is
   ) is
   begin
     -- якщо поле входить в перв.ключ
-    if (p_col_name = l_pkey_column)
+    if (p_col_name = l_pkey_column) 
     then
       
       l_sTmp3 := case 
-                   when (l_sTmp3 Is Null) then ''
-                   else (l_sTmp3 || nlchr || l_offset || '       and ')
+                   when (l_sTmp3 Is Null) then '' 
+                   else (l_sTmp3 || nlchr || l_offset || '   and ')
                  end || p_col_name || ' = ' || to_char(p_col_value);
       
     else
@@ -1423,7 +1427,7 @@ is
         l_sTmp2 := l_sTmp2 || p_col_name || ' = ' || to_char(p_col_value);
       end if;
       
-      l_sTmp2 := l_sTmp2|| ',' || nlchr || l_offset || '           ';
+      l_sTmp2 := l_sTmp2|| ', ' || nlchr || l_offset || '           ';
       
     end if;
     
@@ -1436,13 +1440,13 @@ is
     p_col_value  in  date
   ) is
   begin
-    -- якщо поле входить в PK
-    if (p_col_name = l_pkey_column)
+    -- якщо поле входить в перв.ключ
+    if (p_col_name = l_pkey_column) 
     then
       
       l_sTmp3 := case 
-                 when (l_sTmp3 Is Null) then ''
-                 else (l_sTmp3 || nlchr || l_offset || '       and ')
+                   when (l_sTmp3 Is Null) then '' 
+                   else (l_sTmp3 || nlchr || l_offset || '   and ')
                  end || p_col_name || ' = to_date(' || chr(39) || to_char(p_col_value, 'dd/mm/yyyy') || chr(39) || ',''dd/mm/yyyy'')';
     else
     
@@ -1459,7 +1463,7 @@ is
         
       end if;
       
-      l_sTmp2 := l_sTmp2|| ',' || nlchr || l_offset || '           ';
+      l_sTmp2 := l_sTmp2|| ', ' || nlchr || l_offset || '           ';
       
     end if;
     
@@ -1480,7 +1484,7 @@ is
       l_sTmp2 := l_sTmp2 || p_col_name || ' = ' || chr(39) || replace(p_col_value, chr(39), chr(39)||chr(39)) || chr(39);
     end if;
     
-    l_sTmp2 := l_sTmp2|| ',' || nlchr || l_offset || '           ';
+    l_sTmp2 := l_sTmp2|| ', ' || nlchr || l_offset || '           ';
     
     /*
     l_tmp := length(l_uplsql_row.sql_text);
@@ -1513,31 +1517,33 @@ is
   --
   -- повертає к-т полів в PRIMARY_KEY
   --
-  function GET_PKEY_COLS_COUNT
+  function get_pkey_cols_count
     return pls_integer
   is
     l_cnt  pls_integer := 0;
   begin
-
+    
     for i in l_pkey_cols_tab.first .. l_pkey_cols_tab.last
     loop
       
-      if ( l_pkey_cols_tab(i) is Not Null )
+      if (l_pkey_cols_tab(i) is Null)
       then
         l_cnt := l_cnt + 1;
       end if;
       
     end loop;
     
+    bars_audit.info( 'GET_PKEY_COLS_COUNT exit with: ' || to_char(get_pkey_cols_count) );
+    
     return l_cnt;
     
-  end GET_PKEY_COLS_COUNT;
+  end get_pkey_cols_count;
   ---
 begin
-
+  
   bars_audit.trace( '%s: Start with ( tab_name = %s, condition = %s, offset = %s, mode = %s ).'
                   , title, nvl(p_tab_name,'null'), nvl(p_condition,'null'), to_char(p_offset), p_mode );
-
+  
   dbms_application_info.set_action( 'DPT_UTILS.GET_INSERT4TABLE' );
   
   dbms_application_info.set_client_info( 'tab_name=' || nvl(p_tab_name,'null') || ', condition=' || nvl(p_condition,'null') );
@@ -1593,12 +1599,12 @@ begin
   dbms_application_info.set_client_info( 'count pkey columns' );
   
   -- к-ть полів що входять у PRIMARY_KEY
-  l_pkey_cols_cnt := GET_PKEY_COLS_COUNT();
+  l_pkey_cols_cnt := get_pkey_cols_count();
   
   dbms_application_info.set_client_info( 'pkey_cols_cnt = ' || to_char(l_pkey_cols_cnt) );
   
   -- к-ть полів (l_cols_count) та перелік полів таблиці розділених комою (l_cols_list_str)
-  DBMS_UTILITY.TABLE_TO_COMMA( l_cols_list_tab, l_cols_count, l_cols_list_str );
+  dbms_utility.table_to_comma(l_cols_list_tab, l_cols_count, l_cols_list_str);
   
   l_Cursor := dbms_sql.open_cursor;
   
@@ -1665,16 +1671,16 @@ begin
     if ( p_mode = 'I')
     then
       
-      l_text := l_text || l_offset || 'Insert into ' || l_owner || '.' || l_tbl_nm || nlchr;
-      l_text := l_text || l_offset || '  ( ' || l_cols_list_str || ' )'            || nlchr;
-      l_text := l_text || l_offset || 'Values '                                    || nlchr;
+      l_text := l_text || 'Insert into ' || l_owner || '.' || l_tbl_nm ||nlchr;
+      l_text := l_text || '  ( ' || l_cols_list_str || ' ) '              ||nlchr;
+      l_text := l_text || 'Values '                                       ||nlchr;
       
     else
 
-      l_text := l_text || l_offset || 'begin'                                        || nlchr;
-      l_text := l_text || l_offset || '  Insert into ' || l_owner || '.' || l_tbl_nm || nlchr;
-      l_text := l_text || l_offset || '    ( ' || l_cols_list_str || ' )'            || nlchr;
-      l_text := l_text || l_offset || '  Values '                                    || nlchr;
+      l_text := l_text || l_offset ||'begin '                                         ||nlchr;
+      l_text := l_text || l_offset ||'  Insert into ' || l_owner || '.' || l_tbl_nm ||nlchr;
+      l_text := l_text || l_offset ||'    ( ' || l_cols_list_str || ' ) '             ||nlchr;
+      l_text := l_text || l_offset ||'  Values '                                      ||nlchr;
       
     end if;
     
@@ -1774,7 +1780,7 @@ begin
         l_sTmp2 := SubStr(l_sTmp2, 1, length(l_sTmp2) - (15+p_offset));
       end if;
       
-    end loop on_columns;
+    end loop on_columns; 
     
     bars_audit.trace( '%s values ( %s )', title, l_sTmp );
     dbms_application_info.set_client_info( 'finished make statment for row ' || to_char(DBMS_SQL.LAST_ROW_COUNT) );
@@ -1786,69 +1792,61 @@ begin
       
     else
 
-      l_text := l_text   || l_offset ||'    ( ' || l_sTmp || ' );'                    ||nlchr;
-      l_text := l_text   || l_offset ||'  dbms_output.put_line( ''1 row created.'' );'||nlchr;
-      l_text := l_text   || l_offset ||'exception'                                    ||nlchr;
-      l_text := l_text   || l_offset ||'  when DUP_VAL_ON_INDEX then'                 ||nlchr;
+      l_text := l_text   || l_offset ||'    ( ' || l_sTmp || ' ); '                   ||nlchr;
+      l_text := l_text   || l_offset ||'  dbms_output.put_line(''1 row created.'');'  ||nlchr;
+      l_text := l_text   || l_offset ||'exception '                                   ||nlchr;
+      l_text := l_text   || l_offset ||'  when DUP_VAL_ON_INDEX then '                ||nlchr;
       
       -- якщо к-ть полів таблиці = к-ті полів в індексі (INDEX ORGANIZED) то null
       If (l_cols_count = l_pkey_cols_cnt)
       Then
-        l_text := l_text || l_offset ||'    null;'                                      ||nlchr;
+        l_text := l_text || l_offset ||'    null; '                    ||nlchr;
       Else
-        l_text := l_text || l_offset ||'    update ' || l_owner || '.' || l_tbl_nm      ||nlchr;
-        l_text := l_text || l_offset ||'       set ' || l_sTmp2                         ||nlchr;
-        l_text := l_text || l_offset ||'     where ' || l_sTmp3 || ';'                  ||nlchr;
-        l_text := l_text || l_offset ||'    dbms_output.put_line( ''1 row updated.'' );'||nlchr;
+        l_text := l_text || l_offset ||'    update ' || l_owner || '.' || l_tbl_nm  ||nlchr;
+        l_text := l_text || l_offset ||'       set ' || l_sTmp2                       ||nlchr;
+        l_text := l_text || l_offset ||'     where ' || l_sTmp3 || ';'                ||nlchr;
+        l_text := l_text || l_offset ||'    dbms_output.put_line(''1 row updated.'');'||nlchr;
       End If;
-
-      l_text := l_text   || l_offset ||'end;'                                           ||nlchr;
-
+      
+      l_text := l_text   || l_offset ||'end; '                                        ||nlchr;
+      
       if ( p_offset = 0 ) 
       then -- для звичайної вигрузки інсертів додаємо символ "/"
         l_text := l_text || '/ '                   || nlchr;
       end if;
-
+    
     end if;
-
+    
     l_text := l_text || nlchr;
-
+    
   end loop;
-
-  l_cols_list_tab.delete();
-  l_cols_type_tab.delete();
-  l_pkey_cols_tab.delete();
-
-  IF DBMS_SQL.IS_OPEN( l_Cursor )
+  
+  IF DBMS_SQL.IS_OPEN( l_Cursor ) 
   THEN
     DBMS_SQL.CLOSE_CURSOR( l_Cursor );
   END IF;
-
+  
   dbms_application_info.set_module(NULL,NULL);
   dbms_application_info.set_client_info(Null);
-
+    
   bars_audit.trace( '%s Exit.', title );
-
+  
   return l_text;
   
 exception
   when OTHERS then
     
-    l_cols_list_tab.delete();
-    l_cols_type_tab.delete();
-    l_pkey_cols_tab.delete();
-
     IF DBMS_SQL.IS_OPEN( l_Cursor ) 
     THEN
       DBMS_SQL.CLOSE_CURSOR( l_Cursor );
     END IF;
     
     DBMS_LOB.close( l_text );
-    DBMS_LOB.FREETEMPORARY( l_text );
+    DBMS_LOB.FREETEMPORARY( l_text ); 
     
-    RAISE_APPLICATION_ERROR( -20666, dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace(), true );
+    raise_application_error( -20000, dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace(), true );
     
-end GET_INSERT4TABLE;
+end get_insert4table;
 
 --
 -- створення сценарію вивантаження даних таблиці DPT_BRATES 
@@ -2205,10 +2203,10 @@ begin
   end;
   
   for k in ( select d.acc, i.acrb, a.nls, p.g67
-               from DPT_DEPOSIT  d,
-                    INT_ACCN     i,
-                    ACCOUNTS     a,
-                    PROC_DR$BASE p
+               from bars.DPT_DEPOSIT  d,
+                    bars.INT_ACCN     i,
+                    bars.ACCOUNTS     a,
+                    bars.PROC_DR$BASE p
               where d.vidd = p_vidd
                 and (i.acc = d.acc and i.id = l_id)
                 and a.acc = i.acrB
@@ -2453,8 +2451,16 @@ end TRANSFER_LOG2ARCHIVE;
 
 END DPT_UTILS;
 /
+ show err;
+ 
+PROMPT *** Create  grants  DPT_UTILS ***
+grant EXECUTE                                                                on DPT_UTILS       to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on DPT_UTILS       to DPT_ADMIN;
+grant EXECUTE                                                                on DPT_UTILS       to VKLAD;
 
-show err;
-
-grant EXECUTE on DPT_UTILS to BARS_ACCESS_DEFROLE;
-grant EXECUTE on DPT_UTILS to DPT_ADMIN;
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_utils.sql =========*** End *** =
+ PROMPT ===================================================================================== 
+ 

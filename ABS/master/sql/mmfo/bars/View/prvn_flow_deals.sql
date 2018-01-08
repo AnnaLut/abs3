@@ -23,8 +23,10 @@ PROMPT *** Create  view PRVN_FLOW_DEALS ***
  where c.id = v.id(+);
 
 PROMPT *** Create  grants  PRVN_FLOW_DEALS ***
+grant SELECT                                                                 on PRVN_FLOW_DEALS to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on PRVN_FLOW_DEALS to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on PRVN_FLOW_DEALS to START1;
+grant SELECT                                                                 on PRVN_FLOW_DEALS to UPLD;
 
 
 

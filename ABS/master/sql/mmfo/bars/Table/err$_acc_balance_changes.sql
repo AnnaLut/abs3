@@ -75,6 +75,10 @@ COMMENT ON COLUMN BARS.ERR$_ACC_BALANCE_CHANGES.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ACC_BALANCE_CHANGES ***
+grant SELECT                                                                 on ERR$_ACC_BALANCE_CHANGES to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ACC_BALANCE_CHANGES to UPLD;
+
 
 
 PROMPT ===================================================================================== 

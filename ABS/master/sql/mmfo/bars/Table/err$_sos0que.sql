@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.ERR$_SOS0QUE.REF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_SOS0QUE ***
+grant SELECT                                                                 on ERR$_SOS0QUE    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_SOS0QUE    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

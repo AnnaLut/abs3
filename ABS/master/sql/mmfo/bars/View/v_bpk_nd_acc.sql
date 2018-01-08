@@ -27,8 +27,10 @@ union
 select nd, 'ACC_2209', acc_2209 from bpk_acc;
 
 PROMPT *** Create  grants  V_BPK_ND_ACC ***
+grant SELECT                                                                 on V_BPK_ND_ACC    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BPK_ND_ACC    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BPK_ND_ACC    to OBPC;
+grant SELECT                                                                 on V_BPK_ND_ACC    to UPLD;
 
 
 

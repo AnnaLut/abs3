@@ -56,8 +56,10 @@ where o.ref  = d1.ref   and      t.tt   = d1.tt     and
       k2.kv  = 980      and      t.tt not in ('R01','D01');
 
 PROMPT *** Create  grants  BUCH_D ***
+grant SELECT                                                                 on BUCH_D          to BARSREADER_ROLE;
 grant SELECT                                                                 on BUCH_D          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BUCH_D          to START1;
+grant SELECT                                                                 on BUCH_D          to UPLD;
 
 
 

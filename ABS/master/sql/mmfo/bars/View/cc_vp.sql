@@ -32,8 +32,10 @@ PROMPT *** Create  view CC_VP ***
  ;
 
 PROMPT *** Create  grants  CC_VP ***
+grant SELECT                                                                 on CC_VP           to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on CC_VP           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_VP           to RCC_DEAL;
+grant SELECT                                                                 on CC_VP           to UPLD;
 grant FLASHBACK,SELECT                                                       on CC_VP           to WR_REFREAD;
 
 

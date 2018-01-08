@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_BRANCH_COUNTRY_RNK.RNK IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_BRANCH_COUNTRY_RNK ***
+grant SELECT                                                                 on ERR$_BRANCH_COUNTRY_RNK to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_BRANCH_COUNTRY_RNK to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -101,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BANK_METALS_ACTION ***
+grant SELECT                                                                 on BANK_METALS_ACTION to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BANK_METALS_ACTION to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BANK_METALS_ACTION to BARS_DM;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BANK_METALS_ACTION to START1;
+grant SELECT                                                                 on BANK_METALS_ACTION to UPLD;
 
 
 

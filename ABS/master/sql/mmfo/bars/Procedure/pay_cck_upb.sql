@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure PAY_CCK_UPB ***
 
-CREATE OR REPLACE PROCEDURE BARS.PAY_CCK_UPB
+  CREATE OR REPLACE PROCEDURE BARS.PAY_CCK_UPB 
               (flg_  SMALLINT DEFAULT NULL,  -- Plan/Fact flg
                ref_  INTEGER,    -- Reference
                dat_  DATE,       -- Value Date
@@ -811,8 +811,12 @@ bars_audit.trace('PAY_CCK_UPB: D='||sum1D_||', M='||sum1M_||', T='||sum1T_ ||', 
   end if;
 end PAY_CCK_UPB;
 /
+show err;
 
-grant execute on PAY_CCK_UPB to bars_access_defrole;
+PROMPT *** Create  grants  PAY_CCK_UPB ***
+grant EXECUTE                                                                on PAY_CCK_UPB     to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on PAY_CCK_UPB     to WR_ALL_RIGHTS;
+
 
 
 PROMPT ===================================================================================== 

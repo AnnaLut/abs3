@@ -55,12 +55,10 @@ COMMENT ON COLUMN BARS.BU1.KOEF_PLAN IS 'приращения плана бюджета';
 
 
 
-PROMPT *** Create  constraint PK_BU1 ***
+PROMPT *** Create  constraint CC_BU1_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BU1 ADD CONSTRAINT PK_BU1 PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI  ENABLE';
+  ALTER TABLE BARS.BU1 ADD CONSTRAINT CC_BU1_ID_NN CHECK (ID IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -69,10 +67,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BU1_ID_NN ***
+PROMPT *** Create  constraint PK_BU1 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BU1 ADD CONSTRAINT CC_BU1_ID_NN CHECK (ID IS NOT NULL) ENABLE';
+  ALTER TABLE BARS.BU1 ADD CONSTRAINT PK_BU1 PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYNI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -96,11 +96,13 @@ exception when others then
 
 PROMPT *** Create  grants  BU1 ***
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on BU1             to ABS_ADMIN;
+grant SELECT                                                                 on BU1             to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on BU1             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BU1             to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BU1             to BU;
 grant SELECT                                                                 on BU1             to SALGL;
 grant SELECT                                                                 on BU1             to START1;
+grant SELECT                                                                 on BU1             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BU1             to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BU1             to WR_REFREAD;
 

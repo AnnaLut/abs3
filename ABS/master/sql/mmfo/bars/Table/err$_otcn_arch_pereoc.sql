@@ -73,6 +73,10 @@ COMMENT ON COLUMN BARS.ERR$_OTCN_ARCH_PEREOC.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_OTCN_ARCH_PEREOC ***
+grant SELECT                                                                 on ERR$_OTCN_ARCH_PEREOC to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_OTCN_ARCH_PEREOC to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -54,7 +54,9 @@ COMMENT ON COLUMN BARS.KL_K114.D_MODE IS '';
 
 
 PROMPT *** Create  grants  KL_K114 ***
+grant SELECT                                                                 on KL_K114         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_K114         to BARS_DM;
+grant SELECT                                                                 on KL_K114         to UPLD;
 
 
 

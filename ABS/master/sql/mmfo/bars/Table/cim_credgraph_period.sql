@@ -77,34 +77,10 @@ COMMENT ON COLUMN BARS.CIM_CREDGRAPH_PERIOD.PERCENT_DAY IS 'Дата погашення відсо
 
 
 
-PROMPT *** Create  constraint CC_CIMCGPERIOD_CRMETHOD_NN ***
+PROMPT *** Create  constraint CC_CIMCGPERIOD_PAYDELAY_CHECK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_CREDGRAPH_PERIOD MODIFY (CR_METHOD CONSTRAINT CC_CIMCGPERIOD_CRMETHOD_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CIMCGPERIOD_PERCENTDAY_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIM_CREDGRAPH_PERIOD MODIFY (PERCENT_DAY CONSTRAINT CC_CIMCGPERIOD_PERCENTDAY_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CIMCGPERIOD_CONTRID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIM_CREDGRAPH_PERIOD MODIFY (CONTR_ID CONSTRAINT CC_CIMCGPERIOD_CONTRID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_CREDGRAPH_PERIOD ADD CONSTRAINT CC_CIMCGPERIOD_PAYDELAY_CHECK CHECK (payment_delay>=0) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -125,10 +101,34 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMCGPERIOD_PAYDELAY_CHECK ***
+PROMPT *** Create  constraint CC_CIMCGPERIOD_CONTRID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_CREDGRAPH_PERIOD ADD CONSTRAINT CC_CIMCGPERIOD_PAYDELAY_CHECK CHECK (payment_delay>=0) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CIM_CREDGRAPH_PERIOD MODIFY (CONTR_ID CONSTRAINT CC_CIMCGPERIOD_CONTRID_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CIMCGPERIOD_ENDDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_CREDGRAPH_PERIOD MODIFY (END_DATE CONSTRAINT CC_CIMCGPERIOD_ENDDATE_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CIMCGPERIOD_CRMETHOD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_CREDGRAPH_PERIOD MODIFY (CR_METHOD CONSTRAINT CC_CIMCGPERIOD_CRMETHOD_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -257,10 +257,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMCGPERIOD_ENDDATE_NN ***
+PROMPT *** Create  constraint CC_CIMCGPERIOD_PERCENTDAY_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_CREDGRAPH_PERIOD MODIFY (END_DATE CONSTRAINT CC_CIMCGPERIOD_ENDDATE_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_CREDGRAPH_PERIOD MODIFY (PERCENT_DAY CONSTRAINT CC_CIMCGPERIOD_PERCENTDAY_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -269,9 +269,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_CREDGRAPH_PERIOD ***
+grant SELECT                                                                 on CIM_CREDGRAPH_PERIOD to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CREDGRAPH_PERIOD to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_CREDGRAPH_PERIOD to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CREDGRAPH_PERIOD to CIM_ROLE;
+grant SELECT                                                                 on CIM_CREDGRAPH_PERIOD to UPLD;
 
 
 

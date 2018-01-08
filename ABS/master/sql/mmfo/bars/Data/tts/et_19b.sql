@@ -165,34 +165,67 @@ begin
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('3579', '19B', 1);
+    values ('3570', '19B', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3579'', ''19B'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3570'', ''19B'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('3579', '19B', 1);
+    values ('3570', '19B', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3579'', ''19B'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3570'', ''19B'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('3579', '19B', 1);
+    values ('3570', '19B', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3579'', ''19B'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3570'', ''19B'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
+    values ('3570', '19B', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3570'', ''19B'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
+    values ('3570', '19B', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3570'', ''19B'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
+    values ('3570', '19B', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''3570'', ''19B'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;

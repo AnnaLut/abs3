@@ -89,6 +89,10 @@ COMMENT ON COLUMN BARS.ERR$_CIM_FANTOMS_BOUND.BORG_REASON IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIM_FANTOMS_BOUND ***
+grant SELECT                                                                 on ERR$_CIM_FANTOMS_BOUND to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIM_FANTOMS_BOUND to UPLD;
+
 
 
 PROMPT ===================================================================================== 

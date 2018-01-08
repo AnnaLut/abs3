@@ -58,9 +58,11 @@ COMMENT ON COLUMN BARS.ERR$_TTSAP.DK IS '';
 
 
 PROMPT *** Create  grants  ERR$_TTSAP ***
+grant SELECT                                                                 on ERR$_TTSAP      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_TTSAP      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ERR$_TTSAP      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_TTSAP      to START1;
+grant SELECT                                                                 on ERR$_TTSAP      to UPLD;
 
 
 

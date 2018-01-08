@@ -129,9 +129,11 @@ COMMENT ON COLUMN BARS.REZ14.ID IS 'nbu23_rez.ID';
 
 
 PROMPT *** Create  grants  REZ14 ***
+grant SELECT                                                                 on REZ14           to BARSREADER_ROLE;
 grant SELECT                                                                 on REZ14           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ14           to BARS_DM;
 grant SELECT                                                                 on REZ14           to START1;
+grant SELECT                                                                 on REZ14           to UPLD;
 
 
 

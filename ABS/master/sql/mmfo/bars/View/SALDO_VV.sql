@@ -1,22 +1,14 @@
-CREATE OR REPLACE FORCE VIEW BARS.SALDO_VV
-(
-   KF,
-   ACC,
-   FDAT,
-   KV,
-   NLS,
-   NBS,
-   OB22,
-   DOS,
-   KOS,
-   POS,
-   ost_in,
-   ost_out,
-   ostQ_in,
-   ostQ_out
-)
-AS
-   SELECT KF,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/SALDO_VV.sql =========*** Run *** =====
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view SALDO_VV ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.SALDO_VV ("KF", "ACC", "FDAT", "KV", "NLS", "NBS", "OB22", "DOS", "KOS", "POS", "OST_IN", "OST_OUT", "OSTQ_IN", "OSTQ_OUT") AS 
+  SELECT KF,
           acc,
           dat_alt,
           kv,
@@ -30,7 +22,7 @@ AS
           ABS(fost (acc, dat_alt - 1) / 100),
           0,
           ABS(fostQ (acc, dat_alt - 1) / 100)
-     FROM accounts 
+     FROM accounts
      where dat_alt is not null
    UNION ALL
    SELECT KF,
@@ -50,6 +42,12 @@ AS
      FROM ACCOUNTS
       where dat_alt is not null;
 
-grant select on SALDO_VV to bars_access_defrole;
+PROMPT *** Create  grants  SALDO_VV ***
+grant SELECT                                                                 on SALDO_VV        to BARS_ACCESS_DEFROLE;
+grant FLASHBACK,SELECT                                                       on SALDO_VV        to WR_REFREAD;
 
 
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/SALDO_VV.sql =========*** End *** =====
+PROMPT ===================================================================================== 

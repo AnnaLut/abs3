@@ -103,6 +103,7 @@ exception when others then
 PROMPT *** Create  grants  INT_IDN ***
 grant SELECT                                                                 on INT_IDN         to BARS009;
 grant SELECT                                                                 on INT_IDN         to BARS010;
+grant SELECT                                                                 on INT_IDN         to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on INT_IDN         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_IDN         to BARS_DM;
 grant SELECT                                                                 on INT_IDN         to DPT;
@@ -110,6 +111,7 @@ grant SELECT                                                                 on 
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on INT_IDN         to RCC_DEAL;
 grant SELECT                                                                 on INT_IDN         to RPBN001;
 grant SELECT                                                                 on INT_IDN         to START1;
+grant SELECT                                                                 on INT_IDN         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_IDN         to WR_ALL_RIGHTS;
 
 

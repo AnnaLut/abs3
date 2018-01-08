@@ -50,9 +50,11 @@ COMMENT ON COLUMN BARS.MP_TURN.SUMMA IS '';
 
 
 PROMPT *** Create  grants  MP_TURN ***
+grant SELECT                                                                 on MP_TURN         to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MP_TURN         to BARS_ACCESS_DEFROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MP_TURN         to MVO;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MP_TURN         to START1;
+grant SELECT                                                                 on MP_TURN         to UPLD;
 
 
 

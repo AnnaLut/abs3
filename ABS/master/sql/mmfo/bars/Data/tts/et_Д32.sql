@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции Д32
-prompt Наименование операции: ПОЗАБАЛАНС. Передача цінностей (лотореї та інш) в комору.
+prompt Наименование операции: Д32 ПОЗАБАЛАНС. Передача цінностей (лотореї та інш) в комору.
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('Д32', 'ПОЗАБАЛАНС. Передача цінностей (лотореї та інш) в комору.', 0, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1100100000000000000000000000000000000000000000000000000000000000', null);
+    values ('Д32', 'Д32 ПОЗАБАЛАНС. Передача цінностей (лотореї та інш) в комору.', 0, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1100100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='Д32', name='ПОЗАБАЛАНС. Передача цінностей (лотореї та інш) в комору.', dk=0, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1100100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='Д32', name='Д32 ПОЗАБАЛАНС. Передача цінностей (лотореї та інш) в комору.', dk=0, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1100100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='Д32';
   end;
   --------------------------------

@@ -89,19 +89,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OTCNDEL3A_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OTCN_DEL_3A ADD CONSTRAINT FK_OTCNDEL3A_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C005149 ***
 begin   
  execute immediate '
@@ -114,10 +101,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005154 ***
+PROMPT *** Create  constraint SYS_C005150 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OTCN_DEL_3A MODIFY (TPF NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.OTCN_DEL_3A MODIFY (ISP NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -162,10 +149,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005150 ***
+PROMPT *** Create  constraint SYS_C005154 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OTCN_DEL_3A MODIFY (ISP NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.OTCN_DEL_3A MODIFY (TPF NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -188,9 +175,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  OTCN_DEL_3A ***
+grant SELECT                                                                 on OTCN_DEL_3A     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_DEL_3A     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_DEL_3A     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_DEL_3A     to RPBN002;
+grant SELECT                                                                 on OTCN_DEL_3A     to UPLD;
 
 
 

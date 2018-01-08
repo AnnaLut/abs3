@@ -114,8 +114,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_REPORTS ***
+grant SELECT                                                                 on CIG_REPORTS     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIG_REPORTS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_REPORTS     to BARS_DM;
+grant SELECT                                                                 on CIG_REPORTS     to UPLD;
 
 
 

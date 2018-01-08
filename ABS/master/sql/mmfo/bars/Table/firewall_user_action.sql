@@ -74,9 +74,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIREWALL_USER_ACTION ***
+grant SELECT                                                                 on FIREWALL_USER_ACTION to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIREWALL_USER_ACTION to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIREWALL_USER_ACTION to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIREWALL_USER_ACTION to FIREWALL_USER_ACTION;
+grant SELECT                                                                 on FIREWALL_USER_ACTION to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIREWALL_USER_ACTION to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on FIREWALL_USER_ACTION to WR_REFREAD;
 

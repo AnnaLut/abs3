@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_CASH_SNAPSHOT.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CASH_SNAPSHOT ***
+grant SELECT                                                                 on ERR$_CASH_SNAPSHOT to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CASH_SNAPSHOT to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -71,19 +71,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ACCMSG_CUSTOMER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACC_MSG ADD CONSTRAINT FK_ACCMSG_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_ACCMSG_CHTIME_NN ***
 begin   
  execute immediate '
@@ -108,12 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_ACCMSG ***
+PROMPT *** Create  constraint CC_ACCMSG_ACC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_MSG ADD CONSTRAINT PK_ACCMSG PRIMARY KEY (MSG_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.ACC_MSG MODIFY (ACC CONSTRAINT CC_ACCMSG_ACC_NN NOT NULL DISABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -125,7 +110,7 @@ exception when others then
 PROMPT *** Create  constraint CC_ACCMSG_OSTC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_MSG MODIFY (OSTC CONSTRAINT CC_ACCMSG_OSTC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_MSG MODIFY (OSTC CONSTRAINT CC_ACCMSG_OSTC_NN NOT NULL DISABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -137,7 +122,7 @@ exception when others then
 PROMPT *** Create  constraint CC_ACCMSG_DOSD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_MSG MODIFY (DOS_DELTA CONSTRAINT CC_ACCMSG_DOSD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_MSG MODIFY (DOS_DELTA CONSTRAINT CC_ACCMSG_DOSD_NN NOT NULL DISABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -149,7 +134,7 @@ exception when others then
 PROMPT *** Create  constraint CC_ACCMSG_KOSD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_MSG MODIFY (KOS_DELTA CONSTRAINT CC_ACCMSG_KOSD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_MSG MODIFY (KOS_DELTA CONSTRAINT CC_ACCMSG_KOSD_NN NOT NULL DISABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -158,10 +143,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCMSG_ACC_NN ***
+PROMPT *** Create  constraint PK_ACCMSG ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_MSG MODIFY (ACC CONSTRAINT CC_ACCMSG_ACC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_MSG ADD CONSTRAINT PK_ACCMSG PRIMARY KEY (MSG_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -181,19 +168,14 @@ exception when others then
  end;
 /
 
-begin
-    execute immediate 'create index I_ACCMSG_ACC on ACC_MSG (ACC) tablespace BRSMDLI';
- exception when others then 
-    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
-    end if; 
-end;
-/
 
 
 PROMPT *** Create  grants  ACC_MSG ***
+grant SELECT                                                                 on ACC_MSG         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_MSG         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_MSG         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_MSG         to START1;
+grant SELECT                                                                 on ACC_MSG         to UPLD;
 
 
 

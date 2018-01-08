@@ -1,5 +1,3 @@
-SET SERVEROUTPUT ON 
-SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_BAK1.sql =========*
 PROMPT ===================================================================================== 
@@ -18,11 +16,11 @@ PROMPT *** Create/replace  ARM  $RM_BAK1 ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-    d integer := 0;
+	d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_BAK1 створюємо (або оновлюємо) АРМ АРМ Вилучення документів ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
-                             P_ARM_NAME              => l_application_name, 
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
+                             P_ARM_NAME              => l_application_name,
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -30,122 +28,122 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Виконання повернення операцій ********** ');
           --  Створюємо функцію Виконання повернення операцій
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Виконання повернення операцій',
                                                   p_funcname => '/barsroot/docview/docs/index',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
 
-      --  Створюємо дочірню функцію Р”СЂСѓРєРѕРІР°РЅР° С„РѕСЂР°Сѓ HTML
-                     l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Р”СЂСѓРєРѕРІР°РЅР° С„РѕСЂР°Сѓ HTML',
-                                                              p_funcname => '/barsroot/docview/docs/gettickethtml\S*',
-                                                              p_rolename => 'START1' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
-      --  Створюємо дочірню функцію РќР°Р·РІР° С„Р°Р№Р»Сѓ
+      --  Створюємо дочірню функцію Завантажити *.html
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'РќР°Р·РІР° С„Р°Р№Р»Сѓ',
-                                                              p_funcname => '/barsroot/docview/docs/getticketfilename\S*',
-                                                              p_rolename => 'START1' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Завантажити *.html',
+															  p_funcname => '/barsroot/docview/docs/loadhtml\S*',
+															  p_rolename => 'START1' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
-      --  Створюємо дочірню функцію Р—Р°РІР°РЅС‚Р°Р¶РёС‚Рё *.txt
+      --  Створюємо дочірню функцію Назва файлу
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Р—Р°РІР°РЅС‚Р°Р¶РёС‚Рё *.txt',
-                                                              p_funcname => '/barsroot/docview/docs/loadtxt\S*',
-                                                              p_rolename => 'START1' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Назва файлу',
+															  p_funcname => '/barsroot/docview/docs/getticketfilename\S*',
+															  p_rolename => 'START1' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
-      --  Створюємо дочірню функцію РќР°РїРѕРІРЅРµРЅРЅСЏ С‚Р°Р±Р»РёС†С–
+      --  Створюємо дочірню функцію Завантажити *.txt
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'РќР°РїРѕРІРЅРµРЅРЅСЏ С‚Р°Р±Р»РёС†С–',
-                                                              p_funcname => '/barsroot/docview/docs/grid\S*',
-                                                              p_rolename => 'START1' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Завантажити *.txt',
+															  p_funcname => '/barsroot/docview/docs/loadtxt\S*',
+															  p_rolename => 'START1' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
-      --  Створюємо дочірню функцію РџСЂРёС‡РёРЅРё(РґРѕРІС–РґРЅРёРє)
+      --  Створюємо дочірню функцію Експорт в ексель
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'РџСЂРёС‡РёРЅРё(РґРѕРІС–РґРЅРёРє)',
-                                                              p_funcname => '/barsroot/docview/docs/reasonshandbook\S*',
-                                                              p_rolename => 'START1' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Експорт в ексель',
+															  p_funcname => '/barsroot/docview/docs/exporttoexcel\S*',
+															  p_rolename => 'START1' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
-      --  Створюємо дочірню функцію Р¤Р°Р№Р»
+      --  Створюємо дочірню функцію Сторно
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Р¤Р°Р№Р»',
-                                                              p_funcname => '/barsroot/docview/docs/getticketfile\S*',
-                                                              p_rolename => 'START1' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Сторно',
+															  p_funcname => '/barsroot/docview/docs/storno\S*',
+															  p_rolename => 'START1' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
-      --  Створюємо дочірню функцію РџРµСЂРµРіР»СЏРґ РѕРґРЅРѕРіРѕ РґРѕРєСѓРјРµРЅС‚Сѓ
+      --  Створюємо дочірню функцію Наповнення таблиці
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'РџРµСЂРµРіР»СЏРґ РѕРґРЅРѕРіРѕ РґРѕРєСѓРјРµРЅС‚Сѓ',
-                                                              p_funcname => '/barsroot/docview/docs/item\S*',
-                                                              p_rolename => 'START1' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Наповнення таблиці',
+															  p_funcname => '/barsroot/docview/docs/grid\S*',
+															  p_rolename => 'START1' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
-      --  Створюємо дочірню функцію Р¤С–Р»СЊС‚СЂ
+      --  Створюємо дочірню функцію Друк
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Р¤С–Р»СЊС‚СЂ',
-                                                              p_funcname => '/barsroot/docview/docs/documentdatefilter\S*',
-                                                              p_rolename => 'START1' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Друк',
+															  p_funcname => '/barsroot/docview/docs/getfileforprint\S*',
+															  p_rolename => 'START1' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
-      --  Створюємо дочірню функцію Р”СЂСѓРє
+      --  Створюємо дочірню функцію Причини(довідник)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Р”СЂСѓРє',
-                                                              p_funcname => '/barsroot/docview/docs/getfileforprint\S*',
-                                                              p_rolename => 'START1' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Причини(довідник)',
+															  p_funcname => '/barsroot/docview/docs/reasonshandbook\S*',
+															  p_rolename => 'START1' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
-      --  Створюємо дочірню функцію Р—Р°РІР°РЅС‚Р°Р¶РёС‚Рё *.html
+      --  Створюємо дочірню функцію Фільтр
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Р—Р°РІР°РЅС‚Р°Р¶РёС‚Рё *.html',
-                                                              p_funcname => '/barsroot/docview/docs/loadhtml\S*',
-                                                              p_rolename => 'START1' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Фільтр',
+															  p_funcname => '/barsroot/docview/docs/documentdatefilter\S*',
+															  p_rolename => 'START1' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
-      --  Створюємо дочірню функцію Р•РєСЃРїРѕСЂС‚ РІ РµРєСЃРµР»СЊ
+      --  Створюємо дочірню функцію Друкована форау HTML
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Р•РєСЃРїРѕСЂС‚ РІ РµРєСЃРµР»СЊ',
-                                                              p_funcname => '/barsroot/docview/docs/exporttoexcel\S*',
-                                                              p_rolename => 'START1' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Друкована форау HTML',
+															  p_funcname => '/barsroot/docview/docs/gettickethtml\S*',
+															  p_rolename => 'START1' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
-      --  Створюємо дочірню функцію РЎС‚РѕСЂРЅРѕ
+      --  Створюємо дочірню функцію Файл
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'РЎС‚РѕСЂРЅРѕ',
-                                                              p_funcname => '/barsroot/docview/docs/storno\S*',
-                                                              p_rolename => 'START1' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Файл',
+															  p_funcname => '/barsroot/docview/docs/getticketfile\S*',
+															  p_rolename => 'START1' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Перегляд одного документу
+                     l_function_deps  :=   abs_utils.add_func(
+															  p_name     => 'Перегляд одного документу',
+															  p_funcname => '/barsroot/docview/docs/item\S*',
+															  p_rolename => 'START1' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_BAK1) - АРМ Вилучення документів  ');
     l := l_function_ids.first;
@@ -153,8 +151,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-     
-     
+
+
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -168,6 +166,7 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
+commit;
 end;
 /
 

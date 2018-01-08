@@ -59,8 +59,10 @@ PROMPT *** Create  view V_OW_IICFILES_DOC ***
    and nvl(k.branch, sys_context('bars_context', 'user_branch')) like sys_context('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  V_OW_IICFILES_DOC ***
+grant SELECT                                                                 on V_OW_IICFILES_DOC to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_IICFILES_DOC to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_IICFILES_DOC to OW;
+grant SELECT                                                                 on V_OW_IICFILES_DOC to UPLD;
 
 
 

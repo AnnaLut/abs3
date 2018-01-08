@@ -21,7 +21,7 @@ PROMPT *** Create  table TMP_NLSLIST ***
 begin 
   execute immediate '
   CREATE GLOBAL TEMPORARY TABLE BARS.TMP_NLSLIST 
-   (	NLS VARCHAR2(14), 
+   (	NLS VARCHAR2(20), 
 	KV NUMBER, 
 	BRANCH VARCHAR2(30)
    ) ON COMMIT PRESERVE ROWS ';
@@ -45,8 +45,7 @@ COMMENT ON COLUMN BARS.TMP_NLSLIST.BRANCH IS '';
 
 
 PROMPT *** Create  grants  TMP_NLSLIST ***
-grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_NLSLIST     to BARS_ACCESS_DEFROLE;
-grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_NLSLIST     to START1;
+grant SELECT                                                                 on TMP_NLSLIST     to UPLD;
 
 
 

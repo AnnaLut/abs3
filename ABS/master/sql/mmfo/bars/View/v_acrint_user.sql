@@ -18,7 +18,9 @@ WHERE (i.metr IN (0,1,2,4,5, 7 ) OR i.METR > 90)
  ;
 
 PROMPT *** Create  grants  V_ACRINT_USER ***
+grant SELECT                                                                 on V_ACRINT_USER   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACRINT_USER   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ACRINT_USER   to UPLD;
 grant SELECT                                                                 on V_ACRINT_USER   to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ACRINT_USER   to WR_ALL_RIGHTS;
 

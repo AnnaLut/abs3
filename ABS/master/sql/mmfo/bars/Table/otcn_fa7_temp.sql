@@ -42,8 +42,10 @@ COMMENT ON COLUMN BARS.OTCN_FA7_TEMP.R020 IS '';
 
 PROMPT *** Create  grants  OTCN_FA7_TEMP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_FA7_TEMP   to ABS_ADMIN;
+grant SELECT                                                                 on OTCN_FA7_TEMP   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_FA7_TEMP   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_FA7_TEMP   to RPBN002;
+grant SELECT                                                                 on OTCN_FA7_TEMP   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_FA7_TEMP   to WR_ALL_RIGHTS;
 
 

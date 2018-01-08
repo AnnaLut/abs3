@@ -14,8 +14,10 @@ PROMPT *** Create  view V_ROZNICABUSINESS ***
    ORDER BY   to_number(id,'999');
 
 PROMPT *** Create  grants  V_ROZNICABUSINESS ***
+grant SELECT                                                                 on V_ROZNICABUSINESS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ROZNICABUSINESS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ROZNICABUSINESS to START1;
+grant SELECT                                                                 on V_ROZNICABUSINESS to UPLD;
 
 
 

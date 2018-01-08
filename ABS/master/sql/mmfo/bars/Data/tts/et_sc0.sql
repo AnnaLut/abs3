@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции SC0
-prompt Наименование операции: Поповнення поточ.рах.готівкою
+prompt Наименование операции: SC0 Поповнення поточ.рах.готівкою
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('SC0', 'Поповнення поточ.рах.готівкою', 0, null, 980, null, 980, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, null, null, 16, null, null, null, '0000100001000000000000000000000000010000000000000000000000000000', 'Поповнення поточного рахунку  ПІБ клієнта. Без ПДВ');
+    values ('SC0', 'SC0 Поповнення поточ.рах.готівкою', 0, null, 980, null, 980, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, null, null, 16, null, null, null, '0000100001000000000000000000000000010000000000000000000000000000', 'Поповнення поточного рахунку  ПІБ клієнта. Без ПДВ');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='SC0', name='Поповнення поточ.рах.готівкою', dk=0, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=16, proc=null, s3800=null, rang=null, flags='0000100001000000000000000000000000010000000000000000000000000000', nazn='Поповнення поточного рахунку  ПІБ клієнта. Без ПДВ'
+         set tt='SC0', name='SC0 Поповнення поточ.рах.готівкою', dk=0, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=16, proc=null, s3800=null, rang=null, flags='0000100001000000000000000000000000010000000000000000000000000000', nazn='Поповнення поточного рахунку  ПІБ клієнта. Без ПДВ'
        where tt='SC0';
   end;
   --------------------------------

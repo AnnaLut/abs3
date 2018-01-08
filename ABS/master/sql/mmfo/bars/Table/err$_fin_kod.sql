@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_FIN_KOD.FM IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_FIN_KOD ***
+grant SELECT                                                                 on ERR$_FIN_KOD    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_FIN_KOD    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

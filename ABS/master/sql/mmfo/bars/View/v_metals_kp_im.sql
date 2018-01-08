@@ -139,8 +139,10 @@ PROMPT *** Create  view V_METALS_KP_IM ***
           AND m.type_ = 4;
 
 PROMPT *** Create  grants  V_METALS_KP_IM ***
+grant SELECT                                                                 on V_METALS_KP_IM  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_METALS_KP_IM  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_METALS_KP_IM  to PYOD001;
+grant SELECT                                                                 on V_METALS_KP_IM  to UPLD;
 
 
 

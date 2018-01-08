@@ -132,10 +132,12 @@ exception when others then
 
 PROMPT *** Create  grants  VALUABLES ***
 grant DELETE,INSERT,UPDATE                                                   on VALUABLES       to ABS_ADMIN;
+grant SELECT                                                                 on VALUABLES       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VALUABLES       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VALUABLES       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VALUABLES       to PYOD001;
 grant SELECT                                                                 on VALUABLES       to START1;
+grant SELECT                                                                 on VALUABLES       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VALUABLES       to WR_ALL_RIGHTS;
 grant SELECT                                                                 on VALUABLES       to WR_DOC_INPUT;
 grant FLASHBACK,SELECT                                                       on VALUABLES       to WR_REFREAD;

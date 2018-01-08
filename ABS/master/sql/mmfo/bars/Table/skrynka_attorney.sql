@@ -59,72 +59,10 @@ COMMENT ON COLUMN BARS.SKRYNKA_ATTORNEY.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_SKR_ATTORN_REF_CUSTOMER ***
+PROMPT *** Create  constraint SYS_C0010114 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ATTORNEY ADD CONSTRAINT FK_SKR_ATTORN_REF_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ATTORN_REF_SKRYNKA_ND ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ATTORNEY ADD CONSTRAINT FK_ATTORN_REF_SKRYNKA_ND FOREIGN KEY (ND)
-	  REFERENCES BARS.SKRYNKA_ND (ND) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SKRYNKAATTORNEY_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ATTORNEY MODIFY (KF CONSTRAINT CC_SKRYNKAATTORNEY_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SKRYNKAATTORNEY_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ATTORNEY MODIFY (BRANCH CONSTRAINT CC_SKRYNKAATTORNEY_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0010117 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ATTORNEY MODIFY (DATE_TO NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0010116 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ATTORNEY MODIFY (DATE_FROM NOT NULL ENABLE)';
+  ALTER TABLE BARS.SKRYNKA_ATTORNEY MODIFY (ND NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -145,10 +83,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010114 ***
+PROMPT *** Create  constraint SYS_C0010116 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ATTORNEY MODIFY (ND NOT NULL ENABLE)';
+  ALTER TABLE BARS.SKRYNKA_ATTORNEY MODIFY (DATE_FROM NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -157,11 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SKRYNKAATTORNEY_KF ***
+PROMPT *** Create  constraint SYS_C0010117 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ATTORNEY ADD CONSTRAINT FK_SKRYNKAATTORNEY_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.SKRYNKA_ATTORNEY MODIFY (DATE_TO NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -170,11 +107,22 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SKRYNKAATTORNEY_BRANCH ***
+PROMPT *** Create  constraint CC_SKRYNKAATTORNEY_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ATTORNEY ADD CONSTRAINT FK_SKRYNKAATTORNEY_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.SKRYNKA_ATTORNEY MODIFY (BRANCH CONSTRAINT CC_SKRYNKAATTORNEY_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SKRYNKAATTORNEY_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_ATTORNEY MODIFY (KF CONSTRAINT CC_SKRYNKAATTORNEY_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -183,9 +131,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_ATTORNEY ***
+grant SELECT                                                                 on SKRYNKA_ATTORNEY to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on SKRYNKA_ATTORNEY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SKRYNKA_ATTORNEY to BARS_DM;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on SKRYNKA_ATTORNEY to DEP_SKRN;
+grant SELECT                                                                 on SKRYNKA_ATTORNEY to UPLD;
 
 
 

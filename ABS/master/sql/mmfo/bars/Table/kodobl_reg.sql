@@ -50,11 +50,13 @@ COMMENT ON COLUMN BARS.KODOBL_REG.C_REG IS 'Поле C_REG в таблице SPR_REG';
 
 PROMPT *** Create  grants  KODOBL_REG ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KODOBL_REG      to ABS_ADMIN;
+grant SELECT                                                                 on KODOBL_REG      to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on KODOBL_REG      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KODOBL_REG      to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on KODOBL_REG      to FINMON01;
 grant SELECT                                                                 on KODOBL_REG      to RPBN002;
 grant SELECT                                                                 on KODOBL_REG      to START1;
+grant SELECT                                                                 on KODOBL_REG      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KODOBL_REG      to WR_ALL_RIGHTS;
 
 

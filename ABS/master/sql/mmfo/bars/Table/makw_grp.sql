@@ -115,7 +115,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  MAKW_GRP ***
+grant SELECT                                                                 on MAKW_GRP        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MAKW_GRP        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on MAKW_GRP        to UPLD;
 
 
 

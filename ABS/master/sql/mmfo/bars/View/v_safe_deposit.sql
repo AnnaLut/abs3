@@ -7,10 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_SAFE_DEPOSIT ***
 
-CREATE OR REPLACE VIEW V_SAFE_DEPOSIT
-(n_sk, snum, o_sk, type, keyused, keynumber, keycount, bail_sum, bail_sum_equiv, kv, lcv, acc, nls, ostc, ostb, mdate, acc_isp, acc_isp_name, safe_isp, safe_isp_name, bank_tr, bank_tr_name, nd, num, sos, tariff, nls3600, nmk, custtype, fio, jnmk, okpo, docnum, issued, address, datr, mr, tel, doc_date, dat_begin, dat_end, ndov, dov_fio, dov_okpo, dov_docnum, dov_issued, dov_address, dov_datr, dov_mr, dov_dat_begin, dov_dat_end, nlsk, mfok, nb, rent_sum, pdv, day_payment, discount, peny, amort_income, plan_pay, p_left, fact_pay, f_left, nds2, cur_income, f_income, branch, rnk)
-AS
-SELECT   s.n_sk, s.snum, s.o_sk, d.NAME,
+  CREATE OR REPLACE FORCE VIEW BARS.V_SAFE_DEPOSIT ("N_SK", "SNUM", "O_SK", "TYPE", "KEYUSED", "KEYNUMBER", "KEYCOUNT", "BAIL_SUM", "BAIL_SUM_EQUIV", "KV", "LCV", "ACC", "NLS", "OSTC", "OSTB", "MDATE", "ACC_ISP", "ACC_ISP_NAME", "SAFE_ISP", "SAFE_ISP_NAME", "BANK_TR", "BANK_TR_NAME", "ND", "NUM", "SOS", "TARIFF", "NLS3600", "NMK", "CUSTTYPE", "FIO", "JNMK", "OKPO", "DOCNUM", "ISSUED", "ADDRESS", "DATR", "MR", "TEL", "DOC_DATE", "DAT_BEGIN", "DAT_END", "NDOV", "DOV_FIO", "DOV_OKPO", "DOV_DOCNUM", "DOV_ISSUED", "DOV_ADDRESS", "DOV_DATR", "DOV_MR", "DOV_DAT_BEGIN", "DOV_DAT_END", "NLSK", "MFOK", "NB", "RENT_SUM", "PDV", "DAY_PAYMENT", "DISCOUNT", "PENY", "AMORT_INCOME", "PLAN_PAY", "P_LEFT", "FACT_PAY", "F_LEFT", "NDS2", "CUR_INCOME", "F_INCOME", "BRANCH", "RNK") AS 
+  SELECT   s.n_sk, s.snum, s.o_sk, d.NAME,
      s.keyused, s.keynumber, n.KEYCOUNT,
      d.s, gl.p_icurval (a.kv, d.s, bankdate), a.kv, t.lcv, a.acc, a.nls,a.ostc, a.ostb, a.MDATE,
          st1.id,st1.fio,st2.id,st2.fio,st3.id,st3.fio,
@@ -60,8 +58,10 @@ SELECT   s.n_sk, s.snum, s.o_sk, d.NAME,
      AND sa.acc(+) = na.acc;
 
 PROMPT *** Create  grants  V_SAFE_DEPOSIT ***
+grant SELECT                                                                 on V_SAFE_DEPOSIT  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SAFE_DEPOSIT  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SAFE_DEPOSIT  to DEP_SKRN;
+grant SELECT                                                                 on V_SAFE_DEPOSIT  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SAFE_DEPOSIT  to WR_ALL_RIGHTS;
 
 

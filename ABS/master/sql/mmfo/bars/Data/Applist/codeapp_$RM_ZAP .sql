@@ -1,5 +1,3 @@
-SET SERVEROUTPUT ON 
-SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_ZAP .sql =========*
 PROMPT ===================================================================================== 
@@ -18,44 +16,26 @@ PROMPT *** Create/replace  ARM  $RM_ZAP  ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-    d integer := 0;
+	d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_ZAP  створюємо (або оновлюємо) АРМ АРМ СЕП. Інформаційні запити (WEB) ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
-                             P_ARM_NAME              => l_application_name, 
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
+                             P_ARM_NAME              => l_application_name,
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
      l_application_id := user_menu_utl.get_arm_id(l_application_code); 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію СЕП. Інформаційні запити ********** ');
-          --  Створюємо функцію СЕП. Інформаційні запити
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Інформаційні запити по нерухомим ********** ');
+          --  Створюємо функцію Інформаційні запити по нерухомим
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'СЕП. Інформаційні запити',
-                                                  p_funcname => '/barsroot/qdocs/default.aspx',
-                                                  p_rolename => 'WR_QDOCS' ,    
+                                                  p_name     => 'Інформаційні запити по нерухомим',
+                                                  p_funcname => '/barsroot/qdocs/info_req.aspx',
+                                                  p_rolename => 'WR_QDOCS' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
 
-      --  Створюємо дочірню функцію Діалог додатку "СЕП. Інформаційні запити"
-                     l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Діалог додатку "СЕП. Інформаційні запити"',
-                                                              p_funcname => '/barsroot/qdocs/qdialog.aspx\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
-
-      --  Створюємо дочірню функцію Вікно вводу документа c параметром qdoc
-                     l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Вікно вводу документа c параметром qdoc',
-                                                              p_funcname => '/barsroot/docinput/docinput.aspx?qdoc=\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_ZAP ) - АРМ СЕП. Інформаційні запити (WEB)  ');
     l := l_function_ids.first;
@@ -63,8 +43,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-     
-     
+
+
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -78,6 +58,7 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
+commit;
 end;
 /
 

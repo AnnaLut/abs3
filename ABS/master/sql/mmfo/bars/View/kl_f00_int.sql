@@ -32,9 +32,11 @@ PROMPT *** Create  view KL_F00_INT ***
     WHERE g.kodf = l.kodf AND g.a017 = l.a017;
 
 PROMPT *** Create  grants  KL_F00_INT ***
+grant SELECT                                                                 on KL_F00_INT      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F00_INT      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F00_INT      to KL_F00_INT;
 grant SELECT,UPDATE                                                          on KL_F00_INT      to RPBN002;
+grant SELECT                                                                 on KL_F00_INT      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F00_INT      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KL_F00_INT      to WR_REFREAD;
 

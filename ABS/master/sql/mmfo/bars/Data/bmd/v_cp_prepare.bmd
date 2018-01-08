@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'ЦП Нарахування купону';
   l_tablinesdef := '25';
+  l_tabselect_statement := '';
   l_tabname     := 'V_CP_PREPARE';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,25 +124,24 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'FDAT', 'D', 'З', 1.5, 24, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'INT', 'N', 'Нараховано', 2, 22, 8, 0, 0, 0, 0, '', '#0 00.00', 0, 0, 'sum(INT)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'IR', 'N', 'Ставка', .5, 22, 6, 0, 0, 0, 0, '', '#00.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KVA', 'N', 'Валюта', .3, 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NLSA', 'C', 'Рахунок', 2, 15, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NMSA', 'C', 'Назва рахунку', 3, 70, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'OST', 'N', 'Залишок', 2, 22, 9, 0, 0, 0, 0, '', '#0 00.00', 0, 0, 'sum(OST)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'OSTT', 'N', 'Відсоткове число', 2, 22, 7, 0, 0, 0, 0, '', '#0 00.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'TDAT', 'D', 'По', 1.5, 24, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NAZN', 'C', 'Призначення', 15, 160, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NLSB', 'C', 'Рахунок Б', 2, 15, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'TT', 'C', 'Код операцїі', .3, 3, 0, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'RUNN', 'B', 'Виконати всі', null, null, -1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-    bars_metabase.add_column(l_tabid, 14, 'ACC', 'N', 'e', null, null, -1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);    
-    bars_metabase.add_column(l_tabid, 15, 'KVB', 'N', 'e', null, null, -1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-    bars_metabase.add_column(l_tabid, 16, 'NMSB', 'C', 'e', null, null, -1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-    bars_metabase.add_column(l_tabid, 17, 'ID_A', 'C', 'e', null, null, -1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-    bars_metabase.add_column(l_tabid, 18, 'ID_B', 'C', 'e', null, null, -1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-      
+  bars_metabase.add_column(l_tabid, 1, 'FDAT', 'D', 'З', '1.5', 24, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'INT', 'N', 'Нараховано', '2', 22, 8, 0, 0, 0, 0, '', '#0 00.00', 0, 0, 'sum(INT)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'IR', 'N', 'Ставка', '.5', 22, 6, 0, 0, 0, 0, '', '#00.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'KVA', 'N', 'Валюта', '.3', 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NLSA', 'C', 'Рахунок', '2', 15, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NMSA', 'C', 'Назва рахунку', '3', 70, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'OST', 'N', 'Залишок', '2', 22, 9, 0, 0, 0, 0, '', '#0 00.00', 0, 0, 'sum(OST)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'OSTT', 'N', 'Відсоткове число', '2', 22, 7, 0, 0, 0, 0, '', '#0 00.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'TDAT', 'D', 'По', '1.5', 24, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NAZN', 'C', 'Призначення', '15', 160, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NLSB', 'C', 'Рахунок Б', '2', 15, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'TT', 'C', 'Код операцїі', '.3', 3, 0, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'RUNN', 'B', 'Виконати всі', '', null, -1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'ACC', 'N', 'e', '', null, -1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'KVB', 'N', 'e', '', null, -1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'NMSB', 'C', 'e', '', null, -1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'ID_A', 'C', 'e', '', null, -1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'ID_B', 'C', 'e', '', null, -1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
 
   -- добавляем описание процедур
   bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'make_cp_int(:ACC,:TDAT,:TT,:ID_A,:ID_B,:NLSA,:NLSB,:NMSA,:NMSB,:KVA,:KVB,:INT,:NAZN)');

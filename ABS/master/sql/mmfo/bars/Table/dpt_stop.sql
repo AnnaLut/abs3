@@ -71,49 +71,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTSTOP_DPTSHTYPE ***
+PROMPT *** Create  constraint CC_DPTSTOP_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_STOP ADD CONSTRAINT FK_DPTSTOP_DPTSHTYPE FOREIGN KEY (SH_PROC)
-	  REFERENCES BARS.DPT_SHTYPE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTSTOP_DPTSHOST ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_STOP ADD CONSTRAINT FK_DPTSTOP_DPTSHOST FOREIGN KEY (SH_OST)
-	  REFERENCES BARS.DPT_SHOST (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTSTOP_DPTSHSROK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_STOP ADD CONSTRAINT FK_DPTSTOP_DPTSHSROK FOREIGN KEY (FL)
-	  REFERENCES BARS.DPT_SHSROK (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTSTOP_SHOST_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_STOP MODIFY (SH_OST CONSTRAINT CC_DPTSTOP_SHOST_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_STOP MODIFY (ID CONSTRAINT CC_DPTSTOP_ID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -158,10 +119,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTSTOP_ID_NN ***
+PROMPT *** Create  constraint CC_DPTSTOP_SHOST_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_STOP MODIFY (ID CONSTRAINT CC_DPTSTOP_ID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_STOP MODIFY (SH_OST CONSTRAINT CC_DPTSTOP_SHOST_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -185,11 +146,13 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_STOP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_STOP        to ABS_ADMIN;
+grant SELECT                                                                 on DPT_STOP        to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DPT_STOP        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_STOP        to BARS_DM;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DPT_STOP        to DPT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_STOP        to DPT_ADMIN;
 grant SELECT                                                                 on DPT_STOP        to START1;
+grant SELECT                                                                 on DPT_STOP        to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_STOP        to VKLAD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_STOP        to WR_ALL_RIGHTS;
 grant SELECT                                                                 on DPT_STOP        to WR_DEPOSIT_U;

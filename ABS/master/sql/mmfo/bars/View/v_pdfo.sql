@@ -8,38 +8,168 @@ PROMPT =========================================================================
 PROMPT *** Create  view V_PDFO ***
 
   CREATE OR REPLACE FORCE VIEW BARS.V_PDFO ("BRANCH", "NLS6", "T6", "Z6", "ACC6", "O6", "NLS5", "T5", "Z5", "ACC5", "O5", "V", "V100", "P", "P100", "MFOB", "NLSB", "NAMB", "ID_B") AS 
-  select a6.branch, a6.nls NLS6,  a6.ostb /100 T6, a6.z/100 z6, a6.acc acc6, a6.ob22 o6,
-                  a5.nls NLS5, -a5.ostb /100 T5, a5.z/100 z5, a5.acc acc5, a5.ob22 o5,
-                  least   (a6.z, a5.z)  /100 V ,
-                  least   (a6.z, a5.z)  V100   ,
-                  greatest(a6.z-a5.z,0) /100 P ,
-                  greatest(a6.z-a5.z,0) P100   ,
-       substr( (select val from BRANCH_PARAMETERS where branch = a6.branch and tag = 'PDFOMFO'),1,06) MFOB,
-       substr( (select val from BRANCH_PARAMETERS where branch = a6.branch and tag = decode( a6.ob22, '36', 'PDFOVZB', 'PDFONLS') ),1,14) NLSB,
-       substr( (select val from BRANCH_PARAMETERS where branch = a6.branch and tag = 'PDFONAM'),1,38) NAMB,
-       substr( (select val from BRANCH_PARAMETERS where branch = a6.branch and tag = 'PDFOID' ),1,08) ID_B
-from (select acc, branch,nls,ob22, ostb, least( ost_korr(acc,z23.E,z23.di,nbs), ostb) z
-      from v_gl where kv = 980 and nbs = '3622' and ob22 in ('36','37') and (dazs is null or dazs > z23.E)
-      ) a6,
-     (select acc, branch,nls,ob22, ostb, least(-ost_korr(acc,z23.E,z23.di,nbs),-ostb) z
-      from v_gl where kv = 980 and nbs = '3522' and ob22 in ('30','29') and (dazs is null or dazs > z23.E)
-     ) a5
-where a6.branch = a5.branch and (a6.ob22 = '36' and a5.ob22 ='30' or a6.ob22 = '37' and a5.ob22 ='29')
-union all
-select a6.branch, a6.nls NLS6,  a6.ostb/100 T6, a6.z/100 z6,         a6.acc  acc6, a6.ob22 o6,
-                  ''     NLS5,            0 T5,        0 z5, to_number(null) acc5, ''      o5,
-                  0 V, 0 V100,      a6.z/100 P, a6.z P100  ,
-       substr( (select val from BRANCH_PARAMETERS where branch = a6.branch and tag = 'PDFOMFO'),1,06) MFOB,
-       substr( (select val from BRANCH_PARAMETERS where branch = a6.branch and tag = 'PDFOVZB'),1,14) NLSB,
-       substr( (select val from BRANCH_PARAMETERS where branch = a6.branch and tag = 'PDFONAM'),1,38) NAMB,
-       substr( (select val from BRANCH_PARAMETERS where branch = a6.branch and tag = 'PDFOID' ),1,08) ID_B
-from (select acc, branch,nls,ob22, ostb, least( ost_korr(acc,z23.E,z23.di,nbs), ostb) z
-      from v_gl where kv = 980 and nbs = '3622' and ob22 ='38' and (dazs is null or dazs > z23.E)
-      ) a6;
+  SELECT A6.BRANCH,
+          A6.NLS NLS6,
+          A6.OSTB / 100 T6,
+          A6.Z / 100 Z6,
+          A6.ACC ACC6,
+          A6.OB22 O6,
+          A5.NLS NLS5,
+          -A5.OSTB / 100 T5,
+          A5.Z / 100 Z5,
+          A5.ACC ACC5,
+          A5.OB22 O5,
+          LEAST (A6.Z, A5.Z) / 100 V,
+          LEAST (A6.Z, A5.Z) V100,
+          GREATEST (A6.Z - A5.Z, 0) / 100 P,
+          GREATEST (A6.Z - A5.Z, 0) P100,
+          SUBSTR ( (SELECT VAL
+                      FROM BRANCH_PARAMETERS
+                     WHERE BRANCH = A6.BRANCH AND TAG = 'PDFOMFO'),
+                  1,
+                  06)
+             MFOB,
+          SUBSTR (
+             (SELECT VAL
+                FROM BRANCH_PARAMETERS
+               WHERE     BRANCH = A6.BRANCH
+                     AND TAG = DECODE (A6.OB22, '36', 'PDFOVZB', 'PDFONLS')),
+             1,
+             14)
+             NLSB,
+          SUBSTR ( (SELECT VAL
+                      FROM BRANCH_PARAMETERS
+                     WHERE BRANCH = A6.BRANCH AND TAG = 'PDFONAM'),
+                  1,
+                  38)
+             NAMB,
+          SUBSTR ( (SELECT VAL
+                      FROM BRANCH_PARAMETERS
+                     WHERE BRANCH = A6.BRANCH AND TAG = 'PDFOID'),
+                  1,
+                  08)
+             ID_B
+     FROM (SELECT a.ACC,
+                  a.BRANCH,
+                  a.NLS,
+                  a.OB22,
+                  a.OSTB,
+                  LEAST (NVL (b.OST + b.CRKOS - b.CRDOS, a.OSTC), a.OSTB) Z
+             FROM V_GL a
+                  LEFT JOIN AGG_MONBALS b
+                     ON (    b.KF = a.KF
+                         AND b.ACC = a.ACC
+                         AND b.FDAT =
+                                NVL (
+                                   TO_DATE (PUL.GET ('WDAT'), 'dd.mm.yyyy'),
+                                   TRUNC (SYSDATE, 'MM')))
+            WHERE     a.KV = 980
+                  AND a.NBS = '3622'
+                  AND a.OB22 IN ('36', '37')
+                  AND a.DAOS <=
+                         NVL (TO_DATE (PUL.GET ('WDAT'), 'dd.mm.yyyy'),
+                              TRUNC (SYSDATE, 'MM'))
+                  AND LNNVL (
+                         DAZS <=
+                            NVL (TO_DATE (PUL.GET ('WDAT'), 'dd.mm.yyyy'),
+                                 TRUNC (SYSDATE, 'MM')))) A6,
+          (SELECT a.ACC,
+                  a.BRANCH,
+                  a.NLS,
+                  a.OB22,
+                  a.OSTB,
+                  LEAST (-NVL (b.OST + b.CRKOS - b.CRDOS, a.OSTC), -a.OSTB) Z
+             FROM V_GL a
+                  LEFT JOIN AGG_MONBALS b
+                     ON (    b.KF = a.KF
+                         AND b.ACC = a.ACC
+                         AND b.FDAT =
+                                NVL (
+                                   TO_DATE (PUL.GET ('WDAT'), 'dd.mm.yyyy'),
+                                   TRUNC (SYSDATE, 'MM')))
+            WHERE     a.KV = 980
+                  AND a.NBS = '3522'
+                  AND a.OB22 IN ('29', '30')
+                  AND a.DAOS <=
+                         NVL (TO_DATE (PUL.GET ('WDAT'), 'dd.mm.yyyy'),
+                              TRUNC (SYSDATE, 'MM'))
+                  AND LNNVL (
+                         DAZS <=
+                            NVL (TO_DATE (PUL.GET ('WDAT'), 'dd.mm.yyyy'),
+                                 TRUNC (SYSDATE, 'MM')))) A5
+    WHERE     A6.BRANCH = A5.BRANCH
+          AND (   A6.OB22 = '36' AND A5.OB22 = '30'
+               OR A6.OB22 = '37' AND A5.OB22 = '29')
+   UNION ALL
+   SELECT A6.BRANCH,
+          A6.NLS NLS6,
+          A6.OSTB / 100 T6,
+          A6.Z / 100 Z6,
+          A6.ACC ACC6,
+          A6.OB22 O6,
+          '' NLS5,
+          0 T5,
+          0 Z5,
+          TO_NUMBER (NULL) ACC5,
+          '' O5,
+          0 V,
+          0 V100,
+          A6.Z / 100 P,
+          A6.Z P100,
+          SUBSTR ( (SELECT VAL
+                      FROM BRANCH_PARAMETERS
+                     WHERE BRANCH = A6.BRANCH AND TAG = 'PDFOMFO'),
+                  1,
+                  06)
+             MFOB,
+          SUBSTR ( (SELECT VAL
+                      FROM BRANCH_PARAMETERS
+                     WHERE BRANCH = A6.BRANCH AND TAG = 'PDFOVZB'),
+                  1,
+                  14)
+             NLSB,
+          SUBSTR ( (SELECT VAL
+                      FROM BRANCH_PARAMETERS
+                     WHERE BRANCH = A6.BRANCH AND TAG = 'PDFONAM'),
+                  1,
+                  38)
+             NAMB,
+          SUBSTR ( (SELECT VAL
+                      FROM BRANCH_PARAMETERS
+                     WHERE BRANCH = A6.BRANCH AND TAG = 'PDFOID'),
+                  1,
+                  08)
+             ID_B
+     FROM (SELECT a.ACC,
+                  a.BRANCH,
+                  a.NLS,
+                  a.OB22,
+                  a.OSTB,
+                  LEAST (NVL (b.OST + b.CRKOS - b.CRDOS, a.OSTC), a.OSTB) Z
+             FROM V_GL a
+                  LEFT JOIN AGG_MONBALS b
+                     ON (    b.KF = a.KF
+                         AND b.ACC = a.ACC
+                         AND b.FDAT =
+                                NVL (
+                                   TO_DATE (PUL.GET ('WDAT'), 'dd.mm.yyyy'),
+                                   TRUNC (SYSDATE, 'MM')))
+            WHERE     a.KV = 980
+                  AND a.NBS = '3622'
+                  AND a.OB22 = '38'
+                  AND a.DAOS <=
+                         NVL (TO_DATE (PUL.GET ('WDAT'), 'dd.mm.yyyy'),
+                              TRUNC (SYSDATE, 'MM'))
+                  AND LNNVL (
+                         DAZS <=
+                            NVL (TO_DATE (PUL.GET ('WDAT'), 'dd.mm.yyyy'),
+                                 TRUNC (SYSDATE, 'MM')))) A6;
 
 PROMPT *** Create  grants  V_PDFO ***
+grant SELECT                                                                 on V_PDFO          to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PDFO          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PDFO          to START1;
+grant SELECT                                                                 on V_PDFO          to UPLD;
 
 
 

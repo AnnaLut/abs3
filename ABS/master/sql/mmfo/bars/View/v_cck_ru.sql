@@ -1,5 +1,14 @@
-CREATE OR REPLACE VIEW V_CCK_RU AS
-SELECT x.nd
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CCK_RU.sql =========*** Run *** =====
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_CCK_RU ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_RU ("ND", "NDI", "NDG", "VIDD", "PROD", "ISP", "CC_ID", "RNK", "KV", "S", "GPK", "DSDATE", "DWDATE", "PR", "OSTC", "SOS", "NAMK", "ACC8", "DAZS", "BRANCH", "CUSTTYPE", "SDOG", "TR", "VIDD_NAME", "SOS_NAME", "DAYSN", "FREQ", "FREQP", "OPL_DATE", "OPL_DAY", "ND0", "I_CR9") AS 
+  SELECT x.nd
       ,x.ndi
       ,x.ndg
       ,x.vidd
@@ -113,3 +122,14 @@ SELECT x.nd
            AND ia.id = 0
            AND n.acc = a8.acc
            AND a8.tip = 'LIM') x;
+
+PROMPT *** Create  grants  V_CCK_RU ***
+grant SELECT                                                                 on V_CCK_RU        to BARSREADER_ROLE;
+grant SELECT                                                                 on V_CCK_RU        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CCK_RU        to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CCK_RU.sql =========*** End *** =====
+PROMPT ===================================================================================== 

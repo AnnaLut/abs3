@@ -16,9 +16,11 @@ PROMPT *** Create  view V_CASHACCOUNTS ***
       and dazs is null;
 
 PROMPT *** Create  grants  V_CASHACCOUNTS ***
+grant SELECT                                                                 on V_CASHACCOUNTS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CASHACCOUNTS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CASHACCOUNTS  to OPER000;
 grant SELECT                                                                 on V_CASHACCOUNTS  to RPBN001;
+grant SELECT                                                                 on V_CASHACCOUNTS  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CASHACCOUNTS  to WR_ALL_RIGHTS;
 
 

@@ -128,7 +128,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZA1 ***
+grant SELECT                                                                 on ZA1             to BARSREADER_ROLE;
 grant SELECT                                                                 on ZA1             to BARS_DM;
+grant SELECT                                                                 on ZA1             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZA1             to WR_ALL_RIGHTS;
 
 

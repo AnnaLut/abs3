@@ -167,9 +167,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CLV_CUSTOMER_REL ***
+grant SELECT                                                                 on CLV_CUSTOMER_REL to BARSREADER_ROLE;
 grant SELECT                                                                 on CLV_CUSTOMER_REL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CLV_CUSTOMER_REL to BARS_DM;
 grant SELECT                                                                 on CLV_CUSTOMER_REL to CUST001;
+grant SELECT                                                                 on CLV_CUSTOMER_REL to UPLD;
 
 
 

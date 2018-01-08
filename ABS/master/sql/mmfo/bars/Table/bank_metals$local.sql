@@ -77,49 +77,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BANKMETLOC_KF ***
+PROMPT *** Create  constraint CC_BANKMETLOC_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BANK_METALS$LOCAL ADD CONSTRAINT FK_BANKMETLOC_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_BANKMETLOC_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BANK_METALS$LOCAL ADD CONSTRAINT FK_BANKMETLOC_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_BANKMETLOC_KOD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BANK_METALS$LOCAL ADD CONSTRAINT FK_BANKMETLOC_KOD FOREIGN KEY (KOD)
-	  REFERENCES BARS.BANK_METALS (KOD) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BANKMETLOC_CENAK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BANK_METALS$LOCAL MODIFY (CENA_K CONSTRAINT CC_BANKMETLOC_CENAK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BANK_METALS$LOCAL MODIFY (KF CONSTRAINT CC_BANKMETLOC_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -164,10 +125,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BANKMETLOC_KF_NN ***
+PROMPT *** Create  constraint CC_BANKMETLOC_CENAK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BANK_METALS$LOCAL MODIFY (KF CONSTRAINT CC_BANKMETLOC_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BANK_METALS$LOCAL MODIFY (CENA_K CONSTRAINT CC_BANKMETLOC_CENAK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -204,9 +165,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BANK_METALS$LOCAL ***
+grant SELECT                                                                 on BANK_METALS$LOCAL to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BANK_METALS$LOCAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BANK_METALS$LOCAL to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANK_METALS$LOCAL to TECH005;
+grant SELECT                                                                 on BANK_METALS$LOCAL to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BANK_METALS$LOCAL to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BANK_METALS$LOCAL to WR_REFREAD;
 

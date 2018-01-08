@@ -70,8 +70,10 @@ PROMPT *** Create  view CHECKPB ***
    ORDER BY o.fdat, o.REF;
 
 PROMPT *** Create  grants  CHECKPB ***
+grant SELECT                                                                 on CHECKPB         to BARSREADER_ROLE;
 grant SELECT                                                                 on CHECKPB         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHECKPB         to START1;
+grant SELECT                                                                 on CHECKPB         to UPLD;
 
 
 

@@ -36,8 +36,10 @@ PROMPT *** Create  view V_OW_CRVACC_REQUEST ***
    and c.rnk = p.rnk;
 
 PROMPT *** Create  grants  V_OW_CRVACC_REQUEST ***
+grant SELECT                                                                 on V_OW_CRVACC_REQUEST to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_CRVACC_REQUEST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_CRVACC_REQUEST to OW;
+grant SELECT                                                                 on V_OW_CRVACC_REQUEST to UPLD;
 
 
 

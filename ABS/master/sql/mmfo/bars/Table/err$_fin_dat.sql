@@ -57,6 +57,10 @@ COMMENT ON COLUMN BARS.ERR$_FIN_DAT.FDAT IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_FIN_DAT ***
+grant SELECT                                                                 on ERR$_FIN_DAT    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_FIN_DAT    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

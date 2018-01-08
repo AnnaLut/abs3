@@ -87,8 +87,8 @@ begin
   --------------------------------
   delete from ps_tts where tt='089';
   begin
-    insert into ps_tts(nbs, tt, dk, ob22)
-    values ('1001', '089', 0, '01');
+    insert into ps_tts(nbs, tt, dk)
+    values ('1001', '089', 0);
   exception
     when dup_val_on_index then null;
     when others then
@@ -98,8 +98,8 @@ begin
       end if;
   end;
   begin
-    insert into ps_tts(nbs, tt, dk, ob22)
-    values ('1002', '089', 0, '01');
+    insert into ps_tts(nbs, tt, dk)
+    values ('1002', '089', 0);
   exception
     when dup_val_on_index then null;
     when others then
@@ -109,8 +109,8 @@ begin
       end if;
   end;
   begin
-    insert into ps_tts(nbs, tt, dk, ob22)
-    values ('2924', '089', 1, '11');
+    insert into ps_tts(nbs, tt, dk)
+    values ('2924', '089', 1);
   exception
     when dup_val_on_index then null;
     when others then
@@ -120,8 +120,8 @@ begin
       end if;
   end;
   begin
-    insert into ps_tts(nbs, tt, dk, ob22)
-    values ('2924', '089', 1, '15');
+    insert into ps_tts(nbs, tt, dk)
+    values ('2924', '089', 1);
   exception
     when dup_val_on_index then null;
     when others then

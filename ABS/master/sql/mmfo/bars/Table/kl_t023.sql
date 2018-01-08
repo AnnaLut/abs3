@@ -50,7 +50,9 @@ COMMENT ON COLUMN BARS.KL_T023.D_CLOSE IS '';
 
 
 PROMPT *** Create  grants  KL_T023 ***
+grant SELECT                                                                 on KL_T023         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_T023         to BARS_DM;
+grant SELECT                                                                 on KL_T023         to UPLD;
 
 
 

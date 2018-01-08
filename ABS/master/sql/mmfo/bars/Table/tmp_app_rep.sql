@@ -88,7 +88,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_APP_REP ***
+grant SELECT                                                                 on TMP_APP_REP     to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_APP_REP     to BARS_DM;
+grant SELECT                                                                 on TMP_APP_REP     to UPLD;
 
 
 

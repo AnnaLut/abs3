@@ -163,6 +163,10 @@ COMMENT ON COLUMN BARS.ERR$_FX_DEAL.SWO_REF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_FX_DEAL ***
+grant SELECT                                                                 on ERR$_FX_DEAL    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_FX_DEAL    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

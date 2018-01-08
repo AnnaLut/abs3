@@ -83,6 +83,10 @@ COMMENT ON COLUMN BARS.ERR$_OTCN_TRACE_3A.KV IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_OTCN_TRACE_3A ***
+grant SELECT                                                                 on ERR$_OTCN_TRACE_3A to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_OTCN_TRACE_3A to UPLD;
+
 
 
 PROMPT ===================================================================================== 

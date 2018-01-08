@@ -107,11 +107,18 @@ exception when others then
 
 
 PROMPT *** Create  grants  RNBU_TRACE1 ***
+grant SELECT                                                                 on RNBU_TRACE1     to BARSREADER_ROLE;
 grant SELECT                                                                 on RNBU_TRACE1     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RNBU_TRACE1     to BARS_DM;
 grant SELECT                                                                 on RNBU_TRACE1     to SALGL;
+grant SELECT                                                                 on RNBU_TRACE1     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RNBU_TRACE1     to WR_ALL_RIGHTS;
 
+
+
+PROMPT *** Create SYNONYM  to RNBU_TRACE1 ***
+
+  CREATE OR REPLACE PUBLIC SYNONYM RNBU_TRACE1 FOR BARS.RNBU_TRACE1;
 
 
 PROMPT ===================================================================================== 

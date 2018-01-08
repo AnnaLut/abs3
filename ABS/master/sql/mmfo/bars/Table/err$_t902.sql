@@ -69,6 +69,10 @@ COMMENT ON COLUMN BARS.ERR$_T902.BLK IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_T902 ***
+grant SELECT                                                                 on ERR$_T902       to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_T902       to UPLD;
+
 
 
 PROMPT ===================================================================================== 

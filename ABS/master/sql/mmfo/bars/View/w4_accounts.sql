@@ -35,9 +35,11 @@ union
 select '2625D', acc_2625D from w4_acc where acc_2625D is not null;
 
 PROMPT *** Create  grants  W4_ACCOUNTS ***
+grant SELECT                                                                 on W4_ACCOUNTS     to BARSREADER_ROLE;
 grant SELECT                                                                 on W4_ACCOUNTS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_ACCOUNTS     to CUST001;
 grant SELECT                                                                 on W4_ACCOUNTS     to OW;
+grant SELECT                                                                 on W4_ACCOUNTS     to UPLD;
 
 
 

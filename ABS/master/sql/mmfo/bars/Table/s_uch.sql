@@ -71,8 +71,10 @@ COMMENT ON COLUMN BARS.S_UCH.S_SS IS '';
 
 
 PROMPT *** Create  grants  S_UCH ***
+grant SELECT                                                                 on S_UCH           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S_UCH           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S_UCH           to START1;
+grant SELECT                                                                 on S_UCH           to UPLD;
 
 
 

@@ -57,9 +57,11 @@ COMMENT ON COLUMN BARS.AQ$_BARS_MAIL_QT_L.FLAGS IS '';
 
 
 PROMPT *** Create  grants  AQ$_BARS_MAIL_QT_L ***
+grant SELECT                                                                 on AQ$_BARS_MAIL_QT_L to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on AQ$_BARS_MAIL_QT_L to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AQ$_BARS_MAIL_QT_L to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on AQ$_BARS_MAIL_QT_L to START1;
+grant SELECT                                                                 on AQ$_BARS_MAIL_QT_L to UPLD;
 
 
 

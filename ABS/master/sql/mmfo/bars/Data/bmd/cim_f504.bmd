@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'форма №504(35) (Валютний Контроль)';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'CIM_F504';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,45 +124,45 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 2, 'CONTR_ID', 'N', 'Внутрішній ~код ~контракту', null, 6, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'P_DATE_TO', 'D', 'Сформовано ~на ~дату', null, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'P101', 'C', 'Найменування ~позичальника', null, 27, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'Z', 'C', 'Код ~позичальника', null, 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'R_AGREE_NO', 'C', 'Номер ~реєстрації ~договору ~(свідоцтва)', null, 5, 6, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'P103', 'D', 'Дата ~реєстраційного ~свідоцтва', null, null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'PVAL', 'C', 'Код ~валюти', null, 3, 8, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'T', 'C', 'Номер ~траншу', null, 1, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'M', 'N', 'Ознака ~кредиту', null, 2, 10, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'P107', 'C', 'Назва ~нерезидента-~кредитора', null, 54, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'P108', 'N', 'Тип ~кредитора', null, 2, 12, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'P184', 'N', 'Строковість ~кредиту', null, 2, 13, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'P140', 'N', 'Тип ~кредиту', null, 2, 14, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'P142', 'N', 'Код ~періодичності ~здійснення платежів', null, 2, 15, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'P141', 'N', 'Дострокове ~погашення', null, 2, 16, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'P020', 'C', 'Номер ~балансового ~рахунку', null, 4, 17, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'P143', 'N', 'Підстава ~подання ~звіту', null, 2, 18, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'P050', 'C', 'Номер ~кредитної ~угоди', null, 16, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'P060', 'D', 'Дата ~кредитної ~угоди', null, null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'P090', 'N', 'Загальна ~сума ~кредиту', null, 10, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'P960', 'N', 'Цілі ~використання ~кредиту', null, 2, 22, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'P310', 'D', 'Строк ~погашення ~кредиту', null, null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'P999', 'C', 'Примітка', null, 108, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'P212', 'C', '(212)сума платежів ~ОС боргу(без ~урахування майбутніх ~надходжень кредиту)', null, 1, 25, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=CIM_F504_DETAIL2[CONDITIONS=>CIM_F504_DETAIL2.F504_ID=:F504_ID and CIM_F504_DETAIL2.INDICATOR_ID=212][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,212)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'P213', 'C', '(213)сума платежів ~проц. платежів(без ~урахування майб ~надх кредиту)', null, 1, 26, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=CIM_F504_DETAIL2[CONDITIONS=>CIM_F504_DETAIL2.F504_ID=:F504_ID and CIM_F504_DETAIL2.INDICATOR_ID=213][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,213)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'P201', 'C', '(201)сума майбутнього ~надходження ~кредиту', null, 1, 27, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, 'sPar=CIM_F504_DETAIL[CONDITIONS=>CIM_F504_DETAIL.F504_ID=:F504_ID and CIM_F504_DETAIL.INDICATOR_ID=201][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,201)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'P222', 'C', '(222)сума строкових ~платежів ~зі сплати ~ОС боргу', null, 1, 28, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, 'sPar=CIM_F504_DETAIL2[CONDITIONS=>CIM_F504_DETAIL2.F504_ID=:F504_ID and CIM_F504_DETAIL2.INDICATOR_ID=222][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,222)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'P223', 'C', '(223)сума строкових ~платежів ~зі сплати ~проц. платежів', null, 1, 29, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, 'sPar=CIM_F504_DETAIL2[CONDITIONS=>CIM_F504_DETAIL2.F504_ID=:F504_ID and CIM_F504_DETAIL2.INDICATOR_ID=223][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,223)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'P292', 'C', '(292)сума прогнозних ~платежів простроченої ~заборгованості ~за ОС боргу', null, 1, 30, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=CIM_F504_DETAIL[CONDITIONS=>CIM_F504_DETAIL.F504_ID=:F504_ID and CIM_F504_DETAIL.INDICATOR_ID=292][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,292)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'P293', 'C', '(293)сума прогнозних ~платежів простроченої ~заборгованості ~за проц плат', null, 1, 31, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=CIM_F504_DETAIL[CONDITIONS=>CIM_F504_DETAIL.F504_ID=:F504_ID and CIM_F504_DETAIL.INDICATOR_ID=293][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,293)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'F504_ID', 'N', 'Ідентифікатор ~унікальний', null, null, 32, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'DATE_REG', 'D', 'Створено', null, null, 33, 0, 0, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 34, 'USER_REG', 'C', 'Користувач ~додав у ~звіт', null, 30, 34, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'DATE_CH', 'D', 'Остання ~зміна', null, null, 35, 0, 0, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 36, 'USER_CH', 'C', 'Користувач ~редагування', null, 30, 36, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 37, 'BRANCH', 'C', 'Відділення', null, 30, 37, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 38, 'KF', 'C', 'МФО', null, 6, 38, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 39, 'P010', 'N', 'Вид ~позичальника', null, 2, 24, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 40, 'P320', 'N', 'Код ~типу ~реорганізації', null, 2, 24, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CONTR_ID', 'N', 'Внутрішній ~код ~контракту', '', 6, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'P_DATE_TO', 'D', 'Сформовано ~на ~дату', '', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'P101', 'C', 'Найменування ~позичальника', '', 27, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'Z', 'C', 'Код ~позичальника', '', 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'R_AGREE_NO', 'C', 'Номер ~реєстрації ~договору ~(свідоцтва)', '', 5, 6, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'P103', 'D', 'Дата ~реєстраційного ~свідоцтва', '', null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'PVAL', 'C', 'Код ~валюти', '', 3, 8, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'T', 'C', 'Номер ~траншу', '', 1, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'M', 'N', 'Ознака ~кредиту', '', 2, 10, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'P107', 'C', 'Назва ~нерезидента-~кредитора', '', 54, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'P108', 'N', 'Тип ~кредитора', '', 2, 12, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'P184', 'N', 'Строковість ~кредиту', '', 2, 13, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'P140', 'N', 'Тип ~кредиту', '', 2, 14, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'P142', 'N', 'Код ~періодичності ~здійснення платежів', '', 2, 15, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'P141', 'N', 'Дострокове ~погашення', '', 2, 16, 1, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'P020', 'C', 'Номер ~балансового ~рахунку', '', 4, 17, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'P143', 'N', 'Підстава ~подання ~звіту', '', 2, 18, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'P050', 'C', 'Номер ~кредитної ~угоди', '', 16, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'P060', 'D', 'Дата ~кредитної ~угоди', '', null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'P090', 'N', 'Загальна ~сума ~кредиту', '', 10, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'P960', 'N', 'Цілі ~використання ~кредиту', '', 2, 22, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'P310', 'D', 'Строк ~погашення ~кредиту', '', null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'P999', 'C', 'Примітка', '', 108, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'P212', 'C', '(212)сума платежів ~ОС боргу(без ~урахування майбутніх ~надходжень кредиту)', '', 1, 25, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=CIM_F504_DETAIL2[CONDITIONS=>CIM_F504_DETAIL2.F504_ID=:F504_ID and CIM_F504_DETAIL2.INDICATOR_ID=212][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,212)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'P213', 'C', '(213)сума платежів ~проц. платежів(без ~урахування майб ~надх кредиту)', '', 1, 26, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=CIM_F504_DETAIL2[CONDITIONS=>CIM_F504_DETAIL2.F504_ID=:F504_ID and CIM_F504_DETAIL2.INDICATOR_ID=213][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,213)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'P201', 'C', '(201)сума майбутнього ~надходження ~кредиту', '', 1, 27, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, 'sPar=CIM_F504_DETAIL[CONDITIONS=>CIM_F504_DETAIL.F504_ID=:F504_ID and CIM_F504_DETAIL.INDICATOR_ID=201][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,201)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'P222', 'C', '(222)сума строкових ~платежів ~зі сплати ~ОС боргу', '', 1, 28, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, 'sPar=CIM_F504_DETAIL2[CONDITIONS=>CIM_F504_DETAIL2.F504_ID=:F504_ID and CIM_F504_DETAIL2.INDICATOR_ID=222][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,222)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'P223', 'C', '(223)сума строкових ~платежів ~зі сплати ~проц. платежів', '', 1, 29, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, 'sPar=CIM_F504_DETAIL2[CONDITIONS=>CIM_F504_DETAIL2.F504_ID=:F504_ID and CIM_F504_DETAIL2.INDICATOR_ID=223][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,223)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'P292', 'C', '(292)сума прогнозних ~платежів простроченої ~заборгованості ~за ОС боргу', '', 1, 30, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=CIM_F504_DETAIL[CONDITIONS=>CIM_F504_DETAIL.F504_ID=:F504_ID and CIM_F504_DETAIL.INDICATOR_ID=292][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,292)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'P293', 'C', '(293)сума прогнозних ~платежів простроченої ~заборгованості ~за проц плат', '', 1, 31, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=CIM_F504_DETAIL[CONDITIONS=>CIM_F504_DETAIL.F504_ID=:F504_ID and CIM_F504_DETAIL.INDICATOR_ID=293][ACCESSCODE=>0][PROC=>cim_reports.set_context_f504_detail(:F504_ID,293)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'F504_ID', 'N', 'Ідентифікатор ~унікальний', '', null, 32, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'DATE_REG', 'D', 'Створено', '', null, 33, 0, 0, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'USER_REG', 'C', 'Користувач ~додав у ~звіт', '', 30, 34, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'DATE_CH', 'D', 'Остання ~зміна', '', null, 35, 0, 0, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'USER_CH', 'C', 'Користувач ~редагування', '', 30, 36, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'BRANCH', 'C', 'Відділення', '', 30, 37, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'KF', 'C', 'МФО', '', 6, 38, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'P010', 'N', 'Вид ~позичальника', '', 2, 24, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'P320', 'N', 'Код ~типу ~реорганізації', '', 2, 24, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('v_cim_kl_r030');
@@ -248,7 +253,6 @@ begin
   else
     dbms_output.put_line('В БМД не описана таблица v_cim_kod_51_1 для описания сложного поля таблицы CIM_F504.');
   end if;
-
 
   -- добавляем описание процедур
   bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'cim_reports.add_f504_row(:P101,:Z,:R_AGREE_NO,:P103,:PVAL,:T,:M,:P107,:P108,:P184,:P140,:P142,:P020,:p141,:p143,:p960,:p310,:p050,:p060,:p090,:P999)');

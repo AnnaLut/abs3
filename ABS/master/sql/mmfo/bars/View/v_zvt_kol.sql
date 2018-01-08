@@ -13,8 +13,10 @@ PROMPT *** Create  view V_ZVT_KOL ***
    group by fdat;
 
 PROMPT *** Create  grants  V_ZVT_KOL ***
+grant SELECT                                                                 on V_ZVT_KOL       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZVT_KOL       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ZVT_KOL       to START1;
+grant SELECT                                                                 on V_ZVT_KOL       to UPLD;
 
 
 

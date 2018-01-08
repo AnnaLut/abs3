@@ -111,7 +111,9 @@ PROMPT *** Create  view V_MWAY_DPT_PORTFOLIO_ALL ***
           AND v.type_cod = dt.type_code;
 
 PROMPT *** Create  grants  V_MWAY_DPT_PORTFOLIO_ALL ***
+grant SELECT                                                                 on V_MWAY_DPT_PORTFOLIO_ALL to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_MWAY_DPT_PORTFOLIO_ALL to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_MWAY_DPT_PORTFOLIO_ALL to UPLD;
 
 
 

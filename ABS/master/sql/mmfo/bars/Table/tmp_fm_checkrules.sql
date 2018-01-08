@@ -112,9 +112,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_FM_CHECKRULES ***
+grant SELECT                                                                 on TMP_FM_CHECKRULES to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_FM_CHECKRULES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_FM_CHECKRULES to BARS_DM;
 grant SELECT                                                                 on TMP_FM_CHECKRULES to FINMON01;
+grant SELECT                                                                 on TMP_FM_CHECKRULES to UPLD;
 
 
 

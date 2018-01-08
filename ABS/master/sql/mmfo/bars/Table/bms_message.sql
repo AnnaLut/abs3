@@ -84,19 +84,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BMS_MESSAGE_REF_MESSG_TYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BMS_MESSAGE ADD CONSTRAINT FK_BMS_MESSAGE_REF_MESSG_TYPE FOREIGN KEY (MESSAGE_TYPE_ID)
-	  REFERENCES BARS.BMS_MESSAGE_TYPE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C004239 ***
 begin   
  execute immediate '
@@ -200,7 +187,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BMS_MESSAGE ***
+grant SELECT                                                                 on BMS_MESSAGE     to BARSREADER_ROLE;
 grant SELECT                                                                 on BMS_MESSAGE     to BARS_DM;
+grant DELETE                                                                 on BMS_MESSAGE     to NOSCHENKOOO;
+grant DELETE                                                                 on BMS_MESSAGE     to PODGORNAYALL06;
+grant SELECT                                                                 on BMS_MESSAGE     to UPLD;
 
 
 

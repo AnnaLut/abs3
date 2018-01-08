@@ -36,6 +36,11 @@ begin
     
     if ln_cnt1 = 0 and ln_cnt2 = 0 then
        p_f1P_NN (p_report_date);
+       
+       delete 
+       from TMP_NBU_HIST
+       where kodf='1P' and
+             datf = p_report_date;           
     end if;
     
     p_nbu_save_rezult(p_report_date, p_kod_filii, '#1P'); 

@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.ERR$_CC_GRT.ORA_ERR_MESG$ IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CC_GRT ***
+grant SELECT                                                                 on ERR$_CC_GRT     to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CC_GRT     to UPLD;
+
 
 
 PROMPT ===================================================================================== 

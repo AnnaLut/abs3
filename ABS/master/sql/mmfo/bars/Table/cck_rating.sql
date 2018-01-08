@@ -99,10 +99,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  CCK_RATING ***
+grant SELECT                                                                 on CCK_RATING      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_RATING      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_RATING      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_RATING      to RCC_DEAL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_RATING      to START1;
+grant SELECT                                                                 on CCK_RATING      to UPLD;
 grant FLASHBACK,SELECT                                                       on CCK_RATING      to WR_REFREAD;
 
 

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Протокол надання та підтвердження ресурсів / M_ROLE_ARTEM';
   l_tablinesdef := '20';
+  l_tabselect_statement := '';
   l_tabname     := 'M_ROLE_ARTEM';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,26 +124,26 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'COMM2', 'C', 'Коментар~Користувача~"Хто Підтверд"', null, null, 39, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'FIO1', 'C', 'П І Б~Користувача~"Хто надав"', 2, null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'FIO2', 'C', 'П І Б~Користувача~"Хто Підтверд"', 2, null, 32, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'GI', 'N', 'Числ.код~ Ресурсу~"Кому дано"~GI', null, null, 92, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'GIK', 'C', 'Симв.код~ Ресурсу~"Кому дано"~GIK', 1, null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'GIS', 'C', 'Назва~ Ресурсу~"Кому дано"~GIS', 2, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'GT', 'N', 'Числ.код~типу Ресурсу~"Кому дано"~GT', null, null, 94, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'GTS', 'C', 'Назва~типу Ресурсу~"Кому дано"~GTS', 2, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'MODE1', 'C', 'Дії~Користувача~"Хто надав"', null, null, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'MODE2', 'C', 'Дії~Користувача~"Хто Підтверд"', null, null, 34, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NPP', 'N', '№ пп', null, null, 80, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'RI', 'N', 'Числ.код~ Ресурсу~"Що дано"~RTS', null, null, 91, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'RIK', 'C', 'Симв.код~ Ресурсу~"Що дано"~RIK', 1, null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'RIS', 'C', 'Назва~ Ресурсу~"Що дано"~RIS', 2, null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'RT', 'N', 'Числ.код~типу Ресурсу~"Що дано"~RT', null, null, 93, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'RTS', 'C', 'Назв~типу Ресурсу~"Що дано"~RTS', 2, null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'TIME1', 'C', 'Час Дії~Користувача~"Хто надав"', null, null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'TIME2', 'C', 'Час Дії~Користувача~"Хто Підтверд"', null, 10, 33, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'USER1', 'N', 'Числ.код~ Користувача~"Хто надав"', 1, null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'USER2', 'N', 'Числ.код~ Користувача~"Хто Підтверд"', 1, null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'COMM2', 'C', 'Коментар~Користувача~"Хто Підтверд"', '', null, 39, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'FIO1', 'C', 'П І Б~Користувача~"Хто надав"', '2', null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'FIO2', 'C', 'П І Б~Користувача~"Хто Підтверд"', '2', null, 32, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'GI', 'N', 'Числ.код~ Ресурсу~"Кому дано"~GI', '', null, 92, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'GIK', 'C', 'Симв.код~ Ресурсу~"Кому дано"~GIK', '1', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'GIS', 'C', 'Назва~ Ресурсу~"Кому дано"~GIS', '2', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'GT', 'N', 'Числ.код~типу Ресурсу~"Кому дано"~GT', '', null, 94, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'GTS', 'C', 'Назва~типу Ресурсу~"Кому дано"~GTS', '2', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'MODE1', 'C', 'Дії~Користувача~"Хто надав"', '', null, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'MODE2', 'C', 'Дії~Користувача~"Хто Підтверд"', '', null, 34, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NPP', 'N', '№ пп', '', null, 80, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'RI', 'N', 'Числ.код~ Ресурсу~"Що дано"~RTS', '', null, 91, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'RIK', 'C', 'Симв.код~ Ресурсу~"Що дано"~RIK', '1', null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'RIS', 'C', 'Назва~ Ресурсу~"Що дано"~RIS', '2', null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'RT', 'N', 'Числ.код~типу Ресурсу~"Що дано"~RT', '', null, 93, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'RTS', 'C', 'Назв~типу Ресурсу~"Що дано"~RTS', '2', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'TIME1', 'C', 'Час Дії~Користувача~"Хто надав"', '', null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'TIME2', 'C', 'Час Дії~Користувача~"Хто Підтверд"', '', 10, 33, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'USER1', 'N', 'Числ.код~ Користувача~"Хто надав"', '1', null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'USER2', 'N', 'Числ.код~ Користувача~"Хто Підтверд"', '1', null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 11, 1, 'DESC');

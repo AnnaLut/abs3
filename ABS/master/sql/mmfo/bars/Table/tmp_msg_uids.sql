@@ -40,6 +40,12 @@ COMMENT ON COLUMN BARS.TMP_MSG_UIDS.USER_ID IS 'ID користувача';
 
 
 
+PROMPT *** Create  grants  TMP_MSG_UIDS ***
+grant SELECT                                                                 on TMP_MSG_UIDS    to BARSREADER_ROLE;
+grant INSERT                                                                 on TMP_MSG_UIDS    to NOSCHENKOOO;
+grant INSERT                                                                 on TMP_MSG_UIDS    to PODGORNAYALL06;
+grant SELECT                                                                 on TMP_MSG_UIDS    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

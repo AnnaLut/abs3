@@ -88,7 +88,9 @@ COMMENT ON COLUMN BARS.ERR$_AGG_MONBALS.CALDT_ID IS '';
 
 
 PROMPT *** Create  grants  ERR$_AGG_MONBALS ***
+grant SELECT                                                                 on ERR$_AGG_MONBALS to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_AGG_MONBALS to BARS_DM;
+grant SELECT                                                                 on ERR$_AGG_MONBALS to UPLD;
 
 
 

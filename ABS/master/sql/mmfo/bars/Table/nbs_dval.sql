@@ -65,19 +65,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_NBSDVAL_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBS_DVAL ADD CONSTRAINT FK_NBSDVAL_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C007853 ***
 begin   
  execute immediate '
@@ -128,10 +115,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBS_DVAL ***
+grant SELECT                                                                 on NBS_DVAL        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBS_DVAL        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBS_DVAL        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBS_DVAL        to NBS_DVAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBS_DVAL        to SEP_ROLE;
+grant SELECT                                                                 on NBS_DVAL        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBS_DVAL        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on NBS_DVAL        to WR_REFREAD;
 

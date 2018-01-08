@@ -93,9 +93,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  EK7_AR ***
+grant SELECT                                                                 on EK7_AR          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on EK7_AR          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EK7_AR          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EK7_AR          to EK7_AR;
+grant SELECT                                                                 on EK7_AR          to UPLD;
 grant FLASHBACK,SELECT                                                       on EK7_AR          to WR_REFREAD;
 
 

@@ -51,9 +51,11 @@ COMMENT ON COLUMN BARS.TMP_PFNOTPAY.DATE_END IS '';
 
 
 PROMPT *** Create  grants  TMP_PFNOTPAY ***
+grant SELECT                                                                 on TMP_PFNOTPAY    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_PFNOTPAY    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_PFNOTPAY    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_PFNOTPAY    to START1;
+grant SELECT                                                                 on TMP_PFNOTPAY    to UPLD;
 
 
 

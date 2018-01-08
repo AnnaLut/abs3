@@ -45,6 +45,8 @@ COMMENT ON COLUMN BARS.REF_KOR.VDAT IS '';
 
 
 PROMPT *** Create  grants  REF_KOR ***
+grant SELECT                                                                 on REF_KOR         to BARSREADER_ROLE;
+grant SELECT                                                                 on REF_KOR         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REF_KOR         to WR_ALL_RIGHTS;
 
 

@@ -79,9 +79,11 @@ exception when others then
 PROMPT *** Create  grants  INT_CAP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_CAP         to ABS_ADMIN;
 grant DELETE,INSERT,SELECT                                                   on INT_CAP         to BARS010;
+grant SELECT                                                                 on INT_CAP         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_CAP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_CAP         to BARS_DM;
 grant DELETE,INSERT,SELECT                                                   on INT_CAP         to DPT_ROLE;
+grant SELECT                                                                 on INT_CAP         to UPLD;
 
 
 

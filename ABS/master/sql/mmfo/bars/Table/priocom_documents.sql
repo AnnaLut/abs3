@@ -119,178 +119,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PRC_DOC_NATIONALCURSUM_NN ***
+PROMPT *** Create  constraint CC_PRC_DOC_OPERDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (NATIONALCURSUM CONSTRAINT CC_PRC_DOC_NATIONALCURSUM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRC_DOC_DOCSUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (DOCSUM CONSTRAINT CC_PRC_DOC_DOCSUM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRC_DOC_OTM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (OTM CONSTRAINT CC_PRC_DOC_OTM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRC_DOC_ROWNUMBER_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (ROWNUMBER CONSTRAINT CC_PRC_DOC_ROWNUMBER_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRC_DOC_PAYDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (PAYDATE CONSTRAINT CC_PRC_DOC_PAYDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRC_DOC_PAYDESTINATION_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (PAYDESTINATION CONSTRAINT CC_PRC_DOC_PAYDESTINATION_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRC_DOC_NDP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (NDP CONSTRAINT CC_PRC_DOC_NDP_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRC_DOC_DOCKIND_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (DOCKIND CONSTRAINT CC_PRC_DOC_DOCKIND_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRC_DOC_CURRENCY_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (CURRENCY CONSTRAINT CC_PRC_DOC_CURRENCY_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRC_DOC_ACCOUNT2_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (ACCOUNT2 CONSTRAINT CC_PRC_DOC_ACCOUNT2_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRC_DOC_MFO_B_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (MFO_B CONSTRAINT CC_PRC_DOC_MFO_B_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRC_DOC_ACCOUNT1_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (ACCOUNT1 CONSTRAINT CC_PRC_DOC_ACCOUNT1_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRC_DOC_MFO_A_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (MFO_A CONSTRAINT CC_PRC_DOC_MFO_A_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRC_DOC_DOCID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (DOCID CONSTRAINT CC_PRC_DOC_DOCID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PRC_DOC_ODBSTATUS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (ODBSTATUS CONSTRAINT CC_PRC_DOC_ODBSTATUS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (OPERDATE CONSTRAINT CC_PRC_DOC_OPERDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -311,10 +143,178 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PRC_DOC_OPERDATE_NN ***
+PROMPT *** Create  constraint CC_PRC_DOC_ODBSTATUS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (OPERDATE CONSTRAINT CC_PRC_DOC_OPERDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (ODBSTATUS CONSTRAINT CC_PRC_DOC_ODBSTATUS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PRC_DOC_DOCID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (DOCID CONSTRAINT CC_PRC_DOC_DOCID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PRC_DOC_MFO_A_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (MFO_A CONSTRAINT CC_PRC_DOC_MFO_A_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PRC_DOC_ACCOUNT1_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (ACCOUNT1 CONSTRAINT CC_PRC_DOC_ACCOUNT1_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PRC_DOC_MFO_B_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (MFO_B CONSTRAINT CC_PRC_DOC_MFO_B_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PRC_DOC_ACCOUNT2_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (ACCOUNT2 CONSTRAINT CC_PRC_DOC_ACCOUNT2_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PRC_DOC_CURRENCY_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (CURRENCY CONSTRAINT CC_PRC_DOC_CURRENCY_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PRC_DOC_DOCKIND_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (DOCKIND CONSTRAINT CC_PRC_DOC_DOCKIND_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PRC_DOC_NDP_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (NDP CONSTRAINT CC_PRC_DOC_NDP_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PRC_DOC_PAYDESTINATION_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (PAYDESTINATION CONSTRAINT CC_PRC_DOC_PAYDESTINATION_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PRC_DOC_PAYDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (PAYDATE CONSTRAINT CC_PRC_DOC_PAYDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PRC_DOC_ROWNUMBER_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (ROWNUMBER CONSTRAINT CC_PRC_DOC_ROWNUMBER_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PRC_DOC_OTM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (OTM CONSTRAINT CC_PRC_DOC_OTM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PRC_DOC_DOCSUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (DOCSUM CONSTRAINT CC_PRC_DOC_DOCSUM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PRC_DOC_NATIONALCURSUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRIOCOM_DOCUMENTS MODIFY (NATIONALCURSUM CONSTRAINT CC_PRC_DOC_NATIONALCURSUM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -337,8 +337,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRIOCOM_DOCUMENTS ***
+grant SELECT                                                                 on PRIOCOM_DOCUMENTS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PRIOCOM_DOCUMENTS to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PRIOCOM_DOCUMENTS to START1;
+grant SELECT                                                                 on PRIOCOM_DOCUMENTS to UPLD;
 
 
 

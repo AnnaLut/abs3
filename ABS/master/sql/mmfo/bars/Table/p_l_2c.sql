@@ -23,7 +23,7 @@ PROMPT *** Create  table P_L_2C ***
 begin 
   execute immediate '
   CREATE TABLE BARS.P_L_2C 
-   (	ID NUMBER(4,0), 
+   (	ID VARCHAR2(4), 
 	NAME VARCHAR2(512), 
 	DELETE_DATE DATE
    ) SEGMENT CREATION IMMEDIATE 
@@ -49,21 +49,13 @@ COMMENT ON COLUMN BARS.P_L_2C.DELETE_DATE IS 'Дата видаленя';
 
 
 
-PROMPT *** Create  index PK_P_L_2C ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_P_L_2C ON BARS.P_L_2C (ID) 
-  TABLESPACE BRSDYND ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
 
 PROMPT *** Create  constraint PK_P_L_2C ***
 begin   
  execute immediate '
   ALTER TABLE BARS.P_L_2C ADD CONSTRAINT PK_P_L_2C PRIMARY KEY (ID)
-  USING INDEX BARS.PK_P_L_2C';
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -72,13 +64,25 @@ exception when others then
 
 
 
-alter table P_L_2C modify id varchar2(4);
+PROMPT *** Create  index PK_P_L_2C ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.PK_P_L_2C ON BARS.P_L_2C (ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
 
 
 PROMPT *** Create  grants  P_L_2C ***
+grant SELECT                                                                 on P_L_2C          to BARSREADER_ROLE;
 grant SELECT                                                                 on P_L_2C          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on P_L_2C          to BARS_DM;
 grant SELECT                                                                 on P_L_2C          to CIM_ROLE;
+grant SELECT                                                                 on P_L_2C          to UPLD;
 
 
 

@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_OW_ACC_QUE.DAT IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_OW_ACC_QUE ***
+grant SELECT                                                                 on ERR$_OW_ACC_QUE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_OW_ACC_QUE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

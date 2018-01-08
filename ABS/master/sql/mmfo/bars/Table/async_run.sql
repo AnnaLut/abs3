@@ -84,19 +84,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ASNRUN_ACT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ASYNC_RUN ADD CONSTRAINT FK_ASNRUN_ACT FOREIGN KEY (ACTION_ID)
-	  REFERENCES BARS.ASYNC_ACTION (ACTION_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_ASNRUN_STATE_NN ***
 begin   
  execute immediate '
@@ -137,8 +124,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  ASYNC_RUN ***
+grant SELECT                                                                 on ASYNC_RUN       to BARSREADER_ROLE;
 grant SELECT                                                                 on ASYNC_RUN       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ASYNC_RUN       to BARS_DM;
+grant SELECT                                                                 on ASYNC_RUN       to UPLD;
 
 
 

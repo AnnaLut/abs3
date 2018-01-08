@@ -61,6 +61,10 @@ COMMENT ON COLUMN BARS.ERR$_BIC_ACC.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_BIC_ACC ***
+grant SELECT                                                                 on ERR$_BIC_ACC    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_BIC_ACC    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

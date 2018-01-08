@@ -182,10 +182,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00109369 ***
+PROMPT *** Create  constraint SYS_C00109362 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_STAFF$BASE_BCP MODIFY (POLICY_GROUP NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_STAFF$BASE_BCP MODIFY (LOGNAME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -266,16 +266,20 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00109362 ***
+PROMPT *** Create  constraint SYS_C00109369 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_STAFF$BASE_BCP MODIFY (LOGNAME NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_STAFF$BASE_BCP MODIFY (POLICY_GROUP NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
+
+PROMPT *** Create  grants  TMP_STAFF$BASE_BCP ***
+grant SELECT                                                                 on TMP_STAFF$BASE_BCP to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_STAFF$BASE_BCP to UPLD;
 
 
 

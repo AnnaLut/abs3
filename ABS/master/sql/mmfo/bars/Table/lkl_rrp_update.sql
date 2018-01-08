@@ -59,9 +59,11 @@ COMMENT ON COLUMN BARS.LKL_RRP_UPDATE.KF IS '';
 
 
 PROMPT *** Create  grants  LKL_RRP_UPDATE ***
+grant SELECT                                                                 on LKL_RRP_UPDATE  to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on LKL_RRP_UPDATE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LKL_RRP_UPDATE  to BARS_DM;
 grant INSERT,SELECT                                                          on LKL_RRP_UPDATE  to SETLIM01;
+grant SELECT                                                                 on LKL_RRP_UPDATE  to UPLD;
 
 
 

@@ -85,19 +85,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SWBANKS_SWCHRSETS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_BANKS ADD CONSTRAINT FK_SWBANKS_SWCHRSETS FOREIGN KEY (CHRSET)
-	  REFERENCES BARS.SW_CHRSETS (SETID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SWBANKS_BIC_NN ***
 begin   
  execute immediate '
@@ -127,12 +114,14 @@ PROMPT *** Create  grants  SW_BANKS ***
 grant SELECT                                                                 on SW_BANKS        to BARS013;
 grant FLASHBACK,REFERENCES,SELECT                                            on SW_BANKS        to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on SW_BANKS        to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on SW_BANKS        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_BANKS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_BANKS        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_BANKS        to INSPECTOR;
 grant SELECT                                                                 on SW_BANKS        to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_BANKS        to SWIFT001;
 grant SELECT                                                                 on SW_BANKS        to SWTOSS;
+grant SELECT                                                                 on SW_BANKS        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_BANKS        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SW_BANKS        to WR_REFREAD;
 

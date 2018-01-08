@@ -14,7 +14,9 @@ where b.country_id=c.country(+)
 order by 1 desc;
 
 PROMPT *** Create  grants  V_CIM_BENEFICIARIES ***
+grant SELECT                                                                 on V_CIM_BENEFICIARIES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_CIM_BENEFICIARIES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_BENEFICIARIES to UPLD;
 
 
 

@@ -88,6 +88,7 @@ exception when others then
 
 PROMPT *** Create  grants  SPR_MON ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPR_MON         to ABS_ADMIN;
+grant SELECT                                                                 on SPR_MON         to BARSREADER_ROLE;
 grant SELECT                                                                 on SPR_MON         to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPR_MON         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SPR_MON         to PYOD001;

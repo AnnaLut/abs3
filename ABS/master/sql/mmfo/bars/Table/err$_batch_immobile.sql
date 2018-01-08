@@ -71,6 +71,10 @@ COMMENT ON COLUMN BARS.ERR$_BATCH_IMMOBILE.USERID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_BATCH_IMMOBILE ***
+grant SELECT                                                                 on ERR$_BATCH_IMMOBILE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_BATCH_IMMOBILE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

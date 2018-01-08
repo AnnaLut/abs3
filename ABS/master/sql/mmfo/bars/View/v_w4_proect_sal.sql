@@ -15,8 +15,10 @@ PROMPT *** Create  view V_W4_PROECT_SAL ***
    and nvl(b.used_w4,0) = 1;
 
 PROMPT *** Create  grants  V_W4_PROECT_SAL ***
+grant SELECT                                                                 on V_W4_PROECT_SAL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_PROECT_SAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_W4_PROECT_SAL to OW;
+grant SELECT                                                                 on V_W4_PROECT_SAL to UPLD;
 
 
 

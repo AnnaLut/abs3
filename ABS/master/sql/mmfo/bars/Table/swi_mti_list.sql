@@ -165,8 +165,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SWI_MTI_LIST ***
+grant SELECT                                                                 on SWI_MTI_LIST    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SWI_MTI_LIST    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SWI_MTI_LIST    to START1;
+grant SELECT                                                                 on SWI_MTI_LIST    to UPLD;
 
 
 

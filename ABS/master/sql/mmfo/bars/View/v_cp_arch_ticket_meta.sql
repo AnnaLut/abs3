@@ -30,8 +30,10 @@ PROMPT *** Create  view V_CP_ARCH_TICKET_META ***
           and a.acc = o.acc;
 
 PROMPT *** Create  grants  V_CP_ARCH_TICKET_META ***
+grant SELECT                                                                 on V_CP_ARCH_TICKET_META to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_ARCH_TICKET_META to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_ARCH_TICKET_META to CP_ROLE;
+grant SELECT                                                                 on V_CP_ARCH_TICKET_META to UPLD;
 
 
 

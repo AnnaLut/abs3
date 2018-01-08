@@ -82,7 +82,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  PAY_INT_ACRPAY_BATCH ***
+grant SELECT                                                                 on PAY_INT_ACRPAY_BATCH to BARSREADER_ROLE;
 grant SELECT                                                                 on PAY_INT_ACRPAY_BATCH to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on PAY_INT_ACRPAY_BATCH to UPLD;
 
 
 

@@ -17,8 +17,10 @@ PROMPT *** Create  view ARCDOCS ***
  ;
 
 PROMPT *** Create  grants  ARCDOCS ***
+grant SELECT                                                                 on ARCDOCS         to BARSREADER_ROLE;
 grant SELECT                                                                 on ARCDOCS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ARCDOCS         to START1;
+grant SELECT                                                                 on ARCDOCS         to UPLD;
 
 
 

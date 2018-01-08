@@ -79,19 +79,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DEBHOZ_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEB_HOZ ADD CONSTRAINT FK_DEBHOZ_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DEBHOZ_KF_NN ***
 begin   
  execute immediate '
@@ -118,10 +105,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  DEB_HOZ ***
+grant SELECT                                                                 on DEB_HOZ         to BARSREADER_ROLE;
 grant SELECT                                                                 on DEB_HOZ         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEB_HOZ         to BARS_DM;
 grant SELECT                                                                 on DEB_HOZ         to RCC_DEAL;
 grant SELECT                                                                 on DEB_HOZ         to START1;
+grant SELECT                                                                 on DEB_HOZ         to UPLD;
 
 
 

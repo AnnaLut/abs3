@@ -58,6 +58,10 @@ COMMENT ON COLUMN BARS.KL_S133.DATA_C IS '';
 
 
 
+PROMPT *** Create  grants  KL_S133 ***
+grant SELECT                                                                 on KL_S133         to BARSREADER_ROLE;
+grant SELECT                                                                 on KL_S133         to UPLD;
+
 
 
 PROMPT ===================================================================================== 

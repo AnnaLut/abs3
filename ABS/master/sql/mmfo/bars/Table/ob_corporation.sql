@@ -80,37 +80,24 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00126430 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OB_CORPORATION ADD CHECK (EXTERNAL_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_OB_CORPO_REFERENCE_OB_CORPO ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OB_CORPORATION ADD CONSTRAINT FK_OB_CORPO_REFERENCE_OB_CORPO FOREIGN KEY (PARENT_ID)
-	  REFERENCES BARS.OB_CORPORATION (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_OB_CORPORATION ***
 begin   
  execute immediate '
   ALTER TABLE BARS.OB_CORPORATION ADD CONSTRAINT PK_OB_CORPORATION PRIMARY KEY (ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSSMLD  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C00126430 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OB_CORPORATION ADD CHECK (EXTERNAL_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -133,7 +120,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OB_CORPORATION ***
+grant SELECT                                                                 on OB_CORPORATION  to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on OB_CORPORATION  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on OB_CORPORATION  to UPLD;
 
 
 

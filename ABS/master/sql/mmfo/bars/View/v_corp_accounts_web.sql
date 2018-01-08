@@ -74,8 +74,10 @@ PROMPT *** Create  view V_CORP_ACCOUNTS_WEB ***
           LEFT JOIN SPECPARAM_INT s ON a.ACC = s.ACC;
 
 PROMPT *** Create  grants  V_CORP_ACCOUNTS_WEB ***
+grant SELECT                                                                 on V_CORP_ACCOUNTS_WEB to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_CORP_ACCOUNTS_WEB to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CORP_ACCOUNTS_WEB to CORP_CLIENT;
+grant SELECT                                                                 on V_CORP_ACCOUNTS_WEB to UPLD;
 
 
 

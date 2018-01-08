@@ -64,9 +64,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CCK_NEINF ***
+grant SELECT                                                                 on CCK_NEINF       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_NEINF       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_NEINF       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_NEINF       to START1;
+grant SELECT                                                                 on CCK_NEINF       to UPLD;
 
 
 

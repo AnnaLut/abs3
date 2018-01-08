@@ -49,8 +49,10 @@ WHERE nbs_ob22_null ('9821', SUBSTR (ob22, 5, 2), b.branch) IS NOT NULL
   AND v.ob22_dor  IS NOT NULL AND nbs_ob22_null('9893', v.ob22_dor, b.branch) IS NULL;
 
 PROMPT *** Create  grants  NOT_NLS98 ***
+grant SELECT                                                                 on NOT_NLS98       to BARSREADER_ROLE;
 grant SELECT                                                                 on NOT_NLS98       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NOT_NLS98       to CUST001;
+grant SELECT                                                                 on NOT_NLS98       to UPLD;
 
 
 

@@ -101,6 +101,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPU_PAYMENTS ***
+grant SELECT                                                                 on DPU_PAYMENTS    to BARSREADER_ROLE;
 grant SELECT                                                                 on DPU_PAYMENTS    to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPU_PAYMENTS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_PAYMENTS    to BARS_DM;

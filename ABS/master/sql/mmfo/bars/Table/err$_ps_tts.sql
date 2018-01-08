@@ -62,9 +62,11 @@ COMMENT ON COLUMN BARS.ERR$_PS_TTS.OB22 IS '';
 
 
 PROMPT *** Create  grants  ERR$_PS_TTS ***
+grant SELECT                                                                 on ERR$_PS_TTS     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_PS_TTS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ERR$_PS_TTS     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_PS_TTS     to START1;
+grant SELECT                                                                 on ERR$_PS_TTS     to UPLD;
 
 
 

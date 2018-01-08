@@ -13,7 +13,9 @@ PROMPT *** Create  view V_MBDK_EDIT_CC_ID ***
 FROM CC_deal;
 
 PROMPT *** Create  grants  V_MBDK_EDIT_CC_ID ***
+grant SELECT                                                                 on V_MBDK_EDIT_CC_ID to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_MBDK_EDIT_CC_ID to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_MBDK_EDIT_CC_ID to UPLD;
 
 
 

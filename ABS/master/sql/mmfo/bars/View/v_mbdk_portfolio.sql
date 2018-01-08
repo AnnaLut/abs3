@@ -1,3 +1,5 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_MBDK_PORTFOLIO.sql =========*** Run *
 PROMPT ===================================================================================== 
@@ -5,8 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_MBDK_PORTFOLIO ***
 
-CREATE OR REPLACE VIEW V_MBDK_PORTFOLIO AS
-SELECT user_utl.get_user_name(m.userid) user_name,                      -- isp
+  CREATE OR REPLACE FORCE VIEW BARS.V_MBDK_PORTFOLIO ("USER_NAME", "OSTC", "OSTB", "OSTF", "KV", "NLS", "DDATE", "ZDATE", "SDATE", "WDATE", "RNK", "OKPO", "NMK", "CC_ID", "ND", "ACC", "LIMIT", "SROK", "OST_SROK", "VIDD", "TIPD", "KPROLOG", "BIC", "SWI_REF", "SWO_REF", "NLS_N", "RATN", "IRR", "MDATE_N", "OSTCN", "OSTBN", "OSTFN", "ACR_DAT", "MFOKRED", "ACCKRED", "MFOPERC", "ACCPERC", "S_1819", "BUH", "RAH", "PROSTR", "GPK", "REPO", "ZAL", "ZAL1", "CODE_PRODUCT", "NAME_PRODUCT", "NBS", "OB22", "N_NBU", "D_NBU") AS 
+  SELECT user_utl.get_user_name(m.userid) user_name,                      -- isp
        m.ostc / POWER (10, 2) ostc,                             -- ost body
        m.ostb / POWER (10, 2) ostb,                         -- план по тілу
        m.ostf / POWER (10, 2) ostf,                    -- майбутній по тілу
@@ -61,7 +63,9 @@ FROM   mbd_k m
 ORDER BY m.nd DESC;
 
 PROMPT *** Create  grants  V_MBDK_PORTFOLIO ***
+grant SELECT                                                                 on V_MBDK_PORTFOLIO to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_MBDK_PORTFOLIO to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_MBDK_PORTFOLIO to UPLD;
 
 
 

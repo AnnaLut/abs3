@@ -49,9 +49,11 @@ COMMENT ON COLUMN BARS.RETURN_KREDIT.TXT IS '';
 
 
 PROMPT *** Create  grants  RETURN_KREDIT ***
+grant SELECT                                                                 on RETURN_KREDIT   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RETURN_KREDIT   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RETURN_KREDIT   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RETURN_KREDIT   to START1;
+grant SELECT                                                                 on RETURN_KREDIT   to UPLD;
 
 
 

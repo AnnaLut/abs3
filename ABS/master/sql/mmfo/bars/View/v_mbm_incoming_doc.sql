@@ -13,14 +13,16 @@ PROMPT *** Create  view V_MBM_INCOMING_DOC ***
     accb.rnk as recipientcustomerid
 from   accounts accb
 join   opldok ob on ob.acc = accb.acc
-join   opldok oa on oa.ref = ob.ref and oa.stmt = ob.stmt and oa.dk <> ob.dk 
-join   accounts acca on acca.acc = oa.acc 
+join   opldok oa on oa.ref = ob.ref and oa.stmt = ob.stmt and oa.dk <> ob.dk
+join   accounts acca on acca.acc = oa.acc
 join   v_mbm_documents d on d.id = ob.ref and d.Sender_Code != d.Recipient_Code
 where  accb.nbs in (select nbs from mbm_nbs_acc_types) and ob.dk = 1 and
        d.state = 5;
 
 PROMPT *** Create  grants  V_MBM_INCOMING_DOC ***
+grant SELECT                                                                 on V_MBM_INCOMING_DOC to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBM_INCOMING_DOC to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_MBM_INCOMING_DOC to UPLD;
 
 
 

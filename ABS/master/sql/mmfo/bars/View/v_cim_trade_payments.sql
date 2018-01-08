@@ -26,7 +26,9 @@ PROMPT *** Create  view V_CIM_TRADE_PAYMENTS ***
             FROM v_cim_bound_payments b /*join cim_contracts c on c.contr_type<2 and b.contr_id=c.contr_id*/ where pay_flag=0) b;
 
 PROMPT *** Create  grants  V_CIM_TRADE_PAYMENTS ***
+grant SELECT                                                                 on V_CIM_TRADE_PAYMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_TRADE_PAYMENTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_TRADE_PAYMENTS to UPLD;
 
 
 

@@ -27,7 +27,7 @@ begin
 	ATTR_ID VARCHAR2(100), 
 	VAL VARCHAR2(1024), 
 	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
-   ) SEGMENT CREATION DEFERRED 
+   ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSBIGD ';
@@ -58,19 +58,6 @@ begin
   ALTER TABLE BARS.INS_DEAL_ATTRS ADD CONSTRAINT PK_INSDLSATTRS PRIMARY KEY (DEAL_ID, ATTR_ID, KF)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_INSDLSATTRS_INSDEALS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_DEAL_ATTRS ADD CONSTRAINT FK_INSDLSATTRS_INSDEALS FOREIGN KEY (DEAL_ID, KF)
-	  REFERENCES BARS.INS_DEALS (ID, KF) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -115,19 +102,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_INSDLSATTRS_DEALTAGS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_DEAL_ATTRS ADD CONSTRAINT FK_INSDLSATTRS_DEALTAGS FOREIGN KEY (ATTR_ID)
-	  REFERENCES BARS.INS_ATTRS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_INSDLSATTRS ***
 begin   
  execute immediate '
@@ -140,6 +114,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  INS_DEAL_ATTRS ***
+grant SELECT                                                                 on INS_DEAL_ATTRS  to BARSREADER_ROLE;
+grant SELECT                                                                 on INS_DEAL_ATTRS  to UPLD;
 
 
 

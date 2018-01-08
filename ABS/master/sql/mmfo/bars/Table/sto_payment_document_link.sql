@@ -49,19 +49,6 @@ COMMENT ON COLUMN BARS.STO_PAYMENT_DOCUMENT_LINK.DOCUMENT_ID IS '';
 
 
 
-PROMPT *** Create  constraint FK_PM_DOC_LINK_REF_PAYM ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_PAYMENT_DOCUMENT_LINK ADD CONSTRAINT FK_PM_DOC_LINK_REF_PAYM FOREIGN KEY (PAYMENT_ID)
-	  REFERENCES BARS.STO_PAYMENT (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C006796 ***
 begin   
  execute immediate '
@@ -84,6 +71,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  STO_PAYMENT_DOCUMENT_LINK ***
+grant SELECT                                                                 on STO_PAYMENT_DOCUMENT_LINK to BARSREADER_ROLE;
+grant SELECT                                                                 on STO_PAYMENT_DOCUMENT_LINK to UPLD;
 
 
 

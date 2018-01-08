@@ -108,6 +108,7 @@ PROMPT *** Create  grants  FDAT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on FDAT            to ABS_ADMIN;
 grant SELECT                                                                 on FDAT            to BARSAQ with grant option;
 grant SELECT                                                                 on FDAT            to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on FDAT            to BARSREADER_ROLE;
 grant SELECT                                                                 on FDAT            to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FDAT            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FDAT            to BARS_DM;
@@ -115,6 +116,7 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on FDAT            to RPBN001;
 grant SELECT                                                                 on FDAT            to START1;
 grant SELECT                                                                 on FDAT            to TOSS;
+grant SELECT                                                                 on FDAT            to UPLD;
 grant SELECT                                                                 on FDAT            to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FDAT            to WR_ALL_RIGHTS;
 grant SELECT                                                                 on FDAT            to WR_CUSTLIST;

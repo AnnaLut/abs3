@@ -57,6 +57,10 @@ COMMENT ON COLUMN BARS.ERR$_XML_IMPDOCSW.VALUE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_XML_IMPDOCSW ***
+grant SELECT                                                                 on ERR$_XML_IMPDOCSW to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_XML_IMPDOCSW to UPLD;
+
 
 
 PROMPT ===================================================================================== 

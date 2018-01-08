@@ -69,45 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CUSTOMERCTG_CUSTOMER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_CATEGORY ADD CONSTRAINT FK_CUSTOMERCTG_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMERCTG_FMCATEGORY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_CATEGORY ADD CONSTRAINT FK_CUSTOMERCTG_FMCATEGORY FOREIGN KEY (CATEGORY_ID)
-	  REFERENCES BARS.FM_CATEGORY (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMERCTG_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_CATEGORY ADD CONSTRAINT FK_CUSTOMERCTG_STAFF FOREIGN KEY (USER_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_CUSTOMERCTG_RNK_NN ***
 begin   
  execute immediate '
@@ -158,9 +119,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUSTOMER_CATEGORY ***
+grant SELECT                                                                 on CUSTOMER_CATEGORY to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_CATEGORY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_CATEGORY to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_CATEGORY to CUST001;
+grant SELECT                                                                 on CUSTOMER_CATEGORY to UPLD;
 
 
 

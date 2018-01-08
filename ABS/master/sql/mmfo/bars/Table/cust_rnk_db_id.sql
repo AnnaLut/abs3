@@ -81,9 +81,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUST_RNK_DB_ID ***
+grant SELECT                                                                 on CUST_RNK_DB_ID  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_RNK_DB_ID  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUST_RNK_DB_ID  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_RNK_DB_ID  to START1;
+grant SELECT                                                                 on CUST_RNK_DB_ID  to UPLD;
 
 
 

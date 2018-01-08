@@ -43,9 +43,11 @@ PROMPT *** Create  view V_NBUR_LIST_FILES_USER ***
 ;
 
 PROMPT *** Create  grants  V_NBUR_LIST_FILES_USER ***
+grant SELECT                                                                 on V_NBUR_LIST_FILES_USER to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_LIST_FILES_USER to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_LIST_FILES_USER to RPBN002;
 grant SELECT                                                                 on V_NBUR_LIST_FILES_USER to START1;
+grant SELECT                                                                 on V_NBUR_LIST_FILES_USER to UPLD;
 
 
 

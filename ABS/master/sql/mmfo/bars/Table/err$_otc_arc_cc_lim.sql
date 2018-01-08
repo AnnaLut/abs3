@@ -68,7 +68,9 @@ COMMENT ON COLUMN BARS.ERR$_OTC_ARC_CC_LIM.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_OTC_ARC_CC_LIM ***
+grant SELECT                                                                 on ERR$_OTC_ARC_CC_LIM to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_OTC_ARC_CC_LIM to BARS_DM;
+grant SELECT                                                                 on ERR$_OTC_ARC_CC_LIM to UPLD;
 
 
 

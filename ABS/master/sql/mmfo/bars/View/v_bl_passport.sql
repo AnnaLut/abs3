@@ -13,7 +13,9 @@ PROMPT *** Create  view V_BL_PASSPORT ***
      FROM bl_passport;
 
 PROMPT *** Create  grants  V_BL_PASSPORT ***
+grant SELECT                                                                 on V_BL_PASSPORT   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BL_PASSPORT   to RBL;
+grant SELECT                                                                 on V_BL_PASSPORT   to UPLD;
 
 
 

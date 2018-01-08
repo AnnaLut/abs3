@@ -72,7 +72,9 @@ PROMPT *** Create  view V_USER_CASHVISA_DOCS ***
 ;
 
 PROMPT *** Create  grants  V_USER_CASHVISA_DOCS ***
+grant SELECT                                                                 on V_USER_CASHVISA_DOCS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USER_CASHVISA_DOCS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_USER_CASHVISA_DOCS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USER_CASHVISA_DOCS to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_USER_CASHVISA_DOCS to WR_CHCKINNR_CASH;
 

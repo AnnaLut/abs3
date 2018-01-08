@@ -102,10 +102,12 @@ exception when others then
 
 PROMPT *** Create  grants  FRONTEND ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on FRONTEND        to ABS_ADMIN;
+grant SELECT                                                                 on FRONTEND        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FRONTEND        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FRONTEND        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FRONTEND        to FRONTEND;
 grant SELECT                                                                 on FRONTEND        to START1;
+grant SELECT                                                                 on FRONTEND        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FRONTEND        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on FRONTEND        to WR_REFREAD;
 

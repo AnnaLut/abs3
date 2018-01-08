@@ -74,8 +74,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_KRYM_REF ***
+grant SELECT                                                                 on TMP_KRYM_REF    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_KRYM_REF    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_KRYM_REF    to START1;
+grant SELECT                                                                 on TMP_KRYM_REF    to UPLD;
 
 
 

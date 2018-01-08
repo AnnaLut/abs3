@@ -73,32 +73,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CCVIDD_CCTIPD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_VIDD ADD CONSTRAINT FK_CCVIDD_CCTIPD FOREIGN KEY (TIPD)
-	  REFERENCES BARS.CC_TIPD (TIPD) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CCVIDD_CUSTTYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_VIDD ADD CONSTRAINT FK_CCVIDD_CUSTTYPE FOREIGN KEY (CUSTTYPE)
-	  REFERENCES BARS.CUSTTYPE (CUSTTYPE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_CCVIDD_VIDD_NN ***
 begin   
  execute immediate '
@@ -163,6 +137,7 @@ exception when others then
 PROMPT *** Create  grants  CC_VIDD ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_VIDD         to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_VIDD         to BARS009;
+grant SELECT                                                                 on CC_VIDD         to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_VIDD         to BARSUPL;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on CC_VIDD         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_VIDD         to BARS_DM;
@@ -172,6 +147,7 @@ grant SELECT                                                                 on 
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CC_VIDD         to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_VIDD         to TECH005;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_VIDD         to TECH006;
+grant SELECT                                                                 on CC_VIDD         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_VIDD         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CC_VIDD         to WR_REFREAD;
 

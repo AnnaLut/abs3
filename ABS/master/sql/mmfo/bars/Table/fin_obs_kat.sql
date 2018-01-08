@@ -67,35 +67,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_FINOBSKAT_FIN ***
+PROMPT *** Create  constraint CC_FINOBSKAT_CUS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FIN_OBS_KAT ADD CONSTRAINT FK_FINOBSKAT_FIN FOREIGN KEY (FIN)
-	  REFERENCES BARS.STAN_FIN23 (FIN) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_FINOBSKAT_KAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FIN_OBS_KAT MODIFY (KAT CONSTRAINT CC_FINOBSKAT_KAT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_FINOBSKAT_OBS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FIN_OBS_KAT MODIFY (OBS CONSTRAINT CC_FINOBSKAT_OBS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.FIN_OBS_KAT MODIFY (CUS CONSTRAINT CC_FINOBSKAT_CUS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -116,10 +91,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_FINOBSKAT_CUS_NN ***
+PROMPT *** Create  constraint CC_FINOBSKAT_OBS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FIN_OBS_KAT MODIFY (CUS CONSTRAINT CC_FINOBSKAT_CUS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.FIN_OBS_KAT MODIFY (OBS CONSTRAINT CC_FINOBSKAT_OBS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -128,24 +103,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_FINOBSKAT_KAT ***
+PROMPT *** Create  constraint CC_FINOBSKAT_KAT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FIN_OBS_KAT ADD CONSTRAINT FK_FINOBSKAT_KAT FOREIGN KEY (KAT)
-	  REFERENCES BARS.STAN_KAT23 (KAT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_FINOBSKAT_OBS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FIN_OBS_KAT ADD CONSTRAINT FK_FINOBSKAT_OBS FOREIGN KEY (OBS)
-	  REFERENCES BARS.STAN_OBS23 (OBS) ENABLE';
+  ALTER TABLE BARS.FIN_OBS_KAT MODIFY (KAT CONSTRAINT CC_FINOBSKAT_KAT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -168,9 +129,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_OBS_KAT ***
+grant SELECT                                                                 on FIN_OBS_KAT     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_OBS_KAT     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_OBS_KAT     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_OBS_KAT     to START1;
+grant SELECT                                                                 on FIN_OBS_KAT     to UPLD;
 grant FLASHBACK,SELECT                                                       on FIN_OBS_KAT     to WR_REFREAD;
 
 

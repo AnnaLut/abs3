@@ -1,4 +1,13 @@
-create or replace procedure p_elt_deal_upd(
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_ELT_DEAL_UPD.sql =========*** Ru
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_ELT_DEAL_UPD ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_ELT_DEAL_UPD (
 p_nd       e_deal$base.nd%type,      -- Реф. угоди
 p_user_id  e_deal$base.user_id%type, -- Вик.
 p_cc_id    e_deal$base.cc_id%type,   -- Ідент. угоди
@@ -49,7 +58,7 @@ if newnbs.g_state= 1 then  --переход на новый план счетов
     end case;
   exception when no_data_found then null;
   end;
-else   
+else
   begin
     select acc,     nbs,     nvl(ob22,'XX')
       into l_acc_d, l_nbs_d, l_ob22_d
@@ -97,3 +106,13 @@ end if;
 
 end;
 /
+show err;
+
+PROMPT *** Create  grants  P_ELT_DEAL_UPD ***
+grant EXECUTE                                                                on P_ELT_DEAL_UPD  to BARS_ACCESS_DEFROLE;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_ELT_DEAL_UPD.sql =========*** En
+PROMPT ===================================================================================== 

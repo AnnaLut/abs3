@@ -89,10 +89,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_SCHEME ***
+grant SELECT                                                                 on BPK_SCHEME      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_SCHEME      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_SCHEME      to BARS_DM;
 grant SELECT                                                                 on BPK_SCHEME      to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_SCHEME      to OBPC;
+grant SELECT                                                                 on BPK_SCHEME      to UPLD;
 
 
 

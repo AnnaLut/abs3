@@ -285,6 +285,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  TMP_NBU23_K11 ***
+grant SELECT                                                                 on TMP_NBU23_K11   to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_NBU23_K11   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

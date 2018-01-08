@@ -90,11 +90,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  TNAZNF ***
+grant SELECT                                                                 on TNAZNF          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TNAZNF          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TNAZNF          to BARS_DM;
 grant SELECT                                                                 on TNAZNF          to OPER000;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TNAZNF          to START1;
 grant SELECT                                                                 on TNAZNF          to TECH_MOM1;
+grant SELECT                                                                 on TNAZNF          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TNAZNF          to WR_ALL_RIGHTS;
 grant SELECT                                                                 on TNAZNF          to WR_DOC_INPUT;
 grant FLASHBACK,SELECT                                                       on TNAZNF          to WR_REFREAD;

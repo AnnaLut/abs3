@@ -67,6 +67,10 @@ PROMPT *** Create  view V_USER_CASH2VISA_DOCS2 ***
                      SYS_CONTEXT ('bars_context', 'user_branch') || ',') > 0  -- совпадает один из бранчей
 ;
 
+PROMPT *** Create  grants  V_USER_CASH2VISA_DOCS2 ***
+grant SELECT                                                                 on V_USER_CASH2VISA_DOCS2 to BARSREADER_ROLE;
+grant SELECT                                                                 on V_USER_CASH2VISA_DOCS2 to UPLD;
+
 
 
 PROMPT ===================================================================================== 

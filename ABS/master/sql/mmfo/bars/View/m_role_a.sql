@@ -18,8 +18,10 @@ frontend = PUL.GET('FRO') and
  exists (select 1 from V_RESOURCES_FOR_ROLE where substr(ROLE_CODE,1,100) = PUL.GET('ROLE') );
 
 PROMPT *** Create  grants  M_ROLE_A ***
+grant SELECT                                                                 on M_ROLE_A        to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_A        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on M_ROLE_A        to START1;
+grant SELECT                                                                 on M_ROLE_A        to UPLD;
 
 
 

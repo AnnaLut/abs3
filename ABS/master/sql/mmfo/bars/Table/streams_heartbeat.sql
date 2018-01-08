@@ -102,6 +102,7 @@ exception when others then
 
 PROMPT *** Create  grants  STREAMS_HEARTBEAT ***
 grant FLASHBACK,SELECT                                                       on STREAMS_HEARTBEAT to BARSAQ;
+grant SELECT                                                                 on STREAMS_HEARTBEAT to BARSREADER_ROLE;
 
 
 

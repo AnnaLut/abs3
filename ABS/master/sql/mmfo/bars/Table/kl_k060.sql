@@ -55,7 +55,9 @@ COMMENT ON COLUMN BARS.KL_K060.D_CLOSE IS 'Дата закриття коду';
 
 
 PROMPT *** Create  grants  KL_K060 ***
+grant SELECT                                                                 on KL_K060         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_K060         to BARS_DM;
+grant SELECT                                                                 on KL_K060         to UPLD;
 
 
 

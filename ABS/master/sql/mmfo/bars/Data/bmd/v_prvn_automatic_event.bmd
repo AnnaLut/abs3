@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Перегляд інформації щодо подій дефолту';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_PRVN_AUTOMATIC_EVENT';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,20 +124,20 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'EVENT_DATE', 'D', 'Дата~винекнення~події дефолту', null, null, 19, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'EVENT_NAME', 'C', 'Назва~події~дефолту', null, 100, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'ID', 'N', 'Ід.~№~*РАХ. ЦП ', null, null, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, 'sPar=ACCOUNTS[CONDITIONS=>EXISTS (SELECT 1 FROM CP_DEAL WHERE REF = :REF_AGR AND ACCOUNTS.ACC IN (ACC,ACCD,ACCP,ACCR,ACCS,ACCR2,ACCS5,ACCS6,ACCEXPN,ACCEXPR))][ACCESSCODE=>1]', 'ShowAccList(0, AVIEW_ALL, AVIEW_Financial | AVIEW_ReadOnly, " exists (select 1 from cp_deal where ref= :REF_AGR and A.acc in (ACC,ACCD,ACCP,ACCR,ACCS,ACCR2,ACCS5,ACCS6,ACCEXPN,ACCEXPR ) ) " )', 0);
-  bars_metabase.add_column(l_tabid, 4, 'OBJECT_NAME', 'C', 'Назва~системи', null, 100, 25, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'REF_AGR', 'N', 'Реф~угоди~*РАХ.КД', null, null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, 'sPar=ACCOUNTS[CONDITIONS=>ACCOUNTS.ACC in (select ACC from ND_ACC where nd = :REF_AGR)][ACCESSCODE=>1]', 'ShowAccList(0, AVIEW_ALL, AVIEW_Financial | AVIEW_ReadOnly, " a.acc in (select acc from nd_acc where nd = :REF_AGR ) " )', 0);
-  bars_metabase.add_column(l_tabid, 6, 'REPORTING_DATE', 'D', 'Звітна~дата', null, null, 0, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'RNK', 'N', 'РНК~клієнта~*КАРТКА КЛ', null, null, 6, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/clientregister/registration.aspx?readonly=1'||chr(38)||'rnk=:RNK', 'EditCustomer(:CUSTTYPE, NUMBER_Null, :RNK, CVIEW_ReadOnly, hWndForm, 0, "", FALSE)', 0);
-  bars_metabase.add_column(l_tabid, 8, 'RESTR_END_DAT', 'D', 'Дата~закінч~реструктуриз', null, null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'EVENT_TYPE', 'N', 'Код~події~дефолту', null, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'OBJECT_TYPE', 'C', 'Код~типу~системи', null, null, 22, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'PRD_TP', 'N', 'Тип~договору~в DWH', null, null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'NMK', 'C', 'Назва~клієнта', null, null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'CUSTTYPE', 'N', '1-Бн~2-ЮОї~3-ФО', null, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'ZO', 'B', 'З корр~об', null, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'EVENT_DATE', 'D', 'Дата~винекнення~події дефолту', '', null, 19, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'EVENT_NAME', 'C', 'Назва~події~дефолту', '', 100, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'ID', 'N', 'Ід.~№~*РАХ. ЦП ', '', null, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, 'sPar=ACCOUNTS[CONDITIONS=>EXISTS (SELECT 1 FROM CP_DEAL WHERE REF = :REF_AGR AND ACCOUNTS.ACC IN (ACC,ACCD,ACCP,ACCR,ACCS,ACCR2,ACCS5,ACCS6,ACCEXPN,ACCEXPR))][ACCESSCODE=>1]', 'ShowAccList(0, AVIEW_ALL, AVIEW_Financial | AVIEW_ReadOnly, " exists (select 1 from cp_deal where ref= :REF_AGR and A.acc in (ACC,ACCD,ACCP,ACCR,ACCS,ACCR2,ACCS5,ACCS6,ACCEXPN,ACCEXPR ) ) " )', 0);
+  bars_metabase.add_column(l_tabid, 4, 'OBJECT_NAME', 'C', 'Назва~системи', '', 100, 25, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'REF_AGR', 'N', 'Реф~угоди~*РАХ.КД', '', null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, 'sPar=ACCOUNTS[CONDITIONS=>ACCOUNTS.ACC in (select ACC from ND_ACC where nd = :REF_AGR)][ACCESSCODE=>1]', 'ShowAccList(0, AVIEW_ALL, AVIEW_Financial | AVIEW_ReadOnly, " a.acc in (select acc from nd_acc where nd = :REF_AGR ) " )', 0);
+  bars_metabase.add_column(l_tabid, 6, 'REPORTING_DATE', 'D', 'Звітна~дата', '', null, 0, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'RNK', 'N', 'РНК~клієнта~*КАРТКА КЛ', '', null, 6, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/clientregister/registration.aspx?readonly=1'||chr(38)||'rnk=:RNK', 'EditCustomer(:CUSTTYPE, NUMBER_Null, :RNK, CVIEW_ReadOnly, hWndForm, 0, "", FALSE)', 0);
+  bars_metabase.add_column(l_tabid, 8, 'RESTR_END_DAT', 'D', 'Дата~закінч~реструктуриз', '', null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'EVENT_TYPE', 'N', 'Код~події~дефолту', '', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'OBJECT_TYPE', 'C', 'Код~типу~системи', '', null, 22, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'PRD_TP', 'N', 'Тип~договору~в DWH', '', null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'NMK', 'C', 'Назва~клієнта', '', null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'CUSTTYPE', 'N', '1-Бн~2-ЮОї~3-ФО', '', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'ZO', 'B', 'З корр~об', '', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

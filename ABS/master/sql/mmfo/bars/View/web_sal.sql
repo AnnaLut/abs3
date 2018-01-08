@@ -54,8 +54,10 @@ PROMPT *** Create  view WEB_SAL ***
 
 PROMPT *** Create  grants  WEB_SAL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on WEB_SAL         to ABS_ADMIN;
+grant SELECT                                                                 on WEB_SAL         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WEB_SAL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WEB_SAL         to START1;
+grant SELECT                                                                 on WEB_SAL         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_SAL         to WR_ALL_RIGHTS;
 grant SELECT                                                                 on WEB_SAL         to WR_USER_ACCOUNTS_LIST;
 grant SELECT                                                                 on WEB_SAL         to WR_VIEWACC;

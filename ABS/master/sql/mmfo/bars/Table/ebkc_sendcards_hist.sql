@@ -77,8 +77,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBKC_SENDCARDS_HIST ***
+grant SELECT                                                                 on EBKC_SENDCARDS_HIST to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBKC_SENDCARDS_HIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBKC_SENDCARDS_HIST to BARS_DM;
+grant SELECT                                                                 on EBKC_SENDCARDS_HIST to UPLD;
 
 
 

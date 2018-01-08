@@ -79,6 +79,10 @@ COMMENT ON COLUMN BARS.ERR$_SH_TARIF_UPDATE.NBS_OB22 IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_SH_TARIF_UPDATE ***
+grant SELECT                                                                 on ERR$_SH_TARIF_UPDATE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_SH_TARIF_UPDATE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

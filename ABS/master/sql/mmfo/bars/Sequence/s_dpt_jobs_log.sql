@@ -7,12 +7,11 @@ PROMPT =========================================================================
 
 PROMPT *** Create  sequence S_DPT_JOBS_LOG ***
 
-   CREATE SEQUENCE  BARS.S_DPT_JOBS_LOG  MINVALUE 0 MAXVALUE 999999999999999999999999999 INCREMENT BY 1 START WITH 2827802 CACHE 1000 NOORDER  NOCYCLE ;
+   CREATE SEQUENCE  BARS.S_DPT_JOBS_LOG  MINVALUE 0 MAXVALUE 999999999999999999999 INCREMENT BY 1 START WITH 288080783568113 CACHE 20 NOORDER  NOCYCLE ;
 
 PROMPT *** Create  grants  S_DPT_JOBS_LOG ***
 grant SELECT                                                                 on S_DPT_JOBS_LOG  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on S_DPT_JOBS_LOG  to DPT_ADMIN;
-grant SELECT                                                                 on S_DPT_JOBS_LOG  to WR_ALL_RIGHTS;
+grant SELECT                                                                 on S_DPT_JOBS_LOG  to BARS_CONNECT;
 
 
 

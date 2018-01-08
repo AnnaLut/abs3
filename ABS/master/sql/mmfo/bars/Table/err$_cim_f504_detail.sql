@@ -75,6 +75,10 @@ COMMENT ON COLUMN BARS.ERR$_CIM_F504_DETAIL.RRRR IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIM_F504_DETAIL ***
+grant SELECT                                                                 on ERR$_CIM_F504_DETAIL to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIM_F504_DETAIL to UPLD;
+
 
 
 PROMPT ===================================================================================== 

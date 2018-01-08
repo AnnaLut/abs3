@@ -75,19 +75,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SWIORULE_SWMT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_IORULE ADD CONSTRAINT FK_SWIORULE_SWMT FOREIGN KEY (MT)
-	  REFERENCES BARS.SW_MT (MT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SWIORULE_MT_NN ***
 begin   
  execute immediate '
@@ -127,9 +114,11 @@ exception when others then
 
 PROMPT *** Create  grants  SW_IORULE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_IORULE       to BARS013;
+grant SELECT                                                                 on SW_IORULE       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_IORULE       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_IORULE       to BARS_DM;
 grant SELECT                                                                 on SW_IORULE       to SWTOSS;
+grant SELECT                                                                 on SW_IORULE       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_IORULE       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SW_IORULE       to WR_REFREAD;
 

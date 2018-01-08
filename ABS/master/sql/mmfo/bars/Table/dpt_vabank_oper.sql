@@ -63,9 +63,11 @@ COMMENT ON COLUMN BARS.DPT_VABANK_OPER.NAZN IS '';
 
 
 PROMPT *** Create  grants  DPT_VABANK_OPER ***
+grant SELECT                                                                 on DPT_VABANK_OPER to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VABANK_OPER to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VABANK_OPER to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VABANK_OPER to START1;
+grant SELECT                                                                 on DPT_VABANK_OPER to UPLD;
 
 
 

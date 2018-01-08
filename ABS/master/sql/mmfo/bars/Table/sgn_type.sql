@@ -74,12 +74,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_SGNTYPE ***
+PROMPT *** Create  constraint CC_SGNTYPE_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SGN_TYPE ADD CONSTRAINT PK_SGNTYPE PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.SGN_TYPE ADD CONSTRAINT CC_SGNTYPE_ID CHECK (id=upper(id)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -100,10 +98,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SGNTYPE_ID ***
+PROMPT *** Create  constraint PK_SGNTYPE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SGN_TYPE ADD CONSTRAINT CC_SGNTYPE_ID CHECK (id=upper(id)) ENABLE';
+  ALTER TABLE BARS.SGN_TYPE ADD CONSTRAINT PK_SGNTYPE PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -124,6 +124,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  SGN_TYPE ***
+grant SELECT                                                                 on SGN_TYPE        to BARSREADER_ROLE;
+grant SELECT                                                                 on SGN_TYPE        to UPLD;
 
 
 

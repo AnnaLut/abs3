@@ -105,6 +105,7 @@ exception when others then
 PROMPT *** Create  grants  BASEY ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BASEY           to ABS_ADMIN;
 grant SELECT                                                                 on BASEY           to BARS010;
+grant SELECT                                                                 on BASEY           to BARSREADER_ROLE;
 grant SELECT                                                                 on BASEY           to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BASEY           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BASEY           to BARS_DM;

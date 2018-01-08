@@ -60,9 +60,11 @@ COMMENT ON COLUMN BARS.KOD_S250.DATA_M IS '';
 
 
 PROMPT *** Create  grants  KOD_S250 ***
+grant SELECT                                                                 on KOD_S250        to BARSREADER_ROLE;
 grant SELECT                                                                 on KOD_S250        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_S250        to BARS_DM;
 grant SELECT                                                                 on KOD_S250        to START1;
+grant SELECT                                                                 on KOD_S250        to UPLD;
 
 
 

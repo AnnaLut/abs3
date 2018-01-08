@@ -77,8 +77,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  STAFF_RNK ***
+grant SELECT                                                                 on STAFF_RNK       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_RNK       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_RNK       to START1;
+grant SELECT                                                                 on STAFF_RNK       to UPLD;
 
 
 

@@ -71,6 +71,10 @@ COMMENT ON COLUMN BARS.ERR$_FIN_OBU_PAWN.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_FIN_OBU_PAWN ***
+grant SELECT                                                                 on ERR$_FIN_OBU_PAWN to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_FIN_OBU_PAWN to UPLD;
+
 
 
 PROMPT ===================================================================================== 

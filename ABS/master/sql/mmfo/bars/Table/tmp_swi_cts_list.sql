@@ -64,10 +64,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119141 ***
+PROMPT *** Create  constraint SYS_C00119139 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_SWI_CTS_LIST MODIFY (CTS_IMG NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_SWI_CTS_LIST MODIFY (NAME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -88,16 +88,20 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119139 ***
+PROMPT *** Create  constraint SYS_C00119141 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_SWI_CTS_LIST MODIFY (NAME NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_SWI_CTS_LIST MODIFY (CTS_IMG NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
+
+PROMPT *** Create  grants  TMP_SWI_CTS_LIST ***
+grant SELECT                                                                 on TMP_SWI_CTS_LIST to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_SWI_CTS_LIST to UPLD;
 
 
 

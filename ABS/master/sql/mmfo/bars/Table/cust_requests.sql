@@ -139,10 +139,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTREQS_REQCRUSER_NN ***
+PROMPT *** Create  constraint CC_CUSTREQS_REQTYPE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUST_REQUESTS MODIFY (REQ_CRUSER CONSTRAINT CC_CUSTREQS_REQCRUSER_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CUST_REQUESTS MODIFY (REQ_TYPE CONSTRAINT CC_CUSTREQS_REQTYPE_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -211,10 +211,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTREQS_REQTYPE_NN ***
+PROMPT *** Create  constraint CC_CUSTREQS_REQCRUSER_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUST_REQUESTS MODIFY (REQ_TYPE CONSTRAINT CC_CUSTREQS_REQTYPE_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CUST_REQUESTS MODIFY (REQ_CRUSER CONSTRAINT CC_CUSTREQS_REQCRUSER_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -251,10 +251,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUST_REQUESTS ***
+grant SELECT                                                                 on CUST_REQUESTS   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_REQUESTS   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUST_REQUESTS   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_REQUESTS   to DPT_ADMIN;
 grant SELECT                                                                 on CUST_REQUESTS   to START1;
+grant SELECT                                                                 on CUST_REQUESTS   to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_REQUESTS   to WR_ALL_RIGHTS;
 
 

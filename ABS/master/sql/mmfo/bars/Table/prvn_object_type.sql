@@ -91,10 +91,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRVN_OBJECT_TYPE ***
+grant SELECT                                                                 on PRVN_OBJECT_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on PRVN_OBJECT_TYPE to BARSUPL;
 grant SELECT                                                                 on PRVN_OBJECT_TYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRVN_OBJECT_TYPE to BARS_DM;
 grant SELECT                                                                 on PRVN_OBJECT_TYPE to START1;
+grant SELECT                                                                 on PRVN_OBJECT_TYPE to UPLD;
 
 
 

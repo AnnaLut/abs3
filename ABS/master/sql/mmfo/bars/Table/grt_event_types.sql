@@ -103,8 +103,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRT_EVENT_TYPES ***
+grant SELECT                                                                 on GRT_EVENT_TYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on GRT_EVENT_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRT_EVENT_TYPES to BARS_DM;
+grant SELECT                                                                 on GRT_EVENT_TYPES to UPLD;
 
 
 

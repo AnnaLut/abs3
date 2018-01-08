@@ -44,8 +44,10 @@ COMMENT ON COLUMN BARS.TMP_SW102_REF.SWREF IS '';
 
 
 PROMPT *** Create  grants  TMP_SW102_REF ***
+grant SELECT                                                                 on TMP_SW102_REF   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SW102_REF   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SW102_REF   to START1;
+grant SELECT                                                                 on TMP_SW102_REF   to UPLD;
 
 
 

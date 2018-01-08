@@ -93,19 +93,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CPMANYUPDATE_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CP_MANY_UPDATE ADD CONSTRAINT FK_CPMANYUPDATE_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_CPMANYUPDATE_IDUPD_NN ***
 begin   
  execute immediate '
@@ -118,10 +105,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CPMANYUPDATE_FDAT_NN ***
+PROMPT *** Create  constraint CC_CPMANYUPDATE_CHGACTION_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CP_MANY_UPDATE MODIFY (FDAT CONSTRAINT CC_CPMANYUPDATE_FDAT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CP_MANY_UPDATE MODIFY (CHGACTION CONSTRAINT CC_CPMANYUPDATE_CHGACTION_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -178,10 +165,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CPMANYUPDATE_CHGACTION_NN ***
+PROMPT *** Create  constraint CC_CPMANYUPDATE_FDAT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CP_MANY_UPDATE MODIFY (CHGACTION CONSTRAINT CC_CPMANYUPDATE_CHGACTION_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CP_MANY_UPDATE MODIFY (FDAT CONSTRAINT CC_CPMANYUPDATE_FDAT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -232,6 +219,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_MANY_UPDATE ***
+grant SELECT                                                                 on CP_MANY_UPDATE  to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_MANY_UPDATE  to BARSUPL;
 grant SELECT                                                                 on CP_MANY_UPDATE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_MANY_UPDATE  to BARS_DM;

@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.ERR$_W4_CARD.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_W4_CARD ***
+grant SELECT                                                                 on ERR$_W4_CARD    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_W4_CARD    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

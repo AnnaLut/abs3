@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''SH_TARIF'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''SH_TARIF'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''SH_TARIF'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''SH_TARIF'', ''WHOLE'' , null, ''null'', ''null'', ''null'');
                null;
            end; 
@@ -150,9 +150,11 @@ exception when others then
 
 PROMPT *** Create  grants  SH_TARIF ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SH_TARIF        to ABS_ADMIN;
+grant SELECT                                                                 on SH_TARIF        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SH_TARIF        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SH_TARIF        to BARS_DM;
 grant SELECT                                                                 on SH_TARIF        to START1;
+grant SELECT                                                                 on SH_TARIF        to UPLD;
 grant FLASHBACK,SELECT                                                       on SH_TARIF        to WR_REFREAD;
 
 

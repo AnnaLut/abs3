@@ -12,8 +12,11 @@ is
     l_swift_k   varchar2(200);
 begin
     BEGIN
-       SELECT substr(trim(value), 1, 12)
-          INTO l_swift_k
+       SELECT decode(instr(value, chr(10)), 0, 
+                     substr(trim(value), 1, 12), 
+                     substr(trim(value), instr(value, chr(10))+1)
+                    )
+       INTO l_swift_k
        FROM OPERW
        WHERE REF=p_ref
          AND TAG LIKE '58A%'
@@ -21,27 +24,43 @@ begin
 
        BEGIN
           SELECT k040, b010
-                INTO l_k040, l_b010
+          INTO l_k040, l_b010
           FROM RC_BNK
-          WHERE SWIFT_CODE LIKE l_swift_k||'%'
-            AND ROWNUM=1;
-       EXCEPTION WHEN NO_DATA_FOUND THEN
-          l_swift_k := substr(l_swift_k,1,4)||' '||substr(l_swift_k,5,2)||
-                   ' '||substr(l_swift_k,7,2);
-                   
+          WHERE (SWIFT_CODE LIKE l_swift_k||'%' or 
+                 SWIFT_CODE LIKE substr(l_swift_k,1,4)||' '||
+                                 substr(l_swift_k,5,2)||' '||
+                                 substr(l_swift_k,7,2)||'%');
+       EXCEPTION 
+       WHEN NO_DATA_FOUND THEN
           BEGIN
-             SELECT k040, b010
+             select max(k.k040), null
                 INTO l_k040, l_b010
-             FROM RC_BNK
-             WHERE SWIFT_CODE LIKE l_swift_k||'%'
-               AND ROWNUM=1;
-          EXCEPTION WHEN NO_DATA_FOUND THEN
-             raise;
+             from SW_BANKS s, kl_k040 k
+             where s.bic like l_swift_k || '%' and
+                   upper(s.country) =  upper(k.txt_eng) and
+                   k.d_close is null;
+             
+             if l_k040 is null then
+                raise;
+             end if;
           END;
+       WHEN TOO_MANY_ROWS THEN
+          SELECT k040, b010
+          INTO l_k040, l_b010
+          FROM RC_BNK
+          WHERE (SWIFT_CODE LIKE l_swift_k||'%' or 
+                 SWIFT_CODE LIKE substr(l_swift_k,1,4)||' '||
+                                 substr(l_swift_k,5,2)||' '||
+                                 substr(l_swift_k,7,2)||'%') and 
+                 length(l_swift_k) > length(SWIFT_CODE) and
+                 rownum = 1;
        END;
     EXCEPTION WHEN NO_DATA_FOUND THEN
        BEGIN
-          SELECT substr(trim(value), 1, 12)
+          SELECT decode(instr(value, chr(10)), 0, 
+                     substr(trim(value), 1, 12), 
+                     substr(trim(value), instr(value, chr(10))+1)
+                    )
              INTO l_swift_k
           FROM OPERW
           WHERE REF=p_ref
@@ -52,21 +71,35 @@ begin
              SELECT k040, b010
                 INTO l_k040, l_b010
              FROM RC_BNK
-             WHERE SWIFT_CODE LIKE l_swift_k||'%'
-               AND ROWNUM=1;
-          EXCEPTION WHEN NO_DATA_FOUND THEN
-             l_swift_k := substr(l_swift_k,1,4)||' '||substr(l_swift_k,5,2)||
-                      ' '||substr(l_swift_k,7,2);
-                      
-             BEGIN
-                SELECT k040, b010
+             WHERE (SWIFT_CODE LIKE l_swift_k||'%' or 
+                    SWIFT_CODE LIKE substr(l_swift_k,1,4)||' '||
+                                    substr(l_swift_k,5,2)||' '||
+                                    substr(l_swift_k,7,2)||'%');
+          EXCEPTION 
+          WHEN NO_DATA_FOUND THEN
+              BEGIN
+                 select max(k.k040), null
                     INTO l_k040, l_b010
-                FROM RC_BNK
-                WHERE SWIFT_CODE LIKE l_swift_k||'%'
-                  AND ROWNUM=1;
-             EXCEPTION WHEN NO_DATA_FOUND THEN
-                raise;
-             END;
+                 from SW_BANKS s, kl_k040 k
+                 where s.bic like l_swift_k || '%' and
+                       upper(s.country) =  upper(k.txt_eng) and
+                       k.d_close is null;
+                 
+                 if l_k040 is null then
+                    raise;
+                 end if;
+              END;
+          WHEN TOO_MANY_ROWS THEN
+              SELECT k040, b010
+              INTO l_k040, l_b010
+              FROM RC_BNK
+              WHERE (SWIFT_CODE LIKE l_swift_k||'%' or 
+                     SWIFT_CODE LIKE substr(l_swift_k,1,4)||' '||
+                                     substr(l_swift_k,5,2)||' '||
+                                     substr(l_swift_k,7,2)||'%') and 
+                     length(l_swift_k) > length(SWIFT_CODE) and
+                     rownum = 1;
+
           END;
        EXCEPTION WHEN NO_DATA_FOUND THEN
           BEGIN
@@ -81,21 +114,34 @@ begin
                 SELECT k040, b010
                 INTO l_k040, l_b010
                 FROM RC_BNK
-                WHERE SWIFT_CODE LIKE l_swift_k||'%'
-                  AND ROWNUM=1;
-             EXCEPTION WHEN NO_DATA_FOUND THEN
-                l_swift_k := substr(l_swift_k,1,4)||' '||substr(l_swift_k,5,2)||
-                         ' '||substr(l_swift_k,7,2);
-                         
-                BEGIN
-                   SELECT k040, b010
-                   INTO l_k040, l_b010
-                   FROM RC_BNK
-                   WHERE SWIFT_CODE LIKE l_swift_k||'%'
-                     AND ROWNUM=1;
-                EXCEPTION WHEN NO_DATA_FOUND THEN
-                   raise;
-                END;
+                WHERE (SWIFT_CODE LIKE l_swift_k||'%' or 
+                       SWIFT_CODE LIKE substr(l_swift_k,1,4)||' '||
+                                       substr(l_swift_k,5,2)||' '||
+                                       substr(l_swift_k,7,2)||'%');
+             EXCEPTION 
+             WHEN NO_DATA_FOUND THEN
+                  BEGIN
+                     select max(k.k040), null
+                        INTO l_k040, l_b010
+                     from SW_BANKS s, kl_k040 k
+                     where s.bic like l_swift_k || '%' and
+                           upper(s.country) =  upper(k.txt_eng) and
+                           k.d_close is null;
+                     
+                     if l_k040 is null then
+                        raise;
+                     end if;
+                  END;
+             WHEN TOO_MANY_ROWS THEN
+                  SELECT k040, b010
+                  INTO l_k040, l_b010
+                  FROM RC_BNK
+                  WHERE (SWIFT_CODE LIKE l_swift_k||'%' or 
+                         SWIFT_CODE LIKE substr(l_swift_k,1,4)||' '||
+                                         substr(l_swift_k,5,2)||' '||
+                                         substr(l_swift_k,7,2)||'%') and 
+                         length(l_swift_k) > length(SWIFT_CODE) and
+                         rownum = 1;
              END;
           EXCEPTION WHEN NO_DATA_FOUND THEN
              BEGIN
@@ -111,21 +157,34 @@ begin
                    SELECT k040, b010
                    INTO l_k040, l_b010
                    FROM RC_BNK
-                   WHERE SWIFT_CODE LIKE l_swift_k||'%'
-                     AND ROWNUM=1;
-                EXCEPTION WHEN NO_DATA_FOUND THEN
-                   l_swift_k := substr(l_swift_k,1,4)||' '||substr(l_swift_k,5,2)||
-                               ' '||substr(l_swift_k,7,2);
-                               
-                   BEGIN
-                      SELECT k040
-                         INTO l_k040
-                      FROM RC_BNK
-                      WHERE SWIFT_CODE LIKE l_swift_k||'%'
-                        AND ROWNUM=1;
-                   EXCEPTION WHEN NO_DATA_FOUND THEN
-                      raise;
-                   END;
+                   WHERE (SWIFT_CODE LIKE l_swift_k||'%' or 
+                          SWIFT_CODE LIKE substr(l_swift_k,1,4)||' '||
+                                          substr(l_swift_k,5,2)||' '||
+                                          substr(l_swift_k,7,2)||'%');
+                EXCEPTION 
+                WHEN NO_DATA_FOUND THEN
+                      BEGIN
+                         select max(k.k040), null
+                            INTO l_k040, l_b010
+                         from SW_BANKS s, kl_k040 k
+                         where s.bic like l_swift_k || '%' and
+                               upper(s.country) =  upper(k.txt_eng) and
+                               k.d_close is null;
+                         
+                         if l_k040 is null then
+                            raise;
+                         end if;
+                              END;
+                WHEN TOO_MANY_ROWS THEN
+                    SELECT k040, b010
+                    INTO l_k040, l_b010
+                    FROM RC_BNK
+                    WHERE (SWIFT_CODE LIKE l_swift_k||'%' or 
+                           SWIFT_CODE LIKE substr(l_swift_k,1,4)||' '||
+                                         substr(l_swift_k,5,2)||' '||
+                                         substr(l_swift_k,7,2)||'%') and 
+                         length(l_swift_k) > length(SWIFT_CODE) and
+                         rownum = 1;
                 END;
              EXCEPTION WHEN NO_DATA_FOUND THEN
                 BEGIN
@@ -143,10 +202,20 @@ begin
                       SELECT k040, b010
                       INTO l_k040, l_b010
                       FROM RC_BNK
-                      WHERE SWIFT_CODE LIKE l_swift_k||'%'
-                        AND ROWNUM=1;
-                   EXCEPTION WHEN NO_DATA_FOUND THEN
+                      WHERE SWIFT_CODE LIKE l_swift_k||'%';
+                   EXCEPTION 
+                   WHEN NO_DATA_FOUND THEN
                       null;
+                   WHEN TOO_MANY_ROWS THEN
+                      SELECT k040, b010
+                      INTO l_k040, l_b010
+                      FROM RC_BNK
+                      WHERE (SWIFT_CODE LIKE l_swift_k||'%' or 
+                             SWIFT_CODE LIKE substr(l_swift_k,1,4)||' '||
+                                             substr(l_swift_k,5,2)||' '||
+                                             substr(l_swift_k,7,2)||'%') and 
+                             length(l_swift_k) > length(SWIFT_CODE) and
+                             rownum = 1;
                    END;
                 EXCEPTION WHEN NO_DATA_FOUND THEN
                    null;
@@ -157,14 +226,13 @@ begin
     END;
     
     if p_typ = 1 then
-        l_k040 := lpad(l_k040, 3, '0');
+       l_k040 := lpad(l_k040, 3, '0');
         
-        return l_k040;
+       return l_k040;
     else
-        l_b010 := lpad(l_b010, 10, '0');
+       l_b010 := lpad(l_b010, 10, '0');
         
-        return l_b010;
-        
+       return l_b010;
     end if;
 end;
 /

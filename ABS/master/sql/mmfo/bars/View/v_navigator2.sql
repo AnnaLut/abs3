@@ -23,8 +23,10 @@ PROMPT *** Create  view V_NAVIGATOR2 ***
    ORDER BY   a.dat_a, b.nb;
 
 PROMPT *** Create  grants  V_NAVIGATOR2 ***
+grant SELECT                                                                 on V_NAVIGATOR2    to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_NAVIGATOR2    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NAVIGATOR2    to START1;
+grant SELECT                                                                 on V_NAVIGATOR2    to UPLD;
 grant FLASHBACK,SELECT                                                       on V_NAVIGATOR2    to WR_REFREAD;
 
 

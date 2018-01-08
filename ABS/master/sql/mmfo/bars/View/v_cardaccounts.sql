@@ -38,8 +38,10 @@ PROMPT *** Create  view V_CARDACCOUNTS ***
  WHERE a.nbs IN ('2620', '2630', '2635') AND a.dazs IS NULL AND a.RNK = b.RNK;
 
 PROMPT *** Create  grants  V_CARDACCOUNTS ***
+grant SELECT                                                                 on V_CARDACCOUNTS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CARDACCOUNTS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CARDACCOUNTS  to DPT_ROLE;
+grant SELECT                                                                 on V_CARDACCOUNTS  to UPLD;
 grant SELECT                                                                 on V_CARDACCOUNTS  to WR_ALL_RIGHTS;
 
 

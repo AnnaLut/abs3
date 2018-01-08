@@ -11,7 +11,9 @@ PROMPT *** Create  view V_CIM_KL_R030 ***
   select lpad(kv,3,'0') kv, lcv||' '||name name from tabval where d_close is null;
 
 PROMPT *** Create  grants  V_CIM_KL_R030 ***
+grant SELECT                                                                 on V_CIM_KL_R030   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_KL_R030   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_KL_R030   to UPLD;
 
 
 

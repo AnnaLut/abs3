@@ -14,7 +14,9 @@ PROMPT *** Create  view V_INS_FREQUENCIES ***
  order by f.freq desc;
 
 PROMPT *** Create  grants  V_INS_FREQUENCIES ***
+grant SELECT                                                                 on V_INS_FREQUENCIES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_FREQUENCIES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_INS_FREQUENCIES to UPLD;
 
 
 

@@ -1,4 +1,13 @@
-CREATE OR REPLACE TRIGGER BARS.tbiu_oper_zo
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TBIU_OPER_ZO.sql =========*** Run **
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  trigger TBIU_OPER_ZO ***
+
+  CREATE OR REPLACE TRIGGER BARS.TBIU_OPER_ZO 
    --09.11.2016 Sta Разрешить корр для SNA (Finevare)
    --07.11.2016 Sta Не проверять  счет-Б для нач.МБ ( это есть в модуле CIN). Проверять : Внутр и Ответные
    BEFORE INSERT OR UPDATE
@@ -14,7 +23,7 @@ DECLARE
       p_Ret     INT := 2;
       l_Dat01   DATE;
    BEGIN
-      IF l_T0 = '1'   THEN 
+      IF l_T0 = '1'   THEN
          BEGIN
             SELECT 0 INTO p_Ret FROM srezerv_ob22  WHERE  nbs = SUBSTR (p_nls, 1, 4)   AND ROWNUM = 1;
             raise_application_error ( -20096, 'Заборона на введення корр по рах.' || p_nls
@@ -65,7 +74,7 @@ BEGIN
    ----------------------
 
    --l_T0 := pul.GET ('YES_T0');
-   IF l_T0 IS NULL or l_T0 = '0' 
+   IF l_T0 IS NULL or l_T0 = '0'
    THEN
       l_T0 := barsupl.is_T0_OK (TRUNC (SYSDATE)); -- исключаем возможность манипуляции с лок.банкюдатой
       --   pul.put ('YES_T0', l_T0);
@@ -82,4 +91,9 @@ BEGIN
    END IF;
 END TBIU_OPER_ZO;
 /
+ALTER TRIGGER BARS.TBIU_OPER_ZO ENABLE;
 
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TBIU_OPER_ZO.sql =========*** End **
+PROMPT ===================================================================================== 

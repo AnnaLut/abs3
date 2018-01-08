@@ -102,11 +102,13 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_SHSROK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_SHSROK      to ABS_ADMIN;
+grant SELECT                                                                 on DPT_SHSROK      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_SHSROK      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_SHSROK      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_SHSROK      to DPT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_SHSROK      to DPT_ADMIN;
 grant SELECT                                                                 on DPT_SHSROK      to START1;
+grant SELECT                                                                 on DPT_SHSROK      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_SHSROK      to WR_ALL_RIGHTS;
 
 

@@ -103,7 +103,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  USER_MESSAGES_BARSNOTIFY ***
+grant SELECT                                                                 on USER_MESSAGES_BARSNOTIFY to BARSREADER_ROLE;
 grant SELECT                                                                 on USER_MESSAGES_BARSNOTIFY to BARS_DM;
+grant SELECT                                                                 on USER_MESSAGES_BARSNOTIFY to UPLD;
 
 
 

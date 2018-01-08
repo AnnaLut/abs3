@@ -94,9 +94,11 @@ COMMENT ON COLUMN BARS.TMP_ANI34.G22 IS 'Статус~угоди~22';
 
 
 PROMPT *** Create  grants  TMP_ANI34 ***
+grant SELECT                                                                 on TMP_ANI34       to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_ANI34       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_ANI34       to BARS_DM;
 grant SELECT                                                                 on TMP_ANI34       to START1;
+grant SELECT                                                                 on TMP_ANI34       to UPLD;
 
 
 

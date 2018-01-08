@@ -51,12 +51,10 @@ COMMENT ON COLUMN BARS.CM_OPERTYPE.CLIENTTYPE IS 'Тип клиента: 1-ЮО, 2-ФО';
 
 
 
-PROMPT *** Create  constraint PK_CMOPERTYPE ***
+PROMPT *** Create  constraint CC_CMOPERTYPE_NAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CM_OPERTYPE ADD CONSTRAINT PK_CMOPERTYPE PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD  ENABLE';
+  ALTER TABLE BARS.CM_OPERTYPE ADD CONSTRAINT CC_CMOPERTYPE_NAME_NN CHECK (name is not null) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -65,10 +63,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CMOPERTYPE_NAME_NN ***
+PROMPT *** Create  constraint PK_CMOPERTYPE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CM_OPERTYPE ADD CONSTRAINT CC_CMOPERTYPE_NAME_NN CHECK (name is not null) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CM_OPERTYPE ADD CONSTRAINT PK_CMOPERTYPE PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -91,9 +91,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CM_OPERTYPE ***
+grant SELECT                                                                 on CM_OPERTYPE     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CM_OPERTYPE     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CM_OPERTYPE     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CM_OPERTYPE     to OW;
+grant SELECT                                                                 on CM_OPERTYPE     to UPLD;
 
 
 

@@ -89,7 +89,9 @@ PROMPT *** Create  view V_ZAY_CONVERSION ***
                  a.kv;
 
 PROMPT *** Create  grants  V_ZAY_CONVERSION ***
+grant SELECT                                                                 on V_ZAY_CONVERSION to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY_CONVERSION to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ZAY_CONVERSION to UPLD;
 grant SELECT                                                                 on V_ZAY_CONVERSION to ZAY;
 
 

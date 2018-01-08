@@ -77,19 +77,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_STO_SBON_REFERENCE_STO_PROD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_SBON_PRODUCT ADD CONSTRAINT FK_STO_SBON_REFERENCE_STO_PROD FOREIGN KEY (ID)
-	  REFERENCES BARS.STO_PRODUCT (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C008123 ***
 begin   
  execute immediate '
@@ -128,8 +115,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  STO_SBON_PRODUCT ***
+grant SELECT                                                                 on STO_SBON_PRODUCT to BARSREADER_ROLE;
 grant SELECT                                                                 on STO_SBON_PRODUCT to BARSUPL;
 grant SELECT                                                                 on STO_SBON_PRODUCT to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on STO_SBON_PRODUCT to SBON;
+grant SELECT                                                                 on STO_SBON_PRODUCT to UPLD;
 
 
 

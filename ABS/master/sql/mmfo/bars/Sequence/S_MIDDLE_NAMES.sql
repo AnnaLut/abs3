@@ -1,17 +1,16 @@
-prompt -- ======================================================
-prompt -- create sequence
-prompt -- ======================================================
 
-begin
-  execute immediate 'CREATE SEQUENCE BARS.S_MIDDLE_NAMES START WITH 4000 INCREMENT BY 1 NOCACHE NOCYCLE ORDER';
-  dbms_output.put_line('sequence S_MIDDLE_NAMES created.');
-exception 
-  when others then 
-    if (sqlcode = -00955) 
-    then 
-      dbms_output.put_line('sequence S_MIDDLE_NAMES already exists.');
-    else 
-      raise; 
-    end if;
-end;  
-/
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Sequence/S_MIDDLE_NAMES.sql =========*** Run
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  sequence S_MIDDLE_NAMES ***
+
+   CREATE SEQUENCE  BARS.S_MIDDLE_NAMES  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 4000 NOCACHE  ORDER  NOCYCLE ;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Sequence/S_MIDDLE_NAMES.sql =========*** End
+PROMPT ===================================================================================== 

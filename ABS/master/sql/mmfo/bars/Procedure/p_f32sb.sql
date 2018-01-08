@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F32SB ***
 
-CREATE OR REPLACE PROCEDURE BARS.P_F32SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C' )  IS
+  CREATE OR REPLACE PROCEDURE BARS.P_F32SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C' )  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FILE NAME   :    otcn.sql
 % DESCRIPTION :    Отчетность СберБанка: формирование файлов
@@ -206,20 +206,20 @@ OPEN Saldo;
 
    IF pr_ = 0 and se_ <> 0 THEN
       dk_ := IIF_N(se_,0,'1','2','2');
-      
+
       kodp_ := dk_ || '0' || nbs_ || zz_ || mfo_fa_ || lpad(kv_,3,'0');
       znap_ := TO_CHAR(ABS(se_)) ;
-      
+
       INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc, rnk) VALUES
                              (nls_, kv_, data_, kodp_,znap_, acc_, comm_, tobo_, nbuc_, rnk_) ;
    END IF ;
 
    IF pr_ = 0 and sn_ <> 0 THEN
       dk_ := IIF_N(sn_,0,'1','2','2');
-      
+
       kodp_ := dk_ || '1' || nbs_ || zz_ || mfo_fa_ || lpad(kv_,3,'0');
       znap_ := TO_CHAR(ABS(sn_)) ;
-      
+
       INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc, rnk) VALUES
                              (nls_, kv_, data_, kodp_,znap_, acc_, comm_, tobo_, nbuc_, rnk_) ;
    END IF ;

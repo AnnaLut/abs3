@@ -85,6 +85,10 @@ COMMENT ON COLUMN BARS.ERR$_CP_TICKET.NBB_ IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CP_TICKET ***
+grant SELECT                                                                 on ERR$_CP_TICKET  to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CP_TICKET  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

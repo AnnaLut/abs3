@@ -1,5 +1,3 @@
-SET SERVEROUTPUT ON 
-SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_@UDG.sql =========*
 PROMPT ===================================================================================== 
@@ -18,11 +16,11 @@ PROMPT *** Create/replace  ARM  $RM_@UDG ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-    d integer := 0;
+	d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_@UDG створюємо (або оновлюємо) АРМ АРМ Бюджет (розширений) ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
-                             P_ARM_NAME              => l_application_name, 
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
+                             P_ARM_NAME              => l_application_name,
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -30,89 +28,89 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Експорт катзапитів (DBF, TXT) ********** ');
           --  Створюємо функцію Експорт катзапитів (DBF, TXT)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Експорт катзапитів (DBF, TXT)',
                                                   p_funcname => '/barsroot/cbirep/export_dbf.aspx',
-                                                  p_rolename => 'START1' ,    
+                                                  p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Збір параметрів для експорту DBF
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Збір параметрів для експорту DBF',
-                                                              p_funcname => '/barsroot/cbirep/export_dbf_var.aspx?kodz=\d+',
-                                                              p_rolename => 'START1' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Збір параметрів для експорту DBF',
+															  p_funcname => '/barsroot/cbirep/export_dbf_var.aspx?kodz=\d+',
+															  p_rolename => 'START1' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Друк звітів ********** ');
           --  Створюємо функцію Друк звітів
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Друк звітів',
                                                   p_funcname => '/barsroot/cbirep/rep_list.aspx?codeapp=\S*',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Друк звітів
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Друк звітів',
-                                                              p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Друк звітів',
+															  p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Друк звітів
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Друк звітів',
-                                                              p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Друк звітів',
+															  p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Середньоденнi календарнi залишки по рахунках ********** ');
           --  Створюємо функцію Середньоденнi календарнi залишки по рахунках
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Середньоденнi календарнi залишки по рахунках',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=ACC_AVER[PROC=>PUL_DAT(to_char(:Par0,''dd.mm.yyyy''),to_char(:Par1,''dd.mm.yyyy''));PUL.PUT(''PNBS'',:Par2)][PAR=>:Par0(SEM=З dd.mm.yyyy>,TYPE=D),:Par1(SEM=По dd.mm.yyyy>,TYPE=D),:Par2(SEM=Бал рах>,TYPE=S)][EXEC=>BEFORE][MSG=>Необхідно задати фiльтр !]',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Звіт щодо розподілу залишків  рахунку 6204/01 ********** ');
           --  Створюємо функцію Звіт щодо розподілу залишків  рахунку 6204/01
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Звіт щодо розподілу залишків  рахунку 6204/01',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_6204_01_GOU[PROC=>PUL_DAT(to_char(:Par0,''dd.mm.yyyy''),to_char(:Par1,''dd.mm.yyyy''))][PAR=>:Par0(SEM=З dd/mm/yyyy>,TYPE=D),:Par1(SEM=По dd/mm/yyyy>,TYPE=D)][EXEC=>BEFORE]',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Дод.реквізити ОПЕРАЦІЙ по ІНІЦІАТОРУ та РИНКУ (перегляд) ********** ');
           --  Створюємо функцію Дод.реквізити ОПЕРАЦІЙ по ІНІЦІАТОРУ та РИНКУ (перегляд)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Дод.реквізити ОПЕРАЦІЙ по ІНІЦІАТОРУ та РИНКУ (перегляд)',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=OPER_CP_V&accessCode=1',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_@UDG) - АРМ Бюджет (розширений)  ');
     l := l_function_ids.first;
@@ -120,8 +118,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-     
-     
+
+
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -135,6 +133,12 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
+umu.add_report2arm(100516,'$RM_@UDG');
+umu.add_report2arm(100517,'$RM_@UDG');
+umu.add_report2arm(1000554,'$RM_@UDG');
+umu.add_report2arm(1000555,'$RM_@UDG');
+umu.add_report2arm(1000655,'$RM_@UDG');
+commit;
 end;
 /
 

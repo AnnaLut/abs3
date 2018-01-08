@@ -81,11 +81,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_RESOURCE_REF_RES_TYPE ***
+PROMPT *** Create  constraint SYS_C0025737 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_TYPE_RELATION ADD CONSTRAINT FK_RESOURCE_REF_RES_TYPE FOREIGN KEY (RESOURCE_TYPE_ID)
-	  REFERENCES BARS.ADM_RESOURCE_TYPE (ID) ENABLE';
+  ALTER TABLE BARS.ADM_RESOURCE_TYPE_RELATION MODIFY (MUST_BE_APPROVED NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -94,11 +93,22 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_GRANTEE_REF_RES_TYPE ***
+PROMPT *** Create  constraint SYS_C0025738 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_TYPE_RELATION ADD CONSTRAINT FK_GRANTEE_REF_RES_TYPE FOREIGN KEY (GRANTEE_TYPE_ID)
-	  REFERENCES BARS.ADM_RESOURCE_TYPE (ID) ENABLE';
+  ALTER TABLE BARS.ADM_RESOURCE_TYPE_RELATION MODIFY (ACCESS_MODE_LIST_ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C0025739 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADM_RESOURCE_TYPE_RELATION MODIFY (NO_ACCESS_ITEM_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -121,42 +131,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025739 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_TYPE_RELATION MODIFY (NO_ACCESS_ITEM_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0025738 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_TYPE_RELATION MODIFY (ACCESS_MODE_LIST_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0025737 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_TYPE_RELATION MODIFY (MUST_BE_APPROVED NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_ADM_RESOURCE_TYPE_RELATION ***
 begin   
  execute immediate '
@@ -171,7 +145,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ADM_RESOURCE_TYPE_RELATION ***
+grant SELECT                                                                 on ADM_RESOURCE_TYPE_RELATION to BARSREADER_ROLE;
 grant SELECT                                                                 on ADM_RESOURCE_TYPE_RELATION to BARS_DM;
+grant SELECT                                                                 on ADM_RESOURCE_TYPE_RELATION to UPLD;
 
 
 

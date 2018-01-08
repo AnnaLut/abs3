@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Пл.інст. по перерахуванню(видачі) коштів / CCK_PL_INS1';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'CCK_PL_INS1';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,15 +124,15 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ID_B', 'C', 'Ід.код~отримувача', null, null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'MFOB', 'C', 'МФО банку~отримувача ', null, null, 5, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NAM_B', 'C', 'Назва~отримувача ', null, null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NAZN', 'C', 'Призначення пл.', null, 160, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NLSB', 'C', 'Рахунок~отримувача', null, null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'ND', 'N', 'Реф КД', null, null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'S', 'N', 'Cума для~перерахування', null, null, 0, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(Nvl(S,0)) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'REF', 'N', 'Реф.операц.~перерахування', null, null, 2, 0, 0, 0, 0, '', '', 0, 0, 'Count(*) ', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF', 'DocViewContentsEx(hWndForm, :REF )', 0);
-  bars_metabase.add_column(l_tabid, 10, 'RI', 'C', 'ROWID', null, 100, null, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ID_B', 'C', 'Ід.код~отримувача', '', null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'MFOB', 'C', 'МФО банку~отримувача ', '', null, 5, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NAM_B', 'C', 'Назва~отримувача ', '', null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NAZN', 'C', 'Призначення пл.', '', 160, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NLSB', 'C', 'Рахунок~отримувача', '', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'ND', 'N', 'Реф КД', '', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'S', 'N', 'Cума для~перерахування', '', null, 0, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(Nvl(S,0)) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'REF', 'N', 'Реф.операц.~перерахування', '', null, 2, 0, 0, 0, 0, '', '', 0, 0, 'Count(*) ', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF', 'DocViewContentsEx(hWndForm, :REF )', 0);
+  bars_metabase.add_column(l_tabid, 10, 'RI', 'C', 'ROWID', '', 100, null, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('BANKS');

@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  PO_ZMIST ***
+grant SELECT                                                                 on PO_ZMIST        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PO_ZMIST        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PO_ZMIST        to START1;
+grant SELECT                                                                 on PO_ZMIST        to UPLD;
 
 
 

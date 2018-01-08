@@ -116,12 +116,14 @@ exception when others then
 
 PROMPT *** Create  grants  FS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on FS              to ABS_ADMIN;
+grant SELECT                                                                 on FS              to BARSREADER_ROLE;
 grant SELECT                                                                 on FS              to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FS              to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FS              to BARS_DM;
 grant SELECT                                                                 on FS              to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FS              to FS;
 grant SELECT                                                                 on FS              to START1;
+grant SELECT                                                                 on FS              to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FS              to WR_ALL_RIGHTS;
 grant SELECT                                                                 on FS              to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on FS              to WR_REFREAD;

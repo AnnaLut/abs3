@@ -27,6 +27,7 @@ PROMPT *** Create  grants  SAL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SAL             to ABS_ADMIN;
 grant SELECT                                                                 on SAL             to BARSAQ with grant option;
 grant SELECT                                                                 on SAL             to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on SAL             to BARSREADER_ROLE;
 grant SELECT                                                                 on SAL             to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SAL             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SAL             to JBOSS_USR;
@@ -35,6 +36,7 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on SAL             to RPBN002;
 grant SELECT                                                                 on SAL             to SALGL;
 grant SELECT                                                                 on SAL             to START1;
+grant SELECT                                                                 on SAL             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SAL             to WR_ALL_RIGHTS;
 grant SELECT                                                                 on SAL             to WR_CUSTLIST;
 grant FLASHBACK,SELECT                                                       on SAL             to WR_REFREAD;

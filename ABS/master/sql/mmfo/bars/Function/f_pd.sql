@@ -1,8 +1,10 @@
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_pd.sql =========*** Run *** =====
-PROMPT ===================================================================================== 
+
  
-CREATE OR REPLACE FUNCTION BARS.F_PD (p_dat01 date   , p_rnk integer , p_nd  integer, p_custtype integer,
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_pd.sql =========*** Run *** =====
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE FUNCTION BARS.F_PD (p_dat01 date   , p_rnk integer , p_nd  integer, p_custtype integer,
                                       p_kv    integer, p_nbs varchar2, p_fin integer, p_mode integer) RETURN NUMBER is
 
 /* Версия 2.0  22-06-2017   27-01-2017
@@ -16,7 +18,7 @@ CREATE OR REPLACE FUNCTION BARS.F_PD (p_dat01 date   , p_rnk integer , p_nd  int
 */
 
  l_pd number; l_idf integer; l_deb integer; l_tip_fin integer;
- 
+
 begin
    if p_nbs like '21%'  THEN l_idf := 70; l_tip_fin := 1;
    elsif p_custtype = 2 THEN l_idf := 50; l_tip_fin := 2;
@@ -38,9 +40,15 @@ begin
    end if;
 end;
 /
-show err;
+ show err;
+ 
+PROMPT *** Create  grants  F_PD ***
+grant EXECUTE                                                                on F_PD            to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on F_PD            to START1;
 
-grant execute on f_pd to bars_access_defrole;
-grant execute on f_pd to start1;
-
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_pd.sql =========*** End *** =====
+ PROMPT ===================================================================================== 
  

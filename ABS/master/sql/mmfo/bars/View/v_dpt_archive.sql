@@ -1,30 +1,14 @@
-CREATE OR REPLACE FORCE VIEW BARS.V_DPT_ARCHIVE
-(
-   KF,
-   BRANCH,
-   DPT_ID,
-   ND,
-   VIDD_ID,
-   VIDD_NM,
-   CCY_ID,
-   CCY_CODE,
-   CTR_AMT,
-   CUST_ID,
-   CUST_NM,
-   ACC_NUM,
-   DEP_BAL,
-   INT_BAL,
-   RATE,
-   CTR_DT,
-   BEG_DT,
-   END_DT,
-   CNT_DUBL,
-   USER_ID,
-   EBPY,
-   RPT_DT
-)
-AS
-     SELECT d.KF,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_DPT_ARCHIVE.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_DPT_ARCHIVE ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_DPT_ARCHIVE ("KF", "BRANCH", "DPT_ID", "ND", "VIDD_ID", "VIDD_NM", "CCY_ID", "CCY_CODE", "CTR_AMT", "CUST_ID", "CUST_NM", "ACC_NUM", "DEP_BAL", "INT_BAL", "RATE", "CTR_DT", "BEG_DT", "END_DT", "CNT_DUBL", "USER_ID", "EBPY", "RPT_DT") AS 
+  SELECT d.KF,
             d.BRANCH,
             d.deposit_id,
             d.ND,
@@ -62,50 +46,13 @@ AS
                           GROUP BY deposit_id)
    ORDER BY d.VIDD;
 
-COMMENT ON TABLE BARS.V_DPT_ARCHIVE IS 'Архів депозитів ФО';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.KF IS 'Код філіалу (МФО)';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.BRANCH IS 'Код підроздулу (ТВБВ)';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.DPT_ID IS 'Ід. депозитного договору';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.ND IS 'Номер догоовру';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.VIDD_ID IS 'Ід. виду депозиту';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.VIDD_NM IS 'Назва виду депозиту';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.CCY_ID IS 'Валюта';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.CCY_CODE IS 'Символьний код валюти';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.CTR_AMT IS 'Сума договору';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.CUST_ID IS 'Ід. клієнта';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.CUST_NM IS 'Назва клієнта';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.ACC_NUM IS 'Номер депозитного рахунку';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.DEP_BAL IS 'Залишок на депозитному рахунку';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.INT_BAL IS 'Залишок на відсотковому рахунку';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.RATE IS 'Відсткова ставка';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.CTR_DT IS 'Дата укладення договору';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.BEG_DT IS 'Дата початку дії договору';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.END_DT IS 'Дата закінчення дії договору';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.CNT_DUBL IS 'К-ть пролонгацій договору';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.EBPY IS 'ЄБП';
-
-COMMENT ON COLUMN BARS.V_DPT_ARCHIVE.RPT_DT IS 'Звітна дата';
+PROMPT *** Create  grants  V_DPT_ARCHIVE ***
+grant SELECT                                                                 on V_DPT_ARCHIVE   to BARSREADER_ROLE;
+grant SELECT                                                                 on V_DPT_ARCHIVE   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DPT_ARCHIVE   to UPLD;
 
 
 
-GRANT SELECT ON BARS.V_DPT_ARCHIVE TO BARS_ACCESS_DEFROLE;
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_DPT_ARCHIVE.sql =========*** End *** 
+PROMPT ===================================================================================== 

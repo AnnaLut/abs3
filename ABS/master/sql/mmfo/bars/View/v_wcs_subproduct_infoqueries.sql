@@ -26,7 +26,9 @@ PROMPT *** Create  view V_WCS_SUBPRODUCT_INFOQUERIES ***
  order by si.subproduct_id, si.iquery_id;
 
 PROMPT *** Create  grants  V_WCS_SUBPRODUCT_INFOQUERIES ***
+grant SELECT                                                                 on V_WCS_SUBPRODUCT_INFOQUERIES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SUBPRODUCT_INFOQUERIES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_SUBPRODUCT_INFOQUERIES to UPLD;
 
 
 

@@ -16,8 +16,10 @@ PROMPT *** Create  view V_OW_OIC_ATRANSFERS_HIST ***
  where a.anl_synthcode = w.synthcode(+);
 
 PROMPT *** Create  grants  V_OW_OIC_ATRANSFERS_HIST ***
+grant SELECT                                                                 on V_OW_OIC_ATRANSFERS_HIST to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_OIC_ATRANSFERS_HIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_OIC_ATRANSFERS_HIST to OW;
+grant SELECT                                                                 on V_OW_OIC_ATRANSFERS_HIST to UPLD;
 
 
 

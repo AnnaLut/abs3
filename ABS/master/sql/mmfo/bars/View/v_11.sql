@@ -12,8 +12,10 @@ PROMPT *** Create  view V_11 ***
  where  n.fdat=v.b and n.id like 'CCK2%' and n.kv<>980 and n.istval=0);
 
 PROMPT *** Create  grants  V_11 ***
+grant SELECT                                                                 on V_11            to BARSREADER_ROLE;
 grant SELECT                                                                 on V_11            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_11            to START1;
+grant SELECT                                                                 on V_11            to UPLD;
 
 
 

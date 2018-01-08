@@ -123,10 +123,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTZAY_KF_NN ***
+PROMPT *** Create  constraint CC_CUST_ZAY_RNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUST_ZAY MODIFY (KF CONSTRAINT CC_CUSTZAY_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CUST_ZAY MODIFY (RNK CONSTRAINT CC_CUST_ZAY_RNK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -147,75 +147,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUST_ZAY_RNK_NN ***
+PROMPT *** Create  constraint CC_CUSTZAY_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUST_ZAY MODIFY (RNK CONSTRAINT CC_CUST_ZAY_RNK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTZAY_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUST_ZAY ADD CONSTRAINT FK_CUSTZAY_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUST_ZAY_RNK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUST_ZAY ADD CONSTRAINT FK_CUST_ZAY_RNK FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ON DELETE CASCADE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTZAY_BANKS1 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUST_ZAY ADD CONSTRAINT FK_CUSTZAY_BANKS1 FOREIGN KEY (MFOP)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTZAY_BANKS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUST_ZAY ADD CONSTRAINT FK_CUSTZAY_BANKS2 FOREIGN KEY (MFO26)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTZAY_BANKS3 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUST_ZAY ADD CONSTRAINT FK_CUSTZAY_BANKS3 FOREIGN KEY (MFOV)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CUST_ZAY MODIFY (KF CONSTRAINT CC_CUSTZAY_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -239,10 +174,12 @@ exception when others then
 
 PROMPT *** Create  grants  CUST_ZAY ***
 grant FLASHBACK,SELECT                                                       on CUST_ZAY        to BARSAQ;
+grant SELECT                                                                 on CUST_ZAY        to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CUST_ZAY        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUST_ZAY        to BARS_DM;
 grant SELECT                                                                 on CUST_ZAY        to OPERKKK;
 grant SELECT                                                                 on CUST_ZAY        to TECH_MOM1;
+grant SELECT                                                                 on CUST_ZAY        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUST_ZAY        to WR_ALL_RIGHTS;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CUST_ZAY        to ZAY;
 

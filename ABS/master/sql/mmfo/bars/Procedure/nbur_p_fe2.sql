@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_FE2 ***
 
-CREATE OR REPLACE PROCEDURE BARS.NBUR_P_FE2 (p_kod_filii        varchar2,
+  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_FE2 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -18,9 +18,9 @@ is
 % DESCRIPTION : Процедура формирования #E2 для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION       v.16.019  04/01/2018
+% VERSION       v.16.018  03/01/2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.019  04.01.2018';
+  ver_          char(30)  := 'v.16.018  03.01.2018';
 /*
    Структура показника DD NNN
 
@@ -85,15 +85,10 @@ BEGIN
         P10, P20, P31, P40, P62, REFD,
         D1#E2, D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, NAZN, BAL_UAH,
         P32, P51, P52, P53, P54, P55)
-    select REPORT_DATE, a.KF, REF, TT, CUST_ID, ACC_ID, ACC_NUM, a.KV,
-        P10, P20, lpad(P31, 10, '0') p31, substr(trim(D1#E2),1,2) P40, P62, REFD,
+    select REPORT_DATE, KF, REF, TT, CUST_ID, ACC_ID, ACC_NUM, a.KV,
+        P10, P20, P31, substr(trim(D1#E2),1,2) P40, P62, REFD,
         substr(trim(D1#E2),1,2), D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, NAZN, BAL_UAH,
-        nvl((case when ltrim(p31, '0') = '6' then 'АТ "ОЩАДБАНК"' else b.nmkk end), 'Назва клієнта ') p32,
-        nvl(p51, 'N контр.') p51, 
-        nvl(to_char(to_date(p52, 'dd/mm/yyyy'), 'ddmmyyyy'), 'дата контр') p52, 
-        nvl(substr(c.benef_name,1,135), 'Назва бенефіціара ') p53, 
-        nvl(p54, '00') p54, 
-        p55
+        p32, p51, p52, substr(c.benef_name,1,135) p53, p54, p54
     from (select /*+ ordered */
             unique t.report_date, t.kf, t.ref, t.tt,
             c.cust_id, t.acc_id_db acc_id, t.acc_num_db acc_num, t.kv,
@@ -215,8 +210,7 @@ BEGIN
             substr(o.nazn,1,70) nazn, t.bal_uah,
             c.cust_name p32,
             trim(p.D2#70) p51, trim(p.D3#70) p52,
-            lpad(trim(z1.value), 2, '0') p54, 
-            '2' p55
+            trim(z1.value) p54, '2' p55
         from NBUR_DM_TRANSACTIONS t
         join NBUR_REF_SEL_TRANS r
         on (t.acc_num_db like r.acc_num_db||'%' and
@@ -263,10 +257,7 @@ BEGIN
       ) a
       left outer join v_cim_all_contracts c
       on (a.p51 = c.num and
-          to_date(a.p52, 'dd/mm/yyyy') = c.open_date)
-      left outer join customer b
-      on (a.p31 = b.okpo)    
-          ;
+          to_date(a.p52) = c.open_date);
 
     -- додане користувачем у довідник
     insert into NBUR_TMP_TRANS_1 (REPORT_DATE, KF, REF, TT, RNK, ACC, NLS, KV,
@@ -478,8 +469,8 @@ BEGIN
                            ), 3, '0') nnn,
                      p10,
                      p20,
-                     (case when flag_kons = 0 then p31 else (case when ltrim(p31, '0') = '6' then p31 else '0' end) end) p31,
-                     (case when flag_kons = 0 then p32 else ' ' end) p32,
+                     (case when flag_kons = 0 then p31 else (case when p31 = '006' then p31 else '0' end) end) p31,
+                     (case when flag_kons = 0 then p32 else (case when p31 = '006' then 'АТ "ОЩАДБАНК"' else ' ' end) end) p32,
                      (case when flag_kons = 0 then p40 else '00' end) p40,
                      (case when flag_kons = 0 then p51 else '00000' end) p51,
                      (case when flag_kons = 0 then p52 else '00000000' end) p52,

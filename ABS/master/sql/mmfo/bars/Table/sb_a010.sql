@@ -67,7 +67,7 @@ COMMENT ON COLUMN BARS.SB_A010.DATA_C IS '';
 
 
 PROMPT *** Create  grants  SB_A010 ***
-grant SELECT                                                                 on SB_A010         to BARS_DM;
+grant SELECT                                                                 on SB_A010         to UPLD;
 
 
 

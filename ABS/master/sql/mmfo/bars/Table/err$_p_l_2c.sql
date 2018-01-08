@@ -57,6 +57,10 @@ COMMENT ON COLUMN BARS.ERR$_P_L_2C.DELETE_DATE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_P_L_2C ***
+grant SELECT                                                                 on ERR$_P_L_2C     to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_P_L_2C     to UPLD;
+
 
 
 PROMPT ===================================================================================== 

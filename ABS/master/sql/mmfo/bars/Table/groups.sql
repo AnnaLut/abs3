@@ -102,11 +102,13 @@ exception when others then
 
 PROMPT *** Create  grants  GROUPS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on GROUPS          to ABS_ADMIN;
+grant SELECT                                                                 on GROUPS          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on GROUPS          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GROUPS          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GROUPS          to GROUPS;
 grant SELECT                                                                 on GROUPS          to RCC_DEAL;
 grant SELECT                                                                 on GROUPS          to START1;
+grant SELECT                                                                 on GROUPS          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on GROUPS          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on GROUPS          to WR_REFREAD;
 grant SELECT                                                                 on GROUPS          to WR_VIEWACC;

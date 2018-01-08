@@ -31,6 +31,8 @@ PROMPT *** Create  view V_DWH_INV_CCK_FL ***
 
 PROMPT *** Create  grants  V_DWH_INV_CCK_FL ***
 grant SELECT                                                                 on V_DWH_INV_CCK_FL to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on V_DWH_INV_CCK_FL to BARSREADER_ROLE;
+grant SELECT                                                                 on V_DWH_INV_CCK_FL to UPLD;
 
 
 

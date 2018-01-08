@@ -372,8 +372,24 @@ exception when others then
 
 
 
+
+PROMPT *** Create  index I_ATTRIBUTEVALUES_NUMBER ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I_ATTRIBUTEVALUES_NUMBER ON BARS.ATTRIBUTE_VALUES (NUMBER_VALUES) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  ATTRIBUTE_VALUES ***
+grant SELECT                                                                 on ATTRIBUTE_VALUES to BARSREADER_ROLE;
 grant SELECT                                                                 on ATTRIBUTE_VALUES to BARS_DM;
+grant SELECT                                                                 on ATTRIBUTE_VALUES to UPLD;
 
 
 

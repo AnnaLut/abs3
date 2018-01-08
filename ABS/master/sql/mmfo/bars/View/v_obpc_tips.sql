@@ -16,8 +16,10 @@ PROMPT *** Create  view V_OBPC_TIPS ***
  ;
 
 PROMPT *** Create  grants  V_OBPC_TIPS ***
+grant SELECT                                                                 on V_OBPC_TIPS     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_TIPS     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OBPC_TIPS     to OBPC;
+grant SELECT                                                                 on V_OBPC_TIPS     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_TIPS     to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_OBPC_TIPS     to WR_CREDIT;
 grant FLASHBACK,SELECT                                                       on V_OBPC_TIPS     to WR_REFREAD;

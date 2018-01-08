@@ -25,8 +25,10 @@ select d.deposit_id, 'TCH', a.acc
  ;
 
 PROMPT *** Create  grants  V_DPT_ACCOUNTS ***
+grant SELECT                                                                 on V_DPT_ACCOUNTS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_ACCOUNTS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_ACCOUNTS  to DPT_ROLE;
+grant SELECT                                                                 on V_DPT_ACCOUNTS  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_ACCOUNTS  to WR_ALL_RIGHTS;
 
 

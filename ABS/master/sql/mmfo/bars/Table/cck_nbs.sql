@@ -65,45 +65,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CCK_NBS_IDP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CCK_NBS ADD CONSTRAINT FK_CCK_NBS_IDP FOREIGN KEY (IDP)
-	  REFERENCES BARS.CCK_TIP (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CCK_NBS_IDT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CCK_NBS ADD CONSTRAINT FK_CCK_NBS_IDT FOREIGN KEY (IDT)
-	  REFERENCES BARS.CCK_TERM (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CCK_NBS_NBS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CCK_NBS ADD CONSTRAINT FK_CCK_NBS_NBS FOREIGN KEY (NBS)
-	  REFERENCES BARS.PS (NBS) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_CCK_NBS_NBS ***
 begin   
  execute immediate '
@@ -130,9 +91,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CCK_NBS ***
+grant SELECT                                                                 on CCK_NBS         to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CCK_NBS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_NBS         to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CCK_NBS         to RCC_DEAL;
+grant SELECT                                                                 on CCK_NBS         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_NBS         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CCK_NBS         to WR_REFREAD;
 

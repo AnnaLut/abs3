@@ -1,5 +1,14 @@
-create or replace view V_CCK_ND_ACCOUNT as
-select decode(x.tip,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CCK_ND_ACCOUNT.sql =========*** Run *
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_CCK_ND_ACCOUNT ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_ND_ACCOUNT ("ORD", "ND", "RNK", "OPN", "ACC", "TIP", "OB22", "NMS", "KV", "OSTC", "OSTB", "OSTF", "DOS", "KOS", "DAPP", "DAOS", "DAZS", "MDATE", "ISP", "IR", "BASEY", "TT", "NLS") AS 
+  select decode(x.tip,
               'LIM',
               0,
               'SS ',
@@ -170,3 +179,14 @@ select decode(x.tip,
                   where a2.acc = n2.acc
                     and n2.nd = d.nd
                     and a2.tip = t.tip))) x;
+
+PROMPT *** Create  grants  V_CCK_ND_ACCOUNT ***
+grant SELECT                                                                 on V_CCK_ND_ACCOUNT to BARSREADER_ROLE;
+grant SELECT                                                                 on V_CCK_ND_ACCOUNT to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CCK_ND_ACCOUNT to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CCK_ND_ACCOUNT.sql =========*** End *
+PROMPT ===================================================================================== 

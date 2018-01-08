@@ -14,7 +14,9 @@ where GRANTEE_TYPE_ID  = resource_utl.get_resource_type_id('STAFF_ROLE'  ) and G
   and RESOURCE_TYPE_ID = resource_utl.get_resource_type_id('KLF' );
 
 PROMPT *** Create  grants  M_ROLE_OTC ***
+grant SELECT                                                                 on M_ROLE_OTC      to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_OTC      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on M_ROLE_OTC      to UPLD;
 
 
 

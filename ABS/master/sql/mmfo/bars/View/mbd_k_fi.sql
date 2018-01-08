@@ -40,8 +40,10 @@ PROMPT *** Create  view MBD_K_FI ***
           AND a.acc = p.acc;
 
 PROMPT *** Create  grants  MBD_K_FI ***
+grant SELECT                                                                 on MBD_K_FI        to BARSREADER_ROLE;
 grant SELECT                                                                 on MBD_K_FI        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MBD_K_FI        to FOREX;
+grant SELECT                                                                 on MBD_K_FI        to UPLD;
 
 
 

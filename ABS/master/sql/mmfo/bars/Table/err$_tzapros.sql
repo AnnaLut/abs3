@@ -65,6 +65,10 @@ COMMENT ON COLUMN BARS.ERR$_TZAPROS.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_TZAPROS ***
+grant SELECT                                                                 on ERR$_TZAPROS    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_TZAPROS    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

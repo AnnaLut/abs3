@@ -133,9 +133,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_MATCH_TT ***
+grant SELECT                                                                 on OW_MATCH_TT     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_MATCH_TT     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_MATCH_TT     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_MATCH_TT     to OW;
+grant SELECT                                                                 on OW_MATCH_TT     to UPLD;
 
 
 

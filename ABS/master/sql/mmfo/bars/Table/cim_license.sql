@@ -67,10 +67,12 @@ COMMENT ON COLUMN BARS.CIM_LICENSE.DELETE_UID IS 'id користувача, який видалив в
 
 
 
-PROMPT *** Create  constraint CC_CIMLICENSE_OKPO_NN ***
+PROMPT *** Create  constraint PK_CIMLICENSE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_LICENSE MODIFY (OKPO CONSTRAINT CC_CIMLICENSE_OKPO_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_LICENSE ADD CONSTRAINT PK_CIMLICENSE PRIMARY KEY (LICENSE_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -79,12 +81,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_CIMLICENSE ***
+PROMPT *** Create  constraint CC_CIMLICENSE_OKPO_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_LICENSE ADD CONSTRAINT PK_CIMLICENSE PRIMARY KEY (LICENSE_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CIM_LICENSE MODIFY (OKPO CONSTRAINT CC_CIMLICENSE_OKPO_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -167,9 +167,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_LICENSE ***
+grant SELECT                                                                 on CIM_LICENSE     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_LICENSE     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_LICENSE     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_LICENSE     to CIM_ROLE;
+grant SELECT                                                                 on CIM_LICENSE     to UPLD;
 
 
 

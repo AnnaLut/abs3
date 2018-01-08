@@ -30,8 +30,10 @@ PROMPT *** Create  view V_CENTR_KUBM_2013 ***
 	 ;
 
 PROMPT *** Create  grants  V_CENTR_KUBM_2013 ***
+grant SELECT                                                                 on V_CENTR_KUBM_2013 to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CENTR_KUBM_2013 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CENTR_KUBM_2013 to START1;
+grant SELECT                                                                 on V_CENTR_KUBM_2013 to UPLD;
 
 
 

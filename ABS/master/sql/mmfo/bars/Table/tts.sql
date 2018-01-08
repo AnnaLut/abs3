@@ -100,185 +100,12 @@ COMMENT ON COLUMN BARS.TTS.NAZN IS 'Для дефолтного текста назначения платежа в к
 
 
 
-PROMPT *** Create  constraint FK_TTS_INTERBANK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS ADD CONSTRAINT FK_TTS_INTERBANK FOREIGN KEY (FLI)
-	  REFERENCES BARS.INTERBANK (FLI) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint UK_TTS ***
 begin   
  execute immediate '
   ALTER TABLE BARS.TTS ADD CONSTRAINT UK_TTS UNIQUE (ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TTS_FLAGS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS MODIFY (FLAGS CONSTRAINT CC_TTS_FLAGS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TTS_FLR_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS MODIFY (FLR CONSTRAINT CC_TTS_FLR_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TTS_FLV_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS MODIFY (FLV CONSTRAINT CC_TTS_FLV_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TTS_FLI_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS MODIFY (FLI CONSTRAINT CC_TTS_FLI_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TTS_FLC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS MODIFY (FLC CONSTRAINT CC_TTS_FLC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TTS_NAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS MODIFY (NAME CONSTRAINT CC_TTS_NAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TTS_TT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS MODIFY (TT CONSTRAINT CC_TTS_TT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_TTS_TABVAL2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS ADD CONSTRAINT FK_TTS_TABVAL2 FOREIGN KEY (KVK)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_TTS_DK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS ADD CONSTRAINT FK_TTS_DK FOREIGN KEY (DK)
-	  REFERENCES BARS.DK (DK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_TTS_BANKS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS ADD CONSTRAINT FK_TTS_BANKS FOREIGN KEY (MFOB)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_TTS_TABVAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS ADD CONSTRAINT FK_TTS_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TTS_FLR ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS ADD CONSTRAINT CC_TTS_FLR CHECK (flr in (0, 1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TTS_FLV ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTS ADD CONSTRAINT CC_TTS_FLV CHECK (flv in (0, 1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -349,6 +176,114 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_TTS_FLV ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TTS ADD CONSTRAINT CC_TTS_FLV CHECK (flv in (0, 1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TTS_FLR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TTS ADD CONSTRAINT CC_TTS_FLR CHECK (flr in (0, 1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TTS_TT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TTS MODIFY (TT CONSTRAINT CC_TTS_TT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TTS_NAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TTS MODIFY (NAME CONSTRAINT CC_TTS_NAME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TTS_FLC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TTS MODIFY (FLC CONSTRAINT CC_TTS_FLC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TTS_FLI_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TTS MODIFY (FLI CONSTRAINT CC_TTS_FLI_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TTS_FLV_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TTS MODIFY (FLV CONSTRAINT CC_TTS_FLV_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TTS_FLR_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TTS MODIFY (FLR CONSTRAINT CC_TTS_FLR_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TTS_FLAGS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TTS MODIFY (FLAGS CONSTRAINT CC_TTS_FLAGS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index UK_TTS ***
 begin   
  execute immediate '
@@ -381,6 +316,7 @@ grant DELETE,INSERT,SELECT,UPDATE                                            on 
 grant SELECT                                                                 on TTS             to BARS009;
 grant REFERENCES,SELECT                                                      on TTS             to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on TTS             to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on TTS             to BARSREADER_ROLE;
 grant SELECT                                                                 on TTS             to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TTS             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TTS             to BARS_DM;
@@ -395,6 +331,7 @@ grant SELECT                                                                 on 
 grant SELECT,UPDATE                                                          on TTS             to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TTS             to TECH005;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TTS             to TTS;
+grant SELECT                                                                 on TTS             to UPLD;
 grant SELECT                                                                 on TTS             to USER100101;
 grant SELECT                                                                 on TTS             to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TTS             to WR_ALL_RIGHTS;

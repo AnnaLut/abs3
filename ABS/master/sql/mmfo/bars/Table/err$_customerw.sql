@@ -60,7 +60,9 @@ COMMENT ON COLUMN BARS.ERR$_CUSTOMERW.ISP IS '';
 
 
 PROMPT *** Create  grants  ERR$_CUSTOMERW ***
+grant SELECT                                                                 on ERR$_CUSTOMERW  to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CUSTOMERW  to BARS_DM;
+grant SELECT                                                                 on ERR$_CUSTOMERW  to UPLD;
 
 
 

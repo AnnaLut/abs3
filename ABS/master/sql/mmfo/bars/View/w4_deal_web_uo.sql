@@ -80,7 +80,9 @@ PROMPT *** Create  view W4_DEAL_WEB_UO ***
                          SYS_CONTEXT ('bars_context', 'user_branch_mask'));
 
 PROMPT *** Create  grants  W4_DEAL_WEB_UO ***
+grant SELECT                                                                 on W4_DEAL_WEB_UO  to BARSREADER_ROLE;
 grant SELECT                                                                 on W4_DEAL_WEB_UO  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on W4_DEAL_WEB_UO  to UPLD;
 
 
 

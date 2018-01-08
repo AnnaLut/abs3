@@ -75,35 +75,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SCORQSMTXNUMB_SCORQUESTS ***
+PROMPT *** Create  constraint CC_SCORQSMTXNUMB_MINVAL_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX_NUMB ADD CONSTRAINT FK_SCORQSMTXNUMB_SCORQUESTS FOREIGN KEY (SCORING_ID, QUESTION_ID)
-	  REFERENCES BARS.WCS_SCORING_QUESTIONS (SCORING_ID, QUESTION_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SCORQSMTXNUMB_MAXSIGN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX_NUMB MODIFY (MAX_SIGN CONSTRAINT CC_SCORQSMTXNUMB_MAXSIGN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SCORQSMTXNUMB_MAXVAL_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX_NUMB MODIFY (MAX_VAL CONSTRAINT CC_SCORQSMTXNUMB_MAXVAL_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX_NUMB MODIFY (MIN_VAL CONSTRAINT CC_SCORQSMTXNUMB_MINVAL_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -124,10 +99,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SCORQSMTXNUMB_MINVAL_NN ***
+PROMPT *** Create  constraint CC_SCORQSMTXNUMB_MAXVAL_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX_NUMB MODIFY (MIN_VAL CONSTRAINT CC_SCORQSMTXNUMB_MINVAL_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX_NUMB MODIFY (MAX_VAL CONSTRAINT CC_SCORQSMTXNUMB_MAXVAL_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -136,37 +111,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SCORQSMTXNUMB_MAXS_STS_ID ***
+PROMPT *** Create  constraint CC_SCORQSMTXNUMB_MAXSIGN_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX_NUMB ADD CONSTRAINT FK_SCORQSMTXNUMB_MAXS_STS_ID FOREIGN KEY (MAX_SIGN)
-	  REFERENCES BARS.WCS_SIGN_TYPES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SCORQSMTXNUMB_MINS_STS_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX_NUMB ADD CONSTRAINT FK_SCORQSMTXNUMB_MINS_STS_ID FOREIGN KEY (MIN_SIGN)
-	  REFERENCES BARS.WCS_SIGN_TYPES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SCORQSMTXNUMB_QUESTMTXPARS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX_NUMB ADD CONSTRAINT FK_SCORQSMTXNUMB_QUESTMTXPARS FOREIGN KEY (QUESTION_ID, AXIS_QID)
-	  REFERENCES BARS.WCS_QUESTION_MATRIX_PARAMS (QUESTION_ID, AXIS_QID) ENABLE';
+  ALTER TABLE BARS.WCS_SCORING_QS_MATRIX_NUMB MODIFY (MAX_SIGN CONSTRAINT CC_SCORQSMTXNUMB_MAXSIGN_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -189,8 +137,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SCORING_QS_MATRIX_NUMB ***
+grant SELECT                                                                 on WCS_SCORING_QS_MATRIX_NUMB to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SCORING_QS_MATRIX_NUMB to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SCORING_QS_MATRIX_NUMB to START1;
+grant SELECT                                                                 on WCS_SCORING_QS_MATRIX_NUMB to UPLD;
 
 
 

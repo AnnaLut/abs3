@@ -87,7 +87,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  META_DEP_ACTIONTYPE ***
+grant SELECT                                                                 on META_DEP_ACTIONTYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on META_DEP_ACTIONTYPE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on META_DEP_ACTIONTYPE to UPLD;
 
 
 

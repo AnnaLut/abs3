@@ -73,71 +73,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SWSBTELEX_CUSTOMER ***
+PROMPT *** Create  constraint CC_SWSBTELEX_REF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_SB_TELEX ADD CONSTRAINT FK_SWSBTELEX_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWSBTELEX_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_SB_TELEX MODIFY (KF CONSTRAINT CC_SWSBTELEX_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWSBTELEX_FDAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_SB_TELEX MODIFY (FDAT CONSTRAINT CC_SWSBTELEX_FDAT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWSBTELEX_DAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_SB_TELEX MODIFY (DAT CONSTRAINT CC_SWSBTELEX_DAT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWSBTELEX_FN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_SB_TELEX MODIFY (FN CONSTRAINT CC_SWSBTELEX_FN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWSBTELEX_RNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_SB_TELEX MODIFY (RNK CONSTRAINT CC_SWSBTELEX_RNK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_SB_TELEX MODIFY (REF CONSTRAINT CC_SWSBTELEX_REF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -158,11 +97,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SWSBTELEX_SWJOURNAL ***
+PROMPT *** Create  constraint CC_SWSBTELEX_RNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_SB_TELEX ADD CONSTRAINT FK_SWSBTELEX_SWJOURNAL FOREIGN KEY (SWREF)
-	  REFERENCES BARS.SW_JOURNAL (SWREF) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.SW_SB_TELEX MODIFY (RNK CONSTRAINT CC_SWSBTELEX_RNK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -171,11 +109,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SWSBTELEX_KF ***
+PROMPT *** Create  constraint CC_SWSBTELEX_FN_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_SB_TELEX ADD CONSTRAINT FK_SWSBTELEX_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+  ALTER TABLE BARS.SW_SB_TELEX MODIFY (FN CONSTRAINT CC_SWSBTELEX_FN_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -184,10 +121,34 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SWSBTELEX_REF_NN ***
+PROMPT *** Create  constraint CC_SWSBTELEX_DAT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_SB_TELEX MODIFY (REF CONSTRAINT CC_SWSBTELEX_REF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_SB_TELEX MODIFY (DAT CONSTRAINT CC_SWSBTELEX_DAT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWSBTELEX_FDAT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_SB_TELEX MODIFY (FDAT CONSTRAINT CC_SWSBTELEX_FDAT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWSBTELEX_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_SB_TELEX MODIFY (KF CONSTRAINT CC_SWSBTELEX_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -225,8 +186,10 @@ exception when others then
 
 PROMPT *** Create  grants  SW_SB_TELEX ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_SB_TELEX     to BARS013;
+grant SELECT                                                                 on SW_SB_TELEX     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_SB_TELEX     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_SB_TELEX     to BARS_DM;
+grant SELECT                                                                 on SW_SB_TELEX     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_SB_TELEX     to WR_ALL_RIGHTS;
 
 

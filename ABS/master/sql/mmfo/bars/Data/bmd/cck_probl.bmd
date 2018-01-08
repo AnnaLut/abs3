@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Кредити, що мають прострочку на ПОТОЧНУ дату';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'CCK_PROBL';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,29 +124,29 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Бранч', null, null, 0, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CC_ID', 'C', '№ КД', null, null, 24, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DAT1', 'D', 'Дата~початку', null, null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DAT4', 'D', 'Дата~завершення', null, null, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KV', 'N', 'Код~вал', null, null, 3, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'ND', 'N', 'Реф~.КД', null, null, 2, 1, 1, 0, 0, '', '', 1, 0, 'COUNT(CCK_PROBL.ND)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NMK', 'C', 'Позичальник', null, null, 1, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'PROD', 'C', 'Код~продукту', null, null, 23, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'RNK', 'N', 'РНК', null, null, 22, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'SDOG', 'N', 'Сума ~по договору~ном.', null, null, 4, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'SN', 'N', 'Нормальний~борг по %%~SN екв.', null, null, 13, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SN)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'SP', 'N', 'Прострочений~борг по тілу~SP екв.', null, null, 11, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SP)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SPN', 'N', 'Простр(<=31)~борг по %%~SPN екв.', null, null, 17, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SPN)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SS', 'N', 'Нормальний~борг по тілу~SS екв.', null, null, 8, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SS)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'VIDD', 'N', 'Вид КД', null, null, 25, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'SL', 'N', 'Сумнівний~борг по тілу~SL екв.', null, null, 12, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SL)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'SPN_30', 'N', 'Простр(>31)~борг по %%~SPN екв.', null, null, 18, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SPN_30)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'SLN', 'N', 'Сумнівний~борг по %%~SLN екв.', null, null, 19, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SLN)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'SDOGQ', 'N', 'Сума ~по договору~екв.', null, null, 5, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SDOGQ)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'DAT_SP', 'D', 'Дата виникн~Простроч~Осн.боргу', null, null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'DNI_SP', 'N', 'Кiл днiв~Простроч~Осн.боргу', null, null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'DNI_SPN', 'N', 'Кiл днiв~Простроч~Проц.боргу', null, null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'DAT_SPN', 'D', 'Дата виникн~Простроч~Проц.боргу', null, null, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Бранч', '', null, 0, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CC_ID', 'C', '№ КД', '', null, 24, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAT1', 'D', 'Дата~початку', '', null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DAT4', 'D', 'Дата~завершення', '', null, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KV', 'N', 'Код~вал', '', null, 3, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'ND', 'N', 'Реф~.КД', '', null, 2, 1, 1, 0, 0, '', '', 1, 0, 'COUNT(CCK_PROBL.ND)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NMK', 'C', 'Позичальник', '', null, 1, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'PROD', 'C', 'Код~продукту', '', null, 23, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'RNK', 'N', 'РНК', '', null, 22, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'SDOG', 'N', 'Сума ~по договору~ном.', '', null, 4, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'SN', 'N', 'Нормальний~борг по %%~SN екв.', '', null, 13, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SN)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'SP', 'N', 'Прострочений~борг по тілу~SP екв.', '', null, 11, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SP)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SPN', 'N', 'Простр(<=31)~борг по %%~SPN екв.', '', null, 17, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SPN)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SS', 'N', 'Нормальний~борг по тілу~SS екв.', '', null, 8, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SS)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'VIDD', 'N', 'Вид КД', '', null, 25, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'SL', 'N', 'Сумнівний~борг по тілу~SL екв.', '', null, 12, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SL)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'SPN_30', 'N', 'Простр(>31)~борг по %%~SPN екв.', '', null, 18, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SPN_30)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'SLN', 'N', 'Сумнівний~борг по %%~SLN екв.', '', null, 19, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SLN)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'SDOGQ', 'N', 'Сума ~по договору~екв.', '', null, 5, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(CCK_PROBL.SDOGQ)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'DAT_SP', 'D', 'Дата виникн~Простроч~Осн.боргу', '', null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'DNI_SP', 'N', 'Кiл днiв~Простроч~Осн.боргу', '', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'DNI_SPN', 'N', 'Кiл днiв~Простроч~Проц.боргу', '', null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'DAT_SPN', 'D', 'Дата виникн~Простроч~Проц.боргу', '', null, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('BRANCH');

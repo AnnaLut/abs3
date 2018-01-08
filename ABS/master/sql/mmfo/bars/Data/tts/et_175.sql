@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('175', '175-Відправка дорожніх чеків', 1, '#(nbs_ob22 (''9831'',''01''))', null, '#(nbs_ob22 (''9830'',''01''))', null, null, '#(nbs_ob22 (''9831'',''01''))', '#(nbs_ob22 (''9830'',''01''))', null, 0, 0, 0, 0, null, null, null, null, null, null, '1100100000000000000000000000000000010000000000000000000000000000', null);
+    values ('175', '175-Відправка дорожніх чеків', 1, '#(get_nls_tt(''175'',''NLSM''))', null, '#(nbs_ob22 (''9830'',''01''))', null, null, '#(get_nls_tt(''175'',''NLSA''))', '#(nbs_ob22 (''9830'',''01''))', null, 0, 0, 0, 0, null, null, null, null, null, null, '1100100000000000000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='175', name='175-Відправка дорожніх чеків', dk=1, nlsm='#(nbs_ob22 (''9831'',''01''))', kv=null, nlsk='#(nbs_ob22 (''9830'',''01''))', kvk=null, nlss=null, nlsa='#(nbs_ob22 (''9831'',''01''))', nlsb='#(nbs_ob22 (''9830'',''01''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1100100000000000000000000000000000010000000000000000000000000000', nazn=null
+         set tt='175', name='175-Відправка дорожніх чеків', dk=1, nlsm='#(get_nls_tt(''175'',''NLSM''))', kv=null, nlsk='#(nbs_ob22 (''9830'',''01''))', kvk=null, nlss=null, nlsa='#(get_nls_tt(''175'',''NLSA''))', nlsb='#(nbs_ob22 (''9830'',''01''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1100100000000000000000000000000000010000000000000000000000000000', nazn=null
        where tt='175';
   end;
   --------------------------------

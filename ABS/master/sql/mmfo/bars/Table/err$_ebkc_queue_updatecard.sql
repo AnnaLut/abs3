@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.ERR$_EBKC_QUEUE_UPDATECARD.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_EBKC_QUEUE_UPDATECARD ***
+grant SELECT                                                                 on ERR$_EBKC_QUEUE_UPDATECARD to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_EBKC_QUEUE_UPDATECARD to UPLD;
+
 
 
 PROMPT ===================================================================================== 

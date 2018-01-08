@@ -18,8 +18,10 @@ where  a.nbs ='2625' and a.ob22='22'
 group by a.branch,  p.fdat, o.tt, substr(o.nlsb,1,4);
 
 PROMPT *** Create  grants  VDEB_2625_22 ***
+grant SELECT                                                                 on VDEB_2625_22    to BARSREADER_ROLE;
 grant SELECT                                                                 on VDEB_2625_22    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VDEB_2625_22    to SALGL;
+grant SELECT                                                                 on VDEB_2625_22    to UPLD;
 
 
 

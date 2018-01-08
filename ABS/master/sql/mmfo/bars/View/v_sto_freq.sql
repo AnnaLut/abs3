@@ -13,7 +13,9 @@ from   freq f
 where  f.freq in (1, 5, 7, 360);
 
 PROMPT *** Create  grants  V_STO_FREQ ***
+grant SELECT                                                                 on V_STO_FREQ      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STO_FREQ      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STO_FREQ      to UPLD;
 
 
 

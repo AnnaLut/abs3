@@ -85,45 +85,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SPOT_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPOT ADD CONSTRAINT FK_SPOT_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SPOT_KV ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPOT ADD CONSTRAINT FK_SPOT_KV FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SPOT_VP_LIST ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPOT ADD CONSTRAINT FK_SPOT_VP_LIST FOREIGN KEY (ACC)
-	  REFERENCES BARS.VP_LIST (ACC3800) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C005307 ***
 begin   
  execute immediate '
@@ -163,10 +124,12 @@ exception when others then
 
 PROMPT *** Create  grants  SPOT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPOT            to ABS_ADMIN;
+grant SELECT                                                                 on SPOT            to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPOT            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SPOT            to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPOT            to CUR_RATES;
 grant SELECT                                                                 on SPOT            to START1;
+grant SELECT                                                                 on SPOT            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPOT            to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SPOT            to WR_REFREAD;
 

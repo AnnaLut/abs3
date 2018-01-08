@@ -47,12 +47,10 @@ COMMENT ON COLUMN BARS.STAFF_WEB_LONG_SESSION.EXPIRES IS 'Діє по';
 
 
 
-PROMPT *** Create  constraint PK_STAFF_WEB_LONG_SESSION ***
+PROMPT *** Create  constraint SYS_C00119219 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STAFF_WEB_LONG_SESSION ADD CONSTRAINT PK_STAFF_WEB_LONG_SESSION PRIMARY KEY (CLIENT_IDENTIFIER)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.STAFF_WEB_LONG_SESSION MODIFY (CLIENT_IDENTIFIER NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -61,10 +59,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119219 ***
+PROMPT *** Create  constraint PK_STAFF_WEB_LONG_SESSION ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STAFF_WEB_LONG_SESSION MODIFY (CLIENT_IDENTIFIER NOT NULL ENABLE)';
+  ALTER TABLE BARS.STAFF_WEB_LONG_SESSION ADD CONSTRAINT PK_STAFF_WEB_LONG_SESSION PRIMARY KEY (CLIENT_IDENTIFIER)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -85,6 +85,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  STAFF_WEB_LONG_SESSION ***
+grant SELECT                                                                 on STAFF_WEB_LONG_SESSION to BARSREADER_ROLE;
+grant SELECT                                                                 on STAFF_WEB_LONG_SESSION to UPLD;
 
 
 

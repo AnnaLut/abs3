@@ -129,7 +129,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIN_TK_COPY ***
+grant SELECT                                                                 on CIN_TK_COPY     to BARSREADER_ROLE;
 grant SELECT                                                                 on CIN_TK_COPY     to BARS_DM;
+grant SELECT                                                                 on CIN_TK_COPY     to UPLD;
 
 
 

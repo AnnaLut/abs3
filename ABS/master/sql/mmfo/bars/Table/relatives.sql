@@ -72,8 +72,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  RELATIVES ***
+grant SELECT                                                                 on RELATIVES       to BARSREADER_ROLE;
 grant SELECT                                                                 on RELATIVES       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RELATIVES       to START1;
+grant SELECT                                                                 on RELATIVES       to UPLD;
 
 
 

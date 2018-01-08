@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции !1E
-prompt Наименование операции: Дочірня для 01E(3570/29-6110)
+prompt Наименование операции: !1E Дочірня для 01E(3570/29-6110)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!1E', 'Дочірня для 01E(3570/29-6110)', 1, '#(nbs_ob22_RNK(''3570'',''29'',#(NLSA),980))', 980, null, 980, null, '#(nbs_ob22_RNK(''3570'',''29'',#(NLSA),980))', null, null, 0, 0, 0, 0, '#(S)', null, null, null, null, null, '0000000000000000000000000011000000000000000000000000000000000000', null);
+    values ('!1E', '!1E Дочірня для 01E(3570/29-6110)', 1, '#(nbs_ob22_RNK(''3570'',''29'',#(NLSA),980))', 980, null, 980, null, '#(nbs_ob22_RNK(''3570'',''29'',#(NLSA),980))', null, null, 0, 0, 0, 0, '#(S)', null, null, null, null, null, '0000000000000000000000000011000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!1E', name='Дочірня для 01E(3570/29-6110)', dk=1, nlsm='#(nbs_ob22_RNK(''3570'',''29'',#(NLSA),980))', kv=980, nlsk=null, kvk=980, nlss=null, nlsa='#(nbs_ob22_RNK(''3570'',''29'',#(NLSA),980))', nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000000000000000011000000000000000000000000000000000000', nazn=null
+         set tt='!1E', name='!1E Дочірня для 01E(3570/29-6110)', dk=1, nlsm='#(nbs_ob22_RNK(''3570'',''29'',#(NLSA),980))', kv=980, nlsk=null, kvk=980, nlss=null, nlsa='#(nbs_ob22_RNK(''3570'',''29'',#(NLSA),980))', nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000000000000000011000000000000000000000000000000000000', nazn=null
        where tt='!1E';
   end;
   --------------------------------
@@ -131,232 +131,232 @@ begin
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6110', '01E', 1);
+    values ('6510', '01E', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''01E'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''01E'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;

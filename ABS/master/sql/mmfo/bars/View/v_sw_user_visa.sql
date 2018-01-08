@@ -15,7 +15,9 @@ PROMPT *** Create  view V_SW_USER_VISA ***
 
 PROMPT *** Create  grants  V_SW_USER_VISA ***
 grant SELECT                                                                 on V_SW_USER_VISA  to BARS013;
+grant SELECT                                                                 on V_SW_USER_VISA  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW_USER_VISA  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_SW_USER_VISA  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SW_USER_VISA  to WR_ALL_RIGHTS;
 
 

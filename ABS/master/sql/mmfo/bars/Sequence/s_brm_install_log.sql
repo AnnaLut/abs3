@@ -1,12 +1,16 @@
-begin
-    execute immediate '
-        create sequence s_brm_install_log
-        start with 1
-        increment by 1
-        nocache
-        order';
-exception
-    when others then
-        if sqlcode = -955 then null; else raise; end if;
-end;
-/
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Sequence/S_BRM_INSTALL_LOG.sql =========*** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  sequence S_BRM_INSTALL_LOG ***
+
+   CREATE SEQUENCE  BARS.S_BRM_INSTALL_LOG  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 171 NOCACHE  ORDER  NOCYCLE ;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Sequence/S_BRM_INSTALL_LOG.sql =========*** 
+PROMPT ===================================================================================== 

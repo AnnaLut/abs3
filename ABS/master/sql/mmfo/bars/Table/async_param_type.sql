@@ -78,6 +78,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ASYNC_PARAM_TYPE ***
+grant SELECT                                                                 on ASYNC_PARAM_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on ASYNC_PARAM_TYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ASYNC_PARAM_TYPE to BARS_DM;
 

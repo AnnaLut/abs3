@@ -31,8 +31,10 @@ select  '¬Ì¡‡Î',a.kv, t.lcv, aa.nls, aa.ostc, sum(a.ostc),
  from accounts where nbs in (3800,3801,9920) and nls<>9920103;
 
 PROMPT *** Create  grants  V3800 ***
+grant SELECT                                                                 on V3800           to BARSREADER_ROLE;
 grant SELECT                                                                 on V3800           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V3800           to START1;
+grant SELECT                                                                 on V3800           to UPLD;
 
 
 

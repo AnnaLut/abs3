@@ -34,8 +34,10 @@ PROMPT *** Create  view OBPC_W4 ***
    and a.branch like sys_context ('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  OBPC_W4 ***
+grant SELECT                                                                 on OBPC_W4         to BARSREADER_ROLE;
 grant SELECT                                                                 on OBPC_W4         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_W4         to OW;
+grant SELECT                                                                 on OBPC_W4         to UPLD;
 
 
 

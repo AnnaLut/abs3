@@ -13,8 +13,10 @@ from cp_deal d, cp_kod k, oper o
 where d.ref=o.ref and d.id = k.id;
 
 PROMPT *** Create  grants  V_CP_DEAL ***
+grant SELECT                                                                 on V_CP_DEAL       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_DEAL       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_DEAL       to START1;
+grant SELECT                                                                 on V_CP_DEAL       to UPLD;
 
 
 

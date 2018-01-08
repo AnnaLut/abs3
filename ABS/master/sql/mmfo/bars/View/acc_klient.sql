@@ -13,8 +13,10 @@ from cust_acc u, customer c
 where u.rnk=c.rnk;
 
 PROMPT *** Create  grants  ACC_KLIENT ***
+grant SELECT                                                                 on ACC_KLIENT      to BARSREADER_ROLE;
 grant SELECT                                                                 on ACC_KLIENT      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_KLIENT      to START1;
+grant SELECT                                                                 on ACC_KLIENT      to UPLD;
 
 
 

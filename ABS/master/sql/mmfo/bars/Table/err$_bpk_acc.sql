@@ -97,6 +97,10 @@ COMMENT ON COLUMN BARS.ERR$_BPK_ACC.DAT_CLOSE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_BPK_ACC ***
+grant SELECT                                                                 on ERR$_BPK_ACC    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_BPK_ACC    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -16,8 +16,10 @@ with check option
  ;
 
 PROMPT *** Create  grants  V_PROC_DR_DPT ***
+grant SELECT                                                                 on V_PROC_DR_DPT   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_PROC_DR_DPT   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_PROC_DR_DPT   to DPT_ADMIN;
+grant SELECT                                                                 on V_PROC_DR_DPT   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_PROC_DR_DPT   to WR_ALL_RIGHTS;
 
 

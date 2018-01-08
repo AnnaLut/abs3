@@ -40,8 +40,10 @@ PROMPT *** Create  view V_DPT_INHERITORS ***
           AND h.ATTR_INCOME = m.ATTR_INCOME;
 
 PROMPT *** Create  grants  V_DPT_INHERITORS ***
+grant SELECT                                                                 on V_DPT_INHERITORS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_INHERITORS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_INHERITORS to DPT_ROLE;
+grant SELECT                                                                 on V_DPT_INHERITORS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_INHERITORS to WR_ALL_RIGHTS;
 
 

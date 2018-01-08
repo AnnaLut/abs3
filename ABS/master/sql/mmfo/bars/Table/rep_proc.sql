@@ -64,11 +64,13 @@ exception when others then
 
 PROMPT *** Create  grants  REP_PROC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on REP_PROC        to ABS_ADMIN;
+grant SELECT                                                                 on REP_PROC        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REP_PROC        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REP_PROC        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REP_PROC        to REP_PROC;
 grant SELECT                                                                 on REP_PROC        to RPBN002;
 grant SELECT                                                                 on REP_PROC        to START1;
+grant SELECT                                                                 on REP_PROC        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REP_PROC        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on REP_PROC        to WR_REFREAD;
 

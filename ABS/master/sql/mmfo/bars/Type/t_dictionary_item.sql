@@ -1,14 +1,24 @@
-declare
-  e_obj_exists exception;
-  pragma exception_init( e_obj_exists, -00955 );
-begin
-  execute immediate 'create type T_DICTIONARY_ITEM as object
-( key   varchar2(32767)
-, value varchar2(32767) )';
-exception
-  when e_obj_exists 
-  then dbms_output.put_line( 'Name is already used by an existing object.' );
-end;
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/type/t_dictionary_item.sql =========*** Run 
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE TYPE BARS.T_DICTIONARY_ITEM force as object
+(
+       key varchar2(32767 byte),
+       value varchar2(32767 byte)
+)
 /
 
-grant execute on T_DICTIONARY_ITEM to BARS_ACCESS_DEFROLE;
+ show err;
+ 
+PROMPT *** Create  grants  T_DICTIONARY_ITEM ***
+grant EXECUTE                                                                on T_DICTIONARY_ITEM to BARS_ACCESS_DEFROLE;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/type/t_dictionary_item.sql =========*** End 
+ PROMPT ===================================================================================== 
+ 

@@ -47,9 +47,11 @@ COMMENT ON COLUMN BARS.NBS_DEB_RES.NBS IS '';
 
 
 PROMPT *** Create  grants  NBS_DEB_RES ***
+grant SELECT                                                                 on NBS_DEB_RES     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBS_DEB_RES     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBS_DEB_RES     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBS_DEB_RES     to SALGL;
+grant SELECT                                                                 on NBS_DEB_RES     to UPLD;
 grant FLASHBACK,SELECT                                                       on NBS_DEB_RES     to WR_REFREAD;
 
 

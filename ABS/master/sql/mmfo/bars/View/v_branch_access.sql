@@ -12,6 +12,8 @@ PROMPT *** Create  view V_BRANCH_ACCESS ***
  ;
 
 PROMPT *** Create  grants  V_BRANCH_ACCESS ***
+grant SELECT                                                                 on V_BRANCH_ACCESS to BARSREADER_ROLE;
+grant SELECT                                                                 on V_BRANCH_ACCESS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BRANCH_ACCESS to WR_ALL_RIGHTS;
 
 

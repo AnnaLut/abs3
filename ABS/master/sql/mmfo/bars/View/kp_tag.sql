@@ -73,8 +73,10 @@ where trim(o.TAG)='TARIF'
  ;
 
 PROMPT *** Create  grants  KP_TAG ***
+grant SELECT                                                                 on KP_TAG          to BARSREADER_ROLE;
 grant SELECT                                                                 on KP_TAG          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KP_TAG          to R_KP;
+grant SELECT                                                                 on KP_TAG          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KP_TAG          to WR_ALL_RIGHTS;
 
 

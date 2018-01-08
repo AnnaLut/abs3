@@ -33,7 +33,9 @@ JOIN applist m ON m.codeapp = rl.MODULE_ID
 order by r.id;
 
 PROMPT *** Create  grants  V_DWH_REPORTS ***
+grant SELECT                                                                 on V_DWH_REPORTS   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DWH_REPORTS   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DWH_REPORTS   to UPLD;
 
 
 

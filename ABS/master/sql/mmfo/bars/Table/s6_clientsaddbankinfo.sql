@@ -114,6 +114,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  S6_ClientsAddBankInfo ***
+grant SELECT                                                                 on S6_ClientsAddBankInfo to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

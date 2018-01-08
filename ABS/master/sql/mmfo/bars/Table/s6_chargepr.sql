@@ -132,6 +132,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  S6_ChargePr ***
+grant SELECT                                                                 on S6_ChargePr     to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

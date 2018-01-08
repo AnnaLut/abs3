@@ -76,6 +76,18 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint SYS_C0025767 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REFAPP_BAK MODIFY (CODEAPP NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C0025768 ***
 begin   
  execute immediate '
@@ -87,17 +99,9 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint SYS_C0025767 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REFAPP_BAK MODIFY (CODEAPP NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
+PROMPT *** Create  grants  REFAPP_BAK ***
+grant SELECT                                                                 on REFAPP_BAK      to BARSREADER_ROLE;
+grant SELECT                                                                 on REFAPP_BAK      to UPLD;
 
 
 

@@ -62,9 +62,11 @@ COMMENT ON COLUMN BARS.TMP_FORMA520.DATE2 IS '';
 
 
 PROMPT *** Create  grants  TMP_FORMA520 ***
+grant SELECT                                                                 on TMP_FORMA520    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FORMA520    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_FORMA520    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FORMA520    to START1;
+grant SELECT                                                                 on TMP_FORMA520    to UPLD;
 
 
 

@@ -75,8 +75,10 @@ PROMPT *** Create  view V_CCK_SAL3 ***
     WHERE i.rnk = c.rnk AND i.acc = s.acc(+) AND ad.adds = 0 AND ad.nd = i.nd;
 
 PROMPT *** Create  grants  V_CCK_SAL3 ***
+grant SELECT                                                                 on V_CCK_SAL3      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CCK_SAL3      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CCK_SAL3      to RCC_DEAL;
+grant SELECT                                                                 on V_CCK_SAL3      to UPLD;
 
 
 

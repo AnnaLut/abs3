@@ -31,7 +31,9 @@ PROMPT *** Create  view V_WCS_BID_CURACCOUNTS ***
  order by b.id, a.nls;
 
 PROMPT *** Create  grants  V_WCS_BID_CURACCOUNTS ***
+grant SELECT                                                                 on V_WCS_BID_CURACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_BID_CURACCOUNTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_BID_CURACCOUNTS to UPLD;
 
 
 

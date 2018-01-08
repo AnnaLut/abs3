@@ -178,9 +178,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_CP_UA ***
+grant SELECT                                                                 on TMP_CP_UA       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CP_UA       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_CP_UA       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CP_UA       to START1;
+grant SELECT                                                                 on TMP_CP_UA       to UPLD;
 
 
 

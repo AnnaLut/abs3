@@ -1,9 +1,16 @@
-declare
-    name_already_used exception;
-    pragma exception_init(name_already_used, -955);
-begin
-    execute immediate 'create sequence s_int_reckoning_tracking';
-exception
-    when name_already_used then null;
-end;
-/
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Sequence/S_INT_RECKONING_TRACKING.sql ======
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  sequence S_INT_RECKONING_TRACKING ***
+
+   CREATE SEQUENCE  BARS.S_INT_RECKONING_TRACKING  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 3108319 CACHE 20 NOORDER  NOCYCLE ;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Sequence/S_INT_RECKONING_TRACKING.sql ======
+PROMPT ===================================================================================== 

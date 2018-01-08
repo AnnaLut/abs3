@@ -46,7 +46,9 @@ where teru.kf = ss_kf.kf
   and c.date_off is null) r;
 
 PROMPT *** Create  grants  EBK_CUST_SUBGRP_V ***
+grant SELECT                                                                 on EBK_CUST_SUBGRP_V to BARSREADER_ROLE;
 grant SELECT                                                                 on EBK_CUST_SUBGRP_V to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on EBK_CUST_SUBGRP_V to UPLD;
 
 
 

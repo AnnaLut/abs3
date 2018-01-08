@@ -134,8 +134,10 @@ exception when others then
 
 PROMPT *** Create  grants  AN2K ***
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on AN2K            to AN_KL;
+grant SELECT                                                                 on AN2K            to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on AN2K            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AN2K            to BARS_DM;
+grant SELECT                                                                 on AN2K            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on AN2K            to WR_ALL_RIGHTS;
 
 

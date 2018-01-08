@@ -187,6 +187,10 @@ COMMENT ON COLUMN BARS.ERR$_ALEGRO.PAYMENTIMP IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_ALEGRO ***
+grant SELECT                                                                 on ERR$_ALEGRO     to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_ALEGRO     to UPLD;
+
 
 
 PROMPT ===================================================================================== 

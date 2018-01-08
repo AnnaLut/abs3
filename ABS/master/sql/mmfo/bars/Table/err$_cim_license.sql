@@ -73,6 +73,10 @@ COMMENT ON COLUMN BARS.ERR$_CIM_LICENSE.END_DATE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CIM_LICENSE ***
+grant SELECT                                                                 on ERR$_CIM_LICENSE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CIM_LICENSE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

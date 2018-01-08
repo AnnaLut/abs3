@@ -61,12 +61,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_NBURREFSTATUST ***
+PROMPT *** Create  constraint CC_REFSTATUS_DESCRIPTION_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_REF_STATUS ADD CONSTRAINT PK_NBURREFSTATUST PRIMARY KEY (STATUS_TYPE)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.NBUR_REF_STATUS MODIFY (DESCRIPTION CONSTRAINT CC_REFSTATUS_DESCRIPTION_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -75,10 +73,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_REFSTATUS_DESCRIPTION_NN ***
+PROMPT *** Create  constraint PK_NBURREFSTATUST ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_REF_STATUS MODIFY (DESCRIPTION CONSTRAINT CC_REFSTATUS_DESCRIPTION_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_REF_STATUS ADD CONSTRAINT PK_NBURREFSTATUST PRIMARY KEY (STATUS_TYPE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -101,6 +101,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_REF_STATUS ***
+grant SELECT                                                                 on NBUR_REF_STATUS to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_REF_STATUS to BARS_ACCESS_DEFROLE;
 
 

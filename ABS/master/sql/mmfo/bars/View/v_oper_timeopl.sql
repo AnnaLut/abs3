@@ -57,8 +57,10 @@ PROMPT *** Create  view V_OPER_TIMEOPL ***
 
 PROMPT *** Create  grants  V_OPER_TIMEOPL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OPER_TIMEOPL  to ABS_ADMIN;
+grant SELECT                                                                 on V_OPER_TIMEOPL  to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_OPER_TIMEOPL  to BARS_ACCESS_DEFROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_OPER_TIMEOPL  to START1;
+grant SELECT                                                                 on V_OPER_TIMEOPL  to UPLD;
 grant FLASHBACK,SELECT                                                       on V_OPER_TIMEOPL  to WR_REFREAD;
 
 

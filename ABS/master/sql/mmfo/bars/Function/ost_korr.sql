@@ -1,9 +1,11 @@
+
+ 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/ost_korr.sql =========*** Run *** =
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE FUNCTION BARS.OST_KORR 
-  --  
+  --
 (p_acc number, -- ACC счета
  p_dat date  , -- Дата типа 31 число          31.MM.YYYY
  p_di  number, -- номер даты месячного снимка 01.MM.YYYY, за который делаем отчет
@@ -33,6 +35,9 @@ END ost_korr;
 /
  show err;
  
+PROMPT *** Create  grants  OST_KORR ***
+grant EXECUTE                                                                on OST_KORR        to UPLD;
+
  
  
  PROMPT ===================================================================================== 

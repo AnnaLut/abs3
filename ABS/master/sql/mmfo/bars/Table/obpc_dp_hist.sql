@@ -101,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_DP_HIST ***
+grant SELECT                                                                 on OBPC_DP_HIST    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_DP_HIST    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_DP_HIST    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_DP_HIST    to OBPC;
+grant SELECT                                                                 on OBPC_DP_HIST    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_DP_HIST    to WR_ALL_RIGHTS;
 
 

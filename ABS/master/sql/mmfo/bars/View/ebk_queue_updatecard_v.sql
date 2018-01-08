@@ -107,7 +107,9 @@ PROMPT *** Create  view EBK_QUEUE_UPDATECARD_V ***
  where equ.status = 0;
 
 PROMPT *** Create  grants  EBK_QUEUE_UPDATECARD_V ***
+grant SELECT                                                                 on EBK_QUEUE_UPDATECARD_V to BARSREADER_ROLE;
 grant SELECT                                                                 on EBK_QUEUE_UPDATECARD_V to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on EBK_QUEUE_UPDATECARD_V to UPLD;
 
 
 

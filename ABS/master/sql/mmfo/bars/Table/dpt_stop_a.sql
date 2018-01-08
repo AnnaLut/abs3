@@ -57,19 +57,6 @@ COMMENT ON COLUMN BARS.DPT_STOP_A.SH_TERM IS '';
 
 
 
-PROMPT *** Create  constraint FK_DPTSTOPA_DPTSHTYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_STOP_A ADD CONSTRAINT FK_DPTSTOPA_DPTSHTYPE FOREIGN KEY (SH_PROC)
-	  REFERENCES BARS.DPT_SHTYPE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_DPTSTOPA ***
 begin   
  execute immediate '
@@ -84,36 +71,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint DPT_ST2 ***
+PROMPT *** Create  constraint CC_DPTSTOPA_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_STOP_A ADD CONSTRAINT DPT_ST2 FOREIGN KEY (ID)
-	  REFERENCES BARS.DPT_STOP (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTSTOPA_DPTSHTERM ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_STOP_A ADD CONSTRAINT FK_DPTSTOPA_DPTSHTERM FOREIGN KEY (SH_TERM)
-	  REFERENCES BARS.DPT_SHTERM (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTSTOPA_SHTERM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_STOP_A MODIFY (SH_TERM CONSTRAINT CC_DPTSTOPA_SHTERM_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_STOP_A MODIFY (ID CONSTRAINT CC_DPTSTOPA_ID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -158,10 +119,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTSTOPA_ID_NN ***
+PROMPT *** Create  constraint CC_DPTSTOPA_SHTERM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_STOP_A MODIFY (ID CONSTRAINT CC_DPTSTOPA_ID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_STOP_A MODIFY (SH_TERM CONSTRAINT CC_DPTSTOPA_SHTERM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -185,12 +146,14 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_STOP_A ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_STOP_A      to ABS_ADMIN;
+grant SELECT                                                                 on DPT_STOP_A      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_STOP_A      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_STOP_A      to BARS_DM;
 grant SELECT                                                                 on DPT_STOP_A      to CC_DOC;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_STOP_A      to DPT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_STOP_A      to DPT_ADMIN;
 grant SELECT                                                                 on DPT_STOP_A      to START1;
+grant SELECT                                                                 on DPT_STOP_A      to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_STOP_A      to VKLAD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_STOP_A      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_STOP_A      to WR_REFREAD;

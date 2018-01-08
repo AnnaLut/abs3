@@ -30,8 +30,10 @@ from (select FDAT, HH, DOS, (sum(DOS) over (partition by FDAT) ) DOSO,
 
 PROMPT *** Create  grants  N00_HH ***
 grant SELECT                                                                 on N00_HH          to BARS014;
+grant SELECT                                                                 on N00_HH          to BARSREADER_ROLE;
 grant SELECT                                                                 on N00_HH          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on N00_HH          to SALGL;
+grant SELECT                                                                 on N00_HH          to UPLD;
 
 
 

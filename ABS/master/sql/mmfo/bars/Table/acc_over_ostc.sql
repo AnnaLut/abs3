@@ -69,32 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ACCOVEROSTC_ACCOUNTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACC_OVER_OSTC ADD CONSTRAINT FK_ACCOVEROSTC_ACCOUNTS FOREIGN KEY (KF, ACCO)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ACCOVEROSTC_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACC_OVER_OSTC ADD CONSTRAINT FK_ACCOVEROSTC_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_ACCOVEROSTC_KF_NN ***
 begin   
  execute immediate '
@@ -123,10 +97,12 @@ exception when others then
 PROMPT *** Create  grants  ACC_OVER_OSTC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_OSTC   to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_OSTC   to BARS009;
+grant SELECT                                                                 on ACC_OVER_OSTC   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_OSTC   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_OVER_OSTC   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_OSTC   to TECH005;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_OSTC   to TECH006;
+grant SELECT                                                                 on ACC_OVER_OSTC   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_OVER_OSTC   to WR_ALL_RIGHTS;
 
 

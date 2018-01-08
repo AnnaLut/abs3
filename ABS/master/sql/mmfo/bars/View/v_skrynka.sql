@@ -15,8 +15,10 @@ select O_SK,N_SK,SNUM,KEYUSED,ISP_MO,KEYNUMBER,branch
 from skrynka_arc;
 
 PROMPT *** Create  grants  V_SKRYNKA ***
+grant SELECT                                                                 on V_SKRYNKA       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SKRYNKA       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SKRYNKA       to DEP_SKRN;
+grant SELECT                                                                 on V_SKRYNKA       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SKRYNKA       to WR_ALL_RIGHTS;
 
 

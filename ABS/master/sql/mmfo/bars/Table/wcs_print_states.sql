@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_PRINT_STATES ***
+grant SELECT                                                                 on WCS_PRINT_STATES to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_PRINT_STATES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_PRINT_STATES to BARS_DM;
+grant SELECT                                                                 on WCS_PRINT_STATES to UPLD;
 
 
 

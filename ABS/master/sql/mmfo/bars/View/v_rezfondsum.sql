@@ -82,8 +82,10 @@ PROMPT *** Create  view V_REZFONDSUM ***
  ;
 
 PROMPT *** Create  grants  V_REZFONDSUM ***
+grant SELECT                                                                 on V_REZFONDSUM    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REZFONDSUM    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_REZFONDSUM    to RCC_DEAL;
+grant SELECT                                                                 on V_REZFONDSUM    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_REZFONDSUM    to WR_ALL_RIGHTS;
 
 

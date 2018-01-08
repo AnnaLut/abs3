@@ -77,32 +77,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OTDUSER_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OTD_USER ADD CONSTRAINT FK_OTDUSER_STAFF FOREIGN KEY (USERID)
-	  REFERENCES BARS.STAFF$BASE (ID) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_OTDUSER_OTDEL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OTD_USER ADD CONSTRAINT FK_OTDUSER_OTDEL FOREIGN KEY (OTD)
-	  REFERENCES BARS.OTDEL (ID) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C009716 ***
 begin   
  execute immediate '
@@ -142,12 +116,14 @@ exception when others then
 
 PROMPT *** Create  grants  OTD_USER ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTD_USER        to ABS_ADMIN;
+grant SELECT                                                                 on OTD_USER        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTD_USER        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTD_USER        to BARS_DM;
 grant SELECT                                                                 on OTD_USER        to CP_ROLE;
 grant SELECT                                                                 on OTD_USER        to RCC_DEAL;
 grant SELECT                                                                 on OTD_USER        to RPBN001;
 grant SELECT                                                                 on OTD_USER        to START1;
+grant SELECT                                                                 on OTD_USER        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTD_USER        to WR_ALL_RIGHTS;
 grant SELECT                                                                 on OTD_USER        to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on OTD_USER        to WR_REFREAD;

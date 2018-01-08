@@ -57,6 +57,10 @@ COMMENT ON COLUMN BARS.ERR$_CP_EMIW.VALUE IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CP_EMIW ***
+grant SELECT                                                                 on ERR$_CP_EMIW    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CP_EMIW    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

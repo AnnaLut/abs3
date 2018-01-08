@@ -66,8 +66,10 @@ COMMENT ON COLUMN BARS.FINMON_PEP_CUSTOMERS.COMMENTS IS 'Коментар';
 
 
 PROMPT *** Create  grants  FINMON_PEP_CUSTOMERS ***
+grant SELECT                                                                 on FINMON_PEP_CUSTOMERS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FINMON_PEP_CUSTOMERS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FINMON_PEP_CUSTOMERS to BARS_DM;
+grant SELECT                                                                 on FINMON_PEP_CUSTOMERS to UPLD;
 
 
 

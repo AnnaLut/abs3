@@ -101,12 +101,14 @@ exception when others then
 
 
 PROMPT *** Create  grants  SEX ***
+grant SELECT                                                                 on SEX             to BARSREADER_ROLE;
 grant SELECT                                                                 on SEX             to BARSUPL;
 grant SELECT                                                                 on SEX             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEX             to BARS_DM;
 grant SELECT                                                                 on SEX             to CUST001;
 grant SELECT                                                                 on SEX             to DPT_ROLE;
 grant SELECT                                                                 on SEX             to RCC_DEAL;
+grant SELECT                                                                 on SEX             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SEX             to WR_ALL_RIGHTS;
 grant SELECT                                                                 on SEX             to WR_CUSTREG;
 

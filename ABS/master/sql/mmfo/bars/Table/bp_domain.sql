@@ -54,9 +54,11 @@ COMMENT ON COLUMN BARS.BP_DOMAIN.TATR IS 'Тип атрибута';
 
 
 PROMPT *** Create  grants  BP_DOMAIN ***
+grant SELECT                                                                 on BP_DOMAIN       to BARSREADER_ROLE;
 grant SELECT                                                                 on BP_DOMAIN       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BP_DOMAIN       to BARS_DM;
 grant SELECT                                                                 on BP_DOMAIN       to START1;
+grant SELECT                                                                 on BP_DOMAIN       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BP_DOMAIN       to WR_ALL_RIGHTS;
 
 

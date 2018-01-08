@@ -119,36 +119,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_VREZBPK_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.V_REZ_BPK ADD CONSTRAINT FK_VREZBPK_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_VREZBPK_BRANCH_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.V_REZ_BPK MODIFY (BRANCH CONSTRAINT CC_VREZBPK_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_VREZBPK_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.V_REZ_BPK ADD CONSTRAINT FK_VREZBPK_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -171,8 +145,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  V_REZ_BPK ***
+grant SELECT                                                                 on V_REZ_BPK       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REZ_BPK       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_REZ_BPK       to START1;
+grant SELECT                                                                 on V_REZ_BPK       to UPLD;
 
 
 

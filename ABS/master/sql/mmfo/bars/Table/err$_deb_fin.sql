@@ -71,6 +71,10 @@ COMMENT ON COLUMN BARS.ERR$_DEB_FIN.ORA_ERR_OPTYP$ IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_DEB_FIN ***
+grant SELECT                                                                 on ERR$_DEB_FIN    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_DEB_FIN    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

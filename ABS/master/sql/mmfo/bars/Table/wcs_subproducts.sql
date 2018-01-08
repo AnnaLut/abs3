@@ -65,19 +65,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SUBPRDS_PRDID_PRDS_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SUBPRODUCTS ADD CONSTRAINT FK_SUBPRDS_PRDID_PRDS_ID FOREIGN KEY (PRODUCT_ID)
-	  REFERENCES BARS.WCS_PRODUCTS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SUBPRODUCTS_NAME_NN ***
 begin   
  execute immediate '
@@ -104,9 +91,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SUBPRODUCTS ***
+grant SELECT                                                                 on WCS_SUBPRODUCTS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SUBPRODUCTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_SUBPRODUCTS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SUBPRODUCTS to START1;
+grant SELECT                                                                 on WCS_SUBPRODUCTS to UPLD;
 grant SELECT                                                                 on WCS_SUBPRODUCTS to WCS_SYNC_USER;
 
 

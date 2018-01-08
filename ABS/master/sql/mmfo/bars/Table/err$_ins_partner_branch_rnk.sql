@@ -57,6 +57,10 @@ COMMENT ON COLUMN BARS.ERR$_INS_PARTNER_BRANCH_RNK.RNK IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_INS_PARTNER_BRANCH_RNK ***
+grant SELECT                                                                 on ERR$_INS_PARTNER_BRANCH_RNK to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_INS_PARTNER_BRANCH_RNK to UPLD;
+
 
 
 PROMPT ===================================================================================== 

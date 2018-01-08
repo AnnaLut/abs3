@@ -59,32 +59,6 @@ COMMENT ON COLUMN BARS.MBK_CP.TIPD IS '';
 
 
 
-PROMPT *** Create  constraint FK_MBKCP_ND ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MBK_CP ADD CONSTRAINT FK_MBKCP_ND FOREIGN KEY (ND)
-	  REFERENCES BARS.CC_DEAL (ND) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_MBKCP_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MBK_CP ADD CONSTRAINT FK_MBKCP_ID FOREIGN KEY (ID)
-	  REFERENCES BARS.CP_KOD (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_MBKCP ***
 begin   
  execute immediate '
@@ -113,9 +87,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  MBK_CP ***
+grant SELECT                                                                 on MBK_CP          to BARSREADER_ROLE;
 grant SELECT                                                                 on MBK_CP          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MBK_CP          to BARS_DM;
 grant SELECT                                                                 on MBK_CP          to START1;
+grant SELECT                                                                 on MBK_CP          to UPLD;
 
 
 

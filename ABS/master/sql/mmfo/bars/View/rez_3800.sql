@@ -31,8 +31,10 @@ FROM (SELECT d.B,  SUBSTR (a.branch || '000000/' , 1, 15)  BRANCH,
 );
 
 PROMPT *** Create  grants  REZ_3800 ***
+grant SELECT                                                                 on REZ_3800        to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on REZ_3800        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ_3800        to SALGL;
+grant SELECT                                                                 on REZ_3800        to UPLD;
 
 
 

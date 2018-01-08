@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  PO_PIDST ***
+grant SELECT                                                                 on PO_PIDST        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PO_PIDST        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PO_PIDST        to START1;
+grant SELECT                                                                 on PO_PIDST        to UPLD;
 
 
 

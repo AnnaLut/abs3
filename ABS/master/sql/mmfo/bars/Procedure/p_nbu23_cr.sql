@@ -1,3 +1,5 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_NBU23_CR.sql =========*** Run **
 PROMPT ===================================================================================== 
@@ -7,43 +9,44 @@ PROMPT *** Create  procedure P_NBU23_CR ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_NBU23_CR (p_dat01 date) IS
 
-/* Версия 6.0  14-07-2017  14-03-2017  03-03-2017  07-02-2017  01-02-2017   21-12-2016  
+/* Версия 6.1  13-09-2017  14-07-2017  14-03-2017  03-03-2017  07-02-2017  01-02-2017   21-12-2016
    Заполнение данных в NBU23_REZ
    -------------------------------------
-
+ 8) 14-09-2017 - S180 из ND_VAL
+ 7) 13-09-2017 - Z из REZ_CR в NBU23_REZ
  6) 14-07-2017 - Хоз.дебиторка из модуля tipa = 21 в ID nd вместо acc
  5) 14-03-2017 - Убрала условие при удалении из NBU23_REZ
- 4) 03-03-2017 specparam 
+ 4) 03-03-2017 specparam
  3) 07-02-2017 Вернула REZERV_23
  2) 01-02-2017 Если ОБ22 не заполнен, то = '01'
  1) 21-12-2016 Добавлен rpb - рівень покриття боргу
 */
 
 
- l_fin      REZ_CR.fin%type        ;  l_pd_0     REZ_CR.pd_0%type      ;  l_tipa    REZ_CR.tipa%type      ;  l_fin_z    REZ_CR.fin_z%type     ;  
- l_ISTVAL   REZ_CR.istval%type     ;  p_branch   accounts.BRANCH%type  ;  P_FIN     nbu23_rez.fin%type    ;  P_OBS      nbu23_rez.obs%type    ;  
+ l_fin      REZ_CR.fin%type        ;  l_pd_0     REZ_CR.pd_0%type      ;  l_tipa    REZ_CR.tipa%type      ;  l_fin_z    REZ_CR.fin_z%type     ;
+ l_ISTVAL   REZ_CR.istval%type     ;  p_branch   accounts.BRANCH%type  ;  P_FIN     nbu23_rez.fin%type    ;  P_OBS      nbu23_rez.obs%type    ;
  P_KAT      nbu23_rez.kat%type     ;  P_K        nbu23_rez.k%type      ;  P_IRR     nbu23_rez.irr%type    ;  P_ZAL      TMP_REZ_OBESP23.s%type;
- r012_      specparam.r011%type    ;  P_isp      accounts.ISP%type     ;  p_ob22    accounts.OB22%type    ;  l_spec     nbu23_rez.spec%type   ;  
- P_ZAL_BL   nbu23_rez.ZAL_BL%type  ;  P_ZAL_BLQ  nbu23_rez.ZAL_BLQ%type;  P_ZALQ    TMP_REZ_OBESP23.s%type;  p_SUM_IMP  nbu23_rez.SUM_IMP%type;  
- p_SUMQ_IMP nbu23_rez.SUMQ_IMP%type;  l_nd_cp    nbu23_rez.nd_cp%type  ;  P_ZAL_SV  nbu23_rez.ZAL_SV%type ;  P_ZAL_SVQ  nbu23_rez.ZAL_BLQ%type;  
- DDD_       nbu23_rez.DDD%type     ;  DD_        nbu23_rez.DD%type     ;  L_ID      nbu23_rez.ID%type     ;  L_OKPO     CUSTOMER.OKPO%type    ;  
- L_IDR      nbu23_rez.IDR%type     ;  L_R013     nbu23_rez.R013%type   ;  L_r011    nbu23_rez.r011%type   ;  L_s180     nbu23_rez.s180%type   ;  
+ r012_      specparam.r011%type    ;  P_isp      accounts.ISP%type     ;  p_ob22    accounts.OB22%type    ;  l_spec     nbu23_rez.spec%type   ;
+ P_ZAL_BL   nbu23_rez.ZAL_BL%type  ;  P_ZAL_BLQ  nbu23_rez.ZAL_BLQ%type;  P_ZALQ    TMP_REZ_OBESP23.s%type;  p_SUM_IMP  nbu23_rez.SUM_IMP%type;
+ p_SUMQ_IMP nbu23_rez.SUMQ_IMP%type;  l_nd_cp    nbu23_rez.nd_cp%type  ;  P_ZAL_SV  nbu23_rez.ZAL_SV%type ;  P_ZAL_SVQ  nbu23_rez.ZAL_BLQ%type;
+ DDD_       nbu23_rez.DDD%type     ;  DD_        nbu23_rez.DD%type     ;  L_ID      nbu23_rez.ID%type     ;  L_OKPO     CUSTOMER.OKPO%type    ;
+ L_IDR      nbu23_rez.IDR%type     ;  L_R013     nbu23_rez.R013%type   ;  L_r011    nbu23_rez.r011%type   ;  L_s180     nbu23_rez.s180%type   ;
  l_EAD      REZ_CR.EAD%type        ;  l_EADQ     REZ_CR.eadq%type      ;  l_ta      nbu23_rez.tipa%type   ;
  l_commit   Integer := 0;             l_s080     specparam.s080%type   ;
 
- L_OVKR   VARCHAR2(50);   L_OPD    VARCHAR2(50);   L_KOL24  VARCHAR2(50);   L_KOL27  VARCHAR2(50);   L_KOL29  VARCHAR2(50);   
- L_KOL23  VARCHAR2(50);   L_P_DEF  VARCHAR2(50);   L_KOL25  VARCHAR2(50);   l_kol17  VARCHAR2(50);   L_KOL28  VARCHAR2(50);                                         
- L_OVD    VARCHAR2(50);   L_KOL26  VARCHAR2(50);   l_kol31  VARCHAR2(50);   
+ L_OVKR   VARCHAR2(50);   L_OPD    VARCHAR2(50);   L_KOL24  VARCHAR2(50);   L_KOL27  VARCHAR2(50);   L_KOL29  VARCHAR2(50);
+ L_KOL23  VARCHAR2(50);   L_P_DEF  VARCHAR2(50);   L_KOL25  VARCHAR2(50);   l_kol17  VARCHAR2(50);   L_KOL28  VARCHAR2(50);
+ L_OVD    VARCHAR2(50);   L_KOL26  VARCHAR2(50);   l_kol31  VARCHAR2(50);
 
  l_dat31  date;
 
- TYPE     D354 IS RECORD (ddd char(3) );                
- TYPE     M354 IS TABLE  OF D354 INDEX BY varchar2(1);  
- t35      M354;                                         
-                                                        
- TYPE DDDR IS  RECORD (r020 char(4), ddd char(3) );     
- TYPE DDDM IS  TABLE  OF DDDR INDEX BY varchar2(4);     
- tmp  DDDM ;                                            
+ TYPE     D354 IS RECORD (ddd char(3) );
+ TYPE     M354 IS TABLE  OF D354 INDEX BY varchar2(1);
+ t35      M354;
+
+ TYPE DDDR IS  RECORD (r020 char(4), ddd char(3) );
+ TYPE DDDM IS  TABLE  OF DDDR INDEX BY varchar2(4);
+ tmp  DDDM ;
 
 BEGIN
 
@@ -52,24 +55,24 @@ BEGIN
 
    z23.to_log_rez (user_id , 351 , p_dat01   ,'Подготовка таблицы NBU23_REZ');
    DELETE FROM NBU23_REZ WHERE FDAT = p_dat01;
-   DELETE FROM acc_nlo;  
+   DELETE FROM acc_nlo;
    commit;
    z23.to_log_rez (user_id , 351 , p_dat01   ,'Додаткові параметри');
    FIN_REP.KOL_REZCR(p_dat01);
    for k in (select r.rowid RI ,r.* from rez_cr r where fdat = p_dat01 and fin_z is not null)
    LOOP
-      if k.tipa = 17               THEN l_s080 := null; k.fin_z := NULL; 
+      if k.tipa = 17               THEN l_s080 := null; k.fin_z := NULL;
       elsif substr(k.nls,1,2)='21' THEN k.fin_z:= least(k.fin_z,5);  l_s080 := f_get_s080 (p_dat01,k.tip_fin, k.fin_z);
       else                              l_s080 := f_get_s080 (p_dat01,k.tip_fin, k.fin_z);
-      end if; 
+      end if;
       update rez_cr set s080_z = l_s080, fin_z = k.fin_z where rowid=k.RI;
    end loop;
    z23.to_log_rez (user_id , 351 , p_dat01   ,'Заполнение таблицы NBU23_REZ' );
    for D in (select r020, ddd, r012 from kl_f3_29 where kf='1B' )
-   loop        
+   loop
 
-      If d.r020  = '3548' then t35(d.r012).ddd := d.DDD ;  
-      else                     tmp(d.r020).ddd := d.ddd ;      
+      If d.r020  = '3548' then t35(d.r012).ddd := d.DDD ;
+      else                     tmp(d.r020).ddd := d.ddd ;
       end if;
 
    end loop;
@@ -79,17 +82,17 @@ BEGIN
 
    for k in (select   FDAT  , RNK    , ACC    , KV      , NLS   , NBS , ND      , VIDD, FIN  , bv02q , sum( BV  ) bv  , sum( BVQ  ) bvq , sum( EAD ) ead,
                       bv02  , KOL    , kpz    , SDATE   , wdate , TIPA, LGD     , OVKR, P_DEF, OVD   , sum( EADQ) eadq, sum( CR   ) cr  , sum( CRQ ) crq,
-                      RZ    , FIN_Z  , CCF    , PD_0    , istval, rpb , CC_ID   , s250, TIP  , TEXT  , sum( RC  ) rc  , nvl(sum( ZAL    ),0) zal   , 
-                      GRP   , S080   , DDD_6B , VKR     , OPD   , NMK , custtype, nvl(ob22,'01') ob22, sum( RCQ ) RCQ , NVL(sum( ZALQ   ),0) zalq  , 
-                      S080_z, FIN_KOL, FIN_KOR,                                                                         nvl(sum( ZAL_BV ),0) zal_BV,
+                      RZ    , FIN_Z  , CCF    , PD_0    , istval, rpb , CC_ID   , s250, TIP  , TEXT  , sum( RC  ) rc  , nvl(sum( ZAL    ),0) zal   ,
+                      GRP   , S080   , DDD_6B , VKR     , OPD   , NMK , custtype, nvl(ob22,'01') ob22, sum( RCQ ) RCQ , NVL(sum( ZALQ   ),0) zalq  ,
+                      S080_z, FIN_KOL, FIN_KOR, Z       ,                                                               nvl(sum( ZAL_BV ),0) zal_BV,
                                                                                                                         nvl(sum( ZAL_BVQ),0) zal_BVQ
-             from     REZ_CR where fdat = p_dat01 
-             group by FDAT  , RNK    , ACC    , KV      , NLS   , nbs   , ND     , VIDD   , FIN , VKR, KOL  , FIN23, kpz   , NMK, SDATE, wdate, TIPA, 
-                      LGD   , bv02   , bv02q  , OVKR    , P_DEF , OVD   , OPD    , CCF    , PD_0, RZ , FIN_Z, cc_id, ISTVAL, RPB, S250 , TIP  , TEXT, 
-                      GRP   , S080   , DDD_6B , custtype, OB22  , s080_z, FIN_KOL, FIN_KOR)
+             from     REZ_CR where fdat = p_dat01
+             group by FDAT  , RNK    , ACC    , KV      , NLS   , nbs   , ND     , VIDD   , FIN , VKR, KOL  , FIN23, kpz   , NMK, SDATE, wdate, TIPA,
+                      LGD   , bv02   , bv02q  , OVKR    , P_DEF , OVD   , OPD    , CCF    , PD_0, RZ , FIN_Z, cc_id, ISTVAL, RPB, S250 , TIP  , TEXT,
+                      GRP   , S080   , DDD_6B , custtype, OB22  , s080_z, FIN_KOL, FIN_KOR, Z)
    LOOP
       begin
-         select DECODE (TRIM (sed),'91', DECODE (custtype, 3, 2, custtype), custtype) 
+         select DECODE (TRIM (sed),'91', DECODE (custtype, 3, 2, custtype), custtype)
          into   k.custtype from customer where rnk = k.rnk;
       EXCEPTION WHEN NO_DATA_FOUND THEN  null;
       end;
@@ -98,7 +101,7 @@ BEGIN
          -- По 9100 Батюк Лариса (ГОУ СБЕРБАНК) 14-05-2013 просила ничего не проставлять в DD
          -- Добавлено decode(trim(sed),'91',2,3) для СПД(ФОП) в рамках (351) Петращук
          begin
-            select decode(custtype,1,2,2,2,decode(trim(sed),'91',2,3)),DECODE (TRIM (sed),'91', DECODE (custtype, 3, 2, custtype), custtype) 
+            select decode(custtype,1,2,2,2,decode(trim(sed),'91',2,3)),DECODE (TRIM (sed),'91', DECODE (custtype, 3, 2, custtype), custtype)
             into   dd_, k.custtype from customer where rnk = k.rnk;
          EXCEPTION WHEN NO_DATA_FOUND THEN  null;
          end;
@@ -108,35 +111,38 @@ BEGIN
       end if;
 
       if    k.tipa =  6                                       THEN l_id := k.nbs  ||                k.acc; l_ta := 3;
-      elsif k.tipa =  9 and k.nbs IN ('9129')                 THEN l_id := 'CCK9/'|| k.nd || '/' || k.acc; l_ta := 3;     
+      elsif k.tipa =  9 and k.nbs IN ('9129')                 THEN l_id := 'CCK9/'|| k.nd || '/' || k.acc; l_ta := 3;
       elsif k.tipa =  9 and k.nbs IN ('9000', '9002', '9003',
-                                      '9020', '9023', '9122') THEN l_id := k.nbs  || k.nd ||        k.acc; l_ta := 3;     
-      elsif k.tipa = 15                                       THEN l_id := 'CACP' || k.nd ||        k.acc; l_ta := 9;     
-      elsif k.tipa in (3, 4)                                  THEN l_id := 'CCK2/'|| k.nd || '/' || k.acc; l_ta := 3;          
+                                      '9020', '9023', '9122') THEN l_id := k.nbs  || k.nd ||        k.acc; l_ta := 3;
+      elsif k.tipa = 15                                       THEN l_id := 'CACP' || k.nd ||        k.acc; l_ta := 9;
+      elsif k.tipa in (3, 4)                                  THEN l_id := 'CCK2/'|| k.nd || '/' || k.acc; l_ta := 3;
       elsif k. nbs in ('1811','1819','2800','2801','2805',
                        '2806','2809','3540','3541','3548',
                        '3570','3578','3579','3710')           THEN l_id := 'DEBF' ||                k.acc; l_ta := 17; k.fin_z := NULL; k.s080_Z := null;
       elsif k. nbs in ('3510','3519','3550','3551','3552',
-                       '3559')                                THEN l_id := 'DEBH' ||                k.nd ; l_ta := k.tipa;          
-      elsif k.tipa =  5                                       THEN l_id := 'MBDK' || k.nd ||        k.acc; l_ta := 3;               
-      elsif k.tipa in (10, 90)                                THEN l_id := 'OVER' || k.nd ||        k.acc; l_ta :=10;                    
-      elsif k.tipa in (42)                                    THEN l_id := 'W4'   || k.nd ||        k.acc; l_ta := 4;                         
-      elsif k.tipa in (41)                                    THEN l_id := 'BPK'  || k.nd ||        k.acc; l_ta := 4;                         
-      else                                                         l_id := 'NNN'  || k.nd ||        k.acc; l_ta := NULL;                  
+                       '3559')                                THEN l_id := 'DEBH' ||                k.nd ; l_ta := k.tipa;
+      elsif k.tipa =  5                                       THEN l_id := 'MBDK' || k.nd ||        k.acc; l_ta := 3;
+      elsif k.tipa in (10, 90)                                THEN l_id := 'OVER' || k.nd ||        k.acc; l_ta :=10;
+      elsif k.tipa in (42)                                    THEN l_id := 'W4'   || k.nd ||        k.acc; l_ta := 4;
+      elsif k.tipa in (41)                                    THEN l_id := 'BPK'  || k.nd ||        k.acc; l_ta := 4;
+      else                                                         l_id := 'NNN'  || k.nd ||        k.acc; l_ta := NULL;
       end if;
 
       l_okpo   := f_rnk_okpo   (k.rnk);
       l_idr    := nvl(rez1.id_nbs(k.nbs),0);
 
+      if k.tipa in ( 17) THEN
+         l_s180 := f_get_nd_val_s('S180', k.nd, p_dat01, k.tipa, k.rnk);
+      end if;
+
       begin
-         select r013, r011, s180, r011 into l_r013, l_r011, l_s180, r012_ from specparam where acc=k.acc;
+         select r013, r011, nvl(l_s180,s180), r011 into l_r013, l_r011, l_s180, r012_ from specparam where acc=k.acc;
       exception when no_data_found then null;
       end;
 
       If  tmp.EXISTS(k.nbs) then DDD_:= tmp(k.nbs).ddd;
       else                       DDD_:= null;
       end if;
-      
 
       If k.nbs = '3548' and r012_ is not null then
          if t35.EXISTS(r012_) then  ddd_ := t35(r012_).ddd ; end if;
@@ -144,8 +150,8 @@ BEGIN
          if tmp.EXISTS(k.nbs) then  ddd_ := tmp(k.nbs).ddd ; end if;
       end if;
 
-      --if k.fin is null THEN 
-      --   k.fin  := 1; 
+      --if k.fin is null THEN
+      --   k.fin  := 1;
       --   k.s080 := f_get_s080 (p_dat01, f_pd(p_dat01,k.rnk,k.acc,k.custtype,k.kv,k.nbs,k.fin, 1), k.fin);
       --end if;
 
@@ -157,22 +163,22 @@ BEGIN
       p_par_zalog(p_dat01, k.acc, p_zal_bl, p_zal_blq, p_zal, p_zalQ, p_SUM_IMP, p_SUMQ_IMP, p_zal_sv, p_zal_svq);
 
       begin
-      INSERT INTO NBU23_REZ 
-           ( FDAT    , ID       , RNK    , NBS      , KV        , ND       , CC_ID    , ACC       , NLS    , BRANCH    , FIN    , KAT   , 
-             ZAL     , BV       , REZ    , REZQ     , DD        , DDD      , BVQ      , CUSTTYPE  , IDR    , WDATE     , OKPO   , NMK   , 
-             RZ      , ISTVAL   , R013   , ZALQ     , SDATE     , R011     , S180     , S250      , ISP    , OB22      , TIP    , SPEC  , 
-             ZAL_BL  , ZAL_BLQ  , ND_CP  , SUM_IMP  , SUMQ_IMP  , VKR      , ZAL_SV   , ZAL_SVQ   , GRP    , REZ23     , REZQ23 , KAT23 , 
-             S250_23 , EAD      , EADQ   , CR       , CRQ       , KOL_351  , FIN_351  , KPZ       , LGD    , OVKR      , P_DEF  , OVD   , 
-             OPD     , RC       , RCQ    , ZAL_351  , ZALQ_351  , CCF      , TIP_351  , PD_0      , FIN_Z  , ISTVAL_351, RPB    , S080  , 
-             DDD_6B  , PVZ      , PVZQ   , tipa     , S080_z    , FIN_P    , FIN_D    )                                                           
-      values                                                                                                       
-           ( k.FDAT  , l_ID     , k.RNK  , k.NBS    , k.kv      , k.ND     , k.CC_ID  , k.ACC     , k.NLS  , P_BRANCH  , k.FIN  , p_kat , 
-             P_ZAL   , k.BV     , k.CR   , k.CRQ    , DD_       , DDD_     , k.BVQ    , k.CUSTTYPE, l_IDR  , k.WDATE   , l_OKPO , k.NMK , 
-             k.RZ    , k.ISTVAL , l_R013 , P_ZALQ   , k.SDATE   , l_r011   , l_S180   , k.S250    , P_ISP  , k.OB22    , k.TIP  , l_SPEC, 
-             P_ZAL_BL, P_ZAL_BLQ, L_ND_CP, P_SUM_IMP, P_SUMQ_IMP, k.VKR    , P_ZAL_SV , P_ZAL_SVQ , k.GRP  , k.CR      , k.CRQ  , P_KAT , 
-             k.s250  , k.EAD    , k.EADQ , k.CR     , k.CRQ     , k.KOL    , k.FIN    , k.KPZ     , k.LGD  , k.OVKR    , k.P_DEF, k.OVD , 
-             k.OPD   , k.RC     , k.RCQ  , k.ZAL_BV , k.ZAL_BVQ , k.CCF    , k.TIPA   , k.PD_0    , k.FIN_Z, k.ISTVAL  , k.RPB  , k.s080, 
-             k.DDD_6B, k.zal    , k.zalq , l_ta     , k.s080_z  , k.FIN_KOL, k.FIN_KOR);
+      INSERT INTO NBU23_REZ
+           ( FDAT    , ID       , RNK    , NBS      , KV        , ND       , CC_ID    , ACC       , NLS    , BRANCH    , FIN    , KAT   ,
+             ZAL     , BV       , REZ    , REZQ     , DD        , DDD      , BVQ      , CUSTTYPE  , IDR    , WDATE     , OKPO   , NMK   ,
+             RZ      , ISTVAL   , R013   , ZALQ     , SDATE     , R011     , S180     , S250      , ISP    , OB22      , TIP    , SPEC  ,
+             ZAL_BL  , ZAL_BLQ  , ND_CP  , SUM_IMP  , SUMQ_IMP  , VKR      , ZAL_SV   , ZAL_SVQ   , GRP    , REZ23     , REZQ23 , KAT23 ,
+             S250_23 , EAD      , EADQ   , CR       , CRQ       , KOL_351  , FIN_351  , KPZ       , LGD    , OVKR      , P_DEF  , OVD   ,
+             OPD     , RC       , RCQ    , ZAL_351  , ZALQ_351  , CCF      , TIP_351  , PD_0      , FIN_Z  , ISTVAL_351, RPB    , S080  ,
+             DDD_6B  , PVZ      , PVZQ   , tipa     , S080_z    , FIN_P    , FIN_D    , Z         )
+      values
+           ( k.FDAT  , l_ID     , k.RNK  , k.NBS    , k.kv      , k.ND     , k.CC_ID  , k.ACC     , k.NLS  , P_BRANCH  , k.FIN  , p_kat ,
+             P_ZAL   , k.BV     , k.CR   , k.CRQ    , DD_       , DDD_     , k.BVQ    , k.CUSTTYPE, l_IDR  , k.WDATE   , l_OKPO , k.NMK ,
+             k.RZ    , k.ISTVAL , l_R013 , P_ZALQ   , k.SDATE   , l_r011   , l_S180   , k.S250    , P_ISP  , k.OB22    , k.TIP  , l_SPEC,
+             P_ZAL_BL, P_ZAL_BLQ, L_ND_CP, P_SUM_IMP, P_SUMQ_IMP, k.VKR    , P_ZAL_SV , P_ZAL_SVQ , k.GRP  , k.CR      , k.CRQ  , P_KAT ,
+             k.s250  , k.EAD    , k.EADQ , k.CR     , k.CRQ     , k.KOL    , k.FIN    , k.KPZ     , k.LGD  , k.OVKR    , k.P_DEF, k.OVD ,
+             k.OPD   , k.RC     , k.RCQ  , k.ZAL_BV , k.ZAL_BVQ , k.CCF    , k.TIPA   , k.PD_0    , k.FIN_Z, k.ISTVAL  , k.RPB  , k.s080,
+             k.DDD_6B, k.zal    , k.zalq , l_ta     , k.s080_z  , k.FIN_KOL, k.FIN_KOR, k.Z       );
       exception when others then
            --ORA-00001: unique constraint (BARS.PK_NBU23REZ_ID) violated
            if SQLCODE = -00001 then NULL;
@@ -180,19 +186,19 @@ BEGIN
            end if;
      end;
 
-     l_commit := l_commit + 1; 
+     l_commit := l_commit + 1;
      If l_commit >= 1000 then  commit;  l_commit:= 0 ; end if;
 
    end LOOP;
-/*  
+/*
    for sna in (select n.ROWID RI, n.* from nbu23_rez n where n.fin_351 is null and (tip='SNA' or (id like 'CACP%' and bv<0 )) and n.fdat=p_dat01)
    LOOP
       begin
-         select   fin,   pd_0,   tipa,   fin_z, istval  into   l_fin, l_pd_0, l_tipa, l_fin_z, l_istval from rez_cr 
+         select   fin,   pd_0,   tipa,   fin_z, istval  into   l_fin, l_pd_0, l_tipa, l_fin_z, l_istval from rez_cr
          where nd=sna.nd and fdat=sna.fdat and fin is not null and nbs <> '9129' and rownum=1;
-         update NBU23_rez set FIN_351 = l_fin , TIP_351 = l_TIPA, PD_0 = l_PD_0, FIN_Z   = l_FIN_Z, istval = l_istval 
+         update NBU23_rez set FIN_351 = l_fin , TIP_351 = l_TIPA, PD_0 = l_PD_0, FIN_Z   = l_FIN_Z, istval = l_istval
          where  rowid = sna.RI ;
-      EXCEPTION WHEN NO_DATA_FOUND THEN 
+      EXCEPTION WHEN NO_DATA_FOUND THEN
          update NBU23_rez set FIN_351 = fin where  rowid = sna.RI ;
       END;
 
@@ -208,10 +214,10 @@ BEGIN
    end LOOP;
 
    z23.to_log_rez (user_id ,  12 , p_dat01 ,'Начало резерв NLO ');
-   p_INS_NLO_351  (p_dat01 => p_dat01 ); 
+   p_INS_NLO_351  (p_dat01 => p_dat01 );
    --z23.kontrol1   (p_dat01 => p_dat01 , p_id => 'NLO%'  );
    z23.to_log_rez (user_id ,-12, p_dat01 ,'Конец резерв NLO ');
-   commit; 
+   commit;
    z23.to_log_rez (user_id ,351, p_dat01 ,'Начало залоги для #6B');
    p_pvz(p_dat01);  -- ( pvz ) --> tmp_rez_obesp23 для отчетности #6B
    z23.to_log_rez (user_id ,351, p_dat01 ,'Конец залоги для #6B');
@@ -219,7 +225,7 @@ BEGIN
       p_1200(p_dat01);
    end if;
    rezerv_23 ( p_dat01);
-   z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец REZ_CR --> NBU23_REZ  351 ');                                                                                 
+   z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец REZ_CR --> NBU23_REZ  351 ');
 END;
 /
 show err;

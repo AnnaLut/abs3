@@ -58,9 +58,6 @@ COMMENT ON COLUMN BARS.KL_R040.D_CLOSE IS '';
 
 
 
-PROMPT *** Create  grants  KL_R040 ***
-grant SELECT                                                                 on KL_R040         to BARS_DM;
-
 
 
 PROMPT *** Create SYNONYM  to KL_R040 ***

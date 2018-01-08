@@ -77,10 +77,12 @@ COMMENT ON COLUMN BARS.T_OTCH_PF.OB22 IS 'OB22 вкладного рах. для полілу по типа
 
 
 PROMPT *** Create  grants  T_OTCH_PF ***
+grant SELECT                                                                 on T_OTCH_PF       to BARSREADER_ROLE;
 grant SELECT                                                                 on T_OTCH_PF       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on T_OTCH_PF       to BARS_DM;
 grant SELECT                                                                 on T_OTCH_PF       to RPBN001;
 grant SELECT                                                                 on T_OTCH_PF       to START1;
+grant SELECT                                                                 on T_OTCH_PF       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on T_OTCH_PF       to WR_ALL_RIGHTS;
 
 

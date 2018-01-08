@@ -13,7 +13,9 @@ PROMPT *** Create  view V_USER_NP ***
     WHERE id = user_id;
 
 PROMPT *** Create  grants  V_USER_NP ***
+grant SELECT                                                                 on V_USER_NP       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USER_NP       to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_USER_NP       to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_USER_NP       to WR_DOC_INPUT;
 grant FLASHBACK,SELECT                                                       on V_USER_NP       to WR_REFREAD;
 

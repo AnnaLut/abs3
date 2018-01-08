@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_F02 ***
 
-CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F02 (p_kod_filii        varchar2,
+  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F02 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'G',
@@ -186,7 +186,7 @@ BEGIN
                                           REF,
                                           nd,
                                           branch)
-          SELECT /*+ parallel(8) */p_report_date,
+          SELECT p_report_date,
                  p_kod_filii,
                  p_file_code,
                  (case when l_type = 0 then l_nbuc else d.nbuc end) nbuc,
@@ -221,7 +221,7 @@ BEGIN
                                  d.acc_id,
                                  a.maturity_date,
                                  a.kf,
-                                 a.acc_num,
+                                 d.acc_num,
                                  a.kv,
                                  substr(d.acc_num, 1, 4) NBS,
                                  a.close_date date_off,
@@ -229,29 +229,29 @@ BEGIN
                                  (case when sign(b.adj_bal_uah) <> 1 or d.acc_type = 'OLD' then 0 else adj_bal_uah end) P20,
                                  (case when sign(b.adj_bal) = 1 or d.acc_type = 'OLD' then 0 else -adj_bal end) P11,
                                  (case when sign(b.adj_bal) <> 1 or d.acc_type = 'OLD' then 0 else adj_bal end) P21,
-                                 (case when d.acc_type = 'OLD' 
-                                       then 
+                                 (case when d.acc_type = 'OLD'
+                                       then
                                           d.dosq_repm - b.cudosq
                                        else
                                           b.dosq - d.dosq_repm
                                  end)
                                  P50,
-                                 (case when d.acc_type = 'OLD' 
-                                       then 
+                                 (case when d.acc_type = 'OLD'
+                                       then
                                           d.kosq_repm - b.cukosq
                                        else
                                           b.kosq - d.kosq_repm
                                  end)
                                  P60,
-                                 (case when d.acc_type = 'OLD' 
-                                       then 
+                                 (case when d.acc_type = 'OLD'
+                                       then
                                           d.dos_repm - b.cudos
                                        else
                                           b.dos - d.dos_repm
                                  end)
                                  P51,
-                                 (case when d.acc_type = 'OLD' 
-                                       then 
+                                 (case when d.acc_type = 'OLD'
+                                       then
                                           d.kos_repm - b.cukos
                                        else
                                           b.kos - d.kos_repm
@@ -264,24 +264,24 @@ BEGIN
                                  a.branch,
                                  a.nbuc,
                                  c.K041
-                            FROM nbur_tmp_kod_r020 k,
+                            FROM nbur_kor_balances d,
                                  nbur_dm_accounts a,
                                  nbur_dm_customers c,
-                                 nbur_dm_balances_monthly b,
-                                 nbur_kor_balances d
-                           WHERE     a.nbs = k.r020
+                                 nbur_dm_balances_monthly b                                 
+                           WHERE      substr(d.acc_num,1,4) in (select r020 from nbur_tmp_kod_r020)
+                                 AND d.report_date = to_date('18122017','ddmmyyyy')
+                                 and d.kf = p_kod_filii
+                                 and a.acc_id = d.acc_id
                                  AND a.report_date = p_report_date
                                  AND a.kf = p_kod_filii
-                                 AND b.acc_id = a.acc_id
+                                 AND b.acc_id = d.acc_id
                                  AND b.report_date = p_report_date
                                  AND b.kf = p_kod_filii
-                                 AND a.cust_id = c.cust_id
+                                 AND d.cust_id = c.cust_id
                                  AND c.report_date = p_report_date
                                  and trunc(a.acc_alt_dt, 'mm') = trunc(p_report_date, 'mm')
                                  AND c.kf = p_kod_filii
-                                 AND d.report_date between trunc(p_report_date, 'mm') and p_report_date
-                                 and d.kf = p_kod_filii
-                                 and b.acc_id = d.acc_id) UNPIVOT (VALUE
+                                 ) UNPIVOT (VALUE
                                                                     FOR colname
                                                                     IN  (P10,
                                                                         P20,

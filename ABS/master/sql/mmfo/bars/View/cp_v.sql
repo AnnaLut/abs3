@@ -351,9 +351,11 @@ PROMPT *** Create  view CP_V ***
                             country));
 
 PROMPT *** Create  grants  CP_V ***
+grant SELECT                                                                 on CP_V            to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_V            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_V            to CP_ROLE;
 grant SELECT                                                                 on CP_V            to START1;
+grant SELECT                                                                 on CP_V            to UPLD;
 
 
 

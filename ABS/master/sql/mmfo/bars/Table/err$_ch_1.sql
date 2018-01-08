@@ -95,6 +95,10 @@ COMMENT ON COLUMN BARS.ERR$_CH_1.MFOA IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CH_1 ***
+grant SELECT                                                                 on ERR$_CH_1       to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CH_1       to UPLD;
+
 
 
 PROMPT ===================================================================================== 

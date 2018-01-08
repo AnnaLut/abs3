@@ -189,6 +189,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  TMP_CC_LIM_UPDATE_1 ***
+grant SELECT                                                                 on TMP_CC_LIM_UPDATE_1 to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_CC_LIM_UPDATE_1 to UPLD;
+
 
 
 PROMPT ===================================================================================== 

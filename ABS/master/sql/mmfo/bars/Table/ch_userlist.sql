@@ -79,9 +79,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CH_USERLIST ***
+grant SELECT                                                                 on CH_USERLIST     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CH_USERLIST     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CH_USERLIST     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CH_USERLIST     to START1;
+grant SELECT                                                                 on CH_USERLIST     to UPLD;
 grant FLASHBACK,SELECT                                                       on CH_USERLIST     to WR_REFREAD;
 
 

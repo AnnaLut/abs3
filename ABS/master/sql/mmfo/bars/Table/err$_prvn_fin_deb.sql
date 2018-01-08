@@ -59,6 +59,10 @@ COMMENT ON COLUMN BARS.ERR$_PRVN_FIN_DEB.KF IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_PRVN_FIN_DEB ***
+grant SELECT                                                                 on ERR$_PRVN_FIN_DEB to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_PRVN_FIN_DEB to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -1,4 +1,10 @@
-create or replace package DPU_UTILS
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpu_utils.sql =========*** Run *** =
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.DPU_UTILS 
 is
   -------------------------------------------------------------
   --                                                         --
@@ -315,10 +321,7 @@ is
 
 END DPU_UTILS;
 /
-
-show errors;
-
-create or replace package body DPU_UTILS
+CREATE OR REPLACE PACKAGE BODY BARS.DPU_UTILS 
 is
   --
   -- constants
@@ -413,7 +416,7 @@ $end
 
     bars_audit.trace('%s entry with %s', title, to_char(p_vidd));
 
-    dbms_lob.createtemporary( l_clob, false );
+    dbms_lob.createtemporary (l_clob,  false);
 
     begin
       select * into l_viddrow from dpu_vidd where vidd = p_vidd;
@@ -424,20 +427,20 @@ $end
     end;
     bars_audit.trace('%s depositypename - %s', title, l_viddrow.name);
 
-    l_text :=          'prompt =============================================================='||nlchr;
-    l_text := l_text ||'prompt === ЭКСПОРТ ВИДА ДЕПОЗИТНОГО ДОГОВОРА ЮР.ЛИЦА № '||lpad(to_char(p_vidd), 10, '_')||' ==='||nlchr;
-    l_text := l_text ||'prompt =============================================================='||nlchr||nlchr;
-    l_text := l_text ||'set serveroutput on' ||nlchr;
-    l_text := l_text ||'set feed         off'||nlchr;
-    l_text := l_text ||nlchr;
-    l_text := l_text ||'declare'                                     ||nlchr;
-    l_text := l_text ||'  l_typeid        dpu_types.type_id%type;'   ||nlchr;
-    l_text := l_text ||'  l_typename      dpu_types.type_name%type;' ||nlchr;
-    l_text := l_text ||'  l_typecode      dpu_types.type_code%type;' ||nlchr;
-    l_text := l_text ||'  l_sortord       dpu_types.sort_ord%type;'  ||nlchr;
-    l_text := l_text ||'  l_flactive      dpu_types.fl_active%type;' ||nlchr;
-    l_text := l_text ||'begin'                                       ||nlchr;
-    l_text := l_text ||nlchr;
+    l_text :=          'prompt ============================================================== '||nlchr;
+    l_text := l_text ||'prompt === ЭКСПОРТ ВИДА ДЕПОЗИТНОГО ДОГОВОРА ЮР.ЛИЦА № '||lpad(to_char(p_vidd), 10, '_')||' === '||nlchr;
+    l_text := l_text ||'prompt ============================================================== '||nlchr||nlchr;
+    l_text := l_text ||'set serveroutput on'||nlchr;
+    l_text := l_text ||'set feed off       '||nlchr;
+    l_text := l_text ||nlchr ;
+    l_text := l_text ||'declare '||nlchr;
+    l_text := l_text ||'  l_typeid        dpu_types.type_id%type;   '      ||nlchr;
+    l_text := l_text ||'  l_typename      dpu_types.type_name%type; '      ||nlchr;
+    l_text := l_text ||'  l_typecode      dpu_types.type_code%type; '      ||nlchr;
+    l_text := l_text ||'  l_sortord       dpu_types.sort_ord%type;  '      ||nlchr;
+    l_text := l_text ||'  l_flactive      dpu_types.fl_active%type;  '      ||nlchr;
+    l_text := l_text ||'begin '||nlchr;
+    l_text := l_text ||nlchr ;
 
     -- часть 1. Тип депозитного договора
     select * into l_typerow from dpu_types where type_id = l_viddrow.type_id;
@@ -445,26 +448,26 @@ $end
     bars_audit.trace('%s typename - %s', title, l_typerow.type_name);
 
     l_text := l_text ||'  -- часть 1. тип депозитного договора...'||nlchr;
-    l_text := l_text ||'  begin'||nlchr;
-    l_text := l_text ||'    l_typeid   := '''||to_char(l_typerow.type_id)   ||''';'||nlchr;
-    l_text := l_text ||'    l_typename := '''||dblquote(l_typerow.type_name)||''';'||nlchr;
-    l_text := l_text ||'    l_typecode := '''||dblquote(l_typerow.type_code)||''';'||nlchr;
-    l_text := l_text ||'    l_sortord  := '''||to_char(l_typerow.sort_ord)  ||''';'||nlchr;
-    l_text := l_text ||'    l_flactive := '''||to_char(l_typerow.fl_active) ||''';'||nlchr;
-    l_text := l_text ||'    insert into DPU_TYPES ( TYPE_ID, TYPE_NAME, TYPE_CODE, SORT_ORD, FL_ACTIVE )'||nlchr;
-    l_text := l_text ||'    values ( l_typeid, l_typename, l_typecode, l_sortord, l_flactive );'||nlchr;
+    l_text := l_text ||'  begin '||nlchr;
+    l_text := l_text ||'    l_typeid   := '''||to_char(l_typerow.type_id)   ||'''; '||nlchr;
+    l_text := l_text ||'    l_typename := '''||dblquote(l_typerow.type_name)||'''; '||nlchr;
+    l_text := l_text ||'    l_typecode := '''||dblquote(l_typerow.type_code)||'''; '||nlchr;
+    l_text := l_text ||'    l_sortord  := '''||to_char(l_typerow.sort_ord)  ||'''; '||nlchr;
+    l_text := l_text ||'    l_flactive := '''||to_char(l_typerow.fl_active)  ||'''; '||nlchr;
+    l_text := l_text ||'    insert into dpu_types ( type_id, type_name, type_code, sort_ord, fl_active ) '||nlchr;
+    l_text := l_text ||'    values ( l_typeid, l_typename, l_typecode, l_sortord, l_flactive ); '||nlchr;
     l_text := l_text ||'    dbms_output.put_line(''Создан тип договора № '||to_char(l_typerow.type_id)||' - '||dblquote(l_typerow.type_code)||''' );'||nlchr;
-    l_text := l_text ||'  exception'||nlchr;
-    l_text := l_text ||'    when DUP_VAL_ON_INDEX then'||nlchr;
-    l_text := l_text ||'      update DPU_TYPES '||nlchr;
-    l_text := l_text ||'         set TYPE_NAME = l_typename,'||nlchr;
-    l_text := l_text ||'             TYPE_CODE = l_typecode,'||nlchr;
-    l_text := l_text ||'             SORT_ORD  = l_sortord,' ||nlchr;
-    l_text := l_text ||'             FL_ACTIVE = l_flactive' ||nlchr;
-    l_text := l_text ||'       where TYPE_ID   = l_typeid;'  ||nlchr;
-    l_text := l_text ||'      dbms_output.put_line(''Обновлен тип договора № '||to_char(l_typerow.type_id)||' - '||dblquote(l_typerow.type_code)||''');'||nlchr;
-    l_text := l_text ||'  end;'||nlchr;
-    l_text := l_text ||nlchr;
+    l_text := l_text ||'  exception '||nlchr;
+    l_text := l_text ||'    when DUP_VAL_ON_INDEX then '||nlchr;
+    l_text := l_text ||'      update dpu_types '||nlchr;
+    l_text := l_text ||'         set type_name = l_typename, '||nlchr;
+    l_text := l_text ||'             type_code = l_typecode, '||nlchr;
+    l_text := l_text ||'             sort_ord  = l_sortord, ' ||nlchr;
+    l_text := l_text ||'             fl_active = l_flactive ' ||nlchr;
+    l_text := l_text ||'         where type_id = l_typeid; '  ||nlchr;
+    l_text := l_text ||'      dbms_output.put_line(''Обновлен тип договора № '||to_char(l_typerow.type_id)||' - '||dblquote(l_typerow.type_code)||'''); '||nlchr;
+    l_text := l_text ||'  end; '||nlchr;
+    l_text := l_text ||nlchr ;
 
     dbms_lob.append(l_clob, l_text);
     l_text := null;
@@ -475,24 +478,24 @@ $end
     then
 
       select * into l_template
-        from DOC_SCHEME
+        from doc_scheme
        where id = l_viddrow.shablon;
 
       bars_audit.trace('%s template - %s', title, l_template.id);
 
        l_text := l_text ||'  -- часть 2. шаблон депозитного договора...'||nlchr;
-       l_text := l_text ||'  begin'||nlchr;
-       l_text := l_text ||'    insert into DOC_SCHEME ( ID, NAME ) '||nlchr;
+       l_text := l_text ||'  begin '||nlchr;
+       l_text := l_text ||'    insert into doc_scheme (id, name) '||nlchr;
        l_text := l_text ||'    values (''' || nvl(dblquote(l_template.id),   '') ||''',  ''' || nvl(dblquote(l_template.name), '') ||'''); '||nlchr;
        l_text := l_text ||'    dbms_output.put_line(''Создан шаблон '||dblquote(l_template.id)||' - '||dblquote(l_template.name)||'''); '||nlchr;
        l_text := l_text ||'  exception '||nlchr;
        l_text := l_text ||'    when dup_val_on_index then '||nlchr;
        l_text := l_text ||'      update doc_scheme '||nlchr;
-       l_text := l_text ||'         set name = '''||nvl(dblquote(l_template.name), '') ||'''' ||nlchr;
-       l_text := l_text ||'       where id   = '''||nvl(dblquote(l_template.id),   '') ||''';'||nlchr;
+       l_text := l_text ||'         set name = '''||nvl(dblquote(l_template.name), '') ||'''  '||nlchr;
+       l_text := l_text ||'       where id   = '''||nvl(dblquote(l_template.id),   '') ||'''; '||nlchr;
        l_text := l_text ||'      dbms_output.put_line(''Обновлен шаблон '||dblquote(l_template.id)||' - '||dblquote(l_template.name)||'''); '||nlchr;
-       l_text := l_text ||'  end;'||nlchr;
-       l_text := l_text ||nlchr;
+       l_text := l_text ||'  end; '||nlchr;
+       l_text := l_text ||nlchr ;
 
        select * bulk collect
          into l_root
@@ -504,13 +507,13 @@ $end
          if i = 1 then
             l_text := l_text ||'  -- часть 2.1. привязка к видам договоров (cc_vidd)...'||nlchr;
          end if;
-         l_text := l_text ||'  begin'||nlchr;
-         l_text := l_text ||'    insert into DOC_ROOT ( VIDD, ID )'||nlchr;
-         l_text := l_text ||'    values ('|| nvl(to_char(l_root(i).vidd), 'null') ||', '''|| nvl(dblquote(l_root(i).id), '')||''');'||nlchr;
+         l_text := l_text ||'  begin '||nlchr;
+         l_text := l_text ||'    insert into doc_root (vidd, id) '||nlchr;
+         l_text := l_text ||'    values ('|| nvl(to_char(l_root(i).vidd), 'null') ||', '''|| nvl(dblquote(l_root(i).id), '')||'''); '||nlchr;
          l_text := l_text ||'    dbms_output.put_line(''Шаблон '||dblquote(l_template.id)||' привязан к типу договора №'||to_char(l_root(i).vidd)||''');'||nlchr;
-         l_text := l_text ||'  exception'||nlchr;
-         l_text := l_text ||'    when dup_val_on_index then null;'||nlchr;
-         l_text := l_text ||'  end;'||nlchr;
+         l_text := l_text ||'  exception '||nlchr;
+         l_text := l_text ||'    when dup_val_on_index then null; '||nlchr;
+         l_text := l_text ||'  end; '||nlchr;
          l_text := l_text ||nlchr ;
        end loop;
 
@@ -532,27 +535,27 @@ $end
        where id = l_viddrow.id_stop;
 
       l_text := l_text ||'  -- штраф...'||nlchr;
-      l_text := l_text ||'  begin'||nlchr;
-      l_text := l_text ||'    insert into DPT_STOP ( ID, NAME, FL, SH_PROC, SH_OST )'||nlchr;
+      l_text := l_text ||'  begin '||nlchr;
+      l_text := l_text ||'    insert into dpt_stop (id, name, fl, sh_proc, sh_ost) '||nlchr;
       l_text := l_text ||'    values ('||nvl(to_char(l_stoprow.id), 'null')||', '
                                        ||'substr('''||nvl(dblquote(l_stoprow.name), '') ||''', 1, 50), '
                                        ||nvl(to_char(l_stoprow.fl),     'null') ||', '
                                        ||nvl(to_char(l_stoprow.sh_proc),'null') ||', '
                                        ||nvl(to_char(l_stoprow.sh_ost), 'null') ||');'||nlchr;
       l_text := l_text ||'    dbms_output.put_line(''Создан штраф № '||to_char(l_stoprow.id)||' - '||dblquote(l_stoprow.name)||''');'||nlchr;
-      l_text := l_text ||'  exception'||nlchr;
-      l_text := l_text ||'    when dup_val_on_index then'||nlchr;
-      l_text := l_text ||'      update DPT_STOP'||nlchr;
-      l_text := l_text ||'         set name    = substr('||''''||nvl(dblquote(l_stoprow.name), '') ||''', 1, 50),'||nlchr;
+      l_text := l_text ||'  exception '||nlchr;
+      l_text := l_text ||'    when dup_val_on_index then '||nlchr;
+      l_text := l_text ||'      update dpt_stop '||nlchr;
+      l_text := l_text ||'         set name    = substr('||''''||nvl(dblquote(l_stoprow.name), '') ||''', 1, 50), '||nlchr;
       l_text := l_text ||'             fl      = '||nvl(to_char(l_stoprow.fl),          '') ||',' ||nlchr;
       l_text := l_text ||'             sh_proc = '||nvl(to_char(l_stoprow.sh_proc), 'null') ||',' ||nlchr;
       l_text := l_text ||'             sh_ost  = '||nvl(to_char(l_stoprow.sh_ost),  'null') ||' ' ||nlchr;
       l_text := l_text ||'       where id      = '||nvl(to_char(l_stoprow.id),      'null') ||';' ||nlchr;
-      l_text := l_text ||'      dbms_output.put_line(''Обновлен штраф № '||to_char(l_stoprow.id)||' - '||dblquote(l_stoprow.name)||''');'||nlchr;
-      l_text := l_text ||'  end;'||nlchr;
+      l_text := l_text ||'      dbms_output.put_line(''Обновлен штраф № '||to_char(l_stoprow.id)||' - '||dblquote(l_stoprow.name)||'''); '||nlchr;
+      l_text := l_text ||'  end; '||nlchr;
       l_text := l_text ||nlchr ;
       l_text := l_text ||'  -- удаление описания штрафа...'||nlchr;
-      l_text := l_text ||'  delete from DPT_STOP_A where ID = '||to_char(l_viddrow.id_stop)||';' ||nlchr;
+      l_text := l_text ||'  delete from DPT_STOP_A where id = '||to_char(l_viddrow.id_stop)||';' ||nlchr;
       l_text := l_text ||nlchr ;
 
       dbms_lob.append(l_clob, l_text);
@@ -568,22 +571,22 @@ $end
       loop
 
         l_text := l_text ||'  begin '||nlchr;
-        l_text := l_text ||'    insert into DPT_STOP_A (id, k_srok, k_proc, k_term, sh_proc, sh_term)'||nlchr;
+        l_text := l_text ||'    insert into dpt_stop_a (id, k_srok, k_proc, k_term, sh_proc, sh_term)'||nlchr;
         l_text := l_text ||'    values ('||nvl(to_char(l_stopdata(i).id),      'null') ||', '
                                          ||nvl(to_char(l_stopdata(i).k_srok),  'null') ||', '
                                          ||nvl(to_char(l_stopdata(i).k_proc),  'null') ||', '
                                          ||nvl(to_char(l_stopdata(i).k_term),  'null') ||', '
                                          ||nvl(to_char(l_stopdata(i).sh_proc), 'null') ||', '
                                          ||nvl(to_char(l_stopdata(i).sh_term), 'null') ||');'||nlchr;
-        l_text := l_text ||'  exception' ||nlchr;
-        l_text := l_text ||'    when dup_val_on_index then'||nlchr;
-        l_text := l_text ||'      update DPT_STOP_A'||nlchr;
-        l_text := l_text ||'         set K_PROC  = '||nvl(to_char(l_stopdata(i).k_proc),  'null') ||nlchr;
-        l_text := l_text ||'           , K_TERM  = '||nvl(to_char(l_stopdata(i).k_term),  'null') ||nlchr;
-        l_text := l_text ||'           , SH_PROC = '||nvl(to_char(l_stopdata(i).sh_proc), 'null') ||nlchr;
-        l_text := l_text ||'           , SH_TERM = '||nvl(to_char(l_stopdata(i).sh_term), 'null') ||nlchr;
-        l_text := l_text ||'       where ID      = '||to_char(l_stopdata(i).id)                   ||nlchr;
-        l_text := l_text ||'         and K_SROK  = '||to_char(l_stopdata(i).k_srok) ||';'         ||nlchr;
+        l_text := l_text ||'  exception '||nlchr;
+        l_text := l_text ||'    when dup_val_on_index then '||nlchr;
+        l_text := l_text ||'      update DPT_STOP_A '||nlchr;
+        l_text := l_text ||'         set k_proc  = '||nvl(to_char(l_stopdata(i).k_proc),  'null') ||', '||nlchr;
+        l_text := l_text ||'             k_term  = '||nvl(to_char(l_stopdata(i).k_term),  'null') ||', '||nlchr;
+        l_text := l_text ||'             sh_proc = '||nvl(to_char(l_stopdata(i).sh_proc), 'null') ||', '||nlchr;
+        l_text := l_text ||'             sh_term = '||nvl(to_char(l_stopdata(i).sh_term), 'null') ||'  '||nlchr;
+        l_text := l_text ||'       where id      = '||to_char(l_stopdata(i).id)     ||' ' ||nlchr;
+        l_text := l_text ||'         and k_srok  = '||to_char(l_stopdata(i).k_srok) ||';' ||nlchr;
         l_text := l_text ||'  end; '||nlchr;
         l_text := l_text ||nlchr ;
 
@@ -595,13 +598,15 @@ $end
     End If;
 
     -- часть 4. Вид депозитного договора
-    l_text := DPT_UTILS.GET_INSERT4TABLE( 'DPU_VIDD', 'VIDD = '||to_char(l_viddrow.vidd), 2, 'BARS', 'U' );
-    l_text := replace( l_text, '1 row created.', 'Створено вид депозиту № '||to_char(l_viddrow.vidd)||' - '||dblquote(l_viddrow.name) );
-    l_text := replace( l_text, '1 row updated.', 'Оновлено вид депозиту № '||to_char(l_viddrow.vidd)||' - '||dblquote(l_viddrow.name) );
-    l_text := '  -- 4. вид депозитного договору...' || nlchr || l_text;
-    dbms_lob.append( l_clob, l_text );
-    l_text := null;
+    l_text := l_text ||'  -- 4. вид депозитного договору...'||nlchr;
+    l_text := l_text || DPT_UTILS.GET_INSERT4TABLE( 'DPU_VIDD', 'VIDD = '||to_char(l_viddrow.vidd), 2 );
+    l_text := l_text ||'  if (sql%rowcount > 0 )'||nlchr;
+    l_text := l_text ||'  then'||nlchr;
+    l_text := l_text ||'    dbms_output.put_line(''Створено/оновлено вид депозиту № '||to_char(l_viddrow.vidd)||' - '||dblquote(l_viddrow.name)||''' );'||nlchr;
+    l_text := l_text ||'  end if;'||nlchr;
 
+    dbms_lob.append(l_clob, l_text);
+    l_text := null;
     bars_audit.trace('%s dpu_vidd script succ.created', title);
 
     -- 5. Шкала процентных ставок.
@@ -616,8 +621,8 @@ $end
            l_text := l_text ||'  -- 5. шкала процентных ставок...'||nlchr;
         end if;
         l_text := l_text ||'  begin '||nlchr;
-        l_text := l_text ||'    insert into DPU_VIDD_RATE'||nlchr;
-        l_text := l_text ||'      ( ID, VIDD, TERM, LIMIT, RATE, TERM_DAYS, TERM_INCLUDE, SUMM_INCLUDE, MAX_RATE, TYPE_ID, KV )'||nlchr;
+        l_text := l_text ||'    insert into dpu_vidd_rate '||nlchr;
+        l_text := l_text ||'      (id, vidd, term, limit, rate, term_days, term_include, summ_include, max_rate, type_id, kv) '||nlchr;
         l_text := l_text ||'    values '||nlchr;
         l_text := l_text ||'      (' || nvl( to_char(l_rate(i).id          ), 'null') ||', '   ||nlchr;
         l_text := l_text ||'       ' || nvl( to_char(l_rate(i).vidd        ), 'null') ||', '   ||nlchr;
@@ -632,9 +637,9 @@ $end
         l_text := l_text ||'       ' || nvl( to_char(l_rate(i).kv          ), 'null') ||');'   ||nlchr;
 
         l_text := l_text ||'  exception '||nlchr;
-        l_text := l_text ||'    when dup_val_on_index then null;'||nlchr;
-        l_text := l_text ||'  end;'||nlchr;
-        l_text := l_text ||nlchr;
+        l_text := l_text ||'    when dup_val_on_index then null; '||nlchr;
+        l_text := l_text ||'  end; '||nlchr;
+        l_text := l_text ||nlchr ;
 
         if i = l_rate.count then
            l_text := l_text ||'  dbms_output.put_line(''Обновлены шкалы проц.ставок для вида договора № '||to_char(l_viddrow.vidd)||''');'||nlchr;
@@ -654,78 +659,85 @@ $end
 $if DPU_PARAMS.SBER
 $then
     -- 6. Параметры OB22 для счетов
-    l_text := DPT_UTILS.GET_INSERT4TABLE( 'DPU_TYPES_OB22', 'TYPE_ID = '||to_char(l_viddrow.type_id), 2, 'BARS', 'U' );
-    l_text := '  -- 6. параметры OB22...' || nlchr || l_text;
-    dbms_lob.append( l_clob, l_text );
-    l_text := null;
+    If (l_viddrow.type_id > 0) -- and (l_viddrow.flag = 0))
+    Then
 
---  select *
---    bulk collect
---    into l_ob22
---    from DPU_TYPES_OB22
---   where TYPE_ID = l_viddrow.type_id;
---
---  for o in 1..l_ob22.count
---  loop
---
---    bars_audit.trace( '%s ob22 - (%s/%s, %s/%s, %s/%s, %s/%s)', title,
---                      l_ob22(o).nbs_dep, l_ob22(o).ob22_dep, l_ob22(o).nbs_int, l_ob22(o).ob22_int,
---                      l_ob22(o).nbs_exp, l_ob22(o).ob22_exp, l_ob22(o).nbs_red, l_ob22(o).ob22_red );
---    if ( o = 1 )
---    then
---       -- l_text := l_text ||nlchr;
---       l_text := l_text ||'  -- 6. параметры OB22...'||nlchr;
---    end if;
---
---    l_text := l_text ||'  begin '||nlchr;
---    l_text := l_text ||'    insert into DPU_TYPES_OB22'||nlchr;
---    l_text := l_text ||'      ( type_id, k013, S181, R034, nbs_dep, ob22_dep, nbs_int, ob22_int, nbs_exp, ob22_exp, nbs_red, ob22_red ) '||nlchr;
---    l_text := l_text ||'    values '||nlchr;
---    l_text := l_text ||'      ( '   || nvl( to_char(l_ob22(o).type_id ), 'null') ||  ', ' ;
---    l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).k013    ),     '') ||''', ' ;
---    l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).S181    ),     '') ||''', ' ;
---    l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).R034    ),     '') ||''', ' ;
---    l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).nbs_dep ),     '') ||''', ' ;
---    l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).ob22_dep),     '') ||''', ' ;
---    l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).nbs_int ),     '') ||''', ' ;
---    l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).ob22_int),     '') ||''', ' ;
---    l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).nbs_exp ),     '') ||''', ' ;
---    l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).ob22_exp),     '') ||''', ' ;
---    l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).nbs_red ),     '') ||''', ' ;
---    l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).ob22_red),     '') ||''');' ||nlchr;
---    l_text := l_text ||'    dbms_output.put_line(''Заповнено ОБ22 для типу договору № '||to_char(l_ob22(o).type_id)||''' );'||nlchr;
---    l_text := l_text ||'  exception '||nlchr;
---    l_text := l_text ||'    when DUP_VAL_ON_INDEX then'||nlchr;
---    l_text := l_text ||'      update DPU_TYPES_OB22'  ||nlchr;
---    l_text := l_text ||'         set nbs_dep  = '||''''||nvl(dblquote(l_ob22(o).nbs_dep), '') ||''', '||nlchr;
---    l_text := l_text ||'             ob22_dep = '||''''||nvl(dblquote(l_ob22(o).ob22_dep), '') ||''', '||nlchr;
---    l_text := l_text ||'             nbs_int  = '||''''||nvl(dblquote(l_ob22(o).nbs_int ), '') ||''', '||nlchr;
---    l_text := l_text ||'             ob22_int = '||''''||nvl(dblquote(l_ob22(o).ob22_int), '') ||''', '||nlchr;
---    l_text := l_text ||'             nbs_exp  = '||''''||nvl(dblquote(l_ob22(o).nbs_exp ), '') ||''', '||nlchr;
---    l_text := l_text ||'             ob22_exp = '||''''||nvl(dblquote(l_ob22(o).ob22_exp), '') ||''', '||nlchr;
---    l_text := l_text ||'             nbs_red  = '||''''||nvl(dblquote(l_ob22(o).nbs_red ), '') ||''', '||nlchr;
---    l_text := l_text ||'             ob22_red = '||''''||nvl(dblquote(l_ob22(o).ob22_red), '') ||'''  '||nlchr;
---    l_text := l_text ||'       where type_id  = '|| to_char(l_ob22(o).type_id)    ||nlchr;
---    l_text := l_text ||'         and K013     = '||''''|| l_ob22(o).k013 || ''' ' ||nlchr;
---    l_text := l_text ||'         and S181     = '||''''|| l_ob22(o).S181 || ''' ' ||nlchr;
---    l_text := l_text ||'         and R034     = '||''''|| l_ob22(o).R034 || ''';' ||nlchr;
---    l_text := l_text ||'    dbms_output.put_line(''Оновлено ОБ22 для типу договору № '||to_char(l_viddrow.type_id)||''' );'||nlchr;
---    l_text := l_text ||'  end; '||nlchr;
---    l_text := l_text ||nlchr;
---    dbms_lob.append(l_clob, l_text);
---    l_text := null;
---
---  End Loop;
+      select *
+        bulk collect
+        into l_ob22
+        from BARS.DPU_TYPES_OB22
+       where type_id = l_viddrow.type_id;
+
+      for o in 1..l_ob22.count
+      loop
+
+        bars_audit.trace( '%s ob22 - (%s/%s, %s/%s, %s/%s, %s/%s)', title,
+                          l_ob22(o).nbs_dep, l_ob22(o).ob22_dep, l_ob22(o).nbs_int, l_ob22(o).ob22_int,
+                          l_ob22(o).nbs_exp, l_ob22(o).ob22_exp, l_ob22(o).nbs_red, l_ob22(o).ob22_red );
+        if ( o = 1 )
+        then
+           -- l_text := l_text ||nlchr;
+           l_text := l_text ||'  -- 6. параметры OB22...'||nlchr;
+        end if;
+
+        l_text := l_text ||'  begin '||nlchr;
+        l_text := l_text ||'    insert into dpu_types_ob22  '||nlchr;
+        l_text := l_text ||'      ( type_id, k013, IRVK, R034, nbs_dep, ob22_dep, nbs_int, ob22_int, nbs_exp, ob22_exp, nbs_red, ob22_red ) '||nlchr;
+        l_text := l_text ||'    values '||nlchr;
+        l_text := l_text ||'      ( '   || nvl( to_char(l_ob22(o).type_id ), 'null') ||  ', ' ;
+        l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).k013    ),     '') ||''', ' ;
+        l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).IRVK    ),     '') ||''', ' ;
+        l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).R034    ),     '') ||''', ' ;
+        l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).nbs_dep ),     '') ||''', ' ;
+        l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).ob22_dep),     '') ||''', ' ;
+        l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).nbs_int ),     '') ||''', ' ;
+        l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).ob22_int),     '') ||''', ' ;
+        l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).nbs_exp ),     '') ||''', ' ;
+        l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).ob22_exp),     '') ||''', ' ;
+        l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).nbs_red ),     '') ||''', ' ;
+        l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).ob22_red),     '') ||''');' ||nlchr;
+        l_text := l_text ||nlchr;
+        l_text := l_text ||'    dbms_output.put_line(''Заповнено ОБ22 для типу договору № '||to_char(l_ob22(o).type_id)||''' );'||nlchr;
+        l_text := l_text ||nlchr;
+        l_text := l_text ||'  exception '||nlchr;
+        l_text := l_text ||'    when DUP_VAL_ON_INDEX then'||nlchr;
+        l_text := l_text ||'      update dpu_types_ob22 '  ||nlchr;
+        l_text := l_text ||'         set nbs_dep  = '||''''||nvl(dblquote(l_ob22(o).nbs_dep), '') ||''', '||nlchr;
+        l_text := l_text ||'             ob22_dep = '||''''||nvl(dblquote(l_ob22(o).ob22_dep), '') ||''', '||nlchr;
+        l_text := l_text ||'             nbs_int  = '||''''||nvl(dblquote(l_ob22(o).nbs_int ), '') ||''', '||nlchr;
+        l_text := l_text ||'             ob22_int = '||''''||nvl(dblquote(l_ob22(o).ob22_int), '') ||''', '||nlchr;
+        l_text := l_text ||'             nbs_exp  = '||''''||nvl(dblquote(l_ob22(o).nbs_exp ), '') ||''', '||nlchr;
+        l_text := l_text ||'             ob22_exp = '||''''||nvl(dblquote(l_ob22(o).ob22_exp), '') ||''', '||nlchr;
+        l_text := l_text ||'             nbs_red  = '||''''||nvl(dblquote(l_ob22(o).nbs_red ), '') ||''', '||nlchr;
+        l_text := l_text ||'             ob22_red = '||''''||nvl(dblquote(l_ob22(o).ob22_red), '') ||'''  '||nlchr;
+        l_text := l_text ||'       where type_id  = '|| to_char(l_ob22(o).type_id)    ||nlchr;
+        l_text := l_text ||'         and K013     = '||''''|| l_ob22(o).k013 || ''' ' ||nlchr;
+        l_text := l_text ||'         and IRVK     = '||''''|| l_ob22(o).IRVK || ''' ' ||nlchr;
+        l_text := l_text ||'         and R034     = '||''''|| l_ob22(o).R034 || ''';' ||nlchr;
+        l_text := l_text ||nlchr;
+        l_text := l_text ||'    dbms_output.put_line(''Оновлено ОБ22 для типу договору № '||to_char(l_viddrow.type_id)||''' );'||nlchr;
+        l_text := l_text ||nlchr;
+        l_text := l_text ||'  end; '||nlchr;
+        l_text := l_text ||nlchr;
+        dbms_lob.append(l_clob, l_text);
+        l_text := null;
+
+      End Loop;
+
+    Else
+      l_text := l_text ||nlchr;
+      l_text := l_text ||'  -- параметри OB22 не експортуються для неактивних видів.'||nlchr;
+    End If;
 
     bars_audit.trace('%s dpu_types_ob22 script succ.created', title);
 $end
 
-    l_text := l_text ||nlchr;
-    l_text := l_text ||'  commit;'||nlchr;
-    l_text := l_text ||nlchr;
-    l_text := l_text ||'end;'||nlchr;
+    l_text := l_text ||nlchr ;
+    l_text := l_text ||'  commit; '||nlchr;
+    l_text := l_text ||nlchr ;
+    l_text := l_text ||'end; '||nlchr;
     l_text := l_text ||'/   '||nlchr;
-    l_text := l_text ||nlchr;
+    l_text := l_text ||nlchr ;
     l_text := l_text ||'set feed on '||nlchr;
 
     dbms_lob.append(l_clob, l_text);
@@ -752,7 +764,7 @@ $end
     when others then
       bars_error.raise_nerror (c_modcode, 'GEN_EXPDPTYPE_FAILED', to_char(p_vidd), sqlerrm);
 
-  end GEN_SCRIPT4VIDD;
+  end gen_script4vidd;
 
   --
   -- GEN_SCRIPT4TYPES() - створення сценарію для експорту типу депозиту
@@ -778,19 +790,19 @@ $then
 
     dbms_lob.createtemporary (l_script,  false);
 
-    l_text := 'prompt ==============================================================='||nlchr||
-              'prompt === ЕКСПОРТ ТИПУ ДЕПОЗИТНОГО ДОГОВОРУ ЮР.ОСОБИ № '||lpad(to_char(p_typeid), 10, '_')||' ==='||nlchr||
-              'prompt ==============================================================='||nlchr||
+    l_text := 'prompt =============================================================== '||nlchr||
+              'prompt === ЕКСПОРТ ТИПУ ДЕПОЗИТНОГО ДОГОВОРУ ЮР.ОСОБИ № '||lpad(to_char(p_typeid), 10, '_')||' === '||nlchr||
+              'prompt =============================================================== '||nlchr||
               ''                                                                   ||nlchr||
               'set serveroutput on'                                                ||nlchr||
               'set feed off'                                                       ||nlchr||
               ''                                                                   ||nlchr||
               '-- generated at '|| to_char(sysdate,'dd/mm/yyyy hh24:mi:ss')        ||nlchr||
               ''                                                                   ||nlchr||
-              'begin'                                                              ||nlchr||
+              'begin '                                                             ||nlchr||
               ''                                                                   ||nlchr||
               '  -- параметри типу депозиту'                                       ||nlchr||
-              ''                                                                   ||nlchr;
+              ''                                                                   ||nlchr ;
 
     dbms_lob.append(l_script, l_text);
 
@@ -1140,8 +1152,7 @@ $then
                            freq_name   freq.name%type,
                            nbs_dep     dpu_vidd.bsd%type,
                            nbs_int     dpu_vidd.bsn%type,
---                         IRVK        dpu_vidd.IRVK%type,
-                           s181        dpu_types_ob22.s181%type,
+                           IRVK        dpu_vidd.IRVK%type,
                            term_type   dpu_types.term_type%type,
                            term_min    dpu_types.term_min%type,
                            term_max    dpu_types.term_max%type,
@@ -1181,14 +1192,7 @@ $then
 
       Else -- Діапазон
 
-        Case
-          When p_rec.s181 = '1' Then 
-            l_name := l_type.type_name ||' < року ';
-          When p_rec.s181 = '2' Then 
-            l_name := l_type.type_name ||' > року ';
-          Else
-            l_name := l_type.type_name;
-        End Case;
+        l_name := l_type.type_name;
 
       End If;
 
@@ -1209,7 +1213,7 @@ $then
              MAX_SUMM  = l_type.sum_max,
              LIMIT     = l_type.sum_add,
              SHABLON   = l_type.shablon,
-             DPU_TYPE  = to_number(p_rec.s181),
+             IRVK      = p_rec.IRVK,
              FL_ADD    = p_rec.fl_add,
              FLAG      = 1,
              FL_EXTEND = 0,
@@ -1239,7 +1243,7 @@ $then
             tt, basey, freq_n, tip_ost, flag, fl_extend, fl_autoextend,
             min_summ,  max_summ, limit,
             id_stop,   br_id,    metr,
-            shablon,   fl_add,   DPU_TYPE,
+            shablon,   fl_add,   IRVK,
             comproc,   freq_v,   type_id,
             term_type, term_min, term_max, term_add )
         values
@@ -1248,7 +1252,7 @@ $then
             'DU%', 0, 1, 0, 1, 0, 0,
             l_type.sum_min,  l_type.sum_max,   l_type.sum_add,
             l_type.stop_id,  l_type.br_id,     l_type.metr_id,
-            l_type.shablon,  p_rec.fl_add,     p_rec.S181,
+            l_type.shablon,  p_rec.fl_add,     p_rec.IRVK,
             p_cap,           p_rec.freq_id,    l_type.type_id,
             p_rec.term_type, p_rec.term_min,   p_rec.term_max, p_rec.term_add );
 
@@ -1332,7 +1336,7 @@ $then
     End If;
 
     -- for k in 1 .. l_tab.count
-    If (l_tab.count > 0) 
+    If (l_tab.count > 0)
     Then
 
       for k in l_tab.first .. l_tab.last
@@ -1435,17 +1439,17 @@ $end
       insert
         into DPU_VIDD
         ( TYPE_ID, DPU_CODE, NAME, KV, BSD, BSN
-        , DPU_TYPE, TERM_TYPE, TERM_MIN, TERM_MAX, MIN_SUMM,  MAX_SUMM, LIMIT
-        , FLAG, FL_EXTEND, FL_AUTOEXTEND, FL_ADD, COMPROC, IRVK
+        , TERM_TYPE, TERM_MIN, TERM_MAX, MIN_SUMM,  MAX_SUMM, LIMIT
+        , FLAG, FL_EXTEND, FL_AUTOEXTEND, FL_ADD, COMPROC
         , BASEY, METR, TIP_OST, FREQ_N, FREQ_V, BR_ID, TT, ID_STOP, PENYA
-        , SHABLON, COMMENTS, EXN_MTH_ID
+        , SHABLON, COMMENTS, EXN_MTH_ID, IRVK
         , VIDD )
       values
         ( p_tp_id, p_sbtp_code, p_sbtp_nm, p_ccy_id, p_nbs_dep, p_nbs_int
-        , p_prd_tp_id, p_term_tp, p_term_min, p_term_max, p_amnt_min, p_amnt_max, p_amnt_add
-        , 0, p_line, p_longation, p_replenish, p_comproc, p_irvcbl
+        , p_term_tp, p_term_min, p_term_max, p_amnt_min, p_amnt_max, p_amnt_add
+        , 0, p_line, p_longation, p_replenish, p_comproc
         , p_basey, p_metr, 1, 1, p_freq, p_br_id, p_tt, p_pny_id, p_fine
-        , p_tpl_id, p_comment, p_exn_mth
+        , p_tpl_id, p_comment, p_exn_mth, p_irvcbl
         , S_DPU_VIDD.NextVal )
       returning VIDD
            into p_sbtp_id;
@@ -1593,7 +1597,7 @@ $end
   %param p_longation -
   %param p_replenish -
   %param p_comproc   -
-  %param p_irvcbl    - 
+  %param p_irvcbl    -
   %param p_freq      -
   %param p_br_id     -
   %param p_tt        -
@@ -1653,7 +1657,6 @@ $end
            , FL_AUTOEXTEND = p_longation
            , FL_ADD        = p_replenish
            , COMPROC       = p_comproc
-           , IRVK          = p_irvcbl
            , EXN_MTH_ID    = p_exn_mth
        where VIDD = p_sbtp_id;
 
@@ -1724,24 +1727,19 @@ $end
   %usage   Експорт вид депозиту
   */
     title       constant  varchar2(64) := $$PLSQL_UNIT||'.EXPRT_SUBTYPE';
-    l_script              clob;
   begin
 
     bars_audit.trace( '%s: Entry with ( sbtp_id=%s ).', title, to_char(p_sbtp_id) );
-    
-    dbms_lob.createtemporary( p_script, false );
 
     GEN_SCRIPT4VIDD( p_sbtp_id );
 
     select CLOBDATA
-      into l_script
+      into p_script
       from TMP_EXPDPTYPE
      where MODCODE = c_modcode
        and TYPEID  = p_sbtp_id;
 
     p_file_nm := 'dputype_'||to_char(p_sbtp_id,'FM0000')||'.sql';
-    
-    dbms_lob.append( p_script, l_script );
 
     bars_audit.trace( '%s: Exit.', title );
 
@@ -2026,7 +2024,7 @@ $end
   , p_err_msg      out    varchar2
   ) is
   /**
-  <b>SET_PENALTY_VALUE</b> - Внесення змін у параметри штрафу депозиту 
+  <b>SET_PENALTY_VALUE</b> - Внесення змін у параметри штрафу депозиту
   %param pny_lwr_lmt  - нижня межа ( = 0 - вставка, > 0 - редагування
   %param pny_upr_lmt  - верхня межа
   %param penalty_val  - значення штрафу в штрафному періоді
@@ -2073,11 +2071,11 @@ $end
       else
         null;
     end case;
-    
+
     begin
-      
+
       p_err_msg := null;
-      
+
       if ( pny_lwr_lmt >= 0 )
       then -- edit record
 
@@ -2092,7 +2090,7 @@ $end
              , l_upr_lmt
           from DPT_STOP_A
          where ID = penalty_id;
-        
+
         bars_audit.trace( '%s: l_lwr_lmt=%s, l_upr_lmt=%s.', title, to_char(l_lwr_lmt), to_char(l_upr_lmt) );
 
         -- edit penalty value
@@ -2203,7 +2201,7 @@ $end
           into l_qty
           from DPT_STOP_A
          where ID = penalty_id;
-        
+
         if ( l_qty > 2 )
         then
 
@@ -2212,10 +2210,10 @@ $end
              and K_SROK = penalty_prd;
 
         else
-          
+
           delete DPT_STOP_A
            where ID = penalty_id;
-          
+
         end if;
 
       end if;
@@ -2744,9 +2742,16 @@ BEGIN
   NULL;
 END DPU_UTILS;
 /
+ show err;
+ 
+PROMPT *** Create  grants  DPU_UTILS ***
+grant EXECUTE                                                                on DPU_UTILS       to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on DPU_UTILS       to DPT;
+grant EXECUTE                                                                on DPU_UTILS       to DPT_ADMIN;
 
-show errors;
-
-grant EXECUTE on DPU_UTILS to BARS_ACCESS_DEFROLE;
-grant EXECUTE on DPU_UTILS to DPT;
-grant EXECUTE on DPU_UTILS to DPT_ADMIN;
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpu_utils.sql =========*** End *** =
+ PROMPT ===================================================================================== 
+ 

@@ -59,85 +59,10 @@ COMMENT ON COLUMN BARS.DPT_REQ_DELDEALS.BRANCH IS '';
 
 
 
-PROMPT *** Create  constraint FK_DPTREQDELDEALS_KF ***
+PROMPT *** Create  constraint CC_DPTREQDELDEALS_USERID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQ_DELDEALS ADD CONSTRAINT FK_DPTREQDELDEALS_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTREQDELDEALS_DPTREQS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQ_DELDEALS ADD CONSTRAINT FK_DPTREQDELDEALS_DPTREQS2 FOREIGN KEY (KF, REQ_ID)
-	  REFERENCES BARS.DPT_REQUESTS (KF, REQ_ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTREQDELDEALS_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQ_DELDEALS MODIFY (BRANCH CONSTRAINT CC_DPTREQDELDEALS_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTREQDELDEALS_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQ_DELDEALS MODIFY (KF CONSTRAINT CC_DPTREQDELDEALS_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTREQDELDEALS_REQID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQ_DELDEALS MODIFY (REQ_ID CONSTRAINT CC_DPTREQDELDEALS_REQID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTREQDELDEALS_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQ_DELDEALS ADD CONSTRAINT FK_DPTREQDELDEALS_STAFF FOREIGN KEY (USER_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTREQDELDEALS_USERSTATE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQ_DELDEALS ADD CONSTRAINT CC_DPTREQDELDEALS_USERSTATE CHECK (user_state in (-1, 1)) ENABLE';
+  ALTER TABLE BARS.DPT_REQ_DELDEALS MODIFY (USER_ID CONSTRAINT CC_DPTREQDELDEALS_USERID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -160,10 +85,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTREQDELDEALS_USERID_NN ***
+PROMPT *** Create  constraint CC_DPTREQDELDEALS_USERSTATE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQ_DELDEALS MODIFY (USER_ID CONSTRAINT CC_DPTREQDELDEALS_USERID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_REQ_DELDEALS ADD CONSTRAINT CC_DPTREQDELDEALS_USERSTATE CHECK (user_state in (-1, 1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -172,11 +97,34 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTREQDELDEALS_BRANCH ***
+PROMPT *** Create  constraint CC_DPTREQDELDEALS_REQID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQ_DELDEALS ADD CONSTRAINT FK_DPTREQDELDEALS_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPT_REQ_DELDEALS MODIFY (REQ_ID CONSTRAINT CC_DPTREQDELDEALS_REQID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTREQDELDEALS_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_REQ_DELDEALS MODIFY (KF CONSTRAINT CC_DPTREQDELDEALS_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTREQDELDEALS_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_REQ_DELDEALS MODIFY (BRANCH CONSTRAINT CC_DPTREQDELDEALS_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -199,7 +147,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_REQ_DELDEALS ***
+grant SELECT                                                                 on DPT_REQ_DELDEALS to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_REQ_DELDEALS to BARS_DM;
+grant SELECT                                                                 on DPT_REQ_DELDEALS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_REQ_DELDEALS to WR_ALL_RIGHTS;
 
 

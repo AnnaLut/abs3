@@ -91,6 +91,10 @@ COMMENT ON COLUMN BARS.ERR$_PRVN_FV_REZ.OK_BARS IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_PRVN_FV_REZ ***
+grant SELECT                                                                 on ERR$_PRVN_FV_REZ to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_PRVN_FV_REZ to UPLD;
+
 
 
 PROMPT ===================================================================================== 

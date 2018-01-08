@@ -1,130 +1,202 @@
--- ======================================================================================
--- Module : 
--- Author : 
--- Date   : 11.07.2017
--- ======================================================================================
--- create table SOCIAL_AGENCY
--- ======================================================
 
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET FEEDBACK     OFF
-SET TIMING       OFF
-SET DEFINE       OFF
-SET LINES        200
-SET PAGES        100
-SET TERMOUT      ON
-SET TRIMSPOOL    ON
 
-prompt -- ======================================================
-prompt -- create table SOCIAL_AGENCY
-prompt -- ======================================================
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/SOCIAL_AGENCY.sql =========*** Run ***
+PROMPT ===================================================================================== 
 
-begin
-  bpa.alter_policy_info( 'SOCIAL_AGENCY', 'CENTER', null, null, null, null );
-  bpa.alter_policy_info( 'SOCIAL_AGENCY', 'FILIAL',  'F',  'F',  'F',  'F' );
-  bpa.alter_policy_info( 'SOCIAL_AGENCY', 'WHOLE',  null, null, null, null );
-end;
+
+PROMPT *** ALTER_POLICY_INFO to SOCIAL_AGENCY ***
+
+
+BEGIN 
+        execute immediate  
+          'begin  
+               bpa.alter_policy_info(''SOCIAL_AGENCY'', ''CENTER'' , null, null, null, null);
+               bpa.alter_policy_info(''SOCIAL_AGENCY'', ''FILIAL'' , ''F'', ''F'', ''F'', ''F'');
+               bpa.alter_policy_info(''SOCIAL_AGENCY'', ''WHOLE'' , null, null, null, null);
+               null;
+           end; 
+          '; 
+END; 
 /
 
-declare
-  e_tab_exists           exception;
-  pragma exception_init( e_tab_exists, -00955 );
-begin
-  execute immediate 'create table SOCIAL_AGENCY
-(	AGENCY_ID  NUMBER(38)
-, NAME       VARCHAR2(100) constraint CC_SOCIALAGENCY_NAME_NN      NOT NULL 
-, BRANCH     VARCHAR2(30)  default sys_context(''bars_context'',''user_branch'')
-                           constraint CC_SOCIALAGENCY_BRANCH_NN    NOT NULL
-, DEBIT_ACC  NUMBER(38)
-, CREDIT_ACC NUMBER(38)    constraint CC_SOCIALAGENCY_CREDITACC_NN NOT NULL
-, CARD_ACC   NUMBER(38)    constraint CC_SOCIALAGENCY_CARDACC_NN   NOT NULL
-, CONTRACT   VARCHAR2(30)
-, DATE_ON    DATE          default trunc(sysdate)
-, DATE_OFF   DATE
-, ADDRESS    VARCHAR2(100)
-, PHONE      VARCHAR2(20)
-, DETAILS    VARCHAR2(100)
-, TYPE_ID    NUMBER(38)    constraint CC_SOCIALAGENCY_TYPEID_NN    NOT NULL
-, COMISS_ACC NUMBER(38)
-, constraint PK_SOCIALAGENCY PRIMARY KEY ( AGENCY_ID ) using index tablespace BRSSMLI
-, constraint CC_SOCIALAGENCY_DATES check ( DATE_ON <= DATE_OFF )
-, constraint FK_SOCIALAGENCY_SOCAGNTYPE foreign key (TYPE_ID) references SOCIAL_AGENCY_TYPE (TYPE_ID)
-, constraint FK_SOCIALAGENCY_BRANCH     foreign key (BRANCH)  references BRANCH (BRANCH) deferrable
-) tablespace BRSSMLD';
-  
-  dbms_output.put_line( 'Table "SOCIAL_AGENCY" created.');
-  
-exception
-  when e_tab_exists then
-    dbms_output.put_line( 'Table "SOCIAL_AGENCY" already exists.' );
-end;
+PROMPT *** Create  table SOCIAL_AGENCY ***
+begin 
+  execute immediate '
+  CREATE TABLE BARS.SOCIAL_AGENCY 
+   (	AGENCY_ID NUMBER(38,0), 
+	NAME VARCHAR2(100), 
+	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch''), 
+	DEBIT_ACC NUMBER(38,0), 
+	CREDIT_ACC NUMBER(38,0), 
+	CARD_ACC NUMBER(38,0), 
+	CONTRACT VARCHAR2(30), 
+	DATE_ON DATE DEFAULT trunc(sysdate), 
+	DATE_OFF DATE, 
+	ADDRESS VARCHAR2(100), 
+	PHONE VARCHAR2(20), 
+	DETAILS VARCHAR2(100), 
+	TYPE_ID NUMBER(38,0), 
+	COMISS_ACC NUMBER(38,0)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  TABLESPACE BRSDYND ';
+exception when others then       
+  if sqlcode=-955 then null; else raise; end if; 
+end; 
 /
 
-prompt -- ======================================================
-prompt -- Indexes
-prompt -- ======================================================
 
-declare
-  e_idx_exists           exception;
-  pragma exception_init( e_idx_exists,      -00955 );
-  e_col_already_idx      exception;
-  pragma exception_init( e_col_already_idx, -01408 );
-begin
- execute immediate q'[create index IDX_SOCIALAGENCY_TPID_BR on SOCIAL_AGENCY ( TYPE_ID, BRANCH )
-  tablespace BRSSMLI
-  compress 1 ]';
-  dbms_output.put_line( 'Index "IDX_SOCIALAGENCY_TPID_BR" created.' );
-exception
-  when e_idx_exists 
-  then dbms_output.put_line( 'Name is already used by an existing object.' );
-  when e_col_already_idx 
-  then dbms_output.put_line( 'Such column list already indexed.' );
-end;
+
+
+PROMPT *** ALTER_POLICIES to SOCIAL_AGENCY ***
+ exec bpa.alter_policies('SOCIAL_AGENCY');
+
+
+COMMENT ON TABLE BARS.SOCIAL_AGENCY IS 'Органы социальной защиты (ОСЗ)';
+COMMENT ON COLUMN BARS.SOCIAL_AGENCY.AGENCY_ID IS 'Уникальный номер ОСЗ';
+COMMENT ON COLUMN BARS.SOCIAL_AGENCY.NAME IS 'Название ОСЗ';
+COMMENT ON COLUMN BARS.SOCIAL_AGENCY.BRANCH IS 'Код подразделения';
+COMMENT ON COLUMN BARS.SOCIAL_AGENCY.DEBIT_ACC IS 'Внутр. номер счета дебеторской задолженности';
+COMMENT ON COLUMN BARS.SOCIAL_AGENCY.CREDIT_ACC IS 'Внутр. номер счета кредиторской задолженности';
+COMMENT ON COLUMN BARS.SOCIAL_AGENCY.CARD_ACC IS 'Внутр. номер карточного счета';
+COMMENT ON COLUMN BARS.SOCIAL_AGENCY.CONTRACT IS '№ договора';
+COMMENT ON COLUMN BARS.SOCIAL_AGENCY.DATE_ON IS 'Дата начала действия договора';
+COMMENT ON COLUMN BARS.SOCIAL_AGENCY.DATE_OFF IS 'Дата завершения договора';
+COMMENT ON COLUMN BARS.SOCIAL_AGENCY.ADDRESS IS 'Адрес органа соц. защиты';
+COMMENT ON COLUMN BARS.SOCIAL_AGENCY.PHONE IS 'Телефон ОСЗ';
+COMMENT ON COLUMN BARS.SOCIAL_AGENCY.DETAILS IS 'Комментарии';
+COMMENT ON COLUMN BARS.SOCIAL_AGENCY.TYPE_ID IS 'Тип ОСЗ';
+COMMENT ON COLUMN BARS.SOCIAL_AGENCY.COMISS_ACC IS 'Внутренний номер счета доходов от РКО';
+
+
+
+
+PROMPT *** Create  constraint CC_SOCIALAGENCY_NAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_AGENCY MODIFY (NAME CONSTRAINT CC_SOCIALAGENCY_NAME_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
 /
 
-SET FEEDBACK ON
 
-prompt -- ======================================================
-prompt -- Apply policies
-prompt -- ======================================================
 
-begin
-  bars.bpa.alter_policies( 'SOCIAL_AGENCY' );
-end;
+
+PROMPT *** Create  constraint CC_SOCIALAGENCY_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_AGENCY MODIFY (BRANCH CONSTRAINT CC_SOCIALAGENCY_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
 /
 
-commit;
 
-prompt -- ======================================================
-prompt -- Comments
-prompt -- ======================================================
 
-COMMENT ON TABLE  SOCIAL_AGENCY            IS 'Органы социальной защиты (ОСЗ)';
 
-COMMENT ON COLUMN SOCIAL_AGENCY.AGENCY_ID  IS 'Уникальный номер ОСЗ';
-COMMENT ON COLUMN SOCIAL_AGENCY.NAME       IS 'Название ОСЗ';
-COMMENT ON COLUMN SOCIAL_AGENCY.BRANCH     IS 'Код подразделения';
-COMMENT ON COLUMN SOCIAL_AGENCY.DEBIT_ACC  IS 'Внутр. номер счета дебеторской  задолженности';
-COMMENT ON COLUMN SOCIAL_AGENCY.CREDIT_ACC IS 'Внутр. номер счета кредиторской задолженности';
-COMMENT ON COLUMN SOCIAL_AGENCY.CARD_ACC   IS 'Внутр. номер карточного счета';
-COMMENT ON COLUMN SOCIAL_AGENCY.CONTRACT   IS '№ договора';
-COMMENT ON COLUMN SOCIAL_AGENCY.DATE_ON    IS 'Дата начала действия договора';
-COMMENT ON COLUMN SOCIAL_AGENCY.DATE_OFF   IS 'Дата завершения договора';
-COMMENT ON COLUMN SOCIAL_AGENCY.ADDRESS    IS 'Адрес органа соц. защиты';
-COMMENT ON COLUMN SOCIAL_AGENCY.PHONE      IS 'Телефон ОСЗ';
-COMMENT ON COLUMN SOCIAL_AGENCY.DETAILS    IS 'Коментар';
-COMMENT ON COLUMN SOCIAL_AGENCY.TYPE_ID    IS 'Тип ОСЗ';
-COMMENT ON COLUMN SOCIAL_AGENCY.COMISS_ACC IS 'Внутр. номер счета доходов от РКО';
+PROMPT *** Create  constraint CC_SOCIALAGENCY_CREDITACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_AGENCY MODIFY (CREDIT_ACC CONSTRAINT CC_SOCIALAGENCY_CREDITACC_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
-prompt -- ======================================================
-prompt -- Grants
-prompt -- ======================================================
 
-grant DELETE,INSERT,SELECT,UPDATE on SOCIAL_AGENCY to BARS_ACCESS_DEFROLE;
-grant SELECT                      on SOCIAL_AGENCY to BARS_DM;
-grant DELETE,INSERT,SELECT,UPDATE on SOCIAL_AGENCY to DPT_ROLE;
-grant DELETE,INSERT,SELECT,UPDATE on SOCIAL_AGENCY to WR_ALL_RIGHTS;
 
-prompt -- ======================================================
-prompt -- FINISH
-prompt -- ======================================================
+
+PROMPT *** Create  constraint CC_SOCIALAGENCY_CARDACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_AGENCY MODIFY (CARD_ACC CONSTRAINT CC_SOCIALAGENCY_CARDACC_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SOCIALAGENCY_TYPEID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_AGENCY MODIFY (TYPE_ID CONSTRAINT CC_SOCIALAGENCY_TYPEID_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SOCIALAGENCY_DATES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_AGENCY ADD CONSTRAINT CC_SOCIALAGENCY_DATES CHECK (date_on <= date_off) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_SOCIALAGENCY ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_AGENCY ADD CONSTRAINT PK_SOCIALAGENCY PRIMARY KEY (AGENCY_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYNI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index PK_SOCIALAGENCY ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.PK_SOCIALAGENCY ON BARS.SOCIAL_AGENCY (AGENCY_ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYNI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index IDX_SOCIALAGENCY_TPID_BR ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_SOCIALAGENCY_TPID_BR ON BARS.SOCIAL_AGENCY (TYPE_ID, BRANCH) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS COMPRESS 1 
+  TABLESPACE BRSSMLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
+PROMPT *** Create  grants  SOCIAL_AGENCY ***
+grant SELECT                                                                 on SOCIAL_AGENCY   to BARSREADER_ROLE;
+grant DELETE,INSERT,SELECT,UPDATE                                            on SOCIAL_AGENCY   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on SOCIAL_AGENCY   to BARS_DM;
+grant DELETE,INSERT,SELECT,UPDATE                                            on SOCIAL_AGENCY   to DPT_ROLE;
+grant SELECT                                                                 on SOCIAL_AGENCY   to KLBX;
+grant SELECT                                                                 on SOCIAL_AGENCY   to UPLD;
+grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SOCIAL_AGENCY   to WR_ALL_RIGHTS;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Table/SOCIAL_AGENCY.sql =========*** End ***
+PROMPT ===================================================================================== 

@@ -49,8 +49,10 @@ PROMPT *** Create  view V_CCK_ERR_REL_ACC ***
     WHERE n.acc = x.acc AND n.nd = d.nd;
 
 PROMPT *** Create  grants  V_CCK_ERR_REL_ACC ***
+grant SELECT                                                                 on V_CCK_ERR_REL_ACC to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CCK_ERR_REL_ACC to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CCK_ERR_REL_ACC to START1;
+grant SELECT                                                                 on V_CCK_ERR_REL_ACC to UPLD;
 
 
 

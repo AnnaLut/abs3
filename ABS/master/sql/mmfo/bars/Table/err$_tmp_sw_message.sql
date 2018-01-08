@@ -77,6 +77,10 @@ COMMENT ON COLUMN BARS.ERR$_TMP_SW_MESSAGE.USERID IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_TMP_SW_MESSAGE ***
+grant SELECT                                                                 on ERR$_TMP_SW_MESSAGE to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_TMP_SW_MESSAGE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

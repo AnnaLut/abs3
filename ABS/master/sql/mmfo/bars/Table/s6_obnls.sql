@@ -82,46 +82,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C009676 ***
+PROMPT *** Create  constraint SYS_C009671 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.S6_OBNLS MODIFY (KOS_V NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009675 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_OBNLS MODIFY (DOS_V NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009674 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_OBNLS MODIFY (KOS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009673 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_OBNLS MODIFY (DOS NOT NULL ENABLE)';
+  ALTER TABLE BARS.S6_OBNLS MODIFY (GROUP_U NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -142,10 +106,46 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C009671 ***
+PROMPT *** Create  constraint SYS_C009673 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.S6_OBNLS MODIFY (GROUP_U NOT NULL ENABLE)';
+  ALTER TABLE BARS.S6_OBNLS MODIFY (DOS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009674 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_OBNLS MODIFY (KOS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009675 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_OBNLS MODIFY (DOS_V NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009676 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_OBNLS MODIFY (KOS_V NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -168,8 +168,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  S6_OBNLS ***
+grant SELECT                                                                 on S6_OBNLS        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_OBNLS        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_OBNLS        to START1;
+grant SELECT                                                                 on S6_OBNLS        to UPLD;
 
 
 

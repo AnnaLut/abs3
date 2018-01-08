@@ -23,8 +23,10 @@ PROMPT *** Create  view V_SOC_OPERATIONS ***
  ;
 
 PROMPT *** Create  grants  V_SOC_OPERATIONS ***
+grant SELECT                                                                 on V_SOC_OPERATIONS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SOC_OPERATIONS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SOC_OPERATIONS to DPT_ROLE;
+grant SELECT                                                                 on V_SOC_OPERATIONS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SOC_OPERATIONS to WR_ALL_RIGHTS;
 
 

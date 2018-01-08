@@ -61,7 +61,9 @@ COMMENT ON COLUMN BARS.KL_R014.D_MODE IS '';
 
 
 PROMPT *** Create  grants  KL_R014 ***
+grant SELECT                                                                 on KL_R014         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_R014         to BARS_DM;
+grant SELECT                                                                 on KL_R014         to UPLD;
 
 
 

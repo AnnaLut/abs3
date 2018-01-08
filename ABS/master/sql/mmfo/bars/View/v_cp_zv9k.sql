@@ -12,8 +12,10 @@ PROMPT *** Create  view V_CP_ZV9K ***
     where frm = '9');
 
 PROMPT *** Create  grants  V_CP_ZV9K ***
+grant SELECT                                                                 on V_CP_ZV9K       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_ZV9K       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_ZV9K       to START1;
+grant SELECT                                                                 on V_CP_ZV9K       to UPLD;
 
 
 

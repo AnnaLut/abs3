@@ -227,6 +227,10 @@ COMMENT ON COLUMN BARS.ERR$_CM_CLIENT_QUE_ARC.TYPEDOC IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CM_CLIENT_QUE_ARC ***
+grant SELECT                                                                 on ERR$_CM_CLIENT_QUE_ARC to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CM_CLIENT_QUE_ARC to UPLD;
+
 
 
 PROMPT ===================================================================================== 

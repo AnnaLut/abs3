@@ -69,8 +69,10 @@ COMMENT ON COLUMN BARS.SBER_516.FACTSUM IS '';
 
 
 PROMPT *** Create  grants  SBER_516 ***
+grant SELECT                                                                 on SBER_516        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SBER_516        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SBER_516        to START1;
+grant SELECT                                                                 on SBER_516        to UPLD;
 
 
 

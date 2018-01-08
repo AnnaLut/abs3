@@ -75,6 +75,10 @@ COMMENT ON COLUMN BARS.ERR$_WCS_CC_MEMBERS.MBR10 IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_WCS_CC_MEMBERS ***
+grant SELECT                                                                 on ERR$_WCS_CC_MEMBERS to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_WCS_CC_MEMBERS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

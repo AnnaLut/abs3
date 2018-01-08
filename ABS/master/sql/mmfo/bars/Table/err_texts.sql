@@ -69,32 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ERRTEXTS_ERRLANGS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ERR_TEXTS ADD CONSTRAINT FK_ERRTEXTS_ERRLANGS FOREIGN KEY (ERRLNG_CODE)
-	  REFERENCES BARS.ERR_LANGS (ERRLNG_CODE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ERRTEXTS_ERRCODES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ERR_TEXTS ADD CONSTRAINT FK_ERRTEXTS_ERRCODES FOREIGN KEY (ERRMOD_CODE, ERR_CODE)
-	  REFERENCES BARS.ERR_CODES (ERRMOD_CODE, ERR_CODE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_ERRTEXTS_ERRMODCODE_NN ***
 begin   
  execute immediate '
@@ -158,9 +132,11 @@ exception when others then
 
 PROMPT *** Create  grants  ERR_TEXTS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR_TEXTS       to ABS_ADMIN;
+grant SELECT                                                                 on ERR_TEXTS       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ERR_TEXTS       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ERR_TEXTS       to BARS_DM;
 grant SELECT                                                                 on ERR_TEXTS       to START1;
+grant SELECT                                                                 on ERR_TEXTS       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ERR_TEXTS       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on ERR_TEXTS       to WR_REFREAD;
 

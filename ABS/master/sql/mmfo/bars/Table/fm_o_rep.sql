@@ -77,10 +77,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_O_REP ***
+grant SELECT                                                                 on FM_O_REP        to BARSREADER_ROLE;
 grant SELECT                                                                 on FM_O_REP        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_O_REP        to BARS_DM;
 grant SELECT                                                                 on FM_O_REP        to CUST001;
 grant SELECT                                                                 on FM_O_REP        to FINMON01;
+grant SELECT                                                                 on FM_O_REP        to UPLD;
 
 
 

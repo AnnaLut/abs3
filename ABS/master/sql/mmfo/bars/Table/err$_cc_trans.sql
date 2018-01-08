@@ -77,6 +77,10 @@ COMMENT ON COLUMN BARS.ERR$_CC_TRANS.ORA_ERR_OPTYP$ IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CC_TRANS ***
+grant SELECT                                                                 on ERR$_CC_TRANS   to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CC_TRANS   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

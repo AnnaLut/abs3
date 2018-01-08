@@ -12,8 +12,10 @@ PROMPT *** Create  view SAL_GL ***
   from sal_branch;
 
 PROMPT *** Create  grants  SAL_GL ***
+grant SELECT                                                                 on SAL_GL          to BARSREADER_ROLE;
 grant SELECT                                                                 on SAL_GL          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SAL_GL          to RPBN001;
+grant SELECT                                                                 on SAL_GL          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SAL_GL          to WR_ALL_RIGHTS;
 
 

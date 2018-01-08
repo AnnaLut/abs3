@@ -36,8 +36,10 @@ from ( SELECT d.B,  d.E, a.kv, a.ob22, fdat,
 group by B,  E, fdat, KOD3k, kv, ob22, NBS;
 
 PROMPT *** Create  grants  V_FXANI_3800 ***
+grant SELECT                                                                 on V_FXANI_3800    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FXANI_3800    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FXANI_3800    to START1;
+grant SELECT                                                                 on V_FXANI_3800    to UPLD;
 
 
 

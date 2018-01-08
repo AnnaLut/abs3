@@ -16,8 +16,10 @@ PROMPT *** Create  view V_BPK_TT_FOR_LISTPAY ***
    and t.tt <> 'W4V';
 
 PROMPT *** Create  grants  V_BPK_TT_FOR_LISTPAY ***
+grant SELECT                                                                 on V_BPK_TT_FOR_LISTPAY to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BPK_TT_FOR_LISTPAY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BPK_TT_FOR_LISTPAY to OBPC;
+grant SELECT                                                                 on V_BPK_TT_FOR_LISTPAY to UPLD;
 
 
 

@@ -37,8 +37,10 @@ from dk where dk=0
  ;
 
 PROMPT *** Create  grants  PROVNU_PO3 ***
+grant SELECT                                                                 on PROVNU_PO3      to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on PROVNU_PO3      to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on PROVNU_PO3      to NALOG;
+grant SELECT                                                                 on PROVNU_PO3      to UPLD;
 
 
 

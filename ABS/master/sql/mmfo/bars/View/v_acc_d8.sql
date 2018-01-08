@@ -13,6 +13,8 @@ PROMPT *** Create  view V_ACC_D8 ***
  ;
 
 PROMPT *** Create  grants  V_ACC_D8 ***
+grant SELECT                                                                 on V_ACC_D8        to BARSREADER_ROLE;
+grant SELECT                                                                 on V_ACC_D8        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ACC_D8        to WR_ALL_RIGHTS;
 
 

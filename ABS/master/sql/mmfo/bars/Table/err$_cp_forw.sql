@@ -79,6 +79,10 @@ COMMENT ON COLUMN BARS.ERR$_CP_FORW.SSQ IS '';
 
 
 
+PROMPT *** Create  grants  ERR$_CP_FORW ***
+grant SELECT                                                                 on ERR$_CP_FORW    to BARSREADER_ROLE;
+grant SELECT                                                                 on ERR$_CP_FORW    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -48,10 +48,10 @@ COMMENT ON COLUMN BARS.SYNC_PARAMS.VALUE IS 'Значення параметру';
 
 
 
-PROMPT *** Create  constraint PK_SYNCPARAMS ***
+PROMPT *** Create  constraint CC_SYNCPARAMS_TYPE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SYNC_PARAMS ADD CONSTRAINT PK_SYNCPARAMS PRIMARY KEY (PARAMS) ENABLE';
+  ALTER TABLE BARS.SYNC_PARAMS ADD CONSTRAINT CC_SYNCPARAMS_TYPE CHECK (type in (''NUM'', ''STR'', ''DATE'', ''DATETIME'')) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -60,10 +60,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SYNCPARAMS_TYPE ***
+PROMPT *** Create  constraint PK_SYNCPARAMS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SYNC_PARAMS ADD CONSTRAINT CC_SYNCPARAMS_TYPE CHECK (type in (''NUM'', ''STR'', ''DATE'', ''DATETIME'')) ENABLE';
+  ALTER TABLE BARS.SYNC_PARAMS ADD CONSTRAINT PK_SYNCPARAMS PRIMARY KEY (PARAMS) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -84,8 +84,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SYNC_PARAMS ***
+grant SELECT                                                                 on SYNC_PARAMS     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SYNC_PARAMS     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SYNC_PARAMS     to CIM_ROLE;
+grant SELECT                                                                 on SYNC_PARAMS     to UPLD;
 
 
 

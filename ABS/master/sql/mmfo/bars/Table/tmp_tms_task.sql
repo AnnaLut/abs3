@@ -112,10 +112,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119137 ***
+PROMPT *** Create  constraint SYS_C00119133 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_TMS_TASK MODIFY (STATE_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_TMS_TASK MODIFY (TASK_NAME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -160,16 +160,20 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119133 ***
+PROMPT *** Create  constraint SYS_C00119137 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_TMS_TASK MODIFY (TASK_NAME NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_TMS_TASK MODIFY (STATE_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
+
+PROMPT *** Create  grants  TMP_TMS_TASK ***
+grant SELECT                                                                 on TMP_TMS_TASK    to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_TMS_TASK    to UPLD;
 
 
 

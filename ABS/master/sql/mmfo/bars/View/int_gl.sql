@@ -78,8 +78,10 @@ PROMPT *** Create  view INT_GL ***
     WHERE x.acra = aa.acc AND x.acrb = bb.acc;
 
 PROMPT *** Create  grants  INT_GL ***
+grant SELECT                                                                 on INT_GL          to BARSREADER_ROLE;
 grant SELECT                                                                 on INT_GL          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_GL          to START1;
+grant SELECT                                                                 on INT_GL          to UPLD;
 
 
 

@@ -32,8 +32,10 @@ PROMPT *** Create  view V_CIG_JOB ***
     WHERE LOWER (what) LIKE 'cig_mgr.collect_data%';
 
 PROMPT *** Create  grants  V_CIG_JOB ***
+grant SELECT                                                                 on V_CIG_JOB       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIG_JOB       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CIG_JOB       to CIG_ROLE;
+grant SELECT                                                                 on V_CIG_JOB       to UPLD;
 
 
 

@@ -51,8 +51,50 @@ COMMENT ON COLUMN BARS.VIP_PARAMS_TEMPLATE.DAY IS 'Кількість днів~Вказувати чере
 
 
 
+
+PROMPT *** Create  constraint CC_VPT_IDPAR_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.VIP_PARAMS_TEMPLATE MODIFY (ID_PAR CONSTRAINT CC_VPT_IDPAR_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint UK_VIPPARAMSTEMPLATE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.VIP_PARAMS_TEMPLATE ADD CONSTRAINT UK_VIPPARAMSTEMPLATE UNIQUE (ID_PAR)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index UK_VIPPARAMSTEMPLATE ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.UK_VIPPARAMSTEMPLATE ON BARS.VIP_PARAMS_TEMPLATE (ID_PAR) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  VIP_PARAMS_TEMPLATE ***
+grant SELECT                                                                 on VIP_PARAMS_TEMPLATE to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on VIP_PARAMS_TEMPLATE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VIP_PARAMS_TEMPLATE to UPLD;
 
 
 
