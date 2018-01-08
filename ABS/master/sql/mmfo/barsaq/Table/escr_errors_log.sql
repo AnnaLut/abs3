@@ -33,6 +33,9 @@ COMMENT ON COLUMN BARSAQ.ESCR_ERRORS_LOG.OPER_DATE IS '';
 
 
 
+PROMPT *** Create  grants  ESCR_ERRORS_LOG ***
+grant SELECT                                                                 on ESCR_ERRORS_LOG to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

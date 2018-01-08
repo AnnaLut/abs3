@@ -20,7 +20,7 @@ begin
    ) SEGMENT CREATION DEFERRED 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
-  TABLESPACE BRSIMPDATA300465 ';
+  TABLESPACE BRSUPLD ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
@@ -88,12 +88,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_UPLDMOBJVERS ***
+PROMPT *** Create  constraint CC_UPLDMOBJVERS_GROUPID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSUPL.UPL_DM_OBJECTS_VERS ADD CONSTRAINT PK_UPLDMOBJVERS PRIMARY KEY (REPORT_DATE, KF, OBJECT_ID, GROUP_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSIMPDATA300465  ENABLE';
+  ALTER TABLE BARSUPL.UPL_DM_OBJECTS_VERS MODIFY (GROUP_ID CONSTRAINT CC_UPLDMOBJVERS_GROUPID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -138,10 +136,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_UPLDMOBJVERS_GROUPID_NN ***
+PROMPT *** Create  constraint PK_UPLDMOBJVERS ***
 begin   
  execute immediate '
-  ALTER TABLE BARSUPL.UPL_DM_OBJECTS_VERS MODIFY (GROUP_ID CONSTRAINT CC_UPLDMOBJVERS_GROUPID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSUPL.UPL_DM_OBJECTS_VERS ADD CONSTRAINT PK_UPLDMOBJVERS PRIMARY KEY (REPORT_DATE, KF, OBJECT_ID, GROUP_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSUPLD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -155,7 +155,7 @@ begin
  execute immediate '
   CREATE UNIQUE INDEX BARSUPL.PK_UPLDMOBJVERS ON BARSUPL.UPL_DM_OBJECTS_VERS (REPORT_DATE, KF, OBJECT_ID, GROUP_ID) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSIMPDATA300465 ';
+  TABLESPACE BRSUPLD ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
@@ -165,6 +165,7 @@ exception when others then
 
 PROMPT *** Create  grants  UPL_DM_OBJECTS_VERS ***
 grant SELECT                                                                 on UPL_DM_OBJECTS_VERS to BARS;
+grant SELECT                                                                 on UPL_DM_OBJECTS_VERS to BARSREADER_ROLE;
 grant SELECT                                                                 on UPL_DM_OBJECTS_VERS to UPLD;
 
 

@@ -163,7 +163,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.IBANK_MGR is
   --  ibank_mgr - пакет для обслуживания системи corp2
   --
 
-  g_body_version  constant varchar2(64) := 'version 1.2 13/09/2016';
+  g_body_version  constant varchar2(64) := 'version 1.3 13/05/2017';
   g_awk_body_defs constant varchar2(512) := '';
 
   g_module_name    constant varchar2(3) := 'IBM'; -- Internet Banking Module
@@ -282,7 +282,6 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.IBANK_MGR is
     p_flag      number;
     l_count     number;
     l_timeout   number; -- время работы синхронизации в мин.
-    l_scn           number;
   begin
     l_startdate := p_startdate;
     if p_startdate < sysdate - 7 then
@@ -291,7 +290,6 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.IBANK_MGR is
     write_output(l_trace || 'start, p_startdate=' || to_char(l_startdate, 'DD.MM.YYYY'));
 
     stop_streams;
-    l_scn := dbms_flashback.get_system_change_number();
 
     write_output(l_trace || 'begin job_sync_streams_heartbeat');
     data_import.job_sync_streams_heartbeat;
@@ -332,6 +330,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.IBANK_MGR is
       end if;
     end loop;
     write_output(l_trace || ' finish=' || to_char(sysdate, 'DD.MM.YYYY HH24:MI:SS'));
+
     start_streams;
   end;
 
@@ -372,8 +371,10 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.IBANK_MGR is
           else  raise;
           end if;
         end;
-        dbms_apply_adm.set_parameter(apply_name => 'CB_APPLY', parameter => 'disable_on_error', value => 'y');
-        dbms_apply_adm.set_parameter(apply_name => 'CB_APPLY', parameter => 'PARALLELISM',      value => '1');
+        dbms_apply_adm.set_parameter(apply_name => 'CB_APPLY', parameter => 'DISABLE_ON_ERROR', value => 'Y');
+        dbms_apply_adm.set_parameter(apply_name => 'CB_APPLY', parameter => 'PARALLELISM', value => '1');
+        dbms_apply_adm.set_parameter(apply_name => 'CB_APPLY', parameter => 'TXN_AGE_SPILL_THRESHOLD', value => 'INFINITE');
+        dbms_apply_adm.set_parameter(apply_name => 'CB_APPLY', parameter => 'TXN_LCR_SPILL_THRESHOLD', value => 'INFINITE');
       else
         bars.bars_error.raise_error(G_MODULE_NAME, 100, p_action);
     end case;
@@ -443,7 +444,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.IBANK_MGR is
       when g_action_create then
         begin
           write_output(l_trace || 'создание процесса ' || p_capture_name || ', очередь - ' || p_queue_name);
-          dbms_capture_adm.create_capture(queue_name => p_queue_name, capture_name => p_capture_name, start_scn => l_first_scn, first_scn => l_first_scn, checkpoint_retention_time => 1/24);
+          dbms_capture_adm.create_capture(queue_name => p_queue_name, capture_name => p_capture_name, start_scn => l_first_scn, first_scn => l_first_scn, checkpoint_retention_time => 1);
         exception
           when others then
             if sqlcode = -26665 then
@@ -597,10 +598,11 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.IBANK_MGR is
   --
   procedure stop_streams(p_force boolean default FALSE) is
   begin
-    manage_apply(g_action_stop, p_force);
     manage_capture(g_action_stop, g_cb_capture, p_force);
     manage_capture(g_action_stop, g_tr_capture, p_force);
     manage_propogation(g_action_stop);
+    dbms_lock.sleep(10);
+    manage_apply(g_action_stop, p_force);
     commit;
   end;
 
@@ -609,10 +611,10 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.IBANK_MGR is
   --
   procedure start_streams is
   begin
-    manage_apply(g_action_start);
-    manage_capture(g_action_start, g_cb_capture);
     manage_capture(g_action_start, g_tr_capture);
+    manage_apply(g_action_start);
     manage_propogation(g_action_start);
+    manage_capture(g_action_start, g_cb_capture);
     commit;
   end;
 
@@ -905,6 +907,9 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.IBANK_MGR is
 
       -- правило для захвата BARSAQ.CUST_ADDRESSES
       add_table_rule_tr_capture('BARSAQ.CUST_ADDRESSES');
+      
+      -- !!! temporary 
+      ibank_accounts.SetTransform_CutRUKey;
 
       -- создаем TR_PROPAGATION
       manage_propogation(g_action_create);
@@ -1019,12 +1024,11 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.IBANK_MGR is
       add_table_rule_cb_capture(p_table_name => 'BARS.STREAMS_HEARTBEAT');
       -- правило для захвата BARS.SALDOA
       add_table_rule_cb_capture(p_table_name => 'BARS.SALDOA',
-                                p_condition  => 'barsaq.ibank_accounts.is_subscribed(:dml.get_value(decode(:dml.get_command_type(),''DELETE'',''OLD'',''NEW''),''ACC'').AccessNumber()) = 1');
+                                p_condition  => q'# barsaq.ibank_accounts.is_subscribed(nvl(:dml.get_value('NEW', 'ACC'), :dml.get_value('OLD', 'ACC')).AccessNumber()) = 1 #');
       -- правило для захвата BARS.OPLDOK
       add_table_rule_cb_capture(p_table_name => 'BARS.OPLDOK',
-                                p_condition  => 'barsaq.ibank_accounts.is_subscribed(:dml.get_value(decode(:dml.get_command_type(),''DELETE'',''OLD'',''NEW''),''ACC'').AccessNumber()) = 1 ' ||
-                                                'and (:dml.get_command_type()=''DELETE'' and :dml.get_value(''OLD'',''SOS'').AccessNumber()=5 or ' ||
-                                                ':dml.get_value(''OLD'',''SOS'').AccessNumber()<>5 and :dml.get_value(''NEW'',''SOS'').AccessNumber()=5)');
+                                p_condition  => q'# barsaq.ibank_accounts.is_subscribed(nvl(:dml.get_value('NEW', 'ACC'), :dml.get_value('OLD', 'ACC')).AccessNumber()) = 1
+                                                and ((:dml.get_value('NEW', 'SOS').AccessNumber() = 5) or (:dml.get_value('OLD', 'SOS').AccessNumber() = 5)) #');
       -- правило для захвата BARS.SOS_TRACK
       add_table_rule_cb_capture(p_table_name => 'BARS.SOS_TRACK',
                                 p_condition  => 'barsaq.ibank_accounts.is_doc_imported(:dml.get_value(''NEW'',''REF'').AccessNumber()) = 1' ||
@@ -1100,6 +1104,8 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.IBANK_MGR is
       -- правило для захвата BARSAQ.CUST_ADDRESSES
       add_table_rule_tr_capture('BARSAQ.CUST_ADDRESSES');
 
+      -- !!! temporary 
+      ibank_accounts.SetTransform_CutRUKey;
 
       -- пересинхронизация таблиц
       resync_tables;
@@ -1176,12 +1182,11 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.IBANK_MGR is
       add_table_rule_cb_capture(p_table_name => 'BARS.STREAMS_HEARTBEAT');
       -- правило для захвата BARS.SALDOA
       add_table_rule_cb_capture(p_table_name => 'BARS.SALDOA',
-                                p_condition  => 'barsaq.ibank_accounts.is_subscribed(:dml.get_value(decode(:dml.get_command_type(),''DELETE'',''OLD'',''NEW''),''ACC'').AccessNumber()) = 1');
+                                p_condition  => q'# barsaq.ibank_accounts.is_subscribed(nvl(:dml.get_value('NEW', 'ACC'), :dml.get_value('OLD', 'ACC')).AccessNumber()) = 1 #');
       -- правило для захвата BARS.OPLDOK
       add_table_rule_cb_capture(p_table_name => 'BARS.OPLDOK',
-                                p_condition  => 'barsaq.ibank_accounts.is_subscribed(:dml.get_value(decode(:dml.get_command_type(),''DELETE'',''OLD'',''NEW''),''ACC'').AccessNumber()) = 1 ' ||
-                                                'and (:dml.get_command_type()=''DELETE'' and :dml.get_value(''OLD'',''SOS'').AccessNumber()=5 or ' ||
-                                                ':dml.get_value(''OLD'',''SOS'').AccessNumber()<>5 and :dml.get_value(''NEW'',''SOS'').AccessNumber()=5)');
+                                p_condition  => q'# barsaq.ibank_accounts.is_subscribed(nvl(:dml.get_value('NEW', 'ACC'), :dml.get_value('OLD', 'ACC')).AccessNumber()) = 1
+                                                 and nvl(:dml.get_value('NEW','SOS'), :dml.get_value('OLD','SOS')).AccessNumber() = 5 #');
       -- правило для захвата BARS.SOS_TRACK
       add_table_rule_cb_capture(p_table_name => 'BARS.SOS_TRACK',
                                 p_condition  => 'barsaq.ibank_accounts.is_doc_imported(:dml.get_value(''NEW'',''REF'').AccessNumber()) = 1' || ' and :dml.get_command_type()=''INSERT''' ||
@@ -1267,6 +1272,9 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.IBANK_MGR is
 
       -- правило для захвата BARSAQ.CUST_ADDRESSES
       add_table_rule_tr_capture('BARSAQ.CUST_ADDRESSES');
+
+      -- !!! temporary 
+      ibank_accounts.SetTransform_CutRUKey;
 
       -- создаем TR_PROPAGATION
       manage_propogation(g_action_create);

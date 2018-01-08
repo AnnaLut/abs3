@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure CALCULATE_PROVISION1 ***
 
-CREATE OR REPLACE procedure BARSUPL.CALCULATE_PROVISION1
+  CREATE OR REPLACE PROCEDURE BARSUPL.CALCULATE_PROVISION1 
 ( p_date     in   bars.nbu23_rez.fdat%type,
   p_kf       in   varchar2
 ) is
@@ -23,7 +23,7 @@ begin
   --BARS.TUDA;
   BARS.BC.GO(p_kf);
   BARS.GL.SETP('RESERVE',SYS_CONTEXT('USERENV','SID'),NULL);
-  BARS.BARS_UTL_SNAPSHOT.START_RUNNING;
+--  BARS.BARS_UTL_SNAPSHOT.START_RUNNING; --VVV
 
   dbms_application_info.set_client_info('Z23.START_REZ('||l_calc ||',0);');   -- 00.Стартовые работы Перенесення поточних ГПК в архiв
   BARS.Z23.START_REZ(to_date(l_calc,'dd-mm-yyyy'),0);
@@ -32,13 +32,13 @@ begin
 
   dbms_application_info.set_client_info(NULL);
   dbms_application_info.set_action(NULL);
-  BARS.BARS_UTL_SNAPSHOT.STOP_RUNNING;
+--  BARS.BARS_UTL_SNAPSHOT.STOP_RUNNING; --VVV
   BARS.GL.SETP('RESERVE','',NULL);
 
   bars_audit.info( 'CALCULATE_PROVISION1 - OK');
 exception
   when OTHERS then
-    BARS.BARS_UTL_SNAPSHOT.STOP_RUNNING;
+--    BARS.BARS_UTL_SNAPSHOT.STOP_RUNNING; --VVV
     BARS.GL.SETP('RESERVE','',NULL);
     dbms_application_info.set_action(NULL);
     dbms_application_info.set_client_info(NULL);

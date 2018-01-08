@@ -112,19 +112,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CREDITS_PERID_PERIOD_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.CREDITS_STAT ADD CONSTRAINT FK_CREDITS_PERID_PERIOD_ID FOREIGN KEY (PER_ID)
-	  REFERENCES BARS_DM.PERIODS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_CREDITS_BRANCH_NN ***
 begin   
  execute immediate '
@@ -214,7 +201,9 @@ exception when others then
 
 PROMPT *** Create  grants  CREDITS_STAT ***
 grant SELECT                                                                 on CREDITS_STAT    to BARS;
+grant SELECT                                                                 on CREDITS_STAT    to BARSREADER_ROLE;
 grant SELECT                                                                 on CREDITS_STAT    to BARSUPL;
+grant SELECT                                                                 on CREDITS_STAT    to UPLD;
 
 
 

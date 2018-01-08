@@ -73,6 +73,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  AQ$_CB_QUEUE_TABLE_I ***
+grant SELECT                                                                 on AQ$_CB_QUEUE_TABLE_I to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

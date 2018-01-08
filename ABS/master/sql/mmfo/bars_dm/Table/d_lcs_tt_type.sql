@@ -42,7 +42,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  D_LCS_TT_TYPE ***
+grant SELECT                                                                 on D_LCS_TT_TYPE   to BARSREADER_ROLE;
 grant SELECT                                                                 on D_LCS_TT_TYPE   to BARSUPL;
+grant SELECT                                                                 on D_LCS_TT_TYPE   to UPLD;
 
 
 

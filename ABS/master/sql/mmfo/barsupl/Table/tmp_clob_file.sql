@@ -41,6 +41,10 @@ COMMENT ON COLUMN BARSUPL.TMP_CLOB_FILE.BF IS '';
 
 
 
+PROMPT *** Create  grants  TMP_CLOB_FILE ***
+grant SELECT                                                                 on TMP_CLOB_FILE   to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_CLOB_FILE   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

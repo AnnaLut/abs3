@@ -68,10 +68,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ESCR_REGISTER_INNER_NUMBER ***
+PROMPT *** Create  constraint CC_ESCR_REGISTER_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REGISTER ADD CONSTRAINT CC_ESCR_REGISTER_INNER_NUMBER CHECK (INNER_NUMBER IS NOT NULL) ENABLE';
+  ALTER TABLE BARSAQ.ESCR_REGISTER ADD CONSTRAINT CC_ESCR_REGISTER_ID CHECK (ID IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -80,10 +80,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ESCR_REGISTER_ID ***
+PROMPT *** Create  constraint CC_ESCR_REGISTER_INNER_NUMBER ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REGISTER ADD CONSTRAINT CC_ESCR_REGISTER_ID CHECK (ID IS NOT NULL) ENABLE';
+  ALTER TABLE BARSAQ.ESCR_REGISTER ADD CONSTRAINT CC_ESCR_REGISTER_INNER_NUMBER CHECK (INNER_NUMBER IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -104,6 +104,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  ESCR_REGISTER ***
+grant SELECT                                                                 on ESCR_REGISTER   to BARSREADER_ROLE;
 
 
 

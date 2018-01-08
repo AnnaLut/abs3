@@ -101,6 +101,7 @@ exception when others then
 
 PROMPT *** Create  grants  UPL_RELEASES ***
 grant SELECT                                                                 on UPL_RELEASES    to BARS;
+grant SELECT                                                                 on UPL_RELEASES    to BARSREADER_ROLE;
 grant SELECT                                                                 on UPL_RELEASES    to UPLD;
 
 

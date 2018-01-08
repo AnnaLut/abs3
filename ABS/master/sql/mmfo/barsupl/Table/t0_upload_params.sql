@@ -46,19 +46,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_T0UPLOADPARAMS_OBJECTID ***
-begin   
- execute immediate '
-  ALTER TABLE BARSUPL.T0_UPLOAD_PARAMS ADD CONSTRAINT FK_T0UPLOADPARAMS_OBJECTID FOREIGN KEY (OBJECT_ID)
-	  REFERENCES BARSUPL.UPL_CHECK_OBJECTS (OBJECT_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_T0UPLOADPARAMS_PARAMID_NN ***
 begin   
  execute immediate '
@@ -121,6 +108,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  T0_UPLOAD_PARAMS ***
+grant SELECT                                                                 on T0_UPLOAD_PARAMS to BARSREADER_ROLE;
 grant SELECT                                                                 on T0_UPLOAD_PARAMS to UPLD;
 
 

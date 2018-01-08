@@ -50,10 +50,22 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ESCR_REG_BODY_ID ***
+PROMPT *** Create  constraint CC_DEAL_BUILD_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_BODY ADD CONSTRAINT CC_ESCR_REG_BODY_ID CHECK (ID IS NOT NULL) ENABLE';
+  ALTER TABLE BARSAQ.ESCR_REG_BODY ADD CONSTRAINT CC_DEAL_BUILD_ID CHECK (DEAL_BUILD_ID is not null) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DEAL_ADR_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_BODY ADD CONSTRAINT CC_DEAL_ADR_ID CHECK (DEAL_ADR_ID is not null) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -76,22 +88,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DEAL_ADR_ID ***
+PROMPT *** Create  constraint CC_ESCR_REG_BODY_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_BODY ADD CONSTRAINT CC_DEAL_ADR_ID CHECK (DEAL_ADR_ID is not null) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DEAL_BUILD_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_BODY ADD CONSTRAINT CC_DEAL_BUILD_ID CHECK (DEAL_BUILD_ID is not null) ENABLE';
+  ALTER TABLE BARSAQ.ESCR_REG_BODY ADD CONSTRAINT CC_ESCR_REG_BODY_ID CHECK (ID IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -112,6 +112,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  ESCR_REG_BODY ***
+grant SELECT                                                                 on ESCR_REG_BODY   to BARSREADER_ROLE;
 
 
 

@@ -46,19 +46,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_AUTOJOBS_UPLREGIONS ***
-begin   
- execute immediate '
-  ALTER TABLE BARSUPL.UPL_AUTOJOBS ADD CONSTRAINT FK_AUTOJOBS_UPLREGIONS FOREIGN KEY (KF)
-	  REFERENCES BARSUPL.UPL_REGIONS (KF) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C0033142 ***
 begin   
  execute immediate '
@@ -86,6 +73,7 @@ exception when others then
 
 PROMPT *** Create  grants  UPL_AUTOJOBS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on UPL_AUTOJOBS    to BARS;
+grant SELECT                                                                 on UPL_AUTOJOBS    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on UPL_AUTOJOBS    to UPLD;
 
 

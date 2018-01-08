@@ -55,6 +55,7 @@ exception when others then
 
 PROMPT *** Create  grants  REFSYNC_LIST ***
 grant DELETE,INSERT,SELECT                                                   on REFSYNC_LIST    to BARS;
+grant SELECT                                                                 on REFSYNC_LIST    to BARSREADER_ROLE;
 grant SELECT                                                                 on REFSYNC_LIST    to KLBX;
 
 

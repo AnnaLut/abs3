@@ -87,6 +87,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  DOC_CUREX_CUSTCOMMISSIONS ***
+grant SELECT                                                                 on DOC_CUREX_CUSTCOMMISSIONS to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

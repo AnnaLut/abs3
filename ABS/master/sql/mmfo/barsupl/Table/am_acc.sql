@@ -65,6 +65,10 @@ COMMENT ON COLUMN BARSUPL.AM_ACC.R012 IS '';
 
 
 
+PROMPT *** Create  grants  AM_ACC ***
+grant SELECT                                                                 on AM_ACC          to BARSREADER_ROLE;
+grant SELECT                                                                 on AM_ACC          to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -49,6 +49,10 @@ COMMENT ON COLUMN BARSUPL.MP_DM.TAG_NAME IS 'для таблиць вертикальної структури 
 
 
 
+PROMPT *** Create  grants  MP_DM ***
+grant SELECT                                                                 on MP_DM           to BARSREADER_ROLE;
+grant SELECT                                                                 on MP_DM           to UPLD;
+
 
 
 PROMPT ===================================================================================== 
