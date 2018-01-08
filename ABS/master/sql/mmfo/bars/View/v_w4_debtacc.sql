@@ -35,9 +35,7 @@ PROMPT *** Create  view V_W4_DEBTACC ***
  order by a.branch, c.nmk;
 
 PROMPT *** Create  grants  V_W4_DEBTACC ***
-grant SELECT                                                                 on V_W4_DEBTACC    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_DEBTACC    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_W4_DEBTACC    to UPLD;
 
 
 

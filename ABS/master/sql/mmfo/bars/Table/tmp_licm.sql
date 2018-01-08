@@ -63,8 +63,8 @@ begin
 	ROWTYPE NUMBER, 
 	GRPLIST VARCHAR2(70), 
 	D_REC VARCHAR2(60), 
-	REFNLS VARCHAR2(14), 
-	NLSALT VARCHAR2(15)
+	REFNLS VARCHAR2(14),
+    NLSALT  VARCHAR2(15)
    ) ON COMMIT PRESERVE ROWS ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
@@ -73,13 +73,19 @@ end;
 
 
 
+begin 
+  execute immediate 'alter table BARS.TMP_LICM add (NLSALT  VARCHAR2(15))';
+exception when others then       
+  if sqlcode=-1430 then null; else raise; end if; 
+end; 
+/
+
 
 PROMPT *** ALTER_POLICIES to TMP_LICM ***
  exec bpa.alter_policies('TMP_LICM');
 
 
 COMMENT ON TABLE BARS.TMP_LICM IS 'Временная таблица для отчетности по выпискам';
-COMMENT ON COLUMN BARS.TMP_LICM.NLSALT IS 'Альтернативный номер счета';
 COMMENT ON COLUMN BARS.TMP_LICM.FDAT IS 'Дата движения по счету';
 COMMENT ON COLUMN BARS.TMP_LICM.TIP IS 'тип  счета';
 COMMENT ON COLUMN BARS.TMP_LICM.ACC IS 'acc счета';
@@ -123,14 +129,12 @@ COMMENT ON COLUMN BARS.TMP_LICM.ROWTYPE IS '';
 COMMENT ON COLUMN BARS.TMP_LICM.GRPLIST IS 'Список отчетных групп в кот. входит счет';
 COMMENT ON COLUMN BARS.TMP_LICM.D_REC IS '';
 COMMENT ON COLUMN BARS.TMP_LICM.REFNLS IS 'Лицевой счет по которому был выполнен платеж(если выписка делается по родительскому счету - не дочернему)';
-
+COMMENT ON COLUMN BARS.TMP_LICM.NLSALT IS 'Альтернативный номер счета';
 
 
 PROMPT *** Create  grants  TMP_LICM ***
-grant SELECT                                                                 on TMP_LICM        to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TMP_LICM        to BARS_ACCESS_DEFROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TMP_LICM        to RPBN001;
-grant SELECT                                                                 on TMP_LICM        to UPLD;
 
 
 

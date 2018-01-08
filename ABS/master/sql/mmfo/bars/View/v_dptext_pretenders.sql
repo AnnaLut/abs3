@@ -37,10 +37,8 @@ PROMPT *** Create  view V_DPTEXT_PRETENDERS ***
                       and nvl(r.req_state, 0) >= 0);
 
 PROMPT *** Create  grants  V_DPTEXT_PRETENDERS ***
-grant SELECT                                                                 on V_DPTEXT_PRETENDERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPTEXT_PRETENDERS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPTEXT_PRETENDERS to DPT_ROLE;
-grant SELECT                                                                 on V_DPTEXT_PRETENDERS to UPLD;
 
 
 

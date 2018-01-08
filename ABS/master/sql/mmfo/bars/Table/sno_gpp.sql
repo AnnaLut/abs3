@@ -53,10 +53,6 @@ COMMENT ON COLUMN BARS.SNO_GPP.DAT31 IS '';
 
 
 
-PROMPT *** Create  grants  SNO_GPP ***
-grant SELECT                                                                 on SNO_GPP         to BARSREADER_ROLE;
-grant SELECT                                                                 on SNO_GPP         to UPLD;
-
 
 
 PROMPT ===================================================================================== 

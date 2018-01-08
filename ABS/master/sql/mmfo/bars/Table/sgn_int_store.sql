@@ -72,12 +72,26 @@ exception when others then
 /
 
 
+PROMPT *** Create index I2_SGN_INT_STORE_SIGN_ID ***
+declare
+    name_already_used exception;
+    column_already_indexed exception;
 
+    pragma exception_init(name_already_used, -955);
+    pragma exception_init(column_already_indexed, -1408);
+begin
+    execute immediate 'create index i2_sgn_int_store_sign_id on BARS.SGN_INT_STORE (sign_id) tablespace brsbigi';
+exception
+    when column_already_indexed or name_already_used then
+         null;
+end;
+/
 
-PROMPT *** Create  constraint CC_SGNINTSTORE_SIGNID_NN ***
+PROMPT *** Create  constraint FK_SGNINTSTORE_SGNDATA_REF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SGN_INT_STORE MODIFY (SIGN_ID CONSTRAINT CC_SGNINTSTORE_SIGNID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SGN_INT_STORE ADD CONSTRAINT FK_SGNINTSTORE_SGNDATA_REF FOREIGN KEY (SIGN_ID)
+	  REFERENCES BARS.SGN_DATA (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -92,6 +106,31 @@ begin
   ALTER TABLE BARS.SGN_INT_STORE ADD CONSTRAINT PK_SGNINTSTORE PRIMARY KEY (REF, REC_ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SGNINTSTORE_OPER_VISA_REF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SGN_INT_STORE ADD CONSTRAINT FK_SGNINTSTORE_OPER_VISA_REF FOREIGN KEY (REC_ID)
+	  REFERENCES BARS.OPER_VISA (SQNC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SGNINTSTORE_SIGNID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SGN_INT_STORE MODIFY (SIGN_ID CONSTRAINT CC_SGNINTSTORE_SIGNID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -126,24 +165,6 @@ exception when others then
 /
 
 
-
-
-PROMPT *** Create  index I2_SGN_INT_STORE_SIGN_ID ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.I2_SGN_INT_STORE_SIGN_ID ON BARS.SGN_INT_STORE (SIGN_ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-PROMPT *** Create  grants  SGN_INT_STORE ***
-grant SELECT                                                                 on SGN_INT_STORE   to BARSREADER_ROLE;
-grant SELECT                                                                 on SGN_INT_STORE   to UPLD;
 
 
 

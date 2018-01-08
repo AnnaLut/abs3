@@ -49,11 +49,9 @@ PROMPT *** Create  view V_FOR_NET_PRO ***
           AND b.sb > 0;
 
 PROMPT *** Create  grants  V_FOR_NET_PRO ***
-grant SELECT                                                                 on V_FOR_NET_PRO   to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_FOR_NET_PRO   to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_FOR_NET_PRO   to FOREX;
 grant SELECT,UPDATE                                                          on V_FOR_NET_PRO   to START1;
-grant SELECT                                                                 on V_FOR_NET_PRO   to UPLD;
 
 
 

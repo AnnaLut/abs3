@@ -117,7 +117,6 @@ exception when others then
 PROMPT *** Create  grants  AQ_REFSYNC_TBL ***
 grant SELECT                                                                 on AQ_REFSYNC_TBL  to BARS;
 grant SELECT                                                                 on AQ_REFSYNC_TBL  to BARSAQ_ADM;
-grant SELECT                                                                 on AQ_REFSYNC_TBL  to BARSREADER_ROLE;
 
 
 

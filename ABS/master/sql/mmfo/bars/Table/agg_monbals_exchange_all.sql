@@ -234,10 +234,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00110025 ***
+PROMPT *** Create  constraint SYS_C00110030 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE_ALL MODIFY (OST NOT NULL ENABLE)';
+  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE_ALL MODIFY (KOSQ NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -294,10 +294,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00110030 ***
+PROMPT *** Create  constraint SYS_C00110025 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE_ALL MODIFY (KOSQ NOT NULL ENABLE)';
+  ALTER TABLE BARS.AGG_MONBALS_EXCHANGE_ALL MODIFY (OST NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -398,9 +398,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  AGG_MONBALS_EXCHANGE_ALL ***
-grant SELECT                                                                 on AGG_MONBALS_EXCHANGE_ALL to BARSREADER_ROLE;
 grant ALTER,SELECT                                                           on AGG_MONBALS_EXCHANGE_ALL to DM;
-grant SELECT                                                                 on AGG_MONBALS_EXCHANGE_ALL to UPLD;
 
 
 

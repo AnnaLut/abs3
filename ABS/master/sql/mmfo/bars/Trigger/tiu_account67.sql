@@ -15,9 +15,7 @@ PROMPT *** Create  trigger TIU_ACCOUNT67 ***
                     tip
    ON accounts
    FOR EACH ROW
- WHEN (
-new.acc <> 0
-      ) DECLARE
+     WHEN (new.acc <> 0) DECLARE
    NLS_   VARCHAR2 (15);
 BEGIN
    IF :new.nls LIKE '0000%' AND :new.nbs IS NULL
@@ -69,6 +67,9 @@ BEGIN
       :new.tip := 'LIM';
    END IF;
 END tiu_account67;
+
+
+
 /
 ALTER TRIGGER BARS.TIU_ACCOUNT67 ENABLE;
 

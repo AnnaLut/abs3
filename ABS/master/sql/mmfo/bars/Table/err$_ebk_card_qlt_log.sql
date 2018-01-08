@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_EBK_CARD_QLT_LOG.USER_ID IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_EBK_CARD_QLT_LOG ***
-grant SELECT                                                                 on ERR$_EBK_CARD_QLT_LOG to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_EBK_CARD_QLT_LOG to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -79,6 +79,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_MSGCODES_ERRMODULES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MSG_CODES ADD CONSTRAINT FK_MSGCODES_ERRMODULES FOREIGN KEY (MOD_CODE)
+	  REFERENCES BARS.ERR_MODULES (ERRMOD_CODE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_MSGCODES_MSGID_NN ***
 begin   
  execute immediate '
@@ -143,9 +156,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  MSG_CODES ***
-grant SELECT                                                                 on MSG_CODES       to BARSREADER_ROLE;
 grant SELECT                                                                 on MSG_CODES       to BARS_DM;
-grant SELECT                                                                 on MSG_CODES       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MSG_CODES       to WR_ALL_RIGHTS;
 
 

@@ -85,11 +85,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DOC_BODY ***
-grant SELECT                                                                 on DOC_BODY        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on DOC_BODY        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DOC_BODY        to BARS_DM;
 grant DELETE,INSERT,SELECT                                                   on DOC_BODY        to RCC_DEAL;
-grant SELECT                                                                 on DOC_BODY        to UPLD;
 
 
 

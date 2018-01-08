@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/SBON/View/V_SB_DOV_ORG.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_SB_DOV_ORG ***
-
-  CREATE OR REPLACE FORCE VIEW SBON.V_SB_DOV_ORG ("ID_DOG", "NOMDOG", "ROZRAH", "NAZVA", "TRANZRAH", "KODORG", "MFO", "NAZVA_PLAT", "WORK_MODE", "STATUS", "DATE_UPDATE", "EXTRA_ATTRIBUTES_METADATA") AS 
-  select t.contract_id id_dog,
+create or replace view v_sb_dov_org as
+select t.contract_id id_dog,
        t.contract_number nomdog,
        t.receiver_account rozrah,
        t.receiver_name nazva,
@@ -24,9 +15,3 @@ PROMPT *** Create  view V_SB_DOV_ORG ***
         where  e.product_id = t.id) extra_attributes_metadata
 from   bars.sto_product p
 join   bars.sto_sbon_product t on t.id = p.id;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/SBON/View/V_SB_DOV_ORG.sql =========*** End *** =
-PROMPT ===================================================================================== 

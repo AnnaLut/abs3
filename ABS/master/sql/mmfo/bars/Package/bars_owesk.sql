@@ -39,7 +39,7 @@ is
 --
 -- constants
 --
-g_body_version    constant varchar2(64)  := 'version 1.24 17/10/2017';
+g_body_version    constant varchar2(64)  := 'version 1.23 22/11/2016';
 g_body_defs       constant varchar2(512) := '';
 g_modcode         constant varchar2(3)   := 'BPK';
 g_pkbcode         constant varchar2(100) := 'bars_owesk';
@@ -633,7 +633,7 @@ begin
             where o.acc_pk = a.acc and a.dazs is null
               and a.acc = w.acc and w.tag = 'PK_PRCT'
               and w.value = to_char(p_proect_id)
-              and regexp_like(o.card_code,'(VECCST)|(MSTDEBPID)')
+              and o.card_code like '%VECCST%'
               and a.rnk = l_rnk;
            l_err := 'Клієнту вже відкрито картку ' || l_card || ' ' || l_nls;
         exception
@@ -641,7 +641,7 @@ begin
               -- обновление реквизитов клиента
               bars_ow.alter_client(l_rnk, l_client_array(i));
            when too_many_rows then
-              l_err := 'Клієнту вже відкрито картки %VECCST% або %MSTDEBPID%';
+              l_err := 'Клієнту вже відкрито картки %VECCST%';
         end;
      end if;
 
@@ -713,7 +713,7 @@ begin
 
   bars_audit.trace(h || 'Start.');
 
-  if not regexp_like(p_card_code,'(VECCST)|(MSTDEBPID)') then
+  if p_card_code not like '%VECCST%' then
      raise_application_error(-20000, 'Заборонено відкривати картку ' || p_card_code || ' для Електронний студентський квиток');
   end if;
 

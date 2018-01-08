@@ -65,6 +65,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_MSGTEXTS_MSGCODES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MSG_TEXTS ADD CONSTRAINT FK_MSGTEXTS_MSGCODES FOREIGN KEY (MSG_ID)
+	  REFERENCES BARS.MSG_CODES (MSG_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_MSGTEXTS_ERRLANGS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MSG_TEXTS ADD CONSTRAINT FK_MSGTEXTS_ERRLANGS FOREIGN KEY (LNG_CODE)
+	  REFERENCES BARS.ERR_LANGS (ERRLNG_CODE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_MSGTEXTS_MSGID_NN ***
 begin   
  execute immediate '
@@ -115,9 +141,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  MSG_TEXTS ***
-grant SELECT                                                                 on MSG_TEXTS       to BARSREADER_ROLE;
 grant SELECT                                                                 on MSG_TEXTS       to BARS_DM;
-grant SELECT                                                                 on MSG_TEXTS       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MSG_TEXTS       to WR_ALL_RIGHTS;
 
 

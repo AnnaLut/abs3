@@ -38,9 +38,6 @@ COMMENT ON COLUMN BARSAQ.AQ$_AQ_REFSYNC_TBL_L.FLAGS IS '';
 
 
 
-PROMPT *** Create  grants  AQ$_AQ_REFSYNC_TBL_L ***
-grant SELECT                                                                 on AQ$_AQ_REFSYNC_TBL_L to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

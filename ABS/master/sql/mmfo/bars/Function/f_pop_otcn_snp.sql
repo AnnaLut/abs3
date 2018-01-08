@@ -120,7 +120,7 @@ END IF;
 --end if;
 
 --BARS_UTL_SNAPSHOT.start_running;
-
+  
 DatN_ := TRUNC(Dat_ + 1); -- дата наступна за зв_тною
 
 -- отбор только нужных счетов
@@ -164,12 +164,12 @@ if add_KP_ >= 1 then
              'and (nlsb LIKE ''5040%'' OR nlsb LIKE ''5041%'')) or ' ||
              '((nlsa LIKE ''5040%'' OR nlsa LIKE ''5041%'') and '||
              '(nlsb LIKE ''3902%'' OR nlsb LIKE ''3903%'')))';
-
-      type_kor_ := (case when add_KP_ = 1
-                         then 1
+             
+      type_kor_ := (case when add_KP_ = 1 
+                         then 1 
                          when add_KP_ = 3
                          then 2
-                         else 0
+                         else 0 
                     end);
    ELSE
       sql_doda_ := '';
@@ -239,7 +239,7 @@ elsif type_ in (2, 3, 5) then
            b.CUdosq + b.CUkosq <> 0 or b.CUdos + b.CUkos <> 0
           );
 elsif type_ in (4) then
-
+       
     INSERT /*+APPEND  */
     INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
            VOST, VOSTQ, OST, OSTQ,
@@ -263,11 +263,11 @@ elsif type_ in (4) then
            0,0,0,0,0,0,0,0,0,0
     from AGG_MONBALS b, OTCN_ACC a
     where b.fdat = trunc(dat_, 'mm')
-      and b.ACC = a.acc;
-
-    commit;
-
-
+      and b.ACC = a.acc;    
+      
+    commit;  
+    
+      
     INSERT /*+APPEND */
     INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
            VOST, VOSTQ, OST, OSTQ,
@@ -290,7 +290,7 @@ elsif type_ in (4) then
 
    commit;
 
-    INSERT /*+APPEND */
+    INSERT /*+APPEND */ 
     INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
            VOST, VOSTQ, OST, OSTQ,
            DOS, DOSQ, KOS, KOSQ,
@@ -429,7 +429,7 @@ commit;
                 p.dos99, p.dosq99,p.kos99, p.kosq99,
                 p.doszg, p.koszg,
                 p.dos96zg, p.kos96zg, p.dos99zg, p.kos99zg);
-
+                
 else
     null;
 end if;

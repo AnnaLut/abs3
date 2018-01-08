@@ -74,7 +74,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  ADR_PHONE_CODES ***
-grant SELECT                                                                 on ADR_PHONE_CODES to BARSREADER_ROLE;
 grant SELECT                                                                 on ADR_PHONE_CODES to BARSUPL;
 grant SELECT                                                                 on ADR_PHONE_CODES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ADR_PHONE_CODES to START1;

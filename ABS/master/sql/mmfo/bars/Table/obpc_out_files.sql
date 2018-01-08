@@ -63,6 +63,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OBPCOUTFILES_TIPS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_OUT_FILES ADD CONSTRAINT FK_OBPCOUTFILES_TIPS FOREIGN KEY (ACC_TYPE)
+	  REFERENCES BARS.TIPS (TIP) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OBPCOUTFILES_FILECHAR ***
 begin   
  execute immediate '
@@ -101,12 +114,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_OUT_FILES ***
-grant SELECT                                                                 on OBPC_OUT_FILES  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_OUT_FILES  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_OUT_FILES  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_OUT_FILES  to OBPC;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_OUT_FILES  to OBPC_OUT_FILES;
-grant SELECT                                                                 on OBPC_OUT_FILES  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_OUT_FILES  to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on OBPC_OUT_FILES  to WR_REFREAD;
 

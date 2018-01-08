@@ -107,10 +107,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_TICKET ***
-grant SELECT                                                                 on CP_TICKET       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_TICKET       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_TICKET       to BARS_DM;
-grant SELECT                                                                 on CP_TICKET       to UPLD;
 
 
 

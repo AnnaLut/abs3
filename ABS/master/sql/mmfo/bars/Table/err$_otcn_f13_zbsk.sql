@@ -86,9 +86,7 @@ COMMENT ON COLUMN BARS.ERR$_OTCN_F13_ZBSK.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_OTCN_F13_ZBSK ***
-grant SELECT                                                                 on ERR$_OTCN_F13_ZBSK to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_OTCN_F13_ZBSK to BARS_DM;
-grant SELECT                                                                 on ERR$_OTCN_F13_ZBSK to UPLD;
 
 
 

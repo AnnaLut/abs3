@@ -93,10 +93,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_PHASES_TIMELIMITS ***
-grant SELECT                                                                 on WCS_PHASES_TIMELIMITS to BARSREADER_ROLE;
 grant FLASHBACK,SELECT,UPDATE                                                on WCS_PHASES_TIMELIMITS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_PHASES_TIMELIMITS to BARS_DM;
-grant SELECT                                                                 on WCS_PHASES_TIMELIMITS to UPLD;
 grant FLASHBACK,SELECT                                                       on WCS_PHASES_TIMELIMITS to WR_REFREAD;
 
 

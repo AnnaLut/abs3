@@ -19,7 +19,7 @@ begin
             from (select p_acc_ acc, p_dat_ bdat, p_ratn_ ir
                   from dual
                     union
-                  select acc, bdat, acrn_otc.fprocn(acc, p_id_, bdat) ir
+                  select acc, bdat, acrn.fprocn(acc, p_id_, bdat) ir
                   from int_ratn
                   where acc = p_acc_ and
                         id = p_id_ and

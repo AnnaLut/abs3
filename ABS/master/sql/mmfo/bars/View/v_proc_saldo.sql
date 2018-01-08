@@ -31,11 +31,9 @@ PROMPT *** Create  view V_PROC_SALDO ***
 			AND kv = 980 AND DAZS IS NULL;
 
 PROMPT *** Create  grants  V_PROC_SALDO ***
-grant SELECT                                                                 on V_PROC_SALDO    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PROC_SALDO    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PROC_SALDO    to START1;
 grant SELECT                                                                 on V_PROC_SALDO    to TOSS;
-grant SELECT                                                                 on V_PROC_SALDO    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_PROC_SALDO    to WR_ALL_RIGHTS;
 
 

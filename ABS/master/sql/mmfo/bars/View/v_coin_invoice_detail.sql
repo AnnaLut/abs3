@@ -23,9 +23,7 @@ from tmp_coin_invoice_detail v where v.userid = bars.user_id
 order by v.rn;
 
 PROMPT *** Create  grants  V_COIN_INVOICE_DETAIL ***
-grant SELECT                                                                 on V_COIN_INVOICE_DETAIL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_COIN_INVOICE_DETAIL to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_COIN_INVOICE_DETAIL to UPLD;
 
 
 

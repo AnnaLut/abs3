@@ -34,10 +34,8 @@ PROMPT *** Create  view V_CORP2_DOCS ***
            AND i.bank_ref = o.REF;
 
 PROMPT *** Create  grants  V_CORP2_DOCS ***
-grant SELECT                                                                 on V_CORP2_DOCS    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CORP2_DOCS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CORP2_DOCS    to START1;
-grant SELECT                                                                 on V_CORP2_DOCS    to UPLD;
 
 
 

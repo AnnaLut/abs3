@@ -11,10 +11,8 @@ PROMPT *** Create  view TMP_NBU_394 ***
   select substr(kodp,1,2) COL_P1, substr(kodp,3,2) COL_P2, substr(kodp,6,3) COL_P4, substr(kodp,5,1) COL_P3, znap COL_P5,  TMP_NBU."KODP",TMP_NBU."DATF",TMP_NBU."KODF",TMP_NBU."ZNAP",TMP_NBU."NBUC",TMP_NBU."KF",TMP_NBU."ERR_MSG",TMP_NBU."FL_MOD" from TMP_NBU;
 
 PROMPT *** Create  grants  TMP_NBU_394 ***
-grant SELECT                                                                 on TMP_NBU_394     to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_NBU_394     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_NBU_394     to RPBN002;
-grant SELECT                                                                 on TMP_NBU_394     to UPLD;
 
 
 

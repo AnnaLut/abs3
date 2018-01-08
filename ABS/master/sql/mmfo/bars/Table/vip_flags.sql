@@ -99,7 +99,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  VIP_FLAGS ***
-grant SELECT                                                                 on VIP_FLAGS       to BARSREADER_ROLE;
 grant SELECT                                                                 on VIP_FLAGS       to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VIP_FLAGS       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VIP_FLAGS       to BARS_DM;

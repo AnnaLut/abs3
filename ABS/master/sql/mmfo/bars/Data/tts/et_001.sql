@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции !ZP
-prompt Наименование операции: !ZP STOP-контроль (Зарплата)
+prompt Наименование операции: STOP-контроль (Зарплата)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!ZP', '!ZP STOP-контроль (Зарплата)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_CHECK_ZP(#(REF))', null, null, null, '0', null, '0040M0000000000000000000040M000000000000000000000000000000000000', null);
+    values ('!ZP', 'STOP-контроль (Зарплата)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_CHECK_ZP(#(REF))', null, null, null, null, null, '0040M0000000000000000000040M000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!ZP', name='!ZP STOP-контроль (Зарплата)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_ZP(#(REF))', s2=null, sk=null, proc=null, s3800='0', rang=null, flags='0040M0000000000000000000040M000000000000000000000000000000000000', nazn=null
+         set tt='!ZP', name='STOP-контроль (Зарплата)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_ZP(#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0040M0000000000000000000040M000000000000000000000000000000000000', nazn=null
        where tt='!ZP';
   end;
   --------------------------------
@@ -731,28 +731,6 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6118'', ''001'', 1) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('6510', '001', 1);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''001'', 1) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('6518', '001', 1);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6518'', ''001'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;

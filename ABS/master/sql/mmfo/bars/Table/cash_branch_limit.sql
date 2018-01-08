@@ -71,10 +71,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C007838 ***
+PROMPT *** Create  constraint FK_CASH_BRANCH_LIMIT_KV ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CASH_BRANCH_LIMIT MODIFY (BRANCH NOT NULL ENABLE)';
+  ALTER TABLE BARS.CASH_BRANCH_LIMIT ADD CONSTRAINT FK_CASH_BRANCH_LIMIT_KV FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -83,34 +84,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C007839 ***
+PROMPT *** Create  constraint SYS_C007843 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CASH_BRANCH_LIMIT MODIFY (KV NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C007840 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CASH_BRANCH_LIMIT MODIFY (LIM_P NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C007841 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CASH_BRANCH_LIMIT MODIFY (LIM_M NOT NULL ENABLE)';
+  ALTER TABLE BARS.CASH_BRANCH_LIMIT MODIFY (DAT_LIM NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -131,10 +108,59 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C007843 ***
+PROMPT *** Create  constraint SYS_C007841 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CASH_BRANCH_LIMIT MODIFY (DAT_LIM NOT NULL ENABLE)';
+  ALTER TABLE BARS.CASH_BRANCH_LIMIT MODIFY (LIM_M NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C007840 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CASH_BRANCH_LIMIT MODIFY (LIM_P NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C007839 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CASH_BRANCH_LIMIT MODIFY (KV NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CASHBRANCHLIMIT_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CASH_BRANCH_LIMIT ADD CONSTRAINT FK_CASHBRANCHLIMIT_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ON DELETE CASCADE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C007838 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CASH_BRANCH_LIMIT MODIFY (BRANCH NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -157,12 +183,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CASH_BRANCH_LIMIT ***
-grant SELECT                                                                 on CASH_BRANCH_LIMIT to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CASH_BRANCH_LIMIT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CASH_BRANCH_LIMIT to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CASH_BRANCH_LIMIT to RPBN001;
 grant DELETE                                                                 on CASH_BRANCH_LIMIT to START1;
-grant SELECT                                                                 on CASH_BRANCH_LIMIT to UPLD;
 
 
 

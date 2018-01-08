@@ -109,10 +109,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  VYPISKA ***
-grant SELECT                                                                 on VYPISKA         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VYPISKA         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VYPISKA         to START1;
-grant SELECT                                                                 on VYPISKA         to UPLD;
 
 
 

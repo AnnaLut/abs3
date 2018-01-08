@@ -65,11 +65,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  PASSPV ***
-grant SELECT                                                                 on PASSPV          to BARSREADER_ROLE;
 grant SELECT                                                                 on PASSPV          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PASSPV          to BARS_DM;
 grant SELECT                                                                 on PASSPV          to START1;
-grant SELECT                                                                 on PASSPV          to UPLD;
 
 
 

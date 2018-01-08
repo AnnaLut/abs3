@@ -105,11 +105,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  S6_HIST_PR ***
-grant SELECT                                                                 on S6_HIST_PR      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_HIST_PR      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on S6_HIST_PR      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_HIST_PR      to START1;
-grant SELECT                                                                 on S6_HIST_PR      to UPLD;
 
 
 

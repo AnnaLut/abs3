@@ -111,10 +111,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  MGR_TBL_QUEUE ***
-grant SELECT                                                                 on MGR_TBL_QUEUE   to BARSREADER_ROLE;
-grant SELECT                                                                 on MGR_TBL_QUEUE   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции !$V
-prompt Наименование операции: !$V STOP правило для облігацій заповнення доп реквізитів
+prompt Наименование операции: STOP правило для облігацій заповнення доп реквізитів
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!$V', '!$V STOP правило для облігацій заповнення доп реквізитів', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'f_stop(80840,#(ref),'''',0)', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('!$V', 'STOP правило для облігацій заповнення доп реквізитів', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'f_stop(80840,#(ref),'''',0)', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!$V', name='!$V STOP правило для облігацій заповнення доп реквізитів', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='f_stop(80840,#(ref),'''',0)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='!$V', name='STOP правило для облігацій заповнення доп реквізитів', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='f_stop(80840,#(ref),'''',0)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='!$V';
   end;
   --------------------------------
@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции $R9
-prompt Наименование операции: $R9 1.9.Розмiщення ЦП:кiлькiсть
+prompt Наименование операции: 1.9.Розмiщення ЦП:кiлькiсть
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('$R9', '$R9 1.9.Розмiщення ЦП:кiлькiсть', 1, '#(f_dop(#(REF), ''O9819''))', 980, '#(branch_usr.get_branch_param2(''NLS_9910'',0))', 980, null, null, null, null, 0, 0, 0, 0, '#(S_KIL)*100', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('$R9', '1.9.Розмiщення ЦП:кiлькiсть', 1, '#(f_dop(#(REF), ''O9819''))', 980, '#(branch_usr.get_branch_param2(''NLS_9910'',0))', 980, null, null, null, null, 0, 0, 0, 0, '#(S_KIL)*100', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='$R9', name='$R9 1.9.Розмiщення ЦП:кiлькiсть', dk=1, nlsm='#(f_dop(#(REF), ''O9819''))', kv=980, nlsk='#(branch_usr.get_branch_param2(''NLS_9910'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S_KIL)*100', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='$R9', name='1.9.Розмiщення ЦП:кiлькiсть', dk=1, nlsm='#(f_dop(#(REF), ''O9819''))', kv=980, nlsk='#(branch_usr.get_branch_param2(''NLS_9910'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S_KIL)*100', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='$R9';
   end;
   --------------------------------
@@ -89,7 +89,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции $RN
-prompt Наименование операции: $RN 1.2.Розмiщення ЦП
+prompt Наименование операции: 1.2.Розмiщення ЦП
 declare
   cnt_  number;
 begin
@@ -98,11 +98,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('$RN', '$RN 1.2.Розмiщення ЦП', 1, null, null, null, null, null, null, null, null, 1, 0, 0, 0, '( #(S_NOM) + #(S_KUT) ) * #(S_KIL)  ', null, null, null, null, null, '0000100000000001100000000000000000010000000000000000000000000000', 'Розмiщення сертифiкатiв казначейських зобов`язань: кiлькiсть #(S_KIL) шт.');
+    values ('$RN', '1.2.Розмiщення ЦП', 1, null, null, null, null, null, null, null, null, 1, 0, 0, 0, '( #(S_NOM) + #(S_KUT) ) * #(S_KIL)  ', null, null, null, null, null, '0000100000000001100000000000000000010000000000000000000000000000', 'Розмiщення сертифiкатiв казначейських зобов`язань: кiлькiсть #(S_KIL) шт.');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='$RN', name='$RN 1.2.Розмiщення ЦП', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s='( #(S_NOM) + #(S_KUT) ) * #(S_KIL)  ', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000001100000000000000000010000000000000000000000000000', nazn='Розмiщення сертифiкатiв казначейських зобов`язань: кiлькiсть #(S_KIL) шт.'
+         set tt='$RN', name='1.2.Розмiщення ЦП', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s='( #(S_NOM) + #(S_KUT) ) * #(S_KIL)  ', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000001100000000000000000010000000000000000000000000000', nazn='Розмiщення сертифiкатiв казначейських зобов`язань: кiлькiсть #(S_KIL) шт.'
        where tt='$RN';
   end;
   --------------------------------

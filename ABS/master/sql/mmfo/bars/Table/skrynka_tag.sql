@@ -49,6 +49,32 @@ COMMENT ON COLUMN BARS.SKRYNKA_TAG.CUSTTYPE IS 'тип клиента';
 
 
 
+PROMPT *** Create  constraint FK_SKRYNKA_TAG_TAG ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_TAG ADD CONSTRAINT FK_SKRYNKA_TAG_TAG FOREIGN KEY (TAG)
+	  REFERENCES BARS.CC_TAG (TAG) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKA_TAG_CUSTTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_TAG ADD CONSTRAINT FK_SKRYNKA_TAG_CUSTTYPE FOREIGN KEY (CUSTTYPE)
+	  REFERENCES BARS.CUSTTYPE (CUSTTYPE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SKRYNKATAG_TAG_NN ***
 begin   
  execute immediate '
@@ -89,11 +115,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_TAG ***
-grant SELECT                                                                 on SKRYNKA_TAG     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_TAG     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SKRYNKA_TAG     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SKRYNKA_TAG     to DEP_SKRN;
-grant SELECT                                                                 on SKRYNKA_TAG     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_TAG     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SKRYNKA_TAG     to WR_REFREAD;
 

@@ -47,10 +47,6 @@ COMMENT ON COLUMN BARS.TMP_MAPPING_AST.AD_LOGIN IS '';
 
 
 
-PROMPT *** Create  grants  TMP_MAPPING_AST ***
-grant SELECT                                                                 on TMP_MAPPING_AST to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_MAPPING_AST to UPLD;
-
 
 
 PROMPT ===================================================================================== 

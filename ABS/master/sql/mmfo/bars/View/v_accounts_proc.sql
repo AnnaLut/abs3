@@ -38,9 +38,7 @@ PROMPT *** Create  view V_ACCOUNTS_PROC ***
 
 PROMPT *** Create  grants  V_ACCOUNTS_PROC ***
 grant SELECT                                                                 on V_ACCOUNTS_PROC to BARS014;
-grant SELECT                                                                 on V_ACCOUNTS_PROC to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACCOUNTS_PROC to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ACCOUNTS_PROC to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ACCOUNTS_PROC to WR_ALL_RIGHTS;
 
 

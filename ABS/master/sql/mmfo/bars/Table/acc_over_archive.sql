@@ -104,15 +104,39 @@ COMMENT ON COLUMN BARS.ACC_OVER_ARCHIVE.KF IS '';
 
 
 
+
+PROMPT *** Create  constraint FK_ACCOVERARCHIVE_ACCOUNTS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER_ARCHIVE ADD CONSTRAINT FK_ACCOVERARCHIVE_ACCOUNTS2 FOREIGN KEY (KF, ACCO)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCOVERARCHIVE_ACCOUNTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER_ARCHIVE ADD CONSTRAINT FK_ACCOVERARCHIVE_ACCOUNTS FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  ACC_OVER_ARCHIVE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_ARCHIVE to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_ARCHIVE to BARS009;
-grant SELECT                                                                 on ACC_OVER_ARCHIVE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_ARCHIVE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_OVER_ARCHIVE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_ARCHIVE to TECH005;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_ARCHIVE to TECH006;
-grant SELECT                                                                 on ACC_OVER_ARCHIVE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_OVER_ARCHIVE to WR_ALL_RIGHTS;
 
 

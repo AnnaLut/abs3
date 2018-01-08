@@ -94,14 +94,7 @@ PROMPT *** Create  view VW_ESCR_REGISTER ***
           t1.DEAL_FULL_ADDRESS,
           t1.DEAL_build_TYPE,
           t1.REG_EVENTS
-     FROM vw_escr_reg_header t JOIN reg_body t1 ON t.DEAL_ID = t1.DEAL_ID
-     --and t.branch_code LIKE SYS_CONTEXT ('bars_context', 'user_branch_mask')
-;
-
-PROMPT *** Create  grants  VW_ESCR_REGISTER ***
-grant SELECT                                                                 on VW_ESCR_REGISTER to BARSREADER_ROLE;
-grant SELECT                                                                 on VW_ESCR_REGISTER to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on VW_ESCR_REGISTER to UPLD;
+     FROM vw_escr_reg_header t JOIN reg_body t1 ON t.DEAL_ID = t1.DEAL_ID;
 
 
 

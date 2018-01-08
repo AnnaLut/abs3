@@ -163,9 +163,7 @@ exception when others then
 PROMPT *** Create  grants  AQT_KLBX_REPLIES ***
 grant SELECT                                                                 on AQT_KLBX_REPLIES to BARSAQ with grant option;
 grant SELECT                                                                 on AQT_KLBX_REPLIES to BARSAQ_ADM;
-grant SELECT                                                                 on AQT_KLBX_REPLIES to BARSREADER_ROLE;
 grant SELECT                                                                 on AQT_KLBX_REPLIES to BARS_DM;
-grant SELECT                                                                 on AQT_KLBX_REPLIES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on AQT_KLBX_REPLIES to WR_ALL_RIGHTS;
 
 

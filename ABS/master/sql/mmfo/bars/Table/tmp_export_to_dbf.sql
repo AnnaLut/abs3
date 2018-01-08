@@ -57,9 +57,7 @@ COMMENT ON COLUMN BARS.TMP_EXPORT_TO_DBF.DATA IS '';
 
 
 PROMPT *** Create  grants  TMP_EXPORT_TO_DBF ***
-grant SELECT                                                                 on TMP_EXPORT_TO_DBF to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_EXPORT_TO_DBF to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on TMP_EXPORT_TO_DBF to UPLD;
 
 
 

@@ -51,10 +51,8 @@ COMMENT ON COLUMN BARS.PCORPSR.TOTAL IS '';
 
 
 PROMPT *** Create  grants  PCORPSR ***
-grant SELECT                                                                 on PCORPSR         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PCORPSR         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PCORPSR         to START1;
-grant SELECT                                                                 on PCORPSR         to UPLD;
 
 
 

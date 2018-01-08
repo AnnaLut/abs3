@@ -11,9 +11,7 @@ PROMPT *** Create  view V_PAY_INT_ACRPAY_BATCH ***
   select "BATCH_ID","USER_LOGIN","CREATE_DATE","INFO","FILTER" from pay_int_acrpay_batch order by create_date desc;
 
 PROMPT *** Create  grants  V_PAY_INT_ACRPAY_BATCH ***
-grant SELECT                                                                 on V_PAY_INT_ACRPAY_BATCH to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PAY_INT_ACRPAY_BATCH to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_PAY_INT_ACRPAY_BATCH to UPLD;
 
 
 

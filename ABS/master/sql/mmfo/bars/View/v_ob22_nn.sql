@@ -19,11 +19,9 @@ PROMPT *** Create  view V_OB22_NN ***
       order by ob22;
 
 PROMPT *** Create  grants  V_OB22_NN ***
-grant SELECT                                                                 on V_OB22_NN       to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_OB22_NN       to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_OB22_NN       to NALOG;
 grant SELECT                                                                 on V_OB22_NN       to START1;
-grant SELECT                                                                 on V_OB22_NN       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OB22_NN       to WR_ALL_RIGHTS;
 
 

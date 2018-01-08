@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  sequence S_CP_RYN ***
 
-   CREATE SEQUENCE  BARS.S_CP_RYN  MINVALUE 1 MAXVALUE 999999999999999999999999999 INCREMENT BY 1 START WITH 803 NOCACHE  NOORDER  NOCYCLE ;
+   CREATE SEQUENCE  BARS.S_CP_RYN  MINVALUE 1 MAXVALUE 999999999999999999999999999 INCREMENT BY 1 START WITH 801 NOCACHE  NOORDER  NOCYCLE ;
 
 PROMPT *** Create  grants  S_CP_RYN ***
 grant SELECT                                                                 on S_CP_RYN        to BARS_ACCESS_DEFROLE;

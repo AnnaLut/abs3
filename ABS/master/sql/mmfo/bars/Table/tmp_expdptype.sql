@@ -59,10 +59,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPEXPDPTYPE_MODCODE_NN ***
+PROMPT *** Create  constraint CC_TMPEXPDPTYPE_TYPEID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_EXPDPTYPE MODIFY (MODCODE CONSTRAINT CC_TMPEXPDPTYPE_MODCODE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_EXPDPTYPE MODIFY (TYPEID CONSTRAINT CC_TMPEXPDPTYPE_TYPEID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -71,10 +71,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPEXPDPTYPE_TYPEID_NN ***
+PROMPT *** Create  constraint CC_TMPEXPDPTYPE_MODCODE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_EXPDPTYPE MODIFY (TYPEID CONSTRAINT CC_TMPEXPDPTYPE_TYPEID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_EXPDPTYPE MODIFY (MODCODE CONSTRAINT CC_TMPEXPDPTYPE_MODCODE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -95,11 +95,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_EXPDPTYPE ***
-grant SELECT                                                                 on TMP_EXPDPTYPE   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_EXPDPTYPE   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_EXPDPTYPE   to DPT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_EXPDPTYPE   to DPT_ADMIN;
-grant SELECT                                                                 on TMP_EXPDPTYPE   to UPLD;
 
 
 

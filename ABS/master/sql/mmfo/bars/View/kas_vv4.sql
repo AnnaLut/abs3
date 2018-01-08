@@ -35,10 +35,8 @@ where a2.nbs=m.NBS1 and a2.dazs is null and a2.acc=s2.acc and s2.ob22=m.ob1
               );
 
 PROMPT *** Create  grants  KAS_VV4 ***
-grant SELECT                                                                 on KAS_VV4         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_VV4         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_VV4         to PYOD001;
-grant SELECT                                                                 on KAS_VV4         to UPLD;
 
 
 

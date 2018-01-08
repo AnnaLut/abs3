@@ -16,11 +16,9 @@ PROMPT *** Create  view V_ACC_PRCT ***
     WHERE a.acc = w.acc(+);
 
 PROMPT *** Create  grants  V_ACC_PRCT ***
-grant SELECT                                                                 on V_ACC_PRCT      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACC_PRCT      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ACC_PRCT      to CUST001;
 grant SELECT                                                                 on V_ACC_PRCT      to START1;
-grant SELECT                                                                 on V_ACC_PRCT      to UPLD;
 
 
 

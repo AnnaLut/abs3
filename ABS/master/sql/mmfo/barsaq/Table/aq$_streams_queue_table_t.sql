@@ -59,9 +59,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  AQ$_STREAMS_QUEUE_TABLE_T ***
-grant SELECT                                                                 on AQ$_STREAMS_QUEUE_TABLE_T to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

@@ -25,10 +25,8 @@ FROM ACCM_AGG_MONBALS m,
 where m.caldt_id=b.caldt_id ;
 
 PROMPT *** Create  grants  V_ACCM_AGG ***
-grant SELECT                                                                 on V_ACCM_AGG      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACCM_AGG      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ACCM_AGG      to START1;
-grant SELECT                                                                 on V_ACCM_AGG      to UPLD;
 
 
 

@@ -97,10 +97,36 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OTCN_HISTORY_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OTCN_HISTORY ADD CONSTRAINT FK_OTCN_HISTORY_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OTCNHISTORY_KF_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.OTCN_HISTORY MODIFY (KF CONSTRAINT CC_OTCNHISTORY_KF_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OTCNHISTORY_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OTCN_HISTORY ADD CONSTRAINT FK_OTCNHISTORY_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -135,12 +161,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OTCN_HISTORY ***
-grant SELECT                                                                 on OTCN_HISTORY    to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on OTCN_HISTORY    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_HISTORY    to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on OTCN_HISTORY    to RPBN002;
 grant SELECT                                                                 on OTCN_HISTORY    to START1;
-grant SELECT                                                                 on OTCN_HISTORY    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_HISTORY    to WR_ALL_RIGHTS;
 
 

@@ -19,10 +19,6 @@ PROMPT *** Create  view V_UI_BROWSER_STAT ***
 from ui_func_stats t
 where t.user_data is not null;
 
-PROMPT *** Create  grants  V_UI_BROWSER_STAT ***
-grant SELECT                                                                 on V_UI_BROWSER_STAT to BARSREADER_ROLE;
-grant SELECT                                                                 on V_UI_BROWSER_STAT to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -67,10 +67,6 @@ COMMENT ON COLUMN BARS.ERR$_DYN_FILTER.BRANCH IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DYN_FILTER ***
-grant SELECT                                                                 on ERR$_DYN_FILTER to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DYN_FILTER to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -89,10 +89,8 @@ exception when others then
 
 PROMPT *** Create  grants  DOC_DIALOGREQ ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DOC_DIALOGREQ   to ABS_ADMIN;
-grant SELECT                                                                 on DOC_DIALOGREQ   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DOC_DIALOGREQ   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DOC_DIALOGREQ   to BARS_DM;
-grant SELECT                                                                 on DOC_DIALOGREQ   to UPLD;
 grant FLASHBACK,SELECT                                                       on DOC_DIALOGREQ   to WR_REFREAD;
 
 

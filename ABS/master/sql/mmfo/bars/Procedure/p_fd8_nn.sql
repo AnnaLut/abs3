@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_FD8_NN ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_FD8_NN (
+CREATE OR REPLACE PROCEDURE BARS.p_fd8_nn (
    dat_     DATE,
    sheme_   VARCHAR2 DEFAULT 'G',
    prnk_    NUMBER DEFAULT NULL
@@ -16,7 +16,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #D8 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 13/12/2017 (17/11/2017)
+% VERSION     : 17/11/2017 (16/11/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
@@ -570,12 +570,12 @@ IS
             union all
             select kodp, znap from
             (SELECT DISTINCT r.kodp, r.znap
-               FROM (  SELECT RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO FROM rnbu_trace
+               FROM (  SELECT * FROM rnbu_trace
                        WHERE SUBSTR (kodp, 1, 3) IN ('162', '163')
                          and nls not like '9129%' 
                          and nls not like '3%'
                       UNION 
-                       SELECT RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO FROM rnbu_trace r2
+                       SELECT * FROM rnbu_trace r2
                        WHERE SUBSTR (r2.kodp, 1, 3) IN ('162', '163')
                          and r2.nls like '9129%' 
                          and not exists ( select 1 
@@ -585,7 +585,7 @@ IS
                                             and r3.nls not like '9129%'
                                         )         
                       UNION 
-                        SELECT RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO FROM rnbu_trace r4
+                        SELECT * FROM rnbu_trace r4
                         WHERE SUBSTR (r4.kodp, 1, 3) IN ('162', '163')
                            and r4.nls like '3%' 
                            and not exists ( select 1 
@@ -594,7 +594,6 @@ IS
                                               and substr(r5.kodp, 4, 21) = substr(r4.kodp, 4, 21)  
                                               and r5.nls not like '3%'
                                           ) 
-                      order by recid
                     ) r
                  ORDER BY SUBSTR (r.kodp, 4, 10),
                           SUBSTR (r.kodp, 30),
@@ -602,12 +601,12 @@ IS
             union all
             select kodp, znap from
             (SELECT DISTINCT r.kodp, r.znap
-               FROM (  SELECT RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO FROM rnbu_trace
+               FROM (  SELECT * FROM rnbu_trace
                        WHERE SUBSTR (kodp, 1, 3) IN ('170','171','172','173','174','175','179')
                          and nls not like '9129%' 
                          and nls not like '3%'
                       UNION 
-                       SELECT RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO FROM rnbu_trace r6
+                       SELECT * FROM rnbu_trace r6
                        WHERE SUBSTR (r6.kodp, 1, 3) IN ('170','171','172','173','174','175','179')
                          and r6.nls like '9129%' 
                          and not exists ( select 1 
@@ -617,7 +616,7 @@ IS
                                             and r7.nls not like '9129%'
                                         )         
                       UNION 
-                        SELECT RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO FROM rnbu_trace r8
+                        SELECT * FROM rnbu_trace r8
                         WHERE SUBSTR (r8.kodp, 1, 3) IN ('170','171','172','173','174','175','179')
                            and r8.nls like '3%' 
                            and not exists ( select 1 
@@ -626,7 +625,6 @@ IS
                                               and substr(r9.kodp, 4, 14) = substr(r8.kodp, 4, 14)  
                                               and r9.nls not like '3%'
                                           ) 
-                      order by recid
                     ) r
                  ORDER BY SUBSTR (r.kodp, 4, 14),
                           SUBSTR (r.kodp, 1, 3) )
@@ -5049,7 +5047,7 @@ BEGIN
                       INTO freq_
                    FROM accounts a8, nd_acc n8, int_accn i
                    WHERE n8.nd = nd_  
-                   AND a8.nls like '8999%'
+                   AND a8.nbs = '8999'
                    AND n8.acc = a8.acc
                    AND a8.acc = i.acc
                    AND i.ID = 0
@@ -5088,19 +5086,19 @@ BEGIN
                       w_ := '1';
                    end if;
 
-                   comm_ := substr(comm_ || nls_ || ' ' || to_char(kv_) || ' freq='||to_char(freq_)||
-                            ' R013=' || o_r013_1 || ' W=' || w_, 1, 200);
+                   comm_ := substr(comm_ || nls_ || ' ' || to_char(kv_) || 
+                            ' R013=' || r013_ || ' W=' || w_, 1, 200);
 
                    p_ins ('123' || kod_okpo || kod_nnnn || p070_ || LPAD (to_char(kv_), 3, '0'),
                        TO_CHAR (ABS (o_se_1)),
                        nls_,
-                       null, k021_, w_, '00', comm_
+                       null, k021_, w_, '00'
                       );
 
                    p_ins ('127' || kod_okpo || kod_nnnn || p070_ || LPAD (to_char(kv_), 3, '0'),
                        TO_CHAR (ABS (o_se_1)),
                        nls_,
-                       null, k021_, w_, '00', comm_
+                       null, k021_, w_, '00'
                       );
                 end if;
 
@@ -5108,13 +5106,13 @@ BEGIN
                 THEN
                    w_ := '2';
 
-                   comm_ := substr(comm_ || nls_ || ' ' || to_char(kv_) || ' freq='||to_char(freq_)||
-                            ' R013=' || o_r013_2 || ' W=' || w_, 1, 200);
+                   comm_ := substr(comm_ || nls_ || ' ' || to_char(kv_) || 
+                            ' R013=' || r013_ || ' W=' || w_, 1, 200);
 
                    p_ins ('123' || kod_okpo || kod_nnnn || p070_ || LPAD (to_char(kv_), 3, '0'),
                        TO_CHAR (ABS (o_se_2)),
                        nls_,
-                       null, k021_, w_, '00', comm_
+                       null, k021_, w_, '00'
                       );
                 end if;
              end if;

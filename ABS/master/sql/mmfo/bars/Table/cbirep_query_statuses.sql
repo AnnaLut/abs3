@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CBIREP_QUERY_STATUSES ***
-grant SELECT                                                                 on CBIREP_QUERY_STATUSES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CBIREP_QUERY_STATUSES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CBIREP_QUERY_STATUSES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CBIREP_QUERY_STATUSES to START1;
-grant SELECT                                                                 on CBIREP_QUERY_STATUSES to UPLD;
 
 
 

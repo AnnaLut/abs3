@@ -91,10 +91,8 @@ select    -- дата предыдущего движения относительно отчетной
      from a;
 
 PROMPT *** Create  grants  SALROW ***
-grant SELECT                                                                 on SALROW          to BARSREADER_ROLE;
 grant SELECT                                                                 on SALROW          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALROW          to START1;
-grant SELECT                                                                 on SALROW          to UPLD;
 
 
 

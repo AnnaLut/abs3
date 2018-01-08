@@ -16,10 +16,8 @@ from ani_gap a, (select kv, name from tabval union all
 where a.kv=v.kv and a.branch=b.tobo;
 
 PROMPT *** Create  grants  ANI_GAPV2 ***
-grant SELECT                                                                 on ANI_GAPV2       to BARSREADER_ROLE;
 grant SELECT                                                                 on ANI_GAPV2       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANI_GAPV2       to SALGL;
-grant SELECT                                                                 on ANI_GAPV2       to UPLD;
 
 
 

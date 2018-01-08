@@ -89,6 +89,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_WEB_USERMAP_DBUSER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WEB_USERMAP ADD CONSTRAINT FK_WEB_USERMAP_DBUSER FOREIGN KEY (DBUSER)
+	  REFERENCES BARS.STAFF$BASE (LOGNAME) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_WEBUSERMAP_DBUSER_NN ***
 begin   
  execute immediate '
@@ -127,10 +140,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  WEB_USERMAP ***
-grant SELECT                                                                 on WEB_USERMAP     to BARSREADER_ROLE;
 grant SELECT                                                                 on WEB_USERMAP     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WEB_USERMAP     to BARS_DM;
-grant SELECT                                                                 on WEB_USERMAP     to UPLD;
 grant SELECT                                                                 on WEB_USERMAP     to WEBTECH;
 grant SELECT                                                                 on WEB_USERMAP     to WR_ADMIN;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_USERMAP     to WR_ALL_RIGHTS;

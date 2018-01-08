@@ -16,10 +16,8 @@ PROMPT *** Create  view V_BPK_OB22 ***
    and n.ob22 = s.ob22;
 
 PROMPT *** Create  grants  V_BPK_OB22 ***
-grant SELECT                                                                 on V_BPK_OB22      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BPK_OB22      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BPK_OB22      to OBPC;
-grant SELECT                                                                 on V_BPK_OB22      to UPLD;
 
 
 

@@ -60,10 +60,8 @@ where c.custtype in (1,2,4)  -- юрлица
 and c.rnk=p.rnk(+);
 
 PROMPT *** Create  grants  V_PRIOCOM_CLIENT_CORP ***
-grant SELECT                                                                 on V_PRIOCOM_CLIENT_CORP to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PRIOCOM_CLIENT_CORP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PRIOCOM_CLIENT_CORP to START1;
-grant SELECT                                                                 on V_PRIOCOM_CLIENT_CORP to UPLD;
 
 
 

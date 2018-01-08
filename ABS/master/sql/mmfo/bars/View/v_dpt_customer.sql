@@ -58,12 +58,10 @@ PROMPT *** Create  view V_DPT_CUSTOMER ***
 
 PROMPT *** Create  grants  V_DPT_CUSTOMER ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPT_CUSTOMER  to ABS_ADMIN;
-grant SELECT                                                                 on V_DPT_CUSTOMER  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPT_CUSTOMER  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_CUSTOMER  to DPT;
 grant SELECT                                                                 on V_DPT_CUSTOMER  to DPT_ROLE;
 grant SELECT                                                                 on V_DPT_CUSTOMER  to START1;
-grant SELECT                                                                 on V_DPT_CUSTOMER  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_CUSTOMER  to WR_ALL_RIGHTS;
 
 

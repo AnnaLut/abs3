@@ -104,7 +104,7 @@ l_new_nls  accounts.nls%type;
 
 BEGIN
    bars_audit.info (l_title||'старт открытия счета kf='||gl.amfo||', nls='||p_nls_);
-
+   
    bars_audit.trace('%s params: mod_=%s, p1_=%s, p2_=%s, p3_=%s, p4_=%s, rnk_=%s, p_nls_=%s, kv_=%s',
         l_title, to_char(mod_), to_char(p1_), to_char(p2_), to_char(p3_), to_char(p4_), to_char(rnk_), p_nls_, to_char(kv_));
    bars_audit.trace('%s params: nms_=%s, tip_=%s, isp_=%s, accR_=%s, nbsnull_=%s, pap_=%s, vid_=%s, pos_=%s',
@@ -136,7 +136,7 @@ BEGIN
    ELSE
       grp_ := NULL;
    END IF;
-
+   
    l_nls := p_nls_ ;
 
    bars_audit.trace('%s подготовка: l_bankdate=%s, grp_=%s, l_nls=%s',
@@ -153,9 +153,9 @@ BEGIN
       end if;
    end if;
 
-
-
-
+  
+        
+      
    -- определяем, есть ли счет
    BEGIN
 
@@ -165,9 +165,9 @@ BEGIN
          select acc, dazs into acc_, l_dazs from accounts where nls=l_nls and kv=kv_ ;
       end if;
 
-
-
-
+	  
+	  
+	  
       bars_audit.trace('%s найден счет: acc_=%s, l_dazs=%s',  l_title, to_char(acc_), to_char(l_dazs, 'dd/MM/yyyy'));
 
    EXCEPTION WHEN NO_DATA_FOUND THEN

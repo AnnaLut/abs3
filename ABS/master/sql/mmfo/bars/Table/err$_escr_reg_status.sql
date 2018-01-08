@@ -61,10 +61,6 @@ COMMENT ON COLUMN BARS.ERR$_ESCR_REG_STATUS.ORA_ERR_OPTYP$ IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ESCR_REG_STATUS ***
-grant SELECT                                                                 on ERR$_ESCR_REG_STATUS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ESCR_REG_STATUS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

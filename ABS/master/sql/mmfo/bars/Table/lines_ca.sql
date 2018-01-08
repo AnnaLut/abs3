@@ -79,6 +79,32 @@ COMMENT ON COLUMN BARS.LINES_CA.KF IS '';
 
 
 
+PROMPT *** Create  constraint R_LINES_ZAG_CA ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.LINES_CA ADD CONSTRAINT R_LINES_ZAG_CA FOREIGN KEY (FN, DAT)
+	  REFERENCES BARS.ZAG_TB (FN, DAT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_LINESCA_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.LINES_CA ADD CONSTRAINT FK_LINESCA_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_LINESCA_KF_NN ***
 begin   
  execute immediate '
@@ -119,11 +145,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  LINES_CA ***
-grant SELECT                                                                 on LINES_CA        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LINES_CA        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LINES_CA        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LINES_CA        to RPBN002;
-grant SELECT                                                                 on LINES_CA        to UPLD;
 
 
 

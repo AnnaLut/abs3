@@ -48,9 +48,7 @@ COMMENT ON COLUMN BARS.ESCR_ERRORS_TYPES.DESCRIPTION IS '';
 
 
 PROMPT *** Create  grants  ESCR_ERRORS_TYPES ***
-grant SELECT                                                                 on ESCR_ERRORS_TYPES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ESCR_ERRORS_TYPES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on ESCR_ERRORS_TYPES to UPLD;
 
 
 

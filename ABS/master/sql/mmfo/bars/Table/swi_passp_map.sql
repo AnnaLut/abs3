@@ -101,11 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SWI_PASSP_MAP ***
-grant SELECT                                                                 on SWI_PASSP_MAP   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SWI_PASSP_MAP   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SWI_PASSP_MAP   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SWI_PASSP_MAP   to START1;
-grant SELECT                                                                 on SWI_PASSP_MAP   to UPLD;
 
 
 

@@ -155,9 +155,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  BE_PATCHES ***
-grant SELECT                                                                 on BE_PATCHES      to BARSREADER_ROLE;
 grant SELECT                                                                 on BE_PATCHES      to BARS_DM;
-grant SELECT                                                                 on BE_PATCHES      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BE_PATCHES      to WR_ALL_RIGHTS;
 
 

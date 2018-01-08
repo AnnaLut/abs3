@@ -98,9 +98,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DM_STATS ***
-grant SELECT                                                                 on DM_STATS        to BARSREADER_ROLE;
 grant SELECT                                                                 on DM_STATS        to BARSUPL;
-grant SELECT                                                                 on DM_STATS        to UPLD;
 
 
 

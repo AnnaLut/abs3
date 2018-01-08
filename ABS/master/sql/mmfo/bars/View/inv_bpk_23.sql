@@ -19,10 +19,8 @@ PROMPT *** Create  view INV_BPK_23 ***
        );
 
 PROMPT *** Create  grants  INV_BPK_23 ***
-grant SELECT                                                                 on INV_BPK_23      to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on INV_BPK_23      to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on INV_BPK_23      to RCC_DEAL;
-grant SELECT                                                                 on INV_BPK_23      to UPLD;
 
 
 

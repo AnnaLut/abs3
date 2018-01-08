@@ -51,6 +51,19 @@ COMMENT ON COLUMN BARS.WCS_MAC_LIST_ITEMS.TEXT IS 'Текст';
 
 
 
+PROMPT *** Create  constraint FK_MACLISTITEMS_MID_MACS_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_MAC_LIST_ITEMS ADD CONSTRAINT FK_MACLISTITEMS_MID_MACS_ID FOREIGN KEY (MAC_ID)
+	  REFERENCES BARS.WCS_MACS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_MACLISTITEMS_TEXT_NN ***
 begin   
  execute immediate '
@@ -91,10 +104,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_MAC_LIST_ITEMS ***
-grant SELECT                                                                 on WCS_MAC_LIST_ITEMS to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_MAC_LIST_ITEMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_MAC_LIST_ITEMS to BARS_DM;
-grant SELECT                                                                 on WCS_MAC_LIST_ITEMS to UPLD;
 
 
 

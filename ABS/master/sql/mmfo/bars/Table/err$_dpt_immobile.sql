@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_DPT_IMMOBILE.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPT_IMMOBILE ***
-grant SELECT                                                                 on ERR$_DPT_IMMOBILE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPT_IMMOBILE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

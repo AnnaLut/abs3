@@ -1,10 +1,13 @@
+------------------------------------------------------------------------------
 
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_tarif_caa.sql =========*** Run **
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.F_TARIF_CAA (p_ref    INTEGER,     -- oper.REF
+----    Меняем формулу суммы в операции K12:
+
+update TTS set S = 'F_TARIF_CAA(#(REF),#(KVA),#(NLSA),#(S))' where TT='K12';
+
+commit;
+
+------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION BARS.F_Tarif_CAA (p_ref    INTEGER,     -- oper.REF
                                              p_kv     INTEGER,      -- oper.KV
                                              p_nls    VARCHAR2,   -- oper.NLSA
                                              p_s      NUMERIC)       -- oper.S
@@ -22,7 +25,7 @@ IS
    kod_       INTEGER;                                         ---  код тарифа
    sk_        NUMERIC;                           ---  расчетная сумма комиссии
 
-/*   PROCEDURE setoperw (p_ref      operw.REF%TYPE,
+   PROCEDURE setoperw (p_ref      operw.REF%TYPE,
                        p_tag      operw.tag%TYPE,
                        p_value    operw.VALUE%TYPE)
    IS
@@ -40,7 +43,7 @@ IS
           WHERE REF = p_ref AND tag = p_tag;
 
          COMMIT;
-   END;*/
+   END;
 BEGIN
    kod_kr_ := NVL (TRIM (F_DOP (p_ref, 'D6#70')), '000');
 
@@ -92,7 +95,7 @@ BEGIN
       END IF;
 
 
-     -- setoperw (p_ref, 'K_VIP', '0');
+      setoperw (p_ref, 'K_VIP', '0');
    ELSE                                                      -- Это VIP-клиент
       IF kod_kr_ = '804'
       THEN
@@ -102,7 +105,7 @@ BEGIN
       END IF;
 
 
-     -- setoperw (p_ref, 'K_VIP', '1');
+      setoperw (p_ref, 'K_VIP', '1');
    END IF;
 
 
@@ -117,15 +120,6 @@ BEGIN
    RETURN sk_;
 END F_Tarif_CAA;
 /
- show err;
- 
-PROMPT *** Create  grants  F_TARIF_CAA ***
-grant EXECUTE                                                                on F_TARIF_CAA     to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on F_TARIF_CAA     to START1;
+grant execute on F_Tarif_CAA to bars_access_defrole;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_tarif_caa.sql =========*** End **
- PROMPT ===================================================================================== 
- 
+

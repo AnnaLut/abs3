@@ -59,10 +59,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  USSR_ERR_REF1_STORNO ***
-grant SELECT                                                                 on USSR_ERR_REF1_STORNO to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on USSR_ERR_REF1_STORNO to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on USSR_ERR_REF1_STORNO to START1;
-grant SELECT                                                                 on USSR_ERR_REF1_STORNO to UPLD;
 
 
 

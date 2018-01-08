@@ -53,11 +53,9 @@ COMMENT ON COLUMN BARS.KL_S030.D_OPEN IS '';
 
 
 PROMPT *** Create  grants  KL_S030 ***
-grant SELECT                                                                 on KL_S030         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_S030         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_S030         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_S030         to START1;
-grant SELECT                                                                 on KL_S030         to UPLD;
 
 
 

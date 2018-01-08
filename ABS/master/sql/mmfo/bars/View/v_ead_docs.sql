@@ -41,9 +41,7 @@ PROMPT *** Create  view V_EAD_DOCS ***
    and ed.agr_id = d.deposit_id(+);
 
 PROMPT *** Create  grants  V_EAD_DOCS ***
-grant SELECT                                                                 on V_EAD_DOCS      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_EAD_DOCS      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_EAD_DOCS      to UPLD;
 
 
 

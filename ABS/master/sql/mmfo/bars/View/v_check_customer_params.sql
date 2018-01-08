@@ -97,11 +97,9 @@ unpivot ( val FOR tag IN (codcagent,codcagent_1,codcagent_2,codcagent_3,codcagen
  ;
 
 PROMPT *** Create  grants  V_CHECK_CUSTOMER_PARAMS ***
-grant SELECT                                                                 on V_CHECK_CUSTOMER_PARAMS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CHECK_CUSTOMER_PARAMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CHECK_CUSTOMER_PARAMS to RPBN002;
 grant SELECT                                                                 on V_CHECK_CUSTOMER_PARAMS to TECH005;
-grant SELECT                                                                 on V_CHECK_CUSTOMER_PARAMS to UPLD;
 
 
 

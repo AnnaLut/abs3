@@ -60,10 +60,8 @@ PROMPT *** Create  view V_DPT_AGREEMENTS_CHANGE_AMOUNT ***
  ;
 
 PROMPT *** Create  grants  V_DPT_AGREEMENTS_CHANGE_AMOUNT ***
-grant SELECT                                                                 on V_DPT_AGREEMENTS_CHANGE_AMOUNT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_AGREEMENTS_CHANGE_AMOUNT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_AGREEMENTS_CHANGE_AMOUNT to DPT_ROLE;
-grant SELECT                                                                 on V_DPT_AGREEMENTS_CHANGE_AMOUNT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_AGREEMENTS_CHANGE_AMOUNT to WR_ALL_RIGHTS;
 
 

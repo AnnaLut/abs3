@@ -51,11 +51,9 @@ COMMENT ON COLUMN BARS.EK1_OZ_TMP.PAP IS '';
 
 
 PROMPT *** Create  grants  EK1_OZ_TMP ***
-grant SELECT                                                                 on EK1_OZ_TMP      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EK1_OZ_TMP      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EK1_OZ_TMP      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EK1_OZ_TMP      to START1;
-grant SELECT                                                                 on EK1_OZ_TMP      to UPLD;
 
 
 

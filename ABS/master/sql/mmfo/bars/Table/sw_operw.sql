@@ -85,34 +85,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SWOPERW_SWREF_NN ***
+PROMPT *** Create  constraint CC_SWOPERW_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_OPERW MODIFY (SWREF CONSTRAINT CC_SWOPERW_SWREF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWOPERW_TAG_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_OPERW MODIFY (TAG CONSTRAINT CC_SWOPERW_TAG_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWOPERW_SEQ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_OPERW MODIFY (SEQ CONSTRAINT CC_SWOPERW_SEQ_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SW_OPERW MODIFY (KF CONSTRAINT CC_SWOPERW_KF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -133,10 +109,99 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SWOPERW_KF_NN ***
+PROMPT *** Create  constraint CC_SWOPERW_SEQ_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_OPERW MODIFY (KF CONSTRAINT CC_SWOPERW_KF_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SW_OPERW MODIFY (SEQ CONSTRAINT CC_SWOPERW_SEQ_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWOPERW_TAG_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_OPERW MODIFY (TAG CONSTRAINT CC_SWOPERW_TAG_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWOPERW_SWREF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_OPERW MODIFY (SWREF CONSTRAINT CC_SWOPERW_SWREF_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWOPERW_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_OPERW ADD CONSTRAINT FK_SWOPERW_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWOPERW_SWOPT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_OPERW ADD CONSTRAINT FK_SWOPERW_SWOPT FOREIGN KEY (OPT)
+	  REFERENCES BARS.SW_OPT (OPT) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWOPERW_SWSEQ ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_OPERW ADD CONSTRAINT FK_SWOPERW_SWSEQ FOREIGN KEY (SEQ)
+	  REFERENCES BARS.SW_SEQ (SEQ) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWOPERW_SWTAG ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_OPERW ADD CONSTRAINT FK_SWOPERW_SWTAG FOREIGN KEY (TAG)
+	  REFERENCES BARS.SW_TAG (TAG) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWOPERW_SWJOURNAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_OPERW ADD CONSTRAINT FK_SWOPERW_SWJOURNAL FOREIGN KEY (SWREF)
+	  REFERENCES BARS.SW_JOURNAL (SWREF) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -160,11 +225,9 @@ exception when others then
 
 PROMPT *** Create  grants  SW_OPERW ***
 grant SELECT                                                                 on SW_OPERW        to BARS013;
-grant SELECT                                                                 on SW_OPERW        to BARSREADER_ROLE;
 grant SELECT                                                                 on SW_OPERW        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_OPERW        to BARS_DM;
 grant SELECT                                                                 on SW_OPERW        to SWTOSS;
-grant SELECT                                                                 on SW_OPERW        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_OPERW        to WR_ALL_RIGHTS;
 
 

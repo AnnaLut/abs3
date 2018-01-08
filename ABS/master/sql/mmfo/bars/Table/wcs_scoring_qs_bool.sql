@@ -67,6 +67,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SCORQSBOOL_SCORQUESTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_SCORING_QS_BOOL ADD CONSTRAINT FK_SCORQSBOOL_SCORQUESTS FOREIGN KEY (SCORING_ID, QUESTION_ID)
+	  REFERENCES BARS.WCS_SCORING_QUESTIONS (SCORING_ID, QUESTION_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SCORQSBOOL_IF0_NN ***
 begin   
  execute immediate '
@@ -105,10 +118,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SCORING_QS_BOOL ***
-grant SELECT                                                                 on WCS_SCORING_QS_BOOL to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SCORING_QS_BOOL to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SCORING_QS_BOOL to START1;
-grant SELECT                                                                 on WCS_SCORING_QS_BOOL to UPLD;
 
 
 

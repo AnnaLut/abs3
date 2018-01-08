@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.TMP_SALDODSW.LONG_I2 IS '';
 
 
 
-PROMPT *** Create  grants  TMP_SALDODSW ***
-grant SELECT                                                                 on TMP_SALDODSW    to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_SALDODSW    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

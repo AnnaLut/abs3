@@ -23,10 +23,8 @@ WHERE d.rnk  = c.rnk
   AND d.vidd IN (11,12,13) AND d.nd   = m.nd (+) ;
 
 PROMPT *** Create  grants  V_S080_3 ***
-grant SELECT                                                                 on V_S080_3        to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_S080_3        to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_S080_3        to RCC_DEAL;
-grant SELECT                                                                 on V_S080_3        to UPLD;
 
 
 

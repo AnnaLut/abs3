@@ -44,10 +44,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111499 ***
+PROMPT *** Create  constraint SYS_C00111501 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_REQUEST_STATE MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_REQUEST_STATE MODIFY (STATE_NAME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -68,10 +68,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111501 ***
+PROMPT *** Create  constraint SYS_C00111499 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_REQUEST_STATE MODIFY (STATE_NAME NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_REQUEST_STATE MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -92,10 +92,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  PFU_REQUEST_STATE ***
-grant SELECT                                                                 on PFU_REQUEST_STATE to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_REQUEST_STATE to UPLD;
 
 
 

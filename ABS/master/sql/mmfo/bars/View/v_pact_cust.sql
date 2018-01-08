@@ -16,10 +16,8 @@ where     ( nls like '20%' OR
             nls like '357%') and not exists (select 1 from V_DEP_CUST where rnk = asd.rnk);
 
 PROMPT *** Create  grants  V_PACT_CUST ***
-grant SELECT                                                                 on V_PACT_CUST     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PACT_CUST     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PACT_CUST     to START1;
-grant SELECT                                                                 on V_PACT_CUST     to UPLD;
 
 
 

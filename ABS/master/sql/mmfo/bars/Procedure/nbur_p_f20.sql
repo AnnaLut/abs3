@@ -18,12 +18,12 @@ is
 % DESCRIPTION : Процедура формирования #20 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.007  11.12.2017
+% VERSION     :  v.16.005  01.12.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.007  11.12.2017';
+  ver_          char(30)  := 'v.16.005  01.12.2017';
 /*
-   Періодичність: A013 = 1 Щоденна
-
+   Періодичність: A013 = 1 Щоденна 
+   
    Розріз консолідації: A014 = 3 Зведений за банк
 
    Структура показника    DDDDDDDD
@@ -36,10 +36,10 @@ is
    l_file_code     varchar2(2) := substr(p_file_code, 2, 2);
 BEGIN
     logger.info ('NBUR_P_F20 begin for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
-
+ 
     -- определение начальных параметров (код области или МФО или подразделение)
     nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 5, l_file_code, l_nbuc, l_type);
-
+                 
     BEGIN
        INSERT INTO nbur_detail_protocols (report_date,
                                           kf,
@@ -75,22 +75,22 @@ BEGIN
              NULL,
              NULL,
              branch
-        from (select a.cust_id,
+        from (select a.cust_id, 
                    a.acc_id,
                    a.kf,
                    a.acc_num,
                    a.kv,
                    a.nbs,
                    a.maturity_date,
-                   a.k030,
-                   a.r031,
-                   a.r011,
+                   a.k030, 
+                   a.r031, 
+                   a.r011, 
                    a.r013,
                    a.s181,
                    a.r016,
-                   a.ostq,
+                   a.ostq, 
                    a.t020,
-                   (case when substr(trim(b.ddd),1,3) in ('754') and a.kv = 840
+                   (case when substr(trim(b.ddd),1,3) in ('754') and a.kv = 840 
                             then substr(trim(b.ddd),1,7)||'4'
                          when substr(trim(b.ddd),1,3) in ('753','754','763','764') and a.kv = 978
                             then to_char(to_number(substr(trim(b.ddd),1,3)) + 2) ||
@@ -115,17 +115,17 @@ BEGIN
                      a.kv,
                      a.nbs,
                      a.maturity_date,
-                     c.k030,
-                     a.r034 r031,
-                     a.r011,
+                     c.k030, 
+                     a.r034 r031, 
+                     a.r011, 
                      (case when a.nbs in ('1406','1407','1416','1417','1426','1427','3016','3017',
-                                 '3116','3117','3216','3217') and a.r013 <>'1' then '1'
+                                 '3116','3117','3216','3217') and a.r013 <>'1' then '1' 
                            when a.nbs in ('1410','1420') and a.r013 <> '1' then '9'
                            else a.r013
-                     end) r013,
-                     (case when a.s180 = '0' and a.maturity_date is not null
+                     end) r013, 
+                     (case when a.s180 = '0' and a.maturity_date is not null 
                         then FS181(a.acc_id, p_report_date, a.s180)
-                        else a.s181 end) s181,
+                        else a.s181 end) s181, 
                      a.r016,
                      b.ostq,
                      (case sign(b.ostq) when -1 then '1' else '2' end) t020,
@@ -145,7 +145,7 @@ BEGIN
                      AND c.report_date = p_report_date
                      AND c.kf = p_kod_filii
                      and b.ostq <> 0) a
-            left outer join
+            left outer join 
             (select unique r020, t020, k030, r031, s181, r013, trim(ddd) ddd
             FROM kl_f20
             WHERE kf='20') b
@@ -154,8 +154,8 @@ BEGIN
                 b.k030 in ('X', a.k030) and
                 b.r031 in ('X', a.r031) and
                 b.s181 in ('X', a.s181) and
-                b.r013 in ('X', a.r013))
-            where (substr(a.nbs,1,2) in ('14','31') and
+                b.r013 in ('X', a.r013))                                      
+            where (substr(a.nbs,1,2) in ('14','31') and 
                        (substr(a.nbs,4,1) not in ('6','7') and a.r016 in ('10','90','99') OR
                         substr(a.nbs,4,1) in ('6','7') and a.r016 in ('10','90')) OR
                    substr(a.nbs,1,2) not in ('14','31')) and
@@ -170,17 +170,23 @@ BEGIN
                maturity_date <= to_date('31122008','ddmmyyyy') and
                ((substr(nbs,4,1) in ('6','7') and r011='1') OR
                  substr(nbs,4,1)='0')) and
-              (p_report_date < to_date('01122017','ddmmyyyy') and
+              (p_report_date < to_date('01122017','ddmmyyyy') and    
                substr(ddd,1,3) not in ( '821','822','823','824','825','826','827','831',
                                      '832','833','834','835','836','837','841','842',
                                      '843','844','845','846','847','851','852','853',
                                      '854','855','856','857','861','862','863','864',
                                      '865','866','867','871','872','873','874','875',
                                      '876','877') or
-               p_report_date >= to_date('01122017','ddmmyyyy') and
-               substr(ddd,1,3) in ('058','059','158','159',         -- 2601
-                                   '092','093','192','193',         -- 2700, 2701
-                                   '717','817','719','819'));          -- 2707, 2706
+               p_report_date >= to_date('01122017','ddmmyyyy') and    
+               substr(ddd,1,3) not in ( '821','822','823','824','825','826','827','831',
+                                     '832','833','834','835','836','837','841','842',
+                                     '843','844','845','846','847','851','852','853',
+                                     '854','855','856','857','861','862','863','864',
+                                     '865','866','867','871','872','873','874','875',
+                                     '876','877',
+                                     '058','059','158','159',         -- 2601
+                                     '092','093','192','193',         -- 2700, 2701
+                                     '717','817','719','819'));          -- 2707, 2706                     
     EXCEPTION
        WHEN OTHERS
        THEN

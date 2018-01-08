@@ -70,11 +70,9 @@ COMMENT ON COLUMN BARS.TMP_FILED1.DAT_PD IS 'Дата останнього руху';
 
 PROMPT *** Create  grants  TMP_FILED1 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FILED1      to ABS_ADMIN;
-grant SELECT                                                                 on TMP_FILED1      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FILED1      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_FILED1      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FILED1      to RPBN002;
-grant SELECT                                                                 on TMP_FILED1      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_FILED1      to WR_ALL_RIGHTS;
 
 

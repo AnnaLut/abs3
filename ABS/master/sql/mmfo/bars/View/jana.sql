@@ -22,10 +22,8 @@ where o.fdat=bankdate and
       o.txt in (a.fn_a,a.fn_b) and a.s>0;
 
 PROMPT *** Create  grants  JANA ***
-grant SELECT                                                                 on JANA            to BARSREADER_ROLE;
 grant SELECT                                                                 on JANA            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on JANA            to START1;
-grant SELECT                                                                 on JANA            to UPLD;
 
 
 

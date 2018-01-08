@@ -47,10 +47,8 @@ COMMENT ON COLUMN BARS.PEOPLE.FIO IS '';
 
 
 PROMPT *** Create  grants  PEOPLE ***
-grant SELECT                                                                 on PEOPLE          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PEOPLE          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PEOPLE          to START1;
-grant SELECT                                                                 on PEOPLE          to UPLD;
 
 
 

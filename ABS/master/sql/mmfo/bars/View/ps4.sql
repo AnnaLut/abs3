@@ -20,10 +20,8 @@ from ps
 );
 
 PROMPT *** Create  grants  PS4 ***
-grant SELECT                                                                 on PS4             to BARSREADER_ROLE;
 grant SELECT                                                                 on PS4             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PS4             to START1;
-grant SELECT                                                                 on PS4             to UPLD;
 
 
 

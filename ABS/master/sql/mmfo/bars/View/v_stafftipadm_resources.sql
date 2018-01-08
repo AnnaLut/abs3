@@ -26,9 +26,7 @@ PROMPT *** Create  view V_STAFFTIPADM_RESOURCES ***
 
 PROMPT *** Create  grants  V_STAFFTIPADM_RESOURCES ***
 grant SELECT                                                                 on V_STAFFTIPADM_RESOURCES to ABS_ADMIN;
-grant SELECT                                                                 on V_STAFFTIPADM_RESOURCES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFFTIPADM_RESOURCES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_STAFFTIPADM_RESOURCES to UPLD;
 
 
 

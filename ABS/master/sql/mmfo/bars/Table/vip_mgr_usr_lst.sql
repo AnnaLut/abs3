@@ -60,6 +60,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_VIPMGRUSRLST_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.VIP_MGR_USR_LST ADD CONSTRAINT FK_VIPMGRUSRLST_STAFF FOREIGN KEY (USR_ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_VIPMGRUSRLST_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.VIP_MGR_USR_LST ADD CONSTRAINT FK_VIPMGRUSRLST_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint UK_VIPMGRUSRLST ***
 begin   
  execute immediate '
@@ -88,10 +114,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  VIP_MGR_USR_LST ***
-grant SELECT                                                                 on VIP_MGR_USR_LST to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VIP_MGR_USR_LST to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VIP_MGR_USR_LST to START1;
-grant SELECT                                                                 on VIP_MGR_USR_LST to UPLD;
 grant FLASHBACK,SELECT                                                       on VIP_MGR_USR_LST to WR_REFREAD;
 
 

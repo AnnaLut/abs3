@@ -32,10 +32,8 @@ FROM
   );
 
 PROMPT *** Create  grants  V_BROW ***
-grant SELECT                                                                 on V_BROW          to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BROW          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BROW          to START1;
-grant SELECT                                                                 on V_BROW          to UPLD;
 
 
 

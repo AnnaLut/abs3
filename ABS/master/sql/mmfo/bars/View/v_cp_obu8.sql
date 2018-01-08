@@ -11,10 +11,8 @@ PROMPT *** Create  view V_CP_OBU8 ***
   (SELECT t."ID",t."ISIN",t."NBS_OLD",t."KV",t."REPO",t."D_K",t."PF_OLD",t."EMI",t."OKPO",t."AUKCION",t."DAT_K",t."NM_PROD",t."BV1",t."CENA0",t."KL1",t."N1",t."R1",t."D1",t."P1",t."Z1",t."S1",t."CF008_019",t."N2",t."KL2",t."KL_K2",t."CENA_K2",t."CF008_023",t."DAT_K2",t."NM_PROD2",t."N2_P",t."KL2_P",t."CF008_028",t."DAT_P2",t."NM_POK",t."CENA_P2",t."R2",t."S2",t."TR1_31",t."KL31",t."N31",t."R31",t."D31",t."P31",t."S31",t."Z31",t."IR31",t."DAT_PG",t."CF008_042",t."DAT_IR",t."KOT31",t."CF008_045",t."DAT_KOT",t."DAT_P4",t."SUMB4",t."NM_POK4",t."KL_P4",t."CENA_P4",t."N4",t."BV31",t."PV31",t."CF008_055",t."CF008_056",t."CF008_057",t."CF008_058",t."CF008_059",t."CF008_060",t."CF008_061",t."CF008_062",t."CF008_063",t."DNK",t."CF008_065",t."CF008_066",t."DAT_R",t."NLS",t."NMS",t."REF",t."REF2",t."VID_R",t."CENA_START",t."IR",t."OST_V",t."FL",t."USERID",t."NLS_S",t."D2",t."P2",t."S_D",t."S_C",t."NLS_P",t."S_DP",t."S_CP",t."OST_I",t."S_DK",t."S_CK",t."OST_P",t."NLS_P1",t."DAT_P",t."S_DP_NEW",t."S_CP_NEW",t."PAP",t."S_DK_NEW",t."S_CK_NEW",t."OST_PQ",t."OST_VQ",t."S_DQ",t."S_CQ",t."S_DKQ",t."S_CKQ",t."S_DPQ",t."S_CPQ",t."S_DPQ_NEW",t."S_CPQ_NEW",t."S_DKQ_NEW",t."S_CKQ_NEW",t."NBS_NEW",t."PF_NEW",t."OST_VT",t."OST_V31",t."CENA",t."CENA4",t."N0",t."D0",t."P0",t."R0",t."S0",t."D4",t."P4",t."R4",t."S4",t."Z4",t."KL0",t."KL4",t."DAT_4" FROM tmp_cp_obu t);
 
 PROMPT *** Create  grants  V_CP_OBU8 ***
-grant SELECT                                                                 on V_CP_OBU8       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_OBU8       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_OBU8       to START1;
-grant SELECT                                                                 on V_CP_OBU8       to UPLD;
 
 
 

@@ -20,11 +20,9 @@ where a.attribute_code = bav.attribute_code
   and length(b.branch)  = 1;
 
 PROMPT *** Create  grants  V_DEPRICATED_PARAMS$GLOBAL ***
-grant SELECT                                                                 on V_DEPRICATED_PARAMS$GLOBAL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DEPRICATED_PARAMS$GLOBAL to BARSUPL;
 grant SELECT                                                                 on V_DEPRICATED_PARAMS$GLOBAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DEPRICATED_PARAMS$GLOBAL to START1;
-grant SELECT                                                                 on V_DEPRICATED_PARAMS$GLOBAL to UPLD;
 
 
 

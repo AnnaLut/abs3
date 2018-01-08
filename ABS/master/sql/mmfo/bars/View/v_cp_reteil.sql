@@ -206,10 +206,8 @@ PROMPT *** Create  view V_CP_RETEIL ***
 		  ;
 
 PROMPT *** Create  grants  V_CP_RETEIL ***
-grant SELECT                                                                 on V_CP_RETEIL     to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_CP_RETEIL     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_RETEIL     to PYOD001;
-grant SELECT                                                                 on V_CP_RETEIL     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CP_RETEIL     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_CP_RETEIL     to WR_REFREAD;
 

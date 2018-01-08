@@ -78,9 +78,7 @@ COMMENT ON COLUMN BARS.ERR$_OPLDOK.ID IS '';
 
 
 PROMPT *** Create  grants  ERR$_OPLDOK ***
-grant SELECT                                                                 on ERR$_OPLDOK     to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_OPLDOK     to BARS_DM;
-grant SELECT                                                                 on ERR$_OPLDOK     to UPLD;
 
 
 

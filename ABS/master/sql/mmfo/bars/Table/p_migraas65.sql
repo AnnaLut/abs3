@@ -55,9 +55,7 @@ COMMENT ON COLUMN BARS.P_MIGRAAS65.PROV_SQL IS 'Имя вюшки - Проверочный SQL';
 
 
 PROMPT *** Create  grants  P_MIGRAAS65 ***
-grant SELECT                                                                 on P_MIGRAAS65     to BARSREADER_ROLE;
 grant SELECT                                                                 on P_MIGRAAS65     to BARS_DM;
-grant SELECT                                                                 on P_MIGRAAS65     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on P_MIGRAAS65     to WR_ALL_RIGHTS;
 
 

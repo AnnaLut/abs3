@@ -26,10 +26,6 @@ PROMPT *** Create  view V_OTC_W4_ND_ACC ***
                      ACC_OVR,
                      ACC_PK));
 
-PROMPT *** Create  grants  V_OTC_W4_ND_ACC ***
-grant SELECT                                                                 on V_OTC_W4_ND_ACC to BARSREADER_ROLE;
-grant SELECT                                                                 on V_OTC_W4_ND_ACC to UPLD;
-
 
 
 PROMPT ===================================================================================== 

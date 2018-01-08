@@ -14,10 +14,8 @@ where o.tabid = m.tabid (+) and  o.type = t.type  (+)
 and  exists (select 1 from REFAPP  where codeapp = PUL.GET('ARM') and  tabid  = o.tabid);
 
 PROMPT *** Create  grants  M_ROLE_AR ***
-grant SELECT                                                                 on M_ROLE_AR       to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_AR       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on M_ROLE_AR       to START1;
-grant SELECT                                                                 on M_ROLE_AR       to UPLD;
 
 
 

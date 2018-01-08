@@ -102,9 +102,7 @@ select 'FACT' doc_type, o.ref, o.tt, o.vob, o.nd, o.vdat, o.dk,
 
 PROMPT *** Create  grants  V_SW_CORRACC_DOCS ***
 grant SELECT                                                                 on V_SW_CORRACC_DOCS to BARS013;
-grant SELECT                                                                 on V_SW_CORRACC_DOCS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW_CORRACC_DOCS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_SW_CORRACC_DOCS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SW_CORRACC_DOCS to WR_ALL_RIGHTS;
 
 

@@ -77,10 +77,6 @@ COMMENT ON COLUMN BARS.ERR$_SB_P0851.ORA_ERR_NUMBER$ IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SB_P0851 ***
-grant SELECT                                                                 on ERR$_SB_P0851   to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SB_P0851   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

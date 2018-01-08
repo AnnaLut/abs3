@@ -69,10 +69,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_QUEUEFORMS_ID ***
+PROMPT *** Create  constraint UK_QUEUEFORMS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_QUEUE_FORMS MODIFY (ID CONSTRAINT CC_QUEUEFORMS_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_QUEUE_FORMS ADD CONSTRAINT UK_QUEUEFORMS UNIQUE (ID, REPORT_DATE, KF, STATUS)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS NOLOGGING 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -93,12 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_QUEUEFORMS ***
+PROMPT *** Create  constraint CC_QUEUEFORMS_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_QUEUE_FORMS ADD CONSTRAINT UK_QUEUEFORMS UNIQUE (ID, REPORT_DATE, KF, STATUS)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS NOLOGGING 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.NBUR_QUEUE_FORMS MODIFY (ID CONSTRAINT CC_QUEUEFORMS_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -121,9 +121,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_QUEUE_FORMS ***
-grant SELECT                                                                 on NBUR_QUEUE_FORMS to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_QUEUE_FORMS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on NBUR_QUEUE_FORMS to UPLD;
 
 
 

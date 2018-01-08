@@ -63,10 +63,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_KREDBORG ***
-grant SELECT                                                                 on FM_KREDBORG     to BARSREADER_ROLE;
 grant SELECT                                                                 on FM_KREDBORG     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_KREDBORG     to BARS_DM;
-grant SELECT                                                                 on FM_KREDBORG     to UPLD;
 
 
 

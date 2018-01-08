@@ -40,10 +40,8 @@ FROM v_gl   WHERE nbs = '9760'  AND dazs IS NULL     AND kv = 980
  AND branch = SYS_CONTEXT ('bars_context', 'user_branch');
 
 PROMPT *** Create  grants  V_9760 ***
-grant SELECT                                                                 on V_9760          to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_9760          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_9760          to PYOD001;
-grant SELECT                                                                 on V_9760          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_9760          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_9760          to WR_REFREAD;
 

@@ -115,11 +115,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_STAN ***
-grant SELECT                                                                 on FIN_STAN        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_STAN        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_STAN        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_STAN        to START1;
-grant SELECT                                                                 on FIN_STAN        to UPLD;
 
 
 

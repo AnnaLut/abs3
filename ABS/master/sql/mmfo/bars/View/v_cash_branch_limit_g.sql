@@ -71,11 +71,9 @@ PROMPT *** Create  view V_CASH_BRANCH_LIMIT_G ***
        );
 
 PROMPT *** Create  grants  V_CASH_BRANCH_LIMIT_G ***
-grant SELECT                                                                 on V_CASH_BRANCH_LIMIT_G to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CASH_BRANCH_LIMIT_G to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CASH_BRANCH_LIMIT_G to RPBN001;
 grant SELECT                                                                 on V_CASH_BRANCH_LIMIT_G to START1;
-grant SELECT                                                                 on V_CASH_BRANCH_LIMIT_G to UPLD;
 
 
 

@@ -15,10 +15,8 @@ PROMPT *** Create  view V_VQB_META_COLUMNS ***
     WHERE (c.coltype=t.coltype) AND (c.semantic IS NOT NULL);
 
 PROMPT *** Create  grants  V_VQB_META_COLUMNS ***
-grant SELECT                                                                 on V_VQB_META_COLUMNS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_VQB_META_COLUMNS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_VQB_META_COLUMNS to START1;
-grant SELECT                                                                 on V_VQB_META_COLUMNS to UPLD;
 
 
 

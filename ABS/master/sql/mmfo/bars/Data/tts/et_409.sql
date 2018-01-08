@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('409', '409-Комісія банку за прийняту виручку від клієнтів 6110/80', 0, '#(nbs_ob22 (''6510'',''80''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(nbs_ob22 (''6510'',''80''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, null, null, 5, null, null, null, '1100100001000000000000000000000000010000000000000000000000000000', 'Комісія банку за прийняту виручку від клієнтів, крім корпоративних');
+    values ('409', '409-Комісія банку за прийняту виручку від клієнтів 6110/80', 0, '#(nbs_ob22 (''6110'',''80''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(nbs_ob22 (''6110'',''80''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, null, null, 5, null, null, null, '1100100001000000000000000000000000010000000000000000000000000000', 'Комісія банку за прийняту виручку від клієнтів, крім корпоративних');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='409', name='409-Комісія банку за прийняту виручку від клієнтів 6110/80', dk=0, nlsm='#(nbs_ob22 (''6510'',''80''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''6510'',''80''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=5, proc=null, s3800=null, rang=null, flags='1100100001000000000000000000000000010000000000000000000000000000', nazn='Комісія банку за прийняту виручку від клієнтів, крім корпоративних'
+         set tt='409', name='409-Комісія банку за прийняту виручку від клієнтів 6110/80', dk=0, nlsm='#(nbs_ob22 (''6110'',''80''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''6110'',''80''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=5, proc=null, s3800=null, rang=null, flags='1100100001000000000000000000000000010000000000000000000000000000', nazn='Комісія банку за прийняту виручку від клієнтів, крім корпоративних'
        where tt='409';
   end;
   --------------------------------
@@ -121,12 +121,12 @@ begin
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6510', '409', 1);
+    values ('6110', '409', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''409'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''409'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;

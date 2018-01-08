@@ -114,10 +114,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  MWAY_ERRORS ***
-grant SELECT                                                                 on MWAY_ERRORS     to BARSREADER_ROLE;
-grant SELECT                                                                 on MWAY_ERRORS     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

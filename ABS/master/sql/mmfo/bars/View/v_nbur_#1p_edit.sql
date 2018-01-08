@@ -24,9 +24,7 @@ PROMPT *** Create  view V_NBUR_#1P_EDIT ***
     WHERE p.kodf = '1P';
 
 PROMPT *** Create  grants  V_NBUR_#1P_EDIT ***
-grant SELECT                                                                 on V_NBUR_#1P_EDIT to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_NBUR_#1P_EDIT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_NBUR_#1P_EDIT to UPLD;
 grant FLASHBACK,SELECT                                                       on V_NBUR_#1P_EDIT to WR_REFREAD;
 
 

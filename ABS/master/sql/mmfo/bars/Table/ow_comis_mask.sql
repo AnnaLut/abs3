@@ -79,6 +79,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OWCOMISMASK_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_COMIS_MASK ADD CONSTRAINT FK_OWCOMISMASK_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OWCOMISMASK_BRANCH_NN ***
 begin   
  execute immediate '
@@ -129,11 +142,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_COMIS_MASK ***
-grant SELECT                                                                 on OW_COMIS_MASK   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_COMIS_MASK   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_COMIS_MASK   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_COMIS_MASK   to OW;
-grant SELECT                                                                 on OW_COMIS_MASK   to UPLD;
 
 
 

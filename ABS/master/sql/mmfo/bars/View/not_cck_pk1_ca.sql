@@ -38,10 +38,8 @@ PROMPT *** Create  view NOT_CCK_PK1_CA ***
                               WHERE   ACC_2208 IS NOT NULL));
 
 PROMPT *** Create  grants  NOT_CCK_PK1_CA ***
-grant SELECT                                                                 on NOT_CCK_PK1_CA  to BARSREADER_ROLE;
 grant SELECT                                                                 on NOT_CCK_PK1_CA  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NOT_CCK_PK1_CA  to START1;
-grant SELECT                                                                 on NOT_CCK_PK1_CA  to UPLD;
 
 
 

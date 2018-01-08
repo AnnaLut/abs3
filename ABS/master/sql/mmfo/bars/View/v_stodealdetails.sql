@@ -47,10 +47,8 @@ PROMPT *** Create  view V_STODEALDETAILS ***
           AND D.STATUS_ID = 1;
 
 PROMPT *** Create  grants  V_STODEALDETAILS ***
-grant SELECT                                                                 on V_STODEALDETAILS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STODEALDETAILS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_STODEALDETAILS to STO;
-grant SELECT                                                                 on V_STODEALDETAILS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_STODEALDETAILS to WR_ALL_RIGHTS;
 
 

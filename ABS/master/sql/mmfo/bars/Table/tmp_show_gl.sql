@@ -53,12 +53,10 @@ COMMENT ON COLUMN BARS.TMP_SHOW_GL.OSTK IS '';
 
 
 PROMPT *** Create  grants  TMP_SHOW_GL ***
-grant SELECT                                                                 on TMP_SHOW_GL     to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_SHOW_GL     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_SHOW_GL     to BARS_DM;
 grant SELECT                                                                 on TMP_SHOW_GL     to CUST001;
 grant SELECT                                                                 on TMP_SHOW_GL     to SALGL;
-grant SELECT                                                                 on TMP_SHOW_GL     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_SHOW_GL     to WR_ALL_RIGHTS;
 
 

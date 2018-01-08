@@ -53,10 +53,6 @@ COMMENT ON COLUMN BARS.ERR$_ACC_NLO.ACC IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ACC_NLO ***
-grant SELECT                                                                 on ERR$_ACC_NLO    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ACC_NLO    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

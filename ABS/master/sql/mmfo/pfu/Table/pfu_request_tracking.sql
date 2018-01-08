@@ -39,34 +39,23 @@ COMMENT ON COLUMN PFU.PFU_REQUEST_TRACKING.ERROR_STACK IS '';
 
 
 
+PROMPT *** Create  constraint FK_REQ_TRACK_REF_REQUEST ***
+begin   
+ execute immediate '
+  ALTER TABLE PFU.PFU_REQUEST_TRACKING ADD CONSTRAINT FK_REQ_TRACK_REF_REQUEST FOREIGN KEY (REQUEST_ID)
+	  REFERENCES PFU.PFU_REQUEST (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C00111507 ***
 begin   
  execute immediate '
   ALTER TABLE PFU.PFU_REQUEST_TRACKING MODIFY (ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00111508 ***
-begin   
- execute immediate '
-  ALTER TABLE PFU.PFU_REQUEST_TRACKING MODIFY (REQUEST_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00111509 ***
-begin   
- execute immediate '
-  ALTER TABLE PFU.PFU_REQUEST_TRACKING MODIFY (SYS_TIME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -89,6 +78,30 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint SYS_C00111509 ***
+begin   
+ execute immediate '
+  ALTER TABLE PFU.PFU_REQUEST_TRACKING MODIFY (SYS_TIME NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C00111508 ***
+begin   
+ execute immediate '
+  ALTER TABLE PFU.PFU_REQUEST_TRACKING MODIFY (REQUEST_ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_PFU_REQUEST_TRACKING ***
 begin   
  execute immediate '
@@ -101,10 +114,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  PFU_REQUEST_TRACKING ***
-grant SELECT                                                                 on PFU_REQUEST_TRACKING to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_REQUEST_TRACKING to UPLD;
 
 
 

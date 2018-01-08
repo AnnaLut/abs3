@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K30', 'K30 Комісія за поповнення MASTER CARD (15грн.)', 0, '#(nbs_ob22 (''6510'',''51''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(nbs_ob22 (''6510'',''51''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, 'F_TARIF(26, #(KVA), #(NLSA), #(S) )', null, 5, null, null, null, '0100100001000000000000000000000000010000000000000000000000000000', 'Комісія за поповнення ПК');
+    values ('K30', 'K30 Комісія за поповнення MASTER CARD (15грн.)', 0, '#(nbs_ob22 (''6110'',''51''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(nbs_ob22 (''6110'',''51''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, 'F_TARIF(26, #(KVA), #(NLSA), #(S) )', null, 5, null, null, null, '0100100001000000000000000000000000010000000000000000000000000000', 'Комісія за поповнення ПК');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K30', name='K30 Комісія за поповнення MASTER CARD (15грн.)', dk=0, nlsm='#(nbs_ob22 (''6510'',''51''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''6510'',''51''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(26, #(KVA), #(NLSA), #(S) )', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100001000000000000000000000000010000000000000000000000000000', nazn='Комісія за поповнення ПК'
+         set tt='K30', name='K30 Комісія за поповнення MASTER CARD (15грн.)', dk=0, nlsm='#(nbs_ob22 (''6110'',''51''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''6110'',''51''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(26, #(KVA), #(NLSA), #(S) )', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100001000000000000000000000000010000000000000000000000000000', nazn='Комісія за поповнення ПК'
        where tt='K30';
   end;
   --------------------------------

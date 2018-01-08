@@ -54,7 +54,8 @@ PROMPT *** Create  view PROVODKI_OTC ***
           tts t,
           accounts ad,
           accounts ak,
-          (SELECT od.fdat,
+          (SELECT /*+ parallel(8)*/
+                 od.fdat,
                   od.REF,
                   od.stmt,
                   od.tt,
@@ -64,7 +65,8 @@ PROMPT *** Create  view PROVODKI_OTC ***
                   od.acc accd,
                   ok.acc acck
              FROM opldok od
-                  JOIN opldok ok
+                  JOIN
+                  opldok ok
                      ON (    OD.KF = ok.kf
                          AND OD.REF = ok.REF
                          AND od.stmt = ok.stmt
@@ -76,9 +78,7 @@ PROMPT *** Create  view PROVODKI_OTC ***
           AND o.acck = ak.acc;
 
 PROMPT *** Create  grants  PROVODKI_OTC ***
-grant SELECT                                                                 on PROVODKI_OTC    to BARSREADER_ROLE;
 grant SELECT                                                                 on PROVODKI_OTC    to BARSUPL;
-grant SELECT                                                                 on PROVODKI_OTC    to UPLD;
 
 
 

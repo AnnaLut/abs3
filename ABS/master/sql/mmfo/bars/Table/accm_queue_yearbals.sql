@@ -87,7 +87,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACCM_QUEUE_YEARBALS ***
-grant SELECT                                                                 on ACCM_QUEUE_YEARBALS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_QUEUE_YEARBALS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCM_QUEUE_YEARBALS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_QUEUE_YEARBALS to START1;

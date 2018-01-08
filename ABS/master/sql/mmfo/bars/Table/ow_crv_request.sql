@@ -49,10 +49,12 @@ COMMENT ON COLUMN BARS.OW_CRV_REQUEST.NAME IS 'Наименование запроса';
 
 
 
-PROMPT *** Create  constraint CC_OWCRVREQUEST_NAME_NN ***
+PROMPT *** Create  constraint PK_OWCRVREQUEST ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OW_CRV_REQUEST ADD CONSTRAINT CC_OWCRVREQUEST_NAME_NN CHECK (name is not null) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.OW_CRV_REQUEST ADD CONSTRAINT PK_OWCRVREQUEST PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -61,12 +63,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_OWCRVREQUEST ***
+PROMPT *** Create  constraint CC_OWCRVREQUEST_NAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OW_CRV_REQUEST ADD CONSTRAINT PK_OWCRVREQUEST PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD  ENABLE';
+  ALTER TABLE BARS.OW_CRV_REQUEST ADD CONSTRAINT CC_OWCRVREQUEST_NAME_NN CHECK (name is not null) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_CRV_REQUEST ***
-grant SELECT                                                                 on OW_CRV_REQUEST  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_CRV_REQUEST  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_CRV_REQUEST  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_CRV_REQUEST  to OW;
-grant SELECT                                                                 on OW_CRV_REQUEST  to UPLD;
 
 
 

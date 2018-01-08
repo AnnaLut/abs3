@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Реєстр довіреностей на підписання кредитних договорів';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'WCS_POWER_OF_ATTORNEYS';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,22 +119,22 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACTIVE', 'N', 'Флаг активності', '', 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Код відділення', '', 30, 1, 1, 1, 0, 1, '', '', 1, 1, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'FIO', 'C', 'ФИО підписанта', '', 255, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'FIO_R', 'C', 'ФИО підписанта (скорочене) у род. відм.', '', 255, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'ORD', 'N', 'Порядок', '', 22, 2, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'POA_DATE', 'D', 'Дата довіренності', '', 10, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'POA_NOTARY', 'C', 'Звання та ФІО нотаріуса який посвідчив довіреність', '', 255, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'POA_NOTARY_NUM', 'C', 'Номер в реєстрі нотаріуса який посвідчив довіреніс', '', 255, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'POST', 'C', 'Посада підписанта', '', 255, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'POST_R', 'C', 'Посада підписанта у род. відм.', '', 255, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'BRANCH_ADR', 'C', 'Адреса відділення', '', 255, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'BRANCH_LOC', 'C', 'Населений пункт відділення', '', 255, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'BRANCH_NAME', 'C', 'Назва відділення, для друку договорів', '', 255, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'POA_DOC', 'C', 'Документ що підтверджує повноваження у орудному відмінку з маленької літери', '', 255, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'DISTRICT_NAME', 'C', 'Назва нотаріального округу (у род. відм.)', '', 255, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'POA_CERT', 'D', 'Дата посвідчення довіреності', '', 10, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACTIVE', 'N', 'Флаг активності', null, 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Код відділення', null, 30, 1, 1, 1, 0, 1, '', '', 1, 1, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'FIO', 'C', 'ФИО підписанта', null, 255, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'FIO_R', 'C', 'ФИО підписанта (скорочене) у род. відм.', null, 255, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'ORD', 'N', 'Порядок', null, 22, 2, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'POA_DATE', 'D', 'Дата довіренності', null, 10, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'POA_NOTARY', 'C', 'Звання та ФІО нотаріуса який посвідчив довіреність', null, 255, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'POA_NOTARY_NUM', 'C', 'Номер в реєстрі нотаріуса який посвідчив довіреніс', null, 255, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'POST', 'C', 'Посада підписанта', null, 255, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'POST_R', 'C', 'Посада підписанта у род. відм.', null, 255, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'BRANCH_ADR', 'C', 'Адреса відділення', null, 255, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'BRANCH_LOC', 'C', 'Населений пункт відділення', null, 255, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'BRANCH_NAME', 'C', 'Назва відділення, для друку договорів', null, 255, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'POA_DOC', 'C', 'Документ що підтверджує повноваження у орудному відмінку з маленької літери', null, 255, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'DISTRICT_NAME', 'C', 'Назва нотаріального округу (у род. відм.)', null, 255, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'POA_CERT', 'D', 'Дата посвідчення довіреності', null, 10, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('BRANCH');

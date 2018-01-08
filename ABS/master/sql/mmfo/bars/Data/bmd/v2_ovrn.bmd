@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'OVRN-2) Учасники <<Солідарного>> Овердрафту';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'V2_OVRN';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,39 +119,39 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACCC', 'N', 'Консол~рах~ACC8', '', null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CC_ID', 'C', 'Зовн.№~дог', '', null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'IRA', 'N', 'Ставка~~ОВЕР', '.5', null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'SetProcParN( :ACC, 1, STRING_Null, STRING_Null)', 0);
-  bars_metabase.add_column(l_tabid, 6, 'IRP', 'N', 'Ставка~винаг.~ПАС', '.5', null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'SetProcParN( :ACC, 1, STRING_Null, STRING_Null)', 0);
-  bars_metabase.add_column(l_tabid, 7, 'KV', 'N', 'Вал', '.3', null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'LIM', 'N', 'Інд.лім~Початк', '1.3', null, 5, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', 'FunNSIEditFFiltered("V3_OVRN[PROC=>OVRN.PUL_OVR( 2, "||Str(:ND)||","||Str(:ACC)||")][EXEC=>BEFORE]",0,"nd="||Str(:ND)||" and acc="||Str(:ACC) )', 0);
-  bars_metabase.add_column(l_tabid, 10, 'ND', 'N', 'Реф.дог~гол.угоди', '', null, 34, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NLS', 'C', 'Рахунок~учасника', '1.5', null, 1, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'Sel027 ( hWndMDI, 1, :ND, Str( :RNK ),Str( :ACC )  ) ', 0);
-  bars_metabase.add_column(l_tabid, 12, 'OSTC', 'N', 'Власний~залишок~----------~ Установка STOP', '1.3', null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, 'sPar=[PROC=>OVRN.STOP(1,:ND,:ACC,:NLS,:KV,:X)][PAR=>:X(SEM=Підстава)][EXEC=>BEFORE][QST=>Установити Блокування  :NLS ?][MSG=>ОК, Буде Заблоковоно ліміти всім учасникам !]
+  bars_metabase.add_column(l_tabid, 1, 'ACCC', 'N', 'Консол~рах~ACC8', null, null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CC_ID', 'C', 'Зовн.№~дог', null, null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'IRA', 'N', 'Ставка~~ОВЕР', .5, null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'SetProcParN( :ACC, 1, STRING_Null, STRING_Null)', 0);
+  bars_metabase.add_column(l_tabid, 6, 'IRP', 'N', 'Ставка~винаг.~ПАС', .5, null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'SetProcParN( :ACC, 1, STRING_Null, STRING_Null)', 0);
+  bars_metabase.add_column(l_tabid, 7, 'KV', 'N', 'Вал', .3, null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'LIM', 'N', 'Інд.лім~Початк', 1.3, null, 5, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', 'FunNSIEditFFiltered("V3_OVRN[PROC=>OVRN.PUL_OVR( 2, "||Str(:ND)||","||Str(:ACC)||")][EXEC=>BEFORE]",0,"nd="||Str(:ND)||" and acc="||Str(:ACC) )', 0);
+  bars_metabase.add_column(l_tabid, 10, 'ND', 'N', 'Реф.дог~гол.угоди', null, null, 34, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NLS', 'C', 'Рахунок~учасника', 1.5, null, 1, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'Sel027 ( hWndMDI, 1, :ND, Str( :RNK ),Str( :ACC )  ) ', 0);
+  bars_metabase.add_column(l_tabid, 12, 'OSTC', 'N', 'Власний~залишок~----------~ Установка STOP', 1.3, null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, 'sPar=[PROC=>OVRN.STOP(1,:ND,:ACC,:NLS,:KV,:X)][PAR=>:X(SEM=Підстава)][EXEC=>BEFORE][QST=>Установити Блокування  :NLS ?][MSG=>ОК, Буде Заблоковоно ліміти всім учасникам !]
 ', 'FunNSIEdit("[PROC=>OVRN.STOP( 1, :ND, :ACC, :NLS, :KV, :X )][PAR=>:X(SEM=Підстава)][QST=>Установити Блокування рах."|| :NLS ||".  ?][MSG=>ОК, Буде Заблоковоно ліміти всім учасникам !]")', 0);
-  bars_metabase.add_column(l_tabid, 13, 'OST_FREE', 'N', 'Власний~ресурс~----------~ Відміна STOP', '1.3', null, 24, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, 'sPar=[PROC=>OVRN.STOP(0,:ND,:ACC,:NLS,:KV,:X)][PAR=>:X(SEM=Підстава)][EXEC=>BEFORE][QST=>Відмінити Блокування  :NLS ?][MSG=>ОК, Буде Відновлено ліміти всім учасникам !]
+  bars_metabase.add_column(l_tabid, 13, 'OST_FREE', 'N', 'Власний~ресурс~----------~ Відміна STOP', 1.3, null, 24, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, 'sPar=[PROC=>OVRN.STOP(0,:ND,:ACC,:NLS,:KV,:X)][PAR=>:X(SEM=Підстава)][EXEC=>BEFORE][QST=>Відмінити Блокування  :NLS ?][MSG=>ОК, Буде Відновлено ліміти всім учасникам !]
 ', 'FunNSIEdit("[PROC=>OVRN.STOP( 0, :ND, :ACC, :NLS, :KV, :X )][PAR=>:X(SEM=Підстава)][QST=>Відмінити Блокування  рах."|| :NLS ||".  ?][MSG=>ОК, Буде Відновлено ліміти всім учасникам !]")', 0);
-  bars_metabase.add_column(l_tabid, 14, 'RNK', 'N', 'РНК~гол.угоди', '', null, 37, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'SDATE', 'D', 'Дата~початку дії', '', null, 32, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'SOS', 'N', 'Стан~гол.угоди', '', null, 36, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'WDATE', 'D', 'Дата~завешення', '', null, 33, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'ACC', 'N', 'ACC~---------~ВИПИСКА~ПО РАХ', '', null, 99, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=1', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions," a.acc = :ACC " )', 0);
-  bars_metabase.add_column(l_tabid, 19, 'RNK1', 'N', 'РНК~учасн~----------~КАРТКА', '1', null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/clientregister/registration.aspx?readonly=1'||chr(38)||'rnk=:RNK1', 'EditCustomer( 2 , NUMBER_Null, :RNK1, CVIEW_ReadOnly, hWndForm, 0, "", FALSE)', 0);
-  bars_metabase.add_column(l_tabid, 20, 'NMK1', 'C', 'Клєнт-учасник~-------~ШАБЛОН ПОВІД~ПРО ЗМІНУ ГЛО', '2', null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=VZ_OVRN[NSIFUNCTION][ACCESSCODE=>1][PROC=>OVRN.PUL_OVR(2,:ND,:ACC)][EXEC=>BEFORE][showDialogWindow=>false]', 'FunNSIEditF("VZ_OVRN[PROC=>OVRN.PUL_OVR( 2, "||Str(:ND)||","||Str(:ACC)||")][EXEC=>BEFORE]" , 2  )', 0);
-  bars_metabase.add_column(l_tabid, 21, 'TERM', 'N', 'Погодж.~СБК~кіл.днів', '.5', null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'MDATE', 'D', 'План-дата~обнул.ОВР', '1.3', null, 26, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'DATVZ', 'D', 'Факт-дата~виник.ОВР', '1.3', null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'DATSP', 'D', 'План-дата~просрочки', '1.3', null, 27, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'SP/100', 'N', 'Простр~ОВР', '1', null, 28, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'SPN/100', 'N', 'Простр.%%', '1', null, 29, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'RLIM', 'D', 'Дата зміни~ліміту~----------~ЧКО по міс', '1.2', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=V6_OVRN[NSIFUNCTION][ACCESSCODE=>0][PROC=>PUL.Set_Mas_Ini(''ACC26'',:ACC,''ACC262'')][EXEC=>BEFORE][showDialogWindow=>false]', 'FunNSIEditF("V6_OVRN[PROC=>PUL.Set_Mas_Ini(''ACC26'','' "||Str(:ACC)||"'',''ACC262'')][EXEC=>BEFORE]",0)', 0);
-  bars_metabase.add_column(l_tabid, 29, 'OKPO', 'C', 'Ід код~клієнта', '1.2', null, 30, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', 'FunNSIEdit("[PROC=>OVRN.DEL_slave(:ND,:ACC,:NLS,:KV)][QST=>Вилучити учасника :NMK1 ?][MSG=>Всі параметри угоди відмінено !]")', 0);
-  bars_metabase.add_column(l_tabid, 30, 'PK', 'N', 'Ліміт~ від ЧКО~(%)', '.5', null, 7, 0, 0, 0, 0, '', '#0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'TARIF', 'C', 'Комісійна~винагорода~----------~ТАРИФИ', '.9', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=V8_OVRN[NSIFUNCTION][ACCESSCODE=>2][PROC=>OVRN.PUL_OVR(2,:ND,:ACC)][EXEC=>BEFORE][showDialogWindow=>false]', 'FunNSIEditF("V8_OVRN[PROC=>OVRN.PUL_OVR( 2, "||Str(:ND)||","||Str(:ACC)||")][EXEC=>BEFORE]" , 2  )', 0);
-  bars_metabase.add_column(l_tabid, 32, 'DONOR', 'B', 'Учасник ГК~Без~оверд.', '.5', null, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'IRB', 'N', 'Баз.~% ст~ПАС', '.5', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 34, 'NK', 'N', 'Нов/~Діюч~1/0', '.5', null, 4, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'ACC_ADD', 'C', 'Додаткові~рахунки ЧКО', '2.5', null, 38, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=V_OVR_ACC_ADD[CONDITIONS=>(V_OVR_ACC_ADD.acc = :ACC)][NSIFUNCTION][ACCESSCODE=>2][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'RNK', 'N', 'РНК~гол.угоди', null, null, 37, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'SDATE', 'D', 'Дата~початку дії', null, null, 32, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'SOS', 'N', 'Стан~гол.угоди', null, null, 36, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'WDATE', 'D', 'Дата~завешення', null, null, 33, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'ACC', 'N', 'ACC~---------~ВИПИСКА~ПО РАХ', null, null, 99, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=1', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions," a.acc = :ACC " )', 0);
+  bars_metabase.add_column(l_tabid, 19, 'RNK1', 'N', 'РНК~учасн~----------~КАРТКА', 1, null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/clientregister/registration.aspx?readonly=1'||chr(38)||'rnk=:RNK1', 'EditCustomer( 2 , NUMBER_Null, :RNK1, CVIEW_ReadOnly, hWndForm, 0, "", FALSE)', 0);
+  bars_metabase.add_column(l_tabid, 20, 'NMK1', 'C', 'Клєнт-учасник~-------~ШАБЛОН ПОВІД~ПРО ЗМІНУ ГЛО', 2, null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=VZ_OVRN[NSIFUNCTION][ACCESSCODE=>1][PROC=>OVRN.PUL_OVR(2,:ND,:ACC)][EXEC=>BEFORE][showDialogWindow=>false]', 'FunNSIEditF("VZ_OVRN[PROC=>OVRN.PUL_OVR( 2, "||Str(:ND)||","||Str(:ACC)||")][EXEC=>BEFORE]" , 2  )', 0);
+  bars_metabase.add_column(l_tabid, 21, 'TERM', 'N', 'Погодж.~СБК~кіл.днів', .5, null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'MDATE', 'D', 'План-дата~обнул.ОВР', 1.3, null, 26, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'DATVZ', 'D', 'Факт-дата~виник.ОВР', 1.3, null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'DATSP', 'D', 'План-дата~просрочки', 1.3, null, 27, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'SP/100', 'N', 'Простр~ОВР', 1, null, 28, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'SPN/100', 'N', 'Простр.%%', 1, null, 29, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'RLIM', 'D', 'Дата зміни~ліміту~----------~ЧКО по міс', 1.2, null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=V6_OVRN[NSIFUNCTION][ACCESSCODE=>0][PROC=>PUL.Set_Mas_Ini(''ACC26'',:ACC,''ACC262'')][EXEC=>BEFORE][showDialogWindow=>false]', 'FunNSIEditF("V6_OVRN[PROC=>PUL.Set_Mas_Ini(''ACC26'','' "||Str(:ACC)||"'',''ACC262'')][EXEC=>BEFORE]",0)', 0);
+  bars_metabase.add_column(l_tabid, 29, 'OKPO', 'C', 'Ід код~клієнта', 1.2, null, 30, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', 'FunNSIEdit("[PROC=>OVRN.DEL_slave(:ND,:ACC,:NLS,:KV)][QST=>Вилучити учасника :NMK1 ?][MSG=>Всі параметри угоди відмінено !]")', 0);
+  bars_metabase.add_column(l_tabid, 30, 'PK', 'N', 'Ліміт~ від ЧКО~(%)', .5, null, 7, 0, 0, 0, 0, '', '#0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'TARIF', 'C', 'Комісійна~винагорода~----------~ТАРИФИ', .9, null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=V8_OVRN[NSIFUNCTION][ACCESSCODE=>2][PROC=>OVRN.PUL_OVR(2,:ND,:ACC)][EXEC=>BEFORE][showDialogWindow=>false]', 'FunNSIEditF("V8_OVRN[PROC=>OVRN.PUL_OVR( 2, "||Str(:ND)||","||Str(:ACC)||")][EXEC=>BEFORE]" , 2  )', 0);
+  bars_metabase.add_column(l_tabid, 32, 'DONOR', 'B', 'Учасник ГК~Без~оверд.', .5, null, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'IRB', 'N', 'Баз.~% ст~ПАС', .5, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'NK', 'N', 'Нов/~Діюч~1/0', .5, null, 4, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'ACC_ADD', 'C', 'Додаткові~рахунки ЧКО', 2.5, null, 38, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=V_OVR_ACC_ADD[CONDITIONS=>(V_OVR_ACC_ADD.acc = :ACC)][NSIFUNCTION][ACCESSCODE=>2][showDialogWindow=>false]', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('YES_NO');

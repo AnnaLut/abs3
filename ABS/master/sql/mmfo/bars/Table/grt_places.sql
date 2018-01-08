@@ -89,10 +89,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRT_PLACES ***
-grant SELECT                                                                 on GRT_PLACES      to BARSREADER_ROLE;
 grant SELECT                                                                 on GRT_PLACES      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRT_PLACES      to BARS_DM;
-grant SELECT                                                                 on GRT_PLACES      to UPLD;
 
 
 

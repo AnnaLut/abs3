@@ -73,9 +73,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  REGIONS ***
-grant SELECT                                                                 on REGIONS         to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

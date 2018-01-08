@@ -7,23 +7,24 @@
   CREATE OR REPLACE FUNCTION BARS.NBS_OB22_RKO 
 (p_nbs2 accounts.nbs%type ,  -- Бал. искомого лицевого счета
  p_ob22 accounts.ob22%type,  -- OB22 искомого лицевого счета
- p_nls1 accounts.nls%type ,             -- Входящий лиц.счет   #(NLSA)
- p_kv   accounts.kv%type default  null  -- Bал.вход.лиц.счета  #(KVA)
+ p_nls1 accounts.nls%type ,  -- Входящий лицевой счет
+ p_kv   accounts.kv%type default  null  -- Bал.входящего лиц.счета(по умолч.980)
 )
   return accounts.nls%type is
 
---------------------------------------------------------------------------------
---   Поиск счета по  NBS + ОВ22 + RNK  (RNK определяется через входящий
---   счет p_nls1/p_kv).
---
---
---               Поиск идет только среди ГРН-счетов  !!!
---
---
---   В случае, если подходящих счетов более 1-го, берется счет ACCD из RKO_LST
---   (ACCD - "Рах.списання" в задаче "Плата за РО" )
---------------------------------------------------------------------------------
+/*
+   Поиск счета по  NBS + ОВ22 + RNK  (RNK определяется через входящий
+   счет p_nls1/p_kv).
 
+           !!!  Поиск идет только среди ГРН-счетов  !!!
+           =============================================
+
+   Ф-я  BRANCH-контекст НЕ учитывает !
+
+   В случае, если подходящих счетов более 1-го, берется счет ACCD из RKO_LST
+   (ACCD - "Рах.списання" в задаче "Плата за РО" )
+
+*/
 
  l_kv   accounts.kv%type := nvl(p_kv, gl.baseval);
  l_rnk  accounts.rnk%type;
@@ -32,11 +33,6 @@
  l_kol  int := 0;
 
 begin
-
-
- If substr(p_nls1,1,4) in ('2642','2643','2620') and p_kv = 980 then  -- Эти счета всегда платят 
-    RETURN p_nls1;                                                    -- комиссию "сами за себя"
- End If;
 
 
  ------    Находим RNK и ACC  входящего лицевого счета:
@@ -53,22 +49,20 @@ begin
 
 
  l_kol := 0;
- FOR k in ( Select nls from Accounts  where   RNK = l_rnk
-               and ( NBS in ('2600',
-                             '2650') and OB22 = '01'  and  p_nls1 like '26%'  -- для 2600,2603,2604,2650
+ FOR k in (Select nls from Accounts  where RNK = l_rnk
+               and ( (NBS = p_nbs2  or  NBS = '2650') and OB22 = p_OB22
                         or
-                      NBS = '2560'   and OB22 = '03'  and  p_nls1 like '2560%'
+                      NBS='2560' and OB22='03'
                         or
-                      NBS = '2520'                    and  p_nls1 like '2520%'
+                      NBS='2620' and OB22 in ('07','32')
                         or
-                      NBS = '2530'                    and  p_nls1 like '2530%'
+                      NBS='2642'
                         or
-                      NBS = '2545'                    and  p_nls1 like '2545%'
-                    )
+                      NBS='2643'
+                   )
                and KV  = 980         --- ищем только ГРН-счета
                and DAZS is null
-            order by DAOS 
-          )
+           order by DAOS )
  loop
     l_kol  := l_kol + 1;
     l_nls2 := k.nls ;   ---  В l_nls2 остается самый "молодой" счет  (***)
@@ -76,41 +70,25 @@ begin
 
  ----------------------------------------------------------------
 
+ If substr(p_nls1,1,4) in ('2642','2643') then
 
- If l_kol = 1   then
+    RETURN p_nls1;
 
-    RETURN l_NLS2;        --- Если l_kol=1  - нашли один - RETURN
+ Elsif  l_kol = 1   then
 
+    RETURN l_NLS2;    --- Если l_kol=1  - все, нашли - RETURN
 
  Elsif  l_kol = 0   then
-
     ---  Нет таких счетов вообще:
-     
-    if    substr(p_nls1,1,4) = '2560' then
-
-       raise_application_error(-20203,
-       '\9356 - Не найден счет: Бал=2560, OB22=03'||
-       ' для счета ' || p_nls1 || ' / ' || l_kv,  TRUE );
-
-    elsif substr(p_nls1,1,4) in ('2520','2530','2545') then
-
-       raise_application_error(-20203,
-       '\9356 - Не найден счет: Бал='|| substr(p_nls1,1,4)||', Вал=980'||
-       ' для счета ' || p_nls1 || ' / ' || l_kv,  TRUE );
-
-    else
-
-       raise_application_error(-20203,
-       '\9356 - Не найден счет: Бал=2600/2650, OB22=01, Вал=980'||
-       ' для счета ' || p_nls1 || ' / ' || l_kv,  TRUE );
-
-    end if;
-
+    raise_application_error(-20203,
+     '\9356 - Не найден счет: Бал='|| p_NBS2||', OB22='||p_OB22||
+     ' для счета ' || p_nls1 || '/' || l_kv,  TRUE );
 
 
  Elsif l_kol > 1 and l_kv=980 then
 
-    ---  Нашлось более ОДНОГО счета 2600/01 и входящий - ГРН:
+    ---  Нашлось более ОДНОГО счета 2600/01 и входящий - ГРН.
+
     ---  Лезем в RKO_LST и находим для входящего счета "Рах.списання":
     Begin
 
@@ -149,7 +127,7 @@ begin
 
     Exception when NO_DATA_FOUND then
 
-      Begin  
+      Begin
 
          Select b.nls into l_nls2
          from   RKO_LST r, Accounts a, Accounts b

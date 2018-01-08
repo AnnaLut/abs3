@@ -65,6 +65,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_VIDDTIP_TIP_TIPS_TIP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.VIDD_TIP ADD CONSTRAINT FK_VIDDTIP_TIP_TIPS_TIP FOREIGN KEY (TIP)
+	  REFERENCES BARS.TIPS (TIP) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_VIDDTIP_VIDD_CCVIDD_VIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.VIDD_TIP ADD CONSTRAINT FK_VIDDTIP_VIDD_CCVIDD_VIDD FOREIGN KEY (VIDD)
+	  REFERENCES BARS.CC_VIDD (VIDD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_VIDDTIP_FOPEN_NN ***
 begin   
  execute immediate '
@@ -91,12 +117,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  VIDD_TIP ***
-grant SELECT                                                                 on VIDD_TIP        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VIDD_TIP        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VIDD_TIP        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VIDD_TIP        to RCC_DEAL;
 grant SELECT                                                                 on VIDD_TIP        to START1;
-grant SELECT                                                                 on VIDD_TIP        to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VIDD_TIP        to VIDD_TIP;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VIDD_TIP        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on VIDD_TIP        to WR_REFREAD;

@@ -81,11 +81,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_OB22NU ***
-grant SELECT                                                                 on TMP_OB22NU      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OB22NU      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OB22NU      to NALOG;
 grant SELECT                                                                 on TMP_OB22NU      to RPBN001;
-grant SELECT                                                                 on TMP_OB22NU      to UPLD;
 
 
 

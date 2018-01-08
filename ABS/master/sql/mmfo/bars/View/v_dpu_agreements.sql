@@ -51,12 +51,10 @@ PROMPT *** Create  view V_DPU_AGREEMENTS ***
 );
 
 PROMPT *** Create  grants  V_DPU_AGREEMENTS ***
-grant SELECT                                                                 on V_DPU_AGREEMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPU_AGREEMENTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPU_AGREEMENTS to DPT_ADMIN;
 grant SELECT                                                                 on V_DPU_AGREEMENTS to DPT_ROLE;
 grant SELECT                                                                 on V_DPU_AGREEMENTS to START1;
-grant SELECT                                                                 on V_DPU_AGREEMENTS to UPLD;
 
 
 

@@ -34,9 +34,7 @@ PROMPT *** Create  view V_XMLKLPARAMS ***
     where d.tag = x.par;
 
 PROMPT *** Create  grants  V_XMLKLPARAMS ***
-grant SELECT                                                                 on V_XMLKLPARAMS   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_XMLKLPARAMS   to KLBX;
-grant SELECT                                                                 on V_XMLKLPARAMS   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_XMLKLPARAMS   to WR_ALL_RIGHTS;
 
 

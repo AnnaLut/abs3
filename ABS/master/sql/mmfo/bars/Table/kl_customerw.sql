@@ -65,6 +65,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_KLCUSTOMERW_TAG ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KL_CUSTOMERW ADD CONSTRAINT FK_KLCUSTOMERW_TAG FOREIGN KEY (TAG)
+	  REFERENCES BARS.KL_OPFIELDS (TAG) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KLCUSTOMERW_RNK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KL_CUSTOMERW ADD CONSTRAINT FK_KLCUSTOMERW_RNK FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XPK_KLCUSTOMERW ***
 begin   
  execute immediate '
@@ -79,10 +105,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  KL_CUSTOMERW ***
-grant SELECT                                                                 on KL_CUSTOMERW    to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_CUSTOMERW    to BARS_DM;
 grant SELECT                                                                 on KL_CUSTOMERW    to KLBX;
-grant SELECT                                                                 on KL_CUSTOMERW    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_CUSTOMERW    to WR_ALL_RIGHTS;
 
 

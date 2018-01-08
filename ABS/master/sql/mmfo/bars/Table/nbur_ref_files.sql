@@ -135,10 +135,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_REFFILES_FILENM_NN ***
+PROMPT *** Create  constraint UK_NBURREFFILES ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_REF_FILES MODIFY (FILE_NAME CONSTRAINT CC_REFFILES_FILENM_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_REF_FILES ADD CONSTRAINT UK_NBURREFFILES UNIQUE (FILE_CODE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -209,12 +211,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_NBURREFFILES ***
+PROMPT *** Create  constraint CC_REFFILES_FILENM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_REF_FILES ADD CONSTRAINT UK_NBURREFFILES UNIQUE (FILE_CODE)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.NBUR_REF_FILES MODIFY (FILE_NAME CONSTRAINT CC_REFFILES_FILENM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -251,11 +251,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_REF_FILES ***
-grant SELECT                                                                 on NBUR_REF_FILES  to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_REF_FILES  to BARSUPL;
 grant SELECT                                                                 on NBUR_REF_FILES  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_REF_FILES  to BARS_DM;
-grant SELECT                                                                 on NBUR_REF_FILES  to UPLD;
 
 
 

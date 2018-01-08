@@ -51,10 +51,8 @@ PROMPT *** Create  view NADA7 ***
            GROUP BY SDATE, WDATE, RNK);
 
 PROMPT *** Create  grants  NADA7 ***
-grant SELECT                                                                 on NADA7           to BARSREADER_ROLE;
 grant SELECT                                                                 on NADA7           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NADA7           to SALGL;
-grant SELECT                                                                 on NADA7           to UPLD;
 
 
 

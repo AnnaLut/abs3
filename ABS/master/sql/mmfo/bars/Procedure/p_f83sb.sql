@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F83SB ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F83SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C' )  IS
+  CREATE OR REPLACE PROCEDURE BARS.P_F83SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C' )  IS  
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FILE NAME   :	otcn.sql
 % DESCRIPTION :	ќтчетность —берЅанка: формирование файлов
@@ -47,21 +47,21 @@ userid_ Number;
 tobo_    accounts.tobo%TYPE;
 nms_     accounts.nms%TYPE;
 comm_    rnbu_trace.comm%TYPE;
-typ_     Number;
+typ_     Number; 
 nbuc1_   VARCHAR2(12);
 nbuc_    VARCHAR2(12);
 
 ---ќбороты (по грн)
-CURSOR OPL_DOK IS
+CURSOR OPL_DOK IS 
     SELECT o.accd, o.nlsd, o.kv, o.fdat, NVL(substr(a1.value,1,2),'00'),
-           o.s*100, o.acck, o.nlsk, s.tobo, s.nms
-    FROM  provodki o, oper z, operw a1, accounts s
-    WHERE (substr(o.nlsd,1,4) in ('3522','3622') or
-           substr(o.nlsk,1,4) in ('3522','3622'))
-      and z.ref=o.ref
-      and o.fdat between Dat1_+1 and Dat_
-      and a1.tag (+)='D#83'
-      and a1.ref (+) =o.ref
+           o.s*100, o.acck, o.nlsk, s.tobo, s.nms   
+    FROM  provodki o, oper z, operw a1, accounts s 
+    WHERE (substr(o.nlsd,1,4) in ('3522','3622') or 
+           substr(o.nlsk,1,4) in ('3522','3622'))    
+      and z.ref=o.ref                                
+      and o.fdat between Dat1_+1 and Dat_                   
+      and a1.tag (+)='D#83'                          
+      and a1.ref (+) =o.ref 
       and o.accd = s.acc;
 ---          GROUP BY o.nlsd, o.kv, o.fdat, substr(a1.value,1,2)
 
@@ -94,7 +94,7 @@ LOOP
    comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
 
    IF sn_>0 and (substr(nls_,1,4)='3522' or substr(nls_,1,4)='3622') THEN
-
+    
       IF typ_>0 THEN
          nbuc_ := NVL(F_Codobl_Tobo(accd_,typ_),nbuc1_);
       ELSE

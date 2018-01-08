@@ -444,7 +444,7 @@ begin
              sb_   => oo.s    , sq_   => null   , nom_  => null  ) ;
    If p_Mfob <> gl.aMfo then
       oo.s := f_tarif ( 198 , oo.kv, ll.nlsa, oo.s, 0);
-      gl.PAYv ( 0, oo.ref, gl.bdate, 'D06', 1, oo.kv, ll.nlsa, oo.s, gl.baseval, nls_6100, oo.s );
+      gl.PAYv ( 0, oo.ref, gl.bdate, 'D06', 1, oo.kv, ll.nlsa, oo.s, gl.baseval, nls_6100, oo.s ); 
    end if;
 
    INSERT INTO sw_oper (ref, swref )    values (oo.ref , p_swref              ) ;

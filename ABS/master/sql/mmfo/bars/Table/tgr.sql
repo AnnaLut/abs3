@@ -35,7 +35,9 @@ exception when others then
 end; 
 /
 
-
+prompt modify name to varchar2(50)
+alter table bars.tgr modify name varchar2(50);
+/
 
 
 PROMPT *** ALTER_POLICIES to TGR ***
@@ -102,14 +104,12 @@ exception when others then
 
 PROMPT *** Create  grants  TGR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TGR             to ABS_ADMIN;
-grant SELECT                                                                 on TGR             to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TGR             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TGR             to BARS_DM;
 grant SELECT                                                                 on TGR             to DPT;
 grant SELECT                                                                 on TGR             to DPT_ROLE;
 grant SELECT                                                                 on TGR             to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TGR             to TGR;
-grant SELECT                                                                 on TGR             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TGR             to WR_ALL_RIGHTS;
 grant SELECT                                                                 on TGR             to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on TGR             to WR_REFREAD;

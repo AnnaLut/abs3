@@ -63,6 +63,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_PKKSEPKOMIS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PKK_SEPKOMIS ADD CONSTRAINT FK_PKKSEPKOMIS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_PKKSEPKOMIS_REF_NN ***
 begin   
  execute immediate '
@@ -101,11 +114,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  PKK_SEPKOMIS ***
-grant SELECT                                                                 on PKK_SEPKOMIS    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PKK_SEPKOMIS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PKK_SEPKOMIS    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PKK_SEPKOMIS    to START1;
-grant SELECT                                                                 on PKK_SEPKOMIS    to UPLD;
 
 
 

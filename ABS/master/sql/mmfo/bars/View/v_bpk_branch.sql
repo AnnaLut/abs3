@@ -19,10 +19,8 @@ PROMPT *** Create  view V_BPK_BRANCH ***
  where branch is not null;
 
 PROMPT *** Create  grants  V_BPK_BRANCH ***
-grant SELECT                                                                 on V_BPK_BRANCH    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BPK_BRANCH    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BPK_BRANCH    to OBPC;
-grant SELECT                                                                 on V_BPK_BRANCH    to UPLD;
 grant FLASHBACK,SELECT                                                       on V_BPK_BRANCH    to WR_REFREAD;
 
 

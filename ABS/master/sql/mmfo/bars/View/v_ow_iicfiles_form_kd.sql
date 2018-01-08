@@ -71,10 +71,8 @@ PROMPT *** Create  view V_OW_IICFILES_FORM_KD ***
     WHERE p.acc = a.acc AND a.rnk = c.rnk;
 
 PROMPT *** Create  grants  V_OW_IICFILES_FORM_KD ***
-grant SELECT                                                                 on V_OW_IICFILES_FORM_KD to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_IICFILES_FORM_KD to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_IICFILES_FORM_KD to OW;
-grant SELECT                                                                 on V_OW_IICFILES_FORM_KD to UPLD;
 
 
 

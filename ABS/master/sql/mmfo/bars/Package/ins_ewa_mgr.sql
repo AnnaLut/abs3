@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ins_ewa_mgr.sql =========*** Run ***
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.INS_EWA_MGR is
+ CREATE OR REPLACE PACKAGE BARS.ins_ewa_mgr is
 
   -- Author  : VITALIY.LEBEDINSKIY
   -- Created : 01.02.2016 12:57:33
@@ -122,22 +122,22 @@
   procedure send_sos;
 end ins_ewa_mgr;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.INS_EWA_MGR is
+CREATE OR REPLACE PACKAGE BODY BARS.ins_ewa_mgr is
 
   -- Private type declarations
 
   -- Private constant declarations
   g_package_name constant varchar2(160) := 'ins_ewa_mgr';
   g_body_version  constant varchar2(64)  := 'version 3.01 26/07/2017';
-
+  
   --3.0
 --исправлены мелкие ошибки при создании договоров страхования (формат полей таблиц модуля страхования, проверкуи на корректность данных и и.п.)
 --добавлен функционал " продуктовые пакеты"
 --добавлен функционал для передачи статусов платежа в ПО ЕВА
 --добавлена операция для ЦА EW3
 
-
-
+  
+  
   g_tt constant varchar(3 byte) := 'EW1'; -- операція для РУ
   g_tt_ch constant varchar2(3 byte) := 'EW2'; --Операція перерахунку з каси на транзитний рахунок
   g_tt_ca constant varchar2(3 byte) := 'EW3'; -- операція для ЦА
@@ -773,7 +773,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_EWA_MGR is
     l_type_id ins_types.id%type;
     l_passp passp.passp%type;
     l_ext_state varchar2(400);
-
+    
     l_ref oper.ref%type;
     l_ewa_id number;
     n number;
@@ -804,36 +804,36 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_EWA_MGR is
 
   begin
     logger.info('INS create_deal datetime_in='||to_char(sysdate, 'dd.mm.yyyy hh24:mi:ss'));
-
+    
     -----------------------------------------------
     ---Добавлена проверка на присутствие рефа в json.
     ---Если есть, то загружаем в табличку для дальнейшей передачи статусов платежей в EWA.
-
+    
     l_ref:=to_number(get_xml_val(p_params,'/CreateDealParams/payments/Payment/number/text()'));
-
+    
     if nvl(l_ref,0)=0
-    then
+    then 
         p_deal_number := null;
         p_errcode := -20001;
         p_errmessage := 'В договорі відсутній документ';
         logger.error(g_package_name||' p_errmessage='||p_errmessage||', params:'||chr(13)||chr(10)||substr(p_params.GetStringVal(),0,4000));
         return;
-    else
-
+    else     
+    
        l_ewa_id:=to_number(get_xml_val(p_params,'/CreateDealParams/payments/Payment/id/text()'));
-
-       begin
-         insert into ins_ewa_ref_sos(ref,id_ewa,crt_date,kf) values (l_ref,l_ewa_id,sysdate,f_ourmfo());
-       exception
+       
+       begin             
+         insert into ins_ewa_ref_sos(ref,id_ewa,crt_date,kf) values (l_ref,l_ewa_id,sysdate,f_ourmfo());      
+       exception 
        when dup_val_on_index then
          null;
        end;
-
-    end if;
-
+ 
+    end if;  
+     
     ----------------------------------------------
-    savepoint create_start;
-
+    savepoint create_start;  
+    
     begin
       select to_number(val) into l_ourcountry from params where par = l_parname;
     exception
@@ -909,7 +909,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_EWA_MGR is
         l_ewa_doc_date := get_date(get_xml_val(p_params,'/CreateDealParams/customer/document/date/text()'));
         l_bday := get_date(get_xml_val(p_params,'/CreateDealParams/customer/birthDate/text()'));
         if nvl(l_ewa_doc_date,l_bday)<l_bday
-        then
+        then 
         rollback to savepoint create_start;
         p_deal_number := null;
         p_errcode := -20001;
@@ -918,8 +918,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_EWA_MGR is
         return;
         end if;
     end;
-
-
+    
+    
     /*begin
       select kv into l_currancy from tabval where d_close is null and lcv = p_params.extract('/CreateDealParams/currancy/text()').GetStringVal();
     exception
@@ -1079,7 +1079,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_EWA_MGR is
                                           p_insu_sum    => to_number(get_xml_val(p_params,'/CreateDealParams/payment/text()')),
                                           p_object_type => 'CL',
                                           p_rnk         => l_rnk,
-                                          p_grt_id      => null,
+                                          p_grt_id      => null,            
                                           p_nd          => null,
                                           p_pay_freq    => l_freq,
                                           p_renew_need  => 1);
@@ -1147,7 +1147,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_EWA_MGR is
   end;
 
 procedure send_sos
-is
+is 
 
     l_ins_ewa_ref_sos ins_ewa_ref_sos%rowtype;
     l_url             web_barsconfig.val%type;
@@ -1164,7 +1164,7 @@ is
     l_str             varchar2(4000);
     l_status          varchar2(4000);
     l_tmp             xmltype;
-
+    
 
 begin
 
@@ -1175,11 +1175,11 @@ begin
     select val into l_pass from web_barsconfig where key='EWA.Wallet_pass';
 
 
-   --удаляем все позавчерашние операции,кроме тех по кому небыло успешных передач
+   --удаляем все позавчерашние операции,кроме тех по кому небыло успешных передач 
     delete ins_ewa_ref_sos c
     where  trunc(c.crt_date)<trunc(sysdate)-1 and nvl(c.sos,999)<>999;
-
-    logger.info(g_package_name||'.send_sos.several refs were deleted from queue - '||sql%rowcount);
+    
+    logger.info(g_package_name||'.send_sos.several refs were deleted from queue - '||sql%rowcount); 
 
     for c in  (select s.ref,s.id_ewa,s.crt_date,o.sos,s.sos ewa_sos,
                 case when o.sos<0 then 'CANCELED' when o.sos between 0 and 4 then 'PENDING' when o.sos=5 then 'PAID' else null end ewa_status
@@ -1192,7 +1192,7 @@ begin
                                         p_method    => 'SendAccStatus',
                                         p_wallet_dir =>  l_dir,
                                         p_wallet_pass => l_pass);
-
+     
         soap_rpc.add_parameter(l_request, 'id',    to_char(c.id_ewa));
 
         soap_rpc.add_parameter(l_request, 'state', to_char(c.ewa_status));
@@ -1211,30 +1211,30 @@ begin
             l_res     := dbms_xmldom.item(l_reslist, 0);
             dbms_xslprocessor.valueof(l_res, 'status/text()', l_str);
             l_status := substr(l_str, 1, 200);
-
+            
             if lower(l_status)='ok' then
-
+              
                 update ins_ewa_ref_sos
                 set sos=c.sos
-                where ref=c.ref;
-
+                where ref=c.ref;         
+      
                 logger.info(g_package_name||'.send_sos. ref status was sent - '||c.ref);
-
-            else
-
+              
+            else 
+            
                 dbms_xslprocessor.valueof(l_res, 'message/text()', l_str);
                 l_status := substr(l_str, 1, 4000);
-
+            
                 update ins_ewa_ref_sos
                 set sos=999
                 where ref=c.ref;
-
-                bars_audit.error(g_package_name||'.send_sos. ref- '||c.ref|| '. ERROR:' || l_status);
+                
+                bars_audit.error(g_package_name||'.send_sos. ref- '||c.ref|| '. ERROR:' || l_status);    
 
                 --если какой-то ерор то ставим статус 999, для повтрной передачи.
 
-            end if;
-
+            end if; 
+  
         exception
             when others then
               dbms_xmlparser.freeparser(l_parser);
@@ -1244,9 +1244,9 @@ begin
               update ins_ewa_ref_sos
               set sos=999
               where ref=c.ref;
-        end;
+        end;            
         dbms_xmlparser.freeparser(l_parser);
-        DBMS_XMLDOM.freeDocument(l_doc);
+        DBMS_XMLDOM.freeDocument(l_doc);       
 
     end loop;
 

@@ -19,10 +19,8 @@ PROMPT *** Create  view V_DPT_PORTFOLIO_SHORT ***
      FROM dpt_deposit d;
 
 PROMPT *** Create  grants  V_DPT_PORTFOLIO_SHORT ***
-grant SELECT                                                                 on V_DPT_PORTFOLIO_SHORT to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_PORTFOLIO_SHORT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_PORTFOLIO_SHORT to START1;
-grant SELECT                                                                 on V_DPT_PORTFOLIO_SHORT to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPT_PORTFOLIO_SHORT to VKLAD;
 grant FLASHBACK,SELECT                                                       on V_DPT_PORTFOLIO_SHORT to WR_REFREAD;
 

@@ -57,6 +57,19 @@ COMMENT ON COLUMN BARS.OBJECT_TYPE_STORAGE.WHERE_CLAUSE IS '';
 
 
 
+PROMPT *** Create  constraint FK_STORAGE_REF_OBJ_TYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBJECT_TYPE_STORAGE ADD CONSTRAINT FK_STORAGE_REF_OBJ_TYPE FOREIGN KEY (OBJECT_TYPE_ID)
+	  REFERENCES BARS.OBJECT_TYPE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C006187 ***
 begin   
  execute immediate '
@@ -119,10 +132,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  OBJECT_TYPE_STORAGE ***
-grant SELECT                                                                 on OBJECT_TYPE_STORAGE to BARSREADER_ROLE;
-grant SELECT                                                                 on OBJECT_TYPE_STORAGE to UPLD;
 
 
 

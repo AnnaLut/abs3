@@ -28,9 +28,7 @@ PROMPT *** Create  view V_XMLKLBCUST ***
  ;
 
 PROMPT *** Create  grants  V_XMLKLBCUST ***
-grant SELECT                                                                 on V_XMLKLBCUST    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_XMLKLBCUST    to KLBX;
-grant SELECT                                                                 on V_XMLKLBCUST    to UPLD;
 
 
 

@@ -53,6 +53,19 @@ COMMENT ON COLUMN BARS.SW_MT.CHKGRP IS '';
 
 
 
+PROMPT *** Create  constraint FK_SWMT_CHKLIST ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MT ADD CONSTRAINT FK_SWMT_CHKLIST FOREIGN KEY (CHKGRP)
+	  REFERENCES BARS.CHKLIST (IDCHK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_SWMT ***
 begin   
  execute immediate '
@@ -130,13 +143,11 @@ exception when others then
 
 PROMPT *** Create  grants  SW_MT ***
 grant SELECT                                                                 on SW_MT           to BARS013;
-grant SELECT                                                                 on SW_MT           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_MT           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_MT           to BARS_DM;
 grant SELECT                                                                 on SW_MT           to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_MT           to SWIFT001;
 grant SELECT                                                                 on SW_MT           to SWTOSS;
-grant SELECT                                                                 on SW_MT           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_MT           to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SW_MT           to WR_REFREAD;
 

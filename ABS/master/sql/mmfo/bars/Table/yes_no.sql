@@ -77,11 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  YES_NO ***
-grant SELECT                                                                 on YES_NO          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on YES_NO          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on YES_NO          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on YES_NO          to START1;
-grant SELECT                                                                 on YES_NO          to UPLD;
 
 
 

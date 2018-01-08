@@ -42,10 +42,8 @@ PROMPT *** Create  view V_NBUR_DM_ACCOUNTS ***
 ;
 
 PROMPT *** Create  grants  V_NBUR_DM_ACCOUNTS ***
-grant SELECT                                                                 on V_NBUR_DM_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_DM_ACCOUNTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_DM_ACCOUNTS to RPBN002;
-grant SELECT                                                                 on V_NBUR_DM_ACCOUNTS to UPLD;
 
 
 

@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'розмір середньозваженої ставки міжбанківського кредитування KIАKR';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'CP_PR_KIAKR';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,14 +119,14 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'DAT', 'D', 'дата', '1', 10, 999, 1, 1, 0, 0, '', '1', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'валюта', '1', 22, 999, 1, 1, 0, 0, '', '2', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'PR1', 'N', '1 день', '1', 22, 999, 1, 0, 0, 0, '', '3', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'PR2', 'N', 'від 2 до 7 днів', '1', 22, 999, 1, 0, 0, 0, '', '4', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'PR3', 'N', 'від 8 до 21 дня', '1', 22, 999, 1, 0, 0, 0, '', '5', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'PR4', 'N', 'від 22 до 31 дня', '1', 22, 999, 1, 0, 0, 0, '', '6', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'PR5', 'N', 'від 32 до 92 днів', '1', 22, 999, 1, 0, 0, 0, '', '7', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'PR6', 'N', 'понад 92 днів', '1', 22, 999, 1, 0, 0, 0, '', '8', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'DAT', 'D', 'дата', 1, 10, 999, 1, 1, 0, 0, '', '1', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'валюта', 1, 22, 999, 1, 1, 0, 0, '', '2', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'PR1', 'N', '1 день', 1, 22, 999, 1, 0, 0, 0, '', '3', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'PR2', 'N', 'від 2 до 7 днів', 1, 22, 999, 1, 0, 0, 0, '', '4', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'PR3', 'N', 'від 8 до 21 дня', 1, 22, 999, 1, 0, 0, 0, '', '5', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'PR4', 'N', 'від 22 до 31 дня', 1, 22, 999, 1, 0, 0, 0, '', '6', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'PR5', 'N', 'від 32 до 92 днів', 1, 22, 999, 1, 0, 0, 0, '', '7', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'PR6', 'N', 'понад 92 днів', 1, 22, 999, 1, 0, 0, 0, '', '8', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

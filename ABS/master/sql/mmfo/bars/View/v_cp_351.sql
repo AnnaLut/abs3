@@ -13,11 +13,9 @@ PROMPT *** Create  view V_CP_351 ***
                   where  r.fdat=TO_DATE (pul.get_mas_ini_val ('sFdat1'), 'dd.mm.yyyy') and r.tipa in (15) and r.fdat = n.fdat (+) and r.acc=n.acc (+)) ;
 
 PROMPT *** Create  grants  V_CP_351 ***
-grant SELECT                                                                 on V_CP_351        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_351        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_351        to RCC_DEAL;
 grant SELECT                                                                 on V_CP_351        to START1;
-grant SELECT                                                                 on V_CP_351        to UPLD;
 
 
 

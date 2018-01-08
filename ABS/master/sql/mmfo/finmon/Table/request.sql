@@ -62,6 +62,45 @@ COMMENT ON COLUMN FINMON.REQUEST.BRANCH_ID IS '';
 
 
 
+PROMPT *** Create  constraint R_REQUEST_DFILE ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.REQUEST ADD CONSTRAINT R_REQUEST_DFILE FOREIGN KEY (DFILE_ID, BRANCH_ID)
+	  REFERENCES FINMON.FILE_OUT (ID, BRANCH_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_REQUEST_FILEIN ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.REQUEST ADD CONSTRAINT R_REQUEST_FILEIN FOREIGN KEY (FILE_I_ID, BRANCH_ID)
+	  REFERENCES FINMON.FILE_IN (ID, BRANCH_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_REQUEST_FILEOUT ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.REQUEST ADD CONSTRAINT R_REQUEST_FILEOUT FOREIGN KEY (FILE_O_ID, BRANCH_ID)
+	  REFERENCES FINMON.FILE_OUT (ID, BRANCH_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint XPK_REQUEST ***
 begin   
  execute immediate '
@@ -76,10 +115,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_REQ_IN_DATE ***
+PROMPT *** Create  constraint SYS_C0032118 ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.REQUEST MODIFY (IN_DATE CONSTRAINT NK_REQ_IN_DATE NOT NULL ENABLE)';
+  ALTER TABLE FINMON.REQUEST MODIFY (ZAP_DATE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -124,10 +163,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0032118 ***
+PROMPT *** Create  constraint NK_REQ_IN_DATE ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.REQUEST MODIFY (ZAP_DATE NOT NULL ENABLE)';
+  ALTER TABLE FINMON.REQUEST MODIFY (IN_DATE CONSTRAINT NK_REQ_IN_DATE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -151,7 +190,6 @@ exception when others then
 
 PROMPT *** Create  grants  REQUEST ***
 grant SELECT                                                                 on REQUEST         to BARS;
-grant SELECT                                                                 on REQUEST         to BARSREADER_ROLE;
 
 
 

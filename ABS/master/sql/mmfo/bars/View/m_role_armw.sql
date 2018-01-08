@@ -24,10 +24,8 @@ from (select * from ADM_RESOURCE where GRANTEE_TYPE_ID  = resource_utl.get_resou
 where b.RESOURCE_ID  = d.GRANTEE_ID (+);
 
 PROMPT *** Create  grants  M_ROLE_ARMW ***
-grant SELECT                                                                 on M_ROLE_ARMW     to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_ARMW     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on M_ROLE_ARMW     to START1;
-grant SELECT                                                                 on M_ROLE_ARMW     to UPLD;
 
 
 

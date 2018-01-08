@@ -63,6 +63,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_STAFFTIPAPP_STAFFTIPS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFFTIP_APP ADD CONSTRAINT FK_STAFFTIPAPP_STAFFTIPS FOREIGN KEY (ID)
+	  REFERENCES BARS.STAFF_TIPS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_STAFFTIPAPP_ID_NN ***
 begin   
  execute immediate '
@@ -102,10 +115,8 @@ exception when others then
 
 PROMPT *** Create  grants  STAFFTIP_APP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFFTIP_APP    to ABS_ADMIN;
-grant SELECT                                                                 on STAFFTIP_APP    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFFTIP_APP    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFFTIP_APP    to BARS_DM;
-grant SELECT                                                                 on STAFFTIP_APP    to UPLD;
 
 
 

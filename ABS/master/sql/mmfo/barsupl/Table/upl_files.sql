@@ -104,6 +104,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_UPLFILES_SQLID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_FILES ADD CONSTRAINT FK_UPLFILES_SQLID FOREIGN KEY (SQL_ID)
+	  REFERENCES BARSUPL.UPL_SQL (SQL_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DOMAINCODE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSUPL.UPL_FILES ADD CONSTRAINT FK_DOMAINCODE FOREIGN KEY (DOMAIN_CODE)
+	  REFERENCES BARSUPL.UPL_DOMAINS (DOMAIN_CODE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_UPLFILES_PARTITIONED ***
 begin   
  execute immediate '
@@ -128,10 +154,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_UPLFILES_FILENAMEPRFX_NN ***
+PROMPT *** Create  constraint CC_UPLFILES_CRITICALFLG ***
 begin   
  execute immediate '
-  ALTER TABLE BARSUPL.UPL_FILES MODIFY (FILENAME_PRFX CONSTRAINT CC_UPLFILES_FILENAMEPRFX_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSUPL.UPL_FILES ADD CONSTRAINT CC_UPLFILES_CRITICALFLG CHECK ( CRITICAL_FLG in ( 0, 1, 2 ) ) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -152,10 +178,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_UPLFILES_CRITICALFLG ***
+PROMPT *** Create  constraint CC_UPLFILES_FILENAMEPRFX_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSUPL.UPL_FILES ADD CONSTRAINT CC_UPLFILES_CRITICALFLG CHECK ( CRITICAL_FLG in ( 0, 1, 2 ) ) ENABLE';
+  ALTER TABLE BARSUPL.UPL_FILES MODIFY (FILENAME_PRFX CONSTRAINT CC_UPLFILES_FILENAMEPRFX_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -193,7 +219,6 @@ exception when others then
 
 PROMPT *** Create  grants  UPL_FILES ***
 grant SELECT                                                                 on UPL_FILES       to BARS;
-grant SELECT                                                                 on UPL_FILES       to BARSREADER_ROLE;
 grant SELECT                                                                 on UPL_FILES       to UPLD;
 
 

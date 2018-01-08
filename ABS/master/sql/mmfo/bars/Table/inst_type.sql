@@ -100,13 +100,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  INST_TYPE ***
-grant SELECT                                                                 on INST_TYPE       to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on INST_TYPE       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INST_TYPE       to BARS_DM;
 grant DELETE,INSERT,UPDATE                                                   on INST_TYPE       to INST_TYP;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on INST_TYPE       to INST_TYPE;
 grant SELECT                                                                 on INST_TYPE       to START1;
-grant SELECT                                                                 on INST_TYPE       to UPLD;
 grant FLASHBACK,SELECT                                                       on INST_TYPE       to WR_REFREAD;
 
 

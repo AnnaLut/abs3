@@ -67,8 +67,8 @@ begin
 	R012 VARCHAR2(1), 
 	S580 VARCHAR2(1), 
 	KVD NUMBER, 
-	R016 VARCHAR2(2), 
-	OB22_ALT CHAR(2)
+	R016 VARCHAR2(2),
+        Ob22_alt char(2)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -78,6 +78,13 @@ exception when others then
 end; 
 /
 
+begin  EXECUTE IMMEDIATE 'ALTER TABLE  bars.specparam ADD  (Ob22_alt char(2) ) ' ;
+exception when others then   if SQLCODE = - 01430 then null;   else raise; end if; -- ORA-01430: column being added already exists in table
+end;
+/
+
+COMMENT ON COLUMN BARS.SPECPARAM.OB22_alt IS 'Ob22 для рах NLSALT';
+
 
 
 
@@ -86,7 +93,6 @@ PROMPT *** ALTER_POLICIES to SPECPARAM ***
 
 
 COMMENT ON TABLE BARS.SPECPARAM IS 'Таблиця спец.параметрів рахунків';
-COMMENT ON COLUMN BARS.SPECPARAM.OB22_ALT IS 'Ob22 РґР»СЏ СЂР°С… NLSALT';
 COMMENT ON COLUMN BARS.SPECPARAM.ACC IS 'Внутренний номер счета';
 COMMENT ON COLUMN BARS.SPECPARAM.R011 IS '';
 COMMENT ON COLUMN BARS.SPECPARAM.R013 IS '';
@@ -161,10 +167,75 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SPECPARAM_SPS240 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SPECPARAM ADD CONSTRAINT FK_SPECPARAM_SPS240 FOREIGN KEY (S240)
+	  REFERENCES BARS.SP_S240 (S240) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SPECPARAM_CRISK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SPECPARAM ADD CONSTRAINT FK_SPECPARAM_CRISK FOREIGN KEY (S080)
+	  REFERENCES BARS.CRISK (CRISK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SPECPARAM_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SPECPARAM ADD CONSTRAINT FK_SPECPARAM_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SPECPARAM_ACCOUNTS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SPECPARAM ADD CONSTRAINT FK_SPECPARAM_ACCOUNTS2 FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SPECPARAM_ACC_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.SPECPARAM MODIFY (ACC CONSTRAINT CC_SPECPARAM_ACC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SPECPARAM_SPS180 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SPECPARAM ADD CONSTRAINT FK_SPECPARAM_SPS180 FOREIGN KEY (S180)
+	  REFERENCES BARS.SP_S180 (S180) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -203,7 +274,6 @@ exception when others then
 PROMPT *** Create  grants  SPECPARAM ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPECPARAM       to ABS_ADMIN;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on SPECPARAM       to BARS015;
-grant SELECT                                                                 on SPECPARAM       to BARSREADER_ROLE;
 grant SELECT                                                                 on SPECPARAM       to BARSUPL;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on SPECPARAM       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SPECPARAM       to BARS_DM;
@@ -216,7 +286,6 @@ grant SELECT                                                                 on 
 grant UPDATE                                                                 on SPECPARAM       to R_KP;
 grant UPDATE                                                                 on SPECPARAM       to SALGL;
 grant SELECT                                                                 on SPECPARAM       to START1;
-grant SELECT                                                                 on SPECPARAM       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPECPARAM       to WR_ALL_RIGHTS;
 grant UPDATE                                                                 on SPECPARAM       to WR_DEPOSIT_U;
 

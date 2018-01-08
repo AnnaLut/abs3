@@ -142,10 +142,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00109844 ***
+PROMPT *** Create  constraint SYS_C00109845 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OB_CORPORATION_DATA_TMP MODIFY (FILE_DATE NOT NULL ENABLE)';
+  ALTER TABLE BARS.OB_CORPORATION_DATA_TMP MODIFY (SESSION_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -154,10 +154,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00109845 ***
+PROMPT *** Create  constraint SYS_C00109844 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OB_CORPORATION_DATA_TMP MODIFY (SESSION_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.OB_CORPORATION_DATA_TMP MODIFY (FILE_DATE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -194,9 +194,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  OB_CORPORATION_DATA_TMP ***
-grant SELECT                                                                 on OB_CORPORATION_DATA_TMP to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on OB_CORPORATION_DATA_TMP to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on OB_CORPORATION_DATA_TMP to UPLD;
 
 
 

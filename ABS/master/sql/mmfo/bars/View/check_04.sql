@@ -11,10 +11,8 @@ PROMPT *** Create  view CHECK_04 ***
   select "RECID","ODATE","NLS","KV","CODCAGENT","INTS","S180","K081","K092","DOS","KOS" from rnbu_history;
 
 PROMPT *** Create  grants  CHECK_04 ***
-grant SELECT                                                                 on CHECK_04        to BARSREADER_ROLE;
 grant SELECT                                                                 on CHECK_04        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHECK_04        to START1;
-grant SELECT                                                                 on CHECK_04        to UPLD;
 
 
 

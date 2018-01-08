@@ -65,6 +65,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_ABN1_PS_NBS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ANB1_PS ADD CONSTRAINT FK_ABN1_PS_NBS FOREIGN KEY (NBS)
+	  REFERENCES BARS.PS (NBS) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FX_ANB1_PS_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ANB1_PS ADD CONSTRAINT FX_ANB1_PS_ID FOREIGN KEY (ID)
+	  REFERENCES BARS.ANB1 (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C009313 ***
 begin   
  execute immediate '
@@ -129,12 +155,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  ANB1_PS ***
-grant SELECT                                                                 on ANB1_PS         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANB1_PS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANB1_PS         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANB1_PS         to RPBN001;
 grant DELETE,INSERT,SELECT                                                   on ANB1_PS         to SALGL;
-grant SELECT                                                                 on ANB1_PS         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ANB1_PS         to WR_ALL_RIGHTS;
 
 

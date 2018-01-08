@@ -48,6 +48,19 @@ COMMENT ON COLUMN BARS.MBM_NBS_ACC_TYPES.TYPE_ID IS 'Код типу рахунку';
 
 
 
+PROMPT *** Create  constraint FK_MBM_NBSACCTYPES_TYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MBM_NBS_ACC_TYPES ADD CONSTRAINT FK_MBM_NBSACCTYPES_TYPE FOREIGN KEY (TYPE_ID)
+	  REFERENCES BARS.MBM_ACC_TYPES (TYPE_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_MBM_NBSACCTYPES_TYPEID_NN ***
 begin   
  execute immediate '
@@ -100,9 +113,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  MBM_NBS_ACC_TYPES ***
-grant SELECT                                                                 on MBM_NBS_ACC_TYPES to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MBM_NBS_ACC_TYPES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on MBM_NBS_ACC_TYPES to UPLD;
 
 
 

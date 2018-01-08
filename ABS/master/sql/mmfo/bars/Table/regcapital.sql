@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  REGCAPITAL ***
-grant SELECT                                                                 on REGCAPITAL      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REGCAPITAL      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REGCAPITAL      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REGCAPITAL      to REGCAPITAL;
-grant SELECT                                                                 on REGCAPITAL      to UPLD;
 grant FLASHBACK,SELECT                                                       on REGCAPITAL      to WR_REFREAD;
 
 

@@ -119,9 +119,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  SYNC_ACTIVITY ***
-grant SELECT                                                                 on SYNC_ACTIVITY   to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

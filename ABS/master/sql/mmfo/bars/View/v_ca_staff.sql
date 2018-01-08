@@ -40,10 +40,6 @@ PROMPT *** Create  view V_CA_STAFF ***
             7,
             10;
 
-PROMPT *** Create  grants  V_CA_STAFF ***
-grant SELECT                                                                 on V_CA_STAFF      to BARSREADER_ROLE;
-grant SELECT                                                                 on V_CA_STAFF      to UPLD;
-
 
 
 PROMPT ===================================================================================== 

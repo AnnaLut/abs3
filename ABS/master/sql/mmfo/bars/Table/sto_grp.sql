@@ -107,12 +107,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  STO_GRP ***
-grant SELECT                                                                 on STO_GRP         to BARSREADER_ROLE;
 grant SELECT                                                                 on STO_GRP         to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STO_GRP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STO_GRP         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_GRP         to STO;
-grant SELECT                                                                 on STO_GRP         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STO_GRP         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on STO_GRP         to WR_REFREAD;
 

@@ -103,11 +103,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  USER_LOGIN_SESSIONS ***
-grant SELECT                                                                 on USER_LOGIN_SESSIONS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on USER_LOGIN_SESSIONS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on USER_LOGIN_SESSIONS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on USER_LOGIN_SESSIONS to START1;
-grant SELECT                                                                 on USER_LOGIN_SESSIONS to UPLD;
 
 
 

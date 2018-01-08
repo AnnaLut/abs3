@@ -162,106 +162,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005208 ***
+PROMPT *** Create  constraint SYS_C005218 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ANA MODIFY (NLSA NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005209 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ANA MODIFY (MFOB NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005210 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ANA MODIFY (NLSB NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005211 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ANA MODIFY (DK NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005212 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ANA MODIFY (VOB NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005213 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ANA MODIFY (KV NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005214 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ANA MODIFY (DATD NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005215 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ANA MODIFY (DATP NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005216 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ANA MODIFY (DAT_A NOT NULL ENABLE)';
+  ALTER TABLE BARS.ANA MODIFY (KF NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -282,10 +186,106 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005218 ***
+PROMPT *** Create  constraint SYS_C005216 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ANA MODIFY (KF NOT NULL ENABLE)';
+  ALTER TABLE BARS.ANA MODIFY (DAT_A NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005215 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ANA MODIFY (DATP NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005214 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ANA MODIFY (DATD NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005213 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ANA MODIFY (KV NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005212 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ANA MODIFY (VOB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005211 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ANA MODIFY (DK NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005210 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ANA MODIFY (NLSB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005209 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ANA MODIFY (MFOB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005208 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ANA MODIFY (NLSA NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -294,9 +294,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ANA ***
-grant SELECT                                                                 on ANA             to BARSREADER_ROLE;
 grant SELECT                                                                 on ANA             to BARS_DM;
-grant SELECT                                                                 on ANA             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ANA             to WR_ALL_RIGHTS;
 
 

@@ -14,10 +14,8 @@ where o.swref = w.swref
 order by w.seq, w.tag, w.opt;
 
 PROMPT *** Create  grants  V_DOCUMENTVIEW_SWIFT ***
-grant SELECT                                                                 on V_DOCUMENTVIEW_SWIFT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOCUMENTVIEW_SWIFT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DOCUMENTVIEW_SWIFT to START1;
-grant SELECT                                                                 on V_DOCUMENTVIEW_SWIFT to UPLD;
 
 
 

@@ -75,10 +75,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_NOTARY_PROFIT_ID_NN ***
+PROMPT *** Create  constraint FK_NOTARY_PROFIT_REF_NOTARY ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NOTARY_PROFIT MODIFY (ID CONSTRAINT CC_NOTARY_PROFIT_ID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NOTARY_PROFIT ADD CONSTRAINT FK_NOTARY_PROFIT_REF_NOTARY FOREIGN KEY (NOTARY_ID)
+	  REFERENCES BARS.NOTARY (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -87,46 +88,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_NOTARY_PROFIT_NOTARY_NN ***
+PROMPT *** Create  constraint CC_NOTARY_PROFIT_PROFIT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NOTARY_PROFIT MODIFY (NOTARY_ID CONSTRAINT CC_NOTARY_PROFIT_NOTARY_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NOTARY_PROFIT_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NOTARY_PROFIT MODIFY (BRANCH CONSTRAINT CC_NOTARY_PROFIT_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NOTARY_PROFIT_NBSOB22_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NOTARY_PROFIT MODIFY (NBSOB22 CONSTRAINT CC_NOTARY_PROFIT_NBSOB22_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NOTARY_PROFIT_REFOPER_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NOTARY_PROFIT MODIFY (REF_OPER CONSTRAINT CC_NOTARY_PROFIT_REFOPER_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NOTARY_PROFIT MODIFY (PROFIT CONSTRAINT CC_NOTARY_PROFIT_PROFIT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -147,10 +112,71 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_NOTARY_PROFIT_PROFIT_NN ***
+PROMPT *** Create  constraint CC_NOTARY_PROFIT_REFOPER_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NOTARY_PROFIT MODIFY (PROFIT CONSTRAINT CC_NOTARY_PROFIT_PROFIT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NOTARY_PROFIT MODIFY (REF_OPER CONSTRAINT CC_NOTARY_PROFIT_REFOPER_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NOTARY_PROFIT_NBSOB22_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NOTARY_PROFIT MODIFY (NBSOB22 CONSTRAINT CC_NOTARY_PROFIT_NBSOB22_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NOTARY_PROFIT_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NOTARY_PROFIT MODIFY (BRANCH CONSTRAINT CC_NOTARY_PROFIT_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NOTARY_PROFIT_NOTARY_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NOTARY_PROFIT MODIFY (NOTARY_ID CONSTRAINT CC_NOTARY_PROFIT_NOTARY_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_NOTARY_PROFIT_NOTARY_ACCR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NOTARY_PROFIT ADD CONSTRAINT FK_NOTARY_PROFIT_NOTARY_ACCR FOREIGN KEY (ACCR_ID)
+	  REFERENCES BARS.NOTARY_ACCREDITATION (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_NOTARY_PROFIT_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NOTARY_PROFIT MODIFY (ID CONSTRAINT CC_NOTARY_PROFIT_ID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -187,9 +213,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NOTARY_PROFIT ***
-grant SELECT                                                                 on NOTARY_PROFIT   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NOTARY_PROFIT   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on NOTARY_PROFIT   to UPLD;
 
 
 

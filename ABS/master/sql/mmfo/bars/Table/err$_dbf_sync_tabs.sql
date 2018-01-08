@@ -71,10 +71,6 @@ COMMENT ON COLUMN BARS.ERR$_DBF_SYNC_TABS.ORA_ERR_MESG$ IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DBF_SYNC_TABS ***
-grant SELECT                                                                 on ERR$_DBF_SYNC_TABS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DBF_SYNC_TABS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

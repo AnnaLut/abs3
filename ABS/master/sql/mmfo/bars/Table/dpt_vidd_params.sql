@@ -77,6 +77,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_DPTVIDDPARAMS_DPTVIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_PARAMS ADD CONSTRAINT FK_DPTVIDDPARAMS_DPTVIDD FOREIGN KEY (VIDD)
+	  REFERENCES BARS.DPT_VIDD (VIDD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTVIDDPARAMS_DPTVIDDTAGS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_PARAMS ADD CONSTRAINT FK_DPTVIDDPARAMS_DPTVIDDTAGS FOREIGN KEY (TAG)
+	  REFERENCES BARS.DPT_VIDD_TAGS (TAG) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DPTVIDDPARAMS_VIDD_NN ***
 begin   
  execute immediate '
@@ -127,11 +153,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_VIDD_PARAMS ***
-grant SELECT                                                                 on DPT_VIDD_PARAMS to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DPT_VIDD_PARAMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VIDD_PARAMS to BARS_DM;
 grant SELECT                                                                 on DPT_VIDD_PARAMS to DPT_ADMIN;
-grant SELECT                                                                 on DPT_VIDD_PARAMS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VIDD_PARAMS to WR_ALL_RIGHTS;
 
 

@@ -86,10 +86,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025781 ***
+PROMPT *** Create  constraint SYS_C0025784 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPERLIST_BAK MODIFY (DLGNAME NOT NULL ENABLE)';
+  ALTER TABLE BARS.OPERLIST_BAK MODIFY (USEARC NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -122,20 +122,16 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025784 ***
+PROMPT *** Create  constraint SYS_C0025781 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OPERLIST_BAK MODIFY (USEARC NOT NULL ENABLE)';
+  ALTER TABLE BARS.OPERLIST_BAK MODIFY (DLGNAME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-
-PROMPT *** Create  grants  OPERLIST_BAK ***
-grant SELECT                                                                 on OPERLIST_BAK    to BARSREADER_ROLE;
-grant SELECT                                                                 on OPERLIST_BAK    to UPLD;
 
 
 

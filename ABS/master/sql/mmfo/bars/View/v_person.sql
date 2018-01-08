@@ -40,9 +40,7 @@ PROMPT *** Create  view V_PERSON ***
     WHERE cp.rnk = q.rnk AND q.req_type IN (0, 2);
 
 PROMPT *** Create  grants  V_PERSON ***
-grant SELECT                                                                 on V_PERSON        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PERSON        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_PERSON        to UPLD;
 
 
 

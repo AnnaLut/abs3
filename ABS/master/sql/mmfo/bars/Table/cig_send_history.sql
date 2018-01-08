@@ -145,11 +145,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_SEND_HISTORY ***
-grant SELECT                                                                 on CIG_SEND_HISTORY to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on CIG_SEND_HISTORY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_SEND_HISTORY to BARS_DM;
 grant DELETE,INSERT,SELECT                                                   on CIG_SEND_HISTORY to CIG_ROLE;
-grant SELECT                                                                 on CIG_SEND_HISTORY to UPLD;
 
 
 

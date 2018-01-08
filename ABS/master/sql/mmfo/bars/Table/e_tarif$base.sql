@@ -61,6 +61,32 @@ COMMENT ON COLUMN BARS.E_TARIF$BASE.BRANCH IS '';
 
 
 
+PROMPT *** Create  constraint FK_ETARIF$BASE_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.E_TARIF$BASE ADD CONSTRAINT FK_ETARIF$BASE_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ETARIF$_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.E_TARIF$BASE ADD CONSTRAINT FK_ETARIF$_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint NK_E_TARIF$_ID ***
 begin   
  execute immediate '
@@ -125,9 +151,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  E_TARIF$BASE ***
-grant SELECT                                                                 on E_TARIF$BASE    to BARSREADER_ROLE;
 grant SELECT                                                                 on E_TARIF$BASE    to BARS_DM;
-grant SELECT                                                                 on E_TARIF$BASE    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on E_TARIF$BASE    to WR_ALL_RIGHTS;
 
 

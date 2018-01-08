@@ -133,12 +133,10 @@ COMMENT ON COLUMN BARS.ACC_OVER_UPDATE.DELETED IS '';
 
 
 
-PROMPT *** Create  constraint PK_ACCOVERUPD ***
+PROMPT *** Create  constraint CC_ACCOVERUPD_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_OVER_UPDATE ADD CONSTRAINT PK_ACCOVERUPD PRIMARY KEY (IDUPD)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.ACC_OVER_UPDATE MODIFY (KF CONSTRAINT CC_ACCOVERUPD_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -159,10 +157,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCOVERUPD_KF_NN ***
+PROMPT *** Create  constraint PK_ACCOVERUPD ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_OVER_UPDATE MODIFY (KF CONSTRAINT CC_ACCOVERUPD_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_OVER_UPDATE ADD CONSTRAINT PK_ACCOVERUPD PRIMARY KEY (IDUPD)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -195,10 +195,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCOVERUPD_EFFECTDATE_NN ***
+PROMPT *** Create  constraint CC_ACCOVERUPD_DELETED_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_OVER_UPDATE MODIFY (EFFECTDATE CONSTRAINT CC_ACCOVERUPD_EFFECTDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_OVER_UPDATE MODIFY (DELETED CONSTRAINT CC_ACCOVERUPD_DELETED_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -255,10 +255,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCOVERUPD_DELETED_NN ***
+PROMPT *** Create  constraint CC_ACCOVERUPD_EFFECTDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_OVER_UPDATE MODIFY (DELETED CONSTRAINT CC_ACCOVERUPD_DELETED_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_OVER_UPDATE MODIFY (EFFECTDATE CONSTRAINT CC_ACCOVERUPD_EFFECTDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -323,7 +323,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACC_OVER_UPDATE ***
-grant SELECT                                                                 on ACC_OVER_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ACC_OVER_UPDATE to BARSUPL;
 grant SELECT                                                                 on ACC_OVER_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_OVER_UPDATE to BARS_DM;

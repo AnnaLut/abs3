@@ -55,6 +55,32 @@ COMMENT ON COLUMN BARS.CC_RANG.TYPE_PRIOR IS 'При 1 - приоритет погашения устана
 
 
 
+PROMPT *** Create  constraint FK_CC_RANG_RANG ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_RANG ADD CONSTRAINT FK_CC_RANG_RANG FOREIGN KEY (RANG)
+	  REFERENCES BARS.CC_RANG_NAME (RANG) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CC_RANG_TIP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_RANG ADD CONSTRAINT FK_CC_RANG_TIP FOREIGN KEY (TIP)
+	  REFERENCES BARS.TIPS (TIP) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint NK_CC_RANG_TIP ***
 begin   
  execute immediate '
@@ -119,11 +145,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_RANG ***
-grant SELECT                                                                 on CC_RANG         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_RANG         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_RANG         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_RANG         to RCC_DEAL;
-grant SELECT                                                                 on CC_RANG         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_RANG         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CC_RANG         to WR_REFREAD;
 

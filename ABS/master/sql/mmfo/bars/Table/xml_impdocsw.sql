@@ -51,6 +51,19 @@ COMMENT ON COLUMN BARS.XML_IMPDOCSW.VALUE IS '';
 
 
 
+PROMPT *** Create  constraint XFK_XMLIMPDOCSW ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.XML_IMPDOCSW ADD CONSTRAINT XFK_XMLIMPDOCSW FOREIGN KEY (IMPREF)
+	  REFERENCES BARS.XML_IMPDOCS (IMPREF) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XIE_IMPDOCSW_IMPREF ***
 begin   
  execute immediate '
@@ -65,11 +78,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_IMPDOCSW ***
-grant SELECT                                                                 on XML_IMPDOCSW    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on XML_IMPDOCSW    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on XML_IMPDOCSW    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on XML_IMPDOCSW    to OPER000;
-grant SELECT                                                                 on XML_IMPDOCSW    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_IMPDOCSW    to WR_ALL_RIGHTS;
 
 

@@ -65,6 +65,18 @@ COMMENT ON COLUMN BARS.BPK_PARAMETERS_UPDATE.VALUE IS 'Значення параметру';
 
 
 
+PROMPT *** Create  constraint CC_BPKPARAMETERSUPDATE_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_PARAMETERS_UPDATE MODIFY (KF CONSTRAINT CC_BPKPARAMETERSUPDATE_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_BPKPARAMSUPD ***
 begin   
  execute immediate '
@@ -79,10 +91,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKPARAMETERSUPDATE_KF_NN ***
+PROMPT *** Create  constraint FK_BPKPARAMETERSUPDATE_KF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_PARAMETERS_UPDATE MODIFY (KF CONSTRAINT CC_BPKPARAMETERSUPDATE_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BPK_PARAMETERS_UPDATE ADD CONSTRAINT FK_BPKPARAMETERSUPDATE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -115,10 +128,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKPARAMSUPD_CHGDATE_NN ***
+PROMPT *** Create  constraint CC_BPKPARAMSUPD_TAG_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_PARAMETERS_UPDATE MODIFY (CHGDATE CONSTRAINT CC_BPKPARAMSUPD_CHGDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BPK_PARAMETERS_UPDATE MODIFY (TAG CONSTRAINT CC_BPKPARAMSUPD_TAG_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -175,10 +188,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKPARAMSUPD_TAG_NN ***
+PROMPT *** Create  constraint CC_BPKPARAMSUPD_CHGDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_PARAMETERS_UPDATE MODIFY (TAG CONSTRAINT CC_BPKPARAMSUPD_TAG_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BPK_PARAMETERS_UPDATE MODIFY (CHGDATE CONSTRAINT CC_BPKPARAMSUPD_CHGDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -243,7 +256,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_PARAMETERS_UPDATE ***
-grant SELECT                                                                 on BPK_PARAMETERS_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_PARAMETERS_UPDATE to BARSUPL;
 grant SELECT                                                                 on BPK_PARAMETERS_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_PARAMETERS_UPDATE to BARS_DM;

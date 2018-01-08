@@ -20,10 +20,6 @@ PROMPT *** Create  view V_ND_ACC ***
      FROM   nd_acc n, accounts a
     WHERE   a.dazs IS NULL AND a.acc = n.acc;
 
-PROMPT *** Create  grants  V_ND_ACC ***
-grant SELECT                                                                 on V_ND_ACC        to BARSREADER_ROLE;
-grant SELECT                                                                 on V_ND_ACC        to UPLD;
-
 
 
 PROMPT ===================================================================================== 

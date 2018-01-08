@@ -16,10 +16,8 @@ where banks.mfop = gl.kf
  ;
 
 PROMPT *** Create  grants  V_UCHRRP ***
-grant SELECT                                                                 on V_UCHRRP        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_UCHRRP        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_UCHRRP        to TOSS;
-grant SELECT                                                                 on V_UCHRRP        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_UCHRRP        to WR_ALL_RIGHTS;
 
 

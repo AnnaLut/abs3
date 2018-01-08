@@ -35,10 +35,6 @@ PROMPT *** Create  view CP_DAT_V ***
    --   and cena!=cena_start
    ORDER BY 2, 7;
 
-PROMPT *** Create  grants  CP_DAT_V ***
-grant SELECT                                                                 on CP_DAT_V        to BARSREADER_ROLE;
-grant SELECT                                                                 on CP_DAT_V        to UPLD;
-
 
 
 PROMPT ===================================================================================== 

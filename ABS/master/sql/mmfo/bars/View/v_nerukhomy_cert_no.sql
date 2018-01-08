@@ -22,9 +22,7 @@ PROMPT *** Create  view V_NERUKHOMY_CERT_NO ***
 
 PROMPT *** Create  grants  V_NERUKHOMY_CERT_NO ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_NERUKHOMY_CERT_NO to ABS_ADMIN;
-grant SELECT                                                                 on V_NERUKHOMY_CERT_NO to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_NERUKHOMY_CERT_NO to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_NERUKHOMY_CERT_NO to UPLD;
 grant FLASHBACK,SELECT                                                       on V_NERUKHOMY_CERT_NO to WR_REFREAD;
 
 

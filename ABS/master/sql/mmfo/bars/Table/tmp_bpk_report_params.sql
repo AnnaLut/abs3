@@ -61,10 +61,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_BPK_REPORT_PARAMS ***
-grant SELECT                                                                 on TMP_BPK_REPORT_PARAMS to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_BPK_REPORT_PARAMS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

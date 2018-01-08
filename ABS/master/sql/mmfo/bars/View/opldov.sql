@@ -1,14 +1,18 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/OPLDOV.sql =========*** Run *** =======
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view OPLDOV ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.OPLDOV ("REF", "TT", "DK", "ACC", "FDAT", "S", "SQ", "TXT", "STMT", "SOS") AS 
-  SELECT o.REF,
+CREATE OR REPLACE FORCE VIEW BARS.OPLDOV
+(
+   REF,
+   TT,
+   DK,
+   ACC,
+   FDAT,
+   S,
+   SQ,
+   TXT,
+   STMT,
+   SOS
+)
+AS
+   SELECT o.REF,
           o.TT,
           o.DK,
           o.ACC,
@@ -34,14 +38,19 @@ PROMPT *** Create  view OPLDOV ***
      FROM opldok o, accounts a
     WHERE o.acc = a.acc AND a.nbs IS NULL AND a.accc IS NOT NULL;
 
-PROMPT *** Create  grants  OPLDOV ***
-grant SELECT                                                                 on OPLDOV          to BARSREADER_ROLE;
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OPLDOV          to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on OPLDOV          to UPLD;
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OPLDOV          to WR_ALL_RIGHTS;
 
+GRANT DELETE,
+      INSERT,
+      SELECT,
+      UPDATE,
+      FLASHBACK
+   ON BARS.OPLDOV
+   TO bars_Access_defrole;
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/OPLDOV.sql =========*** End *** =======
-PROMPT ===================================================================================== 
+GRANT DELETE,
+      INSERT,
+      SELECT,
+      UPDATE,
+      FLASHBACK
+   ON BARS.OPLDOV
+   TO WR_ALL_RIGHTS;

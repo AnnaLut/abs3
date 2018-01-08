@@ -38,8 +38,7 @@ begin
 	NPK_3579 VARCHAR2(160), 
 	OB22_6110 VARCHAR2(2), 
 	ID_GLOB NUMBER, 
-	FL1 NUMBER(*,0), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+	FL1 NUMBER(*,0)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -72,7 +71,6 @@ COMMENT ON COLUMN BARS.E_TARIF.NPK_3579 IS '';
 COMMENT ON COLUMN BARS.E_TARIF.OB22_6110 IS 'ОБ22 для 6110';
 COMMENT ON COLUMN BARS.E_TARIF.ID_GLOB IS 'Код Глоб. тарифу';
 COMMENT ON COLUMN BARS.E_TARIF.FL1 IS '1 - тариф за повний м_сяць';
-COMMENT ON COLUMN BARS.E_TARIF.KF IS '';
 
 
 
@@ -92,7 +90,7 @@ exception when others then
 PROMPT *** Create  constraint XPK_E_TARIF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.E_TARIF ADD CONSTRAINT XPK_E_TARIF PRIMARY KEY (KF, ID)
+  ALTER TABLE BARS.E_TARIF ADD CONSTRAINT XPK_E_TARIF PRIMARY KEY (KF,ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYNI  ENABLE';
 exception when others then
@@ -101,27 +99,21 @@ exception when others then
 /
 
 
-
-
-PROMPT *** Create  index XPK_E_TARIF ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.XPK_E_TARIF ON BARS.E_TARIF (KF, ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
+begin
+execute immediate 'alter table E_TARIF
+  add constraint FK_ETARIF_KF_IDGLOB foreign key (KF, ID_GLOB)
+  references TARIF (KF, KOD)';
+ exception when others then 
+    if sqlcode = -2275 then null; else raise; 
+    end if; 
+end;
+/ 
 
 
 PROMPT *** Create  grants  E_TARIF ***
-grant SELECT                                                                 on E_TARIF         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on E_TARIF         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on E_TARIF         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on E_TARIF         to ELT;
-grant SELECT                                                                 on E_TARIF         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on E_TARIF         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on E_TARIF         to WR_REFREAD;
 

@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ibx_pack.sql =========*** Run *** ==
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.IBX_PACK is
+CREATE OR REPLACE PACKAGE BARS.ibx_pack is
 
   -- ===============================================================================================
   g_header_version constant varchar2(64) := 'version 2.0.1 14.02.2017';
@@ -194,7 +188,7 @@
 
 end ibx_pack;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.IBX_PACK is
+CREATE OR REPLACE PACKAGE BODY BARS.ibx_pack is
   -- ================================== Константы ===============================================
   g_body_version constant varchar2(64) := 'version 2.0 15.02.2017';
 
@@ -2559,7 +2553,7 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
            sb_ => p_sum );
 
     gl.pay( 2, l_ref,l_bdate);
-
+    
     p_res_ref := l_ref;
 
 
@@ -2584,6 +2578,7 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
        l_trans_2902 oper.nlsb%type;
        l_trans_2902_nm accounts.nms%type;
        l_6110 oper.nlsb%type;
+       l_trans_2902_nm accounts.nms%type;
        l_nls_t00 oper.nlsb%type;
        l_debit_name oper.nam_a%type;
        l_dk         number:=1;
@@ -2720,7 +2715,7 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
                       sos_    => null,
                       prty_   => 0,
                       uid_    => null);
-
+                      
           select ac.nls, ac.nms
             into l_trans_2902, l_trans_2902_nm
             from accounts ac
@@ -2747,7 +2742,7 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
               select ac.nls
                 into l_6110
                 from accounts ac
-               where ac.nls = '65104740015099'
+               where ac.nls = '61108740015099'
                  and ac.ob22 = '74'
                  and ac.kf = l_mfo
                  and ac.kv = p_receiver_curr
@@ -2766,8 +2761,8 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
                      nls2_ => l_6110,
                        sb_ => l_fee_amount);
            end if;
-
-
+             
+            
 
               if (l_mfo != p_receiver_mfo) then
                 select get_proc_nls('T00',980)
@@ -2851,14 +2846,5 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
 
 end ibx_pack;
 /
- show err;
- 
-PROMPT *** Create  grants  IBX_PACK ***
-grant EXECUTE                                                                on IBX_PACK        to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/ibx_pack.sql =========*** End *** ==
- PROMPT ===================================================================================== 
- 
+grant EXECUTE on ibx_pack to BARS_ACCESS_DEFROLE;

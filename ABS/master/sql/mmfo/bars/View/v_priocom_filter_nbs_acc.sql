@@ -21,10 +21,8 @@ from accounts a
 where dazs is null or dazs is not null and dazs>bankdate_g;
 
 PROMPT *** Create  grants  V_PRIOCOM_FILTER_NBS_ACC ***
-grant SELECT                                                                 on V_PRIOCOM_FILTER_NBS_ACC to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PRIOCOM_FILTER_NBS_ACC to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PRIOCOM_FILTER_NBS_ACC to START1;
-grant SELECT                                                                 on V_PRIOCOM_FILTER_NBS_ACC to UPLD;
 
 
 

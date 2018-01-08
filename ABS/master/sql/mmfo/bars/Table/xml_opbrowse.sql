@@ -46,6 +46,19 @@ COMMENT ON COLUMN BARS.XML_OPBROWSE.BROWSER IS '';
 
 
 
+PROMPT *** Create  constraint XFK_XMLOPBROWSE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.XML_OPBROWSE ADD CONSTRAINT XFK_XMLOPBROWSE FOREIGN KEY (TAG)
+	  REFERENCES BARS.OP_FIELD (TAG) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint XPK_XMLOPBROWSE ***
 begin   
  execute immediate '
@@ -74,9 +87,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_OPBROWSE ***
-grant SELECT                                                                 on XML_OPBROWSE    to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_OPBROWSE    to BARS_DM;
-grant SELECT                                                                 on XML_OPBROWSE    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_OPBROWSE    to WR_ALL_RIGHTS;
 
 

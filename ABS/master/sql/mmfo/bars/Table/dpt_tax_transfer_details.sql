@@ -57,6 +57,94 @@ COMMENT ON COLUMN BARS.DPT_TAX_TRANSFER_DETAILS.OKPO IS 'Код ЄДРПУО отримувача';
 
 
 
+PROMPT *** Create  constraint FK_DPTTAXTRANSFDET_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TAX_TRANSFER_DETAILS ADD CONSTRAINT FK_DPTTAXTRANSFDET_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTTAXTRANSFDET_MFO ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TAX_TRANSFER_DETAILS ADD CONSTRAINT FK_DPTTAXTRANSFDET_MFO FOREIGN KEY (MFO)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_DPTTAXTRANSFERDETAILS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TAX_TRANSFER_DETAILS ADD CONSTRAINT PK_DPTTAXTRANSFERDETAILS PRIMARY KEY (BRANCH)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TAXTRANSDET_OKPO_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TAX_TRANSFER_DETAILS MODIFY (OKPO CONSTRAINT CC_TAXTRANSDET_OKPO_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TAXTRANSDET_NMS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TAX_TRANSFER_DETAILS MODIFY (NMS CONSTRAINT CC_TAXTRANSDET_NMS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TAXTRANSDET_NLS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TAX_TRANSFER_DETAILS MODIFY (NLS CONSTRAINT CC_TAXTRANSDET_NLS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TAXTRANSDET_MFO_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TAX_TRANSFER_DETAILS MODIFY (MFO CONSTRAINT CC_TAXTRANSDET_MFO_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_TAXTRANSDET_BRANCH_NN ***
 begin   
  execute immediate '
@@ -81,68 +169,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TAXTRANSDET_MFO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TAX_TRANSFER_DETAILS MODIFY (MFO CONSTRAINT CC_TAXTRANSDET_MFO_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TAXTRANSDET_NLS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TAX_TRANSFER_DETAILS MODIFY (NLS CONSTRAINT CC_TAXTRANSDET_NLS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TAXTRANSDET_NMS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TAX_TRANSFER_DETAILS MODIFY (NMS CONSTRAINT CC_TAXTRANSDET_NMS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TAXTRANSDET_OKPO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TAX_TRANSFER_DETAILS MODIFY (OKPO CONSTRAINT CC_TAXTRANSDET_OKPO_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint PK_DPTTAXTRANSFERDETAILS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TAX_TRANSFER_DETAILS ADD CONSTRAINT PK_DPTTAXTRANSFERDETAILS PRIMARY KEY (BRANCH)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_DPTTAXTRANSFERDETAILS ***
 begin   
  execute immediate '
@@ -158,12 +184,10 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_TAX_TRANSFER_DETAILS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_TAX_TRANSFER_DETAILS to ABS_ADMIN;
-grant SELECT                                                                 on DPT_TAX_TRANSFER_DETAILS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_TAX_TRANSFER_DETAILS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_TAX_TRANSFER_DETAILS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_TAX_TRANSFER_DETAILS to DPT_ADMIN;
 grant SELECT                                                                 on DPT_TAX_TRANSFER_DETAILS to START1;
-grant SELECT                                                                 on DPT_TAX_TRANSFER_DETAILS to UPLD;
 
 
 

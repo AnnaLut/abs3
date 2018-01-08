@@ -67,6 +67,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_KLPARCH_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLP_ARCH ADD CONSTRAINT FK_KLPARCH_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C006023 ***
 begin   
  execute immediate '
@@ -117,11 +130,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  KLP_ARCH ***
-grant SELECT                                                                 on KLP_ARCH        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_ARCH        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KLP_ARCH        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_ARCH        to TECH_MOM1;
-grant SELECT                                                                 on KLP_ARCH        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLP_ARCH        to WR_ALL_RIGHTS;
 
 

@@ -99,6 +99,206 @@ COMMENT ON COLUMN BARS.TOP_CONTRACTS.BRANCH IS '';
 
 
 
+PROMPT *** Create  constraint FK_TOPCONTRACTS_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT FK_TOPCONTRACTS_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TOPCONTRACTS_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT FK_TOPCONTRACTS_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_TOPCONTRACTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT PK_TOPCONTRACTS PRIMARY KEY (PID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TOPCONTRACTS_IMPEXP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT CC_TOPCONTRACTS_IMPEXP CHECK (impexp   IN (0, 1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TOPCONTRACTS_IDOPER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT CC_TOPCONTRACTS_IDOPER CHECK (id_oper  IN (1, 2)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TOPCONTRACTS_DATES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT CC_TOPCONTRACTS_DATES CHECK (dateopen <= dateclose OR dateclose IS NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TOPCONTRACTS_CLOSED ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT CC_TOPCONTRACTS_CLOSED CHECK (closed   IN (0, 1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TOPCONTRACTS_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS MODIFY (BRANCH CONSTRAINT CC_TOPCONTRACTS_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TOPCONTRACTS_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS MODIFY (KF CONSTRAINT CC_TOPCONTRACTS_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TOPCONTRACTS_CONTROLDAYS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS MODIFY (CONTROL_DAYS CONSTRAINT CC_TOPCONTRACTS_CONTROLDAYS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TOPCONTRACTS_CLOSED_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS MODIFY (CLOSED CONSTRAINT CC_TOPCONTRACTS_CLOSED_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TOPCONTRACTS_IDOPER_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS MODIFY (ID_OPER CONSTRAINT CC_TOPCONTRACTS_IDOPER_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TOPCONTRACTS_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT FK_TOPCONTRACTS_TABVAL FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TOPCONTRACTS_COUNTRY ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT FK_TOPCONTRACTS_COUNTRY FOREIGN KEY (BENEFCOUNTRY)
+	  REFERENCES BARS.COUNTRY (COUNTRY) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TOPCONTRACTS_COUNTRY2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT FK_TOPCONTRACTS_COUNTRY2 FOREIGN KEY (BANKCOUNTRY)
+	  REFERENCES BARS.COUNTRY (COUNTRY) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TOPCONTRACTS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT FK_TOPCONTRACTS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_TOPCONTRACTS_PID_NN ***
 begin   
  execute immediate '
@@ -171,128 +371,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TOPCONTRACTS_IDOPER_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TOP_CONTRACTS MODIFY (ID_OPER CONSTRAINT CC_TOPCONTRACTS_IDOPER_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TOPCONTRACTS_CLOSED_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TOP_CONTRACTS MODIFY (CLOSED CONSTRAINT CC_TOPCONTRACTS_CLOSED_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TOPCONTRACTS_CONTROLDAYS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TOP_CONTRACTS MODIFY (CONTROL_DAYS CONSTRAINT CC_TOPCONTRACTS_CONTROLDAYS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TOPCONTRACTS_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TOP_CONTRACTS MODIFY (KF CONSTRAINT CC_TOPCONTRACTS_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TOPCONTRACTS_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TOP_CONTRACTS MODIFY (BRANCH CONSTRAINT CC_TOPCONTRACTS_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TOPCONTRACTS_CLOSED ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT CC_TOPCONTRACTS_CLOSED CHECK (closed   IN (0, 1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TOPCONTRACTS_DATES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT CC_TOPCONTRACTS_DATES CHECK (dateopen <= dateclose OR dateclose IS NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TOPCONTRACTS_IDOPER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT CC_TOPCONTRACTS_IDOPER CHECK (id_oper  IN (1, 2)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TOPCONTRACTS_IMPEXP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT CC_TOPCONTRACTS_IMPEXP CHECK (impexp   IN (0, 1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint PK_TOPCONTRACTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TOP_CONTRACTS ADD CONSTRAINT PK_TOPCONTRACTS PRIMARY KEY (PID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index I1_TOPCONTRACTS ***
 begin   
  execute immediate '
@@ -323,11 +401,9 @@ exception when others then
 PROMPT *** Create  grants  TOP_CONTRACTS ***
 grant REFERENCES,SELECT                                                      on TOP_CONTRACTS   to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on TOP_CONTRACTS   to BARSAQ_ADM with grant option;
-grant SELECT                                                                 on TOP_CONTRACTS   to BARSREADER_ROLE;
 grant SELECT                                                                 on TOP_CONTRACTS   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TOP_CONTRACTS   to BARS_DM;
 grant SELECT                                                                 on TOP_CONTRACTS   to TECH_MOM1;
-grant SELECT                                                                 on TOP_CONTRACTS   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TOP_CONTRACTS   to WR_ALL_RIGHTS;
 grant SELECT                                                                 on TOP_CONTRACTS   to ZAY;
 

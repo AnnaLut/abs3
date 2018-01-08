@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_OTC_ARC_INFO.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OTC_ARC_INFO ***
-grant SELECT                                                                 on ERR$_OTC_ARC_INFO to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OTC_ARC_INFO to UPLD;
-
 
 
 PROMPT ===================================================================================== 

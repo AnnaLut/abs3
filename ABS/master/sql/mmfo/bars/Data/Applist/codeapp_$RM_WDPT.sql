@@ -1,3 +1,5 @@
+SET SERVEROUTPUT ON 
+SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_WDPT.sql =========*
 PROMPT ===================================================================================== 
@@ -16,11 +18,11 @@ PROMPT *** Create/replace  ARM  $RM_WDPT ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-	d integer := 0;
+    d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_WDPT створюємо (або оновлюємо) АРМ АРМ Вкладних операцій (WEB) ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
-                             P_ARM_NAME              => l_application_name,
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
+                             P_ARM_NAME              => l_application_name, 
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -28,383 +30,383 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перегляд депозитів розірваних у період політичної нестабільност ********** ');
           --  Створюємо функцію Перегляд депозитів розірваних у період політичної нестабільност
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Перегляд депозитів розірваних у період політичної нестабільност',
                                                   p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_dep_broken_in_period_view',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Депозити розірвані у період політичної нестабільності
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Депозити розірвані у період політичної нестабільності',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_dep_broken_period_serch',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Депозити розірвані у період політичної нестабільності',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_dep_broken_period_serch',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Депозити розірвані у період політичної нестабільності ********** ');
           --  Створюємо функцію Депозити розірвані у період політичної нестабільності
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Депозити розірвані у період політичної нестабільності',
                                                   p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_dep_broken_period_serch',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Перегляд розірваного депозиту в пер. політ. нестаб.
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Перегляд розірваного депозиту в пер. політ. нестаб.',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_dep_broken_period_old_view&dep_num=\S*&dep_date=\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Перегляд розірваного депозиту в пер. політ. нестаб.',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_dep_broken_period_old_view&dep_num=\S*&dep_date=\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Внести данi про ДАТИ довiреностей ********** ');
           --  Створюємо функцію Внести данi про ДАТИ довiреностей
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Внести данi про ДАТИ довiреностей',
                                                   p_funcname => '/barsroot/barsweb/references/refbook.aspx?tabid=3347&mode=RW&force=1&rwflag=2',
-                                                  p_rolename => 'DPT_ROLE' ,
+                                                  p_rolename => 'DPT_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Друк звітів ********** ');
           --  Створюємо функцію Друк звітів
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Друк звітів',
                                                   p_funcname => '/barsroot/cbirep/rep_list.aspx?codeapp=\S*',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
-
-      --  Створюємо дочірню функцію Друк звітів
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Друк звітів',
-															  p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+     
 
       --  Створюємо дочірню функцію Друк звітів
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Друк звітів',
-															  p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Друк звітів',
+                                                              p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Друк звітів
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'Друк звітів',
+                                                              p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Візування "своїх" операцій ********** ');
           --  Створюємо функцію Візування "своїх" операцій
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Візування "своїх" операцій',
                                                   p_funcname => '/barsroot/checkinner/default.aspx?type=0',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Візування "своїх" операцій
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Візування "своїх" операцій',
-															  p_funcname => '/barsroot/checkinner/documents.aspx?type=0&grpid=\w+',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Візування "своїх" операцій',
+                                                              p_funcname => '/barsroot/checkinner/documents.aspx?type=0&grpid=\w+',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Сервіс додатку BarsWeb.CheckInner
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сервіс додатку BarsWeb.CheckInner',
-															  p_funcname => '/barsroot/checkinner/service.asmx',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Сервіс додатку BarsWeb.CheckInner',
+                                                              p_funcname => '/barsroot/checkinner/service.asmx',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перенесення депозитів у нерухомі ********** ');
           --  Створюємо функцію Перенесення депозитів у нерухомі
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Перенесення депозитів у нерухомі',
                                                   p_funcname => '/barsroot/deposit/depositapplicantstoimmobile.aspx',
-                                                  p_rolename => 'DPT_ROLE' ,
+                                                  p_rolename => 'DPT_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 1. Відкриття нового вкладу ********** ');
           --  Створюємо функцію 1. Відкриття нового вкладу
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '1. Відкриття нового вкладу',
                                                   p_funcname => '/barsroot/deposit/depositclient.aspx',
-                                                  p_rolename => 'DPT_ROLE' ,
+                                                  p_rolename => 'DPT_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Сторінка  deposit/Default.aspx
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сторінка  deposit/Default.aspx',
-															  p_funcname => '/barsroot/deposit/default.aspx\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Сторінка  deposit/Default.aspx',
+                                                              p_funcname => '/barsroot/deposit/default.aspx\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 7. Інформація про вкладника ********** ');
           --  Створюємо функцію 7. Інформація про вкладника
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '7. Інформація про вкладника',
                                                   p_funcname => '/barsroot/deposit/depositclient.aspx?customer=1',
-                                                  p_rolename => 'DPT_ROLE' ,
+                                                  p_rolename => 'DPT_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Сторінка  deposit/Default.aspx
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сторінка  deposit/Default.aspx',
-															  p_funcname => '/barsroot/deposit/default.aspx\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Сторінка  deposit/Default.aspx',
+                                                              p_funcname => '/barsroot/deposit/default.aspx\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 2. Створення додаткових угод ********** ');
           --  Створюємо функцію 2. Створення додаткових угод
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '2. Створення додаткових угод',
                                                   p_funcname => '/barsroot/deposit/depositsearch.aspx?action=agreement&extended=0',
-                                                  p_rolename => 'DPT_ROLE' ,
+                                                  p_rolename => 'DPT_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Сторінка  deposit/Default.aspx
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сторінка  deposit/Default.aspx',
-															  p_funcname => '/barsroot/deposit/default.aspx\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Сторінка  deposit/Default.aspx',
+                                                              p_funcname => '/barsroot/deposit/default.aspx\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 5. Дострокове розторгнення ********** ');
           --  Створюємо функцію 5. Дострокове розторгнення
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '5. Дострокове розторгнення',
                                                   p_funcname => '/barsroot/deposit/depositsearch.aspx?action=close&extended=0',
-                                                  p_rolename => 'DPT_ROLE' ,
+                                                  p_rolename => 'DPT_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Сторінка  deposit/Default.aspx
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сторінка  deposit/Default.aspx',
-															  p_funcname => '/barsroot/deposit/default.aspx\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Сторінка  deposit/Default.aspx',
+                                                              p_funcname => '/barsroot/deposit/default.aspx\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 3. Виплата вкладу ********** ');
           --  Створюємо функцію 3. Виплата вкладу
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '3. Виплата вкладу',
                                                   p_funcname => '/barsroot/deposit/depositsearch.aspx?action=deposit&extended=0',
-                                                  p_rolename => 'DPT_ROLE' ,
+                                                  p_rolename => 'DPT_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Сторінка  deposit/Default.aspx
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сторінка  deposit/Default.aspx',
-															  p_funcname => '/barsroot/deposit/default.aspx\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Сторінка  deposit/Default.aspx',
+                                                              p_funcname => '/barsroot/deposit/default.aspx\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію B. Перегляд історії ********** ');
           --  Створюємо функцію B. Перегляд історії
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'B. Перегляд історії',
                                                   p_funcname => '/barsroot/deposit/depositsearch.aspx?action=history&extended=0',
-                                                  p_rolename => 'DPT_ROLE' ,
+                                                  p_rolename => 'DPT_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Сторінка  deposit/Default.aspx
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сторінка  deposit/Default.aspx',
-															  p_funcname => '/barsroot/deposit/default.aspx\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Сторінка  deposit/Default.aspx',
+                                                              p_funcname => '/barsroot/deposit/default.aspx\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 4. Виплата відсотків ********** ');
           --  Створюємо функцію 4. Виплата відсотків
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '4. Виплата відсотків',
                                                   p_funcname => '/barsroot/deposit/depositsearch.aspx?action=percent&extended=0',
-                                                  p_rolename => 'DPT_ROLE' ,
+                                                  p_rolename => 'DPT_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Сторінка  deposit/Default.aspx
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сторінка  deposit/Default.aspx',
-															  p_funcname => '/barsroot/deposit/default.aspx\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Сторінка  deposit/Default.aspx',
+                                                              p_funcname => '/barsroot/deposit/default.aspx\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію A. Друк договорів ********** ');
           --  Створюємо функцію A. Друк договорів
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'A. Друк договорів',
                                                   p_funcname => '/barsroot/deposit/depositsearch.aspx?action=print',
-                                                  p_rolename => 'DPT_ROLE' ,
+                                                  p_rolename => 'DPT_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Сторінка  deposit/Default.aspx
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сторінка  deposit/Default.aspx',
-															  p_funcname => '/barsroot/deposit/default.aspx\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Сторінка  deposit/Default.aspx',
+                                                              p_funcname => '/barsroot/deposit/default.aspx\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 6. Пролонгація вкладів ********** ');
           --  Створюємо функцію 6. Пролонгація вкладів
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '6. Пролонгація вкладів',
                                                   p_funcname => '/barsroot/deposit/depositsearch.aspx?action=prolongation',
-                                                  p_rolename => 'DPT_ROLE' ,
+                                                  p_rolename => 'DPT_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Сторінка  deposit/Default.aspx
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сторінка  deposit/Default.aspx',
-															  p_funcname => '/barsroot/deposit/default.aspx\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Сторінка  deposit/Default.aspx',
+                                                              p_funcname => '/barsroot/deposit/default.aspx\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 9. Пошук договорів ********** ');
           --  Створюємо функцію 9. Пошук договорів
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '9. Пошук договорів',
                                                   p_funcname => '/barsroot/deposit/depositsearch.aspx?action=show',
-                                                  p_rolename => 'DPT_ROLE' ,
+                                                  p_rolename => 'DPT_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Сторінка  deposit/Default.aspx
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сторінка  deposit/Default.aspx',
-															  p_funcname => '/barsroot/deposit/default.aspx\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Сторінка  deposit/Default.aspx',
+                                                              p_funcname => '/barsroot/deposit/default.aspx\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 8. Реєстрація свідоцтв про право на спадок ********** ');
           --  Створюємо функцію 8. Реєстрація свідоцтв про право на спадок
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '8. Реєстрація свідоцтв про право на спадок',
                                                   p_funcname => '/barsroot/deposit/depositsearch.aspx?action=testament',
-                                                  p_rolename => 'DPT_ROLE' ,
+                                                  p_rolename => 'DPT_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Сторінка  deposit/Default.aspx
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Сторінка  deposit/Default.aspx',
-															  p_funcname => '/barsroot/deposit/default.aspx\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Сторінка  deposit/Default.aspx',
+                                                              p_funcname => '/barsroot/deposit/default.aspx\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Зарахування ПЕНСІЇ по списку ********** ');
           --  Створюємо функцію Зарахування ПЕНСІЇ по списку
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Зарахування ПЕНСІЇ по списку',
                                                   p_funcname => '/barsroot/docinput/pay_pfu.aspx',
-                                                  p_rolename => 'PYOD001' ,
+                                                  p_rolename => 'PYOD001' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довідники NEW ********** ');
           --  Створюємо функцію Довідники NEW
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Довідники NEW',
                                                   p_funcname => '/barsroot/referencebook/referencelist/',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_WDPT) - АРМ Вкладних операцій (WEB)  ');
     l := l_function_ids.first;
@@ -412,8 +414,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-
-
+     
+     
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -427,32 +429,6 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
-umu.add_report2arm(165,'$RM_WDPT');
-umu.add_report2arm(171,'$RM_WDPT');
-umu.add_report2arm(177,'$RM_WDPT');
-umu.add_report2arm(184,'$RM_WDPT');
-umu.add_report2arm(185,'$RM_WDPT');
-umu.add_report2arm(187,'$RM_WDPT');
-umu.add_report2arm(213,'$RM_WDPT');
-umu.add_report2arm(222,'$RM_WDPT');
-umu.add_report2arm(228,'$RM_WDPT');
-umu.add_report2arm(230,'$RM_WDPT');
-umu.add_report2arm(238,'$RM_WDPT');
-umu.add_report2arm(260,'$RM_WDPT');
-umu.add_report2arm(261,'$RM_WDPT');
-umu.add_report2arm(262,'$RM_WDPT');
-umu.add_report2arm(263,'$RM_WDPT');
-umu.add_report2arm(264,'$RM_WDPT');
-umu.add_report2arm(271,'$RM_WDPT');
-umu.add_report2arm(346,'$RM_WDPT');
-umu.add_report2arm(370,'$RM_WDPT');
-umu.add_report2arm(701,'$RM_WDPT');
-umu.add_report2arm(702,'$RM_WDPT');
-umu.add_report2arm(800,'$RM_WDPT');
-umu.add_report2arm(949,'$RM_WDPT');
-umu.add_report2arm(967,'$RM_WDPT');
-umu.add_report2arm(1008,'$RM_WDPT');
-commit;
 end;
 /
 

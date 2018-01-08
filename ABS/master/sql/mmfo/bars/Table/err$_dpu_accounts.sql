@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_DPU_ACCOUNTS.ACCID IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPU_ACCOUNTS ***
-grant SELECT                                                                 on ERR$_DPU_ACCOUNTS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPU_ACCOUNTS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

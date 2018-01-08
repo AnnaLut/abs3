@@ -121,6 +121,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_TMPREZOBESP23_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_REZ_OBESP23 ADD CONSTRAINT FK_TMPREZOBESP23_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_TMPREZOBESP23_KF_NN ***
 begin   
  execute immediate '
@@ -147,7 +160,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_REZ_OBESP23 ***
-grant SELECT                                                                 on TMP_REZ_OBESP23 to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_REZ_OBESP23 to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_REZ_OBESP23 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_REZ_OBESP23 to BARS_DM;

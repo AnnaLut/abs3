@@ -69,10 +69,8 @@ COMMENT ON COLUMN BARS.UR1.ACC3 IS '';
 
 
 PROMPT *** Create  grants  UR1 ***
-grant SELECT                                                                 on UR1             to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on UR1             to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on UR1             to START1;
-grant SELECT                                                                 on UR1             to UPLD;
 
 
 

@@ -20,10 +20,8 @@ PROMPT *** Create  view V_WEB_MAIL ***
           );
 
 PROMPT *** Create  grants  V_WEB_MAIL ***
-grant SELECT                                                                 on V_WEB_MAIL      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WEB_MAIL      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_WEB_MAIL      to START1;
-grant SELECT                                                                 on V_WEB_MAIL      to UPLD;
 
 
 

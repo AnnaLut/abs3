@@ -61,9 +61,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  STAFF_TIPS_BACKUP ***
-grant SELECT                                                                 on STAFF_TIPS_BACKUP to BARSREADER_ROLE;
 grant SELECT                                                                 on STAFF_TIPS_BACKUP to BARS_DM;
-grant SELECT                                                                 on STAFF_TIPS_BACKUP to UPLD;
 
 
 

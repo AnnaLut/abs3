@@ -20,7 +20,7 @@ PROMPT *** Create  procedure NBUR_P_F2G_NC ***
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 begin
-    p_f2G_NN (p_report_date, 'D');
+    p_f2G_NN (p_report_date);
     
     p_nbu_save_rezult(p_report_date, p_kod_filii, '#2G'); 
 

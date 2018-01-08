@@ -14,9 +14,7 @@ PROMPT *** Create  view V_SW_ALL_PAGES ***
                           order by j.page, w.n;
 
 PROMPT *** Create  grants  V_SW_ALL_PAGES ***
-grant SELECT                                                                 on V_SW_ALL_PAGES  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW_ALL_PAGES  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_SW_ALL_PAGES  to UPLD;
 
 
 

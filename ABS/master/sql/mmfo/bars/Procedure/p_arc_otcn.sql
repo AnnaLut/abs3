@@ -14,7 +14,7 @@ PROMPT *** Create  procedure P_ARC_OTCN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%is
 % DESCRIPTION :    Допоміжгна функція для формування #A7
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     :    03/08/2017 (02/08/2017)
+% VERSION     :    27/01/2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: PDAT_ - звітна дата
             PMODE_ - ознака режиму формування
@@ -30,44 +30,14 @@ PROMPT *** Create  procedure P_ARC_OTCN ***
   mfo_    char(6);
   dat1_   date;
   dat2_   date;
-  cnt_ins1_   number := 0;
-  cnt_ins2_   number := 0;
-  
-  lmode_  number := pmode_;
-  cnt_    number := 0;
 begin
 
   bars_audit.trace( '%s: Entry with ( pdat_=%s, pmode_=%s ).'
                   , $$PLSQL_UNIT, to_char(pdat_,'dd.mm.yyyy'), to_char(pmode_) );
 
   mfo_ := f_ourmfo();
-  
-  -- Підстраховка, якщо з якихось причин не виконалось 
-  -- збереження версії даних джобом
-  if pdat_ < trunc(sysdate) and 
-     pmode_ <> 2
-  then
-      begin
-        select count(*)
-        into cnt_
-        from OTC_ARC_INFO
-        where kf  = mfo_ and
-              dat_otc = pdat_ and
-              dat_sys < sysdate and
-              run_mode = 2 and
-              cnt_lim <> 0 and
-              cnt_trans <> 0;
-              
-         if cnt_ = 0 then
-           lmode_ := 2;
-         end if;
-      exception
-        when others then
-            lmode_ := pmode_;    
-      end;
-  end if;
-  
-  if ( lmode_ in ( 0, 2 ) )
+
+  if ( pmode_ in ( 0, 2 ) )
   then
 
     -- фактична дата кінця декади
@@ -98,7 +68,7 @@ begin
                                                 ||', datr_='||to_char(datr_,'dd.mm.yyyy') );
 
   case
-    when lmode_ in ( 0, 1 )
+    when pmode_ in ( 0, 1 )
     then -- з поцедури формування звітності на всяк випадок ( якщо не накопились дані на джобі )
 
       if trunc(sysdate) <= datn_
@@ -131,7 +101,7 @@ begin
 
       end if;
 
-    when ( lmode_ = 2 )
+    when ( pmode_ = 2 )
     then -- працює job один після настання звітної дати і зберігає історію
 
       if ( datn_ = last_day(datn_) )
@@ -154,12 +124,11 @@ begin
 
         delete OTC_ARC_CC_LIM
          where KF = mfo_
-           and DAT_OTC = datn_;        
-           
-         delete OTC_ARC_CC_TRANS
-         where KF = mfo_
            and DAT_OTC = datn_;
 
+        delete OTC_ARC_CC_TRANS
+         where KF = mfo_
+           and DAT_OTC = datn_;
 
       end if;
 
@@ -171,26 +140,35 @@ begin
 
   end case;
 
+  insert
+    into OTC_ARC_INFO
+       ( NPP, KF, DAT_OTC, DAT_SYS, DAT_BANK, USERID )
+  values
+       ( S_OTC_ARC.NextVal, mfo_, datn_, sysdate, bankdate, user_id );
+
+  commit;
+
   if cnt1_ = 0
   then
-    insert 
+
+    insert /*+ APPEND */
       into OTC_ARC_CC_LIM ( KF, DAT_OTC, ND, FDAT, LIM2, ACC, SUMG, SUMO)
-    select /*+ PARALLEL(8) */  KF, datn_,   ND, FDAT, LIM2, ACC, SUMG, SUMO
+    select /*+ PARALLEL */  KF, datn_,   ND, FDAT, LIM2, ACC, SUMG, SUMO
       from CC_LIM c
      where ( KF, ND ) in ( select n.KF, n.ND
                              from ACCOUNTS s
                              join ND_ACC   n
                                on ( n.KF = s.KF and n.ACC = s.ACC )
+                             join SNAP_BALANCES b
+                               on ( b.KF = s.KF and b.ACC = s.ACC )
                             where s.KF = mfo_
                               and s.NBS in ( select r020
                                                from KOD_R020
                                               where a010 = 'A7'
-                                                and (d_close is null or
-                                                     d_close > pdat_ + 1)
-                                            )
-                         );
-    
-    cnt_ins1_ := sql%rowcount;
+                                                and d_close is null )
+                              and b.FDAT = datr_
+                              and b.OSTQ <> 0 );
+
   else -- було збережено раніше, тому не чіпаємо історію
     null;
   end if;
@@ -198,35 +176,27 @@ begin
   if cnt2_ = 0
   then
 
-    insert 
+    insert /*+ APPEND */
       into OTC_ARC_CC_TRANS ( KF, DAT_OTC, NPP, REF, ACC, FDAT, SV, SZ, D_PLAN, D_FAKT, DAPP, REFP, COMM )
-    select /*+ PARALLEL(8) */    KF, datn_,   NPP, REF, ACC, FDAT, SV, SZ, D_PLAN, D_FAKT, DAPP, REFP, COMM
+    select /*+ PARALLEL */    KF, datn_,   NPP, REF, ACC, FDAT, SV, SZ, D_PLAN, D_FAKT, DAPP, REFP, COMM
       from CC_TRANS
      where ( KF, ACC ) in ( select n.KF, n.ACC
                               from ACCOUNTS s
                               join ND_ACC   n
                                 on ( n.KF = s.KF and n.ACC = s.ACC )
-                            where s.KF = mfo_
-                              and s.NBS in ( select r020
-                                               from KOD_R020
-                                              where a010 = 'A7'
-                                                and (d_close is null or
-                                                     d_close > pdat_ + 1)
-                                            )
-                         );
-                         
-    cnt_ins2_ := sql%rowcount;
+                              join SNAP_BALANCES b
+                                on ( b.KF = s.KF and b.ACC = s.ACC )
+                             where s.KF = mfo_
+                               and s.NBS in ( select r020
+                                                from KOD_R020
+                                               where a010 = 'A7'
+                                                 and d_close is null )
+                               and b.FDAT = datr_
+                               and b.OSTQ <> 0 );
+
   else -- було збережено раніше, тому не чіпаємо історію
     null;
   end if;
-  
-  insert
-    into OTC_ARC_INFO
-       ( NPP, KF, DAT_OTC, DAT_SYS, DAT_BANK, USERID, RUN_MODE, CNT_LIM, CNT_TRANS)
-  values
-       ( S_OTC_ARC.NextVal, mfo_, datn_, sysdate, bankdate, user_id, lmode_, cnt_ins1_, cnt_ins2_ );
-
-  commit;
 
   bars_audit.trace( '%s: Exit.', $$PLSQL_UNIT );
 

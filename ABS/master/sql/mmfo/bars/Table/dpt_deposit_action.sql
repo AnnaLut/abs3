@@ -102,13 +102,11 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_DEPOSIT_ACTION ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_DEPOSIT_ACTION to ABS_ADMIN;
-grant SELECT                                                                 on DPT_DEPOSIT_ACTION to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_DEPOSIT_ACTION to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_DEPOSIT_ACTION to BARS_DM;
 grant SELECT                                                                 on DPT_DEPOSIT_ACTION to DPT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_DEPOSIT_ACTION to DPT_ADMIN;
 grant SELECT                                                                 on DPT_DEPOSIT_ACTION to START1;
-grant SELECT                                                                 on DPT_DEPOSIT_ACTION to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_DEPOSIT_ACTION to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_DEPOSIT_ACTION to WR_REFREAD;
 

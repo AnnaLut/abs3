@@ -35,8 +35,7 @@ begin
 	OTM NUMBER(*,0), 
 	SUMK NUMBER, 
 	NOT_SN NUMBER(*,0), 
-	TYPM VARCHAR2(5), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+	TYPM VARCHAR2(5)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 0 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -54,7 +53,6 @@ PROMPT *** ALTER_POLICIES to CC_LIM_ARC ***
 
 
 COMMENT ON TABLE BARS.CC_LIM_ARC IS 'Архив ГПК';
-COMMENT ON COLUMN BARS.CC_LIM_ARC.KF IS '';
 COMMENT ON COLUMN BARS.CC_LIM_ARC.ND IS 'Реф КД';
 COMMENT ON COLUMN BARS.CC_LIM_ARC.MDAT IS 'дата модиф.';
 COMMENT ON COLUMN BARS.CC_LIM_ARC.FDAT IS 'Плат.дата';
@@ -68,8 +66,10 @@ COMMENT ON COLUMN BARS.CC_LIM_ARC.SUMK IS '';
 COMMENT ON COLUMN BARS.CC_LIM_ARC.NOT_SN IS '';
 COMMENT ON COLUMN BARS.CC_LIM_ARC.TYPM IS 'код модуля, который создал запись.';
 
-
-
+exec bars_policy_adm.add_column_kf(p_table_name => 'CC_LIM_ARC');
+exec bars_policy_adm.alter_policy_info(p_table_name => 'CC_LIM_ARC', p_policy_group => 'WHOLE', p_select_policy => null, p_insert_policy => 'E', p_update_policy => 'E', p_delete_policy => 'E');
+exec bars_policy_adm.alter_policy_info(p_table_name => 'CC_LIM_ARC', p_policy_group => 'FILIAL', p_select_policy => 'M', p_insert_policy => 'M', p_update_policy => 'M', p_delete_policy => 'M');
+exec bars_policy_adm.alter_policies(p_table_name => 'CC_LIM_ARC');
 
 PROMPT *** Create  constraint PK_CCLIMARC ***
 begin   
@@ -82,9 +82,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  index PK_CCLIMARC ***
 begin   
  execute immediate '
@@ -96,17 +93,11 @@ exception when others then
  end;
 /
 
-
-
 PROMPT *** Create  grants  CC_LIM_ARC ***
-grant SELECT                                                                 on CC_LIM_ARC      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_LIM_ARC      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_LIM_ARC      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_LIM_ARC      to RCC_DEAL;
-grant SELECT                                                                 on CC_LIM_ARC      to UPLD;
 grant FLASHBACK,SELECT                                                       on CC_LIM_ARC      to WR_REFREAD;
-
-
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/CC_LIM_ARC.sql =========*** End *** ==

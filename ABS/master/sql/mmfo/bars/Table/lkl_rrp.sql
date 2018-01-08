@@ -119,22 +119,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_LKL_RRP_BLK_NN ***
+PROMPT *** Create  constraint CC_LKLRRP_FILEENCODING_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.LKL_RRP MODIFY (BLK CONSTRAINT CC_LKL_RRP_BLK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_LKL_RRP_BN_SSP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.LKL_RRP MODIFY (BN_SSP CONSTRAINT CC_LKL_RRP_BN_SSP_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.LKL_RRP MODIFY (FILE_ENCODING CONSTRAINT CC_LKLRRP_FILEENCODING_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -155,10 +143,61 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_LKLRRP_FILEENCODING_NN ***
+PROMPT *** Create  constraint CC_LKL_RRP_BN_SSP_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.LKL_RRP MODIFY (FILE_ENCODING CONSTRAINT CC_LKLRRP_FILEENCODING_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.LKL_RRP MODIFY (BN_SSP CONSTRAINT CC_LKL_RRP_BN_SSP_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_LKL_RRP_BLK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.LKL_RRP MODIFY (BLK CONSTRAINT CC_LKL_RRP_BLK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_LKL_RRP_BLK_CODES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.LKL_RRP ADD CONSTRAINT FK_LKL_RRP_BLK_CODES FOREIGN KEY (BLK)
+	  REFERENCES BARS.BLK_CODES (BLK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_LKL_RRP_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.LKL_RRP ADD CONSTRAINT FK_LKL_RRP_TABVAL FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_LKL_RRP_BANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.LKL_RRP ADD CONSTRAINT FK_LKL_RRP_BANKS FOREIGN KEY (MFO)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -181,14 +220,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  LKL_RRP ***
-grant SELECT                                                                 on LKL_RRP         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on LKL_RRP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LKL_RRP         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LKL_RRP         to LKL_RRP;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LKL_RRP         to SEP_ROLE;
 grant SELECT,UPDATE                                                          on LKL_RRP         to SETLIM01;
 grant SELECT,UPDATE                                                          on LKL_RRP         to TOSS;
-grant SELECT                                                                 on LKL_RRP         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on LKL_RRP         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on LKL_RRP         to WR_REFREAD;
 

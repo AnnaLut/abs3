@@ -65,10 +65,11 @@ COMMENT ON COLUMN BARS.CC_SOB.FACT_DATE IS 'ƒата фактического исполнени€ событи€
 
 
 
-PROMPT *** Create  constraint NK_CC_SOB_ND ***
+PROMPT *** Create  constraint FK1_CC_SOB ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_SOB MODIFY (ND CONSTRAINT NK_CC_SOB_ND NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_SOB ADD CONSTRAINT FK1_CC_SOB FOREIGN KEY (ND)
+	  REFERENCES BARS.CC_DEAL (ND) DEFERRABLE DISABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -77,10 +78,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_CC_SOB_FDAT ***
+PROMPT *** Create  constraint FK_CCSOB_KF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_SOB MODIFY (FDAT CONSTRAINT NK_CC_SOB_FDAT NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_SOB ADD CONSTRAINT FK_CCSOB_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -89,22 +91,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_CC_SOB_ID ***
+PROMPT *** Create  constraint XPK_CC_SOB ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_SOB MODIFY (ID CONSTRAINT NK_CC_SOB_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_CC_SOB_ISP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_SOB MODIFY (ISP CONSTRAINT NK_CC_SOB_ISP NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_SOB ADD CONSTRAINT XPK_CC_SOB PRIMARY KEY (ND, ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -125,12 +117,85 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint XPK_CC_SOB ***
+PROMPT *** Create  constraint NK_CC_SOB_ISP ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_SOB ADD CONSTRAINT XPK_CC_SOB PRIMARY KEY (ND, ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
+  ALTER TABLE BARS.CC_SOB MODIFY (ISP CONSTRAINT NK_CC_SOB_ISP NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_CC_SOB_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_SOB MODIFY (ID CONSTRAINT NK_CC_SOB_ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_CC_SOB_FDAT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_SOB MODIFY (FDAT CONSTRAINT NK_CC_SOB_FDAT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_CC_SOB_ND ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_SOB MODIFY (ND CONSTRAINT NK_CC_SOB_ND NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK4_CC_SOB ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_SOB ADD CONSTRAINT FK4_CC_SOB FOREIGN KEY (FREQ)
+	  REFERENCES BARS.FREQ (FREQ) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK3_CC_SOB ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_SOB ADD CONSTRAINT FK3_CC_SOB FOREIGN KEY (OTM)
+	  REFERENCES BARS.CC_OTM (OTM) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK2_CC_SOB ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_SOB ADD CONSTRAINT FK2_CC_SOB FOREIGN KEY (ISP)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -154,12 +219,10 @@ exception when others then
 
 PROMPT *** Create  grants  CC_SOB ***
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CC_SOB          to BARS009;
-grant SELECT                                                                 on CC_SOB          to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_SOB          to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_SOB          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_SOB          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_SOB          to RCC_DEAL;
-grant SELECT                                                                 on CC_SOB          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_SOB          to WR_ALL_RIGHTS;
 
 

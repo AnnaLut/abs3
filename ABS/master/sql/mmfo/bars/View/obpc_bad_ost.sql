@@ -36,10 +36,8 @@ PROMPT *** Create  view OBPC_BAD_OST ***
    and a.ost_pc <> t.ost;
 
 PROMPT *** Create  grants  OBPC_BAD_OST ***
-grant SELECT                                                                 on OBPC_BAD_OST    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_BAD_OST    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_BAD_OST    to OBPC;
-grant SELECT                                                                 on OBPC_BAD_OST    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_BAD_OST    to WR_ALL_RIGHTS;
 
 

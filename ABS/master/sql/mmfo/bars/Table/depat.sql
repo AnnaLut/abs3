@@ -49,11 +49,9 @@ COMMENT ON COLUMN BARS.DEPAT.NAZ_P IS '';
 
 
 PROMPT *** Create  grants  DEPAT ***
-grant SELECT                                                                 on DEPAT           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEPAT           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEPAT           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEPAT           to START1;
-grant SELECT                                                                 on DEPAT           to UPLD;
 
 
 

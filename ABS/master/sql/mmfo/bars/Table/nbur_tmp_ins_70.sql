@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''NBUR_TMP_INS_70'', ''CENTER'' , null, ''E'', ''E'', ''E'');
-               bpa.alter_policy_info(''NBUR_TMP_INS_70'', ''FILIAL'' , null, ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''NBUR_TMP_INS_70'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''NBUR_TMP_INS_70'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
@@ -29,7 +29,7 @@ begin
 	USERID NUMBER, 
 	REF NUMBER, 
 	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
-   ) SEGMENT CREATION IMMEDIATE 
+   ) SEGMENT CREATION DEFERRED 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSDYND ';
@@ -69,12 +69,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_TMP_INS_70 ***
-grant SELECT                                                                 on NBUR_TMP_INS_70 to BARSREADER_ROLE;
-grant SELECT                                                                 on NBUR_TMP_INS_70 to BARSUPL;
-grant DELETE,INSERT,SELECT,UPDATE                                            on NBUR_TMP_INS_70 to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on NBUR_TMP_INS_70 to RPBN002;
-grant SELECT                                                                 on NBUR_TMP_INS_70 to UPLD;
-grant FLASHBACK,SELECT                                                       on NBUR_TMP_INS_70 to WR_REFREAD;
+grant SELECT                                                                 on NBUR_TMP_INS_70 to BARS_ACCESS_DEFROLE;
 
 
 

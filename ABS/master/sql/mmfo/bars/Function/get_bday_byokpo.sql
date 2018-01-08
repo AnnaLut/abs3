@@ -15,7 +15,6 @@ end get_bday_byokpo;
 PROMPT *** Create  grants  GET_BDAY_BYOKPO ***
 grant EXECUTE                                                                on GET_BDAY_BYOKPO to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on GET_BDAY_BYOKPO to CUST001;
-grant EXECUTE                                                                on GET_BDAY_BYOKPO to PFU;
 
  
  

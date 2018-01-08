@@ -91,10 +91,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_DELOIT_REZ ***
-grant SELECT                                                                 on TMP_DELOIT_REZ  to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_DELOIT_REZ  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

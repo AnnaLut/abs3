@@ -21,10 +21,8 @@ PROMPT *** Create  view V_BANKS_RU ***
 
 PROMPT *** Create  grants  V_BANKS_RU ***
 grant FLASHBACK,SELECT                                                       on V_BANKS_RU      to BARS014;
-grant SELECT                                                                 on V_BANKS_RU      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BANKS_RU      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BANKS_RU      to START1;
-grant SELECT                                                                 on V_BANKS_RU      to UPLD;
 grant FLASHBACK,SELECT                                                       on V_BANKS_RU      to WR_REFREAD;
 
 

@@ -74,11 +74,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_GRP_KAT ***
-grant SELECT                                                                 on TMP_GRP_KAT     to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_GRP_KAT     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_GRP_KAT     to BARS_DM;
 grant SELECT                                                                 on TMP_GRP_KAT     to START1;
-grant SELECT                                                                 on TMP_GRP_KAT     to UPLD;
 
 
 

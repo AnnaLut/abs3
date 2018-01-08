@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции !!N
-prompt Наименование операции: STOP правило на перевірку ліміта на поповнення в рамках одного РУ
+prompt STOP правило на перевірку ліміта на поповнення в рамках одного РУ
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!!N', 'STOP правило на перевірку ліміта на поповнення в рамках одного РУ', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(8888,#(KVA),#(NLSA),#(S), 2000000)', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('!!N', 'STOP правило на перевірку ліміта на поповнення в рамках одного РУ', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(8888,#(KVA),#(NLSA),#(S), 500000)', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!!N', name='STOP правило на перевірку ліміта на поповнення в рамках одного РУ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(8888,#(KVA),#(NLSA),#(S), 2000000)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='!!N', name='STOP правило на перевірку ліміта на поповнення в рамках одного РУ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(8888,#(KVA),#(NLSB),#(S), 500000)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='!!N';
   end;
   --------------------------------
@@ -98,11 +98,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('PNA', 'PNA-Поповнення картрахунку готівкою', 0, '#(bpk_get_transit(''18'',#(NLSB),#(NLSA),#(KVA)))', null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, null, null, 29, null, '0', null, '1000100001000000000000000010000000010000000000000000000000000000', 'Поповнення картрахунку готівкою');
+    values ('PNA', 'PNA-Поповнення картрахунку готівкою', 0, '#(bpk_get_transit(''18'',#(NLSB),#(NLSA),#(KVA)))', null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, null, null, 29, null, null, null, '1000100001000000000000000010000000010000000000000000000000000000', 'Поповнення картрахунку готівкою');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='PNA', name='PNA-Поповнення картрахунку готівкою', dk=0, nlsm='#(bpk_get_transit(''18'',#(NLSB),#(NLSA),#(KVA)))', kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=null, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=29, proc=null, s3800='0', rang=null, flags='1000100001000000000000000010000000010000000000000000000000000000', nazn='Поповнення картрахунку готівкою'
+         set tt='PNA', name='PNA-Поповнення картрахунку готівкою', dk=0, nlsm='#(bpk_get_transit(''18'',#(NLSB),#(NLSA),#(KVA)))', kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=null, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=29, proc=null, s3800=null, rang=null, flags='1000100001000000000000000010000000010000000000000000000000000000', nazn='Поповнення картрахунку готівкою'
        where tt='PNA';
   end;
   --------------------------------
@@ -596,3 +596,24 @@ begin
 end;
 /
 commit;
+
+begin
+Insert into BARS.OW_MSGCODE
+   (MSGCODE, DK, SYNTHCODE)
+ Values
+   ('PAYACCNF', 1, 'P4BACA');
+   exception when dup_val_on_index then null;
+end;   
+/
+COMMIT;
+
+
+begin
+Insert into BARS.OBPC_TRANS_OUT
+   (TRAN_TYPE, TT, DK, W4_MSGCODE, PAY_FLAG)
+ Values
+   ('18', 'PNA', 1, 'PAYACCNF', 0);
+    exception when dup_val_on_index then null;
+end; 
+/  
+COMMIT;

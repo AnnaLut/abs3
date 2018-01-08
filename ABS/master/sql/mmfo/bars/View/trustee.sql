@@ -29,10 +29,8 @@ select r.rel_rnk, r.rnk, c.nmk, r.bdate, r.edate, r.document,
    and r.rel_rnk=c.rnk and c.rnk=p.rnk;
 
 PROMPT *** Create  grants  TRUSTEE ***
-grant SELECT                                                                 on TRUSTEE         to BARSREADER_ROLE;
 grant SELECT                                                                 on TRUSTEE         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TRUSTEE         to CUST001;
-grant SELECT                                                                 on TRUSTEE         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TRUSTEE         to WR_ALL_RIGHTS;
 
 

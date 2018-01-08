@@ -116,10 +116,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DWHCBIREPQUER_CRTTIME_NN ***
+PROMPT *** Create  constraint FK_DWHBIREPQUER_STATUS_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DWH_CBIREP_QUERIES MODIFY (CREATION_TIME CONSTRAINT CC_DWHCBIREPQUER_CRTTIME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DWH_CBIREP_QUERIES ADD CONSTRAINT FK_DWHBIREPQUER_STATUS_ID FOREIGN KEY (STATUS_ID)
+	  REFERENCES BARS.DWH_CBIREP_QUERY_STATUSES (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -166,6 +167,18 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_DWHCBIREPQUER_CRTTIME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DWH_CBIREP_QUERIES MODIFY (CREATION_TIME CONSTRAINT CC_DWHCBIREPQUER_CRTTIME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_DWHCBIREPQUERIES ***
 begin   
  execute immediate '
@@ -194,9 +207,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DWH_CBIREP_QUERIES ***
-grant SELECT                                                                 on DWH_CBIREP_QUERIES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DWH_CBIREP_QUERIES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on DWH_CBIREP_QUERIES to UPLD;
 
 
 

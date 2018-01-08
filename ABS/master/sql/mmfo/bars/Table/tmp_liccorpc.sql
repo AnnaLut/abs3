@@ -119,10 +119,8 @@ COMMENT ON COLUMN BARS.TMP_LICCORPC.OKPO IS ' Ó‰ Œ œŒ';
 
 
 PROMPT *** Create  grants  TMP_LICCORPC ***
-grant SELECT                                                                 on TMP_LICCORPC    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_LICCORPC    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_LICCORPC    to RPBN001;
-grant SELECT                                                                 on TMP_LICCORPC    to UPLD;
 
 
 

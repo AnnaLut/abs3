@@ -119,6 +119,18 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_PRVNFINDEB_ACCSP_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PRVN_FIN_DEB MODIFY (ACC_SP CONSTRAINT CC_PRVNFINDEB_ACCSP_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index UK_PRVNFINDEB_ACCSS ***
 begin   
  execute immediate '
@@ -161,7 +173,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRVN_FIN_DEB ***
-grant SELECT                                                                 on PRVN_FIN_DEB    to BARSREADER_ROLE;
 grant SELECT                                                                 on PRVN_FIN_DEB    to BARSUPL;
 grant SELECT                                                                 on PRVN_FIN_DEB    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRVN_FIN_DEB    to BARS_DM;

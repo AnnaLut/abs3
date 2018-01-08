@@ -133,11 +133,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CLV_CORPS_ACC ***
-grant SELECT                                                                 on CLV_CORPS_ACC   to BARSREADER_ROLE;
 grant SELECT                                                                 on CLV_CORPS_ACC   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CLV_CORPS_ACC   to BARS_DM;
 grant SELECT                                                                 on CLV_CORPS_ACC   to CUST001;
-grant SELECT                                                                 on CLV_CORPS_ACC   to UPLD;
 
 
 

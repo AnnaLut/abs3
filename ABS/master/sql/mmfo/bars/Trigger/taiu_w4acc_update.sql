@@ -7,7 +7,9 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TAIU_W4ACC_UPDATE ***
 
-  CREATE OR REPLACE TRIGGER BARS.TAIU_W4ACC_UPDATE AFTER UPDATE OR INSERT OR DELETE ON "BARS"."W4_ACC" FOR EACH ROW 
+  CREATE OR REPLACE TRIGGER BARS.TAIU_W4ACC_UPDATE 
+after insert or update or delete
+   on BARS.W4_ACC for each row
 declare
   -- ver. 07.12.2016
   l_rec    W4_ACC_UPDATE%rowtype;
@@ -218,7 +220,6 @@ begin
   End If;
 
 end TAIU_W4ACC_UPDATE;
-
 /
 ALTER TRIGGER BARS.TAIU_W4ACC_UPDATE ENABLE;
 

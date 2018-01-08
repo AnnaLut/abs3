@@ -1,13 +1,7 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mbk2.sql =========*** Run *** ======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.MBK2 IS
+CREATE OR REPLACE PACKAGE BARS.MBK2 IS
 
 /*
- 17.11.2017 Òğàíñôåğ-2017 ÏÎÄÌÅÍÀ ÏĞÎÖÅÄÓĞÛ ÎÒÊĞ.Ñ×ÅÒÀ  Íà óğîâíå áàë.ñ÷åòîâ - áåç ó÷åòà îá22
+ 17.11.2017 Òğàíñôåğ-2017 ÏÎÄÌÅÍÀ ÏĞÎÖÅÄÓĞÛ ÎÒÊĞ.Ñ×ÅÒÀ  Íà óğîâíå áàë.ñ÷åòîâ - áåç ó÷åòà îá22 
  23.01.2015 Ñóõîâà Äîáàâêè ê îñíîâíîìó ïàêåäæó ÌÁÊ, êîòîğûé ïîòîì Íàòà ×. îáúåäèíèò â îäèí
              Çàáğàëà ñşäà ïğîöåäóğó mbk_SP
 */
@@ -34,6 +28,7 @@ p_nd  number    -- Ğåô ÌÁÊ
 
 END MBK2;
 /
+-------------------------------------------------------------
 CREATE OR REPLACE PACKAGE BODY BARS.MBK2 IS
 
 /*
@@ -334,14 +329,14 @@ function get_over_sum ( p_nd number, p_wdate date, p_acc_ss number, p_dat date )
        l_plan number;
        l_delta number;
        last_date date ;
-begin  l_fakt := ABS( fost ( p_acc_ss, p_dat)) ;
-    select min(fdat) into last_date from  cc_lim   where nd = p_nd and acc = p_acc_ss and fdat >= p_dat;
-    if last_date  is null then
-        if p_dat <= p_wdate then l_delta := 0 ;
-        else  l_delta := l_fakt;
-        end if ;
+begin  l_fakt := ABS( fost ( p_acc_ss, p_dat)) ; 
+    select min(fdat) into last_date from  cc_lim   where nd = p_nd and acc = p_acc_ss and fdat >= p_dat; 
+    if last_date  is null then 
+        if p_dat <= p_wdate then l_delta := 0 ; 
+        else  l_delta := l_fakt; 
+        end if ; 
        return l_delta;
-    else
+    else 
        select lim2+sumg   into l_plan from cc_lim where  nd = p_nd and acc = p_acc_ss and fdat =last_date ;
     end if ;
     l_delta := greatest  ( 0, l_fakt - l_plan);

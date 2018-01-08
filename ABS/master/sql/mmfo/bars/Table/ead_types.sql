@@ -143,10 +143,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  EAD_TYPES ***
-grant SELECT                                                                 on EAD_TYPES       to BARSREADER_ROLE;
 grant SELECT                                                                 on EAD_TYPES       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EAD_TYPES       to BARS_DM;
-grant SELECT                                                                 on EAD_TYPES       to UPLD;
 
 
 

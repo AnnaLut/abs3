@@ -16,9 +16,7 @@ where b.nbs=p.nbs AND (b.DOSQ>0 OR b.KOSQ>0 OR b.OSTD<>0 OR b.OSTK<>0)
  ;
 
 PROMPT *** Create  grants  V_BALANSI_TOBO ***
-grant SELECT                                                                 on V_BALANSI_TOBO  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BALANSI_TOBO  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_BALANSI_TOBO  to UPLD;
 grant SELECT                                                                 on V_BALANSI_TOBO  to WEB_BALANS;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BALANSI_TOBO  to WR_ALL_RIGHTS;
 

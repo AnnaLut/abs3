@@ -74,13 +74,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ORG_PFU ***
-grant SELECT                                                                 on ORG_PFU         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ORG_PFU         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ORG_PFU         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ORG_PFU         to CORP_CLIENT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ORG_PFU         to ORG_PFU;
 grant INSERT,SELECT,UPDATE                                                   on ORG_PFU         to RPBN001;
-grant SELECT                                                                 on ORG_PFU         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ORG_PFU         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on ORG_PFU         to WR_REFREAD;
 

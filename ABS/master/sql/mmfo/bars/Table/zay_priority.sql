@@ -153,10 +153,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAY_PRIORITY ***
-grant SELECT                                                                 on ZAY_PRIORITY    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAY_PRIORITY    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAY_PRIORITY    to BARS_DM;
-grant SELECT                                                                 on ZAY_PRIORITY    to UPLD;
 grant FLASHBACK,SELECT                                                       on ZAY_PRIORITY    to WR_REFREAD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_PRIORITY    to ZAY;
 

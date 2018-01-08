@@ -139,9 +139,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  S6_DocParam_Y ***
-grant SELECT                                                                 on S6_DocParam_Y   to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

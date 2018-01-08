@@ -113,11 +113,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_CREDGRAPH_PAYMENT ***
-grant SELECT                                                                 on CIM_CREDGRAPH_PAYMENT to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CREDGRAPH_PAYMENT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_CREDGRAPH_PAYMENT to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CREDGRAPH_PAYMENT to CIM_ROLE;
-grant SELECT                                                                 on CIM_CREDGRAPH_PAYMENT to UPLD;
 
 
 

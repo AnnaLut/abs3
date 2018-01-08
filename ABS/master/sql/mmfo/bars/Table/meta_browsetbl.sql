@@ -75,10 +75,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_METABROWSETBL_HOSTTABID_NN ***
+PROMPT *** Create  constraint FK_METABROWSETBL_METACOLUMNS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.META_BROWSETBL MODIFY (HOSTTABID CONSTRAINT CC_METABROWSETBL_HOSTTABID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.META_BROWSETBL ADD CONSTRAINT FK_METABROWSETBL_METACOLUMNS FOREIGN KEY (HOSTTABID, HOSTCOLKEYID)
+	  REFERENCES BARS.META_COLUMNS (TABID, COLID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -87,46 +88,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_METABROWSETBL_ADDTABID_NN ***
+PROMPT *** Create  constraint CC_METABROWSETBL_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.META_BROWSETBL MODIFY (ADDTABID CONSTRAINT CC_METABROWSETBL_ADDTABID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_METABROWSETBL_HOSTCOLID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_BROWSETBL MODIFY (HOSTCOLKEYID CONSTRAINT CC_METABROWSETBL_HOSTCOLID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_METABROWSETBL_ADDCOLID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_BROWSETBL MODIFY (ADDCOLKEYID CONSTRAINT CC_METABROWSETBL_ADDCOLID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_METABROWSETBL_VARCOLID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_BROWSETBL MODIFY (VAR_COLID CONSTRAINT CC_METABROWSETBL_VARCOLID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.META_BROWSETBL MODIFY (BRANCH CONSTRAINT CC_METABROWSETBL_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -147,10 +112,97 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_METABROWSETBL_BRANCH_NN ***
+PROMPT *** Create  constraint CC_METABROWSETBL_VARCOLID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.META_BROWSETBL MODIFY (BRANCH CONSTRAINT CC_METABROWSETBL_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.META_BROWSETBL MODIFY (VAR_COLID CONSTRAINT CC_METABROWSETBL_VARCOLID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_METABROWSETBL_ADDCOLID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.META_BROWSETBL MODIFY (ADDCOLKEYID CONSTRAINT CC_METABROWSETBL_ADDCOLID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_METABROWSETBL_HOSTCOLID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.META_BROWSETBL MODIFY (HOSTCOLKEYID CONSTRAINT CC_METABROWSETBL_HOSTCOLID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_METABROWSETBL_ADDTABID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.META_BROWSETBL MODIFY (ADDTABID CONSTRAINT CC_METABROWSETBL_ADDTABID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_METABROWSETBL_HOSTTABID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.META_BROWSETBL MODIFY (HOSTTABID CONSTRAINT CC_METABROWSETBL_HOSTTABID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_METABROWSETBL_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.META_BROWSETBL ADD CONSTRAINT FK_METABROWSETBL_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_METABROWSETBL_METACOLUMNS3 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.META_BROWSETBL ADD CONSTRAINT FK_METABROWSETBL_METACOLUMNS3 FOREIGN KEY (ADDTABID, VAR_COLID)
+	  REFERENCES BARS.META_COLUMNS (TABID, COLID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_METABROWSETBL_METACOLUMNS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.META_BROWSETBL ADD CONSTRAINT FK_METABROWSETBL_METACOLUMNS2 FOREIGN KEY (ADDTABID, ADDCOLKEYID)
+	  REFERENCES BARS.META_COLUMNS (TABID, COLID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -174,11 +226,9 @@ exception when others then
 
 PROMPT *** Create  grants  META_BROWSETBL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_BROWSETBL  to ABS_ADMIN;
-grant SELECT                                                                 on META_BROWSETBL  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_BROWSETBL  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on META_BROWSETBL  to BARS_DM;
 grant SELECT                                                                 on META_BROWSETBL  to START1;
-grant SELECT                                                                 on META_BROWSETBL  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on META_BROWSETBL  to WR_ALL_RIGHTS;
 grant SELECT                                                                 on META_BROWSETBL  to WR_FILTER;
 

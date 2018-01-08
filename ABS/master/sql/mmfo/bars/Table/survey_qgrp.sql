@@ -83,6 +83,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SURVEYQGRP_SURVEY ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_QGRP ADD CONSTRAINT FK_SURVEYQGRP_SURVEY FOREIGN KEY (SURVEY_ID)
+	  REFERENCES BARS.SURVEY (SURVEY_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SURVEYQGRP_GRPID_NN ***
 begin   
  execute immediate '
@@ -159,11 +172,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SURVEY_QGRP ***
-grant SELECT                                                                 on SURVEY_QGRP     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY_QGRP     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SURVEY_QGRP     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY_QGRP     to DPT_ADMIN;
-grant SELECT                                                                 on SURVEY_QGRP     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SURVEY_QGRP     to WR_ALL_RIGHTS;
 
 

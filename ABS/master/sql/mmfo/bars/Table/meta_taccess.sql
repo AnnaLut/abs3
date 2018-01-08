@@ -102,11 +102,9 @@ exception when others then
 
 PROMPT *** Create  grants  META_TACCESS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_TACCESS    to ABS_ADMIN;
-grant SELECT                                                                 on META_TACCESS    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_TACCESS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on META_TACCESS    to BARS_DM;
 grant SELECT                                                                 on META_TACCESS    to START1;
-grant SELECT                                                                 on META_TACCESS    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on META_TACCESS    to WR_ALL_RIGHTS;
 
 

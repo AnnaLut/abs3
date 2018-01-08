@@ -104,14 +104,12 @@ PROMPT *** Create  grants  CUSTTYPE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTTYPE        to ABS_ADMIN;
 grant SELECT                                                                 on CUSTTYPE        to BARSAQ with grant option;
 grant SELECT                                                                 on CUSTTYPE        to BARSAQ_ADM with grant option;
-grant SELECT                                                                 on CUSTTYPE        to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTTYPE        to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTTYPE        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTTYPE        to BARS_DM;
 grant SELECT                                                                 on CUSTTYPE        to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTTYPE        to CUSTTYPE;
 grant SELECT                                                                 on CUSTTYPE        to START1;
-grant SELECT                                                                 on CUSTTYPE        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTTYPE        to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CUSTTYPE        to WR_CUSTLIST;
 grant FLASHBACK,SELECT                                                       on CUSTTYPE        to WR_REFREAD;

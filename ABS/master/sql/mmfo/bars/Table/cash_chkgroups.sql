@@ -47,6 +47,19 @@ COMMENT ON COLUMN BARS.CASH_CHKGROUPS.CHK IS '';
 
 
 
+PROMPT *** Create  constraint XFK_CASHCHKGROUPS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CASH_CHKGROUPS ADD CONSTRAINT XFK_CASHCHKGROUPS FOREIGN KEY (CHK)
+	  REFERENCES BARS.CHKLIST (IDCHK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XUK_CASHCHKGROUPS ***
 begin   
  execute immediate '
@@ -61,11 +74,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CASH_CHKGROUPS ***
-grant SELECT                                                                 on CASH_CHKGROUPS  to BARSREADER_ROLE;
 grant SELECT                                                                 on CASH_CHKGROUPS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CASH_CHKGROUPS  to BARS_DM;
 grant SELECT                                                                 on CASH_CHKGROUPS  to RPBN001;
-grant SELECT                                                                 on CASH_CHKGROUPS  to UPLD;
 
 
 

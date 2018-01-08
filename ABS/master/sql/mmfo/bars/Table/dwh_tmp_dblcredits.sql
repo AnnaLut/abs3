@@ -90,9 +90,7 @@ exception when others then
 
 PROMPT *** Create  grants  DWH_TMP_DBLCREDITS ***
 grant SELECT                                                                 on DWH_TMP_DBLCREDITS to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on DWH_TMP_DBLCREDITS to BARSREADER_ROLE;
 grant SELECT                                                                 on DWH_TMP_DBLCREDITS to BARS_DM;
-grant SELECT                                                                 on DWH_TMP_DBLCREDITS to UPLD;
 
 
 

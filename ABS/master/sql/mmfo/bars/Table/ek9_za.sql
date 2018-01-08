@@ -91,11 +91,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  EK9_ZA ***
-grant SELECT                                                                 on EK9_ZA          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on EK9_ZA          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EK9_ZA          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EK9_ZA          to EK9_ZA;
-grant SELECT                                                                 on EK9_ZA          to UPLD;
 grant FLASHBACK,SELECT                                                       on EK9_ZA          to WR_REFREAD;
 
 

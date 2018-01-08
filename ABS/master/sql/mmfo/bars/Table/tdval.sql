@@ -115,6 +115,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_TDVAL_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TDVAL ADD CONSTRAINT FK_TDVAL_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_TDVAL ***
 begin   
  execute immediate '
@@ -144,7 +157,6 @@ exception when others then
 
 PROMPT *** Create  grants  TDVAL ***
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on TDVAL           to BARS014;
-grant SELECT                                                                 on TDVAL           to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on TDVAL           to BARS_ACCESS_DEFROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TDVAL           to WR_ALL_RIGHTS;
 

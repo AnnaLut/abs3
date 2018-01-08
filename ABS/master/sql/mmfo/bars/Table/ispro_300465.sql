@@ -155,10 +155,6 @@ COMMENT ON COLUMN BARS.ISPRO_300465.REF99BM IS '';
 
 
 
-PROMPT *** Create  grants  ISPRO_300465 ***
-grant SELECT                                                                 on ISPRO_300465    to BARSREADER_ROLE;
-grant SELECT                                                                 on ISPRO_300465    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

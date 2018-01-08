@@ -25,10 +25,8 @@ PROMPT *** Create  view V_NBUR_REF_CALENDAR ***
           S.CALENDAR_DATE = bankdate;
 
 PROMPT *** Create  grants  V_NBUR_REF_CALENDAR ***
-grant SELECT                                                                 on V_NBUR_REF_CALENDAR to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_REF_CALENDAR to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_REF_CALENDAR to RPBN002;
-grant SELECT                                                                 on V_NBUR_REF_CALENDAR to UPLD;
 
 
 

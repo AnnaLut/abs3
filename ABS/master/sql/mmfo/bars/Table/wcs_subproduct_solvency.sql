@@ -63,6 +63,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SPRDSOLV_SBPID_SBPS_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_SUBPRODUCT_SOLVENCY ADD CONSTRAINT FK_SPRDSOLV_SBPID_SBPS_ID FOREIGN KEY (SUBPRODUCT_ID)
+	  REFERENCES BARS.WCS_SUBPRODUCTS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SPRDSOLV_SID_SOLVS_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_SUBPRODUCT_SOLVENCY ADD CONSTRAINT FK_SPRDSOLV_SID_SOLVS_ID FOREIGN KEY (SOLV_ID)
+	  REFERENCES BARS.WCS_SOLVENCIES (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_SPRDSOLV ***
 begin   
  execute immediate '
@@ -77,10 +103,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SUBPRODUCT_SOLVENCY ***
-grant SELECT                                                                 on WCS_SUBPRODUCT_SOLVENCY to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_SUBPRODUCT_SOLVENCY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_SUBPRODUCT_SOLVENCY to BARS_DM;
-grant SELECT                                                                 on WCS_SUBPRODUCT_SOLVENCY to UPLD;
 
 
 

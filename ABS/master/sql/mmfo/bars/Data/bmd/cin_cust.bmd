@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'CIN-2.Довідник клієнтів';
   l_tablinesdef := '30';
-  l_tabselect_statement := '';
   l_tabname     := 'CIN_CUST';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,30 +119,30 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'RNK', 'N', 'Рег.~№ кл', '', null, 1, 0, 1, 0, 1, '', '', 1, 1, '', 0, 0, 0, 'sPar=CIN_TK[CONDITIONS=>CIN_TK.RNK=:RNK][ACCESSCODE=>0]', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'MFO_2600', 'C', 'МФО банка~клiєнта', '', null, 9, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NLS_2600', 'C', 'Рах-2600 клiєнта~в його МФО', '', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NLS_2909', 'C', 'Рах.2909~доставки~в ГОУ ОБ', '', null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/customerlist/custacc.aspx?type=0'||chr(38)||'rnk=:RNK'||chr(38)||'mod=ro', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions, "a.RNK=:RNK" )', 0);
-  bars_metabase.add_column(l_tabid, 5, 'S_A2', 'N', 'А2~Ком-конст~в грн~за доставку', '', null, 3, 0, 0, 0, 0, '', '##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'S_B2', 'N', 'Б2~Ком-конст~в  грн~за вивiз', '', null, 6, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'PR_B1', 'N', 'Б1~Ком.% ~вiд суми~за вивiз', '', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'S_C0', 'N', 'B0~Абон.плата~в  грн~для 1 ТК ', '', null, 8, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NLS_3739', 'C', 'Рах 3739~для сплати~комiсiї~в ГОУ ОБ', '', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/customerlist/custacc.aspx?type=0'||chr(38)||'rnk=:RNK'||chr(38)||'mod=ro', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions, "a.RNK=:RNK" )', 0);
-  bars_metabase.add_column(l_tabid, 10, 'DAPP', 'D', 'Дата, по яку~виконано~розрахунок~комiсiї', '', null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'PA1', 'N', 'А1 % ~комiсiї~ЦА~ГОУ ОБ', '', null, 51, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'PA2', 'N', 'А2 % ~комiсiї~ЦА~ГОУ ОБ', '', null, 52, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'PB1', 'N', 'Б1  % ~комiсiї~ЦА~ГОУ ОБ', '', null, 53, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'PB2', 'N', 'Б2 % ~комiсiї~ЦА~ГОУ ОБ', '', null, 54, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'PC0', 'N', 'В0 % ~комiсiї~ЦА~ГОУ ОБ', '', null, 55, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'TXT1', 'C', 'Посада + ПIБ (Наз.вiдмiнок)', '', null, 66, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'TXT2', 'C', 'Посада + ПIБ (Род.вiдмiнок)', '', null, 67, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'TXT3', 'C', 'Довiреностi', '', null, 68, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'TXT4', 'C', 'Посвiдченої', '', null, 69, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'TXT5', 'C', 'Реєсторовим номером', '', null, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'TXT6', 'C', 'Дог. № ... вiд ...', '', null, 71, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'SB1_MIN', 'N', 'Б1~Min.сума~за мiсяць~за вивiз', '', null, 5, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'S_B3 ', 'N', 'Б3~Штраф-конст~в  грн~за хол/вивiз', '', null, 7, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'NLS_3578', 'C', 'Рах 3578~для нарах.~комiсiї~в ГОУ ОБ', '', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/customerlist/custacc.aspx?type=0'||chr(38)||'rnk=:RNK'||chr(38)||'mod=ro', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions, "a.RNK=:RNK" )', 0);
+  bars_metabase.add_column(l_tabid, 1, 'RNK', 'N', 'Рег.~№ кл', null, null, 1, 0, 1, 0, 1, '', '', 1, 1, '', 0, 0, 0, 'sPar=CIN_TK[CONDITIONS=>CIN_TK.RNK=:RNK][ACCESSCODE=>0]', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'MFO_2600', 'C', 'МФО банка~клiєнта', null, null, 9, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NLS_2600', 'C', 'Рах-2600 клiєнта~в його МФО', null, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NLS_2909', 'C', 'Рах.2909~доставки~в ГОУ ОБ', null, null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/customerlist/custacc.aspx?type=0'||chr(38)||'rnk=:RNK'||chr(38)||'mod=ro', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions, "a.RNK=:RNK" )', 0);
+  bars_metabase.add_column(l_tabid, 5, 'S_A2', 'N', 'А2~Ком-конст~в грн~за доставку', null, null, 3, 0, 0, 0, 0, '', '##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'S_B2', 'N', 'Б2~Ком-конст~в  грн~за вивiз', null, null, 6, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'PR_B1', 'N', 'Б1~Ком.% ~вiд суми~за вивiз', null, null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'S_C0', 'N', 'B0~Абон.плата~в  грн~для 1 ТК ', null, null, 8, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NLS_3739', 'C', 'Рах 3739~для сплати~комiсiї~в ГОУ ОБ', null, null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/customerlist/custacc.aspx?type=0'||chr(38)||'rnk=:RNK'||chr(38)||'mod=ro', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions, "a.RNK=:RNK" )', 0);
+  bars_metabase.add_column(l_tabid, 10, 'DAPP', 'D', 'Дата, по яку~виконано~розрахунок~комiсiї', null, null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'PA1', 'N', 'А1 % ~комiсiї~ЦА~ГОУ ОБ', null, null, 51, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'PA2', 'N', 'А2 % ~комiсiї~ЦА~ГОУ ОБ', null, null, 52, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'PB1', 'N', 'Б1  % ~комiсiї~ЦА~ГОУ ОБ', null, null, 53, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'PB2', 'N', 'Б2 % ~комiсiї~ЦА~ГОУ ОБ', null, null, 54, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'PC0', 'N', 'В0 % ~комiсiї~ЦА~ГОУ ОБ', null, null, 55, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'TXT1', 'C', 'Посада + ПIБ (Наз.вiдмiнок)', null, null, 66, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'TXT2', 'C', 'Посада + ПIБ (Род.вiдмiнок)', null, null, 67, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'TXT3', 'C', 'Довiреностi', null, null, 68, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'TXT4', 'C', 'Посвiдченої', null, null, 69, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'TXT5', 'C', 'Реєсторовим номером', null, null, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'TXT6', 'C', 'Дог. № ... вiд ...', null, null, 71, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'SB1_MIN', 'N', 'Б1~Min.сума~за мiсяць~за вивiз', null, null, 5, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'S_B3 ', 'N', 'Б3~Штраф-конст~в  грн~за хол/вивiз', null, null, 7, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'NLS_3578', 'C', 'Рах 3578~для нарах.~комiсiї~в ГОУ ОБ', null, null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/customerlist/custacc.aspx?type=0'||chr(38)||'rnk=:RNK'||chr(38)||'mod=ro', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions, "a.RNK=:RNK" )', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

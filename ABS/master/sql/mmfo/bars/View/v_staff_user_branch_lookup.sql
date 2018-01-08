@@ -23,9 +23,7 @@ from   (select branch, name, substr(branch, 1, instr(branch, '/', -2)) parent_br
 ;
 
 PROMPT *** Create  grants  V_STAFF_USER_BRANCH_LOOKUP ***
-grant SELECT                                                                 on V_STAFF_USER_BRANCH_LOOKUP to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFF_USER_BRANCH_LOOKUP to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_STAFF_USER_BRANCH_LOOKUP to UPLD;
 
 
 

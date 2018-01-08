@@ -13,9 +13,7 @@ PROMPT *** Create  view V_FREQ_STO ***
     WHERE f.freq not in (2,400,30,999);
 
 PROMPT *** Create  grants  V_FREQ_STO ***
-grant SELECT                                                                 on V_FREQ_STO      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FREQ_STO      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_FREQ_STO      to UPLD;
 
 
 

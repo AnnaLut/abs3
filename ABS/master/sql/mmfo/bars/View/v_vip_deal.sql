@@ -1,14 +1,19 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_VIP_DEAL.sql =========*** Run *** ===
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_VIP_DEAL ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_VIP_DEAL ("RNK", "NMK", "BRANCH", "CUSTOMER_SEGMENT_FINANCIAL", "CUSTOMER_SEGMENT_ACTIVITY", "CUSTOMER_SEGMENT_PRODUCTS_AMNT", "RLVIP", "FIO_MANAGER", "PHONE_MANAGER", "MAIL_MANAGER", "ACCOUNT_MANAGER") AS 
-  SELECT c.RNK,
+CREATE OR REPLACE FORCE VIEW BARS.V_VIP_DEAL
+(
+   RNK,
+   NMK,
+   BRANCH,
+   CUSTOMER_SEGMENT_FINANCIAL,
+   CUSTOMER_SEGMENT_ACTIVITY,
+   CUSTOMER_SEGMENT_PRODUCTS_AMNT,
+   RLVIP,
+   FIO_MANAGER,
+   PHONE_MANAGER,
+   MAIL_MANAGER,
+   ACCOUNT_MANAGER
+)
+AS
+   SELECT c.RNK,
           c.NMK,
           c.BRANCH,
           cs.CUSTOMER_SEGMENT_FINANCIAL,
@@ -31,14 +36,7 @@ PROMPT *** Create  view V_VIP_DEAL ***
                            FROM customerw
                           WHERE tag = 'RLVIP' AND VALUE = 'Так'));
 
-PROMPT *** Create  grants  V_VIP_DEAL ***
-grant SELECT                                                                 on V_VIP_DEAL      to BARSREADER_ROLE;
-grant SELECT                                                                 on V_VIP_DEAL      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_VIP_DEAL      to START1;
-grant SELECT                                                                 on V_VIP_DEAL      to UPLD;
 
+GRANT SELECT ON BARS.V_VIP_DEAL TO BARS_ACCESS_DEFROLE;
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_VIP_DEAL.sql =========*** End *** ===
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.V_VIP_DEAL TO START1;

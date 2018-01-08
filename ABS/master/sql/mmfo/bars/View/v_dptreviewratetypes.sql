@@ -16,10 +16,8 @@ PROMPT *** Create  view V_DPTREVIEWRATETYPES ***
  ;
 
 PROMPT *** Create  grants  V_DPTREVIEWRATETYPES ***
-grant SELECT                                                                 on V_DPTREVIEWRATETYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPTREVIEWRATETYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPTREVIEWRATETYPES to DPT_ADMIN;
-grant SELECT                                                                 on V_DPTREVIEWRATETYPES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPTREVIEWRATETYPES to WR_ALL_RIGHTS;
 
 

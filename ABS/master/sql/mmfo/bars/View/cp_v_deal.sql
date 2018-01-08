@@ -45,11 +45,9 @@ PROMPT *** Create  view CP_V_DEAL ***
       AND v.emi = k.emi;
 
 PROMPT *** Create  grants  CP_V_DEAL ***
-grant SELECT                                                                 on CP_V_DEAL       to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on CP_V_DEAL       to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on CP_V_DEAL       to CP_ROLE;
 grant SELECT                                                                 on CP_V_DEAL       to START1;
-grant SELECT                                                                 on CP_V_DEAL       to UPLD;
 
 
 

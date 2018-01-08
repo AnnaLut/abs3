@@ -51,6 +51,19 @@ COMMENT ON COLUMN BARS.NOTARY_REGION.RNK IS 'Ідентифікатор клієнта, під яким нот
 
 
 
+PROMPT *** Create  constraint FK_NOTARY_REGION_REF_NOTARY ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NOTARY_REGION ADD CONSTRAINT FK_NOTARY_REGION_REF_NOTARY FOREIGN KEY (NOTARY_ID)
+	  REFERENCES BARS.NOTARY (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C006793 ***
 begin   
  execute immediate '
@@ -101,10 +114,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  NOTARY_REGION ***
-grant SELECT                                                                 on NOTARY_REGION   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NOTARY_REGION   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NOTARY_REGION   to BARS_DM;
-grant SELECT                                                                 on NOTARY_REGION   to UPLD;
 
 
 

@@ -110,6 +110,17 @@ begin
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
+    values ('1002', '188', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''1002'', ''188'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
     values ('1811', '188', 1);
   exception
     when dup_val_on_index then null;
@@ -136,12 +147,12 @@ begin
   delete from tts_vob where tt='188';
   begin
     insert into tts_vob(vob, tt, ord)
-    values (222, '188', 1);
+    values (301, '188', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (tts_vob: 222, ''188'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (tts_vob: 301, ''188'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

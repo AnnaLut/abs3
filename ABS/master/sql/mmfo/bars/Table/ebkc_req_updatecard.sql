@@ -110,10 +110,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBKC_REQ_UPDATECARD ***
-grant SELECT                                                                 on EBKC_REQ_UPDATECARD to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBKC_REQ_UPDATECARD to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBKC_REQ_UPDATECARD to BARS_DM;
-grant SELECT                                                                 on EBKC_REQ_UPDATECARD to UPLD;
 
 
 

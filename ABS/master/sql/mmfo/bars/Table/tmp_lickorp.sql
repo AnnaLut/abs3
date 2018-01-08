@@ -136,10 +136,8 @@ COMMENT ON COLUMN BARS.TMP_LICKORP.NLS0 IS '';
 
 
 PROMPT *** Create  grants  TMP_LICKORP ***
-grant SELECT                                                                 on TMP_LICKORP     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_LICKORP     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_LICKORP     to START1;
-grant SELECT                                                                 on TMP_LICKORP     to UPLD;
 
 
 

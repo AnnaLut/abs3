@@ -74,7 +74,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  ASYNC_ACTION_TYPE ***
-grant SELECT                                                                 on ASYNC_ACTION_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on ASYNC_ACTION_TYPE to BARS_DM;
 
 

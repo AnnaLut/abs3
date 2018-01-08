@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := '3K. Фінансовий результат по Контраген. ФОРЕКС-угод за період';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'V_FXANI_3K';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,13 +119,13 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 2, 'B', 'D', 'Початкова~ звітна~ дата', '', null, 52, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'E', 'D', 'Кінцева~звітна~дата', '', null, 54, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'KOD3K', 'C', 'Загальний~тип', '', null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'RNK', 'N', 'РНК~партнеру', '', null, 9, 0, 0, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'S/100', 'N', 'Сума~проводок', '', null, 27, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(S)/100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'SOS', 'N', 'Стан~проводки', '', null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'NMK', 'C', 'Назва~партнеру', '', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'B', 'D', 'Початкова~ звітна~ дата', null, null, 52, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'E', 'D', 'Кінцева~звітна~дата', null, null, 54, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'KOD3K', 'C', 'Загальний~тип', null, null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'RNK', 'N', 'РНК~партнеру', null, null, 9, 0, 0, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'S/100', 'N', 'Сума~проводок', null, null, 27, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(S)/100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'SOS', 'N', 'Стан~проводки', null, null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'NMK', 'C', 'Назва~партнеру', null, null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание вложенных таблиц
   l_newtabid := bars_metabase.get_tabid('V_FXANI_2D');

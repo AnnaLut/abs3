@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Створити пл.календар по відсоткам ДЕПО-СВОП';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'V_FX_SWAP0';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,17 +119,17 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'DT', 'N', 'DEAL_TAG', '', null, 99, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ST', 'N', 'SWAP_TAG', '1', null, 90, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'KVA', 'N', 'Вал. A', '.5', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KVB', 'N', 'Вал. Б', '.5', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'TXT', 'C', 'Створити', '3', null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=V_FX_SWAP1[NSIFUNCTION][ACCESSCODE=>6][PROC=>forex.proc_swap(0,:DT,:A,:B,:C,:D)][PAR=>:A(SEM=База по A,TYPE=N,REF=BASEY),:B(SEM=Ст по A,TYPE=N),:C(SEM=База по Б,TYPE=N,REF=BASEY),:D(SEM=Ст по Б,TYPE=N)][EXEC=>BEFORE][showDialogWindow=>false]
+  bars_metabase.add_column(l_tabid, 1, 'DT', 'N', 'DEAL_TAG', null, null, 99, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ST', 'N', 'SWAP_TAG', 1, null, 90, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'KVA', 'N', 'Вал. A', .5, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KVB', 'N', 'Вал. Б', .5, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'TXT', 'C', 'Створити', 3, null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=V_FX_SWAP1[NSIFUNCTION][ACCESSCODE=>6][PROC=>forex.proc_swap(0,:DT,:A,:B,:C,:D)][PAR=>:A(SEM=База по A,TYPE=N,REF=BASEY),:B(SEM=Ст по A,TYPE=N),:C(SEM=База по Б,TYPE=N,REF=BASEY),:D(SEM=Ст по Б,TYPE=N)][EXEC=>BEFORE][showDialogWindow=>false]
 
 ', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NMK', 'C', 'Партнер', '3', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NTIK', 'C', 'Тікет', '1', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'SA', 'N', 'Сума А', '2', null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SB', 'N', 'Сума Б', '2', null, 6, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NMK', 'C', 'Партнер', 3, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NTIK', 'C', 'Тікет', 1, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'SA', 'N', 'Сума А', 2, null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SB', 'N', 'Сума Б', 2, null, 6, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

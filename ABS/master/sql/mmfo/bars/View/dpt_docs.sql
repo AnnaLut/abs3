@@ -24,11 +24,9 @@ PROMPT *** Create  view DPT_DOCS ***
      AND v.sps IS NULL;
 
 PROMPT *** Create  grants  DPT_DOCS ***
-grant SELECT                                                                 on DPT_DOCS        to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_DOCS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_DOCS        to DPT_ADMIN;
 grant SELECT                                                                 on DPT_DOCS        to DPT_ROLE;
-grant SELECT                                                                 on DPT_DOCS        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_DOCS        to WR_ALL_RIGHTS;
 
 

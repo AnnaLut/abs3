@@ -16,10 +16,8 @@ select '<>980', 'Валюта' from dual
  ;
 
 PROMPT *** Create  grants  V_REPCHOOSE_KV ***
-grant SELECT                                                                 on V_REPCHOOSE_KV  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REPCHOOSE_KV  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_REPCHOOSE_KV  to RPBN001;
-grant SELECT                                                                 on V_REPCHOOSE_KV  to UPLD;
 
 
 

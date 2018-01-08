@@ -82,10 +82,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  ASYNC_SQL ***
-grant SELECT                                                                 on ASYNC_SQL       to BARSREADER_ROLE;
 grant SELECT                                                                 on ASYNC_SQL       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ASYNC_SQL       to BARS_DM;
-grant SELECT                                                                 on ASYNC_SQL       to UPLD;
 
 
 

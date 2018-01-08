@@ -44,11 +44,9 @@ COMMENT ON COLUMN BARS.TMP_PRIOCOM_DOC_LIST.DOCID IS '';
 
 
 PROMPT *** Create  grants  TMP_PRIOCOM_DOC_LIST ***
-grant SELECT                                                                 on TMP_PRIOCOM_DOC_LIST to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_PRIOCOM_DOC_LIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_PRIOCOM_DOC_LIST to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_PRIOCOM_DOC_LIST to START1;
-grant SELECT                                                                 on TMP_PRIOCOM_DOC_LIST to UPLD;
 
 
 

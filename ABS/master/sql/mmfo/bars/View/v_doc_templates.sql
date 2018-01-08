@@ -19,9 +19,7 @@ from doc_scheme
 where d_close is null;
 
 PROMPT *** Create  grants  V_DOC_TEMPLATES ***
-grant SELECT                                                                 on V_DOC_TEMPLATES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOC_TEMPLATES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DOC_TEMPLATES to UPLD;
 
 
 

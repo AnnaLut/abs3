@@ -16,9 +16,7 @@ PROMPT *** Create  view WCS_PARTNERS_MATHER ***
     WHERE ID_MATHER IS NULL;
 
 PROMPT *** Create  grants  WCS_PARTNERS_MATHER ***
-grant SELECT                                                                 on WCS_PARTNERS_MATHER to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WCS_PARTNERS_MATHER to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on WCS_PARTNERS_MATHER to UPLD;
 grant SELECT                                                                 on WCS_PARTNERS_MATHER to WCS_SYNC_USER;
 grant FLASHBACK,SELECT                                                       on WCS_PARTNERS_MATHER to WR_REFREAD;
 

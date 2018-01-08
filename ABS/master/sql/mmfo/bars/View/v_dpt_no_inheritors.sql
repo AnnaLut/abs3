@@ -15,10 +15,8 @@ PROMPT *** Create  view V_DPT_NO_INHERITORS ***
  ;
 
 PROMPT *** Create  grants  V_DPT_NO_INHERITORS ***
-grant SELECT                                                                 on V_DPT_NO_INHERITORS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_NO_INHERITORS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_NO_INHERITORS to DPT_ROLE;
-grant SELECT                                                                 on V_DPT_NO_INHERITORS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_NO_INHERITORS to WR_ALL_RIGHTS;
 
 

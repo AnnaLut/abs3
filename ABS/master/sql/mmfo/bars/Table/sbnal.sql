@@ -66,10 +66,8 @@ COMMENT ON COLUMN BARS.SBNAL.GR_IN IS '';
 
 
 PROMPT *** Create  grants  SBNAL ***
-grant SELECT                                                                 on SBNAL           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SBNAL           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SBNAL           to START1;
-grant SELECT                                                                 on SBNAL           to UPLD;
 
 
 

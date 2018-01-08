@@ -1,12 +1,9 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/FIN_BUDGET2.sql =========*** Run *
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure FIN_BUDGET2 ***
-
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/fin_budget2.sql =========*** Run *
+ PROMPT ===================================================================================== 
+ 
   CREATE OR REPLACE PROCEDURE BARS.FIN_BUDGET2 (fdat_ in date)
  is
     s integer;
@@ -828,14 +825,15 @@ PROMPT *** Create  procedure FIN_BUDGET2 ***
 	  commit;
  end fin_budget2;
 /
-show err;
-
+ show err;
+ 
 PROMPT *** Create  grants  FIN_BUDGET2 ***
 grant EXECUTE                                                                on FIN_BUDGET2     to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on FIN_BUDGET2     to START1;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/FIN_BUDGET2.sql =========*** End *
-PROMPT ===================================================================================== 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/procedure/fin_budget2.sql =========*** End *
+ PROMPT ===================================================================================== 
+ 

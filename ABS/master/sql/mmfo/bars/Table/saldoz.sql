@@ -46,7 +46,7 @@ begin
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING 
   TABLESPACE BRSMDLD , 
- PARTITION P_304665  VALUES (''304665'') SEGMENT CREATION IMMEDIATE 
+ PARTITION P_304665  VALUES (''304665'') SEGMENT CREATION DEFERRED 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING 
   TABLESPACE BRSMDLD , 
@@ -102,7 +102,7 @@ begin
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING 
   TABLESPACE BRSMDLD , 
- PARTITION P_335106  VALUES (''335106'') SEGMENT CREATION IMMEDIATE 
+ PARTITION P_335106  VALUES (''335106'') SEGMENT CREATION DEFERRED 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING 
   TABLESPACE BRSMDLD , 
@@ -118,7 +118,7 @@ begin
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING 
   TABLESPACE BRSMDLD , 
- PARTITION P_351823  VALUES (''351823'') SEGMENT CREATION IMMEDIATE 
+ PARTITION P_351823  VALUES (''351823'') SEGMENT CREATION DEFERRED 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING 
   TABLESPACE BRSMDLD , 
@@ -326,12 +326,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SALDOZ ***
-grant SELECT                                                                 on SALDOZ          to BARSREADER_ROLE;
 grant SELECT                                                                 on SALDOZ          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALDOZ          to BARS_DM;
 grant SELECT                                                                 on SALDOZ          to DM;
 grant SELECT                                                                 on SALDOZ          to START1;
-grant SELECT                                                                 on SALDOZ          to UPLD;
 
 
 

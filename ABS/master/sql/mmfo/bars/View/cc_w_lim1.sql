@@ -16,10 +16,6 @@ FROM (SELECT acc, ND, FDAT, LIM2, NVL(SUMG,0) sumg, NVL(sumo,0)-NVL(sumg,0)-NVL(
       )
 ;
 
-PROMPT *** Create  grants  CC_W_LIM1 ***
-grant SELECT                                                                 on CC_W_LIM1       to BARSREADER_ROLE;
-grant SELECT                                                                 on CC_W_LIM1       to UPLD;
-
 
 
 PROMPT ===================================================================================== 

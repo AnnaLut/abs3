@@ -28,7 +28,7 @@ PROMPT *** Create  procedure PAY_FILE_A ***
                                        p_sign oper.sign%type default null,
                                        p_CreatedByUserName staff.logname%type,
                                        p_ConfirmedByUserName staff.logname%type,
-                     p_tt oper.tt%type,
+                                       p_tt oper.tt%type,
                                        p_ref out oper.ref%type,
                                        p_errcode out number,
                                        p_errmsg out varchar2
@@ -45,11 +45,12 @@ PROMPT *** Create  procedure PAY_FILE_A ***
     l_dreclist  bars_xmlklb.array_drec;
     l_userid staff.id%type;
     l_branch staff.branch%type;
-  l_length number;
-  l_name operw.tag%type;
-  l_val operw.value%type;
-  l_tmp varchar2(32767);
-  l_str varchar2(32767);
+    l_length number;
+    l_name operw.tag%type;
+    l_val operw.value%type;
+    l_tmp varchar2(32767);
+    l_str varchar2(32767);
+    l_cnt_oper decimal;
 
 
     function get_kv(p_lcv tabval.lcv%type) return tabval.kv%type
@@ -66,36 +67,36 @@ PROMPT *** Create  procedure PAY_FILE_A ***
         return l_kv;
       end;
       procedure parse_str(p_str varchar2, p_name out varchar2, p_val out varchar2)
-    is
-    begin
-      p_name := substr(p_str,0,instr(p_str,'=')-1);
-      p_val := substr(p_str,instr(p_str,'=')+1);
-    end;
+        is
+        begin
+          p_name := substr(p_str,0,instr(p_str,'=')-1);
+          p_val := substr(p_str,instr(p_str,'=')+1);
+        end;
 
   begin
     bars_audit.trace('%s: entry point', l_th);
-  bars_audit.info('pay_file_a(input parameters): p_nd=>'||p_nd||chr(13)||chr(10)||
-                  ', p_date=>'||to_char(p_date, 'dd.mm.yyyy') ||chr(13)||chr(10)||
-          ', p_branch=>'||p_branch||chr(13)||chr(10)||
-          ', p_mfoa=>'||p_mfoa||chr(13)||chr(10)||
-          ', p_mfob=>'||p_mfob||chr(13)||chr(10)||
-          ', p_nlsa=>'||p_nlsa||chr(13)||chr(10)||
-          ', p_nlsb=>'||p_nlsb||chr(13)||chr(10)||
-          ', p_okpoa=>'||p_okpoa||chr(13)||chr(10)||
-          ', p_okpob=>'||p_okpob||chr(13)||chr(10)||
-          ', p_kv=>'||p_kv||chr(13)||chr(10)||
-          ', p_s=>'||to_char(p_s)||chr(13)||chr(10)||
-          ', p_nama=>'||p_nama||chr(13)||chr(10)||
-          ', p_namb=>'||p_namb||chr(13)||chr(10)||
-          ', p_nazn=>'||p_nazn||chr(13)||chr(10)||
-          ', p_sk=>'||to_char(p_sk)||chr(13)||chr(10)||
-          ', p_dk=>'||to_char(p_dk)||chr(13)||chr(10)||
-          ', p_vob=>'||to_char(p_vob)||chr(13)||chr(10)||
-          ', p_drec=>'||p_drec||chr(13)||chr(10)||
-          ', p_sign=>'||p_sign||chr(13)||chr(10)||
-          ', p_CreatedByUserName=>'||p_CreatedByUserName||chr(13)||chr(10)||
-          ', p_ConfirmedByUserName=>'||p_ConfirmedByUserName||chr(13)||chr(10)||
-          ', p_tt=>'||p_tt);
+    bars_audit.info('pay_file_a(input parameters): p_nd=>'||p_nd||chr(13)||chr(10)||
+                    ', p_date=>'||to_char(p_date, 'dd.mm.yyyy') ||chr(13)||chr(10)||
+                    ', p_branch=>'||p_branch||chr(13)||chr(10)||
+                    ', p_mfoa=>'||p_mfoa||chr(13)||chr(10)||
+                    ', p_mfob=>'||p_mfob||chr(13)||chr(10)||
+                    ', p_nlsa=>'||p_nlsa||chr(13)||chr(10)||
+                    ', p_nlsb=>'||p_nlsb||chr(13)||chr(10)||
+                    ', p_okpoa=>'||p_okpoa||chr(13)||chr(10)||
+                    ', p_okpob=>'||p_okpob||chr(13)||chr(10)||
+                    ', p_kv=>'||p_kv||chr(13)||chr(10)||
+                    ', p_s=>'||to_char(p_s)||chr(13)||chr(10)||
+                    ', p_nama=>'||p_nama||chr(13)||chr(10)||
+                    ', p_namb=>'||p_namb||chr(13)||chr(10)||
+                    ', p_nazn=>'||p_nazn||chr(13)||chr(10)||
+                    ', p_sk=>'||to_char(p_sk)||chr(13)||chr(10)||
+                    ', p_dk=>'||to_char(p_dk)||chr(13)||chr(10)||
+                    ', p_vob=>'||to_char(p_vob)||chr(13)||chr(10)||
+                    ', p_drec=>'||p_drec||chr(13)||chr(10)||
+                    ', p_sign=>'||p_sign||chr(13)||chr(10)||
+                    ', p_CreatedByUserName=>'||p_CreatedByUserName||chr(13)||chr(10)||
+                    ', p_ConfirmedByUserName=>'||p_ConfirmedByUserName||chr(13)||chr(10)||
+                    ', p_tt=>'||p_tt);
       -- точка отката
       savepoint sp_paystart;
 
@@ -103,6 +104,21 @@ PROMPT *** Create  procedure PAY_FILE_A ***
          -- представляемся отделением
         bc.subst_branch(p_branch);
 
+        select count(1)
+          into l_cnt_oper
+          from oper
+         where nd = p_nd
+           and s = p_s
+           and nlsa = p_nlsa
+           and nlsb = p_nlsb
+           and mfoa = p_mfoa
+           and mfob = p_mfob
+           and kv = (select kv from tabval where lcv = p_kv)
+           and pdat between p_date - 5 and p_date + 1
+           and vdat between p_date - 5 and p_date + 1;
+        if l_cnt_oper > 0 then
+          raise_application_error(-20000, 'Документ з номером '||p_nd||' вже створено!');
+        end if;
 
        -- вычисление операции для оплаты документа
       /* l_tt := bars_xmlklb_imp.get_import_operation(
@@ -112,7 +128,7 @@ PROMPT *** Create  procedure PAY_FILE_A ***
                 p_mfob => p_mfob,
                 p_dk   => p_dk,
                 p_kv   =>get_kv(p_kv));*/
-        l_tt:=p_tt;
+                l_tt:=p_tt;
         bars_audit.trace('%s: l_tt = %s', l_th, l_tt);
 
         l_errcode := null;
@@ -134,7 +150,7 @@ PROMPT *** Create  procedure PAY_FILE_A ***
         l_impdoc.ref_a  := null ;
         l_impdoc.impref := null ;
         l_impdoc.nd     := p_nd;
-        l_impdoc.datd   := p_date;
+        l_impdoc.datd   := trunc(p_date);
         l_impdoc.vdat   := gl.bdate       ;
         l_impdoc.nam_a  := p_nama         ;
         l_impdoc.mfoa   := p_mfoa         ;
@@ -157,20 +173,20 @@ PROMPT *** Create  procedure PAY_FILE_A ***
         l_impdoc.userid := l_userid       ;
 
         l_doc.doc  := l_impdoc;
-  begin
-    if p_drec is not null then
-          l_length := length(p_drec) - length(replace(p_drec,';'));
-          l_str :=p_drec;
-          for i in 0..l_length - 1 loop
-          l_tmp := substr(l_str, 0, instr(l_str,';')-1);
-          l_str := substr(l_str, instr(l_str,';')+1);
-          parse_str(l_tmp,l_name,l_val);
-          l_doc.drec(i).tag := l_name;
-          l_doc.drec(i).val := l_val;
-          end loop;
-     end if;
-    exception when others then
-    raise_application_error(-20000, 'Не коректно сформовано параметр D_REC!');
+    begin
+        if p_drec is not null then
+                  l_length := length(p_drec) - length(replace(p_drec,';'));
+                  l_str :=p_drec;
+                  for i in 0..l_length - 1 loop
+                    l_tmp := substr(l_str, 0, instr(l_str,';')-1);
+                    l_str := substr(l_str, instr(l_str,';')+1);
+                    parse_str(l_tmp,l_name,l_val);
+                    l_doc.drec(i).tag := l_name;
+                    l_doc.drec(i).val := l_val;
+                  end loop;
+         end if;
+      exception when others then
+        raise_application_error(-20000, 'Не коректно сформовано параметр D_REC!');
      end;
         bars_xmlklb_imp.pay_extern_doc( p_doc  => l_doc,
                         p_errcode => l_errcode,
@@ -202,10 +218,10 @@ PROMPT *** Create  procedure PAY_FILE_A ***
        -- возврат контекста
        bc.set_context;
      end;
-   bars_audit.info('pay_file_a(output parameters):
-              p_ref=>'||to_char(p_ref)||chr(13)||chr(10)||
-            ',p_errcode=>'||to_char(p_errcode)||chr(13)||chr(10)||
-            ',p_errmsg=>'||p_errmsg);
+     bars_audit.info('pay_file_a(output parameters):
+                          p_ref=>'||to_char(p_ref)||chr(13)||chr(10)||
+                        ',p_errcode=>'||to_char(p_errcode)||chr(13)||chr(10)||
+                        ',p_errmsg=>'||p_errmsg);
     bars_audit.trace('%s: done', l_th);
 end pay_file_a;
 /

@@ -33,10 +33,12 @@ COMMENT ON COLUMN BARSAQ.DOC_EXPORT_FILES.DOC_FILE IS '';
 
 
 
-PROMPT *** Create  constraint CC_DOCEXPFILES_DOCID_NN ***
+PROMPT *** Create  constraint PK_DOCEXPFILES ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.DOC_EXPORT_FILES MODIFY (DOC_ID CONSTRAINT CC_DOCEXPFILES_DOCID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.DOC_EXPORT_FILES ADD CONSTRAINT PK_DOCEXPFILES PRIMARY KEY (DOC_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -45,12 +47,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_DOCEXPFILES ***
+PROMPT *** Create  constraint CC_DOCEXPFILES_DOCID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.DOC_EXPORT_FILES ADD CONSTRAINT PK_DOCEXPFILES PRIMARY KEY (DOC_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
+  ALTER TABLE BARSAQ.DOC_EXPORT_FILES MODIFY (DOC_ID CONSTRAINT CC_DOCEXPFILES_DOCID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -85,9 +85,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  DOC_EXPORT_FILES ***
-grant SELECT                                                                 on DOC_EXPORT_FILES to BARSREADER_ROLE;
 
 
 

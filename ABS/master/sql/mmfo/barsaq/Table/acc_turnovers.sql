@@ -84,10 +84,36 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCTURNOVERS_BANKID_NN ***
+PROMPT *** Create  constraint FK_ACCTURNOVERS_BANKS ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ACC_TURNOVERS MODIFY (BANK_ID CONSTRAINT CC_ACCTURNOVERS_BANKID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.ACC_TURNOVERS ADD CONSTRAINT FK_ACCTURNOVERS_BANKS FOREIGN KEY (BANK_ID)
+	  REFERENCES BARS.BANKS$BASE (MFO) DEFERRABLE DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCTURNOVERS_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ACC_TURNOVERS ADD CONSTRAINT FK_ACCTURNOVERS_TABVAL FOREIGN KEY (CUR_ID)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) DEFERRABLE DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCTURNOVERS_CRTURNS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ACC_TURNOVERS MODIFY (CREDIT_TURNS CONSTRAINT CC_ACCTURNOVERS_CRTURNS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -156,10 +182,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCTURNOVERS_CRTURNS_NN ***
+PROMPT *** Create  constraint CC_ACCTURNOVERS_BANKID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ACC_TURNOVERS MODIFY (CREDIT_TURNS CONSTRAINT CC_ACCTURNOVERS_CRTURNS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.ACC_TURNOVERS MODIFY (BANK_ID CONSTRAINT CC_ACCTURNOVERS_BANKID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -194,9 +220,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  ACC_TURNOVERS ***
-grant SELECT                                                                 on ACC_TURNOVERS   to BARSREADER_ROLE;
 
 
 

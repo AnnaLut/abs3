@@ -15,11 +15,9 @@ PROMPT *** Create  view V_TRUSTEE_ALLOW2SIGN ***
  ;
 
 PROMPT *** Create  grants  V_TRUSTEE_ALLOW2SIGN ***
-grant SELECT                                                                 on V_TRUSTEE_ALLOW2SIGN to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TRUSTEE_ALLOW2SIGN to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TRUSTEE_ALLOW2SIGN to CUST001;
 grant SELECT                                                                 on V_TRUSTEE_ALLOW2SIGN to DPT_ROLE;
-grant SELECT                                                                 on V_TRUSTEE_ALLOW2SIGN to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_TRUSTEE_ALLOW2SIGN to WR_ALL_RIGHTS;
 
 

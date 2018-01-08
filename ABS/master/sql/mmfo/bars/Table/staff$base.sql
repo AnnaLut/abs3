@@ -137,6 +137,337 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_STAFF_TEMPLID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE MODIFY (TEMPL_ID CONSTRAINT CC_STAFF_TEMPLID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_USEGTW_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE MODIFY (USEGTW CONSTRAINT CC_STAFF_USEGTW_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_CREATED_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE MODIFY (CREATED CONSTRAINT CC_STAFF_CREATED_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_ACTIVE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE MODIFY (ACTIVE CONSTRAINT CC_STAFF_ACTIVE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_POLICYGROUP_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE MODIFY (POLICY_GROUP CONSTRAINT CC_STAFF_POLICYGROUP_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_STAFF_WEB_PROFILE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE MODIFY (WEB_PROFILE CONSTRAINT NK_STAFF_WEB_PROFILE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_CSCHEMA_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE MODIFY (CSCHEMA CONSTRAINT CC_STAFF_CSCHEMA_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_USEARC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE MODIFY (USEARC CONSTRAINT CC_STAFF_USEARC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE MODIFY (BRANCH CONSTRAINT CC_STAFF_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_CLSID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE MODIFY (CLSID CONSTRAINT CC_STAFF_CLSID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_TYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE MODIFY (TYPE CONSTRAINT CC_STAFF_TYPE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_LOGNAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE MODIFY (LOGNAME CONSTRAINT CC_STAFF_LOGNAME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_FIO_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE MODIFY (FIO CONSTRAINT CC_STAFF_FIO_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE MODIFY (ID CONSTRAINT CC_STAFF_ID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STAFF_POLICYGROUPS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT FK_STAFF_POLICYGROUPS FOREIGN KEY (POLICY_GROUP)
+	  REFERENCES BARS.POLICY_GROUPS (POLICY_GROUP) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STAFF_WEB_PROFILE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT FK_STAFF_WEB_PROFILE FOREIGN KEY (WEB_PROFILE)
+	  REFERENCES BARS.WEB_PROFILES (PROFILE_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STAFF_STAFFCLS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT FK_STAFF_STAFFCLS FOREIGN KEY (CLSID)
+	  REFERENCES BARS.STAFF_CLASS (CLSID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STAFF_STAFFPROFILES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT FK_STAFF_STAFFPROFILES FOREIGN KEY (PROFILE)
+	  REFERENCES BARS.STAFF_PROFILES (PROFILE) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STAFF_STAFFTEMPL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT FK_STAFF_STAFFTEMPL FOREIGN KEY (TEMPL_ID)
+	  REFERENCES BARS.STAFF_TEMPLATES (TEMPL_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STAFF_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT FK_STAFF_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STAFF_STAFFTIPS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT FK_STAFF_STAFFTIPS FOREIGN KEY (TIP)
+	  REFERENCES BARS.STAFF_TIPS (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_USEARC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT CC_STAFF_USEARC CHECK (usearc in (0, 1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_BAX ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT CC_STAFF_BAX CHECK (bax in (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_APPROVE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT CC_STAFF_APPROVE CHECK (approve in (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_RDATE1 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT CC_STAFF_RDATE1 CHECK (rdate1 <= rdate2) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_ADATE1 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT CC_STAFF_ADATE1 CHECK (adate1 <= adate2) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STAFF_DISABLE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT CC_STAFF_DISABLE CHECK (disable in (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_STAFF_CANSELBRANCH_CC ***
 begin   
  execute immediate '
@@ -181,246 +512,6 @@ PROMPT *** Create  constraint CC_STAFF_TYPE ***
 begin   
  execute immediate '
   ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT CC_STAFF_TYPE CHECK (type in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_DISABLE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT CC_STAFF_DISABLE CHECK (disable in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_ADATE1 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT CC_STAFF_ADATE1 CHECK (adate1 <= adate2) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_RDATE1 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT CC_STAFF_RDATE1 CHECK (rdate1 <= rdate2) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_APPROVE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT CC_STAFF_APPROVE CHECK (approve in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_BAX ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT CC_STAFF_BAX CHECK (bax in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_USEARC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE ADD CONSTRAINT CC_STAFF_USEARC CHECK (usearc in (0, 1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_ID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE MODIFY (ID CONSTRAINT CC_STAFF_ID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_FIO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE MODIFY (FIO CONSTRAINT CC_STAFF_FIO_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_LOGNAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE MODIFY (LOGNAME CONSTRAINT CC_STAFF_LOGNAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_TYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE MODIFY (TYPE CONSTRAINT CC_STAFF_TYPE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_CLSID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE MODIFY (CLSID CONSTRAINT CC_STAFF_CLSID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE MODIFY (BRANCH CONSTRAINT CC_STAFF_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_USEARC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE MODIFY (USEARC CONSTRAINT CC_STAFF_USEARC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_CSCHEMA_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE MODIFY (CSCHEMA CONSTRAINT CC_STAFF_CSCHEMA_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_STAFF_WEB_PROFILE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE MODIFY (WEB_PROFILE CONSTRAINT NK_STAFF_WEB_PROFILE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_POLICYGROUP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE MODIFY (POLICY_GROUP CONSTRAINT CC_STAFF_POLICYGROUP_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_ACTIVE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE MODIFY (ACTIVE CONSTRAINT CC_STAFF_ACTIVE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_CREATED_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE MODIFY (CREATED CONSTRAINT CC_STAFF_CREATED_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_USEGTW_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE MODIFY (USEGTW CONSTRAINT CC_STAFF_USEGTW_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFF_TEMPLID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF$BASE MODIFY (TEMPL_ID CONSTRAINT CC_STAFF_TEMPLID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -487,14 +578,12 @@ exception when others then
 PROMPT *** Create  grants  STAFF$BASE ***
 grant INSERT,SELECT,UPDATE                                                   on STAFF$BASE      to ABS_ADMIN;
 grant FLASHBACK,REFERENCES,SELECT                                            on STAFF$BASE      to BARSAQ with grant option;
-grant SELECT                                                                 on STAFF$BASE      to BARSREADER_ROLE;
 grant SELECT                                                                 on STAFF$BASE      to BARSUPL;
 grant INSERT,SELECT,UPDATE                                                   on STAFF$BASE      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF$BASE      to BARS_DM;
 grant SELECT                                                                 on STAFF$BASE      to CUST001;
 grant SELECT                                                                 on STAFF$BASE      to FINMON;
 grant SELECT,UPDATE                                                          on STAFF$BASE      to START1;
-grant SELECT                                                                 on STAFF$BASE      to UPLD;
 grant INSERT,SELECT,UPDATE                                                   on STAFF$BASE      to WCS_SYNC_USER;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF$BASE      to WR_ALL_RIGHTS;
 

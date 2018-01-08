@@ -107,10 +107,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005255 ***
+PROMPT *** Create  constraint FK_CINCUST_RNK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIN_CUST MODIFY (RNK NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIN_CUST ADD CONSTRAINT FK_CINCUST_RNK FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -119,58 +120,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005256 ***
+PROMPT *** Create  constraint SYS_C005262 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIN_CUST MODIFY (MFO_2600 NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005257 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIN_CUST MODIFY (NLS_2600 NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005258 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIN_CUST MODIFY (NLS_2909 NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005259 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIN_CUST MODIFY (S_A2 NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005260 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIN_CUST MODIFY (S_B2 NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIN_CUST MODIFY (S_B3 NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -191,10 +144,70 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005262 ***
+PROMPT *** Create  constraint SYS_C005260 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIN_CUST MODIFY (S_B3 NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIN_CUST MODIFY (S_B2 NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005259 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIN_CUST MODIFY (S_A2 NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005258 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIN_CUST MODIFY (NLS_2909 NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005257 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIN_CUST MODIFY (NLS_2600 NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005256 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIN_CUST MODIFY (MFO_2600 NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005255 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIN_CUST MODIFY (RNK NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -217,12 +230,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIN_CUST ***
-grant SELECT                                                                 on CIN_CUST        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CIN_CUST        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIN_CUST        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIN_CUST        to PYOD001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIN_CUST        to START1;
-grant SELECT                                                                 on CIN_CUST        to UPLD;
 grant FLASHBACK,SELECT                                                       on CIN_CUST        to WR_REFREAD;
 
 

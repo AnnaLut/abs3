@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_SAL_SNP.sql =========*** Run ***
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_SAL_SNP ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_SAL_SNP 
+CREATE OR REPLACE PROCEDURE BARS.P_SAL_SNP 
   ( mode_   int ,
     p_dat1  date,
     p_dat2  date,
@@ -76,7 +67,7 @@ PROMPT *** Create  procedure P_SAL_SNP ***
   nn_       number;
   l_dd      number;
   l_cnt     number; -- кол-во чего-либо
-
+  
   -- порог кол-ва счетов:
   -- если не больше этого значения, используем точечный алгоритм доступа
   -- иначе - используем групповой алгоритм доступа
@@ -92,9 +83,9 @@ begin
 
   if mode_= 11
   then
-
+    
     l_dd:=to_date(p_dat2,'dd-mm-yyyy') -  to_date(p_dat1,'dd-mm-yyyy') ;
-
+  
     if l_dd>31
       then  bars_error.raise_nerror(MODCODE, '38');
     end if;
@@ -164,12 +155,12 @@ begin
     /*
     logger.trace('%s: счет 20679301124142(980) отобран(0/1): %s', p, to_char(l_flag));
     */
-
+  
     if ( p_dat2 = gl.bd )
     then -- accounts
-
+  
       select max(fdat) into dat_max from fdat;
-
+  
   		insert
   				into tmp_sal (kv,
   							 nbs,
@@ -223,9 +214,9 @@ begin
   		)
           )
           where dosq<>0 or kosq<>0 or ostq<>0 or ostiq<>0;
-
+  
     else
-
+      
       if l_cnt > l_acc_threshold
       then
           --
@@ -421,12 +412,12 @@ begin
       logger.trace('%s: окончание работы по параметру mode=11', p);
       --
     end if;  --- accounts
-
-  elsif mode_ = 102
+  
+  elsif mode_ = 102 
   then  /* сальдовка  за период, с корр 096*/
-
+    
     EXECUTE IMMEDIATE 'TRUNCATE TABLE CCK_AN_TMP';
-
+    
     insert into CCK_AN_TMP
                (branch,nbs,kv,name,name1,nls,n1,n2,n3,n4,n5,zalq,zal,rezq)
     select a.branch,
@@ -468,21 +459,10 @@ begin
       and a.branch like BRANCH_||'%'
       and a.branch like sys_context('bars_context','user_branch')||'%'
       and a.acc=s.acc(+);
-
+      
   end if;
-
+  
   commit;
 
 end p_sal_snp;
 /
-show err;
-
-PROMPT *** Create  grants  P_SAL_SNP ***
-grant EXECUTE                                                                on P_SAL_SNP       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_SAL_SNP       to RPBN001;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_SAL_SNP.sql =========*** End ***
-PROMPT ===================================================================================== 

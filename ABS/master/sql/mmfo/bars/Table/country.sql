@@ -91,10 +91,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_COUNTRY_COUNTRY_NN ***
+PROMPT *** Create  constraint FK_COUNTRY_RISK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.COUNTRY MODIFY (COUNTRY CONSTRAINT CC_COUNTRY_COUNTRY_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.COUNTRY ADD CONSTRAINT FK_COUNTRY_RISK FOREIGN KEY (GRP)
+	  REFERENCES BARS.REZ_GRP_COUNTRY (GRP) DISABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -107,6 +108,18 @@ PROMPT *** Create  constraint CC_COUNTRY_NAME_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.COUNTRY MODIFY (NAME CONSTRAINT CC_COUNTRY_NAME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_COUNTRY_COUNTRY_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.COUNTRY MODIFY (COUNTRY CONSTRAINT CC_COUNTRY_COUNTRY_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -132,7 +145,6 @@ PROMPT *** Create  grants  COUNTRY ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on COUNTRY         to ABS_ADMIN;
 grant REFERENCES,SELECT                                                      on COUNTRY         to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on COUNTRY         to BARSAQ_ADM with grant option;
-grant SELECT                                                                 on COUNTRY         to BARSREADER_ROLE;
 grant SELECT                                                                 on COUNTRY         to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on COUNTRY         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on COUNTRY         to BARS_DM;
@@ -143,7 +155,6 @@ grant SELECT                                                                 on 
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on COUNTRY         to FINMON;
 grant SELECT                                                                 on COUNTRY         to PYOD001;
 grant SELECT                                                                 on COUNTRY         to START1;
-grant SELECT                                                                 on COUNTRY         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on COUNTRY         to WR_ALL_RIGHTS;
 grant SELECT                                                                 on COUNTRY         to WR_CUSTLIST;
 grant SELECT                                                                 on COUNTRY         to WR_CUSTREG;

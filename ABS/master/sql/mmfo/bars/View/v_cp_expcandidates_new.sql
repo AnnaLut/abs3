@@ -80,9 +80,7 @@ having MAX(DNK) = current_dnk  and  (sum(OST_N_EXP)> 0 OR sum(OST_R_EXP)>0)
     order by cp_id;
 
 PROMPT *** Create  grants  V_CP_EXPCANDIDATES_NEW ***
-grant SELECT                                                                 on V_CP_EXPCANDIDATES_NEW to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_EXPCANDIDATES_NEW to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CP_EXPCANDIDATES_NEW to UPLD;
 
 
 

@@ -22,11 +22,9 @@ SELECT     a.ACC, a.NLS, a.KV, a.NMS, NULL,  --- Eсли № пакета у счета нет, то
 
 PROMPT *** Create  grants  V_ACC_SHTAR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_ACC_SHTAR     to ABS_ADMIN;
-grant SELECT                                                                 on V_ACC_SHTAR     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ACC_SHTAR     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ACC_SHTAR     to CUST001;
 grant SELECT                                                                 on V_ACC_SHTAR     to START1;
-grant SELECT                                                                 on V_ACC_SHTAR     to UPLD;
 grant FLASHBACK,SELECT                                                       on V_ACC_SHTAR     to WR_REFREAD;
 
 

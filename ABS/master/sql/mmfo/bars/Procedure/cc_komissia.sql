@@ -104,7 +104,6 @@ BEGIN
   END;
 
   IF METR_ =  0 THEN  acrn.p_int(nAcc_,nId_,DAT_01, DAT_31,S_,NULL,1);
-    
      update acr_intN  set nazn='Нарахування щомісячної комісії по кредиту N '||l_cc_id||' зa '||to_char(DAT_01,'mm')||' мiсяць '||to_char(DAT_01,'yyyy')||' року. Ставка '||to_char(IR_*100,'990D99MI')
      where acc=nAcc_ and  id=nId_;
 

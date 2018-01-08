@@ -55,9 +55,7 @@ COMMENT ON COLUMN BARS.SB_OPPOK.IM_POL IS '';
 
 
 PROMPT *** Create  grants  SB_OPPOK ***
-grant SELECT                                                                 on SB_OPPOK        to BARSREADER_ROLE;
 grant SELECT                                                                 on SB_OPPOK        to BARS_DM;
-grant SELECT                                                                 on SB_OPPOK        to UPLD;
 
 
 

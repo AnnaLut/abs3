@@ -81,10 +81,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_GRTTYPES_TYPENAME_NN ***
+PROMPT *** Create  constraint FK_GRTTYPES_GRTGROUPS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_TYPES MODIFY (TYPE_NAME CONSTRAINT CC_GRTTYPES_TYPENAME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.GRT_TYPES ADD CONSTRAINT FK_GRTTYPES_GRTGROUPS FOREIGN KEY (GROUP_ID)
+	  REFERENCES BARS.GRT_GROUPS (GROUP_ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -93,82 +94,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_GRTTYPES_GROUPID_NN ***
+PROMPT *** Create  constraint CC_GRTTYPES_KN_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_TYPES MODIFY (GROUP_ID CONSTRAINT CC_GRTTYPES_GROUPID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTTYPES_NBS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_TYPES MODIFY (NBS CONSTRAINT CC_GRTTYPES_NBS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTTYPES_S031_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_TYPES MODIFY (S031 CONSTRAINT CC_GRTTYPES_S031_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTTYPES_DETTBLID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_TYPES MODIFY (DETAIL_TABLE_ID CONSTRAINT CC_GRTTYPES_DETTBLID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTTYPES_KV_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_TYPES MODIFY (KV CONSTRAINT CC_GRTTYPES_KV_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTTYPES_TP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_TYPES MODIFY (TP CONSTRAINT CC_GRTTYPES_TP_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTTYPES_KL_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_TYPES MODIFY (KL CONSTRAINT CC_GRTTYPES_KL_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.GRT_TYPES MODIFY (KN CONSTRAINT CC_GRTTYPES_KN_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -189,10 +118,107 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_GRTTYPES_KN_NN ***
+PROMPT *** Create  constraint CC_GRTTYPES_KL_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_TYPES MODIFY (KN CONSTRAINT CC_GRTTYPES_KN_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.GRT_TYPES MODIFY (KL CONSTRAINT CC_GRTTYPES_KL_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTTYPES_TP_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_TYPES MODIFY (TP CONSTRAINT CC_GRTTYPES_TP_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTTYPES_KV_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_TYPES MODIFY (KV CONSTRAINT CC_GRTTYPES_KV_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTTYPES_DETTBLID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_TYPES MODIFY (DETAIL_TABLE_ID CONSTRAINT CC_GRTTYPES_DETTBLID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTTYPES_S031_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_TYPES MODIFY (S031 CONSTRAINT CC_GRTTYPES_S031_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTTYPES_NBS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_TYPES MODIFY (NBS CONSTRAINT CC_GRTTYPES_NBS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTTYPES_GROUPID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_TYPES MODIFY (GROUP_ID CONSTRAINT CC_GRTTYPES_GROUPID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_GRTTYPES_GRTDETTABLES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_TYPES ADD CONSTRAINT FK_GRTTYPES_GRTDETTABLES FOREIGN KEY (DETAIL_TABLE_ID)
+	  REFERENCES BARS.GRT_DETAIL_TABLES (TABLE_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTTYPES_TYPENAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_TYPES MODIFY (TYPE_NAME CONSTRAINT CC_GRTTYPES_TYPENAME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -215,10 +241,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRT_TYPES ***
-grant SELECT                                                                 on GRT_TYPES       to BARSREADER_ROLE;
 grant SELECT                                                                 on GRT_TYPES       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRT_TYPES       to BARS_DM;
-grant SELECT                                                                 on GRT_TYPES       to UPLD;
 
 
 

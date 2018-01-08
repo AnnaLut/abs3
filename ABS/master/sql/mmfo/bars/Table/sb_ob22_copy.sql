@@ -61,8 +61,6 @@ COMMENT ON COLUMN BARS.SB_OB22_COPY.A010 IS '';
 
 
 PROMPT *** Create  grants  SB_OB22_COPY ***
-grant SELECT                                                                 on SB_OB22_COPY    to BARSREADER_ROLE;
-grant SELECT                                                                 on SB_OB22_COPY    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SB_OB22_COPY    to WR_ALL_RIGHTS;
 
 

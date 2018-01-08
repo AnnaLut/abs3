@@ -32,10 +32,8 @@ PROMPT *** Create  view ACC_86_NEW ***
                        order by ob88,p080;
 
 PROMPT *** Create  grants  ACC_86_NEW ***
-grant SELECT                                                                 on ACC_86_NEW      to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on ACC_86_NEW      to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on ACC_86_NEW      to NALOG;
-grant SELECT                                                                 on ACC_86_NEW      to UPLD;
 
 
 

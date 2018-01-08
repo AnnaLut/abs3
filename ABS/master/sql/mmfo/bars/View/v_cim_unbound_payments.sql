@@ -17,9 +17,7 @@ PROMPT *** Create  view V_CIM_UNBOUND_PAYMENTS ***
     from  v_cim_in_unbound_payments;
 
 PROMPT *** Create  grants  V_CIM_UNBOUND_PAYMENTS ***
-grant SELECT                                                                 on V_CIM_UNBOUND_PAYMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_UNBOUND_PAYMENTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_UNBOUND_PAYMENTS to UPLD;
 
 
 

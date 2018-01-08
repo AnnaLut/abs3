@@ -110,12 +110,10 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_CUSTOMER ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CUSTOMER    to ABS_ADMIN;
-grant SELECT                                                                 on TMP_CUSTOMER    to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TMP_CUSTOMER    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_CUSTOMER    to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TMP_CUSTOMER    to RPBN002;
 grant SELECT                                                                 on TMP_CUSTOMER    to START1;
-grant SELECT                                                                 on TMP_CUSTOMER    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_CUSTOMER    to WR_ALL_RIGHTS;
 
 

@@ -49,11 +49,9 @@ COMMENT ON COLUMN BARS.ID_ACC.ACC IS '';
 
 
 PROMPT *** Create  grants  ID_ACC ***
-grant SELECT                                                                 on ID_ACC          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ID_ACC          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ID_ACC          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ID_ACC          to START1;
-grant SELECT                                                                 on ID_ACC          to UPLD;
 
 
 

@@ -13,7 +13,7 @@ IS
    l_doc_tp_id    v_rko_cust_signatory.doc_tp_id%TYPE;
    l_position     v_rko_cust_signatory.position%TYPE;
    l_trust_regnum v_rko_cust_signatory.trust_regnum%TYPE;
-   l_trust_regdat varchar2 (40);
+   l_trust_regdat varchar2(20);
    l_shot_fio     VARCHAR2 (100);
    l_txt          VARCHAR2 (4000);
 
@@ -58,8 +58,6 @@ BEGIN
 RETURN  (l_txt);
 
 END;
-
-
 /
  show err;
  

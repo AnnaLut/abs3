@@ -101,11 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CONTRACTS_TRUNCSUM ***
-grant SELECT                                                                 on CONTRACTS_TRUNCSUM to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CONTRACTS_TRUNCSUM to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CONTRACTS_TRUNCSUM to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CONTRACTS_TRUNCSUM to F_500;
-grant SELECT                                                                 on CONTRACTS_TRUNCSUM to UPLD;
 grant FLASHBACK,SELECT                                                       on CONTRACTS_TRUNCSUM to WR_REFREAD;
 
 

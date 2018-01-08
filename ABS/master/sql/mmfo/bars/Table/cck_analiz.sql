@@ -83,11 +83,9 @@ COMMENT ON COLUMN BARS.CCK_ANALIZ.UV IS '';
 
 
 PROMPT *** Create  grants  CCK_ANALIZ ***
-grant SELECT                                                                 on CCK_ANALIZ      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_ANALIZ      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_ANALIZ      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_ANALIZ      to RCC_DEAL;
-grant SELECT                                                                 on CCK_ANALIZ      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_ANALIZ      to WR_ALL_RIGHTS;
 
 

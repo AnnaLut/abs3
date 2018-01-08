@@ -110,7 +110,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  DEVELOPERS ***
-grant SELECT                                                                 on DEVELOPERS      to BARSREADER_ROLE;
 grant SELECT                                                                 on DEVELOPERS      to BARS_DM;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEVELOPERS      to WR_ALL_RIGHTS;
 

@@ -42,10 +42,6 @@ COMMENT ON COLUMN BARSUPL.TMP_BPK_ACC_UPDATE.ACC_ID IS '';
 
 
 
-PROMPT *** Create  grants  TMP_BPK_ACC_UPDATE ***
-grant SELECT                                                                 on TMP_BPK_ACC_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_BPK_ACC_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

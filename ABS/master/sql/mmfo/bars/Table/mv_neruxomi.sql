@@ -131,10 +131,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  MV_NERUXOMI ***
-grant SELECT                                                                 on MV_NERUXOMI     to BARSREADER_ROLE;
-grant SELECT                                                                 on MV_NERUXOMI     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

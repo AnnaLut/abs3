@@ -108,10 +108,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_VIPFLAGSARC_VID_NN ***
+PROMPT *** Create  constraint CC_VIPFLAGSARC_GLBD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.VIP_FLAGS_ARC MODIFY (VID CONSTRAINT CC_VIPFLAGSARC_VID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.VIP_FLAGS_ARC MODIFY (GLOBAL_BDATE CONSTRAINT CC_VIPFLAGSARC_GLBD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -132,20 +132,16 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_VIPFLAGSARC_GLBD_NN ***
+PROMPT *** Create  constraint CC_VIPFLAGSARC_VID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.VIP_FLAGS_ARC MODIFY (GLOBAL_BDATE CONSTRAINT CC_VIPFLAGSARC_GLBD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.VIP_FLAGS_ARC MODIFY (VID CONSTRAINT CC_VIPFLAGSARC_VID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-
-PROMPT *** Create  grants  VIP_FLAGS_ARC ***
-grant SELECT                                                                 on VIP_FLAGS_ARC   to BARSREADER_ROLE;
-grant SELECT                                                                 on VIP_FLAGS_ARC   to UPLD;
 
 
 

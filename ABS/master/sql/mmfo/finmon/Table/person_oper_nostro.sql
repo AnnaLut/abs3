@@ -50,6 +50,45 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint R_POPERN_POPER ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.PERSON_OPER_NOSTRO ADD CONSTRAINT R_POPERN_POPER FOREIGN KEY (OPER_ID, PERSON_ID, BRANCH_ID, CL_TYPE)
+	  REFERENCES FINMON.PERSON_OPER (OPER_ID, PERSON_ID, BRANCH_ID, CL_TYPE) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_POPERN_PBANK ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.PERSON_OPER_NOSTRO ADD CONSTRAINT R_POPERN_PBANK FOREIGN KEY (PBANK_ID)
+	  REFERENCES FINMON.PERSON_BANK (ID) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_POPERN_BANK ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.PERSON_OPER_NOSTRO ADD CONSTRAINT R_POPERN_BANK FOREIGN KEY (BRANCH_ID)
+	  REFERENCES FINMON.BANK (ID) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XPK_PERSON_OPER_NOSTRO ***
 begin   
  execute immediate '
@@ -62,9 +101,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  PERSON_OPER_NOSTRO ***
-grant SELECT                                                                 on PERSON_OPER_NOSTRO to BARSREADER_ROLE;
 
 
 

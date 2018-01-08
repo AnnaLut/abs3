@@ -42,9 +42,7 @@ PROMPT *** Create  view V_RKO_LST_FULL2 ***
    order by substr (a.nls, 1, 4) || substr (a.nls, 6), a.kv;
 
 PROMPT *** Create  grants  V_RKO_LST_FULL2 ***
-grant SELECT                                                                 on V_RKO_LST_FULL2 to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RKO_LST_FULL2 to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_RKO_LST_FULL2 to UPLD;
 
 
 

@@ -14,10 +14,8 @@ PROMPT *** Create  view V_BANKS ***
    ORDER BY 1;
 
 PROMPT *** Create  grants  V_BANKS ***
-grant SELECT                                                                 on V_BANKS         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BANKS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BANKS         to START1;
-grant SELECT                                                                 on V_BANKS         to UPLD;
 
 
 

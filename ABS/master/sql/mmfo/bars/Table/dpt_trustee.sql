@@ -93,12 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_DPTTRUSTEE2 ***
+PROMPT *** Create  constraint CC_DPTTRUSTEE_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_TRUSTEE ADD CONSTRAINT UK_DPTTRUSTEE2 UNIQUE (DPT_ID, ADD_NUM)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (BRANCH CONSTRAINT CC_DPTTRUSTEE_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -107,10 +105,210 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTTRUSTEE_FLACT ***
+PROMPT *** Create  constraint CC_DPTTRUSTEE_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_TRUSTEE ADD CONSTRAINT CC_DPTTRUSTEE_FLACT CHECK (fl_act IN (0,1,-1) ) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (KF CONSTRAINT CC_DPTTRUSTEE_KF_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTTRUSTEE_FLACT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (FL_ACT CONSTRAINT CC_DPTTRUSTEE_FLACT_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTTRUSTEE_ADDDAT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (ADD_DAT CONSTRAINT CC_DPTTRUSTEE_ADDDAT_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTTRUSTEE_ADDNUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (ADD_NUM CONSTRAINT CC_DPTTRUSTEE_ADDNUM_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTTRUSTEE_RNK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (RNK CONSTRAINT CC_DPTTRUSTEE_RNK_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTTRUSTEE_RNKTR_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (RNK_TR CONSTRAINT CC_DPTTRUSTEE_RNKTR_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTTRUSTEE_TYPTR_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (TYP_TR CONSTRAINT CC_DPTTRUSTEE_TYPTR_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTTRUSTEE_DPTID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (DPT_ID CONSTRAINT CC_DPTTRUSTEE_DPTID_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTTRUSTEE_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (ID CONSTRAINT CC_DPTTRUSTEE_ID_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTTRUSTEE_DPTDPTALL2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE ADD CONSTRAINT FK_DPTTRUSTEE_DPTDPTALL2 FOREIGN KEY (KF, DPT_ID)
+	  REFERENCES BARS.DPT_DEPOSIT_ALL (KF, DEPOSIT_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTTRUSTEE_DPTTRUSTEE2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE ADD CONSTRAINT FK_DPTTRUSTEE_DPTTRUSTEE2 FOREIGN KEY (KF, UNDO_ID)
+	  REFERENCES BARS.DPT_TRUSTEE (KF, ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTTRUSTEE_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE ADD CONSTRAINT FK_DPTTRUSTEE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTTRUSTEE_DPTTRUSTEETYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE ADD CONSTRAINT FK_DPTTRUSTEE_DPTTRUSTEETYPE FOREIGN KEY (TYP_TR)
+	  REFERENCES BARS.DPT_TRUSTEE_TYPE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTTRUSTEE_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE ADD CONSTRAINT FK_DPTTRUSTEE_CUSTOMER FOREIGN KEY (RNK_TR)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTTRUSTEE_CUSTOMER2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE ADD CONSTRAINT FK_DPTTRUSTEE_CUSTOMER2 FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTTRUSTEE_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE ADD CONSTRAINT FK_DPTTRUSTEE_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPT_TRUSTEE_UNDO_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TRUSTEE ADD CONSTRAINT FK_DPT_TRUSTEE_UNDO_ID FOREIGN KEY (UNDO_ID)
+	  REFERENCES BARS.DPT_TRUSTEE (ID) ON DELETE CASCADE ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -133,10 +331,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTTRUSTEE_ID_NN ***
+PROMPT *** Create  constraint UK_DPTTRUSTEE2 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (ID CONSTRAINT CC_DPTTRUSTEE_ID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.DPT_TRUSTEE ADD CONSTRAINT UK_DPTTRUSTEE2 UNIQUE (DPT_ID, ADD_NUM)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -145,106 +345,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTTRUSTEE_DPTID_NN ***
+PROMPT *** Create  constraint CC_DPTTRUSTEE_FLACT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (DPT_ID CONSTRAINT CC_DPTTRUSTEE_DPTID_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTTRUSTEE_TYPTR_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (TYP_TR CONSTRAINT CC_DPTTRUSTEE_TYPTR_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTTRUSTEE_RNKTR_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (RNK_TR CONSTRAINT CC_DPTTRUSTEE_RNKTR_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTTRUSTEE_RNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (RNK CONSTRAINT CC_DPTTRUSTEE_RNK_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTTRUSTEE_ADDNUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (ADD_NUM CONSTRAINT CC_DPTTRUSTEE_ADDNUM_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTTRUSTEE_ADDDAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (ADD_DAT CONSTRAINT CC_DPTTRUSTEE_ADDDAT_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTTRUSTEE_FLACT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (FL_ACT CONSTRAINT CC_DPTTRUSTEE_FLACT_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTTRUSTEE_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (KF CONSTRAINT CC_DPTTRUSTEE_KF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTTRUSTEE_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TRUSTEE MODIFY (BRANCH CONSTRAINT CC_DPTTRUSTEE_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.DPT_TRUSTEE ADD CONSTRAINT CC_DPTTRUSTEE_FLACT CHECK (fl_act IN (0,1,-1) ) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -323,14 +427,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_TRUSTEE ***
-grant SELECT                                                                 on DPT_TRUSTEE     to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_TRUSTEE     to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_TRUSTEE     to BARS_ACCESS_DEFROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on DPT_TRUSTEE     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_TRUSTEE     to DPT_ROLE;
 grant SELECT                                                                 on DPT_TRUSTEE     to KLBX;
 grant SELECT                                                                 on DPT_TRUSTEE     to RPBN001;
-grant SELECT                                                                 on DPT_TRUSTEE     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_TRUSTEE     to WR_ALL_RIGHTS;
 
 

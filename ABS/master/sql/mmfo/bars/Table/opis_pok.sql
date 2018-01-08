@@ -56,8 +56,7 @@ COMMENT ON COLUMN BARS.OPIS_POK.DATA_C IS '';
 
 
 PROMPT *** Create  grants  OPIS_POK ***
-grant SELECT                                                                 on OPIS_POK        to BARSREADER_ROLE;
-grant SELECT                                                                 on OPIS_POK        to UPLD;
+grant SELECT                                                                 on OPIS_POK        to BARS_DM;
 
 
 

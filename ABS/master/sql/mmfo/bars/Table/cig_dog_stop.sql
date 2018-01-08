@@ -117,11 +117,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_DOG_STOP ***
-grant SELECT                                                                 on CIG_DOG_STOP    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on CIG_DOG_STOP    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_DOG_STOP    to BARS_DM;
 grant DELETE,INSERT,SELECT                                                   on CIG_DOG_STOP    to CIG_ROLE;
-grant SELECT                                                                 on CIG_DOG_STOP    to UPLD;
 
 
 

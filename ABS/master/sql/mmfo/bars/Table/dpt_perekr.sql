@@ -95,11 +95,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_PEREKR ***
-grant SELECT                                                                 on DPT_PEREKR      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_PEREKR      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_PEREKR      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_PEREKR      to START1;
-grant SELECT                                                                 on DPT_PEREKR      to UPLD;
 
 
 

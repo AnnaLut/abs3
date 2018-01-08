@@ -75,10 +75,6 @@ COMMENT ON COLUMN BARS.ERR$_DPU_VIDD_RATE.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPU_VIDD_RATE ***
-grant SELECT                                                                 on ERR$_DPU_VIDD_RATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPU_VIDD_RATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

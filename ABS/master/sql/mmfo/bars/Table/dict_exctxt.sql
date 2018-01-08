@@ -103,9 +103,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DICT_EXCTXT ***
-grant SELECT                                                                 on DICT_EXCTXT     to BARSREADER_ROLE;
 grant SELECT                                                                 on DICT_EXCTXT     to BARS_DM;
-grant SELECT                                                                 on DICT_EXCTXT     to UPLD;
 
 
 

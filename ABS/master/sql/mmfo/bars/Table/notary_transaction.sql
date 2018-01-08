@@ -59,6 +59,19 @@ COMMENT ON COLUMN BARS.NOTARY_TRANSACTION.BRANCH_ID IS 'Бранч, в якому виконана 
 
 
 
+PROMPT *** Create  constraint FK_NOTARY_TRAN_REF_ACCRED ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NOTARY_TRANSACTION ADD CONSTRAINT FK_NOTARY_TRAN_REF_ACCRED FOREIGN KEY (ACCREDITATION_ID)
+	  REFERENCES BARS.NOTARY_ACCREDITATION (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C007426 ***
 begin   
  execute immediate '
@@ -159,9 +172,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NOTARY_TRANSACTION ***
-grant SELECT                                                                 on NOTARY_TRANSACTION to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NOTARY_TRANSACTION to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on NOTARY_TRANSACTION to UPLD;
 
 
 

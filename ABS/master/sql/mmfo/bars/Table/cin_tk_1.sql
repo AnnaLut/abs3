@@ -67,9 +67,7 @@ COMMENT ON COLUMN BARS.CIN_TK_1.ID IS '';
 
 
 PROMPT *** Create  grants  CIN_TK_1 ***
-grant SELECT                                                                 on CIN_TK_1        to BARSREADER_ROLE;
 grant SELECT                                                                 on CIN_TK_1        to BARS_DM;
-grant SELECT                                                                 on CIN_TK_1        to UPLD;
 
 
 

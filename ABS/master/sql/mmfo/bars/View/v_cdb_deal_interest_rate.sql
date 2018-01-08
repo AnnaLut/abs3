@@ -11,9 +11,7 @@ PROMPT *** Create  view V_CDB_DEAL_INTEREST_RATE ***
   select "DEAL_ID","DEAL_NUMBER","RATE_KIND_ID","RATE_KIND","START_DATE","INTEREST_RATE" from cdb.v_cdb_deal_interest_rate;
 
 PROMPT *** Create  grants  V_CDB_DEAL_INTEREST_RATE ***
-grant SELECT                                                                 on V_CDB_DEAL_INTEREST_RATE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CDB_DEAL_INTEREST_RATE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CDB_DEAL_INTEREST_RATE to UPLD;
 
 
 

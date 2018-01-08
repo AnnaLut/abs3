@@ -11,9 +11,7 @@ PROMPT *** Create  view V_FX_SWAP1 ***
   select "DEAL_TAG","NPP","DAT1","DAT2","VDAT","KVA","S_A","KVB","S_B","BASEY_A","RATE_A","BASEY_B","RATE_B" from V_FX_SWAP where  deal_tag = to_number (pul.get('DSW') ) ;
 
 PROMPT *** Create  grants  V_FX_SWAP1 ***
-grant SELECT                                                                 on V_FX_SWAP1      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_FX_SWAP1      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_FX_SWAP1      to UPLD;
 
 
 

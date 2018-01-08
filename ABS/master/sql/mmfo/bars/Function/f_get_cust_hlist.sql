@@ -135,7 +135,7 @@ begin
                    and tr.doc_type = p.passp(+)   )
      loop
         l_ret := substr(l_ret || trim(k.trust) || '; ', 4001, 6000);
-     end loop;    */
+     end loop;    */           
 
   elsif p_par = 5 then
      -- в_домост_ щодо посадових ос_б  (Відомості про органи управління та їх персональний склад)

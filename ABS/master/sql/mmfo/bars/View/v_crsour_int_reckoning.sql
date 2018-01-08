@@ -39,9 +39,7 @@ left join custbank cb on cb.rnk = c.rnk
 where t.reckoning_id = sys_context ('bars_pul', 'reckoning_id');
 
 PROMPT *** Create  grants  V_CRSOUR_INT_RECKONING ***
-grant SELECT                                                                 on V_CRSOUR_INT_RECKONING to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_CRSOUR_INT_RECKONING to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CRSOUR_INT_RECKONING to UPLD;
 
 
 

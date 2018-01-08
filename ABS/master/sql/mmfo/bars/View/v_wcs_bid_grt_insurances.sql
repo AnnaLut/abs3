@@ -114,9 +114,7 @@ PROMPT *** Create  view V_WCS_BID_GRT_INSURANCES ***
    ORDER BY bg.bid_id, gi.insurance_id;
 
 PROMPT *** Create  grants  V_WCS_BID_GRT_INSURANCES ***
-grant SELECT                                                                 on V_WCS_BID_GRT_INSURANCES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_BID_GRT_INSURANCES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_BID_GRT_INSURANCES to UPLD;
 
 
 

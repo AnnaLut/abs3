@@ -1,12 +1,8 @@
-
-
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/CIG_SHED_JOBS_STATE.sql =========*** R
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/cig_shed_jobs_state.sql =========*** Run *** ==
 PROMPT ===================================================================================== 
-
 
 PROMPT *** ALTER_POLICY_INFO to CIG_SHED_JOBS_STATE ***
-
 
 BEGIN 
         execute immediate  
@@ -24,17 +20,17 @@ PROMPT *** Create  table CIG_SHED_JOBS_STATE ***
 begin 
   execute immediate '
   CREATE TABLE BARS.CIG_SHED_JOBS_STATE 
-   (	JOB_NAME VARCHAR2(128), 
-	LAST_START_DATE DATE, 
-	THIS_START_DATE DATE, 
-	NEXT_START_DATE DATE, 
-	TOTAL_TIME VARCHAR2(64), 
-	BROKEN VARCHAR2(1), 
-	INTERVAL VARCHAR2(4000), 
-	FAILURES NUMBER(38,0), 
-	WHAT VARCHAR2(4000), 
-	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch'')
-   ) SEGMENT CREATION IMMEDIATE 
+   (	job_name   varchar2(128) constraint pk_cigshedjobs_state primary key, 
+	    last_start_date date, 
+     	this_start_date date,
+      next_start_date date,
+      total_time varchar2(64),
+      broken     varchar2(1),
+      interval   varchar2(4000),
+      failures   number(38),
+      what       varchar(4000),
+      branch     varchar2(30) default sys_context(''bars_context'',''user_branch'')
+  ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSMDLD ';
@@ -43,63 +39,65 @@ exception when others then
 end; 
 /
 
-
-
-
 PROMPT *** ALTER_POLICIES to CIG_SHED_JOBS_STATE ***
  exec bpa.alter_policies('CIG_SHED_JOBS_STATE');
 
 
 COMMENT ON TABLE BARS.CIG_SHED_JOBS_STATE IS 'Довідник стану виконання завдань';
-COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.JOB_NAME IS 'Найменування';
-COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.LAST_START_DATE IS 'Дата та час останього запуску';
-COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.THIS_START_DATE IS 'Дата та час поточного запуску';
-COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.NEXT_START_DATE IS 'Дата та час наступного запуску';
-COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.TOTAL_TIME IS 'Час виконання';
-COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.BROKEN IS 'Флаг активності';
-COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.INTERVAL IS 'Інтервал виконання';
-COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.FAILURES IS 'Кількість невдалих запусків';
-COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.WHAT IS 'Текст, що виконується';
-COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.BRANCH IS 'Відділення';
+COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.job_name IS 'Найменування';
+COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.last_start_date IS 'Дата та час останього запуску';
+COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.this_start_date IS 'Дата та час поточного запуску';
+COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.next_start_date IS 'Дата та час наступного запуску';
+COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.total_time      IS 'Час виконання';
+COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.broken          IS	'Флаг активності';
+COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.interval        IS 'Інтервал виконання';
+COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.failures        IS 'Кількість невдалих запусків';
+COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.what            IS 'Текст, що виконується';
+COMMENT ON COLUMN BARS.CIG_SHED_JOBS_STATE.branch          IS 'Відділення';
 
-
-
-
-PROMPT *** Create  constraint PK_CIGSHEDJOBS_STATE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIG_SHED_JOBS_STATE ADD CONSTRAINT PK_CIGSHEDJOBS_STATE PRIMARY KEY (JOB_NAME)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLD  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+PROMPT *** Create  grants  CIG_SHED_JOBS_STATE***
+grant SELECT,UPDATE  on CIG_SHED_JOBS_STATE to BARS_ACCESS_DEFROLE;
 /
-
-
-
-
-PROMPT *** Create  index PK_CIGSHEDJOBS_STATE ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_CIGSHEDJOBS_STATE ON BARS.CIG_SHED_JOBS_STATE (JOB_NAME) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLD ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
+grant SELECT         on CIG_SHED_JOBS_STATE to BARS_DM;
 /
-
-
-
-PROMPT *** Create  grants  CIG_SHED_JOBS_STATE ***
-grant SELECT,UPDATE                                                          on CIG_SHED_JOBS_STATE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on CIG_SHED_JOBS_STATE to BARS_DM;
-grant SELECT,UPDATE                                                          on CIG_SHED_JOBS_STATE to CIG_ROLE;
-grant SELECT                                                                 on CIG_SHED_JOBS_STATE to UPLD;
-
-
+grant SELECT,UPDATE  on CIG_SHED_JOBS_STATE to CIG_ROLE;
+/
+PROMPT *** add data CIG_SHED_JOBS_STATE***
+begin
+   delete from cig_shed_jobs_state;
+  
+   insert into cig_shed_jobs_state value
+    (
+    select s.job_name job,
+            s.last_start_date,
+            NULL,
+            s.next_run_date,
+            TO_CHAR(s.last_run_duration) AS total_time,
+            CASE
+              WHEN s.enabled = 'FALSE' THEN
+               'Y'
+              ELSE
+               'N'
+            END broken,
+            s.repeat_interval interval,
+            s.FAILURE_COUNT failures,
+            s.job_action what,
+            case
+              when s.job_name = 'J2248' then
+               '/300465/'
+              when s.job_name = 'J2249' then
+               '/322669/'
+              when s.job_name = 'J2250' then
+               '/324805/'
+              ELSE
+               NULL
+            end as branch
+       from all_scheduler_jobs s
+      where s.job_name in ('J2249', 'J2248', 'J2250')
+      );
+end;
+/
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/CIG_SHED_JOBS_STATE.sql =========*** E
+PROMPT *** End *** ========== Scripts /Sql/BARS/Table/CIG_STATES.sql =========*** End *** ==
 PROMPT ===================================================================================== 

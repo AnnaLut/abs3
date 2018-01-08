@@ -14,10 +14,8 @@ PROMPT *** Create  view FDAT1 ***
 
 PROMPT *** Create  grants  FDAT1 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on FDAT1           to ABS_ADMIN;
-grant SELECT                                                                 on FDAT1           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FDAT1           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FDAT1           to START1;
-grant SELECT                                                                 on FDAT1           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FDAT1           to WR_ALL_RIGHTS;
 
 

@@ -48,8 +48,6 @@ BEGIN
          EXCEPTION
             WHEN NO_DATA_FOUND
             THEN
-               -- 14_06_17 получение инфо по причине появления ошибки
-               bars_audit.info('DPA before err - user_id: ' || user_id );
                -- Запрещено блокировать/разблокировать счет кодом 'Не введен в действие'
                bars_error.raise_nerror ('CAC', 'ACCOUNT_BLK_ACT_ERROR');
          END;
@@ -100,8 +98,7 @@ BEGIN
 
             -- была отправка в ДПА?
             BEGIN
-               SELECT distinct
-			          fn_r,
+               SELECT fn_r,
                       id_pr,
                       err,
                       dat
@@ -134,22 +131,8 @@ BEGIN
                   -- все нормально
                   NULL;
                ELSE
-                  -- 28_09_17 убираем временно запрет на разбокировку, если не получен ответ от ДПА
-                  -- в связи с потребностью принимать квитанции, которые отправлялись по почте, сохраняем инфомацию по изменениям блокировки
-                  IF :old.blkd = 26 and :new.blkd = 0 THEN
-                    bars_audit.info('DPA ручная разблокировка счёта по квитанции из налоговой, для счёта: ' || :new.nls
-                                    || ' валюты: ' || :new.kv
-                                    || ' выполнил пользователь: ' || sys_context('userenv', 'session_user')
-                                    || ' отделение: ' || sys_context('bars_context','user_branch')
-                                    || ' отделение: ' || sys_context('bars_context','user_branch')
-                                    || ' старая блокировка: ' || :old.blkd
-                                    || ' новая блокировка: ' || :new.blkd
-                                    || ' дата: ' || sysdate
-                                    );
-                  ELSE
-                   -- Запрещено разблокировать счет до получения сообщения о регистации счета из ДПА
-                   bars_error.raise_nerror ('CAC', 'ACCOUNT_BLK_DPA_ERROR');
-                  END IF;
+                  -- Запрещено разблокировать счет до получения сообщения о регистации счета из ДПА
+                  bars_error.raise_nerror ('CAC', 'ACCOUNT_BLK_DPA_ERROR');
                END IF;
             -- счет в ДПА не отправлялся (м.б. старый счет)
             EXCEPTION

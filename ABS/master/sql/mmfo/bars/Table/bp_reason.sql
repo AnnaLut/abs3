@@ -102,13 +102,11 @@ exception when others then
 
 PROMPT *** Create  grants  BP_REASON ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BP_REASON       to ABS_ADMIN;
-grant SELECT                                                                 on BP_REASON       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BP_REASON       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BP_REASON       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BP_REASON       to BPREASON;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BP_REASON       to SEP_ROLE;
 grant SELECT                                                                 on BP_REASON       to START1;
-grant SELECT                                                                 on BP_REASON       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BP_REASON       to WR_ALL_RIGHTS;
 grant SELECT                                                                 on BP_REASON       to WR_CHCKINNR_ALL;
 grant SELECT                                                                 on BP_REASON       to WR_CHCKINNR_CASH;

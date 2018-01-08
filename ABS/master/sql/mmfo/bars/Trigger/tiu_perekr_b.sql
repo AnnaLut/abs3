@@ -54,7 +54,7 @@ BEGIN
 --                                  To_char(sysdate,'hh24:mi:ss'),'dd/mm/yyyy hh24:mi:ss'),
                             sysdate           ,
                             user_name         ,
-                            bars_sqnc.get_nextval('S_perekr_b_update'),
+                            S_perekr_b_update.nextval,
                             0);
   ELSIF UPDATING THEN
     flg := 1;
@@ -107,7 +107,7 @@ BEGIN
 --                                    To_char(sysdate,'hh24:mi:ss'),'dd/mm/yyyy hh24:mi:ss'),
                               sysdate                  ,
                               user_name                ,
-                              bars_sqnc.get_nextval('S_perekr_b_update'),
+                              S_perekr_b_update.nextval,
                               1);
     END IF;
   ELSIF DELETING THEN
@@ -148,11 +148,11 @@ BEGIN
 --                                  To_char(sysdate,'hh24:mi:ss'),'dd/mm/yyyy hh24:mi:ss'),
                             sysdate                  ,
                             user_name                ,
-                            bars_sqnc.get_nextval('S_perekr_b_update'),
+                            S_perekr_b_update.nextval,
                             2);
   END IF;
   IF flg=1 THEN
-    bars_audit.write_message(bars_audit.INFO_MSG,bankdate,'—деланы изменени¤ в схеме '||:new.ids);
+    bars_audit.write_message(bars_audit.INFO_MSG,bankdate,'Сделаны изменения в схеме '||:new.ids);
   END IF;
 END tiu_perekr_b;
 /

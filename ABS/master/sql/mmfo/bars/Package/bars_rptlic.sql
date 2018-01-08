@@ -1,7 +1,7 @@
 
  
  PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_rptlic.sql =========*** Run ***
+ PROMPT *** Run *** ========== Scripts \Sql\BARS\package\bars_rptlic.sql =========*** Run ***
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PACKAGE BARS.BARS_RPTLIC 
@@ -1104,7 +1104,7 @@ is
                           -- Тут ми пошаманили
                           --case when o1.sq is not null then o1.sq else gl.p_icurval( p_acc.kv, o1.s, fdat) end *decode(o1.dk,0,-1,1) sq,
 						  gl.p_icurval( p_acc.kv, o1.s, fdat)*decode(o1.dk,0,-1,1) sq,
-                          dk, txt, o1.kf
+                          dk, txt, o1.kf 
                      from opldok o1
                     where o1.acc = l_acc and o1.fdat = p_fdat and o1.sos=5 )
        loop
@@ -1266,17 +1266,17 @@ is
                  l_sq := c1.sq;
                  -- COBUSUPABS-4978
                  begin
-                    select t.value into l_value from operw t where t.ref = c1.ref
+                    select t.value into l_value from operw t where t.ref = c1.ref 
                                                                and t.kf  = c1.kf
                                                                and t.tag = 'OWTRI'
                                                                and c1.tt in (select tt.tt from obpc_trans_out tt);
-                 exception when no_data_found then l_value := '';
-                 end;
-
+                 exception when no_data_found then l_value := '';                                                               
+                 end;   
+                                                         
                  if l_value is not null then
-                     l_nazn := l_value;
+                     l_nazn := l_value; 
                      l_value := null;
-                 end if;
+                 end if; 
                  --
                  if p_refacc is not null then
                     l_nazn := l_nazn;
@@ -2142,6 +2142,6 @@ grant EXECUTE                                                                on 
  
  
  PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_rptlic.sql =========*** End ***
+ PROMPT *** End *** ========== Scripts \Sql\BARS\package\bars_rptlic.sql =========*** End ***
  PROMPT ===================================================================================== 
- 
+   

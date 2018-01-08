@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('197', '197-Оприб в схов кас та інк сумок отрим від інк та прац підрозділу пер', 0, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', null, 0, 0, 0, 0, null, null, 39, null, '0', null, '1000100001000000000000000000000000010000000000000000000000000000', 'Оприбуткування в сховищі касет та інкасаторських сумок отриманих від інкасаторів та працівників підрозділу перерахунку');
+    values ('197', '197-Оприб в схов кас та інк сумок отрим від інк та прац підрозділу пер', 0, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', 980, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', null, 0, 0, 0, 0, null, null, 39, null, null, null, '1000100001000000000000000000000000010000000000000000000000000000', 'Оприбуткування в сховищі касет та інкасаторських сумок отриманих від інкасаторів та працівників підрозділу перерахунку');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='197', name='197-Оприб в схов кас та інк сумок отрим від інк та прац підрозділу пер', dk=0, nlsm=null, kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', kvk=null, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=39, proc=null, s3800='0', rang=null, flags='1000100001000000000000000000000000010000000000000000000000000000', nazn='Оприбуткування в сховищі касет та інкасаторських сумок отриманих від інкасаторів та працівників підрозділу перерахунку'
+         set tt='197', name='197-Оприб в схов кас та інк сумок отрим від інк та прац підрозділу пер', dk=0, nlsm=null, kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', kvk=980, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=39, proc=null, s3800=null, rang=null, flags='1000100001000000000000000000000000010000000000000000000000000000', nazn='Оприбуткування в сховищі касет та інкасаторських сумок отриманих від інкасаторів та працівників підрозділу перерахунку'
        where tt='197';
   end;
   --------------------------------
@@ -154,12 +154,34 @@ begin
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
+    values ('1001', '197', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''1001'', ''197'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
     values ('1002', '197', 0);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (ps_tts: ''1002'', ''197'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
+    values ('1002', '197', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''1002'', ''197'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;

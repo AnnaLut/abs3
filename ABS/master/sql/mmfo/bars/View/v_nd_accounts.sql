@@ -124,9 +124,7 @@ PROMPT *** Create  view V_ND_ACCOUNTS ***
 ;
 
 PROMPT *** Create  grants  V_ND_ACCOUNTS ***
-grant SELECT                                                                 on V_ND_ACCOUNTS   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ND_ACCOUNTS   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ND_ACCOUNTS   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ND_ACCOUNTS   to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_ND_ACCOUNTS   to WR_ND_ACCOUNTS;
 

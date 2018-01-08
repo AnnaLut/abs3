@@ -59,6 +59,19 @@ COMMENT ON COLUMN BARS.DPT_VIDD_RATE.DAT IS 'Дата начала действия ставки';
 
 
 
+PROMPT *** Create  constraint FK_DPTVIDDRATE_DPTVIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_RATE ADD CONSTRAINT FK_DPTVIDDRATE_DPTVIDD FOREIGN KEY (VIDD)
+	  REFERENCES BARS.DPT_VIDD (VIDD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_DPTVIDDRATE ***
 begin   
  execute immediate '
@@ -97,10 +110,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTVIDDRATE_TERMM_NN ***
+PROMPT *** Create  constraint CC_DPTVIDDRATE_DAT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_RATE MODIFY (TERM_M CONSTRAINT CC_DPTVIDDRATE_TERMM_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_VIDD_RATE MODIFY (DAT CONSTRAINT CC_DPTVIDDRATE_DAT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -145,10 +158,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTVIDDRATE_DAT_NN ***
+PROMPT *** Create  constraint CC_DPTVIDDRATE_TERMM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_RATE MODIFY (DAT CONSTRAINT CC_DPTVIDDRATE_DAT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_VIDD_RATE MODIFY (TERM_M CONSTRAINT CC_DPTVIDDRATE_TERMM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -172,14 +185,12 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_VIDD_RATE ***
 grant SELECT                                                                 on DPT_VIDD_RATE   to BARSAQ with grant option;
-grant SELECT                                                                 on DPT_VIDD_RATE   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VIDD_RATE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VIDD_RATE   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_RATE   to DPT_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_RATE   to DPT_ROLE;
 grant SELECT,SELECT                                                          on DPT_VIDD_RATE   to KLBX;
 grant SELECT                                                                 on DPT_VIDD_RATE   to REFSYNC_USR;
-grant SELECT                                                                 on DPT_VIDD_RATE   to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_RATE   to VKLAD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VIDD_RATE   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_VIDD_RATE   to WR_REFREAD;

@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('039', '039-Видача гот у підзвіт інкас та прац підрозділу перерахунку', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, 66, null, '0', null, '1300100001000000000000000000000000010000000000000000000000000000', 'Видача готівки у підзвіт інкасаторам та працівникам підрозділу перерахунку');
+    values ('039', '039-Видача гот у підзвіт інкас та прац підрозділу перерахунку', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, 61, null, null, null, '1100100001000000000000000000000000010000000000000000000000000000', 'Видача готівки у підзвіт інкасаторам та працівникам підрозділу перерахунку');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='039', name='039-Видача гот у підзвіт інкас та прац підрозділу перерахунку', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=66, proc=null, s3800='0', rang=null, flags='1300100001000000000000000000000000010000000000000000000000000000', nazn='Видача готівки у підзвіт інкасаторам та працівникам підрозділу перерахунку'
+         set tt='039', name='039-Видача гот у підзвіт інкас та прац підрозділу перерахунку', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=61, proc=null, s3800=null, rang=null, flags='1100100001000000000000000000000000010000000000000000000000000000', nazn='Видача готівки у підзвіт інкасаторам та працівникам підрозділу перерахунку'
        where tt='039';
   end;
   --------------------------------
@@ -36,12 +36,12 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('D#73 ', '039', 'O', 1, 0, '000', null);
+    values ('D#73 ', '039', 'O', 1, null, '325', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''D#73 '', ''039'', ''O'', 1, 0, ''000'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''D#73 '', ''039'', ''O'', 1, null, ''325'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

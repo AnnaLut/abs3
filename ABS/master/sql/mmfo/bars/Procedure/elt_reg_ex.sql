@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/ELT_REG_EX.sql =========*** Run **
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure ELT_REG_EX ***
-
-  CREATE OR REPLACE PROCEDURE BARS.ELT_REG_EX (p_mode IN     INTEGER,
+CREATE OR REPLACE PROCEDURE elt_reg_ex (p_mode IN     INTEGER,
                      p_nd    IN     E_DEAL$BASE.ND%type,
                      p_rnk   IN     CUSTOMER.RNK%type,
                      p_nls   IN OUT VARCHAR2,
@@ -36,7 +27,7 @@ fl      int;
 l_nn number; l_nns varchar2(2);  l_pos int;
 l_rnk accounts.rnk%type;
 
-pap_   ps.pap%type;
+pap_   ps.pap%type;  
 
 BEGIN
 
@@ -80,7 +71,7 @@ end if;
 
 l_mask:=l_nls35;
 
-l_nn:=01; l_nns:='01';  -- temp otladka
+l_nn:=01; l_nns:='01';  -- temp otladka   
 
 l_mask:=substr(l_mask,1,l_pos-1)||l_nns||substr(l_mask,l_pos+2);
 
@@ -98,7 +89,7 @@ loop
     from accounts where nls=l_nls35;     -- and rnk=p_rnk  and dazs is null;
 
         --jeka begin 12.07.2017 не понимаю зачем это. убрал (Проблема в том, что если уже есть такой счет, на нашем контрагенте, тот же об22, но нет договора, то не пересчитывается)
-
+    
         /*if l_ob22f != l_ob22 then null;
            l_nn:=l_nn+1;
            l_nns:=lpad(to_char(l_nn),2,'0');
@@ -115,13 +106,13 @@ loop
         EXCEPTION  WHEN NO_DATA_FOUND then null;
         fl:=1;
         end;
-        end if;*/
+        end if;*/ 
 
        --всегда подбираем новый счет, если захотят оставить старый, то можно просто вставить в интерфейсе
        l_nn:=l_nn+1;
        l_nns:=lpad(to_char(l_nn),2,'0');
-       l_mask:=substr(l_mask,1,l_pos-1)||l_nns||substr(l_mask,l_pos+2);
-       --jeka end 12.07.2017
+       l_mask:=substr(l_mask,1,l_pos-1)||l_nns||substr(l_mask,l_pos+2);  
+       --jeka end 12.07.2017   
 
   EXCEPTION  WHEN NO_DATA_FOUND then null;
   fl:=1;
@@ -129,7 +120,7 @@ loop
 
 end loop;
 
--- l_nls35 := VKRZN (SUBSTR (gl.AMFO, 1, 5), l_nls35); --jeka  12.07.2017
+-- l_nls35 := VKRZN (SUBSTR (gl.AMFO, 1, 5), l_nls35); --jeka  12.07.2017 
 
 
 
@@ -169,13 +160,3 @@ end;
 
 END elt_reg_ex;
 /
-show err;
-
-PROMPT *** Create  grants  ELT_REG_EX ***
-grant EXECUTE                                                                on ELT_REG_EX      to BARS_ACCESS_DEFROLE;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/ELT_REG_EX.sql =========*** End **
-PROMPT ===================================================================================== 

@@ -63,10 +63,11 @@ COMMENT ON COLUMN BARS.WCS_SCORING_QS_DECIMAL.SCORE_MAX IS '';
 
 
 
-PROMPT *** Create  constraint CC_SCORQSDEC_MINVAL_NN ***
+PROMPT *** Create  constraint FK_SCORQSDEC_SCORQUESTS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_DECIMAL MODIFY (MIN_VAL CONSTRAINT CC_SCORQSDEC_MINVAL_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_SCORING_QS_DECIMAL ADD CONSTRAINT FK_SCORQSDEC_SCORQUESTS FOREIGN KEY (SCORING_ID, QUESTION_ID)
+	  REFERENCES BARS.WCS_SCORING_QUESTIONS (SCORING_ID, QUESTION_ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -75,46 +76,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SCORQSDEC_MINSIGN_NN ***
+PROMPT *** Create  constraint FK_SCORQSDEC_MINS_STYPES_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_DECIMAL MODIFY (MIN_SIGN CONSTRAINT CC_SCORQSDEC_MINSIGN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SCORQSDEC_MAXVAL_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_DECIMAL MODIFY (MAX_VAL CONSTRAINT CC_SCORQSDEC_MAXVAL_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SCORQSDEC_MAXSIGN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_DECIMAL MODIFY (MAX_SIGN CONSTRAINT CC_SCORQSDEC_MAXSIGN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SCORQSDEC_SCORE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_DECIMAL MODIFY (SCORE CONSTRAINT CC_SCORQSDEC_SCORE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_SCORING_QS_DECIMAL ADD CONSTRAINT FK_SCORQSDEC_MINS_STYPES_ID FOREIGN KEY (MIN_SIGN)
+	  REFERENCES BARS.WCS_SIGN_TYPES (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -137,6 +103,79 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_SCORQSDEC_SCORE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_SCORING_QS_DECIMAL MODIFY (SCORE CONSTRAINT CC_SCORQSDEC_SCORE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SCORQSDEC_MAXSIGN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_SCORING_QS_DECIMAL MODIFY (MAX_SIGN CONSTRAINT CC_SCORQSDEC_MAXSIGN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SCORQSDEC_MAXVAL_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_SCORING_QS_DECIMAL MODIFY (MAX_VAL CONSTRAINT CC_SCORQSDEC_MAXVAL_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SCORQSDEC_MINSIGN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_SCORING_QS_DECIMAL MODIFY (MIN_SIGN CONSTRAINT CC_SCORQSDEC_MINSIGN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SCORQSDEC_MAXS_STYPES_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_SCORING_QS_DECIMAL ADD CONSTRAINT FK_SCORQSDEC_MAXS_STYPES_ID FOREIGN KEY (MAX_SIGN)
+	  REFERENCES BARS.WCS_SIGN_TYPES (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SCORQSDEC_MINVAL_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_SCORING_QS_DECIMAL MODIFY (MIN_VAL CONSTRAINT CC_SCORQSDEC_MINVAL_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_SCORQSDEC ***
 begin   
  execute immediate '
@@ -151,11 +190,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SCORING_QS_DECIMAL ***
-grant SELECT                                                                 on WCS_SCORING_QS_DECIMAL to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SCORING_QS_DECIMAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_SCORING_QS_DECIMAL to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SCORING_QS_DECIMAL to START1;
-grant SELECT                                                                 on WCS_SCORING_QS_DECIMAL to UPLD;
 
 
 

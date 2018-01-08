@@ -66,9 +66,7 @@ COMMENT ON COLUMN BARS.ERR$_SOS_TRACK.KF IS '';
 
 
 PROMPT *** Create  grants  ERR$_SOS_TRACK ***
-grant SELECT                                                                 on ERR$_SOS_TRACK  to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_SOS_TRACK  to BARS_DM;
-grant SELECT                                                                 on ERR$_SOS_TRACK  to UPLD;
 
 
 

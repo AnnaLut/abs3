@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_get_elt_ob22.sql =========*** Run
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.F_GET_ELT_OB22 
+CREATE OR REPLACE FUNCTION F_GET_ELT_OB22
 (p_id int, p_nbs varchar2)
 RETURN e_tarif.ob22_3570%type IS
 
@@ -24,15 +18,3 @@ begin
  RETURN l_ret;
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  F_GET_ELT_OB22 ***
-grant EXECUTE                                                                on F_GET_ELT_OB22  to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on F_GET_ELT_OB22  to START1;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_get_elt_ob22.sql =========*** End
- PROMPT ===================================================================================== 
- 

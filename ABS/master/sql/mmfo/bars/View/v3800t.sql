@@ -53,10 +53,8 @@ where
  ;
 
 PROMPT *** Create  grants  V3800T ***
-grant SELECT                                                                 on V3800T          to BARSREADER_ROLE;
 grant SELECT                                                                 on V3800T          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V3800T          to SALGL;
-grant SELECT                                                                 on V3800T          to UPLD;
 
 
 

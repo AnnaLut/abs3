@@ -55,10 +55,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  UPL_FKPRIORITY ***
-grant SELECT                                                                 on UPL_FKPRIORITY  to BARSREADER_ROLE;
-grant SELECT                                                                 on UPL_FKPRIORITY  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

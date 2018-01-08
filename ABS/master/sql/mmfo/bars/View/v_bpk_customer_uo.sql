@@ -44,9 +44,7 @@ select v."RNK",v."TGR",v."CUSTTYPE",v."COUNTRY",v."NMK",v."NMKV",v."NMKK",v."COD
    and v.date_off is null;
 
 PROMPT *** Create  grants  V_BPK_CUSTOMER_UO ***
-grant SELECT                                                                 on V_BPK_CUSTOMER_UO to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BPK_CUSTOMER_UO to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_BPK_CUSTOMER_UO to UPLD;
 
 
 

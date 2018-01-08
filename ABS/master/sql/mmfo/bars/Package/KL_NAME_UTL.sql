@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/kl_name_utl.sql =========*** Run ***
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.KL_NAME_UTL IS
+CREATE OR REPLACE PACKAGE KL_NAME_UTL IS
 
 --***************************************************************************--
 -- (C) BARS. Contragents
@@ -15,7 +9,7 @@ G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := '';
 
 --***************************************************************************--
     -- Ф-ция перевірки імені
---***************************************************************************--
+--***************************************************************************--    
     function check_name(p_FIRST_NAME  FIRST_NAMES.FIRSTRU%type,
                         p_MIDDLE_NAME MIDDLE_NAMES.MIDDLERU%type) return varchar2;
 
@@ -23,25 +17,25 @@ G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := '';
 -- процедура добавления/обновления имени
 --***************************************************************************--
 PROCEDURE Set_First_Name (
-  p_firstid           first_names.firstid%type,
-  p_firstru           first_names.firstru%type,
-  p_firstua           first_names.firstua%type,
-  p_sexid             first_names.sexid%type,
-  p_middleuam         first_names.middleuam%type,
-  p_middleuaf         first_names.middleuaf%type,
-  p_middlerum         first_names.middlerum%type,
-  p_middleruf         first_names.middleruf%type,
-  p_firstuaof         first_names.firstuaof%type,
-  p_firstuarod        first_names.firstuarod%type,
-  p_firstuadat        first_names.firstuadat%type,
-  p_firstuavin        first_names.firstuavin%type,
-  p_firstuatvo        first_names.firstuatvo%type,
-  p_firstuapre        first_names.firstuapre%type,
-  p_firstrurod        first_names.firstrurod%type,
-  p_firstrudat        first_names.firstrudat%type,
-  p_firstruvin        first_names.firstruvin%type,
-  p_firstrutvo        first_names.firstrutvo%type,
-  p_firstrupre        first_names.firstrupre%type
+  p_firstid           first_names.firstid%type,   
+  p_firstru           first_names.firstru%type,     
+  p_firstua           first_names.firstua%type,     
+  p_sexid             first_names.sexid%type,       
+  p_middleuam         first_names.middleuam%type,   
+  p_middleuaf         first_names.middleuaf%type,   
+  p_middlerum         first_names.middlerum%type,   
+  p_middleruf         first_names.middleruf%type,   
+  p_firstuaof         first_names.firstuaof%type,   
+  p_firstuarod        first_names.firstuarod%type,  
+  p_firstuadat        first_names.firstuadat%type,  
+  p_firstuavin        first_names.firstuavin%type,  
+  p_firstuatvo        first_names.firstuatvo%type,  
+  p_firstuapre        first_names.firstuapre%type,  
+  p_firstrurod        first_names.firstrurod%type,  
+  p_firstrudat        first_names.firstrudat%type,  
+  p_firstruvin        first_names.firstruvin%type,  
+  p_firstrutvo        first_names.firstrutvo%type,  
+  p_firstrupre        first_names.firstrupre%type    
 );
 
 --***************************************************************************--
@@ -74,11 +68,11 @@ PROCEDURE Set_Middle_Name (
 --***************************************************************************--
 -- процедура удаления отчества
 --***************************************************************************--
-PROCEDURE Del_Middle_Name ( p_middleid       middle_names.middleid%type);
+PROCEDURE Del_Middle_Name ( p_middleid       middle_names.middleid%type);                        
 
 END KL_NAME_UTL;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.KL_NAME_UTL IS
+CREATE OR REPLACE PACKAGE BODY KL_NAME_UTL IS
 
 --***************************************************************************--
 -- (C) BARS. Contragents
@@ -89,7 +83,7 @@ G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := '';
 
 --***************************************************************************--
     -- Ф-ция перевірки імені
---***************************************************************************--
+--***************************************************************************--    
     function check_name(p_FIRST_NAME  FIRST_NAMES.FIRSTRU%type,
                         p_MIDDLE_NAME MIDDLE_NAMES.MIDDLERU%type) return varchar2
     is
@@ -112,33 +106,33 @@ G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := '';
         end if;
      return sres;
     end check_name;
-
+    
 --***************************************************************************--
 -- процедура добавления/обновления имени
 --***************************************************************************--
 PROCEDURE Set_First_Name (
-  p_firstid           first_names.firstid%type,
-  p_firstru           first_names.firstru%type,
-  p_firstua           first_names.firstua%type,
-  p_sexid             first_names.sexid%type,
-  p_middleuam         first_names.middleuam%type,
-  p_middleuaf         first_names.middleuaf%type,
-  p_middlerum         first_names.middlerum%type,
-  p_middleruf         first_names.middleruf%type,
-  p_firstuaof         first_names.firstuaof%type,
-  p_firstuarod        first_names.firstuarod%type,
-  p_firstuadat        first_names.firstuadat%type,
-  p_firstuavin        first_names.firstuavin%type,
-  p_firstuatvo        first_names.firstuatvo%type,
-  p_firstuapre        first_names.firstuapre%type,
-  p_firstrurod        first_names.firstrurod%type,
-  p_firstrudat        first_names.firstrudat%type,
-  p_firstruvin        first_names.firstruvin%type,
-  p_firstrutvo        first_names.firstrutvo%type,
-  p_firstrupre        first_names.firstrupre%type
+  p_firstid           first_names.firstid%type,   
+  p_firstru           first_names.firstru%type,     
+  p_firstua           first_names.firstua%type,     
+  p_sexid             first_names.sexid%type,       
+  p_middleuam         first_names.middleuam%type,   
+  p_middleuaf         first_names.middleuaf%type,   
+  p_middlerum         first_names.middlerum%type,   
+  p_middleruf         first_names.middleruf%type,   
+  p_firstuaof         first_names.firstuaof%type,   
+  p_firstuarod        first_names.firstuarod%type,  
+  p_firstuadat        first_names.firstuadat%type,  
+  p_firstuavin        first_names.firstuavin%type,  
+  p_firstuatvo        first_names.firstuatvo%type,  
+  p_firstuapre        first_names.firstuapre%type,  
+  p_firstrurod        first_names.firstrurod%type,  
+  p_firstrudat        first_names.firstrudat%type,  
+  p_firstruvin        first_names.firstruvin%type,  
+  p_firstrutvo        first_names.firstrutvo%type,  
+  p_firstrupre        first_names.firstrupre%type    
 ) IS
   l_title    varchar2(20) := 'KL_NAME_UTL.Set_First_Name: ';
-  l_firstid  first_names.firstid %type;
+  l_firstid  first_names.firstid %type; 
 BEGIN
   bars_audit.trace('%s params 1:'
        || 'p_firstid     =>%s,'
@@ -151,15 +145,15 @@ BEGIN
        || 'p_middleruf   =>%s',
        l_title,
        to_char(p_firstid),
-       p_firstru,
-       p_firstua ,
-       to_char(p_sexid),
-       p_middleuam,
+       p_firstru,   
+       p_firstua ,  
+       to_char(p_sexid),     
+       p_middleuam, 
        p_middleuaf ,
        p_middlerum ,
-       p_middleruf
+       p_middleruf 
                    );
-  bars_audit.trace('%s params 2:'
+  bars_audit.trace('%s params 2:'   
        || 'p_firstuaof   =>%s,'
        || 'p_firstuarod  =>%s,'
        || 'p_firstuadat  =>%s,'
@@ -177,7 +171,7 @@ BEGIN
        p_firstuapre,
        p_firstrurod,
        p_firstrudat
-                   );
+                   );                        
   bars_audit.trace('%s params 3:'
        || 'p_firstrudat  =>%s,'
        || 'p_firstruvin  =>%s,'
@@ -188,32 +182,32 @@ BEGIN
        p_firstruvin,
        p_firstrutvo,
        p_firstrupre
-                   );
-
+                   );       
+                   
   UPDATE first_names
-  SET firstru      = p_firstru,
-      firstua      = p_firstua,
-      sexid        = p_sexid,
-      middleuam    = p_middleuam,
-      middleuaf    = p_middleuaf,
-      middlerum    = p_middlerum,
-      middleruf    = p_middleruf,
-      firstuaof    = p_firstuaof ,
-      firstuarod   = p_firstuarod,
+  SET firstru      = p_firstru,   
+      firstua      = p_firstua,    
+      sexid        = p_sexid,      
+      middleuam    = p_middleuam,  
+      middleuaf    = p_middleuaf,  
+      middlerum    = p_middlerum,  
+      middleruf    = p_middleruf,  
+      firstuaof    = p_firstuaof , 
+      firstuarod   = p_firstuarod, 
       firstuadat   = p_firstuadat,
-      firstuavin   = p_firstuavin,
-      firstuatvo   = p_firstuatvo,
-      firstuapre   = p_firstuapre,
-      firstrurod   = p_firstrurod,
-      firstrudat   = p_firstrudat,
+      firstuavin   = p_firstuavin, 
+      firstuatvo   = p_firstuatvo, 
+      firstuapre   = p_firstuapre, 
+      firstrurod   = p_firstrurod, 
+      firstrudat   = p_firstrudat, 
       firstruvin   = p_firstruvin,
-      firstrutvo   = p_firstrutvo,
-      firstrupre   = p_firstrupre
-   WHERE firstid      = p_firstid;
+      firstrutvo   = p_firstrutvo, 
+      firstrupre   = p_firstrupre 
+   WHERE firstid      = p_firstid;  
   IF SQL%rowcount = 0 THEN
      l_firstid:=S_FIRST_NAMES.NEXTVAL;
      bars_audit.trace('%s 3. Начало добавления имени firstid=%s', l_title, l_firstid);
-     INSERT INTO first_names
+     INSERT INTO first_names 
        (
         firstid,
         firstru,
@@ -235,16 +229,16 @@ BEGIN
         firstrutvo,
         firstrupre
         )
-     VALUES
-       (l_firstid,
-        p_firstru,
-        p_firstua,
-        p_sexid,
-        p_middleuam,
-        p_middleuaf,
-        p_middlerum,
-        p_middleruf,
-        p_firstuaof,
+     VALUES 
+       (l_firstid,   
+        p_firstru,   
+        p_firstua,   
+        p_sexid,     
+        p_middleuam, 
+        p_middleuaf, 
+        p_middlerum, 
+        p_middleruf, 
+        p_firstuaof, 
         p_firstuarod,
         p_firstuadat,
         p_firstuavin,
@@ -260,7 +254,7 @@ BEGIN
   ELSE
      bars_audit.trace('%s 5. Завершено исправление имени firstid=%s', l_title, p_firstid);
   END IF;
-END Set_First_Name;
+END Set_First_Name;    
 
 
 --***************************************************************************--
@@ -300,7 +294,7 @@ PROCEDURE Set_Middle_Name (
   p_middlerupre    middle_names.middlerupre%type
 ) IS
   l_title    varchar2(20) := 'KL_NAME_UTL.Set_Middle_Name: ';
-  l_middleid  middle_names.middleid %type;
+  l_middleid  middle_names.middleid %type; 
 BEGIN
   bars_audit.trace('%s params 1:'
        || 'p_middleid     =>%s,'
@@ -312,16 +306,16 @@ BEGIN
        || 'p_middleuarod  =>%s,'
        || 'p_middleuadat  =>%s',
        l_title,
-       to_char(p_middleid),
-       p_middleua,
-       p_middleru,
-       p_sexid,
-       to_char(p_firstid) ,
-       p_middleuaof,
+       to_char(p_middleid),   
+       p_middleua,   
+       p_middleru,   
+       p_sexid,         
+       to_char(p_firstid) ,   
+       p_middleuaof, 
        p_middleuarod,
        p_middleuadat
                    );
-  bars_audit.trace('%s params 2:'
+  bars_audit.trace('%s params 2:'   
        || 'p_middleuavin  =>%s,'
        || 'p_middleuatvo  =>%s,'
        || 'p_middleuapre  =>%s,'
@@ -339,29 +333,29 @@ BEGIN
        p_middleruvin,
        p_middlerutvo,
        p_middlerupre
-                   );
-
+                   );                             
+                   
   UPDATE middle_names
-  SET middleua     = p_middleua,
-      middleru     = p_middleru,
-      sexid        = p_sexid,
-      firstid      = p_firstid,
-      middleuaof   = p_middleuaof,
-      middleuarod  = p_middleuarod,
-      middleuadat  = p_middleuadat,
-      middleuavin  = p_middleuavin,
-      middleuatvo  = p_middleuatvo,
-      middleuapre  = p_middleuapre,
-      middlerurod  = p_middlerurod,
-      middlerudat  = p_middlerudat,
-      middleruvin  = p_middleruvin,
-      middlerutvo  = p_middlerutvo,
-      middlerupre  = p_middlerupre
-   WHERE middleid       = p_middleid ;
+  SET middleua     = p_middleua,    
+      middleru     = p_middleru,    
+      sexid        = p_sexid,       
+      firstid      = p_firstid,     
+      middleuaof   = p_middleuaof,  
+      middleuarod  = p_middleuarod, 
+      middleuadat  = p_middleuadat, 
+      middleuavin  = p_middleuavin, 
+      middleuatvo  = p_middleuatvo, 
+      middleuapre  = p_middleuapre, 
+      middlerurod  = p_middlerurod, 
+      middlerudat  = p_middlerudat, 
+      middleruvin  = p_middleruvin, 
+      middlerutvo  = p_middlerutvo, 
+      middlerupre  = p_middlerupre 
+   WHERE middleid       = p_middleid ;  
   IF SQL%rowcount = 0 THEN
      l_middleid:=S_MIDDLE_NAMES.NEXTVAL;
      bars_audit.trace('%s 3. Начало добавления отчества middleid=%s', l_title, l_middleid);
-     INSERT INTO middle_names
+     INSERT INTO middle_names 
        (
         middleid,
         middleua,
@@ -380,13 +374,13 @@ BEGIN
         middlerutvo,
         middlerupre
         )
-     VALUES
-       (l_middleid,
-        p_middleua,
-        p_middleru,
-        p_sexid,
-        p_firstid,
-        p_middleuaof,
+     VALUES 
+       (l_middleid,   
+        p_middleua,   
+        p_middleru,   
+        p_sexid,      
+        p_firstid,    
+        p_middleuaof, 
         p_middleuarod,
         p_middleuadat,
         p_middleuavin,
@@ -396,13 +390,13 @@ BEGIN
         p_middlerudat,
         p_middleruvin,
         p_middlerutvo,
-        p_middlerupre
+        p_middlerupre    
       );
      bars_audit.trace('%s 4. Завершено добавление отчества middleid=%s', l_title, l_middleid);
   ELSE
      bars_audit.trace('%s 5. Завершено исправление отчества middleid=%s', l_title, p_middleid);
   END IF;
-END Set_Middle_Name;
+END Set_Middle_Name;  
 
 --***************************************************************************--
 -- процедура удаления отчества
@@ -423,14 +417,11 @@ BEGIN
 null;
 END KL_NAME_UTL;
 /
- show err;
- 
-PROMPT *** Create  grants  KL_NAME_UTL ***
-grant EXECUTE                                                                on KL_NAME_UTL     to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/kl_name_utl.sql =========*** End ***
- PROMPT ===================================================================================== 
- 
+begin
+    execute immediate 'grant execute on KL_NAME_UTL to BARS_ACCESS_DEFROLE';
+ exception when others then 
+    if sqlcode = -1917 then null; else raise; 
+    end if; 
+end;
+/ 

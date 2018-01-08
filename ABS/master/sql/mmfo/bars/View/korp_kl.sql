@@ -44,10 +44,8 @@ PROMPT *** Create  view KORP_KL ***
                    2525));
 
 PROMPT *** Create  grants  KORP_KL ***
-grant SELECT                                                                 on KORP_KL         to BARSREADER_ROLE;
 grant SELECT                                                                 on KORP_KL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KORP_KL         to DPT_ADMIN;
-grant SELECT                                                                 on KORP_KL         to UPLD;
 
 
 

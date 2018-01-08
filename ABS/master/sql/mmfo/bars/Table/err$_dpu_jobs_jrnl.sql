@@ -71,10 +71,6 @@ COMMENT ON COLUMN BARS.ERR$_DPU_JOBS_JRNL.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPU_JOBS_JRNL ***
-grant SELECT                                                                 on ERR$_DPU_JOBS_JRNL to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPU_JOBS_JRNL to UPLD;
-
 
 
 PROMPT ===================================================================================== 

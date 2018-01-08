@@ -19,10 +19,8 @@ select ND,N_SK,SOS,FIO,DOKUM,ISSUED,ADRES,DAT_BEGIN,DAT_END,TEL,DOVER,NMK,DOV_DA
 from skrynka_nd_arc;
 
 PROMPT *** Create  grants  V_SKRYNKA_ND ***
-grant SELECT                                                                 on V_SKRYNKA_ND    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SKRYNKA_ND    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SKRYNKA_ND    to DEP_SKRN;
-grant SELECT                                                                 on V_SKRYNKA_ND    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SKRYNKA_ND    to WR_ALL_RIGHTS;
 
 

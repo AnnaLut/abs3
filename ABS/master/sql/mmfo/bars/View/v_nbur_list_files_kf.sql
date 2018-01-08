@@ -19,11 +19,9 @@ PROMPT *** Create  view V_NBUR_LIST_FILES_KF ***
     WHERE F.ID = L.FILE_ID;
 
 PROMPT *** Create  grants  V_NBUR_LIST_FILES_KF ***
-grant SELECT                                                                 on V_NBUR_LIST_FILES_KF to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_LIST_FILES_KF to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_LIST_FILES_KF to RPBN002;
 grant SELECT                                                                 on V_NBUR_LIST_FILES_KF to START1;
-grant SELECT                                                                 on V_NBUR_LIST_FILES_KF to UPLD;
 
 
 

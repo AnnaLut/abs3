@@ -97,10 +97,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_RULE ***
-grant SELECT                                                                 on SW_RULE         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_RULE         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_RULE         to SWIFT001;
-grant SELECT                                                                 on SW_RULE         to UPLD;
 grant FLASHBACK,SELECT                                                       on SW_RULE         to WR_REFREAD;
 
 

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции Д10
-prompt Наименование операции: Д10 ВИДАЧА ГОТІВКИ. Компенсації
+prompt Наименование операции: ВИДАЧА ГОТІВКИ. Компенсації
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('Д10', 'Д10 ВИДАЧА ГОТІВКИ. Компенсації', 0, null, null, null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, 0, 0, 0, 0, null, null, 50, null, null, null, '0100100001000000000000000000000000000000000000000000000000000000', null);
+    values ('Д10', 'ВИДАЧА ГОТІВКИ. Компенсації', 0, null, null, null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, 0, 0, 0, 0, null, null, 50, null, null, null, '0100100001000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='Д10', name='Д10 ВИДАЧА ГОТІВКИ. Компенсації', dk=0, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=50, proc=null, s3800=null, rang=null, flags='0100100001000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='Д10', name='ВИДАЧА ГОТІВКИ. Компенсації', dk=0, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=50, proc=null, s3800=null, rang=null, flags='0100100001000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='Д10';
   end;
   --------------------------------

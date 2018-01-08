@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_ESCR_REG_KIND.NAME IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ESCR_REG_KIND ***
-grant SELECT                                                                 on ERR$_ESCR_REG_KIND to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ESCR_REG_KIND to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -48,6 +48,19 @@ COMMENT ON COLUMN BARS.DWH_REPORT_LINKS.MODULE_ID IS 'Ключ модуля(АРМу) з BARS.B
 
 
 
+PROMPT *** Create  constraint FK_DWH_REPORT_LINKS1 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DWH_REPORT_LINKS ADD CONSTRAINT FK_DWH_REPORT_LINKS1 FOREIGN KEY (REPORT_ID)
+	  REFERENCES BARS.DWH_REPORTS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_DWH_REPORT_LINKS ***
 begin   
  execute immediate '
@@ -76,9 +89,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DWH_REPORT_LINKS ***
-grant SELECT                                                                 on DWH_REPORT_LINKS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DWH_REPORT_LINKS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on DWH_REPORT_LINKS to UPLD;
 
 
 

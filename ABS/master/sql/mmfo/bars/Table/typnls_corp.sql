@@ -49,10 +49,8 @@ COMMENT ON COLUMN BARS.TYPNLS_CORP.TXT IS '';
 
 
 PROMPT *** Create  grants  TYPNLS_CORP ***
-grant SELECT                                                                 on TYPNLS_CORP     to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on TYPNLS_CORP     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TYPNLS_CORP     to BARS_DM;
-grant SELECT                                                                 on TYPNLS_CORP     to UPLD;
 grant FLASHBACK,SELECT                                                       on TYPNLS_CORP     to WR_REFREAD;
 
 

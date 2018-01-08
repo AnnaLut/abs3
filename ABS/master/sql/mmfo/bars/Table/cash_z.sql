@@ -52,12 +52,23 @@ COMMENT ON COLUMN BARS.CASH_Z.S IS '';
 
 
 
+
+PROMPT *** Create  constraint FK_CASH_Z_SK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CASH_Z ADD CONSTRAINT FK_CASH_Z_SK FOREIGN KEY (SK)
+	  REFERENCES BARS.SK (SK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  CASH_Z ***
-grant SELECT                                                                 on CASH_Z          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CASH_Z          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CASH_Z          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CASH_Z          to START1;
-grant SELECT                                                                 on CASH_Z          to UPLD;
 
 
 

@@ -81,7 +81,6 @@ exception when others then
 
 PROMPT *** Create  grants  UPL_CHECK_OBJECTS ***
 grant SELECT                                                                 on UPL_CHECK_OBJECTS to BARS;
-grant SELECT                                                                 on UPL_CHECK_OBJECTS to BARSREADER_ROLE;
 grant SELECT                                                                 on UPL_CHECK_OBJECTS to UPLD;
 
 

@@ -53,10 +53,8 @@ COMMENT ON COLUMN BARS.PERS_Z3.S IS '';
 
 
 PROMPT *** Create  grants  PERS_Z3 ***
-grant SELECT                                                                 on PERS_Z3         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PERS_Z3         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PERS_Z3         to START1;
-grant SELECT                                                                 on PERS_Z3         to UPLD;
 
 
 

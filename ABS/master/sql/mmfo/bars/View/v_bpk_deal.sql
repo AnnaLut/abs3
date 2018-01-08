@@ -13,11 +13,9 @@ union all
 select nd, acc_pk from w4_acc;
 
 PROMPT *** Create  grants  V_BPK_DEAL ***
-grant SELECT                                                                 on V_BPK_DEAL      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BPK_DEAL      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BPK_DEAL      to OBPC;
 grant SELECT                                                                 on V_BPK_DEAL      to OW;
-grant SELECT                                                                 on V_BPK_DEAL      to UPLD;
 
 
 

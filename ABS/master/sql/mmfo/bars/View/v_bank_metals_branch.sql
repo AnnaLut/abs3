@@ -44,11 +44,9 @@ PROMPT *** Create  view V_BANK_METALS_BRANCH ***
           AND l.acc_3800 = a.acc(+);
 
 PROMPT *** Create  grants  V_BANK_METALS_BRANCH ***
-grant SELECT                                                                 on V_BANK_METALS_BRANCH to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BANK_METALS_BRANCH to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BANK_METALS_BRANCH to PYOD001;
 grant SELECT                                                                 on V_BANK_METALS_BRANCH to START1;
-grant SELECT                                                                 on V_BANK_METALS_BRANCH to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BANK_METALS_BRANCH to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_BANK_METALS_BRANCH to WR_REFREAD;
 

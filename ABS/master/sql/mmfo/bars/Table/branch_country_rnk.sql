@@ -80,12 +80,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  BRANCH_COUNTRY_RNK ***
-grant SELECT                                                                 on BRANCH_COUNTRY_RNK to BARSREADER_ROLE;
 grant SELECT                                                                 on BRANCH_COUNTRY_RNK to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH_COUNTRY_RNK to BARS_DM;
 grant SELECT                                                                 on BRANCH_COUNTRY_RNK to RCC_DEAL;
 grant SELECT                                                                 on BRANCH_COUNTRY_RNK to START1;
-grant SELECT                                                                 on BRANCH_COUNTRY_RNK to UPLD;
 
 
 

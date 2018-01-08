@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Довідник економічних показників клієнтів';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'CUSTOMER_EN';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,15 +119,15 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'FS', 'C', 'Форма~власності~(K080)', '', 2, 5, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ISE', 'C', 'Інст. сектор~економіки~(K070)', '', 5, 4, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'K050', 'C', 'Орг. правова~ф-ма госп.~(k050)', '', 3, 8, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NMK', 'C', 'Повне найменування клієнта', '', 70, 3, 1, 0, 1, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'OKPO', 'C', 'Код~ ОКПО', '', 14, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'RNK', 'N', 'Реєстраційний~номер', '', 38, 1, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'SED', 'C', 'Форма~господарювання~(K051)', '', 4, 9, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'VED', 'C', 'Вид ек.~діяльності~(K110)', '', 5, 6, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'OE', 'C', 'Галузь~економіки~(K090)', '', 5, 7, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'FS', 'C', 'Форма~власності~(K080)', null, 2, 5, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ISE', 'C', 'Інст. сектор~економіки~(K070)', null, 5, 4, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'K050', 'C', 'Орг. правова~ф-ма госп.~(k050)', null, 3, 8, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NMK', 'C', 'Повне найменування клієнта', null, 70, 3, 1, 0, 1, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'OKPO', 'C', 'Код~ ОКПО', null, 14, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'RNK', 'N', 'Реєстраційний~номер', null, 38, 1, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'SED', 'C', 'Форма~господарювання~(K051)', null, 4, 9, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'VED', 'C', 'Вид ек.~діяльності~(K110)', null, 5, 6, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'OE', 'C', 'Галузь~економіки~(K090)', null, 5, 7, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('FS');

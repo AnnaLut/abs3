@@ -129,12 +129,50 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_INSADDAGRS_BRANCH_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_ADD_AGREEMENTS ADD CONSTRAINT FK_INSADDAGRS_BRANCH_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INSADDAGRS_SID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_ADD_AGREEMENTS MODIFY (STAFF_ID CONSTRAINT CC_INSADDAGRS_SID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint UK_INSADDAGRS ***
 begin   
  execute immediate '
   ALTER TABLE BARS.INS_ADD_AGREEMENTS ADD CONSTRAINT UK_INSADDAGRS UNIQUE (DEAL_ID, SER, NUM, SDATE, KF)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INSADDAGRS_DID_DEALS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_ADD_AGREEMENTS ADD CONSTRAINT FK_INSADDAGRS_DID_DEALS FOREIGN KEY (DEAL_ID, KF)
+	  REFERENCES BARS.INS_DEALS (ID, KF) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -179,10 +217,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_INSADDAGRS_SID_NN ***
+PROMPT *** Create  constraint FK_INSADDAGRS_STFID_STAFF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INS_ADD_AGREEMENTS MODIFY (STAFF_ID CONSTRAINT CC_INSADDAGRS_SID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.INS_ADD_AGREEMENTS ADD CONSTRAINT FK_INSADDAGRS_STFID_STAFF FOREIGN KEY (STAFF_ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -217,10 +256,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  INS_ADD_AGREEMENTS ***
-grant SELECT                                                                 on INS_ADD_AGREEMENTS to BARSREADER_ROLE;
-grant SELECT                                                                 on INS_ADD_AGREEMENTS to UPLD;
 
 
 

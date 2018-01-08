@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Реєстр проблемних кредитів фізичних осіб';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'CC_DEAL_PROBL';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,32 +119,32 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ND', 'N', 'Референс~кредитного~договору', '', 10, 1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KF', 'C', 'Код установи~банку (МФО)', '', 6, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'BRANCH', 'C', '№ установи~ (ТВБВ)', '', 30, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'OKPO', 'C', 'Код ЄДРПП~фізичної особи', '', 14, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NMK', 'C', 'ПІБ позичальника ~ фізичної особи', '', 70, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'CC_ID', 'C', 'Номер~кредитної угоди', '', 50, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'SDATE', 'D', 'Дата початку~кредитної угоди', '', 10, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'WDATE', 'D', 'Дата закінчення~кредитної угоди', '', 10, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'PROD', 'C', 'Код продукту~кредитної угоди', '', 100, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'KV', 'N', 'Код~валюти', '', 3, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'ST_NOM_NG', 'N', 'Сума заборг.~ за кредитом ~на початок року, ном.', '', 24, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'ST_EQV_NG', 'N', 'Сума заборг.~ за кредитом ~на початок року, екв.', '', 24, 12, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SP_NOM_NG', 'N', 'Сума заборг.~ за проц. ~на початок року, ном.', '', 24, 13, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SP_EQV_NG', 'N', 'Сума заборг.~ за проц. ~на початок року,  екв.', '', 24, 14, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'ST_NOM_OD', 'N', 'Сума заборг.~ за кредитом ~на зв. дату, ном.', '', 24, 15, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'ST_EQV_OD', 'N', 'Сума заборг.~ за кредитом ~на  зв.дату, екв.', '', 24, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'SP_NOM_OD', 'N', 'Сума заборг.~ за проц. ~на зв.дату, ном.', '', 24, 17, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'SP_EQV_OD', 'N', 'Сума заборг.~ за проц. ~на зв.дату, екв.', '', 24, 18, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'KAT_J', 'C', 'Категорія якості~кредитної операції', '', 1, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'DAT_MAX_ZB', 'D', 'Дата найбільшого~ терміну прострочення', '', 10, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'DAT_SP_NOBAL', 'D', 'Дата списання~у збиток~(на позабал/ рахунки)', '', 10, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'DAT_P_KK', 'D', 'Дата визнання~кредиту~проблемним~на КК', '', 10, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'POG_SS_NOM', 'N', 'Сума пог~ осн боргу~ за міс на зв.дату~ном. ', '', 24, 23, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'POG_SS_EQV', 'N', 'Сума пог~ осн боргу~ за міс на зв.дату~екв.', '', 24, 24, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'POG_SN_NOM', 'N', 'Сума пог~процентів~ за міс на зв.дату~ном. ', '', 24, 25, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'POG_SN_EQV', 'N', 'Сума пог~процентів~ за міс на зв.дату~екв.', '', 24, 26, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ND', 'N', 'Референс~кредитного~договору', null, 10, 1, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KF', 'C', 'Код установи~банку (МФО)', null, 6, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'BRANCH', 'C', '№ установи~ (ТВБВ)', null, 30, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'OKPO', 'C', 'Код ЄДРПП~фізичної особи', null, 14, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NMK', 'C', 'ПІБ позичальника ~ фізичної особи', null, 70, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'CC_ID', 'C', 'Номер~кредитної угоди', null, 50, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'SDATE', 'D', 'Дата початку~кредитної угоди', null, 10, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'WDATE', 'D', 'Дата закінчення~кредитної угоди', null, 10, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'PROD', 'C', 'Код продукту~кредитної угоди', null, 100, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'KV', 'N', 'Код~валюти', null, 3, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'ST_NOM_NG', 'N', 'Сума заборг.~ за кредитом ~на початок року, ном.', null, 24, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'ST_EQV_NG', 'N', 'Сума заборг.~ за кредитом ~на початок року, екв.', null, 24, 12, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SP_NOM_NG', 'N', 'Сума заборг.~ за проц. ~на початок року, ном.', null, 24, 13, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SP_EQV_NG', 'N', 'Сума заборг.~ за проц. ~на початок року,  екв.', null, 24, 14, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'ST_NOM_OD', 'N', 'Сума заборг.~ за кредитом ~на зв. дату, ном.', null, 24, 15, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'ST_EQV_OD', 'N', 'Сума заборг.~ за кредитом ~на  зв.дату, екв.', null, 24, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'SP_NOM_OD', 'N', 'Сума заборг.~ за проц. ~на зв.дату, ном.', null, 24, 17, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'SP_EQV_OD', 'N', 'Сума заборг.~ за проц. ~на зв.дату, екв.', null, 24, 18, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'KAT_J', 'C', 'Категорія якості~кредитної операції', null, 1, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'DAT_MAX_ZB', 'D', 'Дата найбільшого~ терміну прострочення', null, 10, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'DAT_SP_NOBAL', 'D', 'Дата списання~у збиток~(на позабал/ рахунки)', null, 10, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'DAT_P_KK', 'D', 'Дата визнання~кредиту~проблемним~на КК', null, 10, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'POG_SS_NOM', 'N', 'Сума пог~ осн боргу~ за міс на зв.дату~ном. ', null, 24, 23, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'POG_SS_EQV', 'N', 'Сума пог~ осн боргу~ за міс на зв.дату~екв.', null, 24, 24, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'POG_SN_NOM', 'N', 'Сума пог~процентів~ за міс на зв.дату~ном. ', null, 24, 25, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'POG_SN_EQV', 'N', 'Сума пог~процентів~ за міс на зв.дату~екв.', null, 24, 26, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

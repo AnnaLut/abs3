@@ -7,8 +7,12 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TBU_W4ACC_ACC_BAN_CHG ***
 
-  CREATE OR REPLACE TRIGGER BARS.TBU_W4ACC_ACC_BAN_CHG BEFORE UPDATE OF "ACC_PK", "ACC_OVR", "ACC_9129", "ACC_3570", "ACC_2208", "ACC_2627", "ACC_2207", "ACC_3579", "ACC_2209", "ACC_2625X", "ACC_2627X", "ACC_2625D", "ACC_2628", "ACC_2203" ON "BARS"."W4_ACC" FOR EACH ROW 
-  WHEN ( old.DAT_CLOSE Is Not Null and new.DAT_CLOSE Is Not Null ) declare
+  CREATE OR REPLACE TRIGGER BARS.TBU_W4ACC_ACC_BAN_CHG 
+before update of ACC_PK,   ACC_OVR,  ACC_9129, ACC_3579, ACC_3570, ACC_2628,  ACC_2627X,
+                 ACC_2627, ACC_2203, ACC_2209, ACC_2208, ACC_2207, ACC_2625D, ACC_2625X
+ON BARS.W4_ACC
+for each row
+   WHEN ( old.DAT_CLOSE Is Not Null and new.DAT_CLOSE Is Not Null ) declare
 begin
 
   if ( (:old.ACC_PK != :new.ACC_PK)
@@ -71,7 +75,6 @@ begin
   end if;
 
 end TBU_W4ACC_ACC_BAN_CHG;
-
 
 
 /

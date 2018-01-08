@@ -74,10 +74,8 @@ COMMENT ON COLUMN BARS.TMP_CP_REP_DOX.SDQ IS '';
 
 
 PROMPT *** Create  grants  TMP_CP_REP_DOX ***
-grant SELECT                                                                 on TMP_CP_REP_DOX  to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_CP_REP_DOX  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_CP_REP_DOX  to START1;
-grant SELECT                                                                 on TMP_CP_REP_DOX  to UPLD;
 
 
 

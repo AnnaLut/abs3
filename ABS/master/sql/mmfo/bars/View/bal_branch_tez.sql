@@ -16,10 +16,8 @@ PROMPT *** Create  view BAL_BRANCH_TEZ ***
 from v_gl where nbs not like '8%' group by nbs, branch;
 
 PROMPT *** Create  grants  BAL_BRANCH_TEZ ***
-grant SELECT                                                                 on BAL_BRANCH_TEZ  to BARSREADER_ROLE;
 grant SELECT                                                                 on BAL_BRANCH_TEZ  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BAL_BRANCH_TEZ  to SALGL;
-grant SELECT                                                                 on BAL_BRANCH_TEZ  to UPLD;
 
 
 

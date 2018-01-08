@@ -120,118 +120,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FGVTEMP_DOCDAT_NN ***
+PROMPT *** Create  constraint FGVTEMP_ADR_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FGV_TEMP MODIFY (PDATE CONSTRAINT FGVTEMP_DOCDAT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FGVTEMP_DATZ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FGV_TEMP MODIFY (DATZ CONSTRAINT FGVTEMP_DATZ_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FGVTEMP_NLS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FGV_TEMP MODIFY (NLS CONSTRAINT FGVTEMP_NLS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FGVTEMP_OSTDEP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FGV_TEMP MODIFY (OST_DEP CONSTRAINT FGVTEMP_OSTDEP_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FGVTEMP_OSTINT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FGV_TEMP MODIFY (OST_INT CONSTRAINT FGVTEMP_OSTINT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FGVTEMP_RATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FGV_TEMP MODIFY (RATE CONSTRAINT FGVTEMP_RATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FGVTEMP_KV_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FGV_TEMP MODIFY (KV CONSTRAINT FGVTEMP_KV_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FGVTEMP_REPDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FGV_TEMP MODIFY (REP_DATE CONSTRAINT FGVTEMP_REPDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FGVTEMP_FIO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FGV_TEMP MODIFY (FIO CONSTRAINT FGVTEMP_FIO_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FGVTEMP_OKPO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FGV_TEMP MODIFY (OKPO CONSTRAINT FGVTEMP_OKPO_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.FGV_TEMP MODIFY (ADR CONSTRAINT FGVTEMP_ADR_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -252,10 +144,118 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FGVTEMP_ADR_NN ***
+PROMPT *** Create  constraint FGVTEMP_OKPO_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FGV_TEMP MODIFY (ADR CONSTRAINT FGVTEMP_ADR_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.FGV_TEMP MODIFY (OKPO CONSTRAINT FGVTEMP_OKPO_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FGVTEMP_FIO_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FGV_TEMP MODIFY (FIO CONSTRAINT FGVTEMP_FIO_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FGVTEMP_REPDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FGV_TEMP MODIFY (REP_DATE CONSTRAINT FGVTEMP_REPDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FGVTEMP_KV_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FGV_TEMP MODIFY (KV CONSTRAINT FGVTEMP_KV_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FGVTEMP_RATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FGV_TEMP MODIFY (RATE CONSTRAINT FGVTEMP_RATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FGVTEMP_OSTINT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FGV_TEMP MODIFY (OST_INT CONSTRAINT FGVTEMP_OSTINT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FGVTEMP_OSTDEP_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FGV_TEMP MODIFY (OST_DEP CONSTRAINT FGVTEMP_OSTDEP_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FGVTEMP_NLS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FGV_TEMP MODIFY (NLS CONSTRAINT FGVTEMP_NLS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FGVTEMP_DATZ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FGV_TEMP MODIFY (DATZ CONSTRAINT FGVTEMP_DATZ_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FGVTEMP_DOCDAT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FGV_TEMP MODIFY (PDATE CONSTRAINT FGVTEMP_DOCDAT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -264,12 +264,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  FGV_TEMP ***
-grant SELECT                                                                 on FGV_TEMP        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FGV_TEMP        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FGV_TEMP        to BARS_DM;
 grant SELECT                                                                 on FGV_TEMP        to RPBN001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FGV_TEMP        to START1;
-grant SELECT                                                                 on FGV_TEMP        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FGV_TEMP        to WR_ALL_RIGHTS;
 
 

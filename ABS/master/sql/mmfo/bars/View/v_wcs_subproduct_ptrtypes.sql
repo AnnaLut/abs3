@@ -14,9 +14,7 @@ PROMPT *** Create  view V_WCS_SUBPRODUCT_PTRTYPES ***
  order by sp.subproduct_id, sp.ptr_type_id;
 
 PROMPT *** Create  grants  V_WCS_SUBPRODUCT_PTRTYPES ***
-grant SELECT                                                                 on V_WCS_SUBPRODUCT_PTRTYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SUBPRODUCT_PTRTYPES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_SUBPRODUCT_PTRTYPES to UPLD;
 
 
 

@@ -13,10 +13,8 @@ PROMPT *** Create  view OBPC_ACC_OVER ***
    WITH CHECK OPTION       CONSTRAINT "CHK_OBPC_ACC_OVER";
 
 PROMPT *** Create  grants  OBPC_ACC_OVER ***
-grant SELECT                                                                 on OBPC_ACC_OVER   to BARSREADER_ROLE;
 grant SELECT                                                                 on OBPC_ACC_OVER   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_ACC_OVER   to START1;
-grant SELECT                                                                 on OBPC_ACC_OVER   to UPLD;
 
 
 

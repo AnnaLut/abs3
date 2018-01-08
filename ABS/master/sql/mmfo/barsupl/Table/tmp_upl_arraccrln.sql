@@ -28,10 +28,6 @@ COMMENT ON COLUMN BARSUPL.TMP_UPL_ARRACCRLN.KF IS '';
 
 
 
-PROMPT *** Create  grants  TMP_UPL_ARRACCRLN ***
-grant SELECT                                                                 on TMP_UPL_ARRACCRLN to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_UPL_ARRACCRLN to UPLD;
-
 
 
 PROMPT ===================================================================================== 

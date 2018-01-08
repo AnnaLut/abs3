@@ -311,8 +311,6 @@ procedure deny_date_control;
 
 procedure del_ref_t902 (p_ref in number);
 
-procedure check_t902_dok(p_ref in number);
-
 END;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.SEP IS
@@ -4530,16 +4528,6 @@ procedure del_ref_t902 (p_ref in number) is
  begin
    DELETE FROM t902 WHERE ref= p_ref;
 END;
-
-procedure check_t902_dok(p_ref in number) is
-  l_cnt number;
-begin
-  select count(*) into l_cnt from t902 where ref = p_ref;
-  if l_cnt = 0 then
-    raise_application_error(-20000,
-                            'Документ вже оброблено!');
-  end if;
-end;
 /**
  * mark_zag_k - помечает заголовок расформированного файла отметкой p_otm
  * @param p_fn  - имя файла
@@ -4663,7 +4651,7 @@ FETCH c0 INTO rec#,dk#,s#,mfoa#,mfob#;
       begin
 
          gl.ref (ref_);
-
+             
          INSERT INTO oper (ref,tt,vob,nd,dk,pdat,vdat,datd,
             nam_a,nlsa,mfoa,nam_b,nlsb,mfob,kv,s,kv2,s2,id_a,id_b,nazn,userid)
          VALUES (ref_,'KLR',6,substr(ref_,-10),dk_,SYSDATE,gl.bDATE,gl.bDATE,

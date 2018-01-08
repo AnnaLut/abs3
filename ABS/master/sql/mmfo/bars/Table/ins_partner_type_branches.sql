@@ -62,12 +62,113 @@ COMMENT ON COLUMN BARS.INS_PARTNER_TYPE_BRANCHES.APPLY_HIER IS 'Застосовувати до
 
 
 
+PROMPT *** Create  constraint FK_PTNTYPEBRHS__LID_LIMITS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_PARTNER_TYPE_BRANCHES ADD CONSTRAINT FK_PTNTYPEBRHS__LID_LIMITS FOREIGN KEY (LIMIT_ID, KF)
+	  REFERENCES BARS.INS_LIMITS (ID, KF) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_PTNTYPEBRHS_FID_FEES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_PARTNER_TYPE_BRANCHES ADD CONSTRAINT FK_PTNTYPEBRHS_FID_FEES FOREIGN KEY (FEE_ID, KF)
+	  REFERENCES BARS.INS_FEES (ID, KF) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PTNTYPEBRHS_AH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_PARTNER_TYPE_BRANCHES ADD CONSTRAINT CC_PTNTYPEBRHS_AH CHECK (apply_hier in (0, 1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_PTNTYPEBRHS_TID_TYPES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_PARTNER_TYPE_BRANCHES ADD CONSTRAINT FK_PTNTYPEBRHS_TID_TYPES FOREIGN KEY (TYPE_ID)
+	  REFERENCES BARS.INS_TYPES (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_PTNTYPEBRHS_B_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_PARTNER_TYPE_BRANCHES ADD CONSTRAINT FK_PTNTYPEBRHS_B_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PTNTYPEBRANCHES_AH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_PARTNER_TYPE_BRANCHES MODIFY (APPLY_HIER CONSTRAINT CC_PTNTYPEBRANCHES_AH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PTNTYPEBRANCHES_BRH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_PARTNER_TYPE_BRANCHES MODIFY (BRANCH CONSTRAINT CC_PTNTYPEBRANCHES_BRH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_PTNTYPEBRANCHES ***
 begin   
  execute immediate '
   ALTER TABLE BARS.INS_PARTNER_TYPE_BRANCHES ADD CONSTRAINT PK_PTNTYPEBRANCHES PRIMARY KEY (ID, KF)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_PTNTYPEBRHS_TID_TARIFFS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_PARTNER_TYPE_BRANCHES ADD CONSTRAINT FK_PTNTYPEBRHS_TID_TARIFFS FOREIGN KEY (TARIFF_ID, KF)
+	  REFERENCES BARS.INS_TARIFFS (ID, KF) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -102,42 +203,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PTNTYPEBRANCHES_BRH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_PARTNER_TYPE_BRANCHES MODIFY (BRANCH CONSTRAINT CC_PTNTYPEBRANCHES_BRH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PTNTYPEBRANCHES_AH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_PARTNER_TYPE_BRANCHES MODIFY (APPLY_HIER CONSTRAINT CC_PTNTYPEBRANCHES_AH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_PTNTYPEBRHS_AH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_PARTNER_TYPE_BRANCHES ADD CONSTRAINT CC_PTNTYPEBRHS_AH CHECK (apply_hier in (0, 1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_PTNTYPEBRANCHES ***
 begin   
  execute immediate '
@@ -164,10 +229,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  INS_PARTNER_TYPE_BRANCHES ***
-grant SELECT                                                                 on INS_PARTNER_TYPE_BRANCHES to BARSREADER_ROLE;
-grant SELECT                                                                 on INS_PARTNER_TYPE_BRANCHES to UPLD;
 
 
 

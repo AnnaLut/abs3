@@ -69,10 +69,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025717 ***
+PROMPT *** Create  constraint PK_STAFF_USER_SESSION ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STAFF_USER_SESSION MODIFY (USER_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.STAFF_USER_SESSION ADD CONSTRAINT PK_STAFF_USER_SESSION PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -93,6 +95,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint SYS_C0025717 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF_USER_SESSION MODIFY (USER_ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index PK_STAFF_USER_SESSION ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.PK_STAFF_USER_SESSION ON BARS.STAFF_USER_SESSION (ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index I_STAFF_SESSION_CLIENT_ID ***
 begin   
  execute immediate '
@@ -107,9 +135,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  STAFF_USER_SESSION ***
-grant SELECT                                                                 on STAFF_USER_SESSION to BARSREADER_ROLE;
 grant SELECT                                                                 on STAFF_USER_SESSION to BARS_DM;
-grant SELECT                                                                 on STAFF_USER_SESSION to UPLD;
 
 
 

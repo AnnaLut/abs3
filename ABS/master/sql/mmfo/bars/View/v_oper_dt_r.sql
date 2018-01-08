@@ -13,10 +13,8 @@ PROMPT *** Create  view V_OPER_DT_R ***
    where tag='DT_R';
 
 PROMPT *** Create  grants  V_OPER_DT_R ***
-grant SELECT                                                                 on V_OPER_DT_R     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OPER_DT_R     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OPER_DT_R     to START1;
-grant SELECT                                                                 on V_OPER_DT_R     to UPLD;
 
 
 

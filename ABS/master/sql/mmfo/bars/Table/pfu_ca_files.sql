@@ -128,6 +128,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_TYPE_TO_FILETYPES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PFU_CA_FILES ADD CONSTRAINT FK_TYPE_TO_FILETYPES FOREIGN KEY (FILE_TYPE)
+	  REFERENCES BARS.PFU_FILETYPES (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_PFU_CA_FILES ***
 begin   
  execute immediate '
@@ -142,9 +155,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  PFU_CA_FILES ***
-grant SELECT                                                                 on PFU_CA_FILES    to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on PFU_CA_FILES    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on PFU_CA_FILES    to UPLD;
 
 
 

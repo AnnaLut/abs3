@@ -69,11 +69,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ROZNICABUSINESS ***
-grant SELECT                                                                 on ROZNICABUSINESS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ROZNICABUSINESS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ROZNICABUSINESS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ROZNICABUSINESS to START1;
-grant SELECT                                                                 on ROZNICABUSINESS to UPLD;
 grant FLASHBACK,SELECT                                                       on ROZNICABUSINESS to WR_REFREAD;
 
 

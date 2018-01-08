@@ -47,10 +47,6 @@ COMMENT ON COLUMN BARS.TMP_CM_OPERTYPE.CLIENTTYPE IS '';
 
 
 
-PROMPT *** Create  grants  TMP_CM_OPERTYPE ***
-grant SELECT                                                                 on TMP_CM_OPERTYPE to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_CM_OPERTYPE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

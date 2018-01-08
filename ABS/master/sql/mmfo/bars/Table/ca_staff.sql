@@ -63,9 +63,7 @@ COMMENT ON COLUMN BARS.CA_STAFF.POSADA IS '';
 
 
 PROMPT *** Create  grants  CA_STAFF ***
-grant SELECT                                                                 on CA_STAFF        to BARSREADER_ROLE;
 grant SELECT                                                                 on CA_STAFF        to BARS_DM;
-grant SELECT                                                                 on CA_STAFF        to UPLD;
 
 
 

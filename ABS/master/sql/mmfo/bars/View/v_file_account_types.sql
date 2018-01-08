@@ -15,10 +15,8 @@ order by ord
  ;
 
 PROMPT *** Create  grants  V_FILE_ACCOUNT_TYPES ***
-grant SELECT                                                                 on V_FILE_ACCOUNT_TYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FILE_ACCOUNT_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FILE_ACCOUNT_TYPES to DPT_ROLE;
-grant SELECT                                                                 on V_FILE_ACCOUNT_TYPES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_FILE_ACCOUNT_TYPES to WR_ALL_RIGHTS;
 
 

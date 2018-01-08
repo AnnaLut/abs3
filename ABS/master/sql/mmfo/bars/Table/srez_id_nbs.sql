@@ -53,12 +53,38 @@ COMMENT ON COLUMN BARS.SREZ_ID_NBS.FONDID IS '';
 
 
 
+PROMPT *** Create  constraint FK_SREZ_ID_NBS_NBS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SREZ_ID_NBS ADD CONSTRAINT FK_SREZ_ID_NBS_NBS FOREIGN KEY (NBS)
+	  REFERENCES BARS.PS (NBS) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint XPK_SREZ_ID_NBS ***
 begin   
  execute immediate '
   ALTER TABLE BARS.SREZ_ID_NBS ADD CONSTRAINT XPK_SREZ_ID_NBS PRIMARY KEY (NBS)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SREZ_ID_NBS_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SREZ_ID_NBS ADD CONSTRAINT FK_SREZ_ID_NBS_ID FOREIGN KEY (ID)
+	  REFERENCES BARS.SREZ_ID (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -81,11 +107,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SREZ_ID_NBS ***
-grant SELECT                                                                 on SREZ_ID_NBS     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SREZ_ID_NBS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SREZ_ID_NBS     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SREZ_ID_NBS     to RCC_DEAL;
-grant SELECT                                                                 on SREZ_ID_NBS     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SREZ_ID_NBS     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SREZ_ID_NBS     to WR_REFREAD;
 

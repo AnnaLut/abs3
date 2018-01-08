@@ -21,9 +21,7 @@ PROMPT *** Create  view V_XMLFILES ***
  ;
 
 PROMPT *** Create  grants  V_XMLFILES ***
-grant SELECT                                                                 on V_XMLFILES      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_XMLFILES      to KLBX;
-grant SELECT                                                                 on V_XMLFILES      to UPLD;
 
 
 

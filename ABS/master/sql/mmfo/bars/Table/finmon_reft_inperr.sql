@@ -75,11 +75,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FINMON_REFT_INPERR ***
-grant SELECT                                                                 on FINMON_REFT_INPERR to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on FINMON_REFT_INPERR to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FINMON_REFT_INPERR to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on FINMON_REFT_INPERR to FINMON01;
-grant SELECT                                                                 on FINMON_REFT_INPERR to UPLD;
 
 
 

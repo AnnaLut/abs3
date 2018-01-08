@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_fill_operw_1pb.sql =========*** R
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.F_FILL_OPERW_1PB (
+create or replace function F_FILL_OPERW_1PB(
                                    p_ref        in number,
                                    p_typ        in number,
                                    p_val        in varchar2,
@@ -18,15 +12,15 @@
 %   Вхідні параметри
 %
 % p_ref - РЕФ документу
-% p_typ - тип памаетру (1 - KOD_B, 2 - KOD_N, 3 -KOD_G
-% p_val - значення параметру
+% p_typ - тип памаетру (1 - KOD_B, 2 - KOD_N, 3 -KOD_G 
+% p_val - значення параметру 
 %
 %   Вихідні параметри
 %
 %        функція повертає 0, якщо все добре, а інакще - код помилки +
 %        у параметрі OUT o_err_mes - повідомлення про помилку
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-is
+is 
     l_tag varchar2(10);
 begin
     if p_typ = 1 then
@@ -34,18 +28,18 @@ begin
     elsif p_typ = 2 then
        l_tag := 'KOD_N';
     elsif p_typ = 3 then
-       l_tag := 'KOD_G';
+       l_tag := 'KOD_G';    
     else
        l_tag := '';
     end if;
-
+    
     if trim(l_tag) is not null and
        p_ref is not null
     then
        if trim(p_val) is null then
-          DELETE
+          DELETE 
           FROM operw
-          WHERE  ref= p_ref AND
+          WHERE  ref= p_ref AND 
                  tag = l_tag;
        else
           MERGE INTO operw o
@@ -58,26 +52,14 @@ begin
           WHEN NOT MATCHED THEN
             INSERT (o.ref, o.tag, o.value)
             VALUES (p_ref, l_tag, p_val);
-       end if;
+       end if; 
     end if;
-
+    
     return 0;
 exception
     when others then
         o_err_mes := sqlerrm;
-
+        
         return sqlcode;
 end;
-/
- show err;
- 
-PROMPT *** Create  grants  F_FILL_OPERW_1PB ***
-grant EXECUTE                                                                on F_FILL_OPERW_1PB to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on F_FILL_OPERW_1PB to START1;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_fill_operw_1pb.sql =========*** E
- PROMPT ===================================================================================== 
- 
+/                                    

@@ -47,10 +47,8 @@ COMMENT ON COLUMN BARS.TMP_Z3.S IS '';
 
 
 PROMPT *** Create  grants  TMP_Z3 ***
-grant SELECT                                                                 on TMP_Z3          to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_Z3          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_Z3          to TOSS;
-grant SELECT                                                                 on TMP_Z3          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_Z3          to WR_ALL_RIGHTS;
 
 

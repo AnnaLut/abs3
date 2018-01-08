@@ -133,9 +133,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  DOC_CUREX_EXCLUSIVE ***
-grant SELECT                                                                 on DOC_CUREX_EXCLUSIVE to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

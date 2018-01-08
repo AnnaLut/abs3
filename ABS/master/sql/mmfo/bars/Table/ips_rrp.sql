@@ -107,6 +107,19 @@ COMMENT ON COLUMN BARS.IPS_RRP.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_IPSRRP_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.IPS_RRP ADD CONSTRAINT FK_IPSRRP_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C005886 ***
 begin   
  execute immediate '
@@ -119,94 +132,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005887 ***
+PROMPT *** Create  constraint CC_IPSRRP_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.IPS_RRP MODIFY (MFOA NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005888 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.IPS_RRP MODIFY (NLSA NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005889 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.IPS_RRP MODIFY (MFOB NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005890 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.IPS_RRP MODIFY (NLSB NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005891 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.IPS_RRP MODIFY (DK NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005892 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.IPS_RRP MODIFY (S NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005893 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.IPS_RRP MODIFY (KV NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005894 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.IPS_RRP MODIFY (FN_A NOT NULL ENABLE)';
+  ALTER TABLE BARS.IPS_RRP MODIFY (KF CONSTRAINT CC_IPSRRP_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -227,10 +156,94 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_IPSRRP_KF_NN ***
+PROMPT *** Create  constraint SYS_C005894 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.IPS_RRP MODIFY (KF CONSTRAINT CC_IPSRRP_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.IPS_RRP MODIFY (FN_A NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005893 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.IPS_RRP MODIFY (KV NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005892 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.IPS_RRP MODIFY (S NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005891 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.IPS_RRP MODIFY (DK NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005890 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.IPS_RRP MODIFY (NLSB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005889 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.IPS_RRP MODIFY (MFOB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005888 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.IPS_RRP MODIFY (NLSA NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005887 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.IPS_RRP MODIFY (MFOA NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -267,13 +280,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  IPS_RRP ***
-grant SELECT                                                                 on IPS_RRP         to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on IPS_RRP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on IPS_RRP         to BARS_DM;
 grant INSERT                                                                 on IPS_RRP         to TECH002;
 grant INSERT                                                                 on IPS_RRP         to TECH004;
 grant INSERT,SELECT,UPDATE                                                   on IPS_RRP         to TOSS;
-grant SELECT                                                                 on IPS_RRP         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on IPS_RRP         to WR_ALL_RIGHTS;
 
 

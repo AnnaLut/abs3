@@ -63,10 +63,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SVOWNERGROUP_ID_NN ***
+PROMPT *** Create  constraint CC_SVOWNERGROUP_NAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SV_OWNER_GROUP ADD CONSTRAINT CC_SVOWNERGROUP_ID_NN CHECK (ID IS NOT NULL) ENABLE';
+  ALTER TABLE BARS.SV_OWNER_GROUP ADD CONSTRAINT CC_SVOWNERGROUP_NAME_NN CHECK (NAME IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -75,10 +75,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SVOWNERGROUP_NAME_NN ***
+PROMPT *** Create  constraint CC_SVOWNERGROUP_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SV_OWNER_GROUP ADD CONSTRAINT CC_SVOWNERGROUP_NAME_NN CHECK (NAME IS NOT NULL) ENABLE';
+  ALTER TABLE BARS.SV_OWNER_GROUP ADD CONSTRAINT CC_SVOWNERGROUP_ID_NN CHECK (ID IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -101,11 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SV_OWNER_GROUP ***
-grant SELECT                                                                 on SV_OWNER_GROUP  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SV_OWNER_GROUP  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_OWNER_GROUP  to RPBN002;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_OWNER_GROUP  to START1;
-grant SELECT                                                                 on SV_OWNER_GROUP  to UPLD;
 grant FLASHBACK,SELECT                                                       on SV_OWNER_GROUP  to WR_REFREAD;
 
 

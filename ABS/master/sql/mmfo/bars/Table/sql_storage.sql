@@ -85,10 +85,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  SQL_STORAGE ***
-grant SELECT                                                                 on SQL_STORAGE     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SQL_STORAGE     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SQL_STORAGE     to START1;
-grant SELECT                                                                 on SQL_STORAGE     to UPLD;
 
 
 

@@ -36,7 +36,7 @@ begin
 	DATF VARCHAR2(4000), 
 	NOM VARCHAR2(4000), 
 	KF VARCHAR2(4000)
-   ) SEGMENT CREATION IMMEDIATE 
+   ) SEGMENT CREATION DEFERRED 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSDYND ';
@@ -70,10 +70,6 @@ COMMENT ON COLUMN BARS.ERR$_KL_F00$LOCAL.NOM IS '';
 COMMENT ON COLUMN BARS.ERR$_KL_F00$LOCAL.KF IS '';
 
 
-
-PROMPT *** Create  grants  ERR$_KL_F00$LOCAL ***
-grant SELECT                                                                 on ERR$_KL_F00$LOCAL to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_KL_F00$LOCAL to UPLD;
 
 
 

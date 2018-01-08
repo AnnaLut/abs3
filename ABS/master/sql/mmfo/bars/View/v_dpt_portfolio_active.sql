@@ -93,16 +93,13 @@ PROMPT *** Create  view V_DPT_PORTFOLIO_ACTIVE ***
           AND d.rnk = c.rnk
           AND c.rnk = p.rnk
           AND d.branch = b.branch
-          AND (d.archdoc_id < 0 OR v.type_cod IN ('CHIL', 'MAIB', 'SCHD'))
-	  and canilookclient(c.rnk) = 1 --COBUSUPABS-4372 Забезпечити можливість обмеження доступу до перегляду/редагування інформації в картках клієнтів певної групи (згідно окремого переліку) для окремих користувачів АБС.
-;
+          AND d.archdoc_id < 0
+	  and canilookclient(c.rnk) = 1 --COBUSUPABS-4372 Забезпечити можливість обмеження доступу до перегляду/редагування інформації в картках клієнтів певної групи (згідно окремого переліку) для окремих користувачів АБС.;
 
 PROMPT *** Create  grants  V_DPT_PORTFOLIO_ACTIVE ***
-grant SELECT                                                                 on V_DPT_PORTFOLIO_ACTIVE to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_DPT_PORTFOLIO_ACTIVE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_PORTFOLIO_ACTIVE to DPT_ADMIN;
 grant SELECT                                                                 on V_DPT_PORTFOLIO_ACTIVE to DPT_ROLE;
-grant SELECT                                                                 on V_DPT_PORTFOLIO_ACTIVE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_PORTFOLIO_ACTIVE to WR_ALL_RIGHTS;
 
 

@@ -91,11 +91,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SUMNIV_OPER ***
-grant SELECT                                                                 on SUMNIV_OPER     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SUMNIV_OPER     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SUMNIV_OPER     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SUMNIV_OPER     to FLAGS;
-grant SELECT                                                                 on SUMNIV_OPER     to UPLD;
 grant FLASHBACK,SELECT                                                       on SUMNIV_OPER     to WR_REFREAD;
 
 

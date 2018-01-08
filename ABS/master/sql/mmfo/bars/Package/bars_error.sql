@@ -2055,7 +2055,6 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on BARS_ERROR      to BASIC_INFO;
 grant EXECUTE                                                                on BARS_ERROR      to DM;
 grant EXECUTE                                                                on BARS_ERROR      to START1;
-grant EXECUTE                                                                on BARS_ERROR      to UPLD;
 grant EXECUTE                                                                on BARS_ERROR      to WR_ALL_RIGHTS;
 
  

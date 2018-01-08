@@ -69,10 +69,6 @@ COMMENT ON COLUMN BARS.TMP_XOZ_OPER.DK IS '';
 
 
 
-PROMPT *** Create  grants  TMP_XOZ_OPER ***
-grant SELECT                                                                 on TMP_XOZ_OPER    to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_XOZ_OPER    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

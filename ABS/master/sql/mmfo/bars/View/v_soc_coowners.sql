@@ -30,10 +30,8 @@ PROMPT *** Create  view V_SOC_COOWNERS ***
  ;
 
 PROMPT *** Create  grants  V_SOC_COOWNERS ***
-grant SELECT                                                                 on V_SOC_COOWNERS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SOC_COOWNERS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SOC_COOWNERS  to DPT_ROLE;
-grant SELECT                                                                 on V_SOC_COOWNERS  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SOC_COOWNERS  to WR_ALL_RIGHTS;
 
 

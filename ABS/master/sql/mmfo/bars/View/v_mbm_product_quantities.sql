@@ -24,9 +24,7 @@ PROMPT *** Create  view V_MBM_PRODUCT_QUANTITIES ***
      FROM V_MBM_CUSTOMERS c;
 
 PROMPT *** Create  grants  V_MBM_PRODUCT_QUANTITIES ***
-grant SELECT                                                                 on V_MBM_PRODUCT_QUANTITIES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBM_PRODUCT_QUANTITIES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_MBM_PRODUCT_QUANTITIES to UPLD;
 
 
 

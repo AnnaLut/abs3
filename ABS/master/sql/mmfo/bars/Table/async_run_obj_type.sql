@@ -78,9 +78,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ASYNC_RUN_OBJ_TYPE ***
-grant SELECT                                                                 on ASYNC_RUN_OBJ_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on ASYNC_RUN_OBJ_TYPE to BARS_DM;
-grant SELECT                                                                 on ASYNC_RUN_OBJ_TYPE to UPLD;
 
 
 

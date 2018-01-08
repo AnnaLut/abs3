@@ -84,9 +84,7 @@ exception when others then
 
 PROMPT *** Create  grants  DDL_UTILS_STORE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DDL_UTILS_STORE to ABS_ADMIN;
-grant SELECT                                                                 on DDL_UTILS_STORE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DDL_UTILS_STORE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on DDL_UTILS_STORE to UPLD;
 
 
 

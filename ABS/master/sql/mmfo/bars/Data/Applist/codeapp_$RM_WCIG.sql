@@ -1,3 +1,5 @@
+SET SERVEROUTPUT ON 
+SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_WCIG.sql =========*
 PROMPT ===================================================================================== 
@@ -16,11 +18,11 @@ PROMPT *** Create/replace  ARM  $RM_WCIG ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-	d integer := 0;
+    d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_WCIG створюємо (або оновлюємо) АРМ АРМ Iнтерфейс з ПВБКI ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
-                             P_ARM_NAME              => l_application_name,
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
+                             P_ARM_NAME              => l_application_name, 
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -28,179 +30,179 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перегляд клієнтів ********** ');
           --  Створюємо функцію Перегляд клієнтів
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Перегляд клієнтів',
                                                   p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_customers',
-                                                  p_rolename => 'CIG_ROLE' ,
+                                                  p_rolename => 'CIG_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Перегляд даних ФО
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Перегляд даних ФО',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_indview&cust_id=\d+&branch=\S+',
-															  p_rolename => 'CIG_ROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Перегляд даних ФО',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_indview&cust_id=\d+&branch=\S+',
+                                                              p_rolename => 'CIG_ROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Перегляд даних ЮО
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Перегляд даних ЮО',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_compview&cust_id=\d+&branch=\S+',
-															  p_rolename => 'CIG_ROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Перегляд даних ЮО',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_compview&cust_id=\d+&branch=\S+',
+                                                              p_rolename => 'CIG_ROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перегляд кредитних угод ********** ');
           --  Створюємо функцію Перегляд кредитних угод
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Перегляд кредитних угод',
                                                   p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_dogs',
-                                                  p_rolename => 'CIG_ROLE' ,
+                                                  p_rolename => 'CIG_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Фінансова інформація по стандартим кредитам(історія)
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Фінансова інформація по стандартим кредитам(історія)',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_doginst&dog_id=\d+&branch=\S+',
-															  p_rolename => 'CIG_ROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Фінансова інформація по стандартим кредитам(історія)',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_doginst&dog_id=\d+&branch=\S+',
+                                                              p_rolename => 'CIG_ROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Перегляд даних ФО
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Перегляд даних ФО',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_indview&cust_id=\d+&branch=\S+',
-															  p_rolename => 'CIG_ROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Перегляд даних ФО',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_indview&cust_id=\d+&branch=\S+',
+                                                              p_rolename => 'CIG_ROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Фінансова інформація по кредитним лініям(історія)
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Фінансова інформація по кредитним лініям(історія)',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_dogcredit&dog_id=\d+&branch=\S+',
-															  p_rolename => 'CIG_ROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Фінансова інформація по кредитним лініям(історія)',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_dogcredit&dog_id=\d+&branch=\S+',
+                                                              p_rolename => 'CIG_ROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Фінансова інформація по МБК
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Фінансова інформація по МБК',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_dogmbk&dog_id=\d+&branch=\S+',
-															  p_rolename => 'CIG_ROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Фінансова інформація по МБК',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_dogmbk&dog_id=\d+&branch=\S+',
+                                                              p_rolename => 'CIG_ROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Фінансова інформація по овердрафтам(історія)
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Фінансова інформація по овердрафтам(історія)',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_dogcredit_ovr&dog_id=\d+&branch=\S+',
-															  p_rolename => 'CIG_ROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Фінансова інформація по овердрафтам(історія)',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_dogcredit_ovr&dog_id=\d+&branch=\S+',
+                                                              p_rolename => 'CIG_ROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Фінансова інформація по БПК(історія)
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Фінансова інформація по БПК(історія)',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_dogcredit_bpk&dog_id=\d+&branch=\S+',
-															  p_rolename => 'CIG_ROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Фінансова інформація по БПК(історія)',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_dogcredit_bpk&dog_id=\d+&branch=\S+',
+                                                              p_rolename => 'CIG_ROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Перегляд даних ЮО
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Перегляд даних ЮО',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_compview&cust_id=\d+&branch=\S+',
-															  p_rolename => 'CIG_ROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Перегляд даних ЮО',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_compview&cust_id=\d+&branch=\S+',
+                                                              p_rolename => 'CIG_ROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Фінансова інформація по гарантіям
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Фінансова інформація по гарантіям',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_doggrnt&dog_id=\d+&branch=\S+',
-															  p_rolename => 'CIG_ROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Фінансова інформація по гарантіям',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_doggrnt&dog_id=\d+&branch=\S+',
+                                                              p_rolename => 'CIG_ROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Пакети передані до ПВБКІ
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Пакети передані до ПВБКІ',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_send_history&dog_id=\d+&branch=\S+',
-															  p_rolename => 'CIG_ROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Пакети передані до ПВБКІ',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_send_history&dog_id=\d+&branch=\S+',
+                                                              p_rolename => 'CIG_ROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перегляд журналу подій ********** ');
           --  Створюємо функцію Перегляд журналу подій
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Перегляд журналу подій',
                                                   p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_events',
-                                                  p_rolename => 'CIG_ROLE' ,
+                                                  p_rolename => 'CIG_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
       --  Створюємо дочірню функцію Перегляд даних договора
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Перегляд даних договора',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_dogview&nd=\d+&branch=\S+',
-															  p_rolename => 'CIG_ROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Перегляд даних договора',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_dogview&nd=\d+&branch=\S+',
+                                                              p_rolename => 'CIG_ROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Перегляд даних клієнта
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Перегляд даних клієнта',
-															  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_custview&rnk=\d+&branch=\S+',
-															  p_rolename => 'CIG_ROLE' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Перегляд даних клієнта',
+                                                              p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_custview&rnk=\d+&branch=\S+',
+                                                              p_rolename => 'CIG_ROLE' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Стан завдання збору даних ********** ');
           --  Створюємо функцію Стан завдання збору даних
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Стан завдання збору даних',
                                                   p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_job',
-                                                  p_rolename => 'CIG_ROLE' ,
+                                                  p_rolename => 'CIG_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Дані для передачі ********** ');
           --  Створюємо функцію Дані для передачі
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Дані для передачі',
                                                   p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_cig_newdata',
-                                                  p_rolename => 'CIG_ROLE' ,
+                                                  p_rolename => 'CIG_ROLE' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_WCIG) - АРМ Iнтерфейс з ПВБКI  ');
     l := l_function_ids.first;
@@ -208,8 +210,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-
-
+     
+     
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -223,7 +225,6 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
-commit;
 end;
 /
 

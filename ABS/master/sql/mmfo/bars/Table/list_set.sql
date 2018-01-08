@@ -104,11 +104,9 @@ exception when others then
 
 PROMPT *** Create  grants  LIST_SET ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on LIST_SET        to ABS_ADMIN;
-grant SELECT                                                                 on LIST_SET        to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on LIST_SET        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LIST_SET        to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on LIST_SET        to START1;
-grant SELECT                                                                 on LIST_SET        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on LIST_SET        to WR_ALL_RIGHTS;
 
 

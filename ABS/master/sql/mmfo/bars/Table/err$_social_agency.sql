@@ -79,10 +79,6 @@ COMMENT ON COLUMN BARS.ERR$_SOCIAL_AGENCY.COMISS_ACC IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SOCIAL_AGENCY ***
-grant SELECT                                                                 on ERR$_SOCIAL_AGENCY to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SOCIAL_AGENCY to UPLD;
-
 
 
 PROMPT ===================================================================================== 

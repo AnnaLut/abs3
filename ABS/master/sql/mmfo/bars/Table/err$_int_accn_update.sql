@@ -111,10 +111,6 @@ COMMENT ON COLUMN BARS.ERR$_INT_ACCN_UPDATE.GLOBAL_BDATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_INT_ACCN_UPDATE ***
-grant SELECT                                                                 on ERR$_INT_ACCN_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_INT_ACCN_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

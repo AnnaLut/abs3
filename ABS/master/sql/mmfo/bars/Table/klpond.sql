@@ -53,6 +53,32 @@ COMMENT ON COLUMN BARS.KLPOND.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_KLPOND_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLPOND ADD CONSTRAINT FK_KLPOND_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KLPOND_KLP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KLPOND ADD CONSTRAINT FK_KLPOND_KLP FOREIGN KEY (KF, FILENAME, POND)
+	  REFERENCES BARS.KLP (KF, NAEX, POND) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_KLPOND_POND_NN ***
 begin   
  execute immediate '
@@ -145,13 +171,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  KLPOND ***
-grant SELECT                                                                 on KLPOND          to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on KLPOND          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KLPOND          to BARS_DM;
 grant INSERT,UPDATE                                                          on KLPOND          to OPERKKK;
 grant SELECT,UPDATE                                                          on KLPOND          to START1;
 grant INSERT,SELECT,UPDATE                                                   on KLPOND          to TECH_MOM1;
-grant SELECT                                                                 on KLPOND          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLPOND          to WR_ALL_RIGHTS;
 
 

@@ -16,10 +16,8 @@ PROMPT *** Create  view O59 ***
 from accounts a, fdat b, fdat e;
 
 PROMPT *** Create  grants  O59 ***
-grant SELECT                                                                 on O59             to BARSREADER_ROLE;
 grant SELECT                                                                 on O59             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on O59             to START1;
-grant SELECT                                                                 on O59             to UPLD;
 
 
 

@@ -55,11 +55,9 @@ COMMENT ON COLUMN BARS.SB_PS853.COD_ACT IS '';
 
 
 PROMPT *** Create  grants  SB_PS853 ***
-grant SELECT                                                                 on SB_PS853        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_PS853        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SB_PS853        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_PS853        to START1;
-grant SELECT                                                                 on SB_PS853        to UPLD;
 
 
 

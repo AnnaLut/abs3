@@ -27,9 +27,7 @@ where  p.rnk(+)=c.rnk and
        w.tag(+)='INSFO';
 
 PROMPT *** Create  grants  V_CUSTOMER_IR ***
-grant SELECT                                                                 on V_CUSTOMER_IR   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTOMER_IR   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CUSTOMER_IR   to UPLD;
 
 
 

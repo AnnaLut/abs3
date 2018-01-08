@@ -30,7 +30,6 @@ END get_branch_id;
  
 PROMPT *** Create  grants  GET_BRANCH_ID ***
 grant EXECUTE                                                                on GET_BRANCH_ID   to BARS;
-grant EXECUTE                                                                on GET_BRANCH_ID   to BARSREADER_ROLE;
 
  
  

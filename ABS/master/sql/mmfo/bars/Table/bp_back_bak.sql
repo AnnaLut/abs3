@@ -51,11 +51,9 @@ COMMENT ON COLUMN BARS.BP_BACK_BAK.ID IS '';
 
 
 PROMPT *** Create  grants  BP_BACK_BAK ***
-grant SELECT                                                                 on BP_BACK_BAK     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BP_BACK_BAK     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BP_BACK_BAK     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BP_BACK_BAK     to START1;
-grant SELECT                                                                 on BP_BACK_BAK     to UPLD;
 
 
 

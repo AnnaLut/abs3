@@ -88,10 +88,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  SGN_TRACE_SIGN ***
-grant SELECT                                                                 on SGN_TRACE_SIGN  to BARSREADER_ROLE;
-grant SELECT                                                                 on SGN_TRACE_SIGN  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

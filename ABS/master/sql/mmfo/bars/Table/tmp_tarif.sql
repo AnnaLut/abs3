@@ -136,9 +136,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_TARIF ***
-grant SELECT                                                                 on TMP_TARIF       to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_TARIF       to BARS_DM;
-grant SELECT                                                                 on TMP_TARIF       to UPLD;
 
 
 

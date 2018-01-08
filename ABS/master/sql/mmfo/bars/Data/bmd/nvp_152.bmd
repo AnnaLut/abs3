@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Протокол розрахунку проц по эф.ставці';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'NVP_152';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,26 +119,26 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BV/100', 'N', '05 База=~REZ+SS+SN+SNO+SE+~SDI+SPI+SP+SPN+SNA', '', null, 9, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CDAT', 'D', 'Календарна~дата', '', null, 2, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'IR/100', 'N', '03~`Визнані  %%=~04*05', '', null, 6, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum( IR ) /100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'MDAT', 'D', 'Звітна~дата', '', null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Реф ~КД', '', null, 30, 0, 1, 0, 0, '', '', 0, 0, 'div0( count(*) , COUNT(DISTINCT KV)  )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'REZ/100', 'N', 'REZ~Резерв', '', null, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(  decode (cdat, mdat-1, nvl(REZ,0),  0)  ) /100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'SDI/100', 'N', 'SDI~Дисконт', '', null, 13, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'SN/100', 'N', 'SN~Нарах %%', '', null, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'SNA/100', 'N', 'SNA~НЕвизн. %%', '', null, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'SNO/100', 'N', 'SNO~Відклад. %%', '', null, 12, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'SP/100', 'N', 'SP~Простр.тіло', '', null, 15, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'SPI/100', 'N', 'SPI~Премія', '', null, 14, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SPN/100', 'N', 'SPN~Простр. %%', '', null, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SS/100', 'N', 'SS~Норм.тіло', '', null, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'EPS1', 'N', '04~ЕПС~1 дня', '', null, 8, 0, 0, 0, 0, '', '#0.0000000', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'NR/100', 'N', '01~`Нарах. %%=~02*(SS+SP)', '', null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum( NR ) /100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'NOM1', 'N', '02~НПС~1 дня', '', null, 5, 0, 0, 0, 0, '', '#0.0000000', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'AR/100', 'N', '00~`Нарах. аморт=~SDI - `SDI', '', null, 3, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum( AR ) /100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'KV', 'N', 'Код~вал', '', null, 1, 0, 1, 0, 0, '', '', 0, 0, 'COUNT(DISTINCT KV) ', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'SE/100', 'N', 'SE~Визнані~пiдсумок', '', null, 7, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BV/100', 'N', '05 База=~REZ+SS+SN+SNO+SE+~SDI+SPI+SP+SPN+SNA', null, null, 9, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CDAT', 'D', 'Календарна~дата', null, null, 2, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'IR/100', 'N', '03~`Визнані  %%=~04*05', null, null, 6, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum( IR ) /100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'MDAT', 'D', 'Звітна~дата', null, null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Реф ~КД', null, null, 30, 0, 1, 0, 0, '', '', 0, 0, 'div0( count(*) , COUNT(DISTINCT KV)  )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'REZ/100', 'N', 'REZ~Резерв', null, null, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(  decode (cdat, mdat-1, nvl(REZ,0),  0)  ) /100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'SDI/100', 'N', 'SDI~Дисконт', null, null, 13, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'SN/100', 'N', 'SN~Нарах %%', null, null, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'SNA/100', 'N', 'SNA~НЕвизн. %%', null, null, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'SNO/100', 'N', 'SNO~Відклад. %%', null, null, 12, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'SP/100', 'N', 'SP~Простр.тіло', null, null, 15, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'SPI/100', 'N', 'SPI~Премія', null, null, 14, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SPN/100', 'N', 'SPN~Простр. %%', null, null, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SS/100', 'N', 'SS~Норм.тіло', null, null, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'EPS1', 'N', '04~ЕПС~1 дня', null, null, 8, 0, 0, 0, 0, '', '#0.0000000', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'NR/100', 'N', '01~`Нарах. %%=~02*(SS+SP)', null, null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum( NR ) /100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'NOM1', 'N', '02~НПС~1 дня', null, null, 5, 0, 0, 0, 0, '', '#0.0000000', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'AR/100', 'N', '00~`Нарах. аморт=~SDI - `SDI', null, null, 3, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum( AR ) /100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'KV', 'N', 'Код~вал', null, null, 1, 0, 1, 0, 0, '', '', 0, 0, 'COUNT(DISTINCT KV) ', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'SE/100', 'N', 'SE~Визнані~пiдсумок', null, null, 7, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 2, 1, 'ASC ');

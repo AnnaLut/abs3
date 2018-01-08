@@ -87,10 +87,6 @@ COMMENT ON COLUMN BARS.ERR$_E_DEAL$BASE_UPDATE.ACCP IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_E_DEAL$BASE_UPDATE ***
-grant SELECT                                                                 on ERR$_E_DEAL$BASE_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_E_DEAL$BASE_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

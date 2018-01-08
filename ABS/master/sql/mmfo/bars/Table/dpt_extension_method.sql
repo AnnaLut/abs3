@@ -102,12 +102,10 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_EXTENSION_METHOD ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_EXTENSION_METHOD to ABS_ADMIN;
-grant SELECT                                                                 on DPT_EXTENSION_METHOD to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_EXTENSION_METHOD to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_EXTENSION_METHOD to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_EXTENSION_METHOD to DPT_ADMIN;
 grant SELECT                                                                 on DPT_EXTENSION_METHOD to START1;
-grant SELECT                                                                 on DPT_EXTENSION_METHOD to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_EXTENSION_METHOD to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_EXTENSION_METHOD to WR_REFREAD;
 

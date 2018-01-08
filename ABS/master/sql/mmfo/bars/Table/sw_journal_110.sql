@@ -129,118 +129,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C009299 ***
+PROMPT *** Create  constraint SYS_C009310 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (TRN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009300 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (IO_IND NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009301 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (SENDER NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009302 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (RECEIVER NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009303 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (AMOUNT NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009304 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (DATE_IN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009305 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (VDATE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009306 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (PAGE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009307 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (SOS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009308 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (LAU_ACT NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (APP_FLAG NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -261,10 +153,118 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C009310 ***
+PROMPT *** Create  constraint SYS_C009308 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (APP_FLAG NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (LAU_ACT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009307 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (SOS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009306 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (PAGE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009305 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (VDATE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009304 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (DATE_IN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009303 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (AMOUNT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009302 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (RECEIVER NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009301 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (SENDER NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009300 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (IO_IND NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009299 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL_110 MODIFY (TRN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -273,10 +273,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_JOURNAL_110 ***
-grant SELECT                                                                 on SW_JOURNAL_110  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_JOURNAL_110  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_JOURNAL_110  to START1;
-grant SELECT                                                                 on SW_JOURNAL_110  to UPLD;
 
 
 

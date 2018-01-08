@@ -85,10 +85,6 @@ COMMENT ON COLUMN BARS.ERR$_FINMON_QUE.ORA_ERR_OPTYP$ IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_FINMON_QUE ***
-grant SELECT                                                                 on ERR$_FINMON_QUE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_FINMON_QUE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

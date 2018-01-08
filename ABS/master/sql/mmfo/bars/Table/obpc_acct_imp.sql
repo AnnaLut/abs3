@@ -93,10 +93,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_ACCT_IMP ***
-grant SELECT                                                                 on OBPC_ACCT_IMP   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_ACCT_IMP   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_ACCT_IMP   to OBPC;
-grant SELECT                                                                 on OBPC_ACCT_IMP   to UPLD;
 
 
 

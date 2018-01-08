@@ -177,11 +177,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_F98 ***
-grant SELECT                                                                 on CIM_F98         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F98         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_F98         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F98         to CIM_ROLE;
-grant SELECT                                                                 on CIM_F98         to UPLD;
 grant SELECT                                                                 on CIM_F98         to ZAY;
 
 

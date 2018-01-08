@@ -89,10 +89,8 @@ UNION ALL
 
 PROMPT *** Create  grants  V_OPER_TIMEOPL_KT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OPER_TIMEOPL_KT to ABS_ADMIN;
-grant SELECT                                                                 on V_OPER_TIMEOPL_KT to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_OPER_TIMEOPL_KT to BARS_ACCESS_DEFROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_OPER_TIMEOPL_KT to START1;
-grant SELECT                                                                 on V_OPER_TIMEOPL_KT to UPLD;
 grant FLASHBACK,SELECT                                                       on V_OPER_TIMEOPL_KT to WR_REFREAD;
 
 

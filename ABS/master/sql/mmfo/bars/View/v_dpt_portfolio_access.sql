@@ -45,10 +45,8 @@ PROMPT *** Create  view V_DPT_PORTFOLIO_ACCESS ***
  ;
 
 PROMPT *** Create  grants  V_DPT_PORTFOLIO_ACCESS ***
-grant SELECT                                                                 on V_DPT_PORTFOLIO_ACCESS to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_DPT_PORTFOLIO_ACCESS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_PORTFOLIO_ACCESS to DPT_ADMIN;
-grant SELECT                                                                 on V_DPT_PORTFOLIO_ACCESS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_PORTFOLIO_ACCESS to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_DPT_PORTFOLIO_ACCESS to WR_REFREAD;
 

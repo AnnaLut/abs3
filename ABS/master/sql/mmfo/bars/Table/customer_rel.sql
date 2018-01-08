@@ -28,8 +28,8 @@ begin
 	REL_ID NUMBER(22,0), 
 	REL_RNK NUMBER(22,0), 
 	REL_INTEXT NUMBER(1,0), 
-	VAGA1 NUMBER(14,10), 
-	VAGA2 NUMBER(14,10), 
+	VAGA1 NUMBER(8,4), 
+	VAGA2 NUMBER(8,4), 
 	TYPE_ID NUMBER(22,0) DEFAULT 1, 
 	POSITION VARCHAR2(100), 
 	FIRST_NAME VARCHAR2(70), 
@@ -117,6 +117,93 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_CUSTOMERREL_RELINTEXT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_REL MODIFY (REL_INTEXT CONSTRAINT CC_CUSTOMERREL_RELINTEXT_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERREL_RELRNK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_REL MODIFY (REL_RNK CONSTRAINT CC_CUSTOMERREL_RELRNK_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERREL_RELID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_REL MODIFY (REL_ID CONSTRAINT CC_CUSTOMERREL_RELID_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERREL_RNK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_REL MODIFY (RNK CONSTRAINT CC_CUSTOMERREL_RNK_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMERREL_CUSTOMERBINDATA ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_REL ADD CONSTRAINT FK_CUSTOMERREL_CUSTOMERBINDATA FOREIGN KEY (SIGN_ID)
+	  REFERENCES BARS.CUSTOMER_BIN_DATA (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMERREL_TRUSTEEDOCTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_REL ADD CONSTRAINT FK_CUSTOMERREL_TRUSTEEDOCTYPE FOREIGN KEY (DOCUMENT_TYPE_ID)
+	  REFERENCES BARS.TRUSTEE_DOCUMENT_TYPE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMERREL_TRUSTEETYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_REL ADD CONSTRAINT FK_CUSTOMERREL_TRUSTEETYPE FOREIGN KEY (TYPE_ID)
+	  REFERENCES BARS.TRUSTEE_TYPE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_CUSTOMERREL_SIGNPRIVS ***
 begin   
  execute immediate '
@@ -177,10 +264,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMERREL_RNK_NN ***
+PROMPT *** Create  constraint FK_CUSTOMERREL_CUSTOMER ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_REL MODIFY (RNK CONSTRAINT CC_CUSTOMERREL_RNK_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CUSTOMER_REL ADD CONSTRAINT FK_CUSTOMERREL_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -189,34 +277,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMERREL_RELID_NN ***
+PROMPT *** Create  constraint FK_CUSTOMERREL_CUSTREL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_REL MODIFY (REL_ID CONSTRAINT CC_CUSTOMERREL_RELID_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERREL_RELRNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_REL MODIFY (REL_RNK CONSTRAINT CC_CUSTOMERREL_RELRNK_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERREL_RELINTEXT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_REL MODIFY (REL_INTEXT CONSTRAINT CC_CUSTOMERREL_RELINTEXT_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CUSTOMER_REL ADD CONSTRAINT FK_CUSTOMERREL_CUSTREL FOREIGN KEY (REL_ID)
+	  REFERENCES BARS.CUST_REL (ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -239,12 +304,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUSTOMER_REL ***
-grant SELECT                                                                 on CUSTOMER_REL    to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTOMER_REL    to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_REL    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_REL    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_REL    to CUST001;
-grant SELECT                                                                 on CUSTOMER_REL    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTOMER_REL    to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CUSTOMER_REL    to WR_CUSTREG;
 

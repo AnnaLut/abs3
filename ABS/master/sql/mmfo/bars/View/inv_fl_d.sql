@@ -27,10 +27,8 @@ PROMPT *** Create  view INV_FL_D ***
               G00 , GT, GR, ACC, RNK, null from INV_CCK_FL_BPKK where gt = 0);
 
 PROMPT *** Create  grants  INV_FL_D ***
-grant SELECT                                                                 on INV_FL_D        to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on INV_FL_D        to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on INV_FL_D        to RCC_DEAL;
-grant SELECT                                                                 on INV_FL_D        to UPLD;
 
 
 

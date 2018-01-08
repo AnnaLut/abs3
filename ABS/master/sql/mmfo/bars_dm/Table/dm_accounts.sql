@@ -64,6 +64,19 @@ COMMENT ON COLUMN BARS_DM.DM_ACCOUNTS.BLKK IS 'Код блокування рахунку по кредиту
 
 
 
+PROMPT *** Create  constraint FK_ACCOUNTS_PERID_PERIOD_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS_DM.DM_ACCOUNTS ADD CONSTRAINT FK_ACCOUNTS_PERID_PERIOD_ID FOREIGN KEY (PER_ID)
+	  REFERENCES BARS_DM.PERIODS (ID) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_ACCOUNTS_PERID_NN ***
 begin   
  execute immediate '
@@ -139,9 +152,7 @@ exception when others then
 
 PROMPT *** Create  grants  DM_ACCOUNTS ***
 grant SELECT                                                                 on DM_ACCOUNTS     to BARS;
-grant SELECT                                                                 on DM_ACCOUNTS     to BARSREADER_ROLE;
 grant SELECT                                                                 on DM_ACCOUNTS     to BARSUPL;
-grant SELECT                                                                 on DM_ACCOUNTS     to UPLD;
 
 
 

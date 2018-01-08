@@ -22,9 +22,7 @@ PROMPT *** Create  view M_ROLE_TYPG ***
 from dual;
 
 PROMPT *** Create  grants  M_ROLE_TYPG ***
-grant SELECT                                                                 on M_ROLE_TYPG     to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_TYPG     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on M_ROLE_TYPG     to UPLD;
 
 
 

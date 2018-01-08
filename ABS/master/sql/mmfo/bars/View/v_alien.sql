@@ -21,10 +21,8 @@ x0.notesec from  alien x0
                 from  staff x1 where (upper(x1.logname) = USER)));
 
 PROMPT *** Create  grants  V_ALIEN ***
-grant SELECT                                                                 on V_ALIEN         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ALIEN         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ALIEN         to START1;
-grant SELECT                                                                 on V_ALIEN         to UPLD;
 
 
 

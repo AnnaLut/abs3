@@ -69,6 +69,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint R_CCK_STAFF_PARAMS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CCK_STAFF_PARAMS ADD CONSTRAINT R_CCK_STAFF_PARAMS FOREIGN KEY (USER_ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C009846 ***
 begin   
  execute immediate '
@@ -107,11 +120,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CCK_STAFF_PARAMS ***
-grant SELECT                                                                 on CCK_STAFF_PARAMS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_STAFF_PARAMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_STAFF_PARAMS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_STAFF_PARAMS to RCC_DEAL;
-grant SELECT                                                                 on CCK_STAFF_PARAMS to UPLD;
 grant FLASHBACK,SELECT                                                       on CCK_STAFF_PARAMS to WR_REFREAD;
 
 

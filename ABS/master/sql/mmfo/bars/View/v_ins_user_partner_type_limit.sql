@@ -37,9 +37,7 @@ PROMPT *** Create  view V_INS_USER_PARTNER_TYPE_LIMIT ***
     WHERE t0.limit_id = t.id(+);
 
 PROMPT *** Create  grants  V_INS_USER_PARTNER_TYPE_LIMIT ***
-grant SELECT                                                                 on V_INS_USER_PARTNER_TYPE_LIMIT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_USER_PARTNER_TYPE_LIMIT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INS_USER_PARTNER_TYPE_LIMIT to UPLD;
 
 
 

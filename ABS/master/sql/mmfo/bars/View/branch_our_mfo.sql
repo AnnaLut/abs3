@@ -13,10 +13,8 @@ PROMPT *** Create  view BRANCH_OUR_MFO ***
     WHERE LENGTH (BRANCH) = 8 and DATE_CLOSED is NULL;
 
 PROMPT *** Create  grants  BRANCH_OUR_MFO ***
-grant SELECT                                                                 on BRANCH_OUR_MFO  to BARSREADER_ROLE;
 grant SELECT                                                                 on BRANCH_OUR_MFO  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH_OUR_MFO  to START1;
-grant SELECT                                                                 on BRANCH_OUR_MFO  to UPLD;
 
 
 

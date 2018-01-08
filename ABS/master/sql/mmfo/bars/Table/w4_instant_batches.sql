@@ -157,10 +157,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  W4_INSTANT_BATCHES ***
-grant SELECT                                                                 on W4_INSTANT_BATCHES to BARSREADER_ROLE;
-grant SELECT                                                                 on W4_INSTANT_BATCHES to UPLD;
-
 
 
 PROMPT ===================================================================================== 

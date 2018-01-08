@@ -45,10 +45,6 @@ COMMENT ON COLUMN BARS.TMP_CM_OPERSTATUS.NAME IS '';
 
 
 
-PROMPT *** Create  grants  TMP_CM_OPERSTATUS ***
-grant SELECT                                                                 on TMP_CM_OPERSTATUS to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_CM_OPERSTATUS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

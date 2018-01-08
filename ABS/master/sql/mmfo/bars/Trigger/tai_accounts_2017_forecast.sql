@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TAI_ACCOUNTS_2017_FORECAST.sql =====
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  trigger TAI_ACCOUNTS_2017_FORECAST ***
-
-  CREATE OR REPLACE TRIGGER BARS.TAI_ACCOUNTS_2017_FORECAST AFTER INSERT  ON ACCOUNTS  FOR EACH ROW
+CREATE OR REPLACE TRIGGER tai_accounts_2017_forecast AFTER INSERT  ON ACCOUNTS  FOR EACH ROW
 declare
    l_new_nls accounts.nls%type;
    l_count     number:= 0;
@@ -17,23 +8,23 @@ declare
    l_row       transfer_2017%rowtype;
    l_trace     varchar2(100) := 'T2017.tai_accounts_2017_forecast: ';
 begin
-
-   if :new.nbs is null then
+   
+   if :new.nbs is null then 
       l_old_nbs := substr(:new.nls,1,4);
-   else
+   else    
       l_old_nbs := :new.nbs;
-   end if;
-
+   end if;    
+   
    select count(*) into l_count from  srezerv_ob22_f where nbs_rez = l_old_nbs AND :new.TIP = 'REZ' ;
    if l_count > 0 then
       -- счет РЕЗЕРВА - открывается даже если есть в transfer_2017
-      return;
+      return; 
    end if;
-
+      
    begin
       -- счет не меняет лицевой
-      select 1 into l_count
-        from transfer_2017
+      select 1 into l_count 
+        from transfer_2017 
        where r020_old = l_old_nbs and r020_old <> r020_new
          and rownum = 1;
    exception when no_data_found then
@@ -42,40 +33,40 @@ begin
 
 
    bars_audit.info(l_trace||'старт внесения счета для прогнозирования kf='||:new.kf||', acc='||:new.acc||', nls='||:new.nls||', nbs='||:new.nbs||', ob22='||:new.ob22);
-/*
-   select * into l_row
-     from transfer_2017 t
-    where t.r020_old = l_old_nbs
-      and t.ob_old = nvl(:new.ob22,t.ob_old)
+/*   
+   select * into l_row 
+     from transfer_2017 t 
+    where t.r020_old = l_old_nbs 
+      and t.ob_old = nvl(:new.ob22,t.ob_old) 
       and rownum = 1;
-
+      
    l_new_nbs := l_row.r020_new;
-
-
+  
+  
    while l_tries < 100 loop
             l_new_nls := vkrzn( substr( :new.kf, 1,5), l_new_nbs||'0' || trunc ( dbms_random.value ( 100000000, 999999999 ) ));
             l_count := 0 ;
-            select count(*) into l_count from
+            select count(*) into l_count from 
             ( select 1  from accounts                  where nls      = l_new_nls   and kf = :new.kf
-              union all
+              union all 
               select 1 from TRANSFORM_2017_FORECAST    where new_nls  = l_new_nls   and kf = :new.kf
             );
-
+            
             -- если такой счет нашли или в счете или в зарезервированных
             -- пытаемся еще раз подобрать
-            if l_count > 0 then
+            if l_count > 0 then               
                l_tries := l_tries + 1;
             else
                -- выход, счет нашли
-               exit;
+               exit;   
             end if;
-
+        
       end loop;
       if l_tries >=100 then
            bars_audit.info(l_trace||'для счета не смогли подобрать новый счет за 100 попыток kf='||:new.kf||', acc='||:new.acc||', nls='||:new.nls);
            return;
       end if;
-*/
+*/           
       insert into transform_2017_forecast(
                     kf,
                     kv,
@@ -89,13 +80,9 @@ begin
                     insert_date          )
     --values (:new.kf, :new.kv, :new.acc, :new.nbs, :new.nls, :new.ob22, l_row.r020_new, l_row.ob_new, l_new_nls, sysdate );
     values (:new.kf, :new.kv, :new.acc, :new.nbs, :new.nls, :new.ob22, null, null, null, sysdate );
-
-
+      
+  
 end;
-/
-ALTER TRIGGER BARS.TAI_ACCOUNTS_2017_FORECAST ENABLE;
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TAI_ACCOUNTS_2017_FORECAST.sql =====
-PROMPT ===================================================================================== 
+/    
+    
+show err

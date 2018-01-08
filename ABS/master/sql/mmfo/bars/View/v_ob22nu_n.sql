@@ -54,14 +54,12 @@ PROMPT *** Create  view V_OB22NU_N ***
                   AND a.ob22 = p.ob22
                   AND s.r020_fa = p.r020_fa
                   AND s.p080 = p.p080
-                  AND (a.nls LIKE '8____11%' and a.kf = '300465' or a.kf<>'300465')) n
+                  AND a.nls LIKE '8____11%') n
     WHERE a.acc = s.acc AND a.nbs = n.r020_fa AND a.ob22 = n.ob22;
 
 PROMPT *** Create  grants  V_OB22NU_N ***
-grant SELECT                                                                 on V_OB22NU_N      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OB22NU_N      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OB22NU_N      to RPBN001;
-grant SELECT                                                                 on V_OB22NU_N      to UPLD;
 
 
 

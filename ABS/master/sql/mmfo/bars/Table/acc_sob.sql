@@ -83,22 +83,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCSOB_ACC_NN ***
+PROMPT *** Create  constraint CC_ACCSOB_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_SOB MODIFY (ACC CONSTRAINT CC_ACCSOB_ACC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCSOB_ID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACC_SOB MODIFY (ID CONSTRAINT CC_ACCSOB_ID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_SOB MODIFY (KF CONSTRAINT CC_ACCSOB_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -119,10 +107,61 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCSOB_KF_NN ***
+PROMPT *** Create  constraint CC_ACCSOB_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_SOB MODIFY (KF CONSTRAINT CC_ACCSOB_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_SOB MODIFY (ID CONSTRAINT CC_ACCSOB_ID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCSOB_ACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_SOB MODIFY (ACC CONSTRAINT CC_ACCSOB_ACC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCSOB_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_SOB ADD CONSTRAINT FK_ACCSOB_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCSOB_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_SOB ADD CONSTRAINT FK_ACCSOB_STAFF FOREIGN KEY (ISP)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCSOB_ACCOUNTS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_SOB ADD CONSTRAINT FK_ACCSOB_ACCOUNTS2 FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -146,12 +185,10 @@ exception when others then
 
 PROMPT *** Create  grants  ACC_SOB ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_SOB         to ABS_ADMIN;
-grant SELECT                                                                 on ACC_SOB         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_SOB         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_SOB         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_SOB         to CUST001;
 grant SELECT                                                                 on ACC_SOB         to START1;
-grant SELECT                                                                 on ACC_SOB         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_SOB         to WR_ALL_RIGHTS;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_SOB         to WR_VIEWACC;
 

@@ -30,9 +30,7 @@ PROMPT *** Create  view V_INS_PARTNER_TYPE_ATTRS ***
  order by pta.attr_id;
 
 PROMPT *** Create  grants  V_INS_PARTNER_TYPE_ATTRS ***
-grant SELECT                                                                 on V_INS_PARTNER_TYPE_ATTRS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_PARTNER_TYPE_ATTRS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INS_PARTNER_TYPE_ATTRS to UPLD;
 
 
 

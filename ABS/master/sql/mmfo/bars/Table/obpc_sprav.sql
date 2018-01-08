@@ -113,12 +113,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_SPRAV ***
-grant SELECT                                                                 on OBPC_SPRAV      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_SPRAV      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_SPRAV      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_SPRAV      to OBPC;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_SPRAV      to OBPC_SPRAV;
-grant SELECT                                                                 on OBPC_SPRAV      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_SPRAV      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on OBPC_SPRAV      to WR_REFREAD;
 

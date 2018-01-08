@@ -52,9 +52,7 @@ PROMPT *** Create  view V_CUSTOMER_ADDRESS ***
     WHERE ca.rnk = q.rnk AND q.req_type IN (0, 2);
 
 PROMPT *** Create  grants  V_CUSTOMER_ADDRESS ***
-grant SELECT                                                                 on V_CUSTOMER_ADDRESS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTOMER_ADDRESS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CUSTOMER_ADDRESS to UPLD;
 
 
 

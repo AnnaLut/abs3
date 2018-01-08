@@ -30,9 +30,7 @@ PROMPT *** Create  view V_SW_PROCMSG ***
 
 PROMPT *** Create  grants  V_SW_PROCMSG ***
 grant SELECT                                                                 on V_SW_PROCMSG    to BARS013;
-grant SELECT                                                                 on V_SW_PROCMSG    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW_PROCMSG    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_SW_PROCMSG    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SW_PROCMSG    to WR_ALL_RIGHTS;
 
 

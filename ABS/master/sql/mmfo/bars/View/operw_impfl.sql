@@ -12,10 +12,8 @@ PROMPT *** Create  view OPERW_IMPFL ***
  ;
 
 PROMPT *** Create  grants  OPERW_IMPFL ***
-grant SELECT                                                                 on OPERW_IMPFL     to BARSREADER_ROLE;
 grant SELECT                                                                 on OPERW_IMPFL     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OPERW_IMPFL     to START1;
-grant SELECT                                                                 on OPERW_IMPFL     to UPLD;
 
 
 

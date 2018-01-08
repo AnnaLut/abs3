@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/swi_get_acc.sql =========*** Run **
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.SWI_GET_ACC (p_nbs varchar2, p_nbs_alt varchar2 default null) return varchar2
+CREATE OR REPLACE FUNCTION BARS.swi_get_acc (p_nbs varchar2, p_nbs_alt varchar2 default null) return varchar2
 is
   l_nls  accounts.nls%type;
   l_ob22 accounts.ob22%type;
@@ -21,7 +15,7 @@ is
 
 
 
-begin    If NVL(newnbs.g_state,0)  = 1 then null;  Else l_6110 := '6110';  l_7109 := '7109';  end if;
+begin    If NVL(newnbs.g_state,0)  = 1 then null;  Else l_6110 := '6110';  l_7109 := '7109';  end if; 
 
   l_nbs := p_nbs;
   if p_nbs_alt is not null then
@@ -57,11 +51,3 @@ begin    If NVL(newnbs.g_state,0)  = 1 then null;  Else l_6110 := '6110';  l_710
   return l_nls;
 end;
 /
- show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/swi_get_acc.sql =========*** End **
- PROMPT ===================================================================================== 
- 

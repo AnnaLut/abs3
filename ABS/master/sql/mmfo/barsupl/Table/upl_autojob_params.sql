@@ -59,7 +59,6 @@ exception when others then
 
 PROMPT *** Create  grants  UPL_AUTOJOB_PARAMS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on UPL_AUTOJOB_PARAMS to BARS;
-grant SELECT                                                                 on UPL_AUTOJOB_PARAMS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on UPL_AUTOJOB_PARAMS to UPLD;
 
 

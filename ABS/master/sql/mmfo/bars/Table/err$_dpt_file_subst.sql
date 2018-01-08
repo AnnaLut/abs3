@@ -55,10 +55,6 @@ COMMENT ON COLUMN BARS.ERR$_DPT_FILE_SUBST.CHILD_BRANCH IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPT_FILE_SUBST ***
-grant SELECT                                                                 on ERR$_DPT_FILE_SUBST to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPT_FILE_SUBST to UPLD;
-
 
 
 PROMPT ===================================================================================== 

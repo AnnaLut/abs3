@@ -164,9 +164,7 @@ PROMPT *** Create  view V_MBM_DEPOSIT_ACCOUNTS ***
     WHERE d.CLOSED = 0;
 
 PROMPT *** Create  grants  V_MBM_DEPOSIT_ACCOUNTS ***
-grant SELECT                                                                 on V_MBM_DEPOSIT_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBM_DEPOSIT_ACCOUNTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_MBM_DEPOSIT_ACCOUNTS to UPLD;
 
 
 

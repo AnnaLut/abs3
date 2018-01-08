@@ -68,6 +68,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_BANKS_BANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.BANKS ADD CONSTRAINT FK_BANKS_BANKS FOREIGN KEY (BANK_ID)
+	  REFERENCES BARS.BANKS$BASE (MFO) DEFERRABLE DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_BANKS ***
 begin   
  execute immediate '
@@ -80,9 +93,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  BANKS ***
-grant SELECT                                                                 on BANKS           to BARSREADER_ROLE;
 
 
 

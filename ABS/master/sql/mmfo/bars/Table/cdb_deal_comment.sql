@@ -101,11 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CDB_DEAL_COMMENT ***
-grant SELECT                                                                 on CDB_DEAL_COMMENT to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CDB_DEAL_COMMENT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CDB_DEAL_COMMENT to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CDB_DEAL_COMMENT to START1;
-grant SELECT                                                                 on CDB_DEAL_COMMENT to UPLD;
 
 
 

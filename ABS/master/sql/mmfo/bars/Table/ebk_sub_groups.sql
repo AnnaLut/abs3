@@ -49,10 +49,8 @@ COMMENT ON COLUMN BARS.EBK_SUB_GROUPS.ID_PRC_QUALITY IS '';
 
 
 PROMPT *** Create  grants  EBK_SUB_GROUPS ***
-grant SELECT                                                                 on EBK_SUB_GROUPS  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBK_SUB_GROUPS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBK_SUB_GROUPS  to BARS_DM;
-grant SELECT                                                                 on EBK_SUB_GROUPS  to UPLD;
 
 
 

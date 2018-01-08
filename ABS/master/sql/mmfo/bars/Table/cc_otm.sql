@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_OTM ***
-grant SELECT                                                                 on CC_OTM          to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CC_OTM          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_OTM          to BARS_DM;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CC_OTM          to RCC_DEAL;
-grant SELECT                                                                 on CC_OTM          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_OTM          to WR_ALL_RIGHTS;
 
 

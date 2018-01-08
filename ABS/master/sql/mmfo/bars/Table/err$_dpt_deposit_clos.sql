@@ -129,10 +129,6 @@ COMMENT ON COLUMN BARS.ERR$_DPT_DEPOSIT_CLOS.LIMIT IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPT_DEPOSIT_CLOS ***
-grant SELECT                                                                 on ERR$_DPT_DEPOSIT_CLOS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPT_DEPOSIT_CLOS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

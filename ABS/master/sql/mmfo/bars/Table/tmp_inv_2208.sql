@@ -44,11 +44,9 @@ COMMENT ON COLUMN BARS.TMP_INV_2208.ACC IS '';
 
 
 PROMPT *** Create  grants  TMP_INV_2208 ***
-grant SELECT                                                                 on TMP_INV_2208    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INV_2208    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_INV_2208    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INV_2208    to START1;
-grant SELECT                                                                 on TMP_INV_2208    to UPLD;
 
 
 

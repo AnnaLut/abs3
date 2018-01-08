@@ -19,9 +19,7 @@ from cc_lim l, cc_lim p
 where l.nd=p.nd and l.fdat=p.fdat;
 
 PROMPT *** Create  grants  CC_VB_GPK ***
-grant SELECT                                                                 on CC_VB_GPK       to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_VB_GPK       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on CC_VB_GPK       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_VB_GPK       to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CC_VB_GPK       to WR_CREDIT;
 

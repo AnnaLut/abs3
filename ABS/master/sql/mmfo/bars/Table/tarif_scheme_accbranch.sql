@@ -106,11 +106,9 @@ exception when others then
 
 PROMPT *** Create  grants  TARIF_SCHEME_ACCBRANCH ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TARIF_SCHEME_ACCBRANCH to ABS_ADMIN;
-grant SELECT                                                                 on TARIF_SCHEME_ACCBRANCH to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TARIF_SCHEME_ACCBRANCH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TARIF_SCHEME_ACCBRANCH to BARS_DM;
 grant SELECT                                                                 on TARIF_SCHEME_ACCBRANCH to START1;
-grant SELECT                                                                 on TARIF_SCHEME_ACCBRANCH to UPLD;
 grant FLASHBACK,SELECT                                                       on TARIF_SCHEME_ACCBRANCH to WR_REFREAD;
 
 

@@ -61,12 +61,10 @@ COMMENT ON COLUMN BARS.ZAY_TRACK_RU.VIZA_NAME IS '';
 
 
 
-PROMPT *** Create  constraint PK_ZAYTRACKRU ***
+PROMPT *** Create  constraint CC_ZAYTRACKRU_MFO_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAY_TRACK_RU ADD CONSTRAINT PK_ZAYTRACKRU PRIMARY KEY (MFO, TRACK_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLD  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.ZAY_TRACK_RU MODIFY (MFO CONSTRAINT CC_ZAYTRACKRU_MFO_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -75,10 +73,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ZAYTRACKRU_MFO_NN ***
+PROMPT *** Create  constraint PK_ZAYTRACKRU ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAY_TRACK_RU MODIFY (MFO CONSTRAINT CC_ZAYTRACKRU_MFO_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.ZAY_TRACK_RU ADD CONSTRAINT PK_ZAYTRACKRU PRIMARY KEY (MFO, TRACK_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLD  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -173,10 +173,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAY_TRACK_RU ***
-grant SELECT                                                                 on ZAY_TRACK_RU    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_TRACK_RU    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAY_TRACK_RU    to BARS_DM;
-grant SELECT                                                                 on ZAY_TRACK_RU    to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_TRACK_RU    to ZAY;
 
 

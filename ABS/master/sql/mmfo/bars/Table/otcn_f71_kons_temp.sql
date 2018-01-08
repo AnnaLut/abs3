@@ -46,10 +46,8 @@ COMMENT ON COLUMN BARS.OTCN_F71_KONS_TEMP.P040 IS '';
 
 
 PROMPT *** Create  grants  OTCN_F71_KONS_TEMP ***
-grant SELECT                                                                 on OTCN_F71_KONS_TEMP to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F71_KONS_TEMP to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F71_KONS_TEMP to START1;
-grant SELECT                                                                 on OTCN_F71_KONS_TEMP to UPLD;
 
 
 

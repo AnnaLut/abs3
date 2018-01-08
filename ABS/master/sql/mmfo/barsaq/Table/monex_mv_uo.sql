@@ -84,6 +84,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_MONEXMVUO_UO ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.MONEX_MV_UO ADD CONSTRAINT FK_MONEXMVUO_UO FOREIGN KEY (UO)
+	  REFERENCES BARSAQ.MONEX_UO (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XPK_MONEXMVUO ***
 begin   
  execute immediate '
@@ -98,7 +111,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  MONEX_MV_UO ***
-grant SELECT                                                                 on MONEX_MV_UO     to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MONEX_MV_UO     to START1;
 
 

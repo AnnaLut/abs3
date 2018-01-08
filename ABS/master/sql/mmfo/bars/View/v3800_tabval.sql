@@ -12,9 +12,7 @@ PROMPT *** Create  view V3800_TABVAL ***
   where exists (select kv from accounts where nbs ='3800' and dazs is null and kv = t.kv) and kv <> 980 ;
 
 PROMPT *** Create  grants  V3800_TABVAL ***
-grant SELECT                                                                 on V3800_TABVAL    to BARSREADER_ROLE;
 grant SELECT                                                                 on V3800_TABVAL    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V3800_TABVAL    to UPLD;
 
 
 

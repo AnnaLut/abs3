@@ -121,6 +121,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CIMREPPARS_REPS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_REPORT_PARAMS ADD CONSTRAINT FK_CIMREPPARS_REPS FOREIGN KEY (REPORT_ID)
+	  REFERENCES BARS.CIM_REPORTS_LIST (REPORT_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_CIMREPPARS_TYPE_CC ***
 begin   
  execute immediate '
@@ -147,10 +160,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_REPORT_PARAMS ***
-grant SELECT                                                                 on CIM_REPORT_PARAMS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_REPORT_PARAMS to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_REPORT_PARAMS to CIM_ROLE;
-grant SELECT                                                                 on CIM_REPORT_PARAMS to UPLD;
 
 
 

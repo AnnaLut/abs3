@@ -33,9 +33,7 @@ PROMPT *** Create  view FX_DREC ***
          -- f.kva = ta.kv AND f.kvb = tb.kv;;
 
 PROMPT *** Create  grants  FX_DREC ***
-grant SELECT                                                                 on FX_DREC         to BARSREADER_ROLE;
 grant SELECT                                                                 on FX_DREC         to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on FX_DREC         to UPLD;
 
 
 

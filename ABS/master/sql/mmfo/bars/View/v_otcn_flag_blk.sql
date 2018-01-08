@@ -13,10 +13,8 @@ from otcn_flag_blk a, staff b
 where a.isp = b.id;
 
 PROMPT *** Create  grants  V_OTCN_FLAG_BLK ***
-grant SELECT                                                                 on V_OTCN_FLAG_BLK to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OTCN_FLAG_BLK to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OTCN_FLAG_BLK to RPBN002;
-grant SELECT                                                                 on V_OTCN_FLAG_BLK to UPLD;
 
 
 

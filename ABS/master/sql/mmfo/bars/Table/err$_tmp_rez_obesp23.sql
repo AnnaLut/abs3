@@ -109,10 +109,6 @@ COMMENT ON COLUMN BARS.ERR$_TMP_REZ_OBESP23.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_TMP_REZ_OBESP23 ***
-grant SELECT                                                                 on ERR$_TMP_REZ_OBESP23 to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_TMP_REZ_OBESP23 to UPLD;
-
 
 
 PROMPT ===================================================================================== 

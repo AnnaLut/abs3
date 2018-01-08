@@ -51,10 +51,8 @@ COMMENT ON COLUMN BARS.TMP_RECOVERED_ACCOUNTSW.VALUE IS '';
 
 
 PROMPT *** Create  grants  TMP_RECOVERED_ACCOUNTSW ***
-grant SELECT                                                                 on TMP_RECOVERED_ACCOUNTSW to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_RECOVERED_ACCOUNTSW to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_RECOVERED_ACCOUNTSW to START1;
-grant SELECT                                                                 on TMP_RECOVERED_ACCOUNTSW to UPLD;
 
 
 

@@ -61,10 +61,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  MV_TRANS_LIMIT150 ***
-grant SELECT                                                                 on MV_TRANS_LIMIT150 to BARSREADER_ROLE;
-grant SELECT                                                                 on MV_TRANS_LIMIT150 to UPLD;
-
 
 
 PROMPT ===================================================================================== 

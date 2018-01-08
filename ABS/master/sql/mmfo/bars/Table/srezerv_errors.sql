@@ -32,7 +32,7 @@ begin
 	CUSTTYPE VARCHAR2(1), 
 	KV VARCHAR2(3), 
 	BRANCH VARCHAR2(100), 
-	NBS_REZ VARCHAR2(20), 
+	NBS_REZ VARCHAR2(10), 
 	NBS_7F VARCHAR2(10), 
 	NBS_7R VARCHAR2(10), 
 	SZ NUMBER, 
@@ -75,6 +75,19 @@ COMMENT ON COLUMN BARS.SREZERV_ERRORS.DESRC IS '';
 
 
 
+PROMPT *** Create  constraint FK_SREZERVERRORS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SREZERV_ERRORS ADD CONSTRAINT FK_SREZERVERRORS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SREZERVERRORS_KF_NN ***
 begin   
  execute immediate '
@@ -87,10 +100,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  SREZERV_ERRORS ***
-grant SELECT                                                                 on SREZERV_ERRORS  to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on SREZERV_ERRORS  to BARS_ACCESS_DEFROLE;
 grant INSERT,SELECT,UPDATE                                                   on SREZERV_ERRORS  to RCC_DEAL;
-grant SELECT                                                                 on SREZERV_ERRORS  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SREZERV_ERRORS  to WR_ALL_RIGHTS;
 
 

@@ -129,10 +129,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKCREDITDEAL_DEALND_NN ***
+PROMPT *** Create  constraint CC_BPKCREDITDEAL_CREATEDT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_CREDIT_DEAL MODIFY (DEAL_ND CONSTRAINT CC_BPKCREDITDEAL_DEALND_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BPK_CREDIT_DEAL MODIFY (CREATE_DT CONSTRAINT CC_BPKCREDITDEAL_CREATEDT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -189,10 +189,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKCREDITDEAL_CREATEDT_NN ***
+PROMPT *** Create  constraint CC_BPKCREDITDEAL_DEALND_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_CREDIT_DEAL MODIFY (CREATE_DT CONSTRAINT CC_BPKCREDITDEAL_CREATEDT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BPK_CREDIT_DEAL MODIFY (DEAL_ND CONSTRAINT CC_BPKCREDITDEAL_DEALND_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -243,7 +243,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_CREDIT_DEAL ***
-grant SELECT                                                                 on BPK_CREDIT_DEAL to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_CREDIT_DEAL to BARSUPL;
 grant SELECT                                                                 on BPK_CREDIT_DEAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_CREDIT_DEAL to BARS_DM;

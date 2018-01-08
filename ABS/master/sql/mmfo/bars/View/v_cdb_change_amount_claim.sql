@@ -11,9 +11,7 @@ PROMPT *** Create  view V_CDB_CHANGE_AMOUNT_CLAIM ***
   select "ID","DEAL_NUMBER","NEW_DEAL_AMOUNT","ALLEGRO_COMMENT","ALLEGRO_CLAIM_ID","SYS_TIME","CLAIM_STATE_ID","CLAIM_STATE" from cdb.v_cdb_change_amount_claim;
 
 PROMPT *** Create  grants  V_CDB_CHANGE_AMOUNT_CLAIM ***
-grant SELECT                                                                 on V_CDB_CHANGE_AMOUNT_CLAIM to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CDB_CHANGE_AMOUNT_CLAIM to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CDB_CHANGE_AMOUNT_CLAIM to UPLD;
 
 
 

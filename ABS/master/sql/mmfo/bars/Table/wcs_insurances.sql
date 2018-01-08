@@ -71,10 +71,61 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_WCSINS_SURID_SURVEYS_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_INSURANCES ADD CONSTRAINT FK_WCSINS_SURID_SURVEYS_ID FOREIGN KEY (SURVEY_ID)
+	  REFERENCES BARS.WCS_SURVEYS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_WCSINS_RQID_CNTQID_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_INSURANCES ADD CONSTRAINT FK_WCSINS_RQID_CNTQID_ID FOREIGN KEY (COUNT_QID)
+	  REFERENCES BARS.WCS_QUESTIONS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_WCSINS_RQID_STSQID_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_INSURANCES ADD CONSTRAINT FK_WCSINS_RQID_STSQID_ID FOREIGN KEY (STATUS_QID)
+	  REFERENCES BARS.WCS_QUESTIONS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_WCSINSURANCES_NAME_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.WCS_INSURANCES MODIFY (NAME CONSTRAINT CC_WCSINSURANCES_NAME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_WCSINSURANCES_SQID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_INSURANCES MODIFY (STATUS_QID CONSTRAINT CC_WCSINSURANCES_SQID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -107,18 +158,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_WCSINSURANCES_SQID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_INSURANCES MODIFY (STATUS_QID CONSTRAINT CC_WCSINSURANCES_SQID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_WCSINSURANCES ***
 begin   
  execute immediate '
@@ -133,10 +172,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_INSURANCES ***
-grant SELECT                                                                 on WCS_INSURANCES  to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_INSURANCES  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_INSURANCES  to BARS_DM;
-grant SELECT                                                                 on WCS_INSURANCES  to UPLD;
 
 
 

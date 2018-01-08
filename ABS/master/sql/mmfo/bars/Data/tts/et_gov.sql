@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции GOV
-prompt Наименование операции: GOV --- Розрахунки за КУПІВЛЮ валюти через вал.позицію
+prompt Наименование операции: --- Розрахунки за КУПІВЛЮ валюти через вал.позицію
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('GOV', 'GOV --- Розрахунки за КУПІВЛЮ валюти через вал.позицію', 0, '#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', null, 0, 0, 1, 0, null, null, null, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', null);
+    values ('GOV', '--- Розрахунки за КУПІВЛЮ валюти через вал.позицію', 0, '#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', null, 0, 0, 1, 0, null, null, null, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='GOV', name='GOV --- Розрахунки за КУПІВЛЮ валюти через вал.позицію', dk=0, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='GOV', name='--- Розрахунки за КУПІВЛЮ валюти через вал.позицію', dk=0, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''VP_1819'',0))', mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='GOV';
   end;
   --------------------------------

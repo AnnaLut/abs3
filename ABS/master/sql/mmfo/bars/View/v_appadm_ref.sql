@@ -14,9 +14,7 @@ PROMPT *** Create  view V_APPADM_REF ***
 
 PROMPT *** Create  grants  V_APPADM_REF ***
 grant SELECT                                                                 on V_APPADM_REF    to ABS_ADMIN;
-grant SELECT                                                                 on V_APPADM_REF    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_APPADM_REF    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_APPADM_REF    to UPLD;
 
 
 

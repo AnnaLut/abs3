@@ -143,10 +143,6 @@ COMMENT ON COLUMN BARS.TMP_OPER_PS1.BDAT IS '';
 
 
 
-PROMPT *** Create  grants  TMP_OPER_PS1 ***
-grant SELECT                                                                 on TMP_OPER_PS1    to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_OPER_PS1    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

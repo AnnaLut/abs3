@@ -91,6 +91,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_WCSPWROFATTRNS_B_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_POWER_OF_ATTORNEYS ADD CONSTRAINT FK_WCSPWROFATTRNS_B_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_WCSPWROFATTRNS_ACTIVE ***
 begin   
  execute immediate '
@@ -117,11 +130,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_POWER_OF_ATTORNEYS ***
-grant SELECT                                                                 on WCS_POWER_OF_ATTORNEYS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WCS_POWER_OF_ATTORNEYS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_POWER_OF_ATTORNEYS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_POWER_OF_ATTORNEYS to START1;
-grant SELECT                                                                 on WCS_POWER_OF_ATTORNEYS to UPLD;
 grant FLASHBACK,SELECT                                                       on WCS_POWER_OF_ATTORNEYS to WR_REFREAD;
 
 

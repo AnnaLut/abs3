@@ -55,10 +55,11 @@ COMMENT ON COLUMN BARS.CIN_TAG_TK.SK_A1 IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C005960 ***
+PROMPT *** Create  constraint FK_CINTAGTK_RNK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIN_TAG_TK MODIFY (TAG NOT NULL ENABLE)';
+  ALTER TABLE BARS.CIN_TAG_TK ADD CONSTRAINT FK_CINTAGTK_RNK FOREIGN KEY (RNK)
+	  REFERENCES BARS.CIN_CUST (RNK) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -67,10 +68,36 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005961 ***
+PROMPT *** Create  constraint FK_CINTAGTK_TAG ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIN_TAG_TK MODIFY (PR_A1 NOT NULL ENABLE)';
+  ALTER TABLE BARS.CIN_TAG_TK ADD CONSTRAINT FK_CINTAGTK_TAG FOREIGN KEY (TAG)
+	  REFERENCES BARS.CIN_TAG (TAG) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CINTAGTK_TK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIN_TAG_TK ADD CONSTRAINT FK_CINTAGTK_TK FOREIGN KEY (TK)
+	  REFERENCES BARS.CIN_TK (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005960 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIN_TAG_TK MODIFY (TAG NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -93,6 +120,18 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint SYS_C005961 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIN_TAG_TK MODIFY (PR_A1 NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XPK_CINTAGTK ***
 begin   
  execute immediate '
@@ -107,12 +146,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIN_TAG_TK ***
-grant SELECT                                                                 on CIN_TAG_TK      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CIN_TAG_TK      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIN_TAG_TK      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIN_TAG_TK      to PYOD001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIN_TAG_TK      to START1;
-grant SELECT                                                                 on CIN_TAG_TK      to UPLD;
 grant FLASHBACK,SELECT                                                       on CIN_TAG_TK      to WR_REFREAD;
 
 

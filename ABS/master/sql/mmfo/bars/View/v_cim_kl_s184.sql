@@ -13,9 +13,7 @@ union
 select 2, 'довгостроковий з первісним або продовженим строком погашення понад 365 (366) днів' from dual;
 
 PROMPT *** Create  grants  V_CIM_KL_S184 ***
-grant SELECT                                                                 on V_CIM_KL_S184   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_KL_S184   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_KL_S184   to UPLD;
 
 
 

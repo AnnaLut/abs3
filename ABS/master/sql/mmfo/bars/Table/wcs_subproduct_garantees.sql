@@ -79,6 +79,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SBPGARS_SBPID_SBPS_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_SUBPRODUCT_GARANTEES ADD CONSTRAINT FK_SBPGARS_SBPID_SBPS_ID FOREIGN KEY (SUBPRODUCT_ID)
+	  REFERENCES BARS.WCS_SUBPRODUCTS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SBPGARS_GID_GARS_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_SUBPRODUCT_GARANTEES ADD CONSTRAINT FK_SBPGARS_GID_GARS_ID FOREIGN KEY (GARANTEE_ID)
+	  REFERENCES BARS.WCS_GARANTEES (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_SBPGARS ***
 begin   
  execute immediate '
@@ -93,10 +119,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SUBPRODUCT_GARANTEES ***
-grant SELECT                                                                 on WCS_SUBPRODUCT_GARANTEES to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_SUBPRODUCT_GARANTEES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_SUBPRODUCT_GARANTEES to BARS_DM;
-grant SELECT                                                                 on WCS_SUBPRODUCT_GARANTEES to UPLD;
 
 
 

@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_BPK_PARAMETERS.VALUE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_BPK_PARAMETERS ***
-grant SELECT                                                                 on ERR$_BPK_PARAMETERS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_BPK_PARAMETERS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

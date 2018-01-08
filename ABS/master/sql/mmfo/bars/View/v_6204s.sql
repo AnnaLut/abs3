@@ -19,10 +19,8 @@ FROM (SELECT branch,
 GROUP BY branch;
 
 PROMPT *** Create  grants  V_6204S ***
-grant SELECT                                                                 on V_6204S         to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_6204S         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_6204S         to SALGL;
-grant SELECT                                                                 on V_6204S         to UPLD;
 grant FLASHBACK,SELECT                                                       on V_6204S         to WR_REFREAD;
 
 

@@ -104,7 +104,6 @@ exception when others then
 
 PROMPT *** Create  grants  TIPS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TIPS            to ABS_ADMIN;
-grant SELECT                                                                 on TIPS            to BARSREADER_ROLE;
 grant SELECT                                                                 on TIPS            to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TIPS            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TIPS            to BARS_DM;

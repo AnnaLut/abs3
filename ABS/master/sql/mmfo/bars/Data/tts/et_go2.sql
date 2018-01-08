@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции GO2
-prompt Наименование операции: GO2 БО: Списание с клиента на Торг.счет
+prompt Наименование операции: БО: Списание с клиента на Торг.счет
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('GO2', 'GO2 БО: Списание с клиента на Торг.счет', 1, null, null, '#(get_nls_tt(''GO2'',''NLSK'',p_kva=>#(KVA)))', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('GO2', 'БО: Списание с клиента на Торг.счет', 1, null, null, '29003', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='GO2', name='GO2 БО: Списание с клиента на Торг.счет', dk=1, nlsm=null, kv=null, nlsk='#(get_nls_tt(''GO2'',''NLSK'',p_kva=>#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='GO2', name='БО: Списание с клиента на Торг.счет', dk=1, nlsm=null, kv=null, nlsk='29003', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='GO2';
   end;
   --------------------------------

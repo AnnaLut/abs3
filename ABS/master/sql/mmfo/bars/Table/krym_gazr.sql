@@ -70,9 +70,7 @@ COMMENT ON COLUMN BARS.KRYM_GAZR.KV IS '';
 
 PROMPT *** Create  grants  KRYM_GAZR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KRYM_GAZR       to ABS_ADMIN;
-grant SELECT                                                                 on KRYM_GAZR       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KRYM_GAZR       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on KRYM_GAZR       to UPLD;
 grant FLASHBACK,SELECT                                                       on KRYM_GAZR       to WR_REFREAD;
 
 

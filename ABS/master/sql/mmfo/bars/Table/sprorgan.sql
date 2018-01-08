@@ -49,11 +49,9 @@ COMMENT ON COLUMN BARS.SPRORGAN.NAZVA IS '';
 
 
 PROMPT *** Create  grants  SPRORGAN ***
-grant SELECT                                                                 on SPRORGAN        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPRORGAN        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SPRORGAN        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPRORGAN        to START1;
-grant SELECT                                                                 on SPRORGAN        to UPLD;
 grant FLASHBACK,SELECT                                                       on SPRORGAN        to WR_REFREAD;
 
 

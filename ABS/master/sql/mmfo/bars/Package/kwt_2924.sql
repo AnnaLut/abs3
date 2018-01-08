@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/kwt_2924.sql =========*** Run *** ==
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.KWT_2924 IS
+CREATE OR REPLACE PACKAGE KWT_2924 IS
 
  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'ver.4.1 30.11.2017';
 
@@ -36,7 +30,13 @@ function body_version   return varchar2;
 
 END KWT_2924;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.KWT_2924 IS
+show err;
+--------------------
+GRANT EXECUTE ON KWT_2924 TO BARS_ACCESS_DEFROLE;
+
+
+---------------------------------------------------------
+CREATE OR REPLACE PACKAGE BODY KWT_2924 IS
  G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=   'ver.4. 15.11.2017';
 /*
 
@@ -72,7 +72,7 @@ begin
         l_ost := fost ( k.acc, (l_dat-1) );
         l_dk1 := k.pap - 1 ;
         l_DK2 := 2 - k.pap ;
-        --
+        -- 
         begin select r020||ob22 into BBBBOO from sb_ob22 where r020||ob22  in ('639901','634001') and d_close is null and rownum = 1 ;  -- Трансфер 2017
         EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error( n_err, 'В довіднику SB_OB22 відсутня аналітика для 63**' )  ;
         end;
@@ -177,7 +177,7 @@ begin l_ACC  := NVL ( p_acc, to_number( pul.get('ATM_ACC' ))) ;
 begin
         select ref into l_ref2 from opldok o where o.acc = l_acc and o.ref = p_ref2 and o.dk = l_DK2 and o.s <= l_Del;
      exception when no_data_found then null;
-   end;
+   end;      
       insert into atm_ref2 (ref1, ref2) values (l_ref1, l_ref2);
 
       --insert into atm_ref2 (ref1, ref2) select l_ref1, l_ref2 from opldok o where o.acc = l_acc and o.ref = p_ref2 and o.dk = l_DK2 and o.s <= l_Del;
@@ -435,15 +435,4 @@ function body_version   return varchar2 is begin  return 'Package body KWT_2924 
 begin   null ;
 END KWT_2924 ;
 /
- show err;
- 
-PROMPT *** Create  grants  KWT_2924 ***
-grant EXECUTE                                                                on KWT_2924        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on KWT_2924        to START1;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/kwt_2924.sql =========*** End *** ==
- PROMPT ===================================================================================== 
- 
+show err;

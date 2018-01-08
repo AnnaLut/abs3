@@ -103,12 +103,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  BS0 ***
-grant SELECT                                                                 on BS0             to BARSREADER_ROLE;
 grant SELECT                                                                 on BS0             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BS0             to BARS_DM;
 grant SELECT                                                                 on BS0             to RPBN001;
 grant SELECT                                                                 on BS0             to SALGL;
-grant SELECT                                                                 on BS0             to UPLD;
 
 
 

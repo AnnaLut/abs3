@@ -56,18 +56,6 @@ COMMENT ON COLUMN BARS.TMP_FINMON_QUE_MODIFICATION.KF IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C00119120 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_FINMON_QUE_MODIFICATION MODIFY (ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C00119121 ***
 begin   
  execute immediate '
@@ -79,9 +67,17 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_FINMON_QUE_MODIFICATION ***
-grant SELECT                                                                 on TMP_FINMON_QUE_MODIFICATION to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_FINMON_QUE_MODIFICATION to UPLD;
+
+PROMPT *** Create  constraint SYS_C00119120 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_FINMON_QUE_MODIFICATION MODIFY (ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
 
 
 

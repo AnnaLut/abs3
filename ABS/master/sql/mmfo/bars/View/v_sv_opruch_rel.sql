@@ -16,10 +16,8 @@ PROMPT *** Create  view V_SV_OPRUCH_REL ***
  where r.owner_id_to = o.id;
 
 PROMPT *** Create  grants  V_SV_OPRUCH_REL ***
-grant SELECT                                                                 on V_SV_OPRUCH_REL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SV_OPRUCH_REL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SV_OPRUCH_REL to RPBN002;
-grant SELECT                                                                 on V_SV_OPRUCH_REL to UPLD;
 
 
 

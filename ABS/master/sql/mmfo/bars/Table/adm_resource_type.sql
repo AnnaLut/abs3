@@ -81,58 +81,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025728 ***
+PROMPT *** Create  constraint UK_ADM_RESOURCE_TYPE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_TYPE MODIFY (RESOURCE_NAME NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0025729 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_TYPE MODIFY (SOURCE_TABLE_NAME NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0025730 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_TYPE MODIFY (SOURCE_ID_COLUMN_NAME NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0025731 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_TYPE MODIFY (SOURCE_CODE_COLUMN_NAME NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0025732 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_TYPE MODIFY (SOURCE_NAME_COLUMN_NAME NOT NULL ENABLE)';
+  ALTER TABLE BARS.ADM_RESOURCE_TYPE ADD CONSTRAINT UK_ADM_RESOURCE_TYPE UNIQUE (RESOURCE_CODE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -155,12 +109,58 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_ADM_RESOURCE_TYPE ***
+PROMPT *** Create  constraint SYS_C0025732 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_TYPE ADD CONSTRAINT UK_ADM_RESOURCE_TYPE UNIQUE (RESOURCE_CODE)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.ADM_RESOURCE_TYPE MODIFY (SOURCE_NAME_COLUMN_NAME NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C0025731 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADM_RESOURCE_TYPE MODIFY (SOURCE_CODE_COLUMN_NAME NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C0025730 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADM_RESOURCE_TYPE MODIFY (SOURCE_ID_COLUMN_NAME NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C0025729 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADM_RESOURCE_TYPE MODIFY (SOURCE_TABLE_NAME NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C0025728 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADM_RESOURCE_TYPE MODIFY (RESOURCE_NAME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -197,9 +197,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ADM_RESOURCE_TYPE ***
-grant SELECT                                                                 on ADM_RESOURCE_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on ADM_RESOURCE_TYPE to BARS_DM;
-grant SELECT                                                                 on ADM_RESOURCE_TYPE to UPLD;
 
 
 

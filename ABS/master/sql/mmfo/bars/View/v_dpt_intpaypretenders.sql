@@ -41,10 +41,8 @@ PROMPT *** Create  view V_DPT_INTPAYPRETENDERS ***
        between dat_next_u (to_date(bankdate), -1) + 1 and bankdate;
 
 PROMPT *** Create  grants  V_DPT_INTPAYPRETENDERS ***
-grant SELECT                                                                 on V_DPT_INTPAYPRETENDERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_INTPAYPRETENDERS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_INTPAYPRETENDERS to DPT_ADMIN;
-grant SELECT                                                                 on V_DPT_INTPAYPRETENDERS to UPLD;
 
 
 

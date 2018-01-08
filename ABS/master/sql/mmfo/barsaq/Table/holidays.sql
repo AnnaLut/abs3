@@ -79,9 +79,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  HOLIDAYS ***
-grant SELECT                                                                 on HOLIDAYS        to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

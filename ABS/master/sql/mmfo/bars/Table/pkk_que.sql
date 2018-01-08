@@ -79,6 +79,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_PKKQUE_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PKK_QUE ADD CONSTRAINT FK_PKKQUE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_PKKQUE_DK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PKK_QUE ADD CONSTRAINT FK_PKKQUE_DK FOREIGN KEY (DK)
+	  REFERENCES BARS.DK (DK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_PKKQUE_REF_NN ***
 begin   
  execute immediate '
@@ -167,13 +193,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  PKK_QUE ***
-grant SELECT                                                                 on PKK_QUE         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PKK_QUE         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PKK_QUE         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PKK_QUE         to OBPC;
 grant DELETE                                                                 on PKK_QUE         to PYOD001;
 grant SELECT                                                                 on PKK_QUE         to TECH004;
-grant SELECT                                                                 on PKK_QUE         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PKK_QUE         to WR_ALL_RIGHTS;
 
 

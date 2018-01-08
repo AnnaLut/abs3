@@ -84,9 +84,7 @@ COMMENT ON COLUMN BARS.ERR$_RNBU_TRACE_ARCH.TOBO IS '';
 
 
 PROMPT *** Create  grants  ERR$_RNBU_TRACE_ARCH ***
-grant SELECT                                                                 on ERR$_RNBU_TRACE_ARCH to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_RNBU_TRACE_ARCH to BARS_DM;
-grant SELECT                                                                 on ERR$_RNBU_TRACE_ARCH to UPLD;
 
 
 

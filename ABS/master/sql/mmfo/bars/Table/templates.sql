@@ -69,10 +69,101 @@ COMMENT ON COLUMN BARS.TEMPLATES.KF IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C005341 ***
+PROMPT *** Create  constraint FK_TEMPLATES_KF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TEMPLATES MODIFY (KODN_I NOT NULL ENABLE)';
+  ALTER TABLE BARS.TEMPLATES ADD CONSTRAINT FK_TEMPLATES_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_DIR_TEMPL_IN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TEMPLATES ADD CONSTRAINT R_DIR_TEMPL_IN FOREIGN KEY (KODN_I)
+	  REFERENCES BARS.DIR_RRP (KODN) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_DIR_TEMPL_OUT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TEMPLATES ADD CONSTRAINT R_DIR_TEMPL_OUT FOREIGN KEY (KODN_O)
+	  REFERENCES BARS.DIR_RRP (KODN) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_PM_TEMPL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TEMPLATES ADD CONSTRAINT R_PM_TEMPL FOREIGN KEY (PM)
+	  REFERENCES BARS.PM_RRP (PM) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_TABVAL_TEMPLATES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TEMPLATES ADD CONSTRAINT R_TABVAL_TEMPLATES FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_TTS_TEMPL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TEMPLATES ADD CONSTRAINT R_TTS_TEMPL FOREIGN KEY (TT)
+	  REFERENCES BARS.TTS (TT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint R_TTS_TEMPL_TTL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TEMPLATES ADD CONSTRAINT R_TTS_TEMPL_TTL FOREIGN KEY (TTL)
+	  REFERENCES BARS.TTS (TT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TEMPLATES_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TEMPLATES MODIFY (KF CONSTRAINT CC_TEMPLATES_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -93,10 +184,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TEMPLATES_KF_NN ***
+PROMPT *** Create  constraint SYS_C005341 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TEMPLATES MODIFY (KF CONSTRAINT CC_TEMPLATES_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TEMPLATES MODIFY (KODN_I NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -119,12 +210,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TEMPLATES ***
-grant SELECT                                                                 on TEMPLATES       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TEMPLATES       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TEMPLATES       to BARS_DM;
 grant SELECT                                                                 on TEMPLATES       to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TEMPLATES       to TEMPLATES;
-grant SELECT                                                                 on TEMPLATES       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TEMPLATES       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on TEMPLATES       to WR_REFREAD;
 

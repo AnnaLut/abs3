@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ZAL_ND_NEW.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_ZAL_ND_NEW ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_ZAL_ND_NEW ("PAP", "ND", "PR_12", "ACC", "NLS", "KV", "OSTB", "OSTC", "PAWN", "MPAWN", "NREE", "DEPID", "CC_IDZ", "SDATZ", "RNK", "SV", "OB22", "MDATE", "DAZS", "DEL", "NAZN", "NMK", "NAME") AS 
-  SELECT DISTINCT pap
+CREATE OR REPLACE VIEW V_ZAL_ND_NEW AS
+SELECT DISTINCT pap
                ,nd
                ,pr_12
                ,acc
@@ -62,14 +53,3 @@ PROMPT *** Create  view V_ZAL_ND_NEW ***
                (SELECT column_value
                   FROM TABLE(tools.string_to_words(pul.get_mas_ini_val('ACC_LIST')
                                                 ,p_splitting_symbol => ','))));
-
-PROMPT *** Create  grants  V_ZAL_ND_NEW ***
-grant SELECT                                                                 on V_ZAL_ND_NEW    to BARSREADER_ROLE;
-grant SELECT                                                                 on V_ZAL_ND_NEW    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ZAL_ND_NEW    to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ZAL_ND_NEW.sql =========*** End *** =
-PROMPT ===================================================================================== 

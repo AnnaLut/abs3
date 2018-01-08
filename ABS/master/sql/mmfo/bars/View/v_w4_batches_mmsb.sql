@@ -23,9 +23,7 @@ PROMPT *** Create  view V_W4_BATCHES_MMSB ***
     on t.user_id = st.id;
 
 PROMPT *** Create  grants  V_W4_BATCHES_MMSB ***
-grant SELECT                                                                 on V_W4_BATCHES_MMSB to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_BATCHES_MMSB to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_W4_BATCHES_MMSB to UPLD;
 
 
 

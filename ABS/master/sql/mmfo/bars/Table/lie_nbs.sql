@@ -47,6 +47,19 @@ COMMENT ON COLUMN BARS.LIE_NBS.NBS IS '';
 
 
 
+PROMPT *** Create  constraint FK_LIE_NBS_PS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.LIE_NBS ADD CONSTRAINT FK_LIE_NBS_PS FOREIGN KEY (NBS)
+	  REFERENCES BARS.PS (NBS) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_LIE_NBS ***
 begin   
  execute immediate '
@@ -75,11 +88,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  LIE_NBS ***
-grant SELECT                                                                 on LIE_NBS         to BARSREADER_ROLE;
 grant SELECT                                                                 on LIE_NBS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LIE_NBS         to BARS_DM;
 grant SELECT                                                                 on LIE_NBS         to START1;
-grant SELECT                                                                 on LIE_NBS         to UPLD;
 
 
 

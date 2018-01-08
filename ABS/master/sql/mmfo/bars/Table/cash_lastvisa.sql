@@ -69,6 +69,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CASHLASTVISA_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CASH_LASTVISA ADD CONSTRAINT FK_CASHLASTVISA_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_CASHLASTVISA_BRANCH_NN ***
 begin   
  execute immediate '
@@ -109,11 +122,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CASH_LASTVISA ***
-grant SELECT                                                                 on CASH_LASTVISA   to BARSREADER_ROLE;
 grant SELECT                                                                 on CASH_LASTVISA   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CASH_LASTVISA   to BARS_DM;
 grant SELECT                                                                 on CASH_LASTVISA   to RPBN001;
-grant SELECT                                                                 on CASH_LASTVISA   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CASH_LASTVISA   to WR_ALL_RIGHTS;
 
 

@@ -17,11 +17,9 @@ PROMPT *** Create  view V_NBUR_LIST_FILES_ALL ***
     WHERE F.PERIOD_TYPE = P.PERIOD_TYPE;
 
 PROMPT *** Create  grants  V_NBUR_LIST_FILES_ALL ***
-grant SELECT                                                                 on V_NBUR_LIST_FILES_ALL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_LIST_FILES_ALL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_LIST_FILES_ALL to RPBN002;
 grant SELECT                                                                 on V_NBUR_LIST_FILES_ALL to START1;
-grant SELECT                                                                 on V_NBUR_LIST_FILES_ALL to UPLD;
 
 
 

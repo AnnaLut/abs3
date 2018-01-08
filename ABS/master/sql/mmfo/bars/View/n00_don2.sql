@@ -28,10 +28,8 @@ where (ost1<> 0 or dos<>0 or kos<>0 or ost2<>0)
 
 PROMPT *** Create  grants  N00_DON2 ***
 grant SELECT                                                                 on N00_DON2        to BARS014;
-grant SELECT                                                                 on N00_DON2        to BARSREADER_ROLE;
 grant SELECT                                                                 on N00_DON2        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on N00_DON2        to SALGL;
-grant SELECT                                                                 on N00_DON2        to UPLD;
 
 
 

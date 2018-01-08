@@ -19,10 +19,8 @@ PROMPT *** Create  view W4_CRV_ACC_CLOSE ***
    and w.tag = 'RVRNK';
 
 PROMPT *** Create  grants  W4_CRV_ACC_CLOSE ***
-grant SELECT                                                                 on W4_CRV_ACC_CLOSE to BARSREADER_ROLE;
 grant SELECT                                                                 on W4_CRV_ACC_CLOSE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_CRV_ACC_CLOSE to OW;
-grant SELECT                                                                 on W4_CRV_ACC_CLOSE to UPLD;
 
 
 

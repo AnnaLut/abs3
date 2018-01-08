@@ -20,9 +20,7 @@ select 5, 'строк дії реєстрації договору закінчився, у тому числі анулювання реє
 ;
 
 PROMPT *** Create  grants  V_CIM_KOD_34_2 ***
-grant SELECT                                                                 on V_CIM_KOD_34_2  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_KOD_34_2  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_KOD_34_2  to UPLD;
 
 
 

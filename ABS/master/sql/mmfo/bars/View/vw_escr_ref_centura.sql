@@ -1,14 +1,19 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/VW_ESCR_REF_CENTURA.sql =========*** Ru
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view VW_ESCR_REF_CENTURA ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.VW_ESCR_REF_CENTURA ("GOOD_ID", "GOOD_NAME", "EVENT_ID", "EVENT_NAME", "EVENT_DATE_FROM", "EVENT_DATE_TO", "EVENT_TYPE", "EVENT_TYPE_ID", "BUILD_TYPE", "BUILD_TYPE_ID", "OB22") AS 
-  SELECT t.good_id,
+CREATE OR REPLACE FORCE VIEW BARS.VW_ESCR_REF_CENTURA
+(
+   GOOD_ID,
+   GOOD_NAME,
+   EVENT_ID,
+   EVENT_NAME,
+   EVENT_DATE_FROM,
+   EVENT_DATE_TO,
+   EVENT_TYPE,
+   EVENT_TYPE_ID,
+   BUILD_TYPE,
+   BUILD_TYPE_ID,
+   OB22
+)
+AS
+   SELECT t.good_id,
           t.good_name,
           t.event_id,
           t.event_name,
@@ -78,13 +83,7 @@ PROMPT *** Create  view VW_ESCR_REF_CENTURA ***
                             AND ev.date_to IS NULL) tt
            ORDER BY tt.good_id, tt.event_id) t;
 
-PROMPT *** Create  grants  VW_ESCR_REF_CENTURA ***
-grant SELECT                                                                 on VW_ESCR_REF_CENTURA to BARSREADER_ROLE;
-grant SELECT                                                                 on VW_ESCR_REF_CENTURA to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on VW_ESCR_REF_CENTURA to UPLD;
 
+GRANT SELECT ON BARS.VW_ESCR_REF_CENTURA TO BARS_ACCESS_DEFROLE;
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/VW_ESCR_REF_CENTURA.sql =========*** En
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.VW_ESCR_REF_CENTURA TO UPLD;

@@ -44,10 +44,8 @@ PROMPT *** Create  view V_CORP_ACCOUNTS_KFILE ***
           and t2.acc = t8.acc(+);
 
 PROMPT *** Create  grants  V_CORP_ACCOUNTS_KFILE ***
-grant SELECT                                                                 on V_CORP_ACCOUNTS_KFILE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CORP_ACCOUNTS_KFILE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CORP_ACCOUNTS_KFILE to CORP_CLIENT;
-grant SELECT                                                                 on V_CORP_ACCOUNTS_KFILE to UPLD;
 
 
 

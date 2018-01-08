@@ -72,7 +72,6 @@ COMMENT ON COLUMN BARS.TMP_REP_PROVOD.REF IS '';
 
 
 
-
 PROMPT *** Create  index IDX_TMP_REP_PROVOD ***
 begin   
  execute immediate '
@@ -83,12 +82,9 @@ exception when others then
 /
 
 
-
 PROMPT *** Create  grants  TMP_REP_PROVOD ***
-grant SELECT                                                                 on TMP_REP_PROVOD  to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_REP_PROVOD  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_REP_PROVOD  to RPBN001;
-grant SELECT                                                                 on TMP_REP_PROVOD  to UPLD;
 
 
 

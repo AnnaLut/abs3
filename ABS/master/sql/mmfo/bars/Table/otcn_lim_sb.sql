@@ -65,6 +65,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OTCNLIMSB_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OTCN_LIM_SB ADD CONSTRAINT FK_OTCNLIMSB_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_OTCN_LIM_SB ***
 begin   
  execute immediate '
@@ -117,10 +130,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  OTCN_LIM_SB ***
-grant SELECT                                                                 on OTCN_LIM_SB     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_LIM_SB     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_LIM_SB     to START1;
-grant SELECT                                                                 on OTCN_LIM_SB     to UPLD;
 
 
 

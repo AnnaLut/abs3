@@ -58,6 +58,19 @@ COMMENT ON COLUMN BARS_DM.BANKMON.ZDATE IS '«в≥тна дата';
 
 
 
+PROMPT *** Create  constraint FK_BANKMON_PERID_PERIOD_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS_DM.BANKMON ADD CONSTRAINT FK_BANKMON_PERID_PERIOD_ID FOREIGN KEY (PER_ID)
+	  REFERENCES BARS_DM.PERIODS (ID) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_BANKMON_PERID_NN ***
 begin   
  execute immediate '
@@ -109,9 +122,7 @@ exception when others then
 
 PROMPT *** Create  grants  BANKMON ***
 grant SELECT                                                                 on BANKMON         to BARS;
-grant SELECT                                                                 on BANKMON         to BARSREADER_ROLE;
 grant SELECT                                                                 on BANKMON         to BARSUPL;
-grant SELECT                                                                 on BANKMON         to UPLD;
 
 
 

@@ -19,9 +19,7 @@ select a.id, a.description, null
 
 PROMPT *** Create  grants  V_APPADM_ALL_REP ***
 grant SELECT                                                                 on V_APPADM_ALL_REP to ABS_ADMIN;
-grant SELECT                                                                 on V_APPADM_ALL_REP to BARSREADER_ROLE;
 grant SELECT                                                                 on V_APPADM_ALL_REP to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_APPADM_ALL_REP to UPLD;
 
 
 

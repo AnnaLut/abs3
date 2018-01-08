@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure CP_SHEDULER ***
 
-  CREATE OR REPLACE PROCEDURE BARS.CP_SHEDULER (p_mode      IN INT,
+CREATE OR REPLACE PROCEDURE cp_sheduler (p_mode      IN INT,
                                          p_id        IN cp_kod.id%TYPE,
                                          p_npp       IN cp_dat.npp%TYPE,
                                          p_dok       IN DATE,
@@ -22,7 +22,7 @@ BEGIN
    /*bars_audit.info(title||' start with params: exec cp_sheduler(p_mode=>'||to_char(p_mode)||', p_id=>'||to_char(p_id)
                         ||',p_npp=>'||to_char(p_npp)||',p_dok=>date'''||to_char(p_dok,'yyyy-mm-dd')||''',p_dnk=>date'''||to_char(p_dnk,'yyyy-mm-dd')
                         ||',p_kup=>'||to_char(p_kup)||',p_nom=>'||to_char(p_nom)||',p_ir='||to_char(p_ir)||',p_expdate=>date'''||to_char(p_expdate,'yyyy-mm-dd')||'''');
-   */
+   */                     
    IF p_mode = 1                                                     -- insert
    THEN
       BEGIN
@@ -54,7 +54,7 @@ BEGIN
              expiry_date = nvl(p_expdate, expiry_date),
              ir = nvl(p_ir, ir)
        WHERE id = p_id AND npp = p_npp;
-
+       
    ELSIF p_mode = 3                                                 --deleting
    THEN
       DELETE cp_dat

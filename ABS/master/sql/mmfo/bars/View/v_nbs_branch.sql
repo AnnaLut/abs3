@@ -19,9 +19,7 @@ where p.ur<> decode(length(a.branch),8,1,15,2,3)
 
 PROMPT *** Create  grants  V_NBS_BRANCH ***
 grant SELECT                                                                 on V_NBS_BRANCH    to ABS_ADMIN;
-grant SELECT                                                                 on V_NBS_BRANCH    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBS_BRANCH    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_NBS_BRANCH    to UPLD;
 
 
 

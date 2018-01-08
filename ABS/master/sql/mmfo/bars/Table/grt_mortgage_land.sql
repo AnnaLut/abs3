@@ -101,6 +101,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_MORTGAGELAND_DEALS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_MORTGAGE_LAND ADD CONSTRAINT FK_MORTGAGELAND_DEALS FOREIGN KEY (DEAL_ID)
+	  REFERENCES BARS.GRT_DEALS (DEAL_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_GRTMORTLAND_AREA_NN ***
 begin   
  execute immediate '
@@ -139,11 +152,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRT_MORTGAGE_LAND ***
-grant SELECT                                                                 on GRT_MORTGAGE_LAND to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRT_MORTGAGE_LAND to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRT_MORTGAGE_LAND to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRT_MORTGAGE_LAND to START1;
-grant SELECT                                                                 on GRT_MORTGAGE_LAND to UPLD;
 
 
 

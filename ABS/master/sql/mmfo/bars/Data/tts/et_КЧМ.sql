@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('КЧМ', 'КЧМ Комісія за ЧЕК (монети)', 1, null, 980, '#(nbs_ob22 (''6510'',''43''))', 980, null, null, null, null, 0, 0, 0, 0, 'f_monet_tar(111,F_DOP(#(REF), (''M_1'')),F_DOP(#(REF), (''M_2'')),F_DOP(#(REF), (''M_5'')),F_DOP(#(REF), (''M_10'')),F_DOP(#(REF), (''M_25'')),F_DOP(#(REF), (''M_50'')))', null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', ' Комісія за виплату монет по чеку ЮО');
+    values ('КЧМ', 'КЧМ Комісія за ЧЕК (монети)', 1, null, 980, '#(nbs_ob22 (''6110'',''43''))', 980, null, null, null, null, 0, 0, 0, 0, 'f_monet_tar(111,F_DOP(#(REF), (''M_1'')),F_DOP(#(REF), (''M_2'')),F_DOP(#(REF), (''M_5'')),F_DOP(#(REF), (''M_10'')),F_DOP(#(REF), (''M_25'')),F_DOP(#(REF), (''M_50'')))', null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', ' Комісія за виплату монет по чеку ЮО');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='КЧМ', name='КЧМ Комісія за ЧЕК (монети)', dk=1, nlsm=null, kv=980, nlsk='#(nbs_ob22 (''6510'',''43''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='f_monet_tar(111,F_DOP(#(REF), (''M_1'')),F_DOP(#(REF), (''M_2'')),F_DOP(#(REF), (''M_5'')),F_DOP(#(REF), (''M_10'')),F_DOP(#(REF), (''M_25'')),F_DOP(#(REF), (''M_50'')))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=' Комісія за виплату монет по чеку ЮО'
+         set tt='КЧМ', name='КЧМ Комісія за ЧЕК (монети)', dk=1, nlsm=null, kv=980, nlsk='#(nbs_ob22 (''6110'',''43''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='f_monet_tar(111,F_DOP(#(REF), (''M_1'')),F_DOP(#(REF), (''M_2'')),F_DOP(#(REF), (''M_5'')),F_DOP(#(REF), (''M_10'')),F_DOP(#(REF), (''M_25'')),F_DOP(#(REF), (''M_50'')))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=' Комісія за виплату монет по чеку ЮО'
        where tt='КЧМ';
   end;
   --------------------------------

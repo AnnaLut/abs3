@@ -81,9 +81,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CF_LOG ***
-grant SELECT                                                                 on CF_LOG          to BARSREADER_ROLE;
 grant SELECT                                                                 on CF_LOG          to BARS_DM;
-grant SELECT                                                                 on CF_LOG          to UPLD;
 
 
 

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции CV5
-prompt Наименование операции: CV5 d2 Конвертація безгот. вал. EUR<>USD
+prompt Наименование операции: d2 Конвертація безгот. вал. EUR<>USD
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CV5', 'CV5 d2 Конвертація безгот. вал. EUR<>USD', 1, null, 840, null, 840, null, null, null, null, 0, 0, 0, 0, '#(S2)', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('CV5', 'd2 Конвертація безгот. вал. EUR<>USD', 1, null, 840, null, 840, null, null, null, null, 0, 0, 0, 0, '#(S2)', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CV5', name='CV5 d2 Конвертація безгот. вал. EUR<>USD', dk=1, nlsm=null, kv=840, nlsk=null, kvk=840, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S2)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='CV5', name='d2 Конвертація безгот. вал. EUR<>USD', dk=1, nlsm=null, kv=840, nlsk=null, kvk=840, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S2)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='CV5';
   end;
   --------------------------------

@@ -16,10 +16,8 @@ WHERE d.vidd=17 and c.RNK=D.RNK
  ;
 
 PROMPT *** Create  grants  INSU_CORPS ***
-grant SELECT                                                                 on INSU_CORPS      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INSU_CORPS      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INSU_CORPS      to RCC_DEAL;
-grant SELECT                                                                 on INSU_CORPS      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INSU_CORPS      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on INSU_CORPS      to WR_REFREAD;
 

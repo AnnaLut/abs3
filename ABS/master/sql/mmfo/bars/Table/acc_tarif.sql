@@ -95,48 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_ACCTARIF ***
+PROMPT *** Create  constraint CC_ACCTARIF_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_TARIF ADD CONSTRAINT PK_ACCTARIF PRIMARY KEY (KF, ACC, KOD)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCTARIF_ACC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACC_TARIF MODIFY (ACC CONSTRAINT CC_ACCTARIF_ACC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCTARIF_KOD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACC_TARIF MODIFY (KOD CONSTRAINT CC_ACCTARIF_KOD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005296 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACC_TARIF MODIFY (TAR NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_TARIF MODIFY (KF CONSTRAINT CC_ACCTARIF_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -157,10 +119,74 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCTARIF_KF_NN ***
+PROMPT *** Create  constraint SYS_C005296 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_TARIF MODIFY (KF CONSTRAINT CC_ACCTARIF_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_TARIF MODIFY (TAR NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCTARIF_KOD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_TARIF MODIFY (KOD CONSTRAINT CC_ACCTARIF_KOD_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCTARIF_ACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_TARIF MODIFY (ACC CONSTRAINT CC_ACCTARIF_ACC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCTARIF_ACCOUNTS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_TARIF ADD CONSTRAINT FK_ACCTARIF_ACCOUNTS2 FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCTARIF_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_TARIF ADD CONSTRAINT FK_ACCTARIF_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_ACCTARIF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_TARIF ADD CONSTRAINT PK_ACCTARIF PRIMARY KEY (KF, ACC, KOD)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -185,13 +211,11 @@ exception when others then
 PROMPT *** Create  grants  ACC_TARIF ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_TARIF       to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_TARIF       to BARSAQ;
-grant SELECT                                                                 on ACC_TARIF       to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on ACC_TARIF       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_TARIF       to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on ACC_TARIF       to CUST001;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on ACC_TARIF       to SALGL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_TARIF       to START1;
-grant SELECT                                                                 on ACC_TARIF       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_TARIF       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on ACC_TARIF       to WR_REFREAD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_TARIF       to WR_VIEWACC;

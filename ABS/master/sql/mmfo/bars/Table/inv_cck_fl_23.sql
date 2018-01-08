@@ -227,6 +227,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_INVCCKFL23_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INV_CCK_FL_23 ADD CONSTRAINT FK_INVCCKFL23_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_INVCCKFL23_GR_NN ***
 begin   
  execute immediate '
@@ -302,11 +315,9 @@ exception when others then
 
 PROMPT *** Create  grants  INV_CCK_FL_23 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on INV_CCK_FL_23   to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on INV_CCK_FL_23   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INV_CCK_FL_23   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INV_CCK_FL_23   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INV_CCK_FL_23   to RCC_DEAL;
-grant SELECT                                                                 on INV_CCK_FL_23   to UPLD;
 
 
 

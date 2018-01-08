@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/pfu_ru_file_utl.sql =========*** Run
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.PFU_RU_FILE_UTL is
+  create or replace package bars.pfu_ru_file_utl is
 
 	-- Author  : YAROSLAV.KURTOV
 	-- Created : 26.04.2017
@@ -53,7 +53,7 @@
 													 p_kill_type  in pfu_epp_kill_type.id_type%type);
 
   procedure set_card_block_processing(p_file_data in clob, p_fileid in number);
-
+  
   procedure set_card_unblock_processing(p_file_data in clob, p_fileid in number);
 
 	procedure repeat_block;
@@ -62,7 +62,7 @@
 
 end pfu_ru_file_utl;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_FILE_UTL is
+CREATE OR REPLACE PACKAGE BODY BARS.pfu_ru_file_utl is
 
 	function get_ref_state_receipt(p_ref_list in t_state) return clob is
 		l_clob      clob;
@@ -85,12 +85,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_FILE_UTL is
 		l_state number;
 		l_nbs   accounts.nbs%type;
 		l_tip   accounts.tip%type;
-
+	
 		l_ref   oper.ref%type;
 		l_ref_a oper.ref_a%type;
 		l_sos   oper.sos%type;
 		l_nlsb  oper.nlsb%type;
-
+	
 
 	begin
 
@@ -118,13 +118,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_FILE_UTL is
 						 and trunc(o.pdat) between to_date(p_ref_list(i).pdat, 'dd.mm.yyyy') and to_date(p_ref_list(i).pdat, 'dd.mm.yyyy') + 5
 						 and o.kf = o.mfob
 						 and o.mfoa = '300465';
-
+				
 					select ac.nbs, ac.tip
 						into l_nbs, l_tip
 						from accounts ac
 					 where ac.nls = l_nlsb
 						 and ac.kv = 980;
-
+				
 					if (l_nbs = '2625' and l_tip like 'W4%') then
 						select pqh.resp_code
 							into l_state
@@ -148,7 +148,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_FILE_UTL is
 					l_supplier_element := dbms_xmldom.createelement(l_domdoc, 'row');
 					l_supplier_node    := dbms_xmldom.appendchild(l_suppp_node,
 																												dbms_xmldom.makenode(l_supplier_element));
-
+				
 					-- Each Supplier node will get a Number node which contains the Supplier Number as text
 					l_supp_element := dbms_xmldom.createelement(l_domdoc, 'ref');
 					l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
@@ -156,24 +156,24 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_FILE_UTL is
 					l_supp_text    := dbms_xmldom.createtextnode(l_domdoc, l_ref_a);
 					l_supp_tnode   := dbms_xmldom.appendchild(l_supp_node,
 																										dbms_xmldom.makenode(l_supp_text));
-
+				
 					l_supp_element := dbms_xmldom.createelement(l_domdoc, 'state_id');
 					l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
 																										dbms_xmldom.makenode(l_supp_element));
 					l_supp_text    := dbms_xmldom.createtextnode(l_domdoc, l_state);
 					l_supp_tnode   := dbms_xmldom.appendchild(l_supp_node,
-
+																										
 																										dbms_xmldom.makenode(l_supp_text));
-
+				
 					l_supp_element := dbms_xmldom.createelement(l_domdoc, 'idr');
 					l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
 																										dbms_xmldom.makenode(l_supp_element));
 					l_supp_text    := dbms_xmldom.createtextnode(l_domdoc,
 																											 p_ref_list(i).idr);
 					l_supp_tnode   := dbms_xmldom.appendchild(l_supp_node,
-
+																										
 																										dbms_xmldom.makenode(l_supp_text));
-
+				
 				exception
 					when others then
 						null;
@@ -661,11 +661,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_FILE_UTL is
 																													 'dd.mm.yyyy'));
 			l_supp_tnode   := dbms_xmldom.appendchild(l_supp_node,
 																								dbms_xmldom.makenode(l_supp_text));
-
+		
 		/* update pfu_epp_killed t
            set t.state = 1
          where t.epp_number = sup_rec.epp_number;*/
-
+		
 		end loop;
 		dbms_xmldom.writetoclob(l_domdoc, l_clob);
 		dbms_xmldom.freedocument(l_domdoc);
@@ -679,35 +679,35 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_FILE_UTL is
 		l_clob      clob;
 		l_domdoc    dbms_xmldom.domdocument;
 		l_root_node dbms_xmldom.domnode;
-
+	
 		l_supp_element dbms_xmldom.domelement;
-
+	
 		l_supp_node dbms_xmldom.domnode;
-
+	
 		l_supp_tnode dbms_xmldom.domnode;
-
+	
 		l_supp_text dbms_xmldom.domtext;
-
+	
 		l_supplier_element dbms_xmldom.domelement;
 		l_supplier_node    dbms_xmldom.domnode;
 		l_sup_node         dbms_xmldom.domnode;
 		l_suppp_node       dbms_xmldom.domnode;
 		l_count            number(2);
 		l_date             date;
-
+	
 		l_rnk   number;
 		l_datet date;
 		l_mfo   varchar2(10);
-
+	
 	begin
-
+	
 		dbms_lob.createtemporary(l_clob, true, 12);
 		-- Create an empty XML document
 		l_domdoc := dbms_xmldom.newdomdocument;
-
+	
 		-- Create a root node
 		l_root_node := dbms_xmldom.makenode(l_domdoc);
-
+	
 		-- Create a new Supplier Node and add it to the root node
 		l_sup_node   := dbms_xmldom.appendchild(l_root_node,
 																						dbms_xmldom.makenode(dbms_xmldom.createelement(l_domdoc,
@@ -721,12 +721,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_FILE_UTL is
 										 where a.nbs in ('2520', '2625')
 											 and a.daos >= add_months(l_date, -12)
 											 and a.dazs is null) loop
-
+		
 			select ac.rnk, ac.kf, nvl(ac.dapp, ac.daos)
 				into l_rnk, l_mfo, l_datet
 				from accounts ac
 			 where ac.acc = sup_rec.acc;
-
+		
 			select count(*)
 				into l_count
 				from opldok o
@@ -741,42 +741,42 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_FILE_UTL is
 				l_supplier_element := dbms_xmldom.createelement(l_domdoc, 'row');
 				l_supplier_node    := dbms_xmldom.appendchild(l_suppp_node,
 																											dbms_xmldom.makenode(l_supplier_element));
-
+			
 				-- Each Supplier node will get a Number node which contains the Supplier Number as text of(l_row, 'rnk/text()'));
 				l_supp_element := dbms_xmldom.createelement(l_domdoc, 'acc_num');
 				l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
 																									dbms_xmldom.makenode(l_supp_element));
-
+			
 				l_supp_text  := dbms_xmldom.createtextnode(l_domdoc, sup_rec.nls);
 				l_supp_tnode := dbms_xmldom.appendchild(l_supp_node,
 																								dbms_xmldom.makenode(l_supp_text));
-
+			
 				l_supp_element := dbms_xmldom.createelement(l_domdoc, 'rnk');
 				l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
 																									dbms_xmldom.makenode(l_supp_element));
-
+			
 				l_supp_text  := dbms_xmldom.createtextnode(l_domdoc, l_rnk);
 				l_supp_tnode := dbms_xmldom.appendchild(l_supp_node,
 																								dbms_xmldom.makenode(l_supp_text));
-
+			
 				l_supp_element := dbms_xmldom.createelement(l_domdoc, 'mfo');
 				l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
 																									dbms_xmldom.makenode(l_supp_element));
-
+			
 				l_supp_text  := dbms_xmldom.createtextnode(l_domdoc, l_mfo);
 				l_supp_tnode := dbms_xmldom.appendchild(l_supp_node,
 																								dbms_xmldom.makenode(l_supp_text));
-
+			
 				l_supp_element := dbms_xmldom.createelement(l_domdoc, 'date_turn');
 				l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
 																									dbms_xmldom.makenode(l_supp_element));
-
+			
 				l_supp_text  := dbms_xmldom.createtextnode(l_domdoc,
 																									 to_char(l_datet,
 																													 'dd.mm.yyyy'));
 				l_supp_tnode := dbms_xmldom.appendchild(l_supp_node,
 																								dbms_xmldom.makenode(l_supp_text));
-
+			
 			end if;
 		end loop;
 		dbms_xmldom.writetoclob(l_domdoc, l_clob);
@@ -1299,12 +1299,12 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
 			return l_clob;
 	end;
 
-  function get_create_paym_receipt(p_fio in varchar2,
-                                   p_okpo in varchar2,
+  function get_create_paym_receipt(p_fio in varchar2, 
+                                   p_okpo in varchar2, 
                                    p_sum in number,
-                                   p_num_acc in number,
-                                   p_acc2560 in number,
-                                   p_date_dead in date,
+                                   p_num_acc in number, 
+                                   p_acc2560 in number, 
+                                   p_date_dead in date, 
                                    p_did in number) return clob is
     l_clob      clob;
     l_domdoc    dbms_xmldom.domdocument;
@@ -1324,7 +1324,7 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
     l_suppp_node       dbms_xmldom.domnode;
 
     l_ostc accounts.ostf%type;
-
+    
     l_ref           oper.ref%type;
     l_tt            tts.tt%type := 'PKY';
     l_vob           oper.vob%type := 6;
@@ -1339,7 +1339,7 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
     l_err           varchar2(4000);
     l_doc           varchar2(30);
     l_sum           number;
-
+    
     l_acc_rec       accounts%rowtype;
 
   begin
@@ -1354,7 +1354,7 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
     select * into l_acc_rec
       from accounts acc
      where acc.nls = p_acc2560;
-
+     
     select c.okpo into l_okpo_b
       from customer c
      where c.rnk = l_acc_rec.rnk;
@@ -1372,20 +1372,20 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
     l_suppp_node := dbms_xmldom.appendchild(l_sup_node,
                                             dbms_xmldom.makenode(dbms_xmldom.createelement(l_domdoc,
                                                                                            'body')));
-
+    
     l_bankdate  := gl.bd;
-
+    
     if l_ostc >= p_sum then
       l_sum := p_sum;
       l_typ := 'ALL';
-    else
+    else 
       l_sum := l_ostc;
       l_typ := 'PART';
     end if;
-
-    if (l_sum > 0) then
+    
+    if (l_sum > 0) then 
       gl.ref(l_ref);
-
+      
       l_mfo := gl.kf;
 
       l_nazn  := substr('Повернення пенсійних коштів;'||p_fio||';'||p_okpo||';'||to_char(sysdate,'DD.MM.YYYY'), 1, 160);
@@ -1421,7 +1421,7 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
                  null);
 
       -- Формирование проводок
-      paytt(0,
+      paytt(0,      
             l_ref,
             l_bankdate,
             l_tt,
@@ -1432,14 +1432,14 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
             '980',
             l_acc_rec.nls,
             l_sum);
-
+      
       chk.put_visa(l_ref, l_tt, 5, 2, null, null, null);
     else
         l_ref := 0;
         l_typ := 'NOTHING';
         l_sum := 0;
     end if;
-
+    
 
     -- Each Supplier node will get a Number node which contains the Supplier Number as text
     l_supp_element := dbms_xmldom.createelement(l_domdoc, 'ref');
@@ -1464,7 +1464,7 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
     l_supp_text    := dbms_xmldom.createtextnode(l_domdoc, l_sum);
     l_supp_tnode   := dbms_xmldom.appendchild(l_supp_node,
                                                 dbms_xmldom.makenode(l_supp_text));
-
+    
         -- Each Supplier node will get a Number node which contains the Supplier Number as text
     l_supp_element := dbms_xmldom.createelement(l_domdoc, 'did');
     l_supp_node    := dbms_xmldom.appendchild(l_suppp_node,
@@ -1562,7 +1562,7 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
         l_supp_text    := dbms_xmldom.createtextnode(l_domdoc, 1);
         l_supp_tnode   := dbms_xmldom.appendchild(l_supp_node,
                                                   dbms_xmldom.makenode(l_supp_text));
-
+                                                  
         l_supp_element := dbms_xmldom.createelement(l_domdoc, 'id');
         l_supp_node    := dbms_xmldom.appendchild(l_suppp_node,
                                                   dbms_xmldom.makenode(l_supp_element));
@@ -1584,7 +1584,7 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
         l_supp_tnode   := dbms_xmldom.appendchild(l_supp_node,
                                                   dbms_xmldom.makenode(l_supp_text));
     elsif (p_id is null and p_nls is not null) then
-
+      
         select t.blkd, t.acc into l_blkd, l_acc
           from accounts t
          where t.nls = p_nls;
@@ -1655,7 +1655,7 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
 		when others then
 			return l_clob;
 	end;
-
+  
    function set_card_unblock_receipt(p_id     in pfu_epp_line_processing.id%type,
                                      p_nls    in accounts.nls%type,
 										  						   p_fileid in number) return clob is
@@ -1701,7 +1701,7 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
            update accounts a
               set a.blkd = 0
             where a.nls = l_nls;
-        end if;
+        end if;     
            update pfu_epp_line_processing p
               set p.is_blk = 1,
                   p.date_blk = l_date,
@@ -1709,7 +1709,7 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
                   p.message = 'Счет разблокирован'
             where p.id = p_id;
             p_comment := 'Счет разблокирован';
-
+        
         -- Create an empty XML document
         l_domdoc := dbms_xmldom.newdomdocument;
 
@@ -1766,7 +1766,7 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
             where a.nls = p_nls;
             p_comment := 'Счет разблокирован';
         else
-           delete
+           delete 
              from acc_to_block_vso t
            where t.acc = l_acc;
            p_comment := 'Счет разблокирован';
@@ -1794,7 +1794,7 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
         l_supp_text    := dbms_xmldom.createtextnode(l_domdoc, 0);
         l_supp_tnode   := dbms_xmldom.appendchild(l_supp_node,
                                                   dbms_xmldom.makenode(l_supp_text));
-
+                                                  
         l_supp_element := dbms_xmldom.createelement(l_domdoc, 'nls');
         l_supp_node    := dbms_xmldom.appendchild(l_suppp_node,
                                                   dbms_xmldom.makenode(l_supp_element));
@@ -1816,7 +1816,7 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
         l_supp_tnode   := dbms_xmldom.appendchild(l_supp_node,
                                                   dbms_xmldom.makenode(l_supp_text));
     end if;
-
+    
 
 		dbms_xmldom.writetoclob(l_domdoc, l_clob);
 		dbms_xmldom.freedocument(l_domdoc);
@@ -1844,20 +1844,20 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
 		l_supplier_node    dbms_xmldom.domnode;
 		l_sup_node         dbms_xmldom.domnode;
 		l_suppp_node       dbms_xmldom.domnode;
-
+	
 		l_nls  accounts.nls%type;
 		l_blkd accounts.blkd%type;
-
+	
 		p_comment pfu_epp_line_processing.message%type;
-
+	
 	begin
 
 		dbms_lob.createtemporary(l_clob, true, 12);
-
+	
 		update pfu_epp_killed t
 			 set t.state = 1
 		 where t.epp_number = p_epp_number;
-
+	
 		-- Create an empty XML document
 		l_domdoc := dbms_xmldom.newdomdocument;
 
@@ -1895,7 +1895,7 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
 		l_rows := dbms_xmldom.getelementsbytagname(l_doc, 'row');
 		for i in 0 .. dbms_xmldom.getlength(l_rows) - 1 loop
 			l_row := dbms_xmldom.item(l_rows, i);
-
+		
 			l_ref_list(i).ref := dbms_xslprocessor.valueof(l_row, 'ref/text()');
 			l_ref_list(i).pdat := dbms_xslprocessor.valueof(l_row, 'pdat/text()');
 			l_ref_list(i).idr := dbms_xslprocessor.valueof(l_row, 'idr/text()');
@@ -1994,17 +1994,17 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
 		l_date   date;
 		l_clob   clob;
 	begin
-
+	
 		l_parser := dbms_xmlparser.newparser;
 		dbms_xmlparser.parseclob(l_parser, p_file_data);
 		l_doc := dbms_xmlparser.getdocument(l_parser);
-
+	
 		l_rows := dbms_xmldom.getelementsbytagname(l_doc, 'body');
-
+	
 		l_row := dbms_xmldom.item(l_rows, 0);
-
+	
 		--    l_date  := to_date(dbms_xslprocessor.valueof(l_row,'daterep/text()'));
-
+	
 		pfu_ru_epp_utl.set_file_state(p_fileid,
 																	10,
 																	'Файл оброблено');
@@ -2151,7 +2151,7 @@ procedure get_create_paym_processing(p_file_data in clob, p_fileid in number) is
     l_parser := dbms_xmlparser.newparser;
     dbms_xmlparser.parseclob(l_parser, p_file_data);
     l_doc := dbms_xmlparser.getdocument(l_parser);
-
+    
     l_rows := dbms_xmldom.getelementsbytagname(l_doc, 'body');
 
  	  l_row := dbms_xmldom.item(l_rows, 0);
@@ -2163,14 +2163,14 @@ procedure get_create_paym_processing(p_file_data in clob, p_fileid in number) is
     l_acc2560    := dbms_xslprocessor.valueof(l_row, 'acc_2560/text()');
     l_date_dead  := dbms_xslprocessor.valueof(l_row, 'date_dead/text()');
     l_did        := dbms_xslprocessor.valueof(l_row, 'did/text()');
-
+    
     pfu_ru_epp_utl.set_file_state(p_fileid, 10, 'Файл оброблено');
     l_clob := get_create_paym_receipt(l_fio, l_okpo, l_sum, l_num_acc, l_acc2560, l_date_dead, l_did);
-
+    
     if l_clob is not null then
        pfu_ru_epp_utl.set_file_state(p_fileid, 20, 'Квитанцію сформовано', l_clob);
     end if;
-
+    
     dbms_xmlparser.freeparser(l_parser);
     dbms_xmldom.freedocument(l_doc);
 
@@ -2262,9 +2262,9 @@ procedure get_create_paym_processing(p_file_data in clob, p_fileid in number) is
 		l_rows := dbms_xmldom.getelementsbytagname(l_doc, 'body');
 
 		l_row := dbms_xmldom.item(l_rows, 0);
-
+	
 		l_epp_number := dbms_xslprocessor.valueof(l_row, 'epp_number/text()');
-
+	
 		pfu_ru_epp_utl.set_file_state(p_fileid,
 																	10,
 																	'”айл оброблено');
@@ -2300,16 +2300,16 @@ procedure get_create_paym_processing(p_file_data in clob, p_fileid in number) is
 		l_rows := dbms_xmldom.getelementsbytagname(l_doc, 'body');
 
 		l_row := dbms_xmldom.item(l_rows, 0);
-
+    
     l_epp := dbms_xslprocessor.valueof(l_row, 'epp/text()');
-
+    
     if l_epp = 0 then
       l_nls := dbms_xslprocessor.valueof(l_row, 'nls/text()');
       l_id := null;
-    else
+    else 
       l_nls := null;
    		l_id  := dbms_xslprocessor.valueof(l_row, 'id/text()');
-    end if;
+    end if; 
 
 		pfu_ru_epp_utl.set_file_state(p_fileid,
 																	10,
@@ -2325,7 +2325,7 @@ procedure get_create_paym_processing(p_file_data in clob, p_fileid in number) is
 		dbms_xmldom.freedocument(l_doc);
 
 	end;
-
+  
   	procedure set_card_unblock_processing(p_file_data in clob,
 													  					    p_fileid    in number) is
 		l_parser dbms_xmlparser.parser;
@@ -2407,7 +2407,7 @@ procedure get_create_paym_processing(p_file_data in clob, p_fileid in number) is
      where acc.nls = c0.nls;
 			end if;
 		end loop;
-
+    
     for c1 in (select *
 								 from acc_to_block_vso) loop
 
@@ -2417,8 +2417,8 @@ procedure get_create_paym_processing(p_file_data in clob, p_fileid in number) is
          update bars.accounts acc
             set acc.blkd = g_blk
           where acc.acc = c1.acc;
-
-          delete from acc_to_block_vso abv
+          
+          delete from acc_to_block_vso abv 
            where abv.acc = c1.acc;
 			end if;
 		end loop;
@@ -2426,7 +2426,7 @@ procedure get_create_paym_processing(p_file_data in clob, p_fileid in number) is
 
 	/*
     procedure pfu_files_processing is
-
+  
     begin
       for i in (select *
                   from pfu_ca_files t

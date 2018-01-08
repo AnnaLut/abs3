@@ -39,10 +39,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  PFU_EPP_LINE_TRANSPORT_UNIT ***
-grant SELECT                                                                 on PFU_EPP_LINE_TRANSPORT_UNIT to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_EPP_LINE_TRANSPORT_UNIT to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -32,10 +32,8 @@ PROMPT *** Create  view V_INFLATION_ACC ***
                      where a.nbs in ('2207','2209','2237','2239') and a.dazs is null;
 
 PROMPT *** Create  grants  V_INFLATION_ACC ***
-grant SELECT                                                                 on V_INFLATION_ACC to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_INFLATION_ACC to BARS_ACCESS_DEFROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_INFLATION_ACC to RCC_DEAL;
-grant SELECT                                                                 on V_INFLATION_ACC to UPLD;
 
 
 

@@ -17,10 +17,8 @@ PROMPT *** Create  view V_CM_PRODUCT ***
  where p.code = c.product_code(+);
 
 PROMPT *** Create  grants  V_CM_PRODUCT ***
-grant SELECT                                                                 on V_CM_PRODUCT    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CM_PRODUCT    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_CM_PRODUCT    to OW;
-grant SELECT                                                                 on V_CM_PRODUCT    to UPLD;
 grant FLASHBACK,SELECT                                                       on V_CM_PRODUCT    to WR_REFREAD;
 
 

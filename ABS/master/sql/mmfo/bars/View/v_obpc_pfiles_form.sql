@@ -54,10 +54,8 @@ select 2, q.rec, d.dk, null card_acc, null card_no,
    and q.kv   = decode(a.currency, 'UAH', 980, 840);
 
 PROMPT *** Create  grants  V_OBPC_PFILES_FORM ***
-grant SELECT                                                                 on V_OBPC_PFILES_FORM to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OBPC_PFILES_FORM to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OBPC_PFILES_FORM to OBPC;
-grant SELECT                                                                 on V_OBPC_PFILES_FORM to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_PFILES_FORM to WR_ALL_RIGHTS;
 
 

@@ -19,10 +19,8 @@ group by s.p080
 order by s.p080;
 
 PROMPT *** Create  grants  ABC2 ***
-grant SELECT                                                                 on ABC2            to BARSREADER_ROLE;
 grant SELECT                                                                 on ABC2            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ABC2            to START1;
-grant SELECT                                                                 on ABC2            to UPLD;
 
 
 

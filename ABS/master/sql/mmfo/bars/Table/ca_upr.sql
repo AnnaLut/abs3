@@ -51,9 +51,7 @@ COMMENT ON COLUMN BARS.CA_UPR.DEPT_RELATION IS '';
 
 
 PROMPT *** Create  grants  CA_UPR ***
-grant SELECT                                                                 on CA_UPR          to BARSREADER_ROLE;
 grant SELECT                                                                 on CA_UPR          to BARS_DM;
-grant SELECT                                                                 on CA_UPR          to UPLD;
 
 
 

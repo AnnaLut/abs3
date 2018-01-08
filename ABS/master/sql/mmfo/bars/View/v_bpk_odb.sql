@@ -55,10 +55,8 @@ PROMPT *** Create  view V_BPK_ODB ***
    and a.acc = w. acc(+) and w.tag(+) = 'PK_ODB';
 
 PROMPT *** Create  grants  V_BPK_ODB ***
-grant SELECT                                                                 on V_BPK_ODB       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BPK_ODB       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BPK_ODB       to OBPC;
-grant SELECT                                                                 on V_BPK_ODB       to UPLD;
 
 
 

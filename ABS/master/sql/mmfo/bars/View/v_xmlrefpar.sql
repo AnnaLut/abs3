@@ -27,9 +27,7 @@ PROMPT *** Create  view V_XMLREFPAR ***
  ;
 
 PROMPT *** Create  grants  V_XMLREFPAR ***
-grant SELECT                                                                 on V_XMLREFPAR     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_XMLREFPAR     to KLBX;
-grant SELECT                                                                 on V_XMLREFPAR     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_XMLREFPAR     to WR_ALL_RIGHTS;
 
 

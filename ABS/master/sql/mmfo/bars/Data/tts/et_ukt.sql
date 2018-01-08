@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции K60
-prompt Наименование операции: K60 Комісія за видачу ощадної книжки у разі втрати (пошкод.) попереднь
+prompt Наименование операции: Комісія за видачу ощадної книжки у разі втрати (пошкод.) попередньої
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K60', 'K60 Комісія за видачу ощадної книжки у разі втрати (пошкод.) попереднь', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, '#(nbs_ob22 (''6510'',''45''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(60, #(KVA), #(NLSA), #(S) )', null, 5, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', 'Комісія за видачу ощадної книжки у разі втрати (пошкод.) попередньої');
+    values ('K60', 'Комісія за видачу ощадної книжки у разі втрати (пошкод.) попередньої', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, '#(nbs_ob22 (''6110'',''45''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(60, #(KVA), #(NLSA), #(S) )', null, 5, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', 'Комісія за видачу ощадної книжки у разі втрати (пошкод.) попередньої');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K60', name='K60 Комісія за видачу ощадної книжки у разі втрати (пошкод.) попереднь', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kv=980, nlsk='#(nbs_ob22 (''6510'',''45''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(60, #(KVA), #(NLSA), #(S) )', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn='Комісія за видачу ощадної книжки у разі втрати (пошкод.) попередньої'
+         set tt='K60', name='Комісія за видачу ощадної книжки у разі втрати (пошкод.) попередньої', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kv=980, nlsk='#(nbs_ob22 (''6110'',''45''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(60, #(KVA), #(NLSA), #(S) )', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn='Комісія за видачу ощадної книжки у разі втрати (пошкод.) попередньої'
        where tt='K60';
   end;
   --------------------------------
@@ -88,12 +88,12 @@ begin
   delete from ps_tts where tt='K60';
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('6510', 'K60', 1);
+    values ('6110', 'K60', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''K60'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''K60'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -145,7 +145,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции UKT
-prompt Наименование операции: UKT Видача нової ощадної книжки у разі втрати (пошкодження) попередньо
+prompt Наименование операции: Видача нової ощадної книжки у разі втрати (пошкодження) попередньої
 declare
   cnt_  number;
 begin
@@ -154,11 +154,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('UKT', 'UKT Видача нової ощадної книжки у разі втрати (пошкодження) попередньо', 1, null, 980, null, 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_9910'',0))', null, null, 1, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', 'Видача нової ощадної книжки у разі втрати (пошкодження) попередньої ');
+    values ('UKT', 'Видача нової ощадної книжки у разі втрати (пошкодження) попередньої', 1, null, 980, null, 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_9910'',0))', null, null, 1, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', 'Видача нової ощадної книжки у разі втрати (пошкодження) попередньої ');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='UKT', name='UKT Видача нової ощадної книжки у разі втрати (пошкодження) попередньо', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_9910'',0))', nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='Видача нової ощадної книжки у разі втрати (пошкодження) попередньої '
+         set tt='UKT', name='Видача нової ощадної книжки у разі втрати (пошкодження) попередньої', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_9910'',0))', nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='Видача нової ощадної книжки у разі втрати (пошкодження) попередньої '
        where tt='UKT';
   end;
   --------------------------------

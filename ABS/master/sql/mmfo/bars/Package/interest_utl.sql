@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/interest_utl.sql =========*** Run **
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.INTEREST_UTL is
+create or replace package interest_utl is
 
     -- вид відсоткової картки (int_idn)
     INTEREST_KIND_EFFECTIVE_RATE   constant integer := -2; -- Ефективна відсоткова ставка (активи)
@@ -464,7 +458,7 @@
         mode_ smallint default 0);
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
+create or replace package body interest_utl as
 
     acc_form integer := 0;
     g_acc integer := 0;
@@ -5088,14 +5082,3 @@ CREATE OR REPLACE PACKAGE BODY BARS.INTEREST_UTL as
 */
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  INTEREST_UTL ***
-grant EXECUTE                                                                on INTEREST_UTL    to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/interest_utl.sql =========*** End **
- PROMPT ===================================================================================== 
- 

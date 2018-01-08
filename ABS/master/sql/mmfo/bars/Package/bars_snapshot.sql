@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_snapshot.sql =========*** Run *
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_SNAPSHOT 
+create or replace package BARS_SNAPSHOT
 is
   --
   -- constants
@@ -56,12 +50,14 @@ is
 
 end BARS_SNAPSHOT;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_SNAPSHOT 
+
+
+create or replace package body BARS_SNAPSHOT
 is
   --
   -- constants
   --
-  g_body_version          constant varchar2(64)  := 'version 1.6  01.11.2017';
+  g_body_version          constant varchar2(64)  := 'version 1.5 22.08.2017';
 
   --
   -- types
@@ -139,7 +135,7 @@ is
   <b>CURRENCY_REVALUATION</b> - процедура переоцінки валютних позицій
   %param
 
-  %version 1.1
+  %version 1.0
   %usage   переоцінка валютних позицій коригуючими проводками.
   */
     title  constant  varchar2(64) := $$PLSQL_UNIT||'.CURRENCY_REVALUATION';
@@ -161,21 +157,20 @@ is
                       , t.ACC3801, a3.NLS as NLS_A, a3.KV as KV_A, SubStr(a3.NMS,1,38) as NAME_A
                       , t.ACC_RRR, a6.NLS as NLS_B, a6.KV as KV_B, SubStr(a6.NMS,1,38) as NAME_B
                       , (ADJ_AMNT_3800_UAH - ADJ_AMNT_3801) as DIFF_AMNT
-                   from ( select /*+ LEADING(v b0) FULL(v) */
-                                 v.KF, v.ACC3801, v.ACC_RRR
-                               , a.NLS, a.KV, a.BRANCH
+                   from ( select v.ACC3801, v.ACC_RRR
+                               , a.KF, a.NLS, a.KV, a.BRANCH
                                , b0.OSTQ - b0.CRDOSQ + b0.CRKOSQ as ADJ_AMNT_3800_UAH
                                , b1.OST  - b1.CRDOS  + b1.CRKOS  as ADJ_AMNT_3801
-                            from VP_LIST  v
-                            join ACCOUNTS a
+                            from BARS.VP_LIST  v
+                            join BARS.ACCOUNTS a
                               on ( a.acc = v.ACC3800 )
-                            join AGG_MONBALS_EXCHANGE b0
+                            join BARS.AGG_MONBALS_EXCHANGE b0
                               on ( b0.FDAT = l_first_day and b0.KF = v.KF and b0.ACC = v.ACC3800 )
-                            join AGG_MONBALS_EXCHANGE b1
+                            join BARS.AGG_MONBALS_EXCHANGE b1
                               on ( b1.FDAT = l_first_day and b1.KF = v.KF and b1.ACC = v.ACC3801 )
-                           where v.KF = p_kf
+                           where a.KF = p_kf
+                             and a.dazs Is Null
                              and v.ACC_RRR Is Not Null
-                             and a.DAZS Is Null
                              and ((b0.OSTQ - b0.CRDOSQ + b0.CRKOSQ) + (b1.OST - b1.CRDOS + b1.CRKOS)) <> 0
                         ) t
                    join BARS.ACCOUNTS a3
@@ -193,8 +188,7 @@ is
       l_amnt := ABS(cur.DIFF_AMNT);
       l_nd   := SubStr(to_char(l_ref),1,10);
 
-      insert
-        into OPER
+      insert into BARS.OPER
         ( REF,  TT,   VOB,   ND,  DK, PDAT,
           VDAT, DATD, USERID,
           MFOA, NLSA, NAM_A, KV,  S,  ID_A,
@@ -802,14 +796,7 @@ begin
 
 END BARS_SNAPSHOT;
 /
- show err;
- 
-PROMPT *** Create  grants  BARS_SNAPSHOT ***
-grant EXECUTE                                                                on BARS_SNAPSHOT   to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_snapshot.sql =========*** End *
- PROMPT ===================================================================================== 
- 
+show err;
+
+grant EXECUTE on BARS_SNAPSHOT to BARS_ACCESS_DEFROLE;

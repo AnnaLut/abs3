@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.TMP_SALDOA.KF IS '';
 
 
 
-PROMPT *** Create  grants  TMP_SALDOA ***
-grant SELECT                                                                 on TMP_SALDOA      to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_SALDOA      to UPLD;
-
 
 
 PROMPT ===================================================================================== 

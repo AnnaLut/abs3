@@ -93,10 +93,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_NBURLSTVERSIONS_VERSNID_NN ***
+PROMPT *** Create  constraint UK_NBURLSTVERSIONS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_LST_VERSIONS MODIFY (VERSION_ID CONSTRAINT CC_NBURLSTVERSIONS_VERSNID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_LST_VERSIONS ADD CONSTRAINT UK_NBURLSTVERSIONS UNIQUE (REPORT_DATE, KF, VERSION_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -143,12 +145,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_NBURLSTVERSIONS ***
+PROMPT *** Create  constraint CC_NBURLSTVERSIONS_VERSNID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_LST_VERSIONS ADD CONSTRAINT UK_NBURLSTVERSIONS UNIQUE (REPORT_DATE, KF, VERSION_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.NBUR_LST_VERSIONS MODIFY (VERSION_ID CONSTRAINT CC_NBURLSTVERSIONS_VERSNID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -185,12 +185,15 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_LST_VERSIONS ***
-grant SELECT                                                                 on NBUR_LST_VERSIONS to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_LST_VERSIONS to BARSUPL;
 grant SELECT                                                                 on NBUR_LST_VERSIONS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_LST_VERSIONS to BARS_DM;
-grant SELECT                                                                 on NBUR_LST_VERSIONS to UPLD;
 
+
+
+PROMPT *** Create SYNONYM  to NBUR_LST_VERSIONS ***
+
+  CREATE OR REPLACE SYNONYM BARS.DM_VERSIONS_LIST FOR BARS.NBUR_LST_VERSIONS;
 
 
 PROMPT ===================================================================================== 

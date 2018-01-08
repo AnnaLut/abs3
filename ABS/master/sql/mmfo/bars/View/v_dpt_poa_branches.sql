@@ -21,10 +21,8 @@ PROMPT *** Create  view V_DPT_POA_BRANCHES ***
    ORDER BY pb.branch, pb.ord;
 
 PROMPT *** Create  grants  V_DPT_POA_BRANCHES ***
-grant SELECT                                                                 on V_DPT_POA_BRANCHES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_POA_BRANCHES to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPT_POA_BRANCHES to DPT_ADMIN;
-grant SELECT                                                                 on V_DPT_POA_BRANCHES to UPLD;
 grant FLASHBACK,SELECT                                                       on V_DPT_POA_BRANCHES to WR_REFREAD;
 
 

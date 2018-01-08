@@ -132,10 +132,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  SKR_IMPORT_DEALS ***
-grant SELECT                                                                 on SKR_IMPORT_DEALS to BARSREADER_ROLE;
-grant SELECT                                                                 on SKR_IMPORT_DEALS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

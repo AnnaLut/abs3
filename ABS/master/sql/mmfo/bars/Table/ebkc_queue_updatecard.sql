@@ -69,10 +69,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint EBKC_Q_UPDCARD_CT_NN ***
+PROMPT *** Create  constraint CC_EBKCQUEUEUPDATECARD_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.EBKC_QUEUE_UPDATECARD ADD CONSTRAINT EBKC_Q_UPDCARD_CT_NN CHECK (cust_type is not null) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.EBKC_QUEUE_UPDATECARD MODIFY (KF CONSTRAINT CC_EBKCQUEUEUPDATECARD_KF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -81,10 +81,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_EBKCQUEUEUPDATECARD_KF_NN ***
+PROMPT *** Create  constraint EBKC_Q_UPDCARD_CT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.EBKC_QUEUE_UPDATECARD MODIFY (KF CONSTRAINT CC_EBKCQUEUEUPDATECARD_KF_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.EBKC_QUEUE_UPDATECARD ADD CONSTRAINT EBKC_Q_UPDCARD_CT_NN CHECK (cust_type is not null) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -121,10 +121,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBKC_QUEUE_UPDATECARD ***
-grant SELECT                                                                 on EBKC_QUEUE_UPDATECARD to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBKC_QUEUE_UPDATECARD to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBKC_QUEUE_UPDATECARD to BARS_DM;
-grant SELECT                                                                 on EBKC_QUEUE_UPDATECARD to UPLD;
 
 
 

@@ -41,10 +41,6 @@ COMMENT ON COLUMN BARS.NBUR_TMP_KOD_R020.R020 IS '';
 
 
 
-PROMPT *** Create  grants  NBUR_TMP_KOD_R020 ***
-grant SELECT                                                                 on NBUR_TMP_KOD_R020 to BARSREADER_ROLE;
-grant SELECT                                                                 on NBUR_TMP_KOD_R020 to UPLD;
-
 
 
 PROMPT ===================================================================================== 

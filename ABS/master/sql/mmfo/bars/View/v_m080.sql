@@ -13,10 +13,8 @@ PROMPT *** Create  view V_M080 ***
 from TMP_CCK_REP where dk is null;
 
 PROMPT *** Create  grants  V_M080 ***
-grant SELECT                                                                 on V_M080          to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_M080          to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_M080          to RCC_DEAL;
-grant SELECT                                                                 on V_M080          to UPLD;
 
 
 

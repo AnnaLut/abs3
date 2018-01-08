@@ -514,11 +514,11 @@ TYPE r_many_grid
                                  tt     oper.tt%type);
   type t_int_prepare is table of r_int_prepare;
   function make_int_prepare return t_int_prepare pipelined;
-
+  
   subtype r_nbu23_rez is nbu23_rez%rowtype;
   type t_nbu23_rez is table of r_nbu23_rez;
   function populate_nbu23_rez(p_ref in number) return t_nbu23_rez pipelined;
-
+   
   procedure calc_many(p_ref cp_many.ref%type);
 
 END value_paper;
@@ -1943,7 +1943,7 @@ END;
            l_cp_cprwnd.p_nDOX             := 2;
            l_cp_cprwnd.p_KV               := 980;
            --l_cp_cprwnd.p_nEMI             := 1;
-           --l_cp_cprwnd.id
+           --l_cp_cprwnd.id                  
 
           else
            l_cp_cprwnd.p_SUMI_ALL_visible := 1;
@@ -2797,7 +2797,7 @@ END;
                    (select nms from accounts where acc = ia.acrb) nmsb,
                    (select kv from accounts where acc = ia.acrb) kvb,
                    (select okpo from customer where rnk = (select rnk from accounts where acc = ia.acrb)) as id_b,
-                   ia.tt,
+                   ia.tt,                   
                    case when ck.tip =  ck.tip -- 2 говорят, не правильное назначение для ДС, надо для всех такое
                    THEN
                        'Нарах.% по '
@@ -2853,9 +2853,9 @@ END;
   TYPE nbu23_rez_cursorCurTyp IS REF CURSOR;
   nbu23_rez_cursor  nbu23_rez_cursorCurTyp;
   v_stmt_str     VARCHAR2 (14000);
- begin
+ begin 
 
-      v_stmt_str := 'select * from NBU23_REZ where ND = '||to_char(p_ref);
+      v_stmt_str := 'select * from NBU23_REZ where ND = '||to_char(p_ref);  
       OPEN nbu23_rez_cursor FOR v_stmt_str;
 
       LOOP
@@ -2864,7 +2864,7 @@ END;
          pipe row (l_nbu23_rez);
       END LOOP;
 
-      CLOSE nbu23_rez_cursor;
+      CLOSE nbu23_rez_cursor;  
  end;
 
  procedure calc_many(p_ref cp_many.ref%type) as
@@ -2874,25 +2874,25 @@ END;
    l_out      varchar2(4000);
  begin
    bars_audit.info(title || ' Start with params: ' || ' p_ref => ' || p_ref);
-   if p_ref is null then
+   if p_ref is null then 
      raise_application_error(-(20000+444),  'Не заданий параметр p_ref');
-   end if;
+   end if;  
    select count(*) into l_cnt from cp_many where ref = p_ref;
    if l_cnt > 0 then
      raise_application_error(-(20000+444),  'Потоки вже побудовані. Для перебудови потрібно видалити існуючі записи.');
-   end if;
+   end if;  
    select dat_ug into l_dat_ug from cp_deal where ref = p_ref;
    --побудувати потоки без врахування продажів
    cp.RMany(p_ref, p_ref, l_dat_ug, 0, 0, l_out);
-   --створити черги згідно продажів
+   --створити черги згідно продажів 
    for cur1 in (select a.dat_opl, a.sumb, a.n, a.ref from cp_arch a where a.ref_main = p_ref and a.op = 2 order by a.dat_opl)
    loop
      cp.RMany_dat(p_ref, cur1.ref, cur1.dat_opl, cur1.sumb, cur1.n);
-   end loop;
-   --відпрацювати чергу(всю)
+   end loop;  
+   --відпрацювати чергу(всю)  
    cp.RMany_all(null);
    bars_audit.info(title || ' End');
- end;
+ end;   
 
 END value_paper;
 /

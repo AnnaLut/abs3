@@ -47,10 +47,8 @@ PROMPT *** Create  view V_ARCHIVE_DOCS ***
      WHERE X0.MFOA = B0.MFO AND X0.MFOB = B1.MFO;
 
 PROMPT *** Create  grants  V_ARCHIVE_DOCS ***
-grant SELECT                                                                 on V_ARCHIVE_DOCS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ARCHIVE_DOCS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ARCHIVE_DOCS  to START1;
-grant SELECT                                                                 on V_ARCHIVE_DOCS  to UPLD;
 
 
 

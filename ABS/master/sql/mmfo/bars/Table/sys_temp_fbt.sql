@@ -48,10 +48,6 @@ COMMENT ON COLUMN BARS.SYS_TEMP_FBT.ACTION IS '';
 
 
 
-PROMPT *** Create  grants  SYS_TEMP_FBT ***
-grant SELECT                                                                 on SYS_TEMP_FBT    to BARSREADER_ROLE;
-grant SELECT                                                                 on SYS_TEMP_FBT    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

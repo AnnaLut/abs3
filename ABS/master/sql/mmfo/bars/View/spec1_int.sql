@@ -24,11 +24,9 @@ PROMPT *** Create  view SPEC1_INT ***
     WHERE a.acc = b.acc;
 
 PROMPT *** Create  grants  SPEC1_INT ***
-grant SELECT                                                                 on SPEC1_INT       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPEC1_INT       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPEC1_INT       to SALGL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPEC1_INT       to START1;
-grant SELECT                                                                 on SPEC1_INT       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPEC1_INT       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SPEC1_INT       to WR_REFREAD;
 

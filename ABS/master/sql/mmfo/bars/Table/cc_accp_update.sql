@@ -179,10 +179,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_ACCP_UPDATE ***
-grant SELECT                                                                 on CC_ACCP_UPDATE  to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_ACCP_UPDATE  to BARSUPL;
 grant SELECT                                                                 on CC_ACCP_UPDATE  to BARS_DM;
-grant SELECT                                                                 on CC_ACCP_UPDATE  to UPLD;
 
 
 

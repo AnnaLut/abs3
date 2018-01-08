@@ -14,10 +14,8 @@ where BRANCH=sys_context('bars_context','user_branch')
  ;
 
 PROMPT *** Create  grants  CC_KOL ***
-grant SELECT                                                                 on CC_KOL          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_KOL          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_KOL          to RCC_DEAL;
-grant SELECT                                                                 on CC_KOL          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_KOL          to WR_ALL_RIGHTS;
 
 

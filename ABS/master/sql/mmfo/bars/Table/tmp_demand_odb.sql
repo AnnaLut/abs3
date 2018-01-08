@@ -104,10 +104,8 @@ COMMENT ON COLUMN BARS.TMP_DEMAND_ODB.REG_NR IS '';
 
 
 PROMPT *** Create  grants  TMP_DEMAND_ODB ***
-grant SELECT                                                                 on TMP_DEMAND_ODB  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DEMAND_ODB  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DEMAND_ODB  to START1;
-grant SELECT                                                                 on TMP_DEMAND_ODB  to UPLD;
 
 
 

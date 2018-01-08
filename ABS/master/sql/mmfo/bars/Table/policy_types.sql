@@ -88,7 +88,6 @@ exception when others then
 
 PROMPT *** Create  grants  POLICY_TYPES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on POLICY_TYPES    to ABS_ADMIN;
-grant SELECT                                                                 on POLICY_TYPES    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on POLICY_TYPES    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on POLICY_TYPES    to START1;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on POLICY_TYPES    to WR_ALL_RIGHTS;

@@ -68,10 +68,8 @@ COMMENT ON COLUMN BARS.RKO_335.S_ALL IS '';
 
 
 PROMPT *** Create  grants  RKO_335 ***
-grant SELECT                                                                 on RKO_335         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on RKO_335         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT                                                   on RKO_335         to START1;
-grant SELECT                                                                 on RKO_335         to UPLD;
 
 
 

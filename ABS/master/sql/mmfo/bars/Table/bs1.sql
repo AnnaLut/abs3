@@ -75,6 +75,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_BS1_BSZ ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BS1 ADD CONSTRAINT FK_BS1_BSZ FOREIGN KEY (IDZ)
+	  REFERENCES BARS.BSZ (IDZ) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint NK_BS1_ID ***
 begin   
  execute immediate '
@@ -102,11 +115,9 @@ exception when others then
 
 PROMPT *** Create  grants  BS1 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BS1             to ABS_ADMIN;
-grant SELECT                                                                 on BS1             to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BS1             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BS1             to BARS_DM;
 grant SELECT,UPDATE                                                          on BS1             to SALGL;
-grant SELECT                                                                 on BS1             to UPLD;
 grant FLASHBACK,SELECT                                                       on BS1             to WR_REFREAD;
 
 

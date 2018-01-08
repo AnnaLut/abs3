@@ -76,10 +76,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_MGRCHECKS_CHECKPROC_NN ***
+PROMPT *** Create  constraint PK_MGRCHECKS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.MGR_CHECKS MODIFY (CHECK_PROC CONSTRAINT CC_MGRCHECKS_CHECKPROC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.MGR_CHECKS ADD CONSTRAINT PK_MGRCHECKS PRIMARY KEY (KF, CHECK_PROC)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -100,12 +102,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_MGRCHECKS ***
+PROMPT *** Create  constraint CC_MGRCHECKS_CHECKPROC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.MGR_CHECKS ADD CONSTRAINT PK_MGRCHECKS PRIMARY KEY (KF, CHECK_PROC)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD  ENABLE';
+  ALTER TABLE BARS.MGR_CHECKS MODIFY (CHECK_PROC CONSTRAINT CC_MGRCHECKS_CHECKPROC_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -126,9 +126,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  MGR_CHECKS ***
-grant SELECT                                                                 on MGR_CHECKS      to BARSREADER_ROLE;
 
 
 

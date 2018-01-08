@@ -16,12 +16,10 @@ PROMPT *** Create  view KL_F00 ***
 
 PROMPT *** Create  grants  KL_F00 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F00          to ABS_ADMIN;
-grant SELECT                                                                 on KL_F00          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F00          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F00          to KL_F00;
 grant SELECT,UPDATE                                                          on KL_F00          to RPBN002;
 grant SELECT                                                                 on KL_F00          to START1;
-grant SELECT                                                                 on KL_F00          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F00          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KL_F00          to WR_REFREAD;
 

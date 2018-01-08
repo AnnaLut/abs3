@@ -109,12 +109,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_BENEFICIARIES ***
-grant SELECT                                                                 on CIM_BENEFICIARIES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_BENEFICIARIES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_BENEFICIARIES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_BENEFICIARIES to CIM_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_BENEFICIARIES to START1;
-grant SELECT                                                                 on CIM_BENEFICIARIES to UPLD;
 
 
 

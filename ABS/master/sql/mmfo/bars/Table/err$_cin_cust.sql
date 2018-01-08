@@ -99,10 +99,6 @@ COMMENT ON COLUMN BARS.ERR$_CIN_CUST.RNK IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIN_CUST ***
-grant SELECT                                                                 on ERR$_CIN_CUST   to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIN_CUST   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

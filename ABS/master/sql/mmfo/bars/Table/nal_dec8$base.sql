@@ -51,6 +51,19 @@ COMMENT ON COLUMN BARS.NAL_DEC8$BASE.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_NALDEC8$BASE_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAL_DEC8$BASE ADD CONSTRAINT FK_NALDEC8$BASE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C008785 ***
 begin   
  execute immediate '
@@ -75,12 +88,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  NAL_DEC8$BASE ***
-grant SELECT                                                                 on NAL_DEC8$BASE   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAL_DEC8$BASE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NAL_DEC8$BASE   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAL_DEC8$BASE   to NALOG;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAL_DEC8$BASE   to NAL_DEC8$BASE;
-grant SELECT                                                                 on NAL_DEC8$BASE   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NAL_DEC8$BASE   to WR_ALL_RIGHTS;
 
 

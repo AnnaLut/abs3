@@ -71,11 +71,9 @@ COMMENT ON COLUMN BARS.IDENT_FM_FL_SPD.G12 IS '';
 
 
 PROMPT *** Create  grants  IDENT_FM_FL_SPD ***
-grant SELECT                                                                 on IDENT_FM_FL_SPD to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on IDENT_FM_FL_SPD to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on IDENT_FM_FL_SPD to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on IDENT_FM_FL_SPD to START1;
-grant SELECT                                                                 on IDENT_FM_FL_SPD to UPLD;
 
 
 

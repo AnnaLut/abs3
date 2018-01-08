@@ -124,9 +124,7 @@ COMMENT ON COLUMN BARS.ERR$_SPECPARAM_UPDATE.S130 IS '';
 
 
 PROMPT *** Create  grants  ERR$_SPECPARAM_UPDATE ***
-grant SELECT                                                                 on ERR$_SPECPARAM_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_SPECPARAM_UPDATE to BARS_DM;
-grant SELECT                                                                 on ERR$_SPECPARAM_UPDATE to UPLD;
 
 
 

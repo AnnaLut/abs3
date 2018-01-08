@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DPY
-prompt Наименование операции: DPY Стягнення штрафу при частковій виплаті зі вкладу
+prompt Наименование операции: Стягнення штрафу при частковій виплаті зі вкладу
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DPY', 'DPY Стягнення штрафу при частковій виплаті зі вкладу', 1, null, null, null, 980, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''03''))', 0, '0000100000000000000000000000000000000000000000000000000000000000', 'Повернення нарахованих, але не сплачених відсотків при знятті частини суми договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DPY', 'Стягнення штрафу при частковій виплаті зі вкладу', 1, null, null, null, 980, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''03''))', 0, '0000100000000000000000000000000000000000000000000000000000000000', 'Повернення нарахованих, але не сплачених відсотків при знятті частини суми договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DPY', name='DPY Стягнення штрафу при частковій виплаті зі вкладу', dk=1, nlsm=null, kv=null, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=0, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='Повернення нарахованих, але не сплачених відсотків при знятті частини суми договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DPY', name='Стягнення штрафу при частковій виплаті зі вкладу', dk=1, nlsm=null, kv=null, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=0, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='Повернення нарахованих, але не сплачених відсотків при знятті частини суми договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DPY';
   end;
   --------------------------------

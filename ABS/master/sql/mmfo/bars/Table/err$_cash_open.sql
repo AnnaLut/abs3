@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_CASH_OPEN.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CASH_OPEN ***
-grant SELECT                                                                 on ERR$_CASH_OPEN  to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CASH_OPEN  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

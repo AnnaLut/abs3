@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_SKRYNKA_ND_REF.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SKRYNKA_ND_REF ***
-grant SELECT                                                                 on ERR$_SKRYNKA_ND_REF to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SKRYNKA_ND_REF to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -38,9 +38,6 @@ COMMENT ON COLUMN BARSAQ.AQ$_CB_QUEUE_TABLE_L.FLAGS IS '';
 
 
 
-PROMPT *** Create  grants  AQ$_CB_QUEUE_TABLE_L ***
-grant SELECT                                                                 on AQ$_CB_QUEUE_TABLE_L to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

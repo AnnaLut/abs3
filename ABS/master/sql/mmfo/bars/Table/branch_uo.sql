@@ -92,22 +92,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BRANCHUO_ID_NN ***
+PROMPT *** Create  constraint FK_BRANCHUO_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BRANCH_UO MODIFY (IDPDR CONSTRAINT CC_BRANCHUO_ID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BRANCHUO_OPN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BRANCH_UO MODIFY (DATE_OPENED CONSTRAINT CC_BRANCHUO_OPN_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BRANCH_UO ADD CONSTRAINT FK_BRANCHUO_ID FOREIGN KEY (IDPDR)
+	  REFERENCES BARS.MONEX_UO (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -130,6 +119,30 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_BRANCHUO_OPN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BRANCH_UO MODIFY (DATE_OPENED CONSTRAINT CC_BRANCHUO_OPN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BRANCHUO_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BRANCH_UO MODIFY (IDPDR CONSTRAINT CC_BRANCHUO_ID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XPK_BRANCHUO ***
 begin   
  execute immediate '
@@ -144,11 +157,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BRANCH_UO ***
-grant SELECT                                                                 on BRANCH_UO       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BRANCH_UO       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH_UO       to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on BRANCH_UO       to START1;
-grant SELECT                                                                 on BRANCH_UO       to UPLD;
 
 
 

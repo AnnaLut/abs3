@@ -33,10 +33,8 @@ where c.rnk=cu.rnk       and cu.acc=a.acc   and c.okpo=l.kod   and
       MONTHS_BETWEEN(o.fdat,a.daos) > 24;
 
 PROMPT *** Create  grants  V_DPAM ***
-grant SELECT                                                                 on V_DPAM          to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPAM          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPAM          to START1;
-grant SELECT                                                                 on V_DPAM          to UPLD;
 
 
 

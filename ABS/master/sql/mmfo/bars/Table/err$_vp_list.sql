@@ -67,10 +67,6 @@ COMMENT ON COLUMN BARS.ERR$_VP_LIST.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_VP_LIST ***
-grant SELECT                                                                 on ERR$_VP_LIST    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_VP_LIST    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

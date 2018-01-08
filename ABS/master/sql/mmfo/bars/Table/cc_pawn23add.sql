@@ -93,7 +93,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_PAWN23ADD ***
-grant SELECT                                                                 on CC_PAWN23ADD    to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_PAWN23ADD    to BARSUPL;
 grant SELECT                                                                 on CC_PAWN23ADD    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_PAWN23ADD    to BARS_DM;

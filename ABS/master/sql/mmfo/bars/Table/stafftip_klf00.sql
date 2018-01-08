@@ -53,6 +53,32 @@ COMMENT ON COLUMN BARS.STAFFTIP_KLF00.REVERSE IS '';
 
 
 
+PROMPT *** Create  constraint FK_STAFFTIPKLF00_STAFFTIPS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFFTIP_KLF00 ADD CONSTRAINT FK_STAFFTIPKLF00_STAFFTIPS FOREIGN KEY (ID)
+	  REFERENCES BARS.STAFF_TIPS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STAFFTIPKLF00_KLF00 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFFTIP_KLF00 ADD CONSTRAINT FK_STAFFTIPKLF00_KLF00 FOREIGN KEY (KODF, A017)
+	  REFERENCES BARS.KL_F00$GLOBAL (KODF, A017) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_STAFFTIPKLF00_ID_NN ***
 begin   
  execute immediate '
@@ -118,9 +144,7 @@ exception when others then
 
 PROMPT *** Create  grants  STAFFTIP_KLF00 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFFTIP_KLF00  to ABS_ADMIN;
-grant SELECT                                                                 on STAFFTIP_KLF00  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFFTIP_KLF00  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on STAFFTIP_KLF00  to UPLD;
 
 
 

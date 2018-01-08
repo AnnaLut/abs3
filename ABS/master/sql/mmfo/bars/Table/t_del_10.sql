@@ -71,10 +71,8 @@ COMMENT ON COLUMN BARS.T_DEL_10.CO_ID IS '';
 
 
 PROMPT *** Create  grants  T_DEL_10 ***
-grant SELECT                                                                 on T_DEL_10        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on T_DEL_10        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on T_DEL_10        to START1;
-grant SELECT                                                                 on T_DEL_10        to UPLD;
 
 
 

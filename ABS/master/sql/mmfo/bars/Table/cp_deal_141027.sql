@@ -88,9 +88,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_DEAL_141027 ***
-grant SELECT                                                                 on CP_DEAL_141027  to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_DEAL_141027  to BARS_DM;
-grant SELECT                                                                 on CP_DEAL_141027  to UPLD;
 
 
 

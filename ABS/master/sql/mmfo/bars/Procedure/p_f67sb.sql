@@ -9,7 +9,7 @@ PROMPT *** Create  procedure P_F67SB ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_F67SB (Dat_ DATE,
                                           tp_ in number default 0,
-                                          sheme_ VARCHAR2 DEFAULT 'C')
+                                          sheme_ VARCHAR2 DEFAULT 'C')  
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FILE NAME   : otcn.sql
@@ -17,10 +17,10 @@ IS
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
 % VERSION     : 13/11/2017 (16/02/2016, 13/01/2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 13/11/2017 - удалил ненужные строки и изменил некоторые блоки формирования
+% 13/11/2017 - удалил ненужные строки и изменил некоторые блоки формирования 
 % 16/02/2016 - для декабря месяца будут включаться годовые корректирующие
 %              обороты
-% 12/01/2016 - вычитаем корректирующие обороты по перекрытию 6,7 классов
+% 12/01/2016 - вычитаем корректирующие обороты по перекрытию 6,7 классов 
 %              на 5040,5041
 % 26/01/2012 - добавила еще один параметр вызова, т.к. файл используется
 % для ежедневной сверки @67 и @87, то там не подходит формирование по месячным
@@ -71,7 +71,7 @@ ret_     number;
 tobo_    accounts.tobo%TYPE;
 nms_     accounts.nms%TYPE;
 comm_    rnbu_trace.comm%TYPE;
-typ_     Number;
+typ_     Number; 
 nbuc1_   VARCHAR2(12);
 nbuc_    VARCHAR2(12);
 d_sum_   DECIMAL(24);
@@ -80,7 +80,7 @@ k_sum_   DECIMAL(24);
 --Остатки номиналы (грн.+валюта)
 CURSOR SALDO IS
    SELECT a.acc, a.nls, a.kv, a.nbs, s.fdat, NVL(trim(sp.ob22),'00'),
-          s.ost, s.ostq, s.dos96, s.kos96, s.dosq96, s.kosq96,
+          s.ost, s.ostq, s.dos96, s.kos96, s.dosq96, s.kosq96, 
           s.dos99, s.kos99, s.dosq99, s.kosq99, a.tobo, a.nms
    FROM  otcn_saldo s, otcn_acc a, specparam_int sp
    WHERE s.acc=a.acc
@@ -115,7 +115,7 @@ end if;
 OPEN SALDO;
    LOOP
       FETCH SALDO INTO acc_, nls_, kv_, nbs_, data_, zz_, Ostn_, Ostq_,
-                       Dos96_, Kos96_, Dosq96_, Kosq96_,
+                       Dos96_, Kos96_, Dosq96_, Kosq96_, 
                        Dos99_, Kos99_, Dosq99_, Kosq99_,
                        tobo_, nms_;
       EXIT WHEN SALDO%NOTFOUND;
@@ -123,7 +123,7 @@ OPEN SALDO;
       comm_ := '';
       comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
 
-      IF typ_ > 0
+      IF typ_ > 0 
       THEN
          nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
       ELSE
@@ -131,18 +131,18 @@ OPEN SALDO;
       END IF;
 
       --- обороты по перекрытию 6,7 классов на 5040,5041
-      IF to_char(Dat_,'MM')='12' and
-         (nls_ like '6%' or nls_ like '7%' or nls_ like '504%' or nls_ like '390%')
+      IF to_char(Dat_,'MM')='12' and 
+         (nls_ like '6%' or nls_ like '7%' or nls_ like '504%' or nls_ like '390%') 
       THEN
          SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
                 NVL(SUM(decode(dk,1,1,0)*s),0)
             INTO d_sum_, k_sum_
-         FROM opldok
+         FROM opldok 
          WHERE fdat  between Dat_  AND Dat_+29 AND
                acc  = acc_   AND
                (tt like 'ZG8%'  or tt like 'ZG9%');
 
-         IF Dos96_ <> 0 then
+         IF Dos96_ <> 0 then 
             Dos96_ := Dos96_ - d_sum_;
          END IF;
          IF Kos96_ <> 0 THEN
@@ -150,26 +150,26 @@ OPEN SALDO;
          END IF;
       END IF;
 
-      if nbs_ in ('5040','5041')
+      if nbs_ in ('5040','5041') 
       then
          Ostn_ := Ostn_-Dos96_+Kos96_;
       end if;
 
-      if nbs_ not in ('5040','5041')
+      if nbs_ not in ('5040','5041') 
       then
          Ostn_ := Ostn_ - Dos96_ + Kos96_ - Dos99_ + Kos99_;
       end if;
 
       Ostq_ := Ostq_ - Dosq96_ + Kosq96_ - Dosq99_ + Kosq99_;
 
-      IF kv_ <> 980
+      IF kv_ <> 980 
       THEN
          se_ := Ostq_;
       ELSE
          se_ := Ostn_;
       END IF;
 
-      IF se_ <> 0
+      IF se_ <> 0 
       THEN
          dk_ := IIF_N(se_,0,'1','2','2');
          kodp_ := dk_ || nbs_ || zz_ ;

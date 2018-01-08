@@ -62,10 +62,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0060797 ***
+PROMPT *** Create  constraint PK_NOTARY_QUEUE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NOTARY_QUEUE MODIFY (OBJECT_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.NOTARY_QUEUE ADD CONSTRAINT PK_NOTARY_QUEUE PRIMARY KEY (OBJECT_ID, OBJECT_TYPE, KF)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYNI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -86,12 +88,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_NOTARY_QUEUE ***
+PROMPT *** Create  constraint SYS_C0060797 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NOTARY_QUEUE ADD CONSTRAINT PK_NOTARY_QUEUE PRIMARY KEY (OBJECT_ID, OBJECT_TYPE, KF)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI  ENABLE';
+  ALTER TABLE BARS.NOTARY_QUEUE MODIFY (OBJECT_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -114,7 +114,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  NOTARY_QUEUE ***
-grant SELECT                                                                 on NOTARY_QUEUE    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NOTARY_QUEUE    to BARS_ACCESS_DEFROLE;
 
 

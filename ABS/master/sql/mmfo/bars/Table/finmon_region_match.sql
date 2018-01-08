@@ -77,12 +77,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  FINMON_REGION_MATCH ***
-grant SELECT                                                                 on FINMON_REGION_MATCH to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on FINMON_REGION_MATCH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FINMON_REGION_MATCH to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on FINMON_REGION_MATCH to FINMON01;
 grant SELECT                                                                 on FINMON_REGION_MATCH to START1;
-grant SELECT                                                                 on FINMON_REGION_MATCH to UPLD;
 
 
 

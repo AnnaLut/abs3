@@ -60,10 +60,6 @@ COMMENT ON COLUMN BARS.KL_D060.D_MODE IS '';
 
 
 
-PROMPT *** Create  grants  KL_D060 ***
-grant SELECT                                                                 on KL_D060         to BARSREADER_ROLE;
-grant SELECT                                                                 on KL_D060         to UPLD;
-
 
 
 PROMPT *** Create SYNONYM  to KL_D060 ***

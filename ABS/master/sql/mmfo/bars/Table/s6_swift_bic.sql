@@ -115,11 +115,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  S6_SWIFT_BIC ***
-grant SELECT                                                                 on S6_SWIFT_BIC    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_SWIFT_BIC    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on S6_SWIFT_BIC    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_SWIFT_BIC    to START1;
-grant SELECT                                                                 on S6_SWIFT_BIC    to UPLD;
 
 
 

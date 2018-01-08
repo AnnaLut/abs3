@@ -43,8 +43,7 @@ begin
 	DOC_CURRENCY NUMBER(3,0), 
 	REF NUMBER(22,0), 
 	DOC_ORN NUMBER(22,0), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
-	TRANS_INFO VARCHAR2(4000)
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -53,7 +52,13 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
-
+begin
+    execute immediate 'alter table OW_OIC_ATRANSFERS_HIST add trans_info VARCHAR2(4000)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
 
 
 
@@ -63,7 +68,6 @@ PROMPT *** ALTER_POLICIES to OW_OIC_ATRANSFERS_HIST ***
 
 COMMENT ON TABLE BARS.OW_OIC_ATRANSFERS_HIST IS 'OpenWay. Імпортовані файли atransfers';
 COMMENT ON COLUMN BARS.OW_OIC_ATRANSFERS_HIST.KF IS '';
-COMMENT ON COLUMN BARS.OW_OIC_ATRANSFERS_HIST.TRANS_INFO IS '';
 COMMENT ON COLUMN BARS.OW_OIC_ATRANSFERS_HIST.ID IS '';
 COMMENT ON COLUMN BARS.OW_OIC_ATRANSFERS_HIST.IDN IS '';
 COMMENT ON COLUMN BARS.OW_OIC_ATRANSFERS_HIST.ANL_SYNTHCODE IS '';
@@ -101,10 +105,36 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OWOICATRNHIST_OWFILES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_OIC_ATRANSFERS_HIST ADD CONSTRAINT FK_OWOICATRNHIST_OWFILES FOREIGN KEY (ID)
+	  REFERENCES BARS.OW_FILES (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OWOICATRANSFERSHIST_KF_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.OW_OIC_ATRANSFERS_HIST MODIFY (KF CONSTRAINT CC_OWOICATRANSFERSHIST_KF_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OWOICATRANSFERSHIST_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_OIC_ATRANSFERS_HIST ADD CONSTRAINT FK_OWOICATRANSFERSHIST_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -179,11 +209,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_OIC_ATRANSFERS_HIST ***
-grant SELECT                                                                 on OW_OIC_ATRANSFERS_HIST to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on OW_OIC_ATRANSFERS_HIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_OIC_ATRANSFERS_HIST to BARS_DM;
 grant SELECT,UPDATE                                                          on OW_OIC_ATRANSFERS_HIST to OW;
-grant SELECT                                                                 on OW_OIC_ATRANSFERS_HIST to UPLD;
 
 
 

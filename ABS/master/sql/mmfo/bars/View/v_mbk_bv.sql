@@ -15,10 +15,6 @@ WHERE (a.nbs > '1500' AND a.nbs < '1600' or a.nbs in ('1600','1607','1608') )
    (SELECT MAX (fdat) FROM saldoa WHERE acc=a.acc AND fdat < TO_DATE (pul.get_mas_ini_val('sFdat1'),'dd.mm.yyyy') )
 group by n.nd having SUM (s.ostf-s.dos+s.kos) <0 ;
 
-PROMPT *** Create  grants  V_MBK_BV ***
-grant SELECT                                                                 on V_MBK_BV        to BARSREADER_ROLE;
-grant SELECT                                                                 on V_MBK_BV        to UPLD;
-
 
 
 PROMPT ===================================================================================== 

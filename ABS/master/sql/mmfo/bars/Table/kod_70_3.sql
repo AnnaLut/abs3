@@ -53,9 +53,7 @@ COMMENT ON COLUMN BARS.KOD_70_3.DATA_C IS '';
 
 
 PROMPT *** Create  grants  KOD_70_3 ***
-grant SELECT                                                                 on KOD_70_3        to BARSREADER_ROLE;
 grant SELECT                                                                 on KOD_70_3        to BARS_DM;
-grant SELECT                                                                 on KOD_70_3        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KOD_70_3        to WR_ALL_RIGHTS;
 
 

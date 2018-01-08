@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DP4
-prompt Наименование операции: DP4 +Виплата відсотків в нац.валюті готівкою
+prompt Наименование операции: +Виплата відсотків в нац.валюті готівкою
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DP4', 'DP4 +Виплата відсотків в нац.валюті готівкою', 1, null, 980, null, 980, null, null, '#(tobopack.GetToboCASH)', null, 0, 0, 0, 0, null, null, 55, null, null, 0, '0000100001000000000000000010000000010000000000000000000000000000', 'Виплата відсотків згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DP4', '+Виплата відсотків в нац.валюті готівкою', 1, null, 980, null, 980, null, null, '#(tobopack.GetToboCASH)', null, 0, 0, 0, 0, null, null, 55, null, null, 0, '0000100001000000000000000010000000010000000000000000000000000000', 'Виплата відсотків згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DP4', name='DP4 +Виплата відсотків в нац.валюті готівкою', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb='#(tobopack.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=55, proc=null, s3800=null, rang=0, flags='0000100001000000000000000010000000010000000000000000000000000000', nazn='Виплата відсотків згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DP4', name='+Виплата відсотків в нац.валюті готівкою', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb='#(tobopack.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=55, proc=null, s3800=null, rang=0, flags='0000100001000000000000000010000000010000000000000000000000000000', nazn='Виплата відсотків згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DP4';
   end;
   --------------------------------

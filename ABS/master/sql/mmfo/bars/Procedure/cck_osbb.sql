@@ -1,20 +1,11 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/CCK_OSBB.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure CCK_OSBB ***
-
-  CREATE OR REPLACE PROCEDURE BARS.CCK_OSBB (p_mode int, p_nd1 number) is
+CREATE OR REPLACE PROCEDURE BARS.cck_OSBB (p_mode int, p_nd1 number) is
 
 -- p_mode = 0 Проверка условий для существующено КДВ
 -- p_mode = 1 Авторизація первинного КД ОСББ
 -- p_mode = 2 Фініш       первинного КД ОСББ + Авто-Старт вторинного КД ОСББ
 -- p_mode = 3 Авторизація вторинного КД ОСББ - як самостійного КД
 /*
-10/11/2017 LitvinSO Для p_mode = 2 с учетом на переход новый план счетов так как мы не меняем cc_deal.PROD анализируем продукт
+10/11/2017 LitvinSO Для p_mode = 2 с учетом на переход новый план счетов так как мы не меняем cc_deal.PROD анализируем продукт 
 26/05/2017 Pivanova додано заміну коми на крапку при вичитуванні тагу S_SDI
 18.11.2015 LitvinSO Реалізовано у перевіркі РНК пропускало клієнтів які відносяться до ЖБК з кодом K050 = 320 і K051 = 62.
 17.11.2015 LitvinSO По зауваженням Мешко Ж. виправив по перевіркам умов не передавались данні з cc_deal і хибно впрацьовували помилки.
@@ -263,17 +254,17 @@ If p_mode = 2 then
                DATNP  => l_datnp,
                nFREQP => 5 ,
                nKom   => sd1.ostb ) ;
-
+   
    if newnbs.g_state= 1 then
-        begin
+        begin  
             SELECT r020_new||ob_new
               INTO dd1.prod
               FROM TRANSFER_2017
              WHERE r020_old||ob_old = dd1.prod and r020_old <> r020_new;
         EXCEPTION WHEN NO_DATA_FOUND THEN null;
-        end;
+        end;     
    end if;
-
+   
    update cc_deal set prod  =  dd1.prod  where nd = dd2.nd ;
    select *       into dd2 from cc_deal  where nd = dd2.nd ;
    --------Его доп.рекв.
@@ -399,10 +390,3 @@ end if;
   RETURN;
 end  cck_OSBB;
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/CCK_OSBB.sql =========*** End *** 
-PROMPT ===================================================================================== 

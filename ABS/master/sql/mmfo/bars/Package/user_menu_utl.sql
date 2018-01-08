@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/user_menu_utl.sql =========*** Run *
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.USER_MENU_UTL is
+  CREATE OR REPLACE PACKAGE BARS.user_menu_utl is
 ------------------------------------------------------------------
 --
 --  Пакет внутреннего пользования для управления ресурсами АРМ-а
@@ -248,7 +248,10 @@
         p_approve number default 0);
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.USER_MENU_UTL as
+
+
+
+CREATE OR REPLACE PACKAGE BODY BARS.user_menu_utl as
 ------------------------------------------------------------------
 --
 --  Пакет внутреннего пользования для управления АРМ-ами и его ресурсами
@@ -1085,7 +1088,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.USER_MENU_UTL as
     end;
 end;
 /
- show err;
+
+show err;
  
 PROMPT *** Create  grants  USER_MENU_UTL ***
 grant EXECUTE                                                                on USER_MENU_UTL   to BARS_ACCESS_DEFROLE;

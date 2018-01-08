@@ -12,11 +12,9 @@ PROMPT *** Create  view SPECPARAM_CP_V ***
 from accounts a, SPECPARAM_CP_OB s where a.acc=s.acc;
 
 PROMPT *** Create  grants  SPECPARAM_CP_V ***
-grant SELECT                                                                 on SPECPARAM_CP_V  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPECPARAM_CP_V  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPECPARAM_CP_V  to SALGL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPECPARAM_CP_V  to START1;
-grant SELECT                                                                 on SPECPARAM_CP_V  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPECPARAM_CP_V  to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SPECPARAM_CP_V  to WR_REFREAD;
 

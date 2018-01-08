@@ -17,10 +17,8 @@ where l.nls = a.nls and l.kv  = a.kv
   and a.branch like sys_context ('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  V_DPA_ACCOUNTS ***
-grant SELECT                                                                 on V_DPA_ACCOUNTS  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPA_ACCOUNTS  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPA_ACCOUNTS  to RPBN002;
-grant SELECT                                                                 on V_DPA_ACCOUNTS  to UPLD;
 grant FLASHBACK,SELECT                                                       on V_DPA_ACCOUNTS  to WR_REFREAD;
 
 

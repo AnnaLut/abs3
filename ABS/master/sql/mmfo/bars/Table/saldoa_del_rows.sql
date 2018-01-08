@@ -78,12 +78,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SALDOA_DEL_ROWS ***
-grant SELECT                                                                 on SALDOA_DEL_ROWS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDOA_DEL_ROWS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALDOA_DEL_ROWS to BARS_DM;
 grant SELECT                                                                 on SALDOA_DEL_ROWS to DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDOA_DEL_ROWS to START1;
-grant SELECT                                                                 on SALDOA_DEL_ROWS to UPLD;
 
 
 

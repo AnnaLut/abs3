@@ -30,10 +30,10 @@ is
    ww operw%rowtype   ;
    aa accounts%rowtype;
    bb accounts%rowtype;
-   l_7109 accounts.NBS%type := '7509' ;
+   l_7109 accounts.NBS%type := '7509' ; 
 begin
 
-   If NVL(newnbs.g_state,0)  = 1 then null;  Else  l_7109 := '7109';  end if;
+   If NVL(newnbs.g_state,0)  = 1 then null;  Else  l_7109 := '7109';  end if; 
 
 
    p_Code :=1 ;

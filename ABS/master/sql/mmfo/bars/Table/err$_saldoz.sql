@@ -65,10 +65,6 @@ COMMENT ON COLUMN BARS.ERR$_SALDOZ.KOSQ IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SALDOZ ***
-grant SELECT                                                                 on ERR$_SALDOZ     to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SALDOZ     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

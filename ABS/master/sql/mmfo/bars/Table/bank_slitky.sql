@@ -97,10 +97,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BANKSL_KOD_NN ***
+PROMPT *** Create  constraint FK_BANKSL_TABVAL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BANK_SLITKY ADD CONSTRAINT CC_BANKSL_KOD_NN CHECK (KOD IS NOT NULL) ENABLE';
+  ALTER TABLE BARS.BANK_SLITKY ADD CONSTRAINT FK_BANKSL_TABVAL FOREIGN KEY (MET)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -113,6 +114,31 @@ PROMPT *** Create  constraint CC_BANKSL_BRANCH_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.BANK_SLITKY ADD CONSTRAINT CC_BANKSL_BRANCH_NN CHECK (BRANCH IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_BANK_SLITKY_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BANK_SLITKY ADD CONSTRAINT FK_BANK_SLITKY_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BANKSL_KOD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BANK_SLITKY ADD CONSTRAINT CC_BANKSL_KOD_NN CHECK (KOD IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -135,11 +161,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BANK_SLITKY ***
-grant SELECT                                                                 on BANK_SLITKY     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANK_SLITKY     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BANK_SLITKY     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANK_SLITKY     to PYOD001;
-grant SELECT                                                                 on BANK_SLITKY     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BANK_SLITKY     to WR_ALL_RIGHTS;
 
 

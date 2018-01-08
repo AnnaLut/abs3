@@ -38,10 +38,8 @@ PROMPT *** Create  view V_DEP_CUST ***
           OR (nls LIKE '2603%' AND kv = 980) AND dazs IS NULL;
 
 PROMPT *** Create  grants  V_DEP_CUST ***
-grant SELECT                                                                 on V_DEP_CUST      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DEP_CUST      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DEP_CUST      to START1;
-grant SELECT                                                                 on V_DEP_CUST      to UPLD;
 
 
 

@@ -135,10 +135,11 @@ COMMENT ON COLUMN BARS.CUSTOMER.SED IS 'Код отрасли экономики';
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMER_BRANCH_TOBO_CC ***
+PROMPT *** Create  constraint FK_CUSTOMER_KF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT CC_CUSTOMER_BRANCH_TOBO_CC CHECK (branch=tobo) DEFERRABLE ENABLE';
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -147,10 +148,83 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMER_SAB ***
+PROMPT *** Create  constraint FK_CUSTOMER_ISE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT CC_CUSTOMER_SAB CHECK (sab is null or sab = upper(sab) ) ENABLE';
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_ISE FOREIGN KEY (ISE)
+	  REFERENCES BARS.ISE (ISE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMER_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER MODIFY (KF CONSTRAINT CC_CUSTOMER_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMER_TOBO_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER MODIFY (TOBO CONSTRAINT CC_CUSTOMER_TOBO_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMER_DATEON_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER MODIFY (DATE_ON CONSTRAINT CC_CUSTOMER_DATEON_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMER_RNK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER MODIFY (RNK CONSTRAINT CC_CUSTOMER_RNK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMER_BC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT CC_CUSTOMER_BC CHECK (bc in (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMER_DATEOFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT CC_CUSTOMER_DATEOFF CHECK (date_off = trunc(date_off)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -173,10 +247,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMER_DATEOFF ***
+PROMPT *** Create  constraint FK_CUSTOMER_FS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT CC_CUSTOMER_DATEOFF CHECK (date_off = trunc(date_off)) ENABLE';
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_FS FOREIGN KEY (FS)
+	  REFERENCES BARS.FS (FS) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -185,10 +260,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMER_BC ***
+PROMPT *** Create  constraint FK_CUSTOMER_PRINSIDER ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT CC_CUSTOMER_BC CHECK (bc in (0,1)) ENABLE';
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_PRINSIDER FOREIGN KEY (PRINSIDER)
+	  REFERENCES BARS.PRINSIDER (PRINSIDER) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -197,10 +273,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMER_RNK_NN ***
+PROMPT *** Create  constraint FK_CUSTOMER_STAFF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER MODIFY (RNK CONSTRAINT CC_CUSTOMER_RNK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_STAFF FOREIGN KEY (ISP)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -209,10 +286,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMER_DATEON_NN ***
+PROMPT *** Create  constraint FK_CUSTOMER_TOBO ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER MODIFY (DATE_ON CONSTRAINT CC_CUSTOMER_DATEON_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_TOBO FOREIGN KEY (TOBO)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -221,10 +299,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMER_TOBO_NN ***
+PROMPT *** Create  constraint FK_CUSTOMER_SPK050 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER MODIFY (TOBO CONSTRAINT CC_CUSTOMER_TOBO_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_SPK050 FOREIGN KEY (K050)
+	  REFERENCES BARS.SP_K050 (K050) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -233,10 +312,165 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMER_KF_NN ***
+PROMPT *** Create  constraint FK_CUSTOMER_BRANCH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER MODIFY (KF CONSTRAINT CC_CUSTOMER_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMER_CUSTTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_CUSTTYPE FOREIGN KEY (CUSTTYPE)
+	  REFERENCES BARS.CUSTTYPE (CUSTTYPE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMER_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_CUSTOMER FOREIGN KEY (RNKP)
+	  REFERENCES BARS.CUSTOMER (RNK) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMER_OE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_OE FOREIGN KEY (OE)
+	  REFERENCES BARS.OE (OE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMER_STMT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_STMT FOREIGN KEY (STMT)
+	  REFERENCES BARS.STMT (STMT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMER_SPRREG ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_SPRREG FOREIGN KEY (C_REG, C_DST)
+	  REFERENCES BARS.SPR_REG (C_REG, C_DST) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMER_TGR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_TGR FOREIGN KEY (TGR)
+	  REFERENCES BARS.TGR (TGR) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMER_CODCAGENT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_CODCAGENT FOREIGN KEY (CODCAGENT)
+	  REFERENCES BARS.CODCAGENT (CODCAGENT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMER_COUNTRY ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_COUNTRY FOREIGN KEY (COUNTRY)
+	  REFERENCES BARS.COUNTRY (COUNTRY) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMER_VED ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_VED FOREIGN KEY (VED)
+	  REFERENCES BARS.VED (VED) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMER_SED ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT FK_CUSTOMER_SED FOREIGN KEY (SED)
+	  REFERENCES BARS.SED (SED) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMER_BRANCH_TOBO_CC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT CC_CUSTOMER_BRANCH_TOBO_CC CHECK (branch=tobo) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMER_SAB ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER ADD CONSTRAINT CC_CUSTOMER_SAB CHECK (sab is null or sab = upper(sab) ) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -349,7 +583,6 @@ grant SELECT                                                                 on 
 grant FLASHBACK,REFERENCES,SELECT                                            on CUSTOMER        to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on CUSTOMER        to BARSAQ_ADM with grant option;
 grant SELECT                                                                 on CUSTOMER        to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on CUSTOMER        to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTOMER        to BARSUPL;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CUSTOMER        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER        to BARS_DM;
@@ -365,7 +598,6 @@ grant SELECT                                                                 on 
 grant SELECT,SELECT                                                          on CUSTOMER        to KLBX;
 grant SELECT                                                                 on CUSTOMER        to OBPC;
 grant SELECT                                                                 on CUSTOMER        to OPERKKK;
-grant SELECT                                                                 on CUSTOMER        to PFU with grant option;
 grant SELECT                                                                 on CUSTOMER        to PYOD001;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CUSTOMER        to RCC_DEAL;
 grant SELECT                                                                 on CUSTOMER        to REFSYNC_USR;
@@ -373,7 +605,6 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on CUSTOMER        to RPBN002;
 grant SELECT,UPDATE                                                          on CUSTOMER        to SALGL;
 grant SELECT                                                                 on CUSTOMER        to START1;
-grant SELECT                                                                 on CUSTOMER        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTOMER        to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CUSTOMER        to WR_CREDIT;
 grant SELECT                                                                 on CUSTOMER        to WR_CREPORTS;

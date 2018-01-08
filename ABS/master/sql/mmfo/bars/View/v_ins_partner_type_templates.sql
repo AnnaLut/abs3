@@ -20,9 +20,7 @@ PROMPT *** Create  view V_INS_PARTNER_TYPE_TEMPLATES ***
  order by ptt.template_id;
 
 PROMPT *** Create  grants  V_INS_PARTNER_TYPE_TEMPLATES ***
-grant SELECT                                                                 on V_INS_PARTNER_TYPE_TEMPLATES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_PARTNER_TYPE_TEMPLATES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INS_PARTNER_TYPE_TEMPLATES to UPLD;
 
 
 

@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/OP_REG_EXFL.sql =========*** Run *
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure OP_REG_EXFL ***
-
-  CREATE OR REPLACE PROCEDURE BARS.OP_REG_EXFL 
+create or replace procedure OP_REG_EXFL
 (     mod_        INTEGER  -- Opening mode : 0, 1, 2, 3, 4, 9, 99, 77
 ,      p1_        INTEGER  -- 1st Par      : 0-inst_num   1-nd   2-nd   3-main acc   4-mfo
 ,      p2_        INTEGER  -- 2nd Par      : -    -    pawn   4-acc
@@ -18,7 +9,7 @@ PROMPT *** Create  procedure OP_REG_EXFL ***
 ,      kv_        SMALLINT -- Currency code
 ,     nms_        VARCHAR2 -- Account name
 ,     tip_        CHAR     -- Account type
-,     isp_        SMALLINT --
+,     isp_        SMALLINT -- 
 ,    accR_    OUT INTEGER  -- Account ID
 , nbsnull_        VARCHAR2 default '1'
 ,     pap_        NUMBER   default null
@@ -48,10 +39,5 @@ BEGIN
   , sec_, seci_, seco_, blkd_, blkk_, lim_, ostx_, nlsalt_, tobo_, accc_ );
 END OP_REG_EXFL;
 /
-show err;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/OP_REG_EXFL.sql =========*** End *
-PROMPT ===================================================================================== 
+show errors

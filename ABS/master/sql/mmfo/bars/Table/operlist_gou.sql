@@ -110,9 +110,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  OPERLIST_GOU ***
-grant SELECT                                                                 on OPERLIST_GOU    to BARSREADER_ROLE;
 grant SELECT                                                                 on OPERLIST_GOU    to BARS_DM;
-grant SELECT                                                                 on OPERLIST_GOU    to UPLD;
 
 
 

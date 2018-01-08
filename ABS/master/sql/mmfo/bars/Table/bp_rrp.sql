@@ -58,6 +58,19 @@ COMMENT ON COLUMN BARS.BP_RRP.NAME IS '';
 
 
 
+PROMPT *** Create  constraint FK_BPRRP_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BP_RRP ADD CONSTRAINT FK_BPRRP_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C009818 ***
 begin   
  execute immediate '
@@ -111,11 +124,9 @@ exception when others then
 
 PROMPT *** Create  grants  BP_RRP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BP_RRP          to BARS014;
-grant SELECT                                                                 on BP_RRP          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BP_RRP          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BP_RRP          to BARS_DM;
 grant SELECT                                                                 on BP_RRP          to START1;
-grant SELECT                                                                 on BP_RRP          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BP_RRP          to WR_ALL_RIGHTS;
 
 

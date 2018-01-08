@@ -79,10 +79,6 @@ COMMENT ON COLUMN BARS.ERR$_SH_TARIF_SCALE_UPDATE.SMAX IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SH_TARIF_SCALE_UPDATE ***
-grant SELECT                                                                 on ERR$_SH_TARIF_SCALE_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SH_TARIF_SCALE_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

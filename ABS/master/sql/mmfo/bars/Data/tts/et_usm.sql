@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции KUV
-prompt Наименование операции: KUV Дочірня до USM
+prompt Наименование операции: Дочірня до USM
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KUV', 'KUV Дочірня до USM', 1, null, null, '#(nbs_ob22 (''6510'',''10''))', 980, null, null, null, null, 0, 0, 1, 0, 'F_TARIF(138,#(KVA),#(NLSA),#(S))', null, 5, null, '#(nbs_ob22 (''3800'',''03''))', null, '0100100000000000000000000000000000000000000000000000000000000000', 'Kомісія за переказ');
+    values ('KUV', 'Дочірня до USM', 1, null, null, '#(nbs_ob22 (''6110'',''10''))', 980, null, null, null, null, 0, 0, 1, 0, 'F_TARIF(138,#(KVA),#(NLSA),#(S))', null, 5, null, '#(nbs_ob22 (''3800'',''03''))', null, '0100100000000000000000000000000000000000000000000000000000000000', 'Kомісія за переказ');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KUV', name='KUV Дочірня до USM', dk=1, nlsm=null, kv=null, nlsk='#(nbs_ob22 (''6510'',''10''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='F_TARIF(138,#(KVA),#(NLSA),#(S))', s2=null, sk=5, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn='Kомісія за переказ'
+         set tt='KUV', name='Дочірня до USM', dk=1, nlsm=null, kv=null, nlsk='#(nbs_ob22 (''6110'',''10''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='F_TARIF(138,#(KVA),#(NLSA),#(S))', s2=null, sk=5, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn='Kомісія за переказ'
        where tt='KUV';
   end;
   --------------------------------
@@ -134,7 +134,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции USM
-prompt Наименование операции: USM Переказ коштів(ін.вал) зг.кред.дог.на рах. ПАТ КБ"ПравексБанк"
+prompt Наименование операции: Переказ коштів(ін.вал) зг.кред.дог.на рах. ПАТ КБ"ПравексБанк"
 declare
   cnt_  number;
 begin
@@ -143,11 +143,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('USM', 'USM Переказ коштів(ін.вал) зг.кред.дог.на рах. ПАТ КБ"ПравексБанк"', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, '191992', '300465', 1, 1, 0, 0, null, null, null, null, null, null, '0201100000000000000000000011000000010000000000000000000000000000', 'Перерахування коштів на власний поточний рахунок');
+    values ('USM', 'Переказ коштів(ін.вал) зг.кред.дог.на рах. ПАТ КБ"ПравексБанк"', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, '191992', '300465', 1, 1, 0, 0, null, null, null, null, null, null, '0201100000000000000000000011000000010000000000000000000000000000', 'Перерахування коштів на власний поточний рахунок');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='USM', name='USM Переказ коштів(ін.вал) зг.кред.дог.на рах. ПАТ КБ"ПравексБанк"', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb='191992', mfob='300465', flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0201100000000000000000000011000000010000000000000000000000000000', nazn='Перерахування коштів на власний поточний рахунок'
+         set tt='USM', name='Переказ коштів(ін.вал) зг.кред.дог.на рах. ПАТ КБ"ПравексБанк"', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb='191992', mfob='300465', flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0201100000000000000000000011000000010000000000000000000000000000', nazn='Перерахування коштів на власний поточний рахунок'
        where tt='USM';
   end;
   --------------------------------

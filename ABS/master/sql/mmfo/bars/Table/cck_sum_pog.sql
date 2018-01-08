@@ -71,10 +71,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_CCK_SUM_POG_ND ***
+PROMPT *** Create  constraint NK_CCK_SUM_POG_RNK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CCK_SUM_POG MODIFY (ND CONSTRAINT NK_CCK_SUM_POG_ND NOT NULL ENABLE)';
+  ALTER TABLE BARS.CCK_SUM_POG MODIFY (RNK CONSTRAINT NK_CCK_SUM_POG_RNK NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -95,10 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_CCK_SUM_POG_RNK ***
+PROMPT *** Create  constraint NK_CCK_SUM_POG_ND ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CCK_SUM_POG MODIFY (RNK CONSTRAINT NK_CCK_SUM_POG_RNK NOT NULL ENABLE)';
+  ALTER TABLE BARS.CCK_SUM_POG MODIFY (ND CONSTRAINT NK_CCK_SUM_POG_ND NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -107,12 +107,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CCK_SUM_POG ***
-grant SELECT                                                                 on CCK_SUM_POG     to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on CCK_SUM_POG     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_SUM_POG     to BARS_DM;
 grant SELECT                                                                 on CCK_SUM_POG     to ELT;
 grant INSERT,SELECT                                                          on CCK_SUM_POG     to RCC_DEAL;
-grant SELECT                                                                 on CCK_SUM_POG     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_SUM_POG     to WR_ALL_RIGHTS;
 
 

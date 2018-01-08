@@ -90,13 +90,11 @@ exception when others then
 
 PROMPT *** Create  grants  KF_OB40 ***
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on KF_OB40         to ABS_ADMIN;
-grant SELECT                                                                 on KF_OB40         to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on KF_OB40         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KF_OB40         to BARS_DM;
 grant SELECT                                                                 on KF_OB40         to PYOD001;
 grant SELECT                                                                 on KF_OB40         to RPBN002;
 grant SELECT                                                                 on KF_OB40         to START1;
-grant SELECT                                                                 on KF_OB40         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KF_OB40         to WR_ALL_RIGHTS;
 
 

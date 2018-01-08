@@ -89,10 +89,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRT_DEAL_STATUSES ***
-grant SELECT                                                                 on GRT_DEAL_STATUSES to BARSREADER_ROLE;
 grant SELECT                                                                 on GRT_DEAL_STATUSES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRT_DEAL_STATUSES to BARS_DM;
-grant SELECT                                                                 on GRT_DEAL_STATUSES to UPLD;
 
 
 

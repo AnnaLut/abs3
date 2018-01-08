@@ -1,13 +1,6 @@
+prompt procedure p_fm_intfoccheck v1.22
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FM_INTDOCCHECK.sql =========*** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_FM_INTDOCCHECK ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_FM_INTDOCCHECK (p_ref number)
+create or replace procedure p_fm_intdoccheck (p_ref number)
 --
 -- Version 1.22 11/04/2017
 --
@@ -201,14 +194,3 @@ exception when others then
 
 end;
 /
-show err;
-
-PROMPT *** Create  grants  P_FM_INTDOCCHECK ***
-grant EXECUTE                                                                on P_FM_INTDOCCHECK to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_FM_INTDOCCHECK to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FM_INTDOCCHECK.sql =========*** 
-PROMPT ===================================================================================== 

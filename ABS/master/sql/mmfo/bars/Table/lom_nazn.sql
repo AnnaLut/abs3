@@ -51,11 +51,9 @@ COMMENT ON COLUMN BARS.LOM_NAZN.S IS '';
 
 
 PROMPT *** Create  grants  LOM_NAZN ***
-grant SELECT                                                                 on LOM_NAZN        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LOM_NAZN        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LOM_NAZN        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LOM_NAZN        to START1;
-grant SELECT                                                                 on LOM_NAZN        to UPLD;
 
 
 

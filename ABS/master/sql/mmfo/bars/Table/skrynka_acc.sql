@@ -83,48 +83,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint XUK_SKRYNKA_ACC_ACC ***
+PROMPT *** Create  constraint CC_SKRYNKAACC_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ACC ADD CONSTRAINT XUK_SKRYNKA_ACC_ACC UNIQUE (ACC)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SKRYNKAACC_ACC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ACC MODIFY (ACC CONSTRAINT CC_SKRYNKAACC_ACC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SKRYNKAACC_NSK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ACC MODIFY (N_SK CONSTRAINT CC_SKRYNKAACC_NSK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NN_SKRYNKA_ACC_TIP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ACC MODIFY (TIP CONSTRAINT NN_SKRYNKA_ACC_TIP NOT NULL ENABLE)';
+  ALTER TABLE BARS.SKRYNKA_ACC MODIFY (KF CONSTRAINT CC_SKRYNKAACC_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -145,10 +107,113 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SKRYNKAACC_KF_NN ***
+PROMPT *** Create  constraint NN_SKRYNKA_ACC_TIP ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ACC MODIFY (KF CONSTRAINT CC_SKRYNKAACC_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SKRYNKA_ACC MODIFY (TIP CONSTRAINT NN_SKRYNKA_ACC_TIP NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SKRYNKAACC_NSK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_ACC MODIFY (N_SK CONSTRAINT CC_SKRYNKAACC_NSK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SKRYNKAACC_ACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_ACC MODIFY (ACC CONSTRAINT CC_SKRYNKAACC_ACC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKAACC_ACCOUNTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_ACC ADD CONSTRAINT FK_SKRYNKAACC_ACCOUNTS FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKAACC_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_ACC ADD CONSTRAINT FK_SKRYNKAACC_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKAACC_SKRYNKA ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_ACC ADD CONSTRAINT FK_SKRYNKAACC_SKRYNKA FOREIGN KEY (KF, N_SK)
+	  REFERENCES BARS.SKRYNKA (KF, N_SK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKA_ACC_TIP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_ACC ADD CONSTRAINT FK_SKRYNKA_ACC_TIP FOREIGN KEY (TIP)
+	  REFERENCES BARS.SKRYNKA_ACC_TIP (TIP) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint XUK_SKRYNKA_ACC_ACC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_ACC ADD CONSTRAINT XUK_SKRYNKA_ACC_ACC UNIQUE (ACC)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKAACC_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_ACC ADD CONSTRAINT FK_SKRYNKAACC_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -199,12 +264,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_ACC ***
-grant SELECT                                                                 on SKRYNKA_ACC     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SKRYNKA_ACC     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SKRYNKA_ACC     to BARS_DM;
 grant SELECT                                                                 on SKRYNKA_ACC     to CC_DOC;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SKRYNKA_ACC     to DEP_SKRN;
-grant SELECT                                                                 on SKRYNKA_ACC     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_ACC     to WR_ALL_RIGHTS;
 
 

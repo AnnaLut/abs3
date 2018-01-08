@@ -31,9 +31,7 @@ PROMPT *** Create  view V_CF_ACC_DOGOVOR ***
     WHERE kf.nd = na.nd AND na.acc = a.acc AND a.dazs IS NULL;
 
 PROMPT *** Create  grants  V_CF_ACC_DOGOVOR ***
-grant SELECT                                                                 on V_CF_ACC_DOGOVOR to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CF_ACC_DOGOVOR to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CF_ACC_DOGOVOR to UPLD;
 
 
 

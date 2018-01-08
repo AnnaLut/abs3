@@ -83,6 +83,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OBPCTRANS_OBPCBOF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TRANS ADD CONSTRAINT FK_OBPCTRANS_OBPCBOF FOREIGN KEY (BOF)
+	  REFERENCES BARS.OBPC_BOF (BOF) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OBPCTRANS_DK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TRANS ADD CONSTRAINT FK_OBPCTRANS_DK FOREIGN KEY (DK)
+	  REFERENCES BARS.DK (DK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OBPCTRANS_TRANTYPE_NN ***
 begin   
  execute immediate '
@@ -147,12 +173,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_TRANS ***
-grant SELECT                                                                 on OBPC_TRANS      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_TRANS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_TRANS      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_TRANS      to OBPC;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_TRANS      to OBPC_TRANS;
-grant SELECT                                                                 on OBPC_TRANS      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_TRANS      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on OBPC_TRANS      to WR_REFREAD;
 

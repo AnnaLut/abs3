@@ -63,9 +63,7 @@ PROMPT *** Create  view V_CIM_F98_REZ ***
     ORDER BY f.k020, NVL (f.datnaksk, f.datanak), f.v_sank;
 
 PROMPT *** Create  grants  V_CIM_F98_REZ ***
-grant SELECT                                                                 on V_CIM_F98_REZ   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_F98_REZ   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_F98_REZ   to UPLD;
 
 
 

@@ -49,10 +49,6 @@ COMMENT ON COLUMN BARS.W4_CONF_ACC_STAT.KF IS '';
 
 
 
-PROMPT *** Create  grants  W4_CONF_ACC_STAT ***
-grant SELECT                                                                 on W4_CONF_ACC_STAT to BARSREADER_ROLE;
-grant SELECT                                                                 on W4_CONF_ACC_STAT to UPLD;
-
 
 
 PROMPT ===================================================================================== 

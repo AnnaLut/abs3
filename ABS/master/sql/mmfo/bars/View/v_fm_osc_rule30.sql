@@ -42,9 +42,7 @@ PROMPT *** Create  view V_FM_OSC_RULE30 ***
           AND gl.p_icurval (NVL (o.kv, 980), NVL (o.s, 0), o.vdat) >=  2000000;
 
 PROMPT *** Create  grants  V_FM_OSC_RULE30 ***
-grant SELECT                                                                 on V_FM_OSC_RULE30 to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FM_OSC_RULE30 to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_FM_OSC_RULE30 to UPLD;
 
 
 

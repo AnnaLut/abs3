@@ -158,94 +158,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C009796 ***
+PROMPT *** Create  constraint SYS_C009805 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.S6_DOCUM MODIFY (D_K NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009797 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_DOCUM MODIFY (SUMMA NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009798 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_DOCUM MODIFY (I_VA NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009799 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_DOCUM MODIFY (DA_OD NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009800 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_DOCUM MODIFY (REE_COUNT NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009801 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_DOCUM MODIFY (CUR_VS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009802 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_DOCUM MODIFY (GROUP_U NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009803 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_DOCUM MODIFY (STATUS NOT NULL ENABLE)';
+  ALTER TABLE BARS.S6_DOCUM MODIFY (ID_PARENT NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -266,10 +182,94 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C009805 ***
+PROMPT *** Create  constraint SYS_C009803 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.S6_DOCUM MODIFY (ID_PARENT NOT NULL ENABLE)';
+  ALTER TABLE BARS.S6_DOCUM MODIFY (STATUS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009802 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_DOCUM MODIFY (GROUP_U NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009801 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_DOCUM MODIFY (CUR_VS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009800 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_DOCUM MODIFY (REE_COUNT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009799 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_DOCUM MODIFY (DA_OD NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009798 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_DOCUM MODIFY (I_VA NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009797 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_DOCUM MODIFY (SUMMA NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009796 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_DOCUM MODIFY (D_K NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -292,10 +292,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  S6_DOCUM ***
-grant SELECT                                                                 on S6_DOCUM        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_DOCUM        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_DOCUM        to START1;
-grant SELECT                                                                 on S6_DOCUM        to UPLD;
 
 
 

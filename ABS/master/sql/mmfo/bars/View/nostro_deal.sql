@@ -43,10 +43,8 @@ PROMPT *** Create  view NOSTRO_DEAL ***
           AND n.acc = a.acc;
 
 PROMPT *** Create  grants  NOSTRO_DEAL ***
-grant SELECT                                                                 on NOSTRO_DEAL     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NOSTRO_DEAL     to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on NOSTRO_DEAL     to START1;
-grant SELECT                                                                 on NOSTRO_DEAL     to UPLD;
 
 
 

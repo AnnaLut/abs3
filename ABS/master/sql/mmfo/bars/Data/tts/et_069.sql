@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции !ZP
-prompt Наименование операции: !ZP STOP-контроль (Зарплата)
+prompt Наименование операции: STOP-контроль (Зарплата)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!ZP', '!ZP STOP-контроль (Зарплата)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_CHECK_ZP(#(REF))', null, null, null, '0', null, '0040M0000000000000000000040M000000000000000000000000000000000000', null);
+    values ('!ZP', 'STOP-контроль (Зарплата)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_CHECK_ZP(#(REF))', null, null, null, null, null, '0040M0000000000000000000040M000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!ZP', name='!ZP STOP-контроль (Зарплата)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_ZP(#(REF))', s2=null, sk=null, proc=null, s3800='0', rang=null, flags='0040M0000000000000000000040M000000000000000000000000000000000000', nazn=null
+         set tt='!ZP', name='STOP-контроль (Зарплата)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_ZP(#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0040M0000000000000000000040M000000000000000000000000000000000000', nazn=null
        where tt='!ZP';
   end;
   --------------------------------
@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции G69
-prompt Наименование операции: G69 Погаш.нарах.комiсiї за ЧЕК
+prompt Наименование операции: Погаш.нарах.комiсiї за ЧЕК
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('G69', 'G69 Погаш.нарах.комiсiї за ЧЕК', 1, '#(nbs_ob22_RKO (''2560'',''03'',#(NLSA),980))', 980, '#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(32, #(KVA),#(NLSA), #(S))', null, 5, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('G69', 'Погаш.нарах.комiсiї за ЧЕК', 1, '#(nbs_ob22_RKO (''2560'',''03'',#(NLSA),980))', 980, '#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(32, #(KVA),#(NLSA), #(S))', null, 5, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='G69', name='G69 Погаш.нарах.комiсiї за ЧЕК', dk=1, nlsm='#(nbs_ob22_RKO (''2560'',''03'',#(NLSA),980))', kv=980, nlsk='#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(32, #(KVA),#(NLSA), #(S))', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='G69', name='Погаш.нарах.комiсiї за ЧЕК', dk=1, nlsm='#(nbs_ob22_RKO (''2560'',''03'',#(NLSA),980))', kv=980, nlsk='#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(32, #(KVA),#(NLSA), #(S))', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='G69';
   end;
   --------------------------------
@@ -109,11 +109,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K69', 'K69 Нарах. 3570 комiсiї за ЧЕК ПФУ', 1, '#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))', 980, '#(nbs_ob22 (''6510'',''73''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(32, #(KVA),#(NLSA), #(S))', null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('K69', 'K69 Нарах. 3570 комiсiї за ЧЕК ПФУ', 1, '#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))', 980, '#(nbs_ob22 (''6110'',''73''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(32, #(KVA),#(NLSA), #(S))', null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K69', name='K69 Нарах. 3570 комiсiї за ЧЕК ПФУ', dk=1, nlsm='#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))', kv=980, nlsk='#(nbs_ob22 (''6510'',''73''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(32, #(KVA),#(NLSA), #(S))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='K69', name='K69 Нарах. 3570 комiсiї за ЧЕК ПФУ', dk=1, nlsm='#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))', kv=980, nlsk='#(nbs_ob22 (''6110'',''73''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(32, #(KVA),#(NLSA), #(S))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='K69';
   end;
   --------------------------------
@@ -187,7 +187,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции ЧЕ1
-prompt Наименование операции: ЧЕ1 1) Доч. для чеків  (доч.к 00С)
+prompt Наименование операции: 1) Доч. для чеків  (доч.к 00С)
 declare
   cnt_  number;
 begin
@@ -196,11 +196,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('ЧЕ1', 'ЧЕ1 1) Доч. для чеків  (доч.к 00С)', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', null, 0, 0, 0, 0, '100', '100', null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('ЧЕ1', '1) Доч. для чеків  (доч.к 00С)', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', null, 0, 0, 0, 0, '100', '100', null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='ЧЕ1', name='ЧЕ1 1) Доч. для чеків  (доч.к 00С)', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s='100', s2='100', sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='ЧЕ1', name='1) Доч. для чеків  (доч.к 00С)', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''NLS_CHEK8'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s='100', s2='100', sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='ЧЕ1';
   end;
   --------------------------------

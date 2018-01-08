@@ -75,7 +75,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRIOCOM_STAFF ***
-grant SELECT                                                                 on PRIOCOM_STAFF   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PRIOCOM_STAFF   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PRIOCOM_STAFF   to PRIOCOM_STAFF_ROLE;
 grant FLASHBACK,SELECT                                                       on PRIOCOM_STAFF   to WR_REFREAD;

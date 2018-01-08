@@ -131,11 +131,9 @@ COMMENT ON COLUMN BARS.TMP_LIC.PDAT IS '';
 
 
 PROMPT *** Create  grants  TMP_LIC ***
-grant SELECT                                                                 on TMP_LIC         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_LIC         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_LIC         to RPBN001;
 grant SELECT                                                                 on TMP_LIC         to START1;
-grant SELECT                                                                 on TMP_LIC         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_LIC         to WR_ALL_RIGHTS;
 grant SELECT                                                                 on TMP_LIC         to WR_CREPORTS;
 

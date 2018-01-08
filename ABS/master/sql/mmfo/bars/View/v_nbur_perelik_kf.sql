@@ -13,10 +13,8 @@ from mv_kf m, regions r
 where M.KF = r.kf;
 
 PROMPT *** Create  grants  V_NBUR_PERELIK_KF ***
-grant SELECT                                                                 on V_NBUR_PERELIK_KF to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_PERELIK_KF to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_PERELIK_KF to RPBN002;
-grant SELECT                                                                 on V_NBUR_PERELIK_KF to UPLD;
 
 
 

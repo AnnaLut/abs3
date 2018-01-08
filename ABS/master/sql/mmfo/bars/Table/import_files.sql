@@ -48,9 +48,7 @@ COMMENT ON COLUMN BARS.IMPORT_FILES.FILE_TYPE IS '';
 
 
 PROMPT *** Create  grants  IMPORT_FILES ***
-grant SELECT                                                                 on IMPORT_FILES    to BARSREADER_ROLE;
 grant SELECT                                                                 on IMPORT_FILES    to BARS_DM;
-grant SELECT                                                                 on IMPORT_FILES    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on IMPORT_FILES    to WR_ALL_RIGHTS;
 
 

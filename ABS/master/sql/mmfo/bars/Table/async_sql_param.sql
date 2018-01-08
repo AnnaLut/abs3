@@ -52,6 +52,19 @@ COMMENT ON COLUMN BARS.ASYNC_SQL_PARAM.PARAM_POS IS 'Порядковий номер параметра 
 
 
 
+PROMPT *** Create  constraint FK_ASNSQLPAR_PAR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ASYNC_SQL_PARAM ADD CONSTRAINT FK_ASNSQLPAR_PAR FOREIGN KEY (PARAM_ID)
+	  REFERENCES BARS.ASYNC_PARAM (PARAM_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_ASNSQLPAR ***
 begin   
  execute immediate '
@@ -80,9 +93,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ASYNC_SQL_PARAM ***
-grant SELECT                                                                 on ASYNC_SQL_PARAM to BARSREADER_ROLE;
 grant SELECT                                                                 on ASYNC_SQL_PARAM to BARS_DM;
-grant SELECT                                                                 on ASYNC_SQL_PARAM to UPLD;
 
 
 

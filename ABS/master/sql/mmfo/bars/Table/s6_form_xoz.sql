@@ -69,11 +69,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  S6_FORM_XOZ ***
-grant SELECT                                                                 on S6_FORM_XOZ     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_FORM_XOZ     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on S6_FORM_XOZ     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_FORM_XOZ     to START1;
-grant SELECT                                                                 on S6_FORM_XOZ     to UPLD;
 
 
 

@@ -20,10 +20,8 @@ PROMPT *** Create  view V_CUST_FM ***
    ORDER BY 3;
 
 PROMPT *** Create  grants  V_CUST_FM ***
-grant SELECT                                                                 on V_CUST_FM       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_CUST_FM       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_CUST_FM       to START1;
-grant SELECT                                                                 on V_CUST_FM       to UPLD;
 
 
 

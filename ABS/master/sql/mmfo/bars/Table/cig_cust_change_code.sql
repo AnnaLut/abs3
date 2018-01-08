@@ -103,11 +103,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_CUST_CHANGE_CODE ***
-grant SELECT                                                                 on CIG_CUST_CHANGE_CODE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIG_CUST_CHANGE_CODE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_CUST_CHANGE_CODE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIG_CUST_CHANGE_CODE to CIG_ROLE;
-grant SELECT                                                                 on CIG_CUST_CHANGE_CODE to UPLD;
 
 
 

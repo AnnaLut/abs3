@@ -66,11 +66,9 @@ COMMENT ON COLUMN BARS.ERR$_OP_RULES.NOMODIFY IS '';
 
 
 PROMPT *** Create  grants  ERR$_OP_RULES ***
-grant SELECT                                                                 on ERR$_OP_RULES   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_OP_RULES   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ERR$_OP_RULES   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_OP_RULES   to START1;
-grant SELECT                                                                 on ERR$_OP_RULES   to UPLD;
 
 
 

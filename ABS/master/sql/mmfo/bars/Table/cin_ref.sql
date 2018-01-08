@@ -59,9 +59,7 @@ COMMENT ON COLUMN BARS.CIN_REF.NLSB IS '';
 
 
 PROMPT *** Create  grants  CIN_REF ***
-grant SELECT                                                                 on CIN_REF         to BARSREADER_ROLE;
 grant SELECT                                                                 on CIN_REF         to BARS_DM;
-grant SELECT                                                                 on CIN_REF         to UPLD;
 
 
 

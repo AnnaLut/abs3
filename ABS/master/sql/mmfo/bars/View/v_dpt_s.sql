@@ -97,11 +97,9 @@ PROMPT *** Create  view V_DPT_S ***
 
 PROMPT *** Create  grants  V_DPT_S ***
 grant SELECT                                                                 on V_DPT_S         to ABS_ADMIN;
-grant SELECT                                                                 on V_DPT_S         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_S         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_S         to DPT;
 grant SELECT                                                                 on V_DPT_S         to START1;
-grant SELECT                                                                 on V_DPT_S         to UPLD;
 
 
 

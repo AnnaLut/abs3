@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_PRODUCTS ***
-grant SELECT                                                                 on WCS_PRODUCTS    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_PRODUCTS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_PRODUCTS    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_PRODUCTS    to START1;
-grant SELECT                                                                 on WCS_PRODUCTS    to UPLD;
 grant SELECT                                                                 on WCS_PRODUCTS    to WCS_SYNC_USER;
 
 

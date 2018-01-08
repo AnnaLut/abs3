@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_CP_ZAL.DATZ IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CP_ZAL ***
-grant SELECT                                                                 on ERR$_CP_ZAL     to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CP_ZAL     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

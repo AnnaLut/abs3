@@ -18,10 +18,8 @@ PROMPT *** Create  view V_XMLIMPDREC ***
  ;
 
 PROMPT *** Create  grants  V_XMLIMPDREC ***
-grant SELECT                                                                 on V_XMLIMPDREC    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_XMLIMPDREC    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_XMLIMPDREC    to OPER000;
-grant SELECT                                                                 on V_XMLIMPDREC    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_XMLIMPDREC    to WR_ALL_RIGHTS;
 
 

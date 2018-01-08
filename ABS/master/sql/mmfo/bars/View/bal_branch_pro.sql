@@ -20,10 +20,8 @@ from (select c.caldt_date,a.nbs,a.branch,a.kv,a.ob22,m.DOS,m.KOS,m.DOSq, m.KOSq,
 group by caldt_date, nbs, branch, kv, ob22;
 
 PROMPT *** Create  grants  BAL_BRANCH_PRO ***
-grant SELECT                                                                 on BAL_BRANCH_PRO  to BARSREADER_ROLE;
 grant SELECT                                                                 on BAL_BRANCH_PRO  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BAL_BRANCH_PRO  to SALGL;
-grant SELECT                                                                 on BAL_BRANCH_PRO  to UPLD;
 
 
 

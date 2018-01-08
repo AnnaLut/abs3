@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Код валюти / код банківського металу';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'TABVAL';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,24 +119,24 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'KV', 'N', 'Числ~Код~СЗК', '', null, 1, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=V_VPLIST[NSIFUNCTION][ACCESSCODE=>2][CONDITIONS=>V_VPLIST.KV= :KV]', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'NAME', 'C', 'Найменування~валюти', '', null, 2, 1, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'LCV', 'C', 'Симв~Код', '', null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'DIG', 'N', 'Коп', '', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'S3801', 'N', 'Рахунок ~ЕКВ.ВАЛ.ПОЗ', '', null, 9, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'S3802', 'C', 'Переоцінка~ВАЛ.ПОЗ~(НКР)', '', null, 10, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'UNIT', 'C', 'Назва~коп', '', null, 7, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'S9281', 'C', 'Рахунок~Позабал.~ЕКВ.ВАЛ.ПОЗ', '', null, 15, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'S9282', 'C', 'Переоцінка~Позабал.~ВАЛ.ПОЗ~(НКР)', '', null, 16, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'SKV', 'N', 'Порядок~сортування', '', null, 0, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'COUNTRY', 'N', 'Країна~емітент', '', null, 8, 1, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'GRP', 'N', 'Група~валюти', '', null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'S0000', 'C', 'Рах.техн.~переоц(1-7 кл)~"Вішалка"', '', null, 17, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'S0009', 'C', 'Рах.техн.~переоц(9 кл)~"Вішалка"', '', null, 18, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'D_CLOSE', 'D', 'Дата~закриття', '', null, 19, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'NOMINAL', 'N', 'Номинал', '', null, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'PRV', 'B', 'Признак валюты~(1-металл)', '1', null, 26, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'SV', 'C', 'Буква-код', '', null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'KV', 'N', 'Числ~Код~СЗК', null, null, 1, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=V_VPLIST[NSIFUNCTION][ACCESSCODE=>2][CONDITIONS=>V_VPLIST.KV= :KV]', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'NAME', 'C', 'Найменування~валюти', null, null, 2, 1, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'LCV', 'C', 'Симв~Код', null, null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'DIG', 'N', 'Коп', null, null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'S3801', 'N', 'Рахунок ~ЕКВ.ВАЛ.ПОЗ', null, null, 9, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'S3802', 'C', 'Переоцінка~ВАЛ.ПОЗ~(НКР)', null, null, 10, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'UNIT', 'C', 'Назва~коп', null, null, 7, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'S9281', 'C', 'Рахунок~Позабал.~ЕКВ.ВАЛ.ПОЗ', null, null, 15, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'S9282', 'C', 'Переоцінка~Позабал.~ВАЛ.ПОЗ~(НКР)', null, null, 16, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'SKV', 'N', 'Порядок~сортування', null, null, 0, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'COUNTRY', 'N', 'Країна~емітент', null, null, 8, 1, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'GRP', 'N', 'Група~валюти', null, null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'S0000', 'C', 'Рах.техн.~переоц(1-7 кл)~"Вішалка"', null, null, 17, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'S0009', 'C', 'Рах.техн.~переоц(9 кл)~"Вішалка"', null, null, 18, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'D_CLOSE', 'D', 'Дата~закриття', null, null, 19, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'NOMINAL', 'N', 'Номинал', null, null, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'PRV', 'B', 'Признак валюты~(1-металл)', 1, null, 26, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'SV', 'C', 'Буква-код', null, null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('COUNTRY');

@@ -47,10 +47,8 @@ COMMENT ON COLUMN BARS.TMP_V2.LINE IS '';
 
 
 PROMPT *** Create  grants  TMP_V2 ***
-grant SELECT                                                                 on TMP_V2          to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_V2          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_V2          to TOSS;
-grant SELECT                                                                 on TMP_V2          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_V2          to WR_ALL_RIGHTS;
 
 

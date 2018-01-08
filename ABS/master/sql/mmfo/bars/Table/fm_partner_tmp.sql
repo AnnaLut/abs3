@@ -50,11 +50,9 @@ COMMENT ON COLUMN BARS.FM_PARTNER_TMP.REF IS '';
 
 
 PROMPT *** Create  grants  FM_PARTNER_TMP ***
-grant SELECT                                                                 on FM_PARTNER_TMP  to BARSREADER_ROLE;
 grant SELECT                                                                 on FM_PARTNER_TMP  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_PARTNER_TMP  to BARS_DM;
 grant SELECT                                                                 on FM_PARTNER_TMP  to START1;
-grant SELECT                                                                 on FM_PARTNER_TMP  to UPLD;
 
 
 

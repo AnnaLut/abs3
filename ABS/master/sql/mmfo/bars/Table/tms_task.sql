@@ -127,10 +127,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0035441 ***
+PROMPT *** Create  constraint UK_TMS_TASK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMS_TASK MODIFY (BRANCH_PROCESSING_MODE NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMS_TASK ADD CONSTRAINT UK_TMS_TASK UNIQUE (TASK_CODE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -189,12 +191,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_TMS_TASK ***
+PROMPT *** Create  constraint SYS_C0035441 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMS_TASK ADD CONSTRAINT UK_TMS_TASK UNIQUE (TASK_CODE)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.TMS_TASK MODIFY (BRANCH_PROCESSING_MODE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -229,10 +229,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  TMS_TASK ***
-grant SELECT                                                                 on TMS_TASK        to BARSREADER_ROLE;
-grant SELECT                                                                 on TMS_TASK        to UPLD;
 
 
 

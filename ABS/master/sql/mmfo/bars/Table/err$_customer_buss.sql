@@ -60,9 +60,7 @@ COMMENT ON COLUMN BARS.ERR$_CUSTOMER_BUSS.BUSSLINE IS '';
 
 
 PROMPT *** Create  grants  ERR$_CUSTOMER_BUSS ***
-grant SELECT                                                                 on ERR$_CUSTOMER_BUSS to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CUSTOMER_BUSS to BARS_DM;
-grant SELECT                                                                 on ERR$_CUSTOMER_BUSS to UPLD;
 
 
 

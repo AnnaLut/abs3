@@ -58,10 +58,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SECUPDQ_USERID_NN ***
+PROMPT *** Create  constraint PK_SECUPDQ ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_UPDATE_QUEUE MODIFY (USER_ID CONSTRAINT CC_SECUPDQ_USERID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEC_UPDATE_QUEUE ADD CONSTRAINT PK_SECUPDQ PRIMARY KEY (UPDATE_TIME, USER_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -70,12 +72,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_SECUPDQ ***
+PROMPT *** Create  constraint CC_SECUPDQ_USERID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_UPDATE_QUEUE ADD CONSTRAINT PK_SECUPDQ PRIMARY KEY (UPDATE_TIME, USER_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD  ENABLE';
+  ALTER TABLE BARS.SEC_UPDATE_QUEUE MODIFY (USER_ID CONSTRAINT CC_SECUPDQ_USERID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -96,9 +96,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  SEC_UPDATE_QUEUE ***
-grant SELECT                                                                 on SEC_UPDATE_QUEUE to BARSREADER_ROLE;
 
 
 

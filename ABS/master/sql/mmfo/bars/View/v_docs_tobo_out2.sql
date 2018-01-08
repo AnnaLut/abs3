@@ -12,8 +12,6 @@ PROMPT *** Create  view V_DOCS_TOBO_OUT2 ***
  ;
 
 PROMPT *** Create  grants  V_DOCS_TOBO_OUT2 ***
-grant SELECT                                                                 on V_DOCS_TOBO_OUT2 to BARSREADER_ROLE;
-grant SELECT                                                                 on V_DOCS_TOBO_OUT2 to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DOCS_TOBO_OUT2 to WR_ALL_RIGHTS;
 
 

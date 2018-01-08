@@ -76,10 +76,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0033497 ***
+PROMPT *** Create  constraint SYS_C0033499 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_CIG_EVENTS MODIFY (EVT_UNAME NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_CIG_EVENTS MODIFY (EVT_MESSAGE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -100,20 +100,16 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0033499 ***
+PROMPT *** Create  constraint SYS_C0033497 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_CIG_EVENTS MODIFY (EVT_MESSAGE NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_CIG_EVENTS MODIFY (EVT_UNAME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-
-PROMPT *** Create  grants  TMP_CIG_EVENTS ***
-grant SELECT                                                                 on TMP_CIG_EVENTS  to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_CIG_EVENTS  to UPLD;
 
 
 

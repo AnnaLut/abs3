@@ -91,10 +91,6 @@ COMMENT ON COLUMN BARS.ERR$_FOREX_A.FDAT IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_FOREX_A ***
-grant SELECT                                                                 on ERR$_FOREX_A    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_FOREX_A    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

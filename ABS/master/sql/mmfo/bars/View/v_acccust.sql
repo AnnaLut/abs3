@@ -21,9 +21,7 @@ PROMPT *** Create  view V_ACCCUST ***
     and substr(a.nls,1,4) in ('2520','2523','2525','2530','2542','2545','2546','2560','2561','2562','2565','2600','2603','2604','2605','2610','2615','2620','2625','2630','2635','2650','2651','2652');
 
 PROMPT *** Create  grants  V_ACCCUST ***
-grant SELECT                                                                 on V_ACCCUST       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACCCUST       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ACCCUST       to UPLD;
 
 
 

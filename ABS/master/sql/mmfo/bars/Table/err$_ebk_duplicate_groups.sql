@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_EBK_DUPLICATE_GROUPS.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_EBK_DUPLICATE_GROUPS ***
-grant SELECT                                                                 on ERR$_EBK_DUPLICATE_GROUPS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_EBK_DUPLICATE_GROUPS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

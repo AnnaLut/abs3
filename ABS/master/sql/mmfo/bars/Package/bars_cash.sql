@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_cash.sql =========*** Run *** =
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_CASH 
+CREATE OR REPLACE PACKAGE BARS.BARS_CASH 
 is
     -----------------------------------------------------------------
     --                                                             --
@@ -263,7 +257,10 @@ is
 
 end bars_cash;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_CASH 
+
+show error
+
+create or replace package body BARS_CASH 
 is
     -----------------------------------------------------------------
     --                                                             --
@@ -2021,15 +2018,8 @@ begin
    init_pack;
 end bars_cash;
 /
- show err;
- 
-PROMPT *** Create  grants  BARS_CASH ***
-grant EXECUTE                                                                on BARS_CASH       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BARS_CASH       to RPBN001;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_cash.sql =========*** End *** =
- PROMPT ===================================================================================== 
- 
+show err;
+
+grant EXECUTE on BARS_CASH to BARS_ACCESS_DEFROLE;
+grant EXECUTE on BARS_CASH to RPBN001;

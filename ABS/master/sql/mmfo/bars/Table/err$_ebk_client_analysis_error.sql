@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_EBK_CLIENT_ANALYSIS_ERROR.INSERT_DATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_EBK_CLIENT_ANALYSIS_ERROR ***
-grant SELECT                                                                 on ERR$_EBK_CLIENT_ANALYSIS_ERROR to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_EBK_CLIENT_ANALYSIS_ERROR to UPLD;
-
 
 
 PROMPT ===================================================================================== 

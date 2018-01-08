@@ -133,12 +133,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TM_CARDMASKS ***
-grant SELECT                                                                 on TM_CARDMASKS    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TM_CARDMASKS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TM_CARDMASKS    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TM_CARDMASKS    to DPT_ADMIN;
 grant SELECT                                                                 on TM_CARDMASKS    to DPT_ROLE;
-grant SELECT                                                                 on TM_CARDMASKS    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TM_CARDMASKS    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on TM_CARDMASKS    to WR_REFREAD;
 

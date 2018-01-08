@@ -85,12 +85,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_POK ***
-grant SELECT                                                                 on FIN_POK         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_POK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_POK         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_POK         to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_POK         to R_FIN2;
-grant SELECT                                                                 on FIN_POK         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_POK         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on FIN_POK         to WR_REFREAD;
 

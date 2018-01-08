@@ -49,10 +49,8 @@ COMMENT ON COLUMN BARS.TMP_OBPCMOVBAL.PDAT IS '';
 
 
 PROMPT *** Create  grants  TMP_OBPCMOVBAL ***
-grant SELECT                                                                 on TMP_OBPCMOVBAL  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OBPCMOVBAL  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OBPCMOVBAL  to START1;
-grant SELECT                                                                 on TMP_OBPCMOVBAL  to UPLD;
 
 
 

@@ -87,46 +87,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BRTIEREDIT_BDATE ***
+PROMPT *** Create  constraint CC_BRTIEREDIT_S_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BR_TIER_EDIT ADD CONSTRAINT CC_BRTIEREDIT_BDATE CHECK (bdate = trunc(bdate)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BRTIEREDIT_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BR_TIER_EDIT MODIFY (KF CONSTRAINT CC_BRTIEREDIT_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BRTIEREDIT_BRID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BR_TIER_EDIT MODIFY (BR_ID CONSTRAINT CC_BRTIEREDIT_BRID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BRTIEREDIT_BDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BR_TIER_EDIT MODIFY (BDATE CONSTRAINT CC_BRTIEREDIT_BDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BR_TIER_EDIT MODIFY (S CONSTRAINT CC_BRTIEREDIT_S_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -147,10 +111,72 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BRTIEREDIT_S_NN ***
+PROMPT *** Create  constraint CC_BRTIEREDIT_BDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BR_TIER_EDIT MODIFY (S CONSTRAINT CC_BRTIEREDIT_S_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BR_TIER_EDIT MODIFY (BDATE CONSTRAINT CC_BRTIEREDIT_BDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BRTIEREDIT_BRID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BR_TIER_EDIT MODIFY (BR_ID CONSTRAINT CC_BRTIEREDIT_BRID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BRTIEREDIT_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BR_TIER_EDIT MODIFY (KF CONSTRAINT CC_BRTIEREDIT_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_BRTIEREDIT_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BR_TIER_EDIT ADD CONSTRAINT FK_BRTIEREDIT_TABVAL FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_BRTIEREDIT_BRATES2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BR_TIER_EDIT ADD CONSTRAINT FK_BRTIEREDIT_BRATES2 FOREIGN KEY (BR_ID, BR_TP)
+	  REFERENCES BARS.BRATES (BR_ID, BR_TP) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_BRTIEREDIT_BDATE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BR_TIER_EDIT ADD CONSTRAINT CC_BRTIEREDIT_BDATE CHECK (bdate = trunc(bdate)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -174,7 +200,6 @@ exception when others then
 
 PROMPT *** Create  grants  BR_TIER_EDIT ***
 grant SELECT                                                                 on BR_TIER_EDIT    to BARSAQ with grant option;
-grant SELECT                                                                 on BR_TIER_EDIT    to BARSREADER_ROLE;
 grant SELECT                                                                 on BR_TIER_EDIT    to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BR_TIER_EDIT    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BR_TIER_EDIT    to BARS_DM;
@@ -182,7 +207,6 @@ grant INSERT,SELECT                                                          on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on BR_TIER_EDIT    to DPT_ADMIN;
 grant SELECT,SELECT                                                          on BR_TIER_EDIT    to KLBX;
 grant SELECT                                                                 on BR_TIER_EDIT    to REFSYNC_USR;
-grant SELECT                                                                 on BR_TIER_EDIT    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BR_TIER_EDIT    to WR_ALL_RIGHTS;
 
 

@@ -49,6 +49,19 @@ COMMENT ON COLUMN BARS.NBUR_LNK_OBJECT_OBJECT.OBJECT_PID IS 'Parent object ident
 
 
 
+PROMPT *** Create  constraint FK_OBJDEPENDENCIES_OBJECTPID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NBUR_LNK_OBJECT_OBJECT ADD CONSTRAINT FK_OBJDEPENDENCIES_OBJECTPID FOREIGN KEY (OBJECT_PID)
+	  REFERENCES BARS.NBUR_REF_OBJECTS (ID) ON DELETE CASCADE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OBJDEPENDENCIES_OBJID_NN ***
 begin   
  execute immediate '
@@ -61,10 +74,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OBJDEPENDENCIES_OBJPID_NN ***
+PROMPT *** Create  constraint FK_OBJDEPENDENCIES_OBJECTID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_LNK_OBJECT_OBJECT MODIFY (OBJECT_PID CONSTRAINT CC_OBJDEPENDENCIES_OBJPID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_LNK_OBJECT_OBJECT ADD CONSTRAINT FK_OBJDEPENDENCIES_OBJECTID FOREIGN KEY (OBJECT_ID)
+	  REFERENCES BARS.NBUR_REF_OBJECTS (ID) ON DELETE CASCADE ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -91,6 +105,18 @@ begin
   ALTER TABLE BARS.NBUR_LNK_OBJECT_OBJECT ADD CONSTRAINT PK_OBJDEPENDENCIES PRIMARY KEY (OBJECT_ID, OBJECT_PID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OBJDEPENDENCIES_OBJPID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NBUR_LNK_OBJECT_OBJECT MODIFY (OBJECT_PID CONSTRAINT CC_OBJDEPENDENCIES_OBJPID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -127,7 +153,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_LNK_OBJECT_OBJECT ***
-grant SELECT                                                                 on NBUR_LNK_OBJECT_OBJECT to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_LNK_OBJECT_OBJECT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_LNK_OBJECT_OBJECT to BARS_DM;
 

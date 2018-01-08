@@ -93,6 +93,19 @@ COMMENT ON COLUMN BARS.LINES_TB.ERR IS '';
 
 
 
+PROMPT *** Create  constraint R_LINES_ZAG_TB ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.LINES_TB ADD CONSTRAINT R_LINES_ZAG_TB FOREIGN KEY (FN, DAT)
+	  REFERENCES BARS.ZAG_TB (FN, DAT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint XPK_LINES_TB ***
 begin   
  execute immediate '
@@ -121,11 +134,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  LINES_TB ***
-grant SELECT                                                                 on LINES_TB        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LINES_TB        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LINES_TB        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LINES_TB        to START1;
-grant SELECT                                                                 on LINES_TB        to UPLD;
 
 
 

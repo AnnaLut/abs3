@@ -48,11 +48,9 @@ COMMENT ON COLUMN BARS.TMP_KLP_C.SID IS '';
 
 
 PROMPT *** Create  grants  TMP_KLP_C ***
-grant SELECT                                                                 on TMP_KLP_C       to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on TMP_KLP_C       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_KLP_C       to BARS_DM;
 grant SELECT,UPDATE                                                          on TMP_KLP_C       to TECH_MOM1;
-grant SELECT                                                                 on TMP_KLP_C       to UPLD;
 
 
 

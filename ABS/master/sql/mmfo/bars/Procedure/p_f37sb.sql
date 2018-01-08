@@ -14,7 +14,7 @@ PROMPT *** Create  procedure P_F37SB ***
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
 % VERSION     : 02/02/2016 (06/01/2016, 04/06/2013)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 02/02/2016 все показатели будем формировать из таблицы OTCN_SALDO
+% 02/02/2016 все показатели будем формировать из таблицы OTCN_SALDO 
 %            наполненной из ACCM_SNAP_BALANCES
 % 06/01/2016 исключаем дату 0101GGGG для оборотов
 % 04/06/2013 в курсоре SALDOBQ данные будем выбирать из OTCN_SALDO,
@@ -107,7 +107,7 @@ CURSOR SaldoASeekOstf IS
           aa.ost, aa.ostq, aa.dos, aa.kos, aa.dosq, aa.kosq, s.tobo, s.nms
    FROM otcn_acc s, otcn_saldo aa, specparam_int sp
    WHERE aa.acc=s.acc
-     and (aa.ost + aa.ostq <> 0 or aa.dos + aa.kos <> 0 or aa.dosq + aa.kosq <> 0)
+     and (aa.ost + aa.ostq <> 0 or aa.dos + aa.kos <> 0 or aa.dosq + aa.kosq <> 0) 
      and s.acc = sp.acc(+);
 
 CURSOR BaseL IS
@@ -155,7 +155,7 @@ Dat1_ := datp_ - 1;
 datn_  := dat_next_u(dat_, -1) + 1;
 
 -- исключаем 0101GGGG
-if to_char(datn_,'DDMM') = '0101'
+if to_char(datn_,'DDMM') = '0101' 
 then
    datn_  := datn_ + 1 ;
 end if;
@@ -171,7 +171,7 @@ ret_ := f_pop_otcn(Dat_, 1, sql_acc_);
 -- Остатки (грн. + валюта номиналы) --
 OPEN SaldoASeekOstf;
 LOOP
-   FETCH SaldoASeekOstf INTO acc_, nls_, kv_, data_, Nbs_, zz_, Ostn_, Oste_,
+   FETCH SaldoASeekOstf INTO acc_, nls_, kv_, data_, Nbs_, zz_, Ostn_, Oste_, 
                              Dosn_, Kosn_, Dose_, Kose_, tobo_, nms_;
    EXIT WHEN SaldoASeekOstf%NOTFOUND;
 

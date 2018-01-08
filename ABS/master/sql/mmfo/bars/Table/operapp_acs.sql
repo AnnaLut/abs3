@@ -101,7 +101,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  OPERAPP_ACS ***
-grant SELECT                                                                 on OPERAPP_ACS     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPERAPP_ACS     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPERAPP_ACS     to START1;
 

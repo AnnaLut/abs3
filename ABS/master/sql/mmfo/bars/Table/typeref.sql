@@ -102,13 +102,11 @@ exception when others then
 
 PROMPT *** Create  grants  TYPEREF ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TYPEREF         to ABS_ADMIN;
-grant SELECT                                                                 on TYPEREF         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TYPEREF         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TYPEREF         to BARS_DM;
 grant SELECT                                                                 on TYPEREF         to REF0000;
 grant SELECT                                                                 on TYPEREF         to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TYPEREF         to TYPEREF;
-grant SELECT                                                                 on TYPEREF         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TYPEREF         to WR_ALL_RIGHTS;
 grant SELECT                                                                 on TYPEREF         to WR_METATAB;
 grant FLASHBACK,SELECT                                                       on TYPEREF         to WR_REFREAD;

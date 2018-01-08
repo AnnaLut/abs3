@@ -36,10 +36,8 @@ PROMPT *** Create  view V_OBPC_TRAN_STAT ***
  group by id, file_name, file_date, tran_type, currency;
 
 PROMPT *** Create  grants  V_OBPC_TRAN_STAT ***
-grant SELECT                                                                 on V_OBPC_TRAN_STAT to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_TRAN_STAT to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OBPC_TRAN_STAT to OBPC;
-grant SELECT                                                                 on V_OBPC_TRAN_STAT to UPLD;
 grant FLASHBACK,SELECT                                                       on V_OBPC_TRAN_STAT to WR_REFREAD;
 
 

@@ -140,6 +140,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CREDDYN_PERID_PERIOD_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS_DM.CREDITS_DYN ADD CONSTRAINT FK_CREDDYN_PERID_PERIOD_ID FOREIGN KEY (PER_ID)
+	  REFERENCES BARS_DM.PERIODS (ID) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_CREDDYN_PERID_NN ***
 begin   
  execute immediate '
@@ -229,9 +242,7 @@ exception when others then
 
 PROMPT *** Create  grants  CREDITS_DYN ***
 grant SELECT                                                                 on CREDITS_DYN     to BARS;
-grant SELECT                                                                 on CREDITS_DYN     to BARSREADER_ROLE;
 grant SELECT                                                                 on CREDITS_DYN     to BARSUPL;
-grant SELECT                                                                 on CREDITS_DYN     to UPLD;
 
 
 

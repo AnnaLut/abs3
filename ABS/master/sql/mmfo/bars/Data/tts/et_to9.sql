@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции TO9
-prompt Наименование операции: TO9 Надлишки інкасованої готівки Клієнта
+prompt Наименование операции: Надлишки інкасованої готівки Клієнта
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('TO9', 'TO9 Надлишки інкасованої готівки Клієнта', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', null, null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1000100000000000000000000000000000010000000000000000000000000000', 'Надлишки інкасованої готівки Клієнта');
+    values ('TO9', 'Надлишки інкасованої готівки Клієнта', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', null, null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1000100000000000000000000000000000010000000000000000000000000000', 'Надлишки інкасованої готівки Клієнта');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='TO9', name='TO9 Надлишки інкасованої готівки Клієнта', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', kv=null, nlsk=null, kvk=null, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1000100000000000000000000000000000010000000000000000000000000000', nazn='Надлишки інкасованої готівки Клієнта'
+         set tt='TO9', name='Надлишки інкасованої готівки Клієнта', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', kv=null, nlsk=null, kvk=null, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH5'',0))', nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1000100000000000000000000000000000010000000000000000000000000000', nazn='Надлишки інкасованої готівки Клієнта'
        where tt='TO9';
   end;
   --------------------------------

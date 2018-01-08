@@ -95,6 +95,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SURVEYANSWOPT_SURVEYOPTLIST ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_ANSWER_OPT ADD CONSTRAINT FK_SURVEYANSWOPT_SURVEYOPTLIST FOREIGN KEY (LIST_ID)
+	  REFERENCES BARS.SURVEY_OPT_LIST (LIST_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SURVEYANSWOPT_OPTVAL_NN ***
 begin   
  execute immediate '
@@ -119,10 +132,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SURVEYANSWOPT_OPTDFLT_NN ***
+PROMPT *** Create  constraint CC_SURVEYANSWOPT_LISTID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SURVEY_ANSWER_OPT MODIFY (OPT_DFLT CONSTRAINT CC_SURVEYANSWOPT_OPTDFLT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SURVEY_ANSWER_OPT MODIFY (LIST_ID CONSTRAINT CC_SURVEYANSWOPT_LISTID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -131,10 +144,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SURVEYANSWOPT_LISTID_NN ***
+PROMPT *** Create  constraint CC_SURVEYANSWOPT_OPTDFLT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SURVEY_ANSWER_OPT MODIFY (LIST_ID CONSTRAINT CC_SURVEYANSWOPT_LISTID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SURVEY_ANSWER_OPT MODIFY (OPT_DFLT CONSTRAINT CC_SURVEYANSWOPT_OPTDFLT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -185,13 +198,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SURVEY_ANSWER_OPT ***
-grant SELECT                                                                 on SURVEY_ANSWER_OPT to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SURVEY_ANSWER_OPT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SURVEY_ANSWER_OPT to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY_ANSWER_OPT to DPT_ADMIN;
 grant SELECT                                                                 on SURVEY_ANSWER_OPT to RCC_DEAL;
 grant SELECT                                                                 on SURVEY_ANSWER_OPT to START1;
-grant SELECT                                                                 on SURVEY_ANSWER_OPT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SURVEY_ANSWER_OPT to WR_ALL_RIGHTS;
 grant SELECT                                                                 on SURVEY_ANSWER_OPT to WR_CREDIT;
 grant FLASHBACK,SELECT                                                       on SURVEY_ANSWER_OPT to WR_REFREAD;

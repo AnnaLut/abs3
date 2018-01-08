@@ -89,6 +89,19 @@ COMMENT ON COLUMN BARS.DEBREG_RES_S.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_DEBREGRESS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEBREG_RES_S ADD CONSTRAINT FK_DEBREGRESS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DEBREGRESS_KF_NN ***
 begin   
  execute immediate '
@@ -115,11 +128,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DEBREG_RES_S ***
-grant SELECT                                                                 on DEBREG_RES_S    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEBREG_RES_S    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEBREG_RES_S    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEBREG_RES_S    to DEB_REG;
-grant SELECT                                                                 on DEBREG_RES_S    to UPLD;
 
 
 

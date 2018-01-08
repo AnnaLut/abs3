@@ -85,6 +85,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CCOVERDUEDATES_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_OVERDUE_DATES ADD CONSTRAINT FK_CCOVERDUEDATES_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_CCOVERDUEDATES ***
 begin   
  execute immediate '
@@ -100,9 +113,7 @@ exception when others then
 
 PROMPT *** Create  grants  CC_OVERDUE_DATES ***
 grant SELECT                                                                 on CC_OVERDUE_DATES to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on CC_OVERDUE_DATES to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_OVERDUE_DATES to BARS_DM;
-grant SELECT                                                                 on CC_OVERDUE_DATES to UPLD;
 
 
 

@@ -73,10 +73,8 @@ PROMPT *** Create  view VALDO_DSW ***
     WHERE LONG_S1_UAH <> 0                               -- 29 Розмiщено строкові;
 
 PROMPT *** Create  grants  VALDO_DSW ***
-grant SELECT                                                                 on VALDO_DSW       to BARSREADER_ROLE;
 grant SELECT                                                                 on VALDO_DSW       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VALDO_DSW       to START1;
-grant SELECT                                                                 on VALDO_DSW       to UPLD;
 
 
 

@@ -234,11 +234,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_CP_PRGN ***
-grant SELECT                                                                 on TMP_CP_PRGN     to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_CP_PRGN     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_CP_PRGN     to BARS_DM;
 grant SELECT                                                                 on TMP_CP_PRGN     to START1;
-grant SELECT                                                                 on TMP_CP_PRGN     to UPLD;
 
 
 

@@ -1,14 +1,34 @@
+prompt =======================================================
+prompt COBUSUPABS-3949
+prompt ----------------
+prompt АРМ «Деб.заборг за госп.діяльністю банку»: 
+prompt  Щодо додатк.реквізитів: № договору, дата,  та можливо признач.платежу (на загальну суму згідно договору) 
+prompt  Після оплати загальної суми платежу розносити на окремі рахунки дебіторської заборгованості , 
+prompt  що відповідають рахункам із різними значеннями параметра аналітичного розрізу ОВ22 
+prompt  та контролювати закриття загальної суми розрахунків. 
+prompt =======================================================
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/OPER_XOZ.sql =========*** Run *** =====
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view OPER_XOZ ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.OPER_XOZ ("REF", "TT", "VOB", "ND", "PDAT", "VDAT", "S", "DATD", "NAM_A", "NLSA", "NAM_B", "NLSB", "MFOB", "NAZN", "ID_B", "KPR") AS 
-  SELECT "REF",
+CREATE OR REPLACE FORCE VIEW BARS.OPER_XOZ
+(
+   REF,
+   TT,
+   VOB,
+   ND,
+   PDAT,
+   VDAT,
+   S,
+   DATD,
+   NAM_A,
+   NLSA,
+   NAM_B,
+   NLSB,
+   MFOB,
+   NAZN,
+   ID_B,
+   KPR
+)
+AS
+   SELECT "REF",
           "TT",
           "VOB",
           "ND",
@@ -51,14 +71,4 @@ PROMPT *** Create  view OPER_XOZ ***
                   AND pdat >= TRUNC (SYSDATE))
     WHERE kpr = 1;
 
-PROMPT *** Create  grants  OPER_XOZ ***
-grant SELECT                                                                 on OPER_XOZ        to BARSREADER_ROLE;
-grant SELECT                                                                 on OPER_XOZ        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on OPER_XOZ        to START1;
-grant SELECT                                                                 on OPER_XOZ        to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/OPER_XOZ.sql =========*** End *** =====
-PROMPT ===================================================================================== 
+/  

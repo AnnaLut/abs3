@@ -57,9 +57,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  ESCR_REG_KIND ***
-grant SELECT                                                                 on ESCR_REG_KIND   to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

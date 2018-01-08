@@ -187,9 +187,7 @@ PROMPT *** Create  view V_CIG_NEWDATA ***
    and not exists (select 1 from cig_dog_stop where dog_id = tab.dog_id and branch = tab.branch);
 
 PROMPT *** Create  grants  V_CIG_NEWDATA ***
-grant SELECT                                                                 on V_CIG_NEWDATA   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIG_NEWDATA   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIG_NEWDATA   to UPLD;
 
 
 

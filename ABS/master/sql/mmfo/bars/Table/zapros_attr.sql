@@ -94,11 +94,9 @@ exception when others then
 
 PROMPT *** Create  grants  ZAPROS_ATTR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAPROS_ATTR     to ABS_ADMIN;
-grant SELECT                                                                 on ZAPROS_ATTR     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAPROS_ATTR     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAPROS_ATTR     to BARS_DM;
 grant SELECT                                                                 on ZAPROS_ATTR     to START1;
-grant SELECT                                                                 on ZAPROS_ATTR     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAPROS_ATTR     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on ZAPROS_ATTR     to WR_REFREAD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAPROS_ATTR     to ZAPROS;

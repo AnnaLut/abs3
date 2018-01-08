@@ -44,9 +44,7 @@ ORDER BY bic
 
 PROMPT *** Create  grants  SW_STMT_CUSTOMER_LIST ***
 grant SELECT                                                                 on SW_STMT_CUSTOMER_LIST to BARS013;
-grant SELECT                                                                 on SW_STMT_CUSTOMER_LIST to BARSREADER_ROLE;
 grant SELECT                                                                 on SW_STMT_CUSTOMER_LIST to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on SW_STMT_CUSTOMER_LIST to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_STMT_CUSTOMER_LIST to WR_ALL_RIGHTS;
 
 

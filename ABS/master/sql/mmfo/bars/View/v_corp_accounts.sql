@@ -37,11 +37,9 @@ from (
 where  to_char(o.kod_upf(+)) = to_char(a.inst_kod);
 
 PROMPT *** Create  grants  V_CORP_ACCOUNTS ***
-grant SELECT                                                                 on V_CORP_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CORP_ACCOUNTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CORP_ACCOUNTS to CORP_CLIENT;
 grant SELECT                                                                 on V_CORP_ACCOUNTS to RPBN001;
-grant SELECT                                                                 on V_CORP_ACCOUNTS to UPLD;
 
 
 

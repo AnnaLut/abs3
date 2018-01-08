@@ -335,10 +335,6 @@ COMMENT ON COLUMN BARS.ERR$_NBU23_REZ_ARC.ORA_ERR_ROWID$ IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_NBU23_REZ_ARC ***
-grant SELECT                                                                 on ERR$_NBU23_REZ_ARC to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_NBU23_REZ_ARC to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -102,11 +102,9 @@ exception when others then
 
 PROMPT *** Create  grants  IN_CHARGE_LIST ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on IN_CHARGE_LIST  to ABS_ADMIN;
-grant SELECT                                                                 on IN_CHARGE_LIST  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on IN_CHARGE_LIST  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on IN_CHARGE_LIST  to BARS_DM;
 grant SELECT                                                                 on IN_CHARGE_LIST  to START1;
-grant SELECT                                                                 on IN_CHARGE_LIST  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on IN_CHARGE_LIST  to WR_ALL_RIGHTS;
 
 

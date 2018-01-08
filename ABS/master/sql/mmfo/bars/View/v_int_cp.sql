@@ -181,9 +181,7 @@ PROMPT *** Create  view V_INT_CP ***
    ORDER BY s_good DESC;
 
 PROMPT *** Create  grants  V_INT_CP ***
-grant SELECT                                                                 on V_INT_CP        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INT_CP        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INT_CP        to UPLD;
 
 
 

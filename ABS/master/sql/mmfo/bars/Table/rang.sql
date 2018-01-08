@@ -102,7 +102,6 @@ exception when others then
 
 PROMPT *** Create  grants  RANG ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on RANG            to ABS_ADMIN;
-grant SELECT                                                                 on RANG            to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RANG            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RANG            to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RANG            to FINMON01;
@@ -110,7 +109,6 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on RANG            to OPERKKK;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RANG            to RANG;
 grant SELECT                                                                 on RANG            to START1;
-grant SELECT                                                                 on RANG            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RANG            to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on RANG            to WR_REFREAD;
 grant SELECT                                                                 on RANG            to WR_VIEWACC;

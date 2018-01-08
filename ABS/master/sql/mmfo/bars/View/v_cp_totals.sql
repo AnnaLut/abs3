@@ -172,9 +172,7 @@ PROMPT *** Create  view V_CP_TOTALS ***
    ORDER BY TIP, VIDD, ID;
 
 PROMPT *** Create  grants  V_CP_TOTALS ***
-grant SELECT                                                                 on V_CP_TOTALS     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_TOTALS     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CP_TOTALS     to UPLD;
 
 
 

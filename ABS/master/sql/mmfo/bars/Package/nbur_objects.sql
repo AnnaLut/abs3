@@ -1,29 +1,23 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/nbur_objects.sql =========*** Run **
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.NBUR_OBJECTS 
+create or replace package NBUR_OBJECTS
 is
-
+  
   --
   -- constants
   --
   g_header_version  constant varchar2(64)  := 'version 17.3  2017.10.23';
   g_header_defs     constant varchar2(512) := '';
-
+  
   --
   -- types
   --
   subtype tbl_nm_subtype is varchar2(30) Not Null;
-
+  
   -- header_version - возвращает версию заголовка пакета
   function header_version return varchar2;
-
+  
   -- body_version - возвращает версию тела пакета
   function body_version return varchar2;
-
+  
   --
   --  получение идентификатора объекта по его имени
   --
@@ -31,7 +25,7 @@ is
   ( p_object_name  in     nbur_ref_objects.object_name%type
   ) return number
     result_cache;
-
+  
   --
   --  получение имени объекта по его идентификатору
   --
@@ -39,7 +33,7 @@ is
   ( p_object_id    in     number
   ) return varchar2
     result_cache;
-
+  
   --
   --  получение VERSION_ID загруженного объекта
   --
@@ -48,7 +42,7 @@ is
   , p_report_date  in date
   , p_kf           in varchar2
   ) return number;
-
+  
   --
   -- ADD NEW or UPDATE EXISTING OBJECT
   --
@@ -62,7 +56,7 @@ is
   , p_obj_code     in     nbur_ref_objects.name_id_var%type
   , p_obj_id       out    nbur_ref_objects.id%type
   );
-
+  
   --
   -- SET_OBJECT_DEPENDENCIES
   --
@@ -70,7 +64,7 @@ is
   ( p_obj_id       in     nbur_lnk_object_object.object_id%type
   , p_obj_pid      in     nbur_lnk_object_object.object_pid%type
   );
-
+  
   --
   --  вставка инфо о начале процесса загрузки объекта в таблицу загруженных объектов
   --
@@ -82,7 +76,7 @@ is
   , p_kf           in     nbur_lst_objects.kf%type
   , p_start_time   in     nbur_lst_objects.start_time%type  default systimestamp
   );
-
+  
   --
   --
   --
@@ -91,7 +85,7 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   --
   --
@@ -100,7 +94,7 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   --
   --
@@ -109,7 +103,7 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   --
   --
@@ -118,7 +112,7 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   -- LOAD_BAL_YEARLY
   --
@@ -127,11 +121,11 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   -- зміна статусу версії об`єкту
   --
-
+  
   procedure P_UPDATE_ONE_OBJ_STATUS
   ( p_object_id    in     nbur_lst_objects.object_id%type
   , p_report_date  in     nbur_lst_objects.report_date%type
@@ -178,7 +172,7 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   -- Наповнення даними вітрини SWIFT реквізитів фін. документів
   --
@@ -191,10 +185,10 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   -- Наповнення даними вітрини зв`язків рахунків та договорів
-  --
+  -- 
   --  p_report_date - Звітна дата
   --  p_kf          - Код фiлiалу (МФО)
   --  p_version_id  - Iдентифiкатор версії
@@ -204,7 +198,7 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   -- Наповнення даними вітрини процентних карток рахунків
   --
@@ -217,10 +211,10 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   -- Наповнення даними вітрини процентних ставок договорів
-  --
+  -- 
   --  p_report_date - Звітна дата
   --  p_kf          - Код фiлiалу (МФО)
   --  p_version_id  - Iдентифiкатор версії
@@ -230,10 +224,10 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
-  --
-  --
+  -- 
+  -- 
   --  p_report_date - Звітна дата
   --  p_kf          - Код фiлiалу (МФО)
   --  p_version_id  - Iдентифiкатор версії
@@ -243,7 +237,7 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   -- Наповнення даними вітрини касових (і не тільки) символів документів
   --
@@ -256,8 +250,8 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
-
+  
+  
   --
   -- Наповнення даними вітрини сум забезпечення в розрізі рахунків
   --
@@ -270,7 +264,7 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   -- Наповнення даними вітрини резервів по активах
   --
@@ -283,7 +277,7 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   -- Наповнення даними вітрини графіків платежів (зниження ліміту кредитування)
   --
@@ -296,7 +290,7 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   -- Наповнення вітрини Середньо-хронологічних залишків
   --
@@ -309,7 +303,7 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   -- Наповнення консолідованиї вітрини даних фінансових транзакцій за місяць, в т.ч. коригуючими
   --
@@ -322,10 +316,10 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   -- Наповнення вітрини даних нарахованих доходів та витрат за місяць
-  --
+  -- 
   --  p_report_date - Звітна дата
   --  p_kf          - Код фiлiалу (МФО)
   --  p_version_id  - Iдентифiкатор версії
@@ -335,10 +329,10 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   );
-
+  
   --
   --
-  --
+  -- 
   --  p_report_date - Звітна дата
   --  p_kf          - Код фiлiалу (МФО)
   --
@@ -347,10 +341,10 @@ is
   , p_kf           in     nbur_lst_versions.kf%type
   , p_vrsn_id      in     nbur_lst_versions.version_id%type default null
   );
-
+  
   --
   -- Збереження протоколів формування файлів в архіві версій
-  --
+  -- 
   --  p_report_date - Звітна дата
   --  p_kf          - Код фiлiалу (МФО)
   --  p_vrsn_id     - Iдентифiкатор версії
@@ -362,10 +356,10 @@ is
   , p_vrsn_id      in     nbur_lst_files.version_id%type
   , p_file_id      in     nbur_lst_files.file_id%type
   );
-
+  
   --
   --
-  --
+  -- 
   --  p_report_date - Звітна дата
   --  p_kf          - Код фiлiалу (МФО)
   --  p_object_id   - Iдентифiкатор об`єкту
@@ -377,10 +371,10 @@ is
   , p_object_id    in     nbur_lst_blc_objects.object_id%type
   , p_version_id   in     nbur_lst_blc_objects.version_id%type default null
   );
-
+  
   --
   -- RETRIEVE_VERSION
-  --
+  -- 
   --  p_report_date - Звітна дата
   --  p_kf          - Код фiлiалу (МФО)
   --  p_version_id  - Iдентифiкатор версії
@@ -395,7 +389,7 @@ is
 
   --
   -- REMOVE_INVALID_VERSIONS
-  --
+  -- 
   --  p_report_date - Звітна дата
   --  p_kf          - Код фiлiалу (МФО)
   --
@@ -411,10 +405,10 @@ is
   ( p_start_id     in     number
   , p_end_id       in     number
   );
-
+  
   --
   --
-  --
+  -- 
   --  p_report_date - Звітна дата
   --  p_kf          - Код фiлiалу (МФО)
   --  p_version_id  - Iдентифiкатор версії
@@ -431,9 +425,14 @@ is
 
 END NBUR_OBJECTS;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.NBUR_OBJECTS 
-is
 
+show err
+
+----------------------------------------------------------------------------------------------------
+
+create or replace package body NBUR_OBJECTS
+is
+  
   --
   -- constants
   --
@@ -1209,7 +1208,7 @@ is
 
     p_start_load_object (l_object_id, l_object_name, p_version_id, p_report_date, p_kf, systimestamp );
 
-    l_frst_yr_dt := add_months(trunc(p_report_date,'YYYY'), -12);
+    l_frst_yr_dt := trunc(p_report_date,'YYYY');
 
     if ( p_kf is null )
     then
@@ -6338,15 +6337,9 @@ BEGIN
 
 END NBUR_OBJECTS;
 /
- show err;
- 
-PROMPT *** Create  grants  NBUR_OBJECTS ***
-grant EXECUTE                                                                on NBUR_OBJECTS    to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on NBUR_OBJECTS    to RPBN002;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/nbur_objects.sql =========*** End **
- PROMPT ===================================================================================== 
- 
+show err
+
+GRANT EXECUTE ON BARS.NBUR_OBJECTS TO BARS_ACCESS_DEFROLE;
+
+-- exec sys.utl_recomp.recomp_serial('BARS');

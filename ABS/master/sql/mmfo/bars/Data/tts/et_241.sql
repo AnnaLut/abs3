@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции 241
-prompt Наименование операции: 241 Списання сум премії при списанні безнадійної заборгованості за кре
+prompt Наименование операции: Списання сум премії при списанні безнадійної заборгованості за кред.оп
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('241', '241 Списання сум премії при списанні безнадійної заборгованості за кре', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1000100000000000000000000000000000000000000000000000000000000000', 'Списання сум премії при списанні безнадійної заборгованості за кредитними операціями');
+    values ('241', 'Списання сум премії при списанні безнадійної заборгованості за кред.оп', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1000100000000000000000000000000000000000000000000000000000000000', 'Списання сум премії при списанні безнадійної заборгованості за кредитними операціями');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='241', name='241 Списання сум премії при списанні безнадійної заборгованості за кре', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1000100000000000000000000000000000000000000000000000000000000000', nazn='Списання сум премії при списанні безнадійної заборгованості за кредитними операціями'
+         set tt='241', name='Списання сум премії при списанні безнадійної заборгованості за кред.оп', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1000100000000000000000000000000000000000000000000000000000000000', nazn='Списання сум премії при списанні безнадійної заборгованості за кредитними операціями'
        where tt='241';
   end;
   --------------------------------

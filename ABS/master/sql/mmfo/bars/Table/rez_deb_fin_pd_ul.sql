@@ -52,11 +52,9 @@ COMMENT ON COLUMN BARS.REZ_DEB_FIN_PD_UL.PD IS 'Значення коефіцієнту імовірності
 
 
 PROMPT *** Create  grants  REZ_DEB_FIN_PD_UL ***
-grant SELECT                                                                 on REZ_DEB_FIN_PD_UL to BARSREADER_ROLE;
 grant SELECT                                                                 on REZ_DEB_FIN_PD_UL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ_DEB_FIN_PD_UL to RCC_DEAL;
 grant SELECT                                                                 on REZ_DEB_FIN_PD_UL to START1;
-grant SELECT                                                                 on REZ_DEB_FIN_PD_UL to UPLD;
 
 
 

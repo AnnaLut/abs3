@@ -95,6 +95,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OTCNF13ZBSK_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OTCN_F13_ZBSK ADD CONSTRAINT FK_OTCNF13ZBSK_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C006487 ***
 begin   
  execute immediate '
@@ -134,7 +147,7 @@ exception when others then
 PROMPT *** Create  index I1_OTCN_F13_ZBSK ***
 begin   
  execute immediate '
-  CREATE INDEX BARS.I1_OTCN_F13_ZBSK ON BARS.OTCN_F13_ZBSK (KF, REF, STMT) 
+  CREATE INDEX BARS.I1_OTCN_F13_ZBSK ON BARS.OTCN_F13_ZBSK (REF) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYNI ';
 exception when others then
@@ -148,7 +161,7 @@ exception when others then
 PROMPT *** Create  index I2_OTCN_F13_ZBSK ***
 begin   
  execute immediate '
-  CREATE INDEX BARS.I2_OTCN_F13_ZBSK ON BARS.OTCN_F13_ZBSK (KF, FDAT) 
+  CREATE INDEX BARS.I2_OTCN_F13_ZBSK ON BARS.OTCN_F13_ZBSK (FDAT) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYNI ';
 exception when others then
@@ -174,13 +187,11 @@ exception when others then
 
 PROMPT *** Create  grants  OTCN_F13_ZBSK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F13_ZBSK   to ABS_ADMIN;
-grant SELECT                                                                 on OTCN_F13_ZBSK   to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on OTCN_F13_ZBSK   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_F13_ZBSK   to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on OTCN_F13_ZBSK   to RPBN002;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on OTCN_F13_ZBSK   to SALGL;
 grant SELECT                                                                 on OTCN_F13_ZBSK   to START1;
-grant SELECT                                                                 on OTCN_F13_ZBSK   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_F13_ZBSK   to WR_ALL_RIGHTS;
 
 

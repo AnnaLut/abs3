@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_OW_CRVACC_REQUEST.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OW_CRVACC_REQUEST ***
-grant SELECT                                                                 on ERR$_OW_CRVACC_REQUEST to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OW_CRVACC_REQUEST to UPLD;
-
 
 
 PROMPT ===================================================================================== 

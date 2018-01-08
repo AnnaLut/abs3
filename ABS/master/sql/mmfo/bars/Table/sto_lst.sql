@@ -87,46 +87,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_STOLST_IDS_NN ***
+PROMPT *** Create  constraint CC_STOLST_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STO_LST MODIFY (IDS CONSTRAINT CC_STOLST_IDS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STOLST_RNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_LST MODIFY (RNK CONSTRAINT CC_STOLST_RNK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STOLST_SDAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_LST MODIFY (SDAT CONSTRAINT CC_STOLST_SDAT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STOLST_IDG_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_LST MODIFY (IDG CONSTRAINT CC_STOLST_IDG_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.STO_LST MODIFY (BRANCH CONSTRAINT CC_STOLST_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -147,10 +111,98 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_STOLST_BRANCH_NN ***
+PROMPT *** Create  constraint CC_STOLST_IDG_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STO_LST MODIFY (BRANCH CONSTRAINT CC_STOLST_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.STO_LST MODIFY (IDG CONSTRAINT CC_STOLST_IDG_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STOLST_SDAT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STO_LST MODIFY (SDAT CONSTRAINT CC_STOLST_SDAT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STOLST_RNK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STO_LST MODIFY (RNK CONSTRAINT CC_STOLST_RNK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_STOLST_IDS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STO_LST MODIFY (IDS CONSTRAINT CC_STOLST_IDS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STOLST_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STO_LST ADD CONSTRAINT FK_STOLST_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STOLST_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STO_LST ADD CONSTRAINT FK_STOLST_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STOLST_STOGRP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STO_LST ADD CONSTRAINT FK_STOLST_STOGRP FOREIGN KEY (IDG)
+	  REFERENCES BARS.STO_GRP (IDG) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STOLST_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STO_LST ADD CONSTRAINT FK_STOLST_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -187,12 +239,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  STO_LST ***
-grant SELECT                                                                 on STO_LST         to BARSREADER_ROLE;
 grant SELECT                                                                 on STO_LST         to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_LST         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STO_LST         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_LST         to STO;
-grant SELECT                                                                 on STO_LST         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STO_LST         to WR_ALL_RIGHTS;
 
 

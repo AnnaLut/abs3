@@ -15,9 +15,7 @@ PROMPT *** Create  view V_STAFFTIPADM_TIP_APPS ***
 
 PROMPT *** Create  grants  V_STAFFTIPADM_TIP_APPS ***
 grant SELECT                                                                 on V_STAFFTIPADM_TIP_APPS to ABS_ADMIN;
-grant SELECT                                                                 on V_STAFFTIPADM_TIP_APPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFFTIPADM_TIP_APPS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_STAFFTIPADM_TIP_APPS to UPLD;
 
 
 

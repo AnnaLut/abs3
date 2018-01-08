@@ -40,10 +40,8 @@ select r.oper_type,
    and a.rnk = c.rnk(+);
 
 PROMPT *** Create  grants  V_CM_ACC_REQUEST ***
-grant SELECT                                                                 on V_CM_ACC_REQUEST to BARSREADER_ROLE;
 grant DELETE,SELECT                                                          on V_CM_ACC_REQUEST to BARS_ACCESS_DEFROLE;
 grant DELETE,SELECT                                                          on V_CM_ACC_REQUEST to OW;
-grant SELECT                                                                 on V_CM_ACC_REQUEST to UPLD;
 
 
 

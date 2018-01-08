@@ -105,14 +105,14 @@ begin
   -------- Группы контроля -------
   --------------------------------
   delete from chklist_tts where tt='I00';
-  begin
+   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
     values (5, 'I00', 1, null, 'f_tt_I00_chk(5 , dk, nlsa, nlsb, branch) = 1', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''I00'', 1, null, ''f_tt_I00_chk(5 , dk, nlsa, nlsb, branch) = 1'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''I00'', 1, null, ''(nvl(branch,SYS_CONTEXT (''''bars_context'''', ''''user_branch''''))=''''/300465/000041/'''')'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -123,7 +123,7 @@ begin
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 9, ''I00'', 4, null, ''f_tt_I00_chk(9 , dk, nlsa, nlsb, branch) = 1'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 9, ''I00'', 4, null, ''(nvl(branch,SYS_CONTEXT (''''bars_context'''', ''''user_branch''''))=''''/300465/000041/'''')'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -134,7 +134,7 @@ begin
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 16, ''I00'', 3, null, ''f_tt_I00_chk(16 , dk, nlsa, nlsb, branch) = 1'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 16, ''I00'', 3, null, ''(nvl(branch,SYS_CONTEXT (''''bars_context'''', ''''user_branch''''))!=''''/300465/000041/'''')'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

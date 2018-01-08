@@ -55,11 +55,9 @@ COMMENT ON COLUMN BARS.CONTS.RNK IS '';
 
 
 PROMPT *** Create  grants  CONTS ***
-grant SELECT                                                                 on CONTS           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CONTS           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CONTS           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CONTS           to CONTS;
-grant SELECT                                                                 on CONTS           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CONTS           to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CONTS           to WR_REFREAD;
 

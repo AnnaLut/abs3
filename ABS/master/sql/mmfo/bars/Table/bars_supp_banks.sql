@@ -77,11 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BARS_SUPP_BANKS ***
-grant SELECT                                                                 on BARS_SUPP_BANKS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BARS_SUPP_BANKS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BARS_SUPP_BANKS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BARS_SUPP_BANKS to START1;
-grant SELECT                                                                 on BARS_SUPP_BANKS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BARS_SUPP_BANKS to WR_ALL_RIGHTS;
 
 

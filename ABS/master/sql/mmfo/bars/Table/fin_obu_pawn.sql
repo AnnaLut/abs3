@@ -79,6 +79,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_FINOBUPAWN_PAWN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FIN_OBU_PAWN ADD CONSTRAINT FK_FINOBUPAWN_PAWN FOREIGN KEY (PAWN)
+	  REFERENCES BARS.CC_PAWN (PAWN) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_FINOBUPAWN_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FIN_OBU_PAWN ADD CONSTRAINT FK_FINOBUPAWN_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint NK_FINOBUPAWN_ID ***
 begin   
  execute immediate '
@@ -91,10 +117,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_FINOBUPAWN_ND ***
+PROMPT *** Create  constraint CC_FINOBUPAWN_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FIN_OBU_PAWN MODIFY (ND CONSTRAINT NK_FINOBUPAWN_ND NOT NULL ENABLE)';
+  ALTER TABLE BARS.FIN_OBU_PAWN MODIFY (KF CONSTRAINT CC_FINOBUPAWN_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -151,10 +177,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_FINOBUPAWN_KF_NN ***
+PROMPT *** Create  constraint NK_FINOBUPAWN_ND ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FIN_OBU_PAWN MODIFY (KF CONSTRAINT CC_FINOBUPAWN_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.FIN_OBU_PAWN MODIFY (ND CONSTRAINT NK_FINOBUPAWN_ND NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -191,11 +217,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_OBU_PAWN ***
-grant SELECT                                                                 on FIN_OBU_PAWN    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_OBU_PAWN    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_OBU_PAWN    to BARS_DM;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_OBU_PAWN    to START1;
-grant SELECT                                                                 on FIN_OBU_PAWN    to UPLD;
 
 
 

@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/DM/package/dm_utl.sql =========*** Run *** ======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE DM.DM_UTL 
+create or replace package DM.DM_UTL
 is
   --
   -- constants
@@ -75,7 +69,7 @@ is
   , p_date              in     date
   , p_kf                in     varchar2
   ) return number;
-
+  
   --
   -- GATHER_TBL_STATS
   --
@@ -84,7 +78,7 @@ is
   , p_tab_name     in     varchar2
   , p_dop          in     integer  default 1
   );
-
+  
   --
   -- GATHER_TBL_STATS
   --
@@ -98,7 +92,7 @@ is
   , p_cascade      in     boolean
   , p_force        in     boolean  default FALSE
   );
-
+  
   --
   -- GATHER_IDX_STATS
   --
@@ -109,7 +103,7 @@ is
   , p_grnlr        in     varchar2 default 'AUTO'
   , p_force        in     boolean  default FALSE
   );
-
+  
   --
   -- GATHER_DM_STATS
   --
@@ -120,7 +114,12 @@ is
 
 END DM_UTL;
 /
-CREATE OR REPLACE PACKAGE BODY DM.DM_UTL 
+
+show errors
+
+----------------------------------------------------------------------------------------------------
+
+create or replace package body DM.DM_UTL
 is
   --
   -- constants
@@ -474,13 +473,13 @@ is
         l_ptsn  := 0;
         l_sptsn := 0;
     end;
-
+    
     l_stmt := case
               when upper(p_table_nm) = 'SALDOA'
               then q'[s where not exists (select 1 from ]'||l_tbl_own||q'[.ACCOUNTS a where a.NLS like '80%' and a.ACC = s.ACC)]'
               else null
               end;
-
+    
     l_stmt := case
               when ( l_sptsn = 1 and p_kf Is Not Null )
               then 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm ||
@@ -491,17 +490,17 @@ is
               else 'select nvl(max(ora_rowscn),0) from ' || l_tbl_own || '.' || p_table_nm ||
                    ' where FDAT = to_date('''||l_dt||''',''yyyymmdd'')'
               end;
-
+    
     bars_audit.trace( '%s: stmt=>%s.', title,l_stmt );
-
+    
     execute immediate l_stmt into l_scn;
-
+    
     bars_audit.trace( '%s: Exit with SCN=%s', title, to_char(l_scn) );
 
     return l_scn;
 
   end GET_LAST_SCN;
-
+  
   --
   --
   --
@@ -512,10 +511,10 @@ is
   ) is
     title     constant    varchar2(60) := $$PLSQL_UNIT||'.GATHER_TBL_STATS';
   begin
-
+    
     bars_audit.trace( '%s: Entry with ( p_own_name=%s, p_tab_name=%s, p_dop=%s ).'
                     , title, p_own_name, p_tab_name, to_char( p_dop ) );
-
+    
     begin
       DBMS_STATS.GATHER_TABLE_STATS
       ( ownname          => p_own_name
@@ -530,11 +529,11 @@ is
         bars_audit.error( $$PLSQL_UNIT || ': ' ||chr(10)|| dbms_utility.format_error_stack()
                                                ||chr(10)|| dbms_utility.format_error_backtrace() );
     end;
-
+    
     bars_audit.trace( '%s: Exit.', title );
-
+    
   end GATHER_TBL_STATS;
-
+  
   --
   --
   --
@@ -550,12 +549,12 @@ is
   ) is
     title     constant    varchar2(60) := $$PLSQL_UNIT||'.GATHER_TBL_STATS';
   begin
-
+    
     bars_audit.trace( '%s: Entry with ( p_own_name=%s, p_tab_name=%s, p_ptsn_name=%s, p_mth_opt=%s, p_dop=%s, p_grnlr=%s, p_cascade=%s, p_force=%s ).'
                     , title, p_own_name, p_tab_name, p_ptsn_name, p_mth_opt, to_char( p_dop ), p_grnlr
                     , case when p_cascade then 'TRUE' else 'FALSE' end
                     , case when p_force   then 'TRUE' else 'FALSE' end );
-
+    
     begin
       DBMS_STATS.GATHER_TABLE_STATS
       ( ownname          => p_own_name
@@ -572,11 +571,11 @@ is
         bars_audit.error( $$PLSQL_UNIT || ': ' ||chr(10)|| dbms_utility.format_error_stack()
                                                ||chr(10)|| dbms_utility.format_error_backtrace() );
     end;
-
+    
     bars_audit.trace( '%s: Exit.', title );
-
+    
   end GATHER_TBL_STATS;
-
+  
   --
   --
   --
@@ -589,11 +588,11 @@ is
   ) is
     title     constant    varchar2(60) := $$PLSQL_UNIT||'.GATHER_IDX_STATS';
   begin
-
+    
     bars_audit.trace( '%s: Entry with ( p_own_name=%s, p_idx_name=%s, p_dop=%s, p_grnlr=%s, p_force=%s ).'
                     , title, p_own_name, p_idx_name, to_char( p_dop ), p_grnlr
                     , case when p_force then 'TRUE' else 'FALSE' end );
-
+    
     begin
       DBMS_STATS.GATHER_INDEX_STATS
       ( ownname     => p_own_name
@@ -606,11 +605,11 @@ is
         bars_audit.error( $$PLSQL_UNIT || ': ' ||chr(10)|| dbms_utility.format_error_stack()
                                                ||chr(10)|| dbms_utility.format_error_backtrace() );
     end;
-
+    
     bars_audit.trace( '%s: Exit.', title );
-
+    
   end GATHER_IDX_STATS;
-
+  
   --
   --
   --
@@ -620,10 +619,10 @@ is
   ) is
     title     constant    varchar2(64) := $$PLSQL_UNIT||'.GATHER_DM_STATS';
   begin
-
+    
     bars_audit.trace( '%s: Entry with ( p_dm_nm=%s, p_force=%s ).'
                     , title, p_dm_nm, case when p_force then 'TRUE' else 'FALSE' end );
-
+    
     begin
       DBMS_STATS.GATHER_TABLE_STATS
       ( ownname          => 'BARS'
@@ -633,9 +632,9 @@ is
         bars_audit.error( $$PLSQL_UNIT || ': ' ||chr(10)|| dbms_utility.format_error_stack()
                                                ||chr(10)|| dbms_utility.format_error_backtrace() );
     end;
-
+    
     bars_audit.trace( '%s: Exit.', title );
-
+    
   end GATHER_DM_STATS;
 
 
@@ -644,14 +643,7 @@ BEGIN
   NULL;
 END DM_UTL;
 /
- show err;
- 
-PROMPT *** Create  grants  DM_UTL ***
-grant EXECUTE                                                                on DM_UTL          to BARS;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/DM/package/dm_utl.sql =========*** End *** ======
- PROMPT ===================================================================================== 
- 
+show errors
+
+grant EXECUTE on DM.DM_UTL to BARS;

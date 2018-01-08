@@ -87,10 +87,6 @@ COMMENT ON COLUMN BARS.ERR$_REZ_W4_BPK.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_REZ_W4_BPK ***
-grant SELECT                                                                 on ERR$_REZ_W4_BPK to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_REZ_W4_BPK to UPLD;
-
 
 
 PROMPT ===================================================================================== 

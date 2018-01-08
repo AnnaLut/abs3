@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_ZAY_RECIPIENTS.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ZAY_RECIPIENTS ***
-grant SELECT                                                                 on ERR$_ZAY_RECIPIENTS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ZAY_RECIPIENTS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

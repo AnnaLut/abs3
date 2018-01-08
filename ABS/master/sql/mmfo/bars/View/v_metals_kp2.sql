@@ -127,10 +127,8 @@ PROMPT *** Create  view V_METALS_KP2 ***
           AND (m.cena > 0 OR m.cena_k > 0);
 
 PROMPT *** Create  grants  V_METALS_KP2 ***
-grant SELECT                                                                 on V_METALS_KP2    to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_METALS_KP2    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_METALS_KP2    to PYOD001;
-grant SELECT                                                                 on V_METALS_KP2    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_METALS_KP2    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_METALS_KP2    to WR_REFREAD;
 

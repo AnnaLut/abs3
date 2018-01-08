@@ -94,10 +94,8 @@ PROMPT *** Create  view V_PAY_MBDK ***
                OR y.npp = 23 AND x.ostB_b > 0 AND x.ostB_b = x.ostC_b);
 
 PROMPT *** Create  grants  V_PAY_MBDK ***
-grant SELECT                                                                 on V_PAY_MBDK      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PAY_MBDK      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PAY_MBDK      to START1;
-grant SELECT                                                                 on V_PAY_MBDK      to UPLD;
 
 
 

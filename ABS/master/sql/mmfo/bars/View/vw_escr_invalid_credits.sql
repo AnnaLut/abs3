@@ -398,9 +398,7 @@ select t.deal_id, 10 error_id
            AND substr(d.prod, 1, 6) = r.ob22);
 
 PROMPT *** Create  grants  VW_ESCR_INVALID_CREDITS ***
-grant SELECT                                                                 on VW_ESCR_INVALID_CREDITS to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_INVALID_CREDITS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on VW_ESCR_INVALID_CREDITS to UPLD;
 
 
 

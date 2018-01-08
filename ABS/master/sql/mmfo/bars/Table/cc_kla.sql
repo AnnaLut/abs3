@@ -51,6 +51,19 @@ COMMENT ON COLUMN BARS.CC_KLA.VIDD IS 'Вид дог.по КП';
 
 
 
+PROMPT *** Create  constraint FK_CC_KLA_VIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_KLA ADD CONSTRAINT FK_CC_KLA_VIDD FOREIGN KEY (VIDD)
+	  REFERENCES BARS.CC_VIDD (VIDD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint XPK_CC_KLA ***
 begin   
  execute immediate '
@@ -79,11 +92,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_KLA ***
-grant SELECT                                                                 on CC_KLA          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_KLA          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_KLA          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_KLA          to RCC_DEAL;
-grant SELECT                                                                 on CC_KLA          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_KLA          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CC_KLA          to WR_REFREAD;
 

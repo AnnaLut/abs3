@@ -1,16 +1,13 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/REZ_PAY_OB22.sql =========*** Run 
 PROMPT ===================================================================================== 
-
 
 PROMPT *** Create  procedure REZ_PAY_OB22 ***
 
   CREATE OR REPLACE PROCEDURE BARS.REZ_PAY_OB22 (dat_ DATE, mode_ NUMBER DEFAULT 0, p_user number default null)  IS
 
 /* Версія   1.0   13-11-2017
-   13-11-2017(1.0) - Убран rez.p_unload_data;
+   13-11-2017(1.0) - Убран rez.p_unload_data; 
 */
 
   doform_nazn varchar2(100) := 'Формування резерву під ';
@@ -872,6 +869,7 @@ dbms_output.put_line(k.branch||'   '||k.r_nls||' '|| k.kv||' === '||k.sz);
   --rez.p_unload_data;
 
 END REZ_PAY_OB22  ;
+ 
 /
 show err;
 

@@ -14,9 +14,7 @@ where GRANTEE_TYPE_ID  = resource_utl.get_resource_type_id('STAFF_ROLE'  ) and G
   and RESOURCE_TYPE_ID = resource_utl.get_resource_type_id('TTS' );
 
 PROMPT *** Create  grants  M_ROLE_TTS ***
-grant SELECT                                                                 on M_ROLE_TTS      to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_TTS      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on M_ROLE_TTS      to UPLD;
 
 
 

@@ -69,6 +69,18 @@ COMMENT ON COLUMN BARS.BRANCH.NAME_ALT IS '';
 
 
 
+PROMPT *** Create  constraint CC_BRANCH_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BRANCH ADD CONSTRAINT CC_BRANCH_BRANCH CHECK (REGEXP_LIKE(BRANCH, ''^/(\d{6}/){0,3}$'')) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_BRANCH ***
 begin   
  execute immediate '
@@ -83,10 +95,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BRANCH_BRANCH ***
+PROMPT *** Create  constraint FK_BRANCHTIP ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BRANCH ADD CONSTRAINT CC_BRANCH_BRANCH CHECK (REGEXP_LIKE(BRANCH, ''^/(\d{6}/){0,3}$'')) ENABLE';
+  ALTER TABLE BARS.BRANCH ADD CONSTRAINT FK_BRANCHTIP FOREIGN KEY (DESCRIPTION)
+	  REFERENCES BARS.BRANCH_TIP (TIP) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -148,7 +161,6 @@ PROMPT *** Create  grants  BRANCH ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BRANCH          to ABS_ADMIN;
 grant FLASHBACK,REFERENCES,SELECT                                            on BRANCH          to BARSAQ with grant option;
 grant DELETE,INSERT,REFERENCES,SELECT,UPDATE                                 on BRANCH          to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on BRANCH          to BARSREADER_ROLE;
 grant SELECT                                                                 on BRANCH          to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRANCH          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH          to BARS_DM;
@@ -159,7 +171,6 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on BRANCH          to RPBN002;
 grant SELECT                                                                 on BRANCH          to SALGL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BRANCH          to START1;
-grant SELECT                                                                 on BRANCH          to UPLD;
 grant INSERT,SELECT,UPDATE                                                   on BRANCH          to WCS_SYNC_USER;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRANCH          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BRANCH          to WR_REFREAD;

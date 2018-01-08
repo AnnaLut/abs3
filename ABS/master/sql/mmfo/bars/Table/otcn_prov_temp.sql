@@ -70,10 +70,8 @@ COMMENT ON COLUMN BARS.OTCN_PROV_TEMP.BRANCH IS '';
 
 PROMPT *** Create  grants  OTCN_PROV_TEMP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_PROV_TEMP  to ABS_ADMIN;
-grant SELECT                                                                 on OTCN_PROV_TEMP  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_PROV_TEMP  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_PROV_TEMP  to RPBN002;
-grant SELECT                                                                 on OTCN_PROV_TEMP  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_PROV_TEMP  to WR_ALL_RIGHTS;
 
 

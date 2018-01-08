@@ -43,7 +43,7 @@ begin
 	S0 NUMBER, 
 	K0 NUMBER, 
 	IDM NUMBER(*,0)
-   ) SEGMENT CREATION IMMEDIATE 
+   ) SEGMENT CREATION DEFERRED 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSDYND ';
@@ -83,6 +83,135 @@ COMMENT ON COLUMN BARS.KAS_Z.IDM IS 'Сист.№ маршруту';
 
 
 
+PROMPT *** Create  constraint FK_KASZ_IDM ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KAS_Z ADD CONSTRAINT FK_KASZ_IDM FOREIGN KEY (IDM)
+	  REFERENCES BARS.KAS_M (IDM) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KASZ_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KAS_Z ADD CONSTRAINT FK_KASZ_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_KASZ ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KAS_Z ADD CONSTRAINT PK_KASZ PRIMARY KEY (IDZ)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KASZ_DT2_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KAS_Z MODIFY (DAT2 CONSTRAINT CC_KASZ_DT2_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_KASZ_VID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KAS_Z MODIFY (VID CONSTRAINT CC_KASZ_VID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KASZ_KV ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KAS_Z ADD CONSTRAINT FK_KASZ_KV FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KASZ_IDS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KAS_Z ADD CONSTRAINT FK_KASZ_IDS FOREIGN KEY (IDS)
+	  REFERENCES BARS.KAS_U (IDS) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KASZ_IDI ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KAS_Z ADD CONSTRAINT FK_KASZ_IDI FOREIGN KEY (IDI)
+	  REFERENCES BARS.KAS_F (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KASZ_SOS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KAS_Z ADD CONSTRAINT FK_KASZ_SOS FOREIGN KEY (SOS)
+	  REFERENCES BARS.KAS_SOS (SOS) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KASZ_VID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KAS_Z ADD CONSTRAINT FK_KASZ_VID FOREIGN KEY (VID)
+	  REFERENCES BARS.KAS_VID (VID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_KASZ_SOS_NN ***
 begin   
  execute immediate '
@@ -107,44 +236,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_KASZ_VID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KAS_Z MODIFY (VID CONSTRAINT CC_KASZ_VID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_KASZ_DT2_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KAS_Z MODIFY (DAT2 CONSTRAINT CC_KASZ_DT2_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint PK_KASZ ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KAS_Z ADD CONSTRAINT PK_KASZ PRIMARY KEY (IDZ)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_KASZ ***
 begin   
  execute immediate '
@@ -160,10 +251,8 @@ exception when others then
 
 PROMPT *** Create  grants  KAS_Z ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_Z           to ABS_ADMIN;
-grant SELECT                                                                 on KAS_Z           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_Z           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_Z           to PYOD001;
-grant SELECT                                                                 on KAS_Z           to UPLD;
 
 
 

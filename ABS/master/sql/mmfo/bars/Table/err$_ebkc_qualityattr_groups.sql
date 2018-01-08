@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_EBKC_QUALITYATTR_GROUPS.CUST_TYPE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_EBKC_QUALITYATTR_GROUPS ***
-grant SELECT                                                                 on ERR$_EBKC_QUALITYATTR_GROUPS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_EBKC_QUALITYATTR_GROUPS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

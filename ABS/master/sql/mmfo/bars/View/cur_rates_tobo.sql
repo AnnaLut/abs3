@@ -19,10 +19,8 @@ PROMPT *** Create  view CUR_RATES_TOBO ***
 PROMPT *** Create  grants  CUR_RATES_TOBO ***
 grant REFERENCES,SELECT                                                      on CUR_RATES_TOBO  to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on CUR_RATES_TOBO  to BARSAQ_ADM with grant option;
-grant SELECT                                                                 on CUR_RATES_TOBO  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUR_RATES_TOBO  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUR_RATES_TOBO  to PYOD001;
-grant SELECT                                                                 on CUR_RATES_TOBO  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUR_RATES_TOBO  to WR_ALL_RIGHTS;
 
 

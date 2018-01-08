@@ -77,12 +77,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_RIZIK ***
-grant SELECT                                                                 on FM_RIZIK        to BARSREADER_ROLE;
 grant SELECT                                                                 on FM_RIZIK        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_RIZIK        to BARS_DM;
 grant SELECT                                                                 on FM_RIZIK        to CUST001;
 grant SELECT                                                                 on FM_RIZIK        to FINMON01;
-grant SELECT                                                                 on FM_RIZIK        to UPLD;
 
 
 

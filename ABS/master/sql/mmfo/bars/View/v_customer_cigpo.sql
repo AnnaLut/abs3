@@ -13,10 +13,8 @@ PROMPT *** Create  view V_CUSTOMER_CIGPO ***
      where   tag='CIGPO';
 
 PROMPT *** Create  grants  V_CUSTOMER_CIGPO ***
-grant SELECT                                                                 on V_CUSTOMER_CIGPO to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTOMER_CIGPO to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUSTOMER_CIGPO to START1;
-grant SELECT                                                                 on V_CUSTOMER_CIGPO to UPLD;
 
 
 

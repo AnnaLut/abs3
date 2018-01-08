@@ -71,9 +71,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_VIDD_EXCLUSIVE ***
-grant SELECT                                                                 on DPT_VIDD_EXCLUSIVE to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_VIDD_EXCLUSIVE to BARS_DM;
-grant SELECT                                                                 on DPT_VIDD_EXCLUSIVE to UPLD;
 
 
 

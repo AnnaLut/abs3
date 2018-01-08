@@ -107,10 +107,8 @@ PROMPT *** Create  view LORO_SWT_SEP ***
     WHERE x.rnk = c.rnk AND c.rnk = b.rnk;
 
 PROMPT *** Create  grants  LORO_SWT_SEP ***
-grant SELECT                                                                 on LORO_SWT_SEP    to BARSREADER_ROLE;
 grant SELECT                                                                 on LORO_SWT_SEP    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LORO_SWT_SEP    to START1;
-grant SELECT                                                                 on LORO_SWT_SEP    to UPLD;
 
 
 

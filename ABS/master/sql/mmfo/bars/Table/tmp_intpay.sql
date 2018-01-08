@@ -111,10 +111,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPINTPAY_ID_NN ***
+PROMPT *** Create  constraint FK_TMPINTPAY_ACCOUNTS3 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (ID CONSTRAINT CC_TMPINTPAY_ID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_INTPAY ADD CONSTRAINT FK_TMPINTPAY_ACCOUNTS3 FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -123,226 +124,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPINTPAY_ACC_NN ***
+PROMPT *** Create  constraint CC_TMPINTPAY_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (ACC CONSTRAINT CC_TMPINTPAY_ACC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_TT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (TT CONSTRAINT CC_TMPINTPAY_TT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_VOB_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (VOB CONSTRAINT CC_TMPINTPAY_VOB_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_NAZN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (NAZN CONSTRAINT CC_TMPINTPAY_NAZN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_S_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (S CONSTRAINT CC_TMPINTPAY_S_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_DPTID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (DPT_ID CONSTRAINT CC_TMPINTPAY_DPTID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_NLSA_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (NLSA CONSTRAINT CC_TMPINTPAY_NLSA_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_KVA_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (KVA CONSTRAINT CC_TMPINTPAY_KVA_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_NMSA_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (NMSA CONSTRAINT CC_TMPINTPAY_NMSA_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_OKPOA_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (OKPOA CONSTRAINT CC_TMPINTPAY_OKPOA_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_MFOB_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (MFOB CONSTRAINT CC_TMPINTPAY_MFOB_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_NLSB_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (NLSB CONSTRAINT CC_TMPINTPAY_NLSB_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_KVB_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (KVB CONSTRAINT CC_TMPINTPAY_KVB_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_NMSB_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (NMSB CONSTRAINT CC_TMPINTPAY_NMSB_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_OKPOB_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (OKPOB CONSTRAINT CC_TMPINTPAY_OKPOB_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_ND_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (ND CONSTRAINT CC_TMPINTPAY_ND_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_DK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (DK CONSTRAINT CC_TMPINTPAY_DK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_MFOA_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (MFOA CONSTRAINT CC_TMPINTPAY_MFOA_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_TMPINTPAY_S2_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (S2 CONSTRAINT CC_TMPINTPAY_S2_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (KF CONSTRAINT CC_TMPINTPAY_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -363,10 +148,381 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TMPINTPAY_KF_NN ***
+PROMPT *** Create  constraint CC_TMPINTPAY_S2_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_INTPAY MODIFY (KF CONSTRAINT CC_TMPINTPAY_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (S2 CONSTRAINT CC_TMPINTPAY_S2_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_MFOA_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (MFOA CONSTRAINT CC_TMPINTPAY_MFOA_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_DK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (DK CONSTRAINT CC_TMPINTPAY_DK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_ND_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (ND CONSTRAINT CC_TMPINTPAY_ND_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_OKPOB_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (OKPOB CONSTRAINT CC_TMPINTPAY_OKPOB_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_NMSB_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (NMSB CONSTRAINT CC_TMPINTPAY_NMSB_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_KVB_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (KVB CONSTRAINT CC_TMPINTPAY_KVB_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_NLSB_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (NLSB CONSTRAINT CC_TMPINTPAY_NLSB_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_MFOB_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (MFOB CONSTRAINT CC_TMPINTPAY_MFOB_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_OKPOA_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (OKPOA CONSTRAINT CC_TMPINTPAY_OKPOA_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_NMSA_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (NMSA CONSTRAINT CC_TMPINTPAY_NMSA_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_KVA_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (KVA CONSTRAINT CC_TMPINTPAY_KVA_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_NLSA_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (NLSA CONSTRAINT CC_TMPINTPAY_NLSA_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_DPTID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (DPT_ID CONSTRAINT CC_TMPINTPAY_DPTID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_S_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (S CONSTRAINT CC_TMPINTPAY_S_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_NAZN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (NAZN CONSTRAINT CC_TMPINTPAY_NAZN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_VOB_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (VOB CONSTRAINT CC_TMPINTPAY_VOB_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_TT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (TT CONSTRAINT CC_TMPINTPAY_TT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_ACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (ACC CONSTRAINT CC_TMPINTPAY_ACC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTPAY_ACCOUNTS4 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY ADD CONSTRAINT FK_TMPINTPAY_ACCOUNTS4 FOREIGN KEY (KF, ACCA)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTPAY_VOB ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY ADD CONSTRAINT FK_TMPINTPAY_VOB FOREIGN KEY (VOB)
+	  REFERENCES BARS.VOB (VOB) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTPAY_TTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY ADD CONSTRAINT FK_TMPINTPAY_TTS FOREIGN KEY (TT)
+	  REFERENCES BARS.TTS (TT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTPAY_TABVAL2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY ADD CONSTRAINT FK_TMPINTPAY_TABVAL2 FOREIGN KEY (KVB)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTPAY_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY ADD CONSTRAINT FK_TMPINTPAY_TABVAL FOREIGN KEY (KVA)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTPAY_BANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY ADD CONSTRAINT FK_TMPINTPAY_BANKS FOREIGN KEY (MFOB)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTPAY_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY ADD CONSTRAINT FK_TMPINTPAY_STAFF FOREIGN KEY (ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTPAY_DPTVIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY ADD CONSTRAINT FK_TMPINTPAY_DPTVIDD FOREIGN KEY (VIDD)
+	  REFERENCES BARS.DPT_VIDD (VIDD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTPAY_DK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY ADD CONSTRAINT FK_TMPINTPAY_DK FOREIGN KEY (DK)
+	  REFERENCES BARS.DK (DK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTPAY_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY ADD CONSTRAINT FK_TMPINTPAY_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TMPINTPAY_DPTDEPOSIT2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY ADD CONSTRAINT FK_TMPINTPAY_DPTDEPOSIT2 FOREIGN KEY (KF, DPT_ID)
+	  REFERENCES BARS.DPT_DEPOSIT (KF, DEPOSIT_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_TMPINTPAY_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_INTPAY MODIFY (ID CONSTRAINT CC_TMPINTPAY_ID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -390,12 +546,10 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_INTPAY ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_INTPAY      to ABS_ADMIN;
-grant SELECT                                                                 on TMP_INTPAY      to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on TMP_INTPAY      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_INTPAY      to BARS_DM;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on TMP_INTPAY      to DPT;
 grant SELECT                                                                 on TMP_INTPAY      to START1;
-grant SELECT                                                                 on TMP_INTPAY      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_INTPAY      to WR_ALL_RIGHTS;
 
 

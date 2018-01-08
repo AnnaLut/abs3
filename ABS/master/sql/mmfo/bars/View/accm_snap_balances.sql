@@ -18,7 +18,6 @@ PROMPT *** Create  view ACCM_SNAP_BALANCES ***
 
 PROMPT *** Create  grants  ACCM_SNAP_BALANCES ***
 grant SELECT                                                                 on ACCM_SNAP_BALANCES to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on ACCM_SNAP_BALANCES to BARSREADER_ROLE;
 grant SELECT                                                                 on ACCM_SNAP_BALANCES to BARSUPL;
 grant SELECT                                                                 on ACCM_SNAP_BALANCES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCM_SNAP_BALANCES to START1;

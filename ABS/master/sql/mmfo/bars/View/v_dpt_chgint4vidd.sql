@@ -18,10 +18,8 @@ PROMPT *** Create  view V_DPT_CHGINT4VIDD ***
  ;
 
 PROMPT *** Create  grants  V_DPT_CHGINT4VIDD ***
-grant SELECT                                                                 on V_DPT_CHGINT4VIDD to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_CHGINT4VIDD to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_CHGINT4VIDD to DPT_ADMIN;
-grant SELECT                                                                 on V_DPT_CHGINT4VIDD to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_CHGINT4VIDD to WR_ALL_RIGHTS;
 
 

@@ -15,10 +15,8 @@ PROMPT *** Create  view V_STHTYPE ***
    SELECT 'Багатоквартирний ' name, 3 id FROM DUAL;
 
 PROMPT *** Create  grants  V_STHTYPE ***
-grant SELECT                                                                 on V_STHTYPE       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STHTYPE       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_STHTYPE       to START1;
-grant SELECT                                                                 on V_STHTYPE       to UPLD;
 
 
 

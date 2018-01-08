@@ -117,11 +117,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OTCN_2H_ANKETA ***
-grant SELECT                                                                 on OTCN_2H_ANKETA  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_2H_ANKETA  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_2H_ANKETA  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_2H_ANKETA  to RPBN002;
-grant SELECT                                                                 on OTCN_2H_ANKETA  to UPLD;
 grant FLASHBACK,SELECT                                                       on OTCN_2H_ANKETA  to WR_REFREAD;
 
 

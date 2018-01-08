@@ -32,10 +32,8 @@ PROMPT *** Create  view V_BPK_PRODUCT ***
    and (b.d_close is null or b.d_close > sysdate);
 
 PROMPT *** Create  grants  V_BPK_PRODUCT ***
-grant SELECT                                                                 on V_BPK_PRODUCT   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BPK_PRODUCT   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BPK_PRODUCT   to OBPC;
-grant SELECT                                                                 on V_BPK_PRODUCT   to UPLD;
 
 
 

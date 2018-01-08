@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции !C1
-prompt Наименование операции: !C1 STOP-правило на суму переказу 15000,00
+prompt Наименование операции: STOP-правило на суму переказу 15000,00
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!C1', '!C1 STOP-правило на суму переказу 15000,00', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(101,#(KVA),'''',#(S),#(REF))', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('!C1', 'STOP-правило на суму переказу 15000,00', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(101,#(KVA),'''',#(S),#(REF))', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!C1', name='!C1 STOP-правило на суму переказу 15000,00', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(101,#(KVA),'''',#(S),#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='!C1', name='STOP-правило на суму переказу 15000,00', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(101,#(KVA),'''',#(S),#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='!C1';
   end;
   --------------------------------
@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции CCF
-prompt Наименование операции: CCF (доч.CAF) Комісія банку за прийом переказу по сист."Contact" (ближ
+prompt Наименование операции: (доч.CAF) Комісія банку за прийом переказу по сист."Contact" (ближн)
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CCF', 'CCF (доч.CAF) Комісія банку за прийом переказу по сист."Contact" (ближ', 1, '#(nbs_ob22 (''2909'',''64''))', 980, '#(nbs_ob22 (''6510'',''B3''))', 980, null, null, null, null, 0, 0, 0, 0, 'CAF_KOM (''CCF'',#(KVA), #(S) )', 'CAF_KOM (''CCF'',#(KVA), #(S) )', null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('CCF', '(доч.CAF) Комісія банку за прийом переказу по сист."Contact" (ближн)', 1, '#(nbs_ob22 (''2909'',''64''))', 980, '#(nbs_ob22 (''6110'',''B3''))', 980, null, null, null, null, 0, 0, 0, 0, 'CAF_KOM (''CCF'',#(KVA), #(S) )', 'CAF_KOM (''CCF'',#(KVA), #(S) )', null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CCF', name='CCF (доч.CAF) Комісія банку за прийом переказу по сист."Contact" (ближ', dk=1, nlsm='#(nbs_ob22 (''2909'',''64''))', kv=980, nlsk='#(nbs_ob22 (''6510'',''B3''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='CAF_KOM (''CCF'',#(KVA), #(S) )', s2='CAF_KOM (''CCF'',#(KVA), #(S) )', sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='CCF', name='(доч.CAF) Комісія банку за прийом переказу по сист."Contact" (ближн)', dk=1, nlsm='#(nbs_ob22 (''2909'',''64''))', kv=980, nlsk='#(nbs_ob22 (''6110'',''B3''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='CAF_KOM (''CCF'',#(KVA), #(S) )', s2='CAF_KOM (''CCF'',#(KVA), #(S) )', sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='CCF';
   end;
   --------------------------------
@@ -111,7 +111,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции CDF
-prompt Наименование операции: CDF (доч.CAF) Комісія агента за прийом переказу по сист."Contact" (бли
+prompt Наименование операции: (доч.CAF) Комісія агента за прийом переказу по сист."Contact" (ближн)
 declare
   cnt_  number;
 begin
@@ -120,11 +120,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CDF', 'CDF (доч.CAF) Комісія агента за прийом переказу по сист."Contact" (бли', 1, '#(nbs_ob22 (''2909'',''64''))', 980, '#(nbs_ob22 (''2909'',''64''))', null, null, null, null, null, 0, 0, 1, 0, 'gl.p_icurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)', 'CAF_KOM (''CDF'',#(KVA), #(S) )', null, null, '#(nbs_ob22 (''3800'',''03''))', null, '0000100000000000000000000000000000000000000000000000000000000000', 'gl.p_ncurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)');
+    values ('CDF', '(доч.CAF) Комісія агента за прийом переказу по сист."Contact" (ближн)', 1, '#(nbs_ob22 (''2909'',''64''))', 980, '#(nbs_ob22 (''2909'',''64''))', null, null, null, null, null, 0, 0, 1, 0, 'gl.p_icurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)', 'CAF_KOM (''CDF'',#(KVA), #(S) )', null, null, '#(nbs_ob22 (''3800'',''03''))', null, '0000100000000000000000000000000000000000000000000000000000000000', 'gl.p_ncurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CDF', name='CDF (доч.CAF) Комісія агента за прийом переказу по сист."Contact" (бли', dk=1, nlsm='#(nbs_ob22 (''2909'',''64''))', kv=980, nlsk='#(nbs_ob22 (''2909'',''64''))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='gl.p_icurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)', s2='CAF_KOM (''CDF'',#(KVA), #(S) )', sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='gl.p_ncurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)'
+         set tt='CDF', name='(доч.CAF) Комісія агента за прийом переказу по сист."Contact" (ближн)', dk=1, nlsm='#(nbs_ob22 (''2909'',''64''))', kv=980, nlsk='#(nbs_ob22 (''2909'',''64''))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='gl.p_icurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)', s2='CAF_KOM (''CDF'',#(KVA), #(S) )', sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='gl.p_ncurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)'
        where tt='CDF';
   end;
   --------------------------------
@@ -165,7 +165,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции K57
-prompt Наименование операции: K57 (доч.CAF) Комісія за прийом переказу по системі "Contact" (ближн)
+prompt Наименование операции: (доч.CAF) Комісія за прийом переказу по системі "Contact" (ближн)
 declare
   cnt_  number;
 begin
@@ -174,11 +174,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K57', 'K57 (доч.CAF) Комісія за прийом переказу по системі "Contact" (ближн)', 0, '#(nbs_ob22 (''2909'',''64''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'CAF_KOM (''K57'',#(KVA), #(S) )', 'CAF_KOM (''K57'',#(KVA), #(S) )', 5, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('K57', '(доч.CAF) Комісія за прийом переказу по системі "Contact" (ближн)', 0, '#(nbs_ob22 (''2909'',''64''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'CAF_KOM (''K57'',#(KVA), #(S) )', 'CAF_KOM (''K57'',#(KVA), #(S) )', 5, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K57', name='K57 (доч.CAF) Комісія за прийом переказу по системі "Contact" (ближн)', dk=0, nlsm='#(nbs_ob22 (''2909'',''64''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='CAF_KOM (''K57'',#(KVA), #(S) )', s2='CAF_KOM (''K57'',#(KVA), #(S) )', sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='K57', name='(доч.CAF) Комісія за прийом переказу по системі "Contact" (ближн)', dk=0, nlsm='#(nbs_ob22 (''2909'',''64''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='CAF_KOM (''K57'',#(KVA), #(S) )', s2='CAF_KOM (''K57'',#(KVA), #(S) )', sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='K57';
   end;
   --------------------------------

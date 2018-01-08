@@ -16,9 +16,7 @@ from
   grt_subjects s;
 
 PROMPT *** Create  grants  V_GRT_SUBJECTS ***
-grant SELECT                                                                 on V_GRT_SUBJECTS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GRT_SUBJECTS  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_GRT_SUBJECTS  to UPLD;
 
 
 

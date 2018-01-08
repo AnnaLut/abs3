@@ -208,10 +208,8 @@ PROMPT *** Create  view V_CCK_MES2 ***
       AND i.nd = ad.nd(+);
 
 PROMPT *** Create  grants  V_CCK_MES2 ***
-grant SELECT                                                                 on V_CCK_MES2      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CCK_MES2      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CCK_MES2      to RCC_DEAL;
-grant SELECT                                                                 on V_CCK_MES2      to UPLD;
 
 
 

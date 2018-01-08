@@ -67,6 +67,45 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint XFK_XMLREFDEPDPAR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.XML_REFDEPPAR ADD CONSTRAINT XFK_XMLREFDEPDPAR FOREIGN KEY (KLTABLE_DEPNAME, DESTPAR)
+	  REFERENCES BARS.XML_REFREQV_PAR (KLTABLE_NAME, PARNAME) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint XFK_XMLREFDEPSPAR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.XML_REFDEPPAR ADD CONSTRAINT XFK_XMLREFDEPSPAR FOREIGN KEY (KLTABLE_NAME, SRCPAR)
+	  REFERENCES BARS.XML_REFREQV_PAR (KLTABLE_NAME, PARNAME) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint XFK_XMLREFDEPPAR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.XML_REFDEPPAR ADD CONSTRAINT XFK_XMLREFDEPPAR FOREIGN KEY (KLTABLE_NAME)
+	  REFERENCES BARS.XML_REFLIST (KLTABLE_NAME) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XUK_XMLREFDEPPAR ***
 begin   
  execute immediate '
@@ -81,10 +120,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_REFDEPPAR ***
-grant SELECT                                                                 on XML_REFDEPPAR   to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_REFDEPPAR   to BARS_DM;
 grant SELECT                                                                 on XML_REFDEPPAR   to KLBX;
-grant SELECT                                                                 on XML_REFDEPPAR   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_REFDEPPAR   to WR_ALL_RIGHTS;
 
 

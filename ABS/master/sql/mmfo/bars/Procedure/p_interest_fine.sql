@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_INTEREST_FINE.sql =========*** R
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_INTEREST_FINE ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_INTEREST_FINE (p_type    IN NUMBER DEFAULT 0,
+CREATE OR REPLACE PROCEDURE p_interest_fine(p_type    IN NUMBER DEFAULT 0,
                                             p_date_to IN DATE,
                                             p_mode    in number default 0,
                                             p_group   in number default 0) IS
@@ -252,13 +243,3 @@ BEGIN
 
 END p_interest_fine;
 /
-show err;
-
-PROMPT *** Create  grants  P_INTEREST_FINE ***
-grant EXECUTE                                                                on P_INTEREST_FINE to BARS_ACCESS_DEFROLE;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_INTEREST_FINE.sql =========*** E
-PROMPT ===================================================================================== 

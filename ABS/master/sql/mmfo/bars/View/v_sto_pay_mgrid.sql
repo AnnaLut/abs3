@@ -12,9 +12,7 @@ PROMPT *** Create  view V_STO_PAY_MGRID ***
 from v_sto_payments;
 
 PROMPT *** Create  grants  V_STO_PAY_MGRID ***
-grant SELECT                                                                 on V_STO_PAY_MGRID to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STO_PAY_MGRID to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_STO_PAY_MGRID to UPLD;
 
 
 

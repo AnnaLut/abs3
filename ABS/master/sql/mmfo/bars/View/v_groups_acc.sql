@@ -12,11 +12,9 @@ PROMPT *** Create  view V_GROUPS_ACC ***
 ;
 
 PROMPT *** Create  grants  V_GROUPS_ACC ***
-grant SELECT                                                                 on V_GROUPS_ACC    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GROUPS_ACC    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_GROUPS_ACC    to CUST001;
 grant SELECT                                                                 on V_GROUPS_ACC    to START1;
-grant SELECT                                                                 on V_GROUPS_ACC    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_GROUPS_ACC    to WR_ALL_RIGHTS;
 
 

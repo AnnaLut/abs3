@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPA_REJECT_CODES ***
-grant SELECT                                                                 on DPA_REJECT_CODES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPA_REJECT_CODES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPA_REJECT_CODES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPA_REJECT_CODES to RPBN002;
-grant SELECT                                                                 on DPA_REJECT_CODES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPA_REJECT_CODES to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPA_REJECT_CODES to WR_REFREAD;
 

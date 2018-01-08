@@ -15,9 +15,7 @@ union all select '9m' as term from dual
 union all select '12m' as term from dual;
 
 PROMPT *** Create  grants  V_CIM_F503_P_BASE_T ***
-grant SELECT                                                                 on V_CIM_F503_P_BASE_T to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_F503_P_BASE_T to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_F503_P_BASE_T to UPLD;
 
 
 

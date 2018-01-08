@@ -53,6 +53,32 @@ COMMENT ON COLUMN BARS.KAS_B.NSM IS '№ змiни';
 
 
 
+PROMPT *** Create  constraint FK_KASB_IDM ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KAS_B ADD CONSTRAINT FK_KASB_IDM FOREIGN KEY (IDM)
+	  REFERENCES BARS.KAS_M (IDM) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_KASB_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.KAS_B ADD CONSTRAINT FK_KASB_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_KASB_KF_NN ***
 begin   
  execute immediate '
@@ -94,10 +120,8 @@ exception when others then
 
 PROMPT *** Create  grants  KAS_B ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_B           to ABS_ADMIN;
-grant SELECT                                                                 on KAS_B           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KAS_B           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KAS_B           to PYOD001;
-grant SELECT                                                                 on KAS_B           to UPLD;
 grant FLASHBACK,SELECT                                                       on KAS_B           to WR_REFREAD;
 
 

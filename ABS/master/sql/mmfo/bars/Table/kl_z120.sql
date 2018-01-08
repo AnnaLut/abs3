@@ -55,11 +55,9 @@ COMMENT ON COLUMN BARS.KL_Z120.D_CLOSE IS '';
 
 
 PROMPT *** Create  grants  KL_Z120 ***
-grant SELECT                                                                 on KL_Z120         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_Z120         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_Z120         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_Z120         to START1;
-grant SELECT                                                                 on KL_Z120         to UPLD;
 
 
 

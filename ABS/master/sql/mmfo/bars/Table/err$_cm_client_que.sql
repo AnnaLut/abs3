@@ -219,10 +219,6 @@ COMMENT ON COLUMN BARS.ERR$_CM_CLIENT_QUE.ADDR1_REGION IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CM_CLIENT_QUE ***
-grant SELECT                                                                 on ERR$_CM_CLIENT_QUE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CM_CLIENT_QUE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

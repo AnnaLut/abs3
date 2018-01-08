@@ -74,6 +74,33 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SGNEXTSTORE_SGNDATA_REF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SGN_EXT_STORE ADD CONSTRAINT FK_SGNEXTSTORE_SGNDATA_REF FOREIGN KEY (SIGN_ID)
+	  REFERENCES BARS.SGN_DATA (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint UK_SGNEXTSTORE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SGN_EXT_STORE ADD CONSTRAINT UK_SGNEXTSTORE UNIQUE (REF, SIGN_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_SGNEXTSTORE ***
 begin   
  execute immediate '
@@ -102,10 +129,10 @@ exception when others then
 
 
 
-PROMPT *** Create  index UI_SGNEXTSTORE_SIGN_ID ***
+PROMPT *** Create  index UK_SGNEXTSTORE ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.UI_SGNEXTSTORE_SIGN_ID ON BARS.SGN_EXT_STORE (SIGN_ID) 
+  CREATE UNIQUE INDEX BARS.UK_SGNEXTSTORE ON BARS.SGN_EXT_STORE (REF, SIGN_ID) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI ';
 exception when others then
@@ -116,10 +143,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  SGN_EXT_STORE ***
-grant SELECT                                                                 on SGN_EXT_STORE   to BARSREADER_ROLE;
 grant SELECT                                                                 on SGN_EXT_STORE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SGN_EXT_STORE   to TOSS;
-grant SELECT                                                                 on SGN_EXT_STORE   to UPLD;
 
 
 

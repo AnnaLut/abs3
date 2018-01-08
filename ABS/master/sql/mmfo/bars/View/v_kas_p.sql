@@ -27,10 +27,8 @@ PROMPT *** Create  view V_KAS_P ***
    ORDER BY v.grp, v.NAME;
 
 PROMPT *** Create  grants  V_KAS_P ***
-grant SELECT                                                                 on V_KAS_P         to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_KAS_P         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_KAS_P         to RCC_DEAL;
-grant SELECT                                                                 on V_KAS_P         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_KAS_P         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_KAS_P         to WR_REFREAD;
 

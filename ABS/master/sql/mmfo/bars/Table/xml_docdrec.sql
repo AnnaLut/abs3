@@ -61,6 +61,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint XFK_XMLDOCDREC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.XML_DOCDREC ADD CONSTRAINT XFK_XMLDOCDREC FOREIGN KEY (TAG)
+	  REFERENCES BARS.OP_FIELD (TAG) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XPK_XMLDOCDREC ***
 begin   
  execute immediate '
@@ -75,7 +88,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_DOCDREC ***
-grant SELECT                                                                 on XML_DOCDREC     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on XML_DOCDREC     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on XML_DOCDREC     to START1;
 

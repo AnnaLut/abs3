@@ -125,7 +125,6 @@ exception when others then
 
 PROMPT *** Create  grants  DECISION_NLS ***
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on DECISION_NLS    to BARS;
-grant SELECT                                                                 on DECISION_NLS    to BARSREADER_ROLE;
 
 
 

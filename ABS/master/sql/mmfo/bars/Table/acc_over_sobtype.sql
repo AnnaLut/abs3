@@ -79,12 +79,10 @@ exception when others then
 PROMPT *** Create  grants  ACC_OVER_SOBTYPE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_SOBTYPE to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_SOBTYPE to BARS009;
-grant SELECT                                                                 on ACC_OVER_SOBTYPE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_SOBTYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_OVER_SOBTYPE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_SOBTYPE to TECH005;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_SOBTYPE to TECH006;
-grant SELECT                                                                 on ACC_OVER_SOBTYPE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_OVER_SOBTYPE to WR_ALL_RIGHTS;
 
 

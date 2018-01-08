@@ -17,9 +17,7 @@ PROMPT *** Create  view V_USERADM_BRANCHES ***
 
 PROMPT *** Create  grants  V_USERADM_BRANCHES ***
 grant SELECT                                                                 on V_USERADM_BRANCHES to ABS_ADMIN;
-grant SELECT                                                                 on V_USERADM_BRANCHES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USERADM_BRANCHES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_USERADM_BRANCHES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USERADM_BRANCHES to WR_ALL_RIGHTS;
 
 

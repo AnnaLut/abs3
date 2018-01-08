@@ -31,7 +31,7 @@ begin
 	DAT_BAL DATE, 
 	NBS_OW VARCHAR2(15), 
 	OST NUMBER
-   ) SEGMENT CREATION IMMEDIATE 
+   ) SEGMENT CREATION DEFERRED 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSDYND ';
@@ -60,6 +60,19 @@ COMMENT ON COLUMN BARS.OW_CNG_DATA_TXT.OST IS '';
 
 
 
+PROMPT *** Create  constraint FK_OWCNGDATATXT_OWCNGTYPES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_CNG_DATA_TXT ADD CONSTRAINT FK_OWCNGDATATXT_OWCNGTYPES FOREIGN KEY (NBS_OW)
+	  REFERENCES BARS.OW_CNG_TYPES (NBS_OW) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index IDX_OW_CNG_DATA_TXT_ACC ***
 begin   
  execute immediate '
@@ -74,9 +87,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_CNG_DATA_TXT ***
-grant SELECT                                                                 on OW_CNG_DATA_TXT to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_CNG_DATA_TXT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on OW_CNG_DATA_TXT to UPLD;
 
 
 

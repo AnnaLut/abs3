@@ -15,10 +15,6 @@ PROMPT *** Create  view V_DPU_OUR_BRANCH ***
    and BRANCH like '/______/______/%'
    and DATE_CLOSED Is Null;
 
-PROMPT *** Create  grants  V_DPU_OUR_BRANCH ***
-grant SELECT                                                                 on V_DPU_OUR_BRANCH to BARSREADER_ROLE;
-grant SELECT                                                                 on V_DPU_OUR_BRANCH to UPLD;
-
 
 
 PROMPT ===================================================================================== 

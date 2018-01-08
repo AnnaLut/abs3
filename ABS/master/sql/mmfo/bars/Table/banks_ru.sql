@@ -83,12 +83,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  BANKS_RU ***
-grant SELECT                                                                 on BANKS_RU        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANKS_RU        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BANKS_RU        to BARS_DM;
 grant SELECT                                                                 on BANKS_RU        to FINMON;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANKS_RU        to START1;
-grant SELECT                                                                 on BANKS_RU        to UPLD;
 
 
 

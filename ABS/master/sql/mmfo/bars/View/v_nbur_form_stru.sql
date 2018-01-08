@@ -22,11 +22,9 @@ PROMPT *** Create  view V_NBUR_FORM_STRU ***
      FROM NBUR_REF_FILES f JOIN NBUR_REF_FORM_STRU p ON (F.ID = p.FILE_ID);
 
 PROMPT *** Create  grants  V_NBUR_FORM_STRU ***
-grant SELECT                                                                 on V_NBUR_FORM_STRU to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_FORM_STRU to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_FORM_STRU to RPBN002;
 grant SELECT                                                                 on V_NBUR_FORM_STRU to START1;
-grant SELECT                                                                 on V_NBUR_FORM_STRU to UPLD;
 
 
 

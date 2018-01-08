@@ -195,11 +195,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_CONTRACTS_CREDIT ***
-grant SELECT                                                                 on CIM_CONTRACTS_CREDIT to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONTRACTS_CREDIT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_CONTRACTS_CREDIT to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONTRACTS_CREDIT to CIM_ROLE;
-grant SELECT                                                                 on CIM_CONTRACTS_CREDIT to UPLD;
 
 
 

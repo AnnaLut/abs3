@@ -90,7 +90,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  AQ$_BARS_MSG_QT_I ***
-grant SELECT                                                                 on AQ$_BARS_MSG_QT_I to BARSREADER_ROLE;
 grant SELECT                                                                 on AQ$_BARS_MSG_QT_I to BARS_DM;
 
 

@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_SPECPARAM_CP_OB.MARKET IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SPECPARAM_CP_OB ***
-grant SELECT                                                                 on ERR$_SPECPARAM_CP_OB to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SPECPARAM_CP_OB to UPLD;
-
 
 
 PROMPT ===================================================================================== 

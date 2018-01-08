@@ -81,6 +81,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_ERRCODES_ERRMODULES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ERR_CODES ADD CONSTRAINT FK_ERRCODES_ERRMODULES FOREIGN KEY (ERRMOD_CODE)
+	  REFERENCES BARS.ERR_MODULES (ERRMOD_CODE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_ERRCODES_ERRMODCODE_NN ***
 begin   
  execute immediate '
@@ -159,9 +172,7 @@ exception when others then
 PROMPT *** Create  grants  ERR_CODES ***
 grant REFERENCES,SELECT                                                      on ERR_CODES       to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on ERR_CODES       to BARSAQ_ADM with grant option;
-grant SELECT                                                                 on ERR_CODES       to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR_CODES       to BARS_DM;
-grant SELECT                                                                 on ERR_CODES       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ERR_CODES       to WR_ALL_RIGHTS;
 
 

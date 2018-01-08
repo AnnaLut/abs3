@@ -143,7 +143,7 @@ begin
     --
     select val
       into G_SMS_PROV
-      from params$base
+      from params
      where par='SMS_PROV';
     --
     -- инстанцируем объект
@@ -207,7 +207,10 @@ begin
                (select 1
                     from dual
                     where
-                    to_number(to_char(sysdate,'HH24MI')) between 600 and 2100
+                    to_number(to_char(sysdate,'HH24MI'))
+                    between nvl( GET_GLOBAL_PARAM('SMS_SEND_START'),600)
+                    and nvl(GET_GLOBAL_PARAM('SMS_SEND_STOP'),2100)      --не відправляти смс з 21 вечора до 6 ранку
+
                )
                order by msg_id for update skip locked)
     loop

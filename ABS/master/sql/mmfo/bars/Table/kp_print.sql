@@ -47,11 +47,9 @@ COMMENT ON COLUMN BARS.KP_PRINT.VOB IS '';
 
 
 PROMPT *** Create  grants  KP_PRINT ***
-grant SELECT                                                                 on KP_PRINT        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KP_PRINT        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KP_PRINT        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KP_PRINT        to R_KP;
-grant SELECT                                                                 on KP_PRINT        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KP_PRINT        to WR_ALL_RIGHTS;
 
 

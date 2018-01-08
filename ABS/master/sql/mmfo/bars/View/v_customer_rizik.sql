@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CUSTOMER_RIZIK.sql =========*** Run *
 PROMPT ===================================================================================== 
@@ -62,16 +60,14 @@ PROMPT *** Create  view V_CUSTOMER_RIZIK ***
                      FROM customerw_update cw
                     WHERE tag = 'RIZIK')
             WHERE rn = 1) cww
-    WHERE c.rnk = cww.rnk(+)
+    WHERE c.rnk = cww.rnk(+) 
 	AND c.date_off IS NULL
 ;
 
 PROMPT *** Create  grants  V_CUSTOMER_RIZIK ***
-grant SELECT                                                                 on V_CUSTOMER_RIZIK to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTOMER_RIZIK to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUSTOMER_RIZIK to CUST001;
 grant SELECT                                                                 on V_CUSTOMER_RIZIK to START1;
-grant SELECT                                                                 on V_CUSTOMER_RIZIK to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CUSTOMER_RIZIK to WR_ALL_RIGHTS;
 
 

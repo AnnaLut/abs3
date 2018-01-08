@@ -63,12 +63,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_CHECK ***
-grant SELECT                                                                 on CP_CHECK        to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_CHECK        to BARSUPL;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on CP_CHECK        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_CHECK        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_CHECK        to CP_ROLE;
-grant SELECT                                                                 on CP_CHECK        to UPLD;
 grant FLASHBACK,SELECT                                                       on CP_CHECK        to WR_REFREAD;
 
 

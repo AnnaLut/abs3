@@ -73,10 +73,10 @@ COMMENT ON COLUMN BARS.CC_SOB_UPDATE.FACT_DATE IS 'Дата фактического исполнения 
 
 
 
-PROMPT *** Create  constraint CC_CC_SOBUPDATE_CHGACTION ***
+PROMPT *** Create  constraint C_CC_SOBUPDATE_IDUPD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_SOB_UPDATE ADD CONSTRAINT CC_CC_SOBUPDATE_CHGACTION CHECK (chgaction in (1,2,3)) ENABLE';
+  ALTER TABLE BARS.CC_SOB_UPDATE MODIFY (IDUPD CONSTRAINT C_CC_SOBUPDATE_IDUPD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -97,10 +97,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint C_CC_SOBUPDATE_IDUPD_NN ***
+PROMPT *** Create  constraint CC_CC_SOBUPDATE_CHGACTION ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_SOB_UPDATE MODIFY (IDUPD CONSTRAINT C_CC_SOBUPDATE_IDUPD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_SOB_UPDATE ADD CONSTRAINT CC_CC_SOBUPDATE_CHGACTION CHECK (chgaction in (1,2,3)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -121,10 +121,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_CC_SOB_UPDATE_ND ***
+PROMPT *** Create  constraint C_CC_SOBUPDATE_CHGACTION_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_SOB_UPDATE MODIFY (ND CONSTRAINT NK_CC_SOB_UPDATE_ND NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_SOB_UPDATE MODIFY (CHGACTION CONSTRAINT C_CC_SOBUPDATE_CHGACTION_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -181,10 +181,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint C_CC_SOBUPDATE_CHGACTION_NN ***
+PROMPT *** Create  constraint NK_CC_SOB_UPDATE_ND ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_SOB_UPDATE MODIFY (CHGACTION CONSTRAINT C_CC_SOBUPDATE_CHGACTION_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_SOB_UPDATE MODIFY (ND CONSTRAINT NK_CC_SOB_UPDATE_ND NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -221,13 +221,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_SOB_UPDATE ***
-grant SELECT                                                                 on CC_SOB_UPDATE   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_SOB_UPDATE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_SOB_UPDATE   to BARS_DM;
 grant SELECT                                                                 on CC_SOB_UPDATE   to CC_DOC;
 grant INSERT,SELECT                                                          on CC_SOB_UPDATE   to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_SOB_UPDATE   to RCC_DEAL;
-grant SELECT                                                                 on CC_SOB_UPDATE   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_SOB_UPDATE   to WR_ALL_RIGHTS;
 
 

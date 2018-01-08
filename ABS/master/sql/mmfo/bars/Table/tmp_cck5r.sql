@@ -117,11 +117,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_CCK5R ***
-grant SELECT                                                                 on TMP_CCK5R       to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_CCK5R       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_CCK5R       to RCC_DEAL;
 grant SELECT                                                                 on TMP_CCK5R       to SALGL;
-grant SELECT                                                                 on TMP_CCK5R       to UPLD;
 
 
 

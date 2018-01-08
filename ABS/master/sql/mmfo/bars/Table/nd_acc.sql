@@ -51,6 +51,32 @@ COMMENT ON COLUMN BARS.ND_ACC.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_NDACC_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ND_ACC ADD CONSTRAINT FK_NDACC_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_NDACC_ACCOUNTS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ND_ACC ADD CONSTRAINT FK_NDACC_ACCOUNTS2 FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_NDACC ***
 begin   
  execute immediate '
@@ -145,7 +171,6 @@ exception when others then
 PROMPT *** Create  grants  ND_ACC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ND_ACC          to ABS_ADMIN;
 grant SELECT                                                                 on ND_ACC          to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on ND_ACC          to BARSREADER_ROLE;
 grant SELECT                                                                 on ND_ACC          to BARSUPL;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on ND_ACC          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ND_ACC          to BARS_DM;
@@ -155,7 +180,6 @@ grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on 
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on ND_ACC          to RCC_DEAL;
 grant SELECT                                                                 on ND_ACC          to RPBN001;
 grant SELECT                                                                 on ND_ACC          to START1;
-grant SELECT                                                                 on ND_ACC          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ND_ACC          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on ND_ACC          to WR_REFREAD;
 

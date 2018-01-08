@@ -18,9 +18,7 @@ join   adm_resource_type t on t.id = rel.resource_type_id
 ;
 
 PROMPT *** Create  grants  V_ARM_RESOURCE_TYPE_LOOKUP ***
-grant SELECT                                                                 on V_ARM_RESOURCE_TYPE_LOOKUP to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ARM_RESOURCE_TYPE_LOOKUP to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ARM_RESOURCE_TYPE_LOOKUP to UPLD;
 
 
 

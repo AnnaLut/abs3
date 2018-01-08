@@ -163,10 +163,8 @@ COMMENT ON COLUMN BARS.TMP_CP_REP.KOL IS '';
 
 
 PROMPT *** Create  grants  TMP_CP_REP ***
-grant SELECT                                                                 on TMP_CP_REP      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CP_REP      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CP_REP      to START1;
-grant SELECT                                                                 on TMP_CP_REP      to UPLD;
 
 
 

@@ -154,10 +154,8 @@ COMMENT ON COLUMN BARS.REZERV_REPORT.S55 IS '';
 
 
 PROMPT *** Create  grants  REZERV_REPORT ***
-grant SELECT                                                                 on REZERV_REPORT   to BARSREADER_ROLE;
 grant SELECT                                                                 on REZERV_REPORT   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZERV_REPORT   to RCC_DEAL;
-grant SELECT                                                                 on REZERV_REPORT   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REZERV_REPORT   to WR_ALL_RIGHTS;
 
 

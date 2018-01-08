@@ -1,19 +1,10 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FC5.sql =========*** Run *** ===
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_FC5 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_FC5 (dat_ DATE, pnd_ NUMBER DEFAULT NULL)
+CREATE OR REPLACE PROCEDURE BARS.p_fc5 (dat_ DATE, pnd_ NUMBER DEFAULT NULL)
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.011  03/01/2018
+% VERSION     : v.17.010     28.12.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 
@@ -242,9 +233,7 @@ IS
    dati_    integer := null;
    freq_    number;
    fl_cp_   number:=0;
-   
-   sum_zal  number:=0;
-   
+
    CURSOR saldo_cp
    IS
       SELECT a.acc, a.nls, a.kv, a.fdat, a.nbs, a.tip,
@@ -546,25 +535,7 @@ BEGIN
    loop
        table_r013(k.pok) := 1;
    end loop;
-
 -------------------------------------------------------------------
-   if mfo_ = 300465 then
-         pul_dat(to_char(Dat_,'dd-mm-yyyy'), '');
-
-         EXECUTE IMMEDIATE 'delete from otcn_f42_cp';
-
-         sql_acc_ :=
-                'insert into otcn_f42_cp (fdat, acc, nls, kv, sum_zal, dat_zal, rnk, kodp) '
-              ||'select c.fdat, a.acc, a.nls, a.kv, nvl(c.sum_zal, 0), c.dat_zal, a.rnk, null '
-              ||'from accounts a, cp_v_zal_acc c '
-              ||'where a.acc = c.acc '
-              ||'  and c.fdat = :dat_ '
-              ||'  and substr(a.nls,1,4) like ''14__%''' ;
-
-            EXECUTE IMMEDIATE sql_acc_ USING dat_;
-   end if;
--------------------------------------------------------------------
-
 
    if pnd_ is null then
       sql_acc_ := ' SELECT   *
@@ -770,9 +741,8 @@ BEGIN
               -- 17.10.2011 выполняем разбивку только для активных остатков
               -- 09/04/2014 для ГОУ Сбербанка исключаем разбивку по 3118 Нафтогаза
               IF fa7p_ > 0 and se_ < 0 and
+                 not (nbs_ in ('1408', '1418', '1428') and nvl(r013_, '0') = '1') and
                  not (mfo_ = 300465 and rnk_ = 907973 and nbs_ in ('1418', '3118')) and
-                 not (nbs_ in ('1418', '1428') and nvl(r011_, '0') in ('D')) and
-                 not (nbs_ in ('3118') and nvl(r011_, '0') in ('2', 'A')) and
                  nbs_ <> '2628'
               THEN
                  if se_ <> 0 then
@@ -861,53 +831,25 @@ BEGIN
                     then
                          r017_ := '1';
                          segm_WWW := '840';
-                    end if;
-                    
-                    if ((substr(nls_,1,4) in ('1410','1420','1430','1435','1436','1437','1440','1446','1447')) or
-                        (substr(nls_,1,4) in ('1415','1416','1417','1426','1427') and r013_ not in ('3','9'))) or
-                       ((substr(nls_,1,4) in ('1412','1413','1414','1422','1423','1424')) or 
-                         (substr(nls_,1,4) in ('1415','1416','1417','1426','1427') and r013_ in ('3','9'))) 
-                         and s245_ <= 'I' 
-                    then
-                        select nvl(sum(sum_zal), 0)
-                        into sum_zal
-                          from otcn_f42_cp
-                          where fdat = dat_
-                            and substr(nls,4,1)<>'8'
-                            and acc = acc_;
-                    else
-                        sum_zal := 0;
+
                     end if;
 
                     IF dat_ >= dat_zmin4  then
 
                        p_set_s580_def(nbs_, r013_);
-                       kodp_ := dk_ || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||s245_||k077_;                    
-                       
-                       znap_ := TO_CHAR (ABS (se_ - sum_zal));
+                       kodp_ := dk_ || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||s245_||k077_;
 
                     else
 
                        p_set_s580_def(nbs_, r013_);
                        kodp_ := dk_ || nbs_ || r013_ || LPAD (kv_, 3, '0') || r012_|| s580_||r017_||segm_WWW;
-                       
-                       znap_ := TO_CHAR (ABS (se_));
 
                     END IF;
 
+                    znap_ := TO_CHAR (ABS (se_));
 
                     p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp_, znap_, rnk_, isp_, substr(comm_,1,200),
                                  nd_, acc_, mdate_, nbuc_, tobo_);
-                                 
-                    if dat_ >= dat_zmin4 and sum_zal <> 0 then
-                       kodp_ := dk_ || nbs_ || '2' ||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||s245_||k077_;                    
-                       
-                       znap_ := TO_CHAR (ABS (sum_zal));
-
-                       p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp_, znap_, rnk_, isp_, substr(comm_,1,200),
-                                     nd_, acc_, mdate_, nbuc_, tobo_);
-                     
-                    end if;             
                  END IF;
               END IF;
 
@@ -2046,14 +1988,3 @@ BEGIN
    logger.info ('P_FC5: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END;
 /
-show err;
-
-PROMPT *** Create  grants  P_FC5 ***
-grant EXECUTE                                                                on P_FC5           to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_FC5           to RPBN002;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FC5.sql =========*** End *** ===
-PROMPT ===================================================================================== 

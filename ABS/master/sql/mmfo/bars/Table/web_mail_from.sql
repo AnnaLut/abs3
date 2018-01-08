@@ -101,10 +101,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  WEB_MAIL_FROM ***
-grant SELECT                                                                 on WEB_MAIL_FROM   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_MAIL_FROM   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WEB_MAIL_FROM   to START1;
-grant SELECT                                                                 on WEB_MAIL_FROM   to UPLD;
 grant FLASHBACK,SELECT                                                       on WEB_MAIL_FROM   to WR_REFREAD;
 
 

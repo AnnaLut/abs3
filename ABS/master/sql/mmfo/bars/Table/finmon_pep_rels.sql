@@ -104,10 +104,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CK_PTYPE ***
+PROMPT *** Create  constraint SYS_C0035419 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FINMON_PEP_RELS ADD CONSTRAINT CK_PTYPE CHECK (PTYPE IN (1,2,3)) ENABLE';
+  ALTER TABLE BARS.FINMON_PEP_RELS ADD PRIMARY KEY (IDCODE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -128,12 +130,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0035419 ***
+PROMPT *** Create  constraint CK_PTYPE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FINMON_PEP_RELS ADD PRIMARY KEY (IDCODE)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.FINMON_PEP_RELS ADD CONSTRAINT CK_PTYPE CHECK (PTYPE IN (1,2,3)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -156,9 +156,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  FINMON_PEP_RELS ***
-grant SELECT                                                                 on FINMON_PEP_RELS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FINMON_PEP_RELS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on FINMON_PEP_RELS to UPLD;
 grant FLASHBACK,SELECT                                                       on FINMON_PEP_RELS to WR_REFREAD;
 
 

@@ -203,10 +203,6 @@ COMMENT ON COLUMN BARS.ERR$_ZAYAVKA.ORA_ERR_TAG$ IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ZAYAVKA ***
-grant SELECT                                                                 on ERR$_ZAYAVKA    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ZAYAVKA    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

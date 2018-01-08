@@ -7,7 +7,6 @@ PROMPT =========================================================================
 
 PROMPT *** ALTER_POLICY_INFO to OTCN_F42_TEMP ***
 
-
 BEGIN 
         execute immediate  
           'begin  
@@ -16,6 +15,15 @@ BEGIN
                null;
            end; 
           '; 
+END; 
+/
+
+BEGIN 
+        execute immediate  
+          'drop TABLE BARS.OTCN_F42_TEMP'; 
+exception
+    when others then
+        if sqlcode = -942 then null; else raise; end if;          
 END; 
 /
 
@@ -36,8 +44,8 @@ begin
 	R020 CHAR(4), 
 	ACCC NUMBER(*,0), 
 	ZAL NUMBER, 
-	RNK NUMBER, 
-	OB22 VARCHAR2(2)
+	RNK NUMBER,
+    OB22 varchar2(2)
    ) ON COMMIT PRESERVE ROWS ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
@@ -66,12 +74,11 @@ COMMENT ON COLUMN BARS.OTCN_F42_TEMP.R020 IS '';
 COMMENT ON COLUMN BARS.OTCN_F42_TEMP.ACCC IS '';
 COMMENT ON COLUMN BARS.OTCN_F42_TEMP.ZAL IS '';
 COMMENT ON COLUMN BARS.OTCN_F42_TEMP.RNK IS '';
-COMMENT ON COLUMN BARS.OTCN_F42_TEMP.OB22 IS '';
 
 
 
 
-PROMPT *** Create  constraint SYS_C00139665 ***
+PROMPT *** Create  constraint SYS_C0010306 ***
 begin   
  execute immediate '
   ALTER TABLE BARS.OTCN_F42_TEMP MODIFY (KV NOT NULL ENABLE)';

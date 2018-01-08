@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции KB7
-prompt Наименование операции: KB7 off DPT - Первинний внесок гот. ГРН
+prompt Наименование операции: off DPT - Первинний внесок гот. ГРН
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KB7', 'KB7 off DPT - Первинний внесок гот. ГРН', 0, '#(tobopack.GetTOBOParam(''TRDPT''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(tobopack.GetTOBOParam(''TRDPT''))', '#( TOBOPACK.GetToboCASH)', null, 0, 0, 0, 0, null, null, 16, null, null, null, '0001100001000000000000000000000000010100000000100000000000000000', null);
+    values ('KB7', 'off DPT - Первинний внесок гот. ГРН', 0, '#(tobopack.GetTOBOParam(''TRDPT''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(tobopack.GetTOBOParam(''TRDPT''))', '#( TOBOPACK.GetToboCASH)', null, 0, 0, 0, 0, null, null, 16, null, null, null, '0001100001000000000000000000000000010100000000100000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KB7', name='KB7 off DPT - Первинний внесок гот. ГРН', dk=0, nlsm='#(tobopack.GetTOBOParam(''TRDPT''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(tobopack.GetTOBOParam(''TRDPT''))', nlsb='#( TOBOPACK.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=16, proc=null, s3800=null, rang=null, flags='0001100001000000000000000000000000010100000000100000000000000000', nazn=null
+         set tt='KB7', name='off DPT - Первинний внесок гот. ГРН', dk=0, nlsm='#(tobopack.GetTOBOParam(''TRDPT''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(tobopack.GetTOBOParam(''TRDPT''))', nlsb='#( TOBOPACK.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=16, proc=null, s3800=null, rang=null, flags='0001100001000000000000000000000000010100000000100000000000000000', nazn=null
        where tt='KB7';
   end;
   --------------------------------

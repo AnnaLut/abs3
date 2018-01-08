@@ -51,12 +51,10 @@ COMMENT ON COLUMN BARS.GRP_REZ.NAME_SHORT IS 'Коротка назва';
 
 
 PROMPT *** Create  grants  GRP_REZ ***
-grant SELECT                                                                 on GRP_REZ         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRP_REZ         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRP_REZ         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRP_REZ         to RCC_DEAL;
 grant SELECT                                                                 on GRP_REZ         to START1;
-grant SELECT                                                                 on GRP_REZ         to UPLD;
 
 
 

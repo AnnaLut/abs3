@@ -60,10 +60,8 @@ select 0 sos,
                        and  a.dazs is null);
 
 PROMPT *** Create  grants  ACC_87_NEW ***
-grant SELECT                                                                 on ACC_87_NEW      to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on ACC_87_NEW      to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on ACC_87_NEW      to NALOG;
-grant SELECT                                                                 on ACC_87_NEW      to UPLD;
 
 
 

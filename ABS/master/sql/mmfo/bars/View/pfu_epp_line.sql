@@ -21,9 +21,7 @@ PROMPT *** Create  view PFU_EPP_LINE ***
 ;
 
 PROMPT *** Create  grants  PFU_EPP_LINE ***
-grant SELECT                                                                 on PFU_EPP_LINE    to BARSREADER_ROLE;
 grant SELECT                                                                 on PFU_EPP_LINE    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on PFU_EPP_LINE    to UPLD;
 
 
 

@@ -15,9 +15,7 @@ PROMPT *** Create  view V_CIM_CUSTOMS_DECL ***
     from customs_decl;
 
 PROMPT *** Create  grants  V_CIM_CUSTOMS_DECL ***
-grant SELECT                                                                 on V_CIM_CUSTOMS_DECL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_CUSTOMS_DECL to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_CUSTOMS_DECL to UPLD;
 
 
 

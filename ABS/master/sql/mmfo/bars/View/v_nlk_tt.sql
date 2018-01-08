@@ -13,10 +13,8 @@ PROMPT *** Create  view V_NLK_TT ***
    where n.tt = t.tt;
 
 PROMPT *** Create  grants  V_NLK_TT ***
-grant SELECT                                                                 on V_NLK_TT        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NLK_TT        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NLK_TT        to START1;
-grant SELECT                                                                 on V_NLK_TT        to UPLD;
 
 
 

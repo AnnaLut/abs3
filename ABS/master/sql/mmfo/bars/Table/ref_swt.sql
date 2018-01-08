@@ -55,10 +55,8 @@ COMMENT ON COLUMN BARS.REF_SWT.BIS IS '';
 
 
 PROMPT *** Create  grants  REF_SWT ***
-grant SELECT                                                                 on REF_SWT         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REF_SWT         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REF_SWT         to START1;
-grant SELECT                                                                 on REF_SWT         to UPLD;
 
 
 

@@ -78,10 +78,35 @@ COMMENT ON COLUMN BARSAQ.ACC_TRANSACTIONS.REF92_BANK_NAME IS 'Наименование банка
 
 
 
-PROMPT *** Create  constraint CC_ACCTRANS_TYPEID_CC ***
+PROMPT *** Create  constraint CC_ACCTRANS_BANKID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ACC_TRANSACTIONS ADD CONSTRAINT CC_ACCTRANS_TYPEID_CC CHECK (type_id in (''C'',''D'')) ENABLE';
+  ALTER TABLE BARSAQ.ACC_TRANSACTIONS MODIFY (BANK_ID CONSTRAINT CC_ACCTRANS_BANKID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCTRANS_NARRATIVE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ACC_TRANSACTIONS MODIFY (NARRATIVE CONSTRAINT CC_ACCTRANS_NARRATIVE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCTRANS_BANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ACC_TRANSACTIONS ADD CONSTRAINT FK_ACCTRANS_BANKS FOREIGN KEY (BANK_ID)
+	  REFERENCES BARS.BANKS$BASE (MFO) DEFERRABLE DISABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -104,10 +129,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCTRANS_BANKID_NN ***
+PROMPT *** Create  constraint CC_ACCTRANS_TYPEID_CC ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ACC_TRANSACTIONS MODIFY (BANK_ID CONSTRAINT CC_ACCTRANS_BANKID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.ACC_TRANSACTIONS ADD CONSTRAINT CC_ACCTRANS_TYPEID_CC CHECK (type_id in (''C'',''D'')) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -272,10 +297,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCTRANS_NARRATIVE_NN ***
+PROMPT *** Create  constraint FK_ACCTRANS_TABVAL ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ACC_TRANSACTIONS MODIFY (NARRATIVE CONSTRAINT CC_ACCTRANS_NARRATIVE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.ACC_TRANSACTIONS ADD CONSTRAINT FK_ACCTRANS_TABVAL FOREIGN KEY (CUR_ID)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) DEFERRABLE DISABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -310,9 +336,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  ACC_TRANSACTIONS ***
-grant SELECT                                                                 on ACC_TRANSACTIONS to BARSREADER_ROLE;
 
 
 

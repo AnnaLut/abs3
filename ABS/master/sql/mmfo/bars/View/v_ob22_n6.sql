@@ -18,10 +18,8 @@ PROMPT *** Create  view V_OB22_N6 ***
  ;
 
 PROMPT *** Create  grants  V_OB22_N6 ***
-grant SELECT                                                                 on V_OB22_N6       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OB22_N6       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OB22_N6       to NALOG;
-grant SELECT                                                                 on V_OB22_N6       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OB22_N6       to WR_ALL_RIGHTS;
 
 

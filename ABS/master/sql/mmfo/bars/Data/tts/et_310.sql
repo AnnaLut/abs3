@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('310', '310-Перерахування коштів за операціями по кред.заборгованості клієнті', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 1, 1, 0, 0, null, null, null, null, null, null, '1301100000000000000000000000000000110000000000000000000000000000', null);
+    values ('310', '310-Перерахування коштів за операціями по кред.заборгованості клієнті', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 1, 1, 0, 0, null, null, null, null, null, null, '1301100000000000000000000000000000110000000000000000000000000000', 'Перерахування коштів за операціями по кредиторській заборгованості клієнтів ');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='310', name='310-Перерахування коштів за операціями по кред.заборгованості клієнті', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1301100000000000000000000000000000110000000000000000000000000000', nazn=null
+         set tt='310', name='310-Перерахування коштів за операціями по кред.заборгованості клієнті', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1301100000000000000000000000000000110000000000000000000000000000', nazn='Перерахування коштів за операціями по кредиторській заборгованості клієнтів '
        where tt='310';
   end;
   --------------------------------
@@ -184,17 +184,6 @@ begin
   ------- Балансовые счета -------
   --------------------------------
   delete from ps_tts where tt='310';
-  begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('2560', '310', 0);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2560'', ''310'', 0) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
   begin
     insert into ps_tts(nbs, tt, dk)
     values ('2801', '310', 0);

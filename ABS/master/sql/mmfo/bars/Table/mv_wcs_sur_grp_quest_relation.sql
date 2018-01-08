@@ -50,9 +50,7 @@ COMMENT ON COLUMN BARS.MV_WCS_SUR_GRP_QUEST_RELATION.QUESTION_ID IS 'Ідентифікат
 
 
 PROMPT *** Create  grants  MV_WCS_SUR_GRP_QUEST_RELATION ***
-grant SELECT                                                                 on MV_WCS_SUR_GRP_QUEST_RELATION to BARSREADER_ROLE;
 grant SELECT                                                                 on MV_WCS_SUR_GRP_QUEST_RELATION to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on MV_WCS_SUR_GRP_QUEST_RELATION to UPLD;
 
 
 

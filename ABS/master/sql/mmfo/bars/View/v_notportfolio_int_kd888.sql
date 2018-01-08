@@ -47,9 +47,7 @@ PROMPT *** Create  view V_NOTPORTFOLIO_INT_KD888 ***
                    WHERE d.acc = t.account_id);
 
 PROMPT *** Create  grants  V_NOTPORTFOLIO_INT_KD888 ***
-grant SELECT                                                                 on V_NOTPORTFOLIO_INT_KD888 to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NOTPORTFOLIO_INT_KD888 to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_NOTPORTFOLIO_INT_KD888 to UPLD;
 
 
 

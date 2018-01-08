@@ -63,6 +63,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_ACC_CLB_CLBANKS_CLBID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_CLB ADD CONSTRAINT FK_ACC_CLB_CLBANKS_CLBID FOREIGN KEY (CLBID)
+	  REFERENCES BARS.CLBANKS (CLBID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C009055 ***
 begin   
  execute immediate '
@@ -89,11 +102,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACC_CLB ***
-grant SELECT                                                                 on ACC_CLB         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_CLB         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_CLB         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_CLB         to START1;
-grant SELECT                                                                 on ACC_CLB         to UPLD;
 
 
 

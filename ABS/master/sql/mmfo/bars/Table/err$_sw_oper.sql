@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_SW_OPER.SWRNUM IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SW_OPER ***
-grant SELECT                                                                 on ERR$_SW_OPER    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SW_OPER    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

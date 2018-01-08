@@ -18,10 +18,8 @@ PROMPT *** Create  view V_OBPC_BAD_TRAN ***
  group by t.id, file_name, file_date, n.branch, t.tran_type, t.tran_russ;
 
 PROMPT *** Create  grants  V_OBPC_BAD_TRAN ***
-grant SELECT                                                                 on V_OBPC_BAD_TRAN to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_BAD_TRAN to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OBPC_BAD_TRAN to OBPC;
-grant SELECT                                                                 on V_OBPC_BAD_TRAN to UPLD;
 grant FLASHBACK,SELECT                                                       on V_OBPC_BAD_TRAN to WR_REFREAD;
 
 

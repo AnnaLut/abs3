@@ -102,11 +102,9 @@ exception when others then
 
 PROMPT *** Create  grants  POLICY_TRIGGERS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on POLICY_TRIGGERS to ABS_ADMIN;
-grant SELECT                                                                 on POLICY_TRIGGERS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on POLICY_TRIGGERS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on POLICY_TRIGGERS to BARS_DM;
 grant SELECT                                                                 on POLICY_TRIGGERS to START1;
-grant SELECT                                                                 on POLICY_TRIGGERS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on POLICY_TRIGGERS to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on POLICY_TRIGGERS to WR_REFREAD;
 

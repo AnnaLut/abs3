@@ -113,14 +113,12 @@ exception when others then
 PROMPT *** Create  grants  CRISK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CRISK           to ABS_ADMIN;
 grant SELECT                                                                 on CRISK           to BARS009;
-grant SELECT                                                                 on CRISK           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CRISK           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CRISK           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CRISK           to RCC_DEAL;
 grant SELECT                                                                 on CRISK           to START1;
 grant SELECT                                                                 on CRISK           to TECH005;
 grant SELECT                                                                 on CRISK           to TECH006;
-grant SELECT                                                                 on CRISK           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CRISK           to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CRISK           to WR_REFREAD;
 

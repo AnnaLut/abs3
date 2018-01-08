@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_INS_DEAL_STS_HISTORY.COMM IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_INS_DEAL_STS_HISTORY ***
-grant SELECT                                                                 on ERR$_INS_DEAL_STS_HISTORY to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_INS_DEAL_STS_HISTORY to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -59,10 +59,8 @@ COMMENT ON COLUMN BARS.KOD_70_1.DATA_C IS '';
 
 
 PROMPT *** Create  grants  KOD_70_1 ***
-grant SELECT                                                                 on KOD_70_1        to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on KOD_70_1        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_70_1        to BARS_DM;
-grant SELECT                                                                 on KOD_70_1        to UPLD;
 grant FLASHBACK,SELECT                                                       on KOD_70_1        to WR_REFREAD;
 
 

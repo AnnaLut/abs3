@@ -25,7 +25,7 @@ end tbi_cpARCH_REF_MAIN ;
 
 
 /
-ALTER TRIGGER BARS.TBI_CPARCH_REF_MAIN ENABLE;
+ALTER TRIGGER BARS.TBI_CPARCH_REF_MAIN DISABLE;
 
 
 PROMPT ===================================================================================== 

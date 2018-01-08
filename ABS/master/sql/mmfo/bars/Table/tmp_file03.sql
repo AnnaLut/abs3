@@ -98,37 +98,11 @@ exception when others then
 
 
 
-
-PROMPT *** Create  index I4_TMP_FILE03 ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.I4_TMP_FILE03 ON BARS.TMP_FILE03 (NLSD, NLSK) ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index I5_TMP_FILE03 ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.I5_TMP_FILE03 ON BARS.TMP_FILE03 (NLSK) ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
 PROMPT *** Create  grants  TMP_FILE03 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FILE03      to ABS_ADMIN;
-grant SELECT                                                                 on TMP_FILE03      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FILE03      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_FILE03      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FILE03      to RPBN002;
-grant SELECT                                                                 on TMP_FILE03      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_FILE03      to WR_ALL_RIGHTS;
 
 

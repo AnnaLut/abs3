@@ -516,28 +516,28 @@ BEGIN
      AND cd.ref = l_refcp
      AND a.nls = p_nls
      AND a.kv = p_kv;
-
+    
     begin
      select 1
-       into l_same_pawn
+       into l_same_pawn  
        from cc_pawn t1, cc_pawn t2
-      where t1.pawn = p_pawn
+      where t1.pawn = p_pawn   
         and t2.pawn = l_cp_warrantyset.PAWN
         and t1.nbsz = t2.nbsz;
-    exception when no_data_found then l_same_pawn := 0;
+    exception when no_data_found then l_same_pawn := 0;    
     end;
-    if l_same_pawn = 1
-    then
+    if l_same_pawn = 1 
+    then 
         update pawn_acc
            set pawn = p_pawn
          where acc =  l_cp_warrantyset.acc;
-    end if;
+    end if; 
     -- проверка, какие реквизиты изменились
     if      l_cp_warrantyset.ref_   != l_refcp
          or (l_cp_warrantyset.PAWN  != p_pawn and l_same_pawn = 0)
          or l_cp_warrantyset.KV     != p_kv
     then raise_application_error (-20001,'ERR:  Зміни первинних реквізитів гарантії заборонені, угода' || to_char(l_ref) || ' Видаліть гарантію і заведіть нову.', TRUE);
-
+    
     elsif   l_cp_warrantyset.S      != p_s*100     -- вставка проводки на разницу суммы
     then
       bars_audit.trace(' %s l_cp_warrantyset.S = %s,  p_s*100 = %s', title, to_char(l_cp_warrantyset.S), to_char(p_s*100));

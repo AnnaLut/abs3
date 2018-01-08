@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/VW_ESCR_REF_FOR_COMPENSATION.sql ======
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view VW_ESCR_REF_FOR_COMPENSATION ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.VW_ESCR_REF_FOR_COMPENSATION ("TT", "REF", "NLSB", "OSTC", "NAZN", "S", "ACC", "ND", "SDATE", "CC_ID", "ID_B", "TXT", "DATE_CHECK") AS 
-  SELECT o.tt,
+CREATE OR REPLACE VIEW VW_ESCR_REF_FOR_COMPENSATION AS
+SELECT o.tt,
        o.REF,
        o.nlsb,
        a.ostc,
@@ -24,19 +15,9 @@ PROMPT *** Create  view VW_ESCR_REF_FOR_COMPENSATION ***
          WHERE REF = o.REF
            AND ROWNUM = 1) txt,
        case   when extract(month from o.vdat) =extract(month from gl.bd) then 0 else 1
-       end date_check
+       end date_check   
   FROM oper o, nlk_ref r, accounts a
  WHERE a.tip = 'NLQ'
    AND a.acc = r.acc
    AND r.ref2 IS NULL
    AND r.ref1 = o.REF;
-
-PROMPT *** Create  grants  VW_ESCR_REF_FOR_COMPENSATION ***
-grant SELECT                                                                 on VW_ESCR_REF_FOR_COMPENSATION to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on VW_ESCR_REF_FOR_COMPENSATION to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/VW_ESCR_REF_FOR_COMPENSATION.sql ======
-PROMPT ===================================================================================== 

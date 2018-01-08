@@ -53,13 +53,11 @@ PROMPT *** Create  view V_CUSTOMER_REL ***
             and c.rnk=s.rnk(+) ) ;
 
 PROMPT *** Create  grants  V_CUSTOMER_REL ***
-grant SELECT                                                                 on V_CUSTOMER_REL  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTOMER_REL  to BARSUPL;
 grant SELECT                                                                 on V_CUSTOMER_REL  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUSTOMER_REL  to BARS_DM;
 grant SELECT                                                                 on V_CUSTOMER_REL  to CUST001;
 grant SELECT                                                                 on V_CUSTOMER_REL  to STO;
-grant SELECT                                                                 on V_CUSTOMER_REL  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CUSTOMER_REL  to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_CUSTOMER_REL  to WR_CUSTREG;
 

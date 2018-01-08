@@ -105,9 +105,7 @@ PROMPT *** Create  view V_WCS_BID_GARANTEES ***
    ORDER BY b.id, sg.garantee_id, cnt.idx;
 
 PROMPT *** Create  grants  V_WCS_BID_GARANTEES ***
-grant SELECT                                                                 on V_WCS_BID_GARANTEES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_BID_GARANTEES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_BID_GARANTEES to UPLD;
 
 
 

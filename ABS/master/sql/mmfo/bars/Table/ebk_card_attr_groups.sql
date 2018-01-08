@@ -77,10 +77,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBK_CARD_ATTR_GROUPS ***
-grant SELECT                                                                 on EBK_CARD_ATTR_GROUPS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBK_CARD_ATTR_GROUPS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBK_CARD_ATTR_GROUPS to BARS_DM;
-grant SELECT                                                                 on EBK_CARD_ATTR_GROUPS to UPLD;
 
 
 

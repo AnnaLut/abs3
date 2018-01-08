@@ -77,10 +77,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  KL_OPFIELDS ***
-grant SELECT                                                                 on KL_OPFIELDS     to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_OPFIELDS     to BARS_DM;
 grant SELECT                                                                 on KL_OPFIELDS     to KLBX;
-grant SELECT                                                                 on KL_OPFIELDS     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_OPFIELDS     to WR_ALL_RIGHTS;
 
 

@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_ow.sql =========*** Run *** ===
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_OW 
+CREATE OR REPLACE PACKAGE BARS_OW
 is
 
 g_header_version  constant varchar2(64)  := 'version 4.286_nb 14/11/2017';
@@ -406,7 +400,7 @@ procedure web_out_files(p_mode in number,
 
 function check_available(p_nls in varchar2, p_kv in number, p_s in number)
   return boolean;
-
+  
 procedure final_payment (p_ref  in number,
                          p_dk   in number,
                          b_kvt out boolean,
@@ -427,7 +421,7 @@ function get_new_nbs(p_nbs in varchar2) return varchar2;
 
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_OW 
+CREATE OR REPLACE PACKAGE BODY BARS_OW
 is
 
 --
@@ -3518,7 +3512,7 @@ begin
                  end if;
                  exception
                    when others then
-
+                     
                     l_err := substr(' витовка док.' || l_srn || '-ошибка:'||sqlerrm,1,254);
                     bars_audit.info(h ||'Err:' || p_filename|| ' Ref:'||l_srn||' '|| dbms_utility.format_error_stack() || chr(10) ||
                                     dbms_utility.format_error_backtrace());
@@ -16838,17 +16832,5 @@ begin
   ow_init;
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  BARS_OW ***
-grant EXECUTE                                                                on BARS_OW         to ABS_ADMIN;
-grant EXECUTE                                                                on BARS_OW         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BARS_OW         to OW;
-grant EXECUTE                                                                on BARS_OW         to TECH005;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_ow.sql =========*** End *** ===
- PROMPT ===================================================================================== 
- 
+show err;
+/

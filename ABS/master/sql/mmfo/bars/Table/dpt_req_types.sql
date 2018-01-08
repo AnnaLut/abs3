@@ -159,9 +159,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_REQ_TYPES ***
-grant SELECT                                                                 on DPT_REQ_TYPES   to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_REQ_TYPES   to BARS_DM;
-grant SELECT                                                                 on DPT_REQ_TYPES   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_REQ_TYPES   to WR_ALL_RIGHTS;
 
 

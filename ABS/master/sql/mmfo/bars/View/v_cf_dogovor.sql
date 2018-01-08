@@ -159,9 +159,7 @@ PROMPT *** Create  view V_CF_DOGOVOR ***
                          SYS_CONTEXT ('bars_context', 'user_branch_mask'));
 
 PROMPT *** Create  grants  V_CF_DOGOVOR ***
-grant SELECT                                                                 on V_CF_DOGOVOR    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CF_DOGOVOR    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CF_DOGOVOR    to UPLD;
 
 
 

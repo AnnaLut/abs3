@@ -1,3 +1,5 @@
+SET SERVEROUTPUT ON 
+SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_STO2.sql =========*
 PROMPT ===================================================================================== 
@@ -16,11 +18,11 @@ PROMPT *** Create/replace  ARM  $RM_STO2 ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-	d integer := 0;
+    d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_STO2 створюємо (або оновлюємо) АРМ STO SBON Регулярні платежі. Оплата комунальних послуг ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
-                             P_ARM_NAME              => l_application_name,
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
+                             P_ARM_NAME              => l_application_name, 
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -28,56 +30,56 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію СБОН+Розпорядження на оплату послуг ********** ');
           --  Створюємо функцію СБОН+Розпорядження на оплату послуг
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'СБОН+Розпорядження на оплату послуг',
                                                   p_funcname => '/barsroot/Payreg/Payreg/SbonOrders',
-                                                  p_rolename => 'DPT' ,
+                                                  p_rolename => 'DPT' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію СБОН+Провайдери ********** ');
           --  Створюємо функцію СБОН+Провайдери
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'СБОН+Провайдери',
                                                   p_funcname => '/barsroot/Payreg/Payreg/SbonProviderIndex',
-                                                  p_rolename => 'DPT' ,
+                                                  p_rolename => 'DPT' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Друк звітів ********** ');
           --  Створюємо функцію Друк звітів
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Друк звітів',
                                                   p_funcname => '/barsroot/cbirep/rep_list.aspx?codeapp=\S*',
-                                                  p_rolename => '' ,
+                                                  p_rolename => '' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
-
-      --  Створюємо дочірню функцію Друк звітів
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Друк звітів',
-															  p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+     
 
       --  Створюємо дочірню функцію Друк звітів
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Друк звітів',
-															  p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
-															  p_rolename => '' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+                                                              p_name     => 'Друк звітів',
+                                                              p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Друк звітів
+                     l_function_deps  :=   abs_utils.add_func(
+                                                              p_name     => 'Друк звітів',
+                                                              p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
+                                                              p_rolename => '' ,    
+                                                              p_frontend => l_application_type_id
+                                                              );
+                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_STO2) - STO SBON Регулярні платежі. Оплата комунальних послуг  ');
     l := l_function_ids.first;
@@ -85,8 +87,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-
-
+     
+     
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -100,9 +102,6 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
-umu.add_report2arm(3100,'$RM_STO2');
-umu.add_report2arm(3101,'$RM_STO2');
-commit;
 end;
 /
 

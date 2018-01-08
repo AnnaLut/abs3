@@ -50,18 +50,6 @@ COMMENT ON COLUMN BARS.DPT_TTS_VIDD_ARC.ISMAIN IS '';
 
 
 
-PROMPT *** Create  constraint CC_DPTTTSVIDDA_VIDD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_TTS_VIDD_ARC MODIFY (VIDD CONSTRAINT CC_DPTTTSVIDDA_VIDD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DPTTTSVIDDA_TT_NN ***
 begin   
  execute immediate '
@@ -73,10 +61,20 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint CC_DPTTTSVIDDA_VIDD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_TTS_VIDD_ARC MODIFY (VIDD CONSTRAINT CC_DPTTTSVIDDA_VIDD_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  DPT_TTS_VIDD_ARC ***
-grant SELECT                                                                 on DPT_TTS_VIDD_ARC to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_TTS_VIDD_ARC to BARS_DM;
-grant SELECT                                                                 on DPT_TTS_VIDD_ARC to UPLD;
 
 
 

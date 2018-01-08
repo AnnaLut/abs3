@@ -34,10 +34,8 @@ PROMPT *** Create  view V_SALDO_HOLIDAY ***
 ;
 
 PROMPT *** Create  grants  V_SALDO_HOLIDAY ***
-grant SELECT                                                                 on V_SALDO_HOLIDAY to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SALDO_HOLIDAY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SALDO_HOLIDAY to START1;
-grant SELECT                                                                 on V_SALDO_HOLIDAY to UPLD;
 
 
 

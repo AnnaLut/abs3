@@ -78,10 +78,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  META_ICONS ***
-grant SELECT                                                                 on META_ICONS      to BARSREADER_ROLE;
 grant SELECT                                                                 on META_ICONS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on META_ICONS      to BARS_DM;
-grant SELECT                                                                 on META_ICONS      to UPLD;
 
 
 

@@ -13,9 +13,7 @@ PROMPT *** Create  view V_WCS_SUBPRODUCT_SURVEY ***
  where ss.survey_id = s.survey_id;
 
 PROMPT *** Create  grants  V_WCS_SUBPRODUCT_SURVEY ***
-grant SELECT                                                                 on V_WCS_SUBPRODUCT_SURVEY to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SUBPRODUCT_SURVEY to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_SUBPRODUCT_SURVEY to UPLD;
 
 
 

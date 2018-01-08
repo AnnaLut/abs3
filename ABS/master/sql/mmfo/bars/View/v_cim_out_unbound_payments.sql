@@ -1,14 +1,7 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CIM_OUT_UNBOUND_PAYMENTS.sql ========
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_CIM_OUT_UNBOUND_PAYMENTS ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_CIM_OUT_UNBOUND_PAYMENTS ("REF", "CUST_RNK", "CUST_OKPO", "CUST_NMK", "CUST_ND", "BENEF_NMK", "ACC", "NLS", "PDAT", "VDAT", "KV", "TOTAL_SUM", "UNBOUND_SUM", "NAZN", "OP_TYPE_ID", "OP_TYPE", "PAY_TYPE", "PAY_TYPE_NAME", "IS_VISED", "DIRECT", "DIRECT_NAME", "TT", "BACKGROUND_COLOR", "ATTACHMENTS_COUNT") AS 
-  SELECT ip.REF,
+CREATE OR REPLACE VIEW V_CIM_OUT_UNBOUND_PAYMENTS
+(ref, cust_rnk, cust_okpo, cust_nmk, cust_nd, benef_nmk, acc, nls, pdat, vdat, kv, total_sum, unbound_sum, nazn, op_type_id, op_type, pay_type, pay_type_name, is_vised, direct, direct_name, tt, background_color, attachments_count)
+AS
+SELECT ip.REF,
           c.rnk,
           c.okpo,
           c.nmkk,
@@ -185,14 +178,30 @@ PROMPT *** Create  view V_CIM_OUT_UNBOUND_PAYMENTS ***
           AND fb.delete_date IS NULL
           AND fb.direct = 1
           AND fb.contr_id IS NULL;
+comment on table V_CIM_OUT_UNBOUND_PAYMENTS is 'Нерозібрані вихідні (імпортні) платежі v 1.00.02';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.REF is 'Референс платежу';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.CUST_RNK is 'Реєстраційний номер клієнта';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.CUST_OKPO is 'ЄДРПОУ клієнта';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.CUST_NMK is 'Назва клієнта';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.CUST_ND is '№ договору з клієнтом';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.BENEF_NMK is 'Найменування контрагента';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.ACC is 'ACC рахунку';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.NLS is 'Рахунок';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.PDAT is 'Дата створення локумента';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.VDAT is 'Дата валютування';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.KV is 'Валюта платежу';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.TOTAL_SUM is 'Сума платежу';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.UNBOUND_SUM is 'Частина суми платежу, не прив’язана до жодного з контрактів';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.NAZN is 'Призначення платежу';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.OP_TYPE is 'Тип операції (додатковий реквізит)';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.PAY_TYPE is 'Тип, 0-раніше не прив''язані, 1-відв''язані реальні, 2-відв''язані фантоми';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.PAY_TYPE_NAME is 'Назва типу';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.IS_VISED is 'Признак візи, 0-незавізований,1-завізований';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.DIRECT is 'Напрям платежу 0 - вхідні, 1 - вихідні';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.TT is 'Код операції';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.BACKGROUND_COLOR is 'Колір фону (1 - жовтий, 0 - колір по замовчуванню)';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.ATTACHMENTS_COUNT is 'Клієнт надав супровідні док. в CORP';
 
-PROMPT *** Create  grants  V_CIM_OUT_UNBOUND_PAYMENTS ***
-grant SELECT                                                                 on V_CIM_OUT_UNBOUND_PAYMENTS to BARSREADER_ROLE;
-grant SELECT                                                                 on V_CIM_OUT_UNBOUND_PAYMENTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_OUT_UNBOUND_PAYMENTS to UPLD;
+GRANT SELECT ON BARS.V_CIM_OUT_UNBOUND_PAYMENTS TO BARSREADER_ROLE;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CIM_OUT_UNBOUND_PAYMENTS.sql ========
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.V_CIM_OUT_UNBOUND_PAYMENTS TO BARS_ACCESS_DEFROLE;

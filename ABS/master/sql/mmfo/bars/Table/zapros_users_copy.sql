@@ -46,9 +46,7 @@ COMMENT ON COLUMN BARS.ZAPROS_USERS_COPY.USER_ID IS '';
 
 
 PROMPT *** Create  grants  ZAPROS_USERS_COPY ***
-grant SELECT                                                                 on ZAPROS_USERS_COPY to BARSREADER_ROLE;
 grant SELECT                                                                 on ZAPROS_USERS_COPY to BARS_DM;
-grant SELECT                                                                 on ZAPROS_USERS_COPY to UPLD;
 
 
 

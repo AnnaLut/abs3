@@ -45,12 +45,10 @@ COMMENT ON COLUMN BARS.TMP_IRR.S IS '';
 
 
 PROMPT *** Create  grants  TMP_IRR ***
-grant SELECT                                                                 on TMP_IRR         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_IRR         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_IRR         to CP_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_IRR         to FOREX;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_IRR         to RCC_DEAL;
-grant SELECT                                                                 on TMP_IRR         to UPLD;
 
 
 

@@ -60,18 +60,6 @@ COMMENT ON COLUMN BARS.STAFF_CHK_BAK.GRANTOR IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C0025772 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_CHK_BAK MODIFY (CHKID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C0025771 ***
 begin   
  execute immediate '
@@ -83,9 +71,17 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  STAFF_CHK_BAK ***
-grant SELECT                                                                 on STAFF_CHK_BAK   to BARSREADER_ROLE;
-grant SELECT                                                                 on STAFF_CHK_BAK   to UPLD;
+
+PROMPT *** Create  constraint SYS_C0025772 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF_CHK_BAK MODIFY (CHKID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
 
 
 

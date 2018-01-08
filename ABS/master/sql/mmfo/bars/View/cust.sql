@@ -11,10 +11,8 @@ PROMPT *** Create  view CUST ***
   SELECT RNK,ISE,FS,OE,SED,VED FROM CUSTOMER;
 
 PROMPT *** Create  grants  CUST ***
-grant SELECT                                                                 on CUST            to BARSREADER_ROLE;
 grant SELECT                                                                 on CUST            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUST            to START1;
-grant SELECT                                                                 on CUST            to UPLD;
 
 
 

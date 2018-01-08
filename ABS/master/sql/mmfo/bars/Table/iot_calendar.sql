@@ -75,7 +75,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  IOT_CALENDAR ***
-grant SELECT                                                                 on IOT_CALENDAR    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on IOT_CALENDAR    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on IOT_CALENDAR    to START1;
 

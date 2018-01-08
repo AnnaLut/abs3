@@ -101,9 +101,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_SYNC_TYPE ***
-grant SELECT                                                                 on SKRYNKA_SYNC_TYPE to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_SYNC_TYPE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on SKRYNKA_SYNC_TYPE to UPLD;
 
 
 

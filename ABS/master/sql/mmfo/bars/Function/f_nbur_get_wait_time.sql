@@ -12,7 +12,13 @@ is
    l_job_name  varchar2(200);
    l_kf        varchar2(20) := bc.current_mfo;
 begin
-   l_job_name := 'NBUR_CHECK_QUEUE_'||to_char(p_type)||'_'||l_kf;
+   if p_type = 1 then
+      l_job_name := 'NBUR_CHECK_QUEUE_1_';
+   else
+      l_job_name := 'NBUR_CHECK_QUEUE_2_';
+   end if;
+   
+   l_job_name := l_job_name ||l_kf;
    
    begin
       SELECT TO_CHAR (EXTRACT (MINUTE FROM (next_run_date - sysdate) DAY TO SECOND)),

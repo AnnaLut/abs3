@@ -61,10 +61,6 @@ COMMENT ON COLUMN BARS.ERR$_SB_PS853.COD_ACT IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SB_PS853 ***
-grant SELECT                                                                 on ERR$_SB_PS853   to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SB_PS853   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

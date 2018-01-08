@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cim_mgr.sql =========*** Run *** ===
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.CIM_MGR 
+CREATE OR REPLACE PACKAGE CIM_MGR
 is
    --
    --  CIM_MGR
@@ -669,7 +669,7 @@ function check_bound(p_doc_kind in number, --вид документу (0 - платіж, 1 - МД)
 function get_control_date(p_doc_kind in number, --id висновку
                           p_doc_type in number, --тип документу
                           p_doc_id in number, --id документу
-                          p_pay_flag in number default null -- для оптимізації при виклику з cim_reports
+                          p_pay_flag in number default null -- для оптимізації при виклику з cim_reports                          
                          ) return date;
 
 --------------------------------------------------------------------------------
@@ -768,7 +768,7 @@ function val_convert(p_dat in date , -- Дата конмертації
 
 END cim_mgr;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CIM_MGR 
+CREATE OR REPLACE PACKAGE BODY cim_mgr
 is
    --
    --  CIM_MGR
@@ -3464,7 +3464,7 @@ begin
         if l_contr_type!=1 then return null; end if;
         else --тоді тупо ретурн нулл, бо буде но_дата_фаунд (бо cim_reports використовує також v_cim_bound_payments)
           return null;
-    end if;
+    end if;   
   else
     if p_doc_type=0 then
       select trunc(v.allow_dat), b.contr_id into l_vdat, l_contr_id

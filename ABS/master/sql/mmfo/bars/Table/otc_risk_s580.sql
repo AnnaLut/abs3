@@ -71,11 +71,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OTC_RISK_S580 ***
-grant SELECT                                                                 on OTC_RISK_S580   to BARSREADER_ROLE;
 grant SELECT                                                                 on OTC_RISK_S580   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTC_RISK_S580   to BARS_DM;
 grant SELECT                                                                 on OTC_RISK_S580   to START1;
-grant SELECT                                                                 on OTC_RISK_S580   to UPLD;
 
 
 

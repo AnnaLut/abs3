@@ -79,10 +79,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_EMIW ***
-grant SELECT                                                                 on CP_EMIW         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_EMIW         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_EMIW         to BARS_DM;
-grant SELECT                                                                 on CP_EMIW         to UPLD;
 
 
 

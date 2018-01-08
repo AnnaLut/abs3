@@ -53,10 +53,8 @@ WHERE substr(s.nbs,1,1) in ('6','7')
 GROUP by  s.fdat;
 
 PROMPT *** Create  grants  DXXX ***
-grant SELECT                                                                 on DXXX            to BARSREADER_ROLE;
 grant SELECT                                                                 on DXXX            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DXXX            to START1;
-grant SELECT                                                                 on DXXX            to UPLD;
 
 
 

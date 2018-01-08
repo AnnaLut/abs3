@@ -113,10 +113,6 @@ COMMENT ON COLUMN BARS.ERR$_CC_DEAL_UPDATE.GRP IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CC_DEAL_UPDATE ***
-grant SELECT                                                                 on ERR$_CC_DEAL_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CC_DEAL_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

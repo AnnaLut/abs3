@@ -1,14 +1,24 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_USER_ZVIT.sql =========*** Run *** ==
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_USER_ZVIT ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_USER_ZVIT ("USERID", "FIO", "BRANCH", "VDAT", "KF", "REF", "MFOA", "MFOB", "TT", "NAME", "NLSA", "NLSB", "S", "KV", "NAZN", "SOS") AS 
-  SELECT a.userid,
+CREATE OR REPLACE FORCE VIEW BARS.V_USER_ZVIT
+(
+   USERID,
+   FIO,
+   BRANCH,
+   VDAT,
+   KF,
+   REF,
+   MFOA,
+   MFOB,
+   TT,
+   NAME,
+   NLSA,
+   NLSB,
+   S,
+   KV,
+   NAZN,
+   SOS
+)
+AS
+   SELECT a.userid,
           c.fio,
           a.branch,
           a.vdat,
@@ -110,12 +120,5 @@ PROMPT *** Create  view V_USER_ZVIT ***
                                                 'RHO176',
                                                 'RHO152'));
 
-PROMPT *** Create  grants  V_USER_ZVIT ***
-grant SELECT                                                                 on V_USER_ZVIT     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_USER_ZVIT     to UPLD;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_USER_ZVIT.sql =========*** End *** ==
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.V_USER_ZVIT TO BARS_ACCESS_DEFROLE;

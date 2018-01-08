@@ -65,10 +65,6 @@ COMMENT ON COLUMN BARS.ERR$_SKRYNKA_ND_BRANCH.RENTER_NAME IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SKRYNKA_ND_BRANCH ***
-grant SELECT                                                                 on ERR$_SKRYNKA_ND_BRANCH to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SKRYNKA_ND_BRANCH to UPLD;
-
 
 
 PROMPT ===================================================================================== 

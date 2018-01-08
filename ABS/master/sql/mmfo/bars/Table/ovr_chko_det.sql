@@ -49,10 +49,6 @@ COMMENT ON COLUMN BARS.OVR_CHKO_DET.DATM IS '';
 
 
 
-PROMPT *** Create  grants  OVR_CHKO_DET ***
-grant SELECT                                                                 on OVR_CHKO_DET    to BARSREADER_ROLE;
-grant SELECT                                                                 on OVR_CHKO_DET    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

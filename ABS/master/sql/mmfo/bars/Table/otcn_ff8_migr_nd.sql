@@ -23,8 +23,7 @@ PROMPT *** Create  table OTCN_FF8_MIGR_ND ***
 begin 
   execute immediate '
   CREATE GLOBAL TEMPORARY TABLE BARS.OTCN_FF8_MIGR_ND 
-   (	ND VARCHAR2(40), 
-	VID NUMBER
+   (	ND VARCHAR2(40)
    ) ON COMMIT PRESERVE ROWS ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
@@ -40,13 +39,8 @@ PROMPT *** ALTER_POLICIES to OTCN_FF8_MIGR_ND ***
 
 COMMENT ON TABLE BARS.OTCN_FF8_MIGR_ND IS '';
 COMMENT ON COLUMN BARS.OTCN_FF8_MIGR_ND.ND IS '';
-COMMENT ON COLUMN BARS.OTCN_FF8_MIGR_ND.VID IS '';
 
 
-
-PROMPT *** Create  grants  OTCN_FF8_MIGR_ND ***
-grant SELECT                                                                 on OTCN_FF8_MIGR_ND to BARSREADER_ROLE;
-grant SELECT                                                                 on OTCN_FF8_MIGR_ND to UPLD;
 
 
 

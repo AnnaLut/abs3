@@ -109,11 +109,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SV_FILES ***
-grant SELECT                                                                 on SV_FILES        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_FILES        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SV_FILES        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_FILES        to RPBN002;
-grant SELECT                                                                 on SV_FILES        to UPLD;
 
 
 

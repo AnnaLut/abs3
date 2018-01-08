@@ -11,10 +11,8 @@ PROMPT *** Create  view ACC_PROC ***
   select acc,acrn.fprocn(acc,id) from int_accn;
 
 PROMPT *** Create  grants  ACC_PROC ***
-grant SELECT                                                                 on ACC_PROC        to BARSREADER_ROLE;
 grant SELECT                                                                 on ACC_PROC        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_PROC        to START1;
-grant SELECT                                                                 on ACC_PROC        to UPLD;
 
 
 

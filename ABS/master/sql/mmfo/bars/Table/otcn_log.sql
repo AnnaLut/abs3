@@ -69,6 +69,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OTCNLOG_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OTCN_LOG ADD CONSTRAINT FK_OTCNLOG_STAFF FOREIGN KEY (USERID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OTCNLOG_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OTCN_LOG ADD CONSTRAINT FK_OTCNLOG_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C009903 ***
 begin   
  execute immediate '
@@ -132,11 +158,9 @@ exception when others then
 
 PROMPT *** Create  grants  OTCN_LOG ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_LOG        to ABS_ADMIN;
-grant SELECT                                                                 on OTCN_LOG        to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on OTCN_LOG        to BARS_ACCESS_DEFROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on OTCN_LOG        to RPBN002;
 grant SELECT                                                                 on OTCN_LOG        to START1;
-grant SELECT                                                                 on OTCN_LOG        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_LOG        to WR_ALL_RIGHTS;
 
 

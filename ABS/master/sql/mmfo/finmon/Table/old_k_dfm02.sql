@@ -29,9 +29,6 @@ COMMENT ON COLUMN FINMON.OLD_K_DFM02.D_CLOSE IS '';
 
 
 
-PROMPT *** Create  grants  OLD_K_DFM02 ***
-grant SELECT                                                                 on OLD_K_DFM02     to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

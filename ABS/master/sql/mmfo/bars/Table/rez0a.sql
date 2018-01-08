@@ -77,11 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ0A ***
-grant SELECT                                                                 on REZ0A           to BARSREADER_ROLE;
 grant SELECT                                                                 on REZ0A           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ0A           to BARS_DM;
 grant SELECT                                                                 on REZ0A           to SALGL;
-grant SELECT                                                                 on REZ0A           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REZ0A           to WR_ALL_RIGHTS;
 
 

@@ -125,10 +125,6 @@ COMMENT ON COLUMN BARS.ERR$_DPU_DEAL_UPDATE.EFFECTDATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPU_DEAL_UPDATE ***
-grant SELECT                                                                 on ERR$_DPU_DEAL_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPU_DEAL_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции K11
-prompt Наименование операции: K11 d: Kомісія за Списання безготівк.коштів ФО на користь ЮО
+prompt Наименование операции: d: Kомісія за Списання безготівк.коштів ФО на користь ЮО
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K11', 'K11 d: Kомісія за Списання безготівк.коштів ФО на користь ЮО', 1, null, 980, '#(nbs_ob22 (''6510'',''10''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF( 11, #(KVA), #(NLSA), #(S) )', null, null, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', 'Kомісія за Списання безготівк.коштів ФО на користь ВАТ "Ощадбанку"');
+    values ('K11', 'd: Kомісія за Списання безготівк.коштів ФО на користь ЮО', 1, null, 980, '#(nbs_ob22 (''6110'',''10''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF( 11, #(KVA), #(NLSA), #(S) )', null, null, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', 'Kомісія за Списання безготівк.коштів ФО на користь ВАТ "Ощадбанку"');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K11', name='K11 d: Kомісія за Списання безготівк.коштів ФО на користь ЮО', dk=1, nlsm=null, kv=980, nlsk='#(nbs_ob22 (''6510'',''10''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF( 11, #(KVA), #(NLSA), #(S) )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn='Kомісія за Списання безготівк.коштів ФО на користь ВАТ "Ощадбанку"'
+         set tt='K11', name='d: Kомісія за Списання безготівк.коштів ФО на користь ЮО', dk=1, nlsm=null, kv=980, nlsk='#(nbs_ob22 (''6110'',''10''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF( 11, #(KVA), #(NLSA), #(S) )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn='Kомісія за Списання безготівк.коштів ФО на користь ВАТ "Ощадбанку"'
        where tt='K11';
   end;
   --------------------------------

@@ -76,10 +76,8 @@ COMMENT ON COLUMN BARS.DPA_ACC_USERID.USERID IS '';
 
 
 PROMPT *** Create  grants  DPA_ACC_USERID ***
-grant SELECT                                                                 on DPA_ACC_USERID  to BARSREADER_ROLE;
 grant INSERT                                                                 on DPA_ACC_USERID  to BARS_ACCESS_DEFROLE;
 grant INSERT                                                                 on DPA_ACC_USERID  to RPBN002;
-grant SELECT                                                                 on DPA_ACC_USERID  to UPLD;
 
 
 

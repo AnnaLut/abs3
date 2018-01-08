@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Перегляд історії змін критеріїв ризику клієнтів';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'V_CUST_RISK';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,16 +119,16 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'CUSTTYPE', 'N', 'Тип~клієнта', '.5', 22, 4, 0, 0, 0, 0, '', '#0', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DAT_BEGIN', 'D', 'Дата~встановлення', '1.2', 10, 7, 0, 0, 0, 0, '', 'dd/MM/yyyy', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DAT_END', 'D', 'Дата~зняття', '1.2', 10, 8, 0, 0, 0, 0, '', 'dd/MM/yyyy', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NMK', 'C', 'Найменування клієнта', '3', 70, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'RISK_ID', 'N', 'Код~критерію', '1', 22, 5, 0, 1, 0, 0, '', '#0', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'RISK_NAME', 'C', 'Назва~критерію', '2', 1000, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'RNK', 'N', 'РНК клієнта', '1', 22, 1, 0, 1, 0, 0, '', '#0', 1, 0, '', 0, 0, 1, '', 'EditCustomer(:CUSTTYPE, NUMBER_Null, :RNK, CVIEW_ReadOnly, hWndForm, 0, '', FALSE)', 0);
-  bars_metabase.add_column(l_tabid, 8, 'STAFF_FIO', 'C', 'ПІБ користувача', '3', 60, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'STAFF_ID', 'N', 'Ід~користувача', '1', 22, 9, 0, 1, 0, 0, '', '#0', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'OKPO', 'C', 'ЄДРПОУ', '1.2', 15, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'CUSTTYPE', 'N', 'Тип~клієнта', 0.5, 22, 4, 0, 0, 0, 0, '', '#0', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DAT_BEGIN', 'D', 'Дата~встановлення', 1.2, 10, 7, 0, 0, 0, 0, '', 'dd/MM/yyyy', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAT_END', 'D', 'Дата~зняття', 1.2, 10, 8, 0, 0, 0, 0, '', 'dd/MM/yyyy', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NMK', 'C', 'Найменування клієнта', 3, 70, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'RISK_ID', 'N', 'Код~критерію', 1, 22, 5, 0, 1, 0, 0, '', '#0', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'RISK_NAME', 'C', 'Назва~критерію', 2, 1000, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'RNK', 'N', 'РНК клієнта', 1, 22, 1, 0, 1, 0, 0, '', '#0', 1, 0, '', 0, 0, 1, '', 'EditCustomer(:CUSTTYPE, NUMBER_Null, :RNK, CVIEW_ReadOnly, hWndForm, 0, '', FALSE)', 0);
+  bars_metabase.add_column(l_tabid, 8, 'STAFF_FIO', 'C', 'ПІБ користувача', 3, 60, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'STAFF_ID', 'N', 'Ід~користувача', 1, 22, 9, 0, 1, 0, 0, '', '#0', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'OKPO', 'C', 'ЄДРПОУ', 1.2, 15, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
@@ -199,3 +194,4 @@ end;
 /
 
 commit;
+/

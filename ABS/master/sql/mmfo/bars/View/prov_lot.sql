@@ -29,10 +29,8 @@ where fdat >= add_months(sysdate,-1 ) and
  ;
 
 PROMPT *** Create  grants  PROV_LOT ***
-grant SELECT                                                                 on PROV_LOT        to BARSREADER_ROLE;
 grant SELECT                                                                 on PROV_LOT        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PROV_LOT        to SALGL;
-grant SELECT                                                                 on PROV_LOT        to UPLD;
 
 
 

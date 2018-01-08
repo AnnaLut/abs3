@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции 976
-prompt Наименование операции: 976 <<Компенсацiї>>
+prompt Наименование операции: <<Компенсацiї>>
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('976', '976 <<Компенсацiї>>', 1, null, 980, null, 980, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000000000000001000000000000000000010000000000000000000000000000', '#(#(D9760) || '':'' || substr( #(P9760), 10,50)||'' ''|| #(TOBO3) ||'' ''|| #(FIO) ||'' ''|| #(A9760)  )');
+    values ('976', '<<Компенсацiї>>', 1, null, 980, null, 980, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000000000000001000000000000000000010000000000000000000000000000', '#(#(D9760) || '':'' || substr( #(P9760), 10,50)||'' ''|| #(TOBO3) ||'' ''|| #(FIO) ||'' ''|| #(A9760)  )');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='976', name='976 <<Компенсацiї>>', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000001000000000000000000010000000000000000000000000000', nazn='#(#(D9760) || '':'' || substr( #(P9760), 10,50)||'' ''|| #(TOBO3) ||'' ''|| #(FIO) ||'' ''|| #(A9760)  )'
+         set tt='976', name='<<Компенсацiї>>', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000001000000000000000000010000000000000000000000000000', nazn='#(#(D9760) || '':'' || substr( #(P9760), 10,50)||'' ''|| #(TOBO3) ||'' ''|| #(FIO) ||'' ''|| #(A9760)  )'
        where tt='976';
   end;
   --------------------------------

@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cdb_mediator.sql =========*** Run **
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.CDB_MEDIATOR is
+create or replace package cdb_mediator is
 
     DEAL_TYPE_LENDING              constant integer := 1;
     DEAL_TYPE_BORROWING            constant integer := 2;
@@ -312,7 +306,7 @@
         p_reckoning_id in integer);
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CDB_MEDIATOR as
+create or replace package body cdb_mediator as
 
     function read_operation_type(
         p_operation_type in varchar2,
@@ -2236,14 +2230,3 @@ CREATE OR REPLACE PACKAGE BODY BARS.CDB_MEDIATOR as
     end;
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  CDB_MEDIATOR ***
-grant EXECUTE                                                                on CDB_MEDIATOR    to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/cdb_mediator.sql =========*** End **
- PROMPT ===================================================================================== 
- 

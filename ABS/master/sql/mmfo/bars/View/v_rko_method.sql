@@ -13,10 +13,8 @@ PROMPT *** Create  view V_RKO_METHOD ***
  where a.acc = m.acc(+);
 
 PROMPT *** Create  grants  V_RKO_METHOD ***
-grant SELECT                                                                 on V_RKO_METHOD    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_RKO_METHOD    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_RKO_METHOD    to CUST001;
-grant SELECT                                                                 on V_RKO_METHOD    to UPLD;
 
 
 

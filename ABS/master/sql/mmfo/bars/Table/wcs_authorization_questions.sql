@@ -59,6 +59,32 @@ COMMENT ON COLUMN BARS.WCS_AUTHORIZATION_QUESTIONS.ORD IS 'Порядок отображения';
 
 
 
+PROMPT *** Create  constraint FK_AUTHQS_AID_AUTHS_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_AUTHORIZATION_QUESTIONS ADD CONSTRAINT FK_AUTHQS_AID_AUTHS_ID FOREIGN KEY (AUTH_ID)
+	  REFERENCES BARS.WCS_AUTHORIZATIONS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_AUTHQS_QID_QUEST_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_AUTHORIZATION_QUESTIONS ADD CONSTRAINT FK_AUTHQS_QID_QUEST_ID FOREIGN KEY (QUESTION_ID)
+	  REFERENCES BARS.WCS_QUESTIONS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_AUTHQS_ORD_NN ***
 begin   
  execute immediate '
@@ -85,10 +111,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_AUTHQS_REQUIRED ***
+PROMPT *** Create  constraint CC_AUTHQS_ISCHECKABLE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_AUTHORIZATION_QUESTIONS ADD CONSTRAINT CC_AUTHQS_REQUIRED CHECK (is_required in (0, 1)) ENABLE';
+  ALTER TABLE BARS.WCS_AUTHORIZATION_QUESTIONS ADD CONSTRAINT CC_AUTHQS_ISCHECKABLE CHECK (is_checkable in (0, 1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -97,10 +123,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_AUTHQS_ISCHECKABLE ***
+PROMPT *** Create  constraint CC_AUTHQS_REQUIRED ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_AUTHORIZATION_QUESTIONS ADD CONSTRAINT CC_AUTHQS_ISCHECKABLE CHECK (is_checkable in (0, 1)) ENABLE';
+  ALTER TABLE BARS.WCS_AUTHORIZATION_QUESTIONS ADD CONSTRAINT CC_AUTHQS_REQUIRED CHECK (is_required in (0, 1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -123,11 +149,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_AUTHORIZATION_QUESTIONS ***
-grant SELECT                                                                 on WCS_AUTHORIZATION_QUESTIONS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_AUTHORIZATION_QUESTIONS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_AUTHORIZATION_QUESTIONS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_AUTHORIZATION_QUESTIONS to START1;
-grant SELECT                                                                 on WCS_AUTHORIZATION_QUESTIONS to UPLD;
 
 
 

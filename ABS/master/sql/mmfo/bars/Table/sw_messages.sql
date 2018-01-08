@@ -54,6 +54,32 @@ COMMENT ON COLUMN BARS.SW_MESSAGES.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_SWMESSAGES_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MESSAGES ADD CONSTRAINT FK_SWMESSAGES_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWMESSAGES_SWJOURNAL2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MESSAGES ADD CONSTRAINT FK_SWMESSAGES_SWJOURNAL2 FOREIGN KEY (KF, SWREF)
+	  REFERENCES BARS.SW_JOURNAL (KF, SWREF) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_SWMESSAGES ***
 begin   
  execute immediate '
@@ -107,11 +133,9 @@ exception when others then
 
 PROMPT *** Create  grants  SW_MESSAGES ***
 grant SELECT                                                                 on SW_MESSAGES     to BARS013;
-grant SELECT                                                                 on SW_MESSAGES     to BARSREADER_ROLE;
 grant SELECT                                                                 on SW_MESSAGES     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_MESSAGES     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_MESSAGES     to SWTOSS;
-grant SELECT                                                                 on SW_MESSAGES     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_MESSAGES     to WR_ALL_RIGHTS;
 
 

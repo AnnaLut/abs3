@@ -49,11 +49,9 @@ COMMENT ON COLUMN BARS.CIM_CUSTOMER_UPD.MODIFY_DATE IS 'Дата зміни';
 
 
 PROMPT *** Create  grants  CIM_CUSTOMER_UPD ***
-grant SELECT                                                                 on CIM_CUSTOMER_UPD to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CUSTOMER_UPD to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_CUSTOMER_UPD to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CUSTOMER_UPD to CIM_ROLE;
-grant SELECT                                                                 on CIM_CUSTOMER_UPD to UPLD;
 
 
 

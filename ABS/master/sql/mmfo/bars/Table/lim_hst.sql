@@ -55,10 +55,8 @@ COMMENT ON COLUMN BARS.LIM_HST.LOGNAME IS '';
 
 
 PROMPT *** Create  grants  LIM_HST ***
-grant SELECT                                                                 on LIM_HST         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LIM_HST         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LIM_HST         to START1;
-grant SELECT                                                                 on LIM_HST         to UPLD;
 
 
 

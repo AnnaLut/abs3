@@ -103,14 +103,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAG_NOK ***
-grant SELECT                                                                 on ZAG_NOK         to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on ZAG_NOK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAG_NOK         to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on ZAG_NOK         to NOKK;
 grant DELETE,INSERT,SELECT                                                   on ZAG_NOK         to SBB_LZ;
 grant DELETE,INSERT,SELECT                                                   on ZAG_NOK         to SBB_NC;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on ZAG_NOK         to START1;
-grant SELECT                                                                 on ZAG_NOK         to UPLD;
 
 
 

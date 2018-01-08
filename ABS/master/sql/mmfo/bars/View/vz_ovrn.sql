@@ -20,10 +20,8 @@ from (select * from OVR_REP_ZAG where acc = to_number( pul.Get_Mas_Ini_Val('ACC'
 where s.npp = z.npp (+)  ;
 
 PROMPT *** Create  grants  VZ_OVRN ***
-grant SELECT                                                                 on VZ_OVRN         to BARSREADER_ROLE;
 grant SELECT                                                                 on VZ_OVRN         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VZ_OVRN         to START1;
-grant SELECT                                                                 on VZ_OVRN         to UPLD;
 
 
 

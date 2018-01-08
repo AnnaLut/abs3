@@ -14,10 +14,8 @@ PROMPT *** Create  view V_REPORTS_LIST ***
 ;
 
 PROMPT *** Create  grants  V_REPORTS_LIST ***
-grant SELECT                                                                 on V_REPORTS_LIST  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REPORTS_LIST  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_REPORTS_LIST  to RPBN001;
-grant SELECT                                                                 on V_REPORTS_LIST  to UPLD;
 
 
 

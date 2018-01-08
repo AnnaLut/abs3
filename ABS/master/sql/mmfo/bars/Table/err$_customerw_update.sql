@@ -70,9 +70,7 @@ COMMENT ON COLUMN BARS.ERR$_CUSTOMERW_UPDATE.IDUPD IS '';
 
 
 PROMPT *** Create  grants  ERR$_CUSTOMERW_UPDATE ***
-grant SELECT                                                                 on ERR$_CUSTOMERW_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CUSTOMERW_UPDATE to BARS_DM;
-grant SELECT                                                                 on ERR$_CUSTOMERW_UPDATE to UPLD;
 
 
 

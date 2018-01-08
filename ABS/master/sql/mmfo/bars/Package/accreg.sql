@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/accreg.sql =========*** Run *** ====
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.ACCREG 
+create or replace package ACCREG
 is
 
 --***************************************************************************--
@@ -50,7 +44,7 @@ procedure OPN_ACC
 , p_nms            in     accounts.nms%type  -- Account name
 , p_kv             in     accounts.kv%type   -- Currency code
 , p_isp            in     accounts.isp%type  -- User id
-, p_nlsalt         in     accounts.nlsalt%type default Null --
+, p_nlsalt         in     accounts.nlsalt%type default Null -- 
 , p_pap            in     accounts.pap%type    default Null -- T020
 , p_tip            in     accounts.tip%type    default 'ODB'
 , p_pos            in     accounts.pos%type    default Null -- Account Characteristic
@@ -192,10 +186,10 @@ procedure RSRV_ACC_NUM
 ( p_nls      in     accounts_rsrv.nls%type            -- Account  number
 , p_kv       in     accounts_rsrv.kv%type             -- Currency code
 , p_nms      in     accounts_rsrv.nms%type            -- Account name
-, p_branch   in     accounts_rsrv.branch%type         --
-, p_isp      in     accounts_rsrv.isp%type            --
+, p_branch   in     accounts_rsrv.branch%type         -- 
+, p_isp      in     accounts_rsrv.isp%type            -- 
 , p_rnk      in     accounts_rsrv.rnk%type            -- Customer number
-, p_agrm_num in     accountsw.value%type default null --
+, p_agrm_num in     accountsw.value%type default null -- 
 --, p_errmsg      out varchar2
 );
 
@@ -217,17 +211,17 @@ procedure P_RESERVE_ACC
 , p_kv       in     accounts.kv%type                  -- Currency code
 , p_nms      in     accounts.nms%type                 -- Account name
 , p_tip      in     accounts.tip%type                 -- Account type
-, p_grp      in     accounts.grp%type                 --
-, p_isp      in     accounts.isp%type                 --
-, p_pap      in     accounts.pap%type    default null --
-, p_vid      in     accounts.vid%type    default null --
-, p_pos      in     accounts.pos%type    default null --
-, p_blkd     in     accounts.blkd%type   default null --
-, p_blkk     in     accounts.blkk%type   default null --
-, p_lim      in     accounts.lim%type    default null --
-, p_ostx     in     accounts.ostx%type   default null --
-, p_nlsalt   in     accounts.nlsalt%type default null --
-, p_branch   in     accounts.branch%type default null --
+, p_grp      in     accounts.grp%type                 -- 
+, p_isp      in     accounts.isp%type                 -- 
+, p_pap      in     accounts.pap%type    default null -- 
+, p_vid      in     accounts.vid%type    default null -- 
+, p_pos      in     accounts.pos%type    default null -- 
+, p_blkd     in     accounts.blkd%type   default null -- 
+, p_blkk     in     accounts.blkk%type   default null -- 
+, p_lim      in     accounts.lim%type    default null -- 
+, p_ostx     in     accounts.ostx%type   default null -- 
+, p_nlsalt   in     accounts.nlsalt%type default null -- 
+, p_branch   in     accounts.branch%type default null -- 
 , p_ob22     in     accounts.ob22%type   default null -- OB22
 , p_agrm_num in     accountsw.value%type default null -- номер договору банківського обслуговування
 , p_trf_id   in     sh_tarif.ids%type    default null -- код тарифного пакету
@@ -268,7 +262,12 @@ procedure DUPLICATE_ACC
 
 end accreg;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.ACCREG 
+
+show err
+
+----------------------------------------------------------------------------------------------------
+
+create or replace package body ACCREG
 is
 
   --***************************************************************************--
@@ -477,9 +476,9 @@ $then
             end;
         end;
       else -- перевірка на допустимість типу рахунка
-
+        
         null;
-
+        
 --       begin
 --         select TIP
 --           into l_tip
@@ -501,7 +500,7 @@ $then
 --               bars_error.raise_nerror( g_modcode, 'GENERAL_ERROR_CODE', 'Недопустимий тип '||tip_||' для балансового рахунку '||l_nbs  );
 --           end;
 --       end;
-
+        
       end if;
 
 $end
@@ -538,9 +537,18 @@ $end
   then
     SetAccountSParam( accR_, 'OB22', ob22_ );
   end if;
-
+  
 $if ACC_PARAMS.MMFO
 $then
+  bars_audit.info( 'DPA_ACCREG: l_nbs - ' || l_nbs 
+                          || '; nls_ - ' || nls_
+                          || '; accR_ - ' || accR_
+                          || '; rnk_ - ' || rnk_
+                          || '; nms_ - ' || nms_
+                          || '; ob22_ - ' || ob22_
+                          || '; BARS_DPA.DPA_NBS - ' || BARS_DPA.DPA_NBS( l_nbs, ob22_ )
+                   );
+				   
   if ( BARS_DPA.DPA_NBS( l_nbs, ob22_ ) = 1 )
   then -- COBUMMFO-4028
     BARS_DPA.ACCOUNTS_TAX( p_acc  => accr_
@@ -659,9 +667,9 @@ $then
             end;
         end;
       else -- перевірка на допустимість типу рахунка
-
+        
         null;
-
+        
 --       begin
 --         select TIP
 --           into l_tip
@@ -683,7 +691,7 @@ $then
 --               bars_error.raise_nerror( g_modcode, 'GENERAL_ERROR_CODE', 'Недопустимий тип '||tip_||' для балансового рахунку '||l_nbs  );
 --           end;
 --       end;
-
+        
       end if;
 
 $end
@@ -728,6 +736,16 @@ $end
 
 $if ACC_PARAMS.MMFO
 $then
+  bars_audit.info( 'DPA_ACCREG: l_nbs - ' || l_nbs 
+                          || '; p_acc - ' || p_acc
+                          || '; p_nls - ' || p_nls
+                          || '; p_nbs - ' || p_nbs
+                          || '; p_rnk - ' || p_rnk                          
+                          || '; p_ob22 - ' || p_ob22
+                          || '; p_ob22 - ' || p_mode
+                          || '; BARS_DPA.DPA_NBS - ' || BARS_DPA.DPA_NBS( l_nbs, p_ob22 )
+                          || '; BARS_DPA.DPA_NBS - ' || BARS_DPA.DPA_NBS( p_nbs, p_ob22 )
+                  );
   if ( BARS_DPA.DPA_NBS( l_nbs, p_ob22 ) = 1 and p_mode <> 9)
   then -- COBUMMFO-4028
     BARS_DPA.ACCOUNTS_TAX( p_acc  => p_acc
@@ -1809,15 +1827,15 @@ begin
     case
     when ( l_ostc <> 0 )
     then p_info := 'Счет ' || l_nls || ': ненулевой остаток (Ф)';
-    when l_ostb <> 0
+    when l_ostb <> 0 
     then p_info := 'Счет ' || l_nls || ': ненулевой остаток (П)';
-    when l_ostf <> 0
+    when l_ostf <> 0 
     then p_info := 'Счет ' || l_nls || ': ненулевой остаток (Б)';
-    when l_dazs is not null
+    when l_dazs is not null 
     then p_info := 'Счет ' || l_nls || ': уже закрыт';
-    when l_daos > l_bankdate
+    when l_daos > l_bankdate 
     then p_info := 'Счет ' || l_nls || ': нельзя закрыть датой, меньшей даты открытия '||to_char(l_daos,'dd.mm.yyyy');
-    when l_dapp >= l_bankdate
+    when l_dapp >= l_bankdate 
     then p_info := 'Счет ' || l_nls || ': нельзя закрыть датой, меньшей даты последнего движения по счету '||to_char(l_dapp,'dd.mm.yyyy');
     when ( l_kv <> GL.baseval and l_dappQ >= l_bankdate )
     then p_info := 'Счет ' || l_nls || ': нельзя закрыть датой, меньшей даты последней переоценки '||to_char(l_dappQ,'dd.mm.yyyy');
@@ -1889,9 +1907,9 @@ begin
            p_info      := '';
         end if;
 
-        if p_can_close = 1
+        if p_can_close = 1 
         then
-
+          
           update accounts
              set dazs = l_bankdate
            where acc = k.acra;
@@ -1901,7 +1919,7 @@ begin
                  acr_dat = l_bankdate
            where acc = p_acc
              and acra = k.acra;
-
+         
         end if;
 
       end loop;
@@ -1917,7 +1935,7 @@ begin
       return a.NBS, a.RNK
         into l_nbs, l_rnk;
 
-      if ( l_daos < to_date('01.09.2015','dd.mm.yyyy') and
+      if ( l_daos < to_date('01.09.2015','dd.mm.yyyy') and 
            l_nbs in ('2512','2513','2520','2523','2525'
                     ,'2526','2530','2531','2541','2542'
                     ,'2544','2545','2546','2552','2553'
@@ -1967,7 +1985,7 @@ procedure P_ACC_RESTORE
   l_active   number(1);
   ---<NEWNBS>---
   r_tfm_fc   transform_2017_forecast%rowtype;
-
+  
   procedure CHK_EXISTENCE
   is
     l_exst  number(1);
@@ -1981,13 +1999,13 @@ procedure P_ACC_RESTORE
        where KF  = r_tfm_fc.KF
          and NLS = r_tfm_fc.NEW_NLS
          and KV  = r_tfm_fc.KV
-       union
+       union 
       select 1 -- forecast
         from TRANSFORM_2017_FORECAST
        where KF      = r_tfm_fc.KF
          and NEW_NLS = r_tfm_fc.NEW_NLS
          and KV      = r_tfm_fc.KV
-       union
+       union 
       select 1 -- reserved
         from ACCOUNTS_RSRV
        where KF  = r_tfm_fc.KF
@@ -2741,17 +2759,7 @@ begin
   null;
 end ACCREG;
 /
- show err;
- 
-PROMPT *** Create  grants  ACCREG ***
-grant EXECUTE                                                                on ACCREG          to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on ACCREG          to CUST001;
-grant EXECUTE                                                                on ACCREG          to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on ACCREG          to WR_VIEWACC;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/accreg.sql =========*** End *** ====
- PROMPT ===================================================================================== 
- 
+show errors
+
+grant execute on ACCREG to BARS_ACCESS_DEFROLE;

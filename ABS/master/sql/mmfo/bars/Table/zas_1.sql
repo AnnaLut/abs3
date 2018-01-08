@@ -55,10 +55,8 @@ COMMENT ON COLUMN BARS.ZAS_1.NBS IS '';
 
 
 PROMPT *** Create  grants  ZAS_1 ***
-grant SELECT                                                                 on ZAS_1           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAS_1           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAS_1           to START1;
-grant SELECT                                                                 on ZAS_1           to UPLD;
 
 
 

@@ -96,9 +96,7 @@ COMMENT ON COLUMN BARS.ERR$_CUSTOMER_REL.NAME_R IS '';
 
 
 PROMPT *** Create  grants  ERR$_CUSTOMER_REL ***
-grant SELECT                                                                 on ERR$_CUSTOMER_REL to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CUSTOMER_REL to BARS_DM;
-grant SELECT                                                                 on ERR$_CUSTOMER_REL to UPLD;
 
 
 

@@ -84,9 +84,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  OP_FIELD_GOU ***
-grant SELECT                                                                 on OP_FIELD_GOU    to BARSREADER_ROLE;
 grant SELECT                                                                 on OP_FIELD_GOU    to BARS_DM;
-grant SELECT                                                                 on OP_FIELD_GOU    to UPLD;
 
 
 

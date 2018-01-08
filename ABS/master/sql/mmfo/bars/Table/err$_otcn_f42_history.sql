@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_OTCN_F42_HISTORY.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OTCN_F42_HISTORY ***
-grant SELECT                                                                 on ERR$_OTCN_F42_HISTORY to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OTCN_F42_HISTORY to UPLD;
-
 
 
 PROMPT ===================================================================================== 

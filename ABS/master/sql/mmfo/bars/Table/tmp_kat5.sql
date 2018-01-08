@@ -86,9 +86,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_KAT5 ***
-grant SELECT                                                                 on TMP_KAT5        to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_KAT5        to BARS_DM;
-grant SELECT                                                                 on TMP_KAT5        to UPLD;
 
 
 

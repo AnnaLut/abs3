@@ -44,10 +44,8 @@ COMMENT ON COLUMN BARS.TMP_PRIOCOM_ACC_LIST.NLS IS '';
 
 
 PROMPT *** Create  grants  TMP_PRIOCOM_ACC_LIST ***
-grant SELECT                                                                 on TMP_PRIOCOM_ACC_LIST to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_PRIOCOM_ACC_LIST to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_PRIOCOM_ACC_LIST to START1;
-grant SELECT                                                                 on TMP_PRIOCOM_ACC_LIST to UPLD;
 
 
 

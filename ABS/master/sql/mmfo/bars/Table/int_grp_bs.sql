@@ -51,11 +51,9 @@ COMMENT ON COLUMN BARS.INT_GRP_BS.NBS IS '';
 
 
 PROMPT *** Create  grants  INT_GRP_BS ***
-grant SELECT                                                                 on INT_GRP_BS      to BARSREADER_ROLE;
 grant SELECT                                                                 on INT_GRP_BS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_GRP_BS      to BARS_DM;
 grant SELECT                                                                 on INT_GRP_BS      to RPBN001;
-grant SELECT                                                                 on INT_GRP_BS      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_GRP_BS      to WR_ALL_RIGHTS;
 
 

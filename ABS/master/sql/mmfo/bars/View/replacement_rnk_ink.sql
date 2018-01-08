@@ -20,7 +20,7 @@ PROMPT *** Create  view REPLACEMENT_RNK_INK ***
             c.okpo,
             c.bc
        FROM v_gl a, customer c
-      WHERE     (   (nbs = '3578' AND ob22 IN ('17', '09', '41', '45'))
+      WHERE     (   (nbs = '3578' AND ob22 IN ('17', '09', '41', '45'))                 
                  OR (nbs = '2909' AND ob22 IN ('43'))
                  or nbs in ('3610', '3619', '3519','3510')
                  )
@@ -30,10 +30,8 @@ PROMPT *** Create  view REPLACEMENT_RNK_INK ***
    ORDER BY branch;
 
 PROMPT *** Create  grants  REPLACEMENT_RNK_INK ***
-grant SELECT                                                                 on REPLACEMENT_RNK_INK to BARSREADER_ROLE;
 grant FLASHBACK,SELECT,UPDATE                                                on REPLACEMENT_RNK_INK to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on REPLACEMENT_RNK_INK to START1;
-grant SELECT                                                                 on REPLACEMENT_RNK_INK to UPLD;
 
 
 

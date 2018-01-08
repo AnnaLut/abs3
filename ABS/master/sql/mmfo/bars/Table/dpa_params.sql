@@ -52,6 +52,19 @@ COMMENT ON COLUMN BARS.DPA_PARAMS.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_DPA_PARAMS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPA_PARAMS ADD CONSTRAINT FK_DPA_PARAMS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DPA_PARAMS_KF_NN ***
 begin   
  execute immediate '
@@ -78,9 +91,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPA_PARAMS ***
-grant SELECT                                                                 on DPA_PARAMS      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPA_PARAMS      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on DPA_PARAMS      to UPLD;
 
 
 

@@ -61,6 +61,19 @@ COMMENT ON COLUMN BARS.CP_KODA.PV IS '';
 
 
 
+PROMPT *** Create  constraint FK_CP_KODA_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_KODA ADD CONSTRAINT FK_CP_KODA_ID FOREIGN KEY (ID)
+	  REFERENCES BARS.CP_KOD (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_CP_KODA_ID ***
 begin   
  execute immediate '
@@ -89,11 +102,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_KODA ***
-grant SELECT                                                                 on CP_KODA         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_KODA         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_KODA         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_KODA         to START1;
-grant SELECT                                                                 on CP_KODA         to UPLD;
 
 
 

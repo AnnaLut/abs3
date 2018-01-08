@@ -25,10 +25,7 @@ begin
 	LAST_RU_IDUPD NUMBER, 
 	LAST_RU_CHGDATE DATE, 
 	TRANSACC VARCHAR2(15), 
-	TRANSKV NUMBER(3,0), 
-	DATE_BLK DATE, 
-	COMM VARCHAR2(4000), 
-	ISPAYED NUMBER(1,0)
+	TRANSKV NUMBER(3,0)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -40,9 +37,6 @@ end;
 
 
 COMMENT ON TABLE PFU.PFU_PENSACC IS 'Рахунки пенсіонерів ЄБП';
-COMMENT ON COLUMN PFU.PFU_PENSACC.DATE_BLK IS '';
-COMMENT ON COLUMN PFU.PFU_PENSACC.COMM IS '';
-COMMENT ON COLUMN PFU.PFU_PENSACC.ISPAYED IS '';
 COMMENT ON COLUMN PFU.PFU_PENSACC.ID IS '';
 COMMENT ON COLUMN PFU.PFU_PENSACC.KF IS '';
 COMMENT ON COLUMN PFU.PFU_PENSACC.BRANCH IS '';
@@ -64,10 +58,12 @@ COMMENT ON COLUMN PFU.PFU_PENSACC.TRANSKV IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C00111498 ***
+PROMPT *** Create  constraint PK_PFUPENSACC ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_PENSACC MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_PENSACC ADD CONSTRAINT PK_PFUPENSACC PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -76,12 +72,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_PFUPENSACC ***
+PROMPT *** Create  constraint SYS_C00111498 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_PENSACC ADD CONSTRAINT PK_PFUPENSACC PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
+  ALTER TABLE PFU.PFU_PENSACC MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -133,11 +127,36 @@ exception when others then
 
 PROMPT *** Create  grants  PFU_PENSACC ***
 grant SELECT                                                                 on PFU_PENSACC     to BARS;
-grant SELECT                                                                 on PFU_PENSACC     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PFU_PENSACC     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on PFU_PENSACC     to UPLD;
 
 
+PROMPT *** ADD field date_blk PK_PFUPENSACC ***
+begin
+    execute immediate 'alter table PFU.PFU_PENSACC add date_blk date';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+PROMPT *** ADD field ispayed PK_PFUPENSACC ***
+begin
+    execute immediate 'alter table PFU.PFU_PENSACC add ispayed number(1)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+                  
+PROMPT *** ADD field comm PK_PFUPENSACC ***
+begin
+    execute immediate 'alter table PFU.PFU_PENSACC add comm varchar2(4000)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/PFU/Table/PFU_PENSACC.sql =========*** End *** ==

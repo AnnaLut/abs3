@@ -286,50 +286,6 @@ begin
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
-    values ('1612', 'F01', 0);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''1612'', ''F01'', 0) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('1612', 'F01', 1);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''1612'', ''F01'', 1) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('1613', 'F01', 0);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''1613'', ''F01'', 0) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('1613', 'F01', 1);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''1613'', ''F01'', 1) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into ps_tts(nbs, tt, dk)
     values ('1621', 'F01', 0);
   exception
     when dup_val_on_index then null;

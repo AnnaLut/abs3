@@ -60,9 +60,7 @@ COMMENT ON COLUMN BARS.ERR$_ACCOUNTS_FIELD.USE_IN_ARCH IS '';
 
 
 PROMPT *** Create  grants  ERR$_ACCOUNTS_FIELD ***
-grant SELECT                                                                 on ERR$_ACCOUNTS_FIELD to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_ACCOUNTS_FIELD to BARS_DM;
-grant SELECT                                                                 on ERR$_ACCOUNTS_FIELD to UPLD;
 
 
 

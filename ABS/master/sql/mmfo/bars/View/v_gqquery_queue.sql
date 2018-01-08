@@ -14,8 +14,6 @@ PROMPT *** Create  view V_GQQUERY_QUEUE ***
  ;
 
 PROMPT *** Create  grants  V_GQQUERY_QUEUE ***
-grant SELECT                                                                 on V_GQQUERY_QUEUE to BARSREADER_ROLE;
-grant SELECT                                                                 on V_GQQUERY_QUEUE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_GQQUERY_QUEUE to WR_ALL_RIGHTS;
 
 

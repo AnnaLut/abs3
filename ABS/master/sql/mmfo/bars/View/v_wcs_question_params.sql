@@ -39,9 +39,7 @@ PROMPT *** Create  view V_WCS_QUESTION_PARAMS ***
  order by q.id;
 
 PROMPT *** Create  grants  V_WCS_QUESTION_PARAMS ***
-grant SELECT                                                                 on V_WCS_QUESTION_PARAMS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_QUESTION_PARAMS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_QUESTION_PARAMS to UPLD;
 
 
 

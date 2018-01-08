@@ -64,10 +64,6 @@ COMMENT ON COLUMN BARS.NBUR_DM_TXN_SYMBOLS_ERRLOG.SYMB_VAL IS '';
 
 
 
-PROMPT *** Create  grants  NBUR_DM_TXN_SYMBOLS_ERRLOG ***
-grant SELECT                                                                 on NBUR_DM_TXN_SYMBOLS_ERRLOG to BARSREADER_ROLE;
-grant SELECT                                                                 on NBUR_DM_TXN_SYMBOLS_ERRLOG to UPLD;
-
 
 
 PROMPT ===================================================================================== 

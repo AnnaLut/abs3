@@ -18,10 +18,8 @@ PROMPT *** Create  view V_SW_STAFF_MESSAGES ***
 group by w.id, s.logname, s.fio;
 
 PROMPT *** Create  grants  V_SW_STAFF_MESSAGES ***
-grant SELECT                                                                 on V_SW_STAFF_MESSAGES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW_STAFF_MESSAGES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SW_STAFF_MESSAGES to START1;
-grant SELECT                                                                 on V_SW_STAFF_MESSAGES to UPLD;
 
 
 

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции 301
-prompt Наименование операции: Проведення розрахун.за рах.кредит.заборгован.за опер.з клієнтами банку
+prompt Наименование операции: 301-Кошти для зарахування на вкладні рахунки  згідно отриманих спискі
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('301', 'Проведення розрахун.за рах.кредит.заборгован.за опер.з клієнтами банку', 1, null, 980, null, 980, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1301100000000000000000000001000000010000000000000000000000000000', 'Кошти для зарахування на вкладні рахунки  згідно отриманих списків');
+    values ('301', '301-Кошти для зарахування на вкладні рахунки  згідно отриманих спискі', 1, null, 980, null, 980, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1301100000000000000000000001000000010000000000000000000000000000', 'Кошти для зарахування на вкладні рахунки  згідно отриманих списків');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='301', name='Проведення розрахун.за рах.кредит.заборгован.за опер.з клієнтами банку', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1301100000000000000000000001000000010000000000000000000000000000', nazn='Кошти для зарахування на вкладні рахунки  згідно отриманих списків'
+         set tt='301', name='301-Кошти для зарахування на вкладні рахунки  згідно отриманих спискі', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1301100000000000000000000001000000010000000000000000000000000000', nazn='Кошти для зарахування на вкладні рахунки  згідно отриманих списків'
        where tt='301';
   end;
   --------------------------------

@@ -96,9 +96,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_SW_MESSAGE_SOURCE ***
-grant SELECT                                                                 on TMP_SW_MESSAGE_SOURCE to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_SW_MESSAGE_SOURCE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on TMP_SW_MESSAGE_SOURCE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_SW_MESSAGE_SOURCE to WR_ALL_RIGHTS;
 
 

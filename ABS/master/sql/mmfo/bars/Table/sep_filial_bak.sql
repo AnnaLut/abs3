@@ -129,10 +129,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  SEP_FILIAL_BAK ***
-grant SELECT                                                                 on SEP_FILIAL_BAK  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEP_FILIAL_BAK  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEP_FILIAL_BAK  to START1;
-grant SELECT                                                                 on SEP_FILIAL_BAK  to UPLD;
 
 
 

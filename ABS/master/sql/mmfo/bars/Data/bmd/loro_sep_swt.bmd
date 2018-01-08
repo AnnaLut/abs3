@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'L3) Грн-Лоро : СЭП -> SWIFT';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'LORO_SEP_SWT';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,28 +119,28 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC_1600', '', null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'BIC', 'C', 'SWIFT~BIC банку~отримувача', '', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'EditCustomer( 1, NUMBER_Null, :RNK, CVIEW_ReadOnly, hWndForm, 0, "", FALSE)', 0);
-  bars_metabase.add_column(l_tabid, 3, 'D_REC', 'C', 'СЕП~Додатковi~реквiзити', '', null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'KV', '', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'MFOA', 'C', 'СЕП~МФО банку~вiдправника', '', null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NAZN', 'C', 'СЕП~Призначення платежу', '', 160, 26, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NLSB', 'C', 'СЕП~Лоро-Рах.~банку-отримувача', '', null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'Show_Sal_Day_P(:ACC, STRING_Null, NUMBER_Null, GetBankDate()-10, GetBankDate())', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NLSA', 'C', 'СЕП~Рахунок~вiдправника', '', null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NAM_B', 'C', 'СЕП~Назва Рах.~банку-отримувача', '', null, 29, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'REC_O', 'B', 'Ок~!', '', null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'REF', 'N', 'Вхiдний~референс', '', null, 3, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REF)', 0);
-  bars_metabase.add_column(l_tabid, 12, 'RNK', 'N', 'RNK_1600', '', null, 97, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'S', 'N', 'Сума~зарахування', '', null, 12, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'VDAT', 'D', 'Дата~отримання', '', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'COUNTRY', 'C', 'Код~країни~отримувача', '', null, 28, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'NAM_A', 'C', 'СЕП~Назва~вiдправника', '', null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'K50', 'C', 'SWIFT-50K~Назва~вiдправника', '', 80, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'P57', 'C', 'SWIFT-57D~Назва Рах.~банку-отримувача', '', 80, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'P59_1', 'C', 'SWIFT-59D~Рах.~отримувача', '', 24, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'P59_2', 'C', 'SWIFT-59D~Назва~отримувача', '', 80, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'P70', 'C', 'SWIFT-70~Призначення платежу', '', 160, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'KOD_N', 'C', '1-ПБ~Код~ Приз.пл', '', null, 11, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC_1600', null, null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BIC', 'C', 'SWIFT~BIC банку~отримувача', null, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'EditCustomer( 1, NUMBER_Null, :RNK, CVIEW_ReadOnly, hWndForm, 0, "", FALSE)', 0);
+  bars_metabase.add_column(l_tabid, 3, 'D_REC', 'C', 'СЕП~Додатковi~реквiзити', null, null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'KV', null, null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'MFOA', 'C', 'СЕП~МФО банку~вiдправника', null, null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NAZN', 'C', 'СЕП~Призначення платежу', null, 160, 26, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NLSB', 'C', 'СЕП~Лоро-Рах.~банку-отримувача', null, null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'Show_Sal_Day_P(:ACC, STRING_Null, NUMBER_Null, GetBankDate()-10, GetBankDate())', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NLSA', 'C', 'СЕП~Рахунок~вiдправника', null, null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NAM_B', 'C', 'СЕП~Назва Рах.~банку-отримувача', null, null, 29, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'REC_O', 'B', 'Ок~!', null, null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'REF', 'N', 'Вхiдний~референс', null, null, 3, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REF)', 0);
+  bars_metabase.add_column(l_tabid, 12, 'RNK', 'N', 'RNK_1600', null, null, 97, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'S', 'N', 'Сума~зарахування', null, null, 12, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'VDAT', 'D', 'Дата~отримання', null, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'COUNTRY', 'C', 'Код~країни~отримувача', null, null, 28, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'NAM_A', 'C', 'СЕП~Назва~вiдправника', null, null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'K50', 'C', 'SWIFT-50K~Назва~вiдправника', null, 80, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'P57', 'C', 'SWIFT-57D~Назва Рах.~банку-отримувача', null, 80, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'P59_1', 'C', 'SWIFT-59D~Рах.~отримувача', null, 24, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'P59_2', 'C', 'SWIFT-59D~Назва~отримувача', null, 80, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'P70', 'C', 'SWIFT-70~Призначення платежу', null, 160, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'KOD_N', 'C', '1-ПБ~Код~ Приз.пл', null, null, 11, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

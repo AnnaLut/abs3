@@ -79,10 +79,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_COMPONENTS ***
-grant SELECT                                                                 on CIM_COMPONENTS  to BARSREADER_ROLE;
 grant SELECT                                                                 on CIM_COMPONENTS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_COMPONENTS  to BARS_DM;
-grant SELECT                                                                 on CIM_COMPONENTS  to UPLD;
 
 
 

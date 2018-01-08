@@ -164,8 +164,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  MODULE_REQUEST_QT ***
-grant SELECT                                                                 on MODULE_REQUEST_QT to BARSREADER_ROLE;
-grant SELECT                                                                 on MODULE_REQUEST_QT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MODULE_REQUEST_QT to WR_ALL_RIGHTS;
 
 

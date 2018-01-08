@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.TMP_CC_LIM_MINUS.NOT_SN IS '';
 
 
 
-PROMPT *** Create  grants  TMP_CC_LIM_MINUS ***
-grant SELECT                                                                 on TMP_CC_LIM_MINUS to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_CC_LIM_MINUS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

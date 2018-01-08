@@ -55,6 +55,19 @@ COMMENT ON COLUMN BARS.DPT_INHERIT_TAX.TAX_NUM IS 'Номер докум. сплати податку с
 
 
 
+PROMPT *** Create  constraint FK_DPTINHERITTAX ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_INHERIT_TAX ADD CONSTRAINT FK_DPTINHERITTAX FOREIGN KEY (DPT_ID, INHERIT_CUSTID)
+	  REFERENCES BARS.DPT_INHERITORS (DPT_ID, INHERIT_CUSTID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DPTINHERITTAX_DPTID_NN ***
 begin   
  execute immediate '
@@ -108,12 +121,10 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_INHERIT_TAX ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_INHERIT_TAX to ABS_ADMIN;
-grant SELECT                                                                 on DPT_INHERIT_TAX to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_INHERIT_TAX to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_INHERIT_TAX to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_INHERIT_TAX to DPT_ADMIN;
 grant SELECT                                                                 on DPT_INHERIT_TAX to START1;
-grant SELECT                                                                 on DPT_INHERIT_TAX to UPLD;
 
 
 

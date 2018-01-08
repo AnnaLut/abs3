@@ -1,29 +1,30 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_MBDK_PRODUCT.sql =========*** Run ***
 PROMPT ===================================================================================== 
 
-
 PROMPT *** Create  view V_MBDK_PRODUCT ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_MBDK_PRODUCT ("VIDD", "NAME", "TIPD", "TIPP") AS 
-  select vidd,
+create or replace view v_mbdk_product as
+select vidd,
        name,
        tipd,
        (case when t.vidd in (2700,2701,3660,3661) then 1 else 2 end) tipp
 from  cc_vidd t
 where mbk.check_if_deal_belong_to_mbdk(t.vidd) = 'Y';
 
+grant select on v_mbdk_product to bars_access_defrole;
+
+comment on table  v_mbdk_product is 'МБДК: види договорів';
+comment on column v_mbdk_product.vidd is 'Код виду договору';
+comment on column v_mbdk_product.name is 'Вид договору';
+comment on column v_mbdk_product.tipd is 'Тип дог.: 1-розміщення, 2-залучення';
+comment on column v_mbdk_product.tipp is 'Тип продукту: 1-банки , 2-2700,3660 - ЮО';
+
 PROMPT *** Create  grants  V_MBDK_PRODUCT ***
-grant SELECT                                                                 on V_MBDK_PRODUCT  to BARSREADER_ROLE;
-grant SELECT                                                                 on V_MBDK_PRODUCT  to BARSUPL;
-grant DELETE,INSERT,SELECT,UPDATE                                            on V_MBDK_PRODUCT  to BARS_ACCESS_DEFROLE;
-grant DELETE,INSERT,SELECT,UPDATE                                            on V_MBDK_PRODUCT  to RCC_DEAL;
-grant DELETE,INSERT,SELECT,UPDATE                                            on V_MBDK_PRODUCT  to START1;
-grant SELECT                                                                 on V_MBDK_PRODUCT  to UPLD;
-
-
+GRANT SELECT, INSERT, UPDATE, DELETE ON BARS.v_mbdk_product TO RCC_DEAL;
+GRANT SELECT, INSERT, UPDATE, DELETE ON BARS.v_mbdk_product TO START1;
+GRANT SELECT, INSERT, UPDATE, DELETE ON BARS.v_mbdk_product TO BARS_ACCESS_DEFROLE;
+GRANT SELECT ON BARS.v_mbdk_product to BARSUPL;
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_MBDK_PRODUCT.sql =========*** End ***

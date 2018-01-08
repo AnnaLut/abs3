@@ -78,11 +78,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_ALL ***
-grant SELECT                                                                 on FIN_ALL         to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_ALL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_ALL         to RCC_DEAL;
 grant SELECT                                                                 on FIN_ALL         to START1;
-grant SELECT                                                                 on FIN_ALL         to UPLD;
 
 
 

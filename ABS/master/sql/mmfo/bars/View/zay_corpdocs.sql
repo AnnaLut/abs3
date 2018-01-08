@@ -13,9 +13,7 @@ PROMPT *** Create  view ZAY_CORPDOCS ***
     WHERE z.id = m.idz AND m.doc_id = D.doc_id;
 
 PROMPT *** Create  grants  ZAY_CORPDOCS ***
-grant SELECT                                                                 on ZAY_CORPDOCS    to BARSREADER_ROLE;
 grant SELECT                                                                 on ZAY_CORPDOCS    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on ZAY_CORPDOCS    to UPLD;
 grant SELECT                                                                 on ZAY_CORPDOCS    to ZAY;
 
 

@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := ' ПЛАТIЖНI ДОРУЧЕННЯ в iноземнiй валютi або банкiвських металах';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'KLP_SWIFT';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,54 +119,54 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ADRESBANKBEN', 'C', '57:~Банк бенефiцiара,~мiсцезнаходження', '', 254, 15, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ADRESBANKPL', 'C', '52:~Банк платника,~мiсцезнаходження/адреса', '', 254, 7, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'ADRESBEN', 'C', '59:~Бенефiцiар,~мiсцезнаходження', '', 254, 12, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'ADRESPL', 'C', '50:~Платник,~мiсцезнаходження/адреса', '', 254, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'BANKPOSR', 'C', '56:~Банк посередник б.бенеф.,Назва,~SWIFT код банку', '', 96, 39, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'BIK', 'C', '57:~Банк бенефiцiара,~BIC код банку', '', 32, 17, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'CHECKBOX1', 'C', '71:~Комiсiйнi за рахунок,~OUR', '', 16, 27, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'CHECKBOX2', 'C', '71:~Комiсiйнi за рахунок,~BEN', '', 16, 28, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'CHECKBOX3', 'C', '71:~Комiсiйнi за рахунок~ SHA', '', 16, 29, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'CHECKBOX4', 'C', '70:~Призначення платежу,~без ПДВ', '', 16, 24, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'CHECKBOX5', 'C', '70:~Призначення платежу,~оплата', '', 16, 25, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'CHECKBOX6', 'C', '70:~ Призначення платежу,~попередня оплата', '', 16, 26, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'DATETIMEPICKER1', 'C', 'Дата вiд', '', 16, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'FIO2', 'C', 'ПIБ-2', '', 96, 37, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'FIO1', 'C', 'ПIБ-1', '', 96, 36, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'FL', 'N', 'Флаг~обробки', '', 22, 3, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'IBANBEN', 'C', 'Допомiжнi реквiзити,~Найменування та iншi реквiзити', '', 254, 35, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'ID', 'N', 'Iдентифiкатор', '', 22, 38, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'INNBANK', 'C', '57:~Банк бенефiцiара,~IНН банку', '', 32, 21, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'I_VA', 'C', '32:~Цифровий код валюти/банк.метал.', '', 16, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'KF', 'C', 'Код фiлiї', '', 6, 1, 1, 1, 0, 0, '', '', 1, 0, '''Разом''', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'KODBANKBEN', 'C', 'Допомiжнi реквiзити,~IBAN бенефiцiара', '', 32, 34, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'KODBANKPL', 'C', 'Допомiжнi реквiзити,~Код банку платника', '', 32, 33, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'KODOP', 'C', '71:~Комiсiйнi за рахунок,~Код операцiї', '', 32, 31, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'KODSTRBEN', 'C', '71:~Комiсiйнi за рахунок,~Код країни бенефiцiара', '', 32, 32, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'NAMEBANKBEN', 'C', '57:~Банк бенефiцiара,~найменування', '', 254, 14, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'NAMEBANKKOR', 'C', '57:~Банк бенефiцiара,~найм-ня банку, де зн-ся к/р', '', 254, 19, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'NAMEBANKPL', 'C', '52:~Банк платника,~найменування', '', 254, 6, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'NAMEBEN', 'C', '59:~Бенефiцiар,~найменування', '', 254, 11, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'NAMEPL', 'C', '50:~Платник,~назва', '', 254, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'NAMEVIDBANK', 'C', '57:~Банк бенефiцiара,~найменування вiддiлення банку', '', 254, 20, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'NAZNPLAT', 'C', '70: Призначення платежу', '', 1024, 22, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'NDS', 'C', '70:~Призначення платежу,~ПДВ', '', 96, 23, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 34, 'NKORR', 'C', '57:~Банк бенефiцiара,~номер коррахунку', '', 96, 18, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'OKPOPL', 'C', '71:~Комiсiйнi за рахунок,~iдентифiкацiйний код/номер', '', 32, 30, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 36, 'PS_NUMBER', 'C', 'ПЛАТIЖНЕ ДОРУЧЕННЯ в iн.валютi або банк.метал.', '', 96, 1, 1, 0, 0, 0, '', '', 1, 0, 'count(*)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 37, 'RAHBEN', 'C', '59:~Бенефiцiар,~N% рахунку', '', 96, 13, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 38, 'RAHPL', 'C', '50:~Платник,~N% рахунку', '', 96, 5, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 39, 'SUMMA', 'C', '32:~Сума або маса валюти/банк.метал.~ЦИФРАМИ', '', 96, 9, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 40, 'SUMPROP', 'C', '32:~Сума або маса валюти/банк.метал.~СЛОВАМИ', '', 254, 10, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 41, 'NAMEF', 'C', 'Наименование~файла', '', 12, 45, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 42, 'NUMKORRAHBANKBEN', 'C', '57:~Банк бенефіціара,~номер коррахунку', '', 96, 40, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 43, 'NAMEVIDBANKBEN', 'C', '57:~Банк бенефіціара,~найменування відділення банку', '', 254, 41, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 44, 'BIKKODBANKBEN', 'C', '57:~Банк бенефіціара,~БІК код банку', '', 96, 42, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 45, 'NAMEBANKKORBANKBEN', 'C', '57:~Банк бенефіціара,~найменування банку, в якому знаходиться коррахунок', '', 254, 43, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 46, 'INNBANKBEN', 'C', '57:~Банк бенефіціара,~ІНН банку', '', 96, 44, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 47, 'SWIFTKODBANKBEN', 'C', '57:~Банк бенефіціара,~SWIFT код банку', '', 96, 16, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 48, 'DATEDOKKB', 'D', 'Дата/час~надходження~заявки', '', null, 48, 1, 0, 0, 0, '', 'dd.MM.yyyy hhhh:mm:ss', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ADRESBANKBEN', 'C', '57:~Банк бенефiцiара,~мiсцезнаходження', null, 254, 15, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ADRESBANKPL', 'C', '52:~Банк платника,~мiсцезнаходження/адреса', null, 254, 7, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'ADRESBEN', 'C', '59:~Бенефiцiар,~мiсцезнаходження', null, 254, 12, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ADRESPL', 'C', '50:~Платник,~мiсцезнаходження/адреса', null, 254, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'BANKPOSR', 'C', '56:~Банк посередник б.бенеф.,Назва,~SWIFT код банку', null, 96, 39, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'BIK', 'C', '57:~Банк бенефiцiара,~BIC код банку', null, 32, 17, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'CHECKBOX1', 'C', '71:~Комiсiйнi за рахунок,~OUR', null, 16, 27, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'CHECKBOX2', 'C', '71:~Комiсiйнi за рахунок,~BEN', null, 16, 28, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'CHECKBOX3', 'C', '71:~Комiсiйнi за рахунок~ SHA', null, 16, 29, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'CHECKBOX4', 'C', '70:~Призначення платежу,~без ПДВ', null, 16, 24, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'CHECKBOX5', 'C', '70:~Призначення платежу,~оплата', null, 16, 25, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'CHECKBOX6', 'C', '70:~ Призначення платежу,~попередня оплата', null, 16, 26, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'DATETIMEPICKER1', 'C', 'Дата вiд', null, 16, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'FIO2', 'C', 'ПIБ-2', null, 96, 37, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'FIO1', 'C', 'ПIБ-1', null, 96, 36, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'FL', 'N', 'Флаг~обробки', null, 22, 3, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'IBANBEN', 'C', 'Допомiжнi реквiзити,~Найменування та iншi реквiзити', null, 254, 35, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'ID', 'N', 'Iдентифiкатор', null, 22, 38, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'INNBANK', 'C', '57:~Банк бенефiцiара,~IНН банку', null, 32, 21, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'I_VA', 'C', '32:~Цифровий код валюти/банк.метал.', null, 16, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'KF', 'C', 'Код фiлiї', null, 6, 1, 1, 1, 0, 0, '', '', 1, 0, '''Разом''', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'KODBANKBEN', 'C', 'Допомiжнi реквiзити,~IBAN бенефiцiара', null, 32, 34, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'KODBANKPL', 'C', 'Допомiжнi реквiзити,~Код банку платника', null, 32, 33, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'KODOP', 'C', '71:~Комiсiйнi за рахунок,~Код операцiї', null, 32, 31, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'KODSTRBEN', 'C', '71:~Комiсiйнi за рахунок,~Код країни бенефiцiара', null, 32, 32, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'NAMEBANKBEN', 'C', '57:~Банк бенефiцiара,~найменування', null, 254, 14, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'NAMEBANKKOR', 'C', '57:~Банк бенефiцiара,~найм-ня банку, де зн-ся к/р', null, 254, 19, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'NAMEBANKPL', 'C', '52:~Банк платника,~найменування', null, 254, 6, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'NAMEBEN', 'C', '59:~Бенефiцiар,~найменування', null, 254, 11, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'NAMEPL', 'C', '50:~Платник,~назва', null, 254, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'NAMEVIDBANK', 'C', '57:~Банк бенефiцiара,~найменування вiддiлення банку', null, 254, 20, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'NAZNPLAT', 'C', '70: Призначення платежу', null, 1024, 22, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'NDS', 'C', '70:~Призначення платежу,~ПДВ', null, 96, 23, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'NKORR', 'C', '57:~Банк бенефiцiара,~номер коррахунку', null, 96, 18, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'OKPOPL', 'C', '71:~Комiсiйнi за рахунок,~iдентифiкацiйний код/номер', null, 32, 30, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'PS_NUMBER', 'C', 'ПЛАТIЖНЕ ДОРУЧЕННЯ в iн.валютi або банк.метал.', null, 96, 1, 1, 0, 0, 0, '', '', 1, 0, 'count(*)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'RAHBEN', 'C', '59:~Бенефiцiар,~N% рахунку', null, 96, 13, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'RAHPL', 'C', '50:~Платник,~N% рахунку', null, 96, 5, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'SUMMA', 'C', '32:~Сума або маса валюти/банк.метал.~ЦИФРАМИ', null, 96, 9, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'SUMPROP', 'C', '32:~Сума або маса валюти/банк.метал.~СЛОВАМИ', null, 254, 10, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 41, 'NAMEF', 'C', 'Наименование~файла', null, 12, 45, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 42, 'NUMKORRAHBANKBEN', 'C', '57:~Банк бенефіціара,~номер коррахунку', null, 96, 40, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 43, 'NAMEVIDBANKBEN', 'C', '57:~Банк бенефіціара,~найменування відділення банку', null, 254, 41, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 44, 'BIKKODBANKBEN', 'C', '57:~Банк бенефіціара,~БІК код банку', null, 96, 42, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 45, 'NAMEBANKKORBANKBEN', 'C', '57:~Банк бенефіціара,~найменування банку, в якому знаходиться коррахунок', null, 254, 43, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 46, 'INNBANKBEN', 'C', '57:~Банк бенефіціара,~ІНН банку', null, 96, 44, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 47, 'SWIFTKODBANKBEN', 'C', '57:~Банк бенефіціара,~SWIFT код банку', null, 96, 16, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 48, 'DATEDOKKB', 'D', 'Дата/час~надходження~заявки', null, null, 48, 1, 0, 0, 0, '', 'dd.MM.yyyy hhhh:mm:ss', 1, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('KLP_FL');

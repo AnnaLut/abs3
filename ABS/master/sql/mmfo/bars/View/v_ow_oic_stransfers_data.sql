@@ -36,10 +36,8 @@ PROMPT *** Create  view V_OW_OIC_STRANSFERS_DATA ***
   from ow_oic_stransfers_data a;
 
 PROMPT *** Create  grants  V_OW_OIC_STRANSFERS_DATA ***
-grant SELECT                                                                 on V_OW_OIC_STRANSFERS_DATA to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_OIC_STRANSFERS_DATA to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_OIC_STRANSFERS_DATA to OW;
-grant SELECT                                                                 on V_OW_OIC_STRANSFERS_DATA to UPLD;
 
 
 

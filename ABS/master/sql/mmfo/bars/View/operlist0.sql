@@ -11,9 +11,7 @@ PROMPT *** Create  view OPERLIST0 ***
   select "CODEOPER","NAME","DLGNAME","FUNCNAME","SEMANTIC","RUNABLE","PARENTID","ROLENAME","FRONTEND","USEARC" from operlist WHERE FRONTEND = 0 and RUNABLE <> 3;
 
 PROMPT *** Create  grants  OPERLIST0 ***
-grant SELECT                                                                 on OPERLIST0       to BARSREADER_ROLE;
 grant SELECT                                                                 on OPERLIST0       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on OPERLIST0       to UPLD;
 
 
 

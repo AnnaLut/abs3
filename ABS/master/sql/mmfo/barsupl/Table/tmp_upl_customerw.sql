@@ -38,10 +38,6 @@ COMMENT ON COLUMN BARSUPL.TMP_UPL_CUSTOMERW.VIPK IS '';
 
 
 
-PROMPT *** Create  grants  TMP_UPL_CUSTOMERW ***
-grant SELECT                                                                 on TMP_UPL_CUSTOMERW to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_UPL_CUSTOMERW to UPLD;
-
 
 
 PROMPT ===================================================================================== 

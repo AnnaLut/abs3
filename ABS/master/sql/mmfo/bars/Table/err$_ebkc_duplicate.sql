@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_EBKC_DUPLICATE.INSDATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_EBKC_DUPLICATE ***
-grant SELECT                                                                 on ERR$_EBKC_DUPLICATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_EBKC_DUPLICATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

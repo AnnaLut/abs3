@@ -77,11 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_NAL ***
-grant SELECT                                                                 on REZ_NAL         to BARSREADER_ROLE;
 grant SELECT                                                                 on REZ_NAL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ_NAL         to RCC_DEAL;
 grant SELECT                                                                 on REZ_NAL         to START1;
-grant SELECT                                                                 on REZ_NAL         to UPLD;
 
 
 

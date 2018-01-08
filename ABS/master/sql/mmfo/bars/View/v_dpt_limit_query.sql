@@ -34,10 +34,8 @@ where l.currency = a.kv
   and d.vidd = v.vidd;
 
 PROMPT *** Create  grants  V_DPT_LIMIT_QUERY ***
-grant SELECT                                                                 on V_DPT_LIMIT_QUERY to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_LIMIT_QUERY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_LIMIT_QUERY to START1;
-grant SELECT                                                                 on V_DPT_LIMIT_QUERY to UPLD;
 
 
 

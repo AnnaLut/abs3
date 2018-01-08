@@ -55,10 +55,10 @@ COMMENT ON COLUMN BARS.SKRYNKA_ACC_TIP.NBS IS '';
 
 
 
-PROMPT *** Create  constraint PK_SKRYNKA_ACC ***
+PROMPT *** Create  constraint XUK_SKRYNKA_ACC_NAME ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ACC_TIP ADD CONSTRAINT PK_SKRYNKA_ACC PRIMARY KEY (TIP)
+  ALTER TABLE BARS.SKRYNKA_ACC_TIP ADD CONSTRAINT XUK_SKRYNKA_ACC_NAME UNIQUE (NAME)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSSMLI  ENABLE';
 exception when others then
@@ -69,10 +69,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint XUK_SKRYNKA_ACC_NAME ***
+PROMPT *** Create  constraint PK_SKRYNKA_ACC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ACC_TIP ADD CONSTRAINT XUK_SKRYNKA_ACC_NAME UNIQUE (NAME)
+  ALTER TABLE BARS.SKRYNKA_ACC_TIP ADD CONSTRAINT PK_SKRYNKA_ACC PRIMARY KEY (TIP)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSSMLI  ENABLE';
 exception when others then
@@ -111,11 +111,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_ACC_TIP ***
-grant SELECT                                                                 on SKRYNKA_ACC_TIP to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SKRYNKA_ACC_TIP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SKRYNKA_ACC_TIP to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SKRYNKA_ACC_TIP to DEP_SKRN;
-grant SELECT                                                                 on SKRYNKA_ACC_TIP to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_ACC_TIP to WR_ALL_RIGHTS;
 
 

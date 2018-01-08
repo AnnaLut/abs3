@@ -55,10 +55,6 @@ COMMENT ON COLUMN BARS.ESCR_INSTALL_LOG.COMMENTS IS '';
 
 
 
-PROMPT *** Create  grants  ESCR_INSTALL_LOG ***
-grant SELECT                                                                 on ESCR_INSTALL_LOG to BARSREADER_ROLE;
-grant SELECT                                                                 on ESCR_INSTALL_LOG to UPLD;
-
 
 
 PROMPT ===================================================================================== 

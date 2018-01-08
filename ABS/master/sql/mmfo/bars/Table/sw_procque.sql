@@ -87,6 +87,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SWPROCQUE_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_PROCQUE ADD CONSTRAINT FK_SWPROCQUE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWPROCQUE_SWJOURNAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_PROCQUE ADD CONSTRAINT FK_SWPROCQUE_SWJOURNAL FOREIGN KEY (KF, SWREF)
+	  REFERENCES BARS.SW_JOURNAL (KF, SWREF) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_SWPROCQUE ***
 begin   
  execute immediate '
@@ -101,7 +127,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_PROCQUE ***
-grant SELECT                                                                 on SW_PROCQUE      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_PROCQUE      to WR_ALL_RIGHTS;
 
 

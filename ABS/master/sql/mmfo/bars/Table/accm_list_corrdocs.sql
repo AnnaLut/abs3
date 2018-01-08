@@ -92,82 +92,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_CALDT_NN ***
+PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_REF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (CALDT_ID CONSTRAINT CC_ACCMLISTCRDOCS_CALDT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_CORDT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (CORDT_ID CONSTRAINT CC_ACCMLISTCRDOCS_CORDT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_CORTP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (COR_TYPE CONSTRAINT CC_ACCMLISTCRDOCS_CORTP_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_ACC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (ACC CONSTRAINT CC_ACCMLISTCRDOCS_ACC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_DOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (DOS CONSTRAINT CC_ACCMLISTCRDOCS_DOS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_DOSQ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (DOSQ CONSTRAINT CC_ACCMLISTCRDOCS_DOSQ_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_KOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (KOS CONSTRAINT CC_ACCMLISTCRDOCS_KOS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (REF CONSTRAINT CC_ACCMLISTCRDOCS_REF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -188,10 +116,108 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_REF_NN ***
+PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_KOS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (REF CONSTRAINT CC_ACCMLISTCRDOCS_REF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (KOS CONSTRAINT CC_ACCMLISTCRDOCS_KOS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_DOSQ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (DOSQ CONSTRAINT CC_ACCMLISTCRDOCS_DOSQ_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_DOS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (DOS CONSTRAINT CC_ACCMLISTCRDOCS_DOS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_ACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (ACC CONSTRAINT CC_ACCMLISTCRDOCS_ACC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_CORTP_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (COR_TYPE CONSTRAINT CC_ACCMLISTCRDOCS_CORTP_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_CORDT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (CORDT_ID CONSTRAINT CC_ACCMLISTCRDOCS_CORDT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCMLISTCRDOCS_ACCMCAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_LIST_CORRDOCS ADD CONSTRAINT FK_ACCMLISTCRDOCS_ACCMCAL FOREIGN KEY (CALDT_ID)
+	  REFERENCES BARS.ACCM_CALENDAR (CALDT_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCMLISTCRDOCS_ACCMCAL2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_LIST_CORRDOCS ADD CONSTRAINT FK_ACCMLISTCRDOCS_ACCMCAL2 FOREIGN KEY (CORDT_ID)
+	  REFERENCES BARS.ACCM_CALENDAR (CALDT_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMLISTCRDOCS_CALDT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_LIST_CORRDOCS MODIFY (CALDT_ID CONSTRAINT CC_ACCMLISTCRDOCS_CALDT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -242,11 +268,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACCM_LIST_CORRDOCS ***
-grant SELECT                                                                 on ACCM_LIST_CORRDOCS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_LIST_CORRDOCS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCM_LIST_CORRDOCS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_LIST_CORRDOCS to START1;
-grant SELECT                                                                 on ACCM_LIST_CORRDOCS to UPLD;
 
 
 

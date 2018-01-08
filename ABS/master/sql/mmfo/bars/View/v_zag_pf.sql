@@ -16,10 +16,8 @@ PROMPT *** Create  view V_ZAG_PF ***
      FROM ZAG_PF;
 
 PROMPT *** Create  grants  V_ZAG_PF ***
-grant SELECT                                                                 on V_ZAG_PF        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_ZAG_PF        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_ZAG_PF        to DEB_REG;
-grant SELECT                                                                 on V_ZAG_PF        to UPLD;
 
 
 

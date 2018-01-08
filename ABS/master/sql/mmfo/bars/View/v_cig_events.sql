@@ -82,9 +82,7 @@ PROMPT *** Create  view V_CIG_EVENTS ***
           and ce.branch = SYS_CONTEXT ('bars_context', 'user_branch');
 
 PROMPT *** Create  grants  V_CIG_EVENTS ***
-grant SELECT                                                                 on V_CIG_EVENTS    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIG_EVENTS    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIG_EVENTS    to UPLD;
 
 
 

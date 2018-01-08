@@ -43,9 +43,7 @@ select 10, '10', '10. АРМи - Друковані звіти'
 ;
 
 PROMPT *** Create  grants  V_REL_ADMN_OBJS ***
-grant SELECT                                                                 on V_REL_ADMN_OBJS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REL_ADMN_OBJS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_REL_ADMN_OBJS to UPLD;
 
 
 

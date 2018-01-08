@@ -101,12 +101,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_FIELD ***
-grant SELECT                                                                 on DPT_FIELD       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_FIELD       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_FIELD       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_FIELD       to DPT_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_FIELD       to DPT_ROLE;
-grant SELECT                                                                 on DPT_FIELD       to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_FIELD       to VKLAD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_FIELD       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_FIELD       to WR_REFREAD;

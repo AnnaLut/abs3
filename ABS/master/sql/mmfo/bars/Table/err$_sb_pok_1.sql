@@ -91,10 +91,6 @@ COMMENT ON COLUMN BARS.ERR$_SB_POK_1.DATA_M IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SB_POK_1 ***
-grant SELECT                                                                 on ERR$_SB_POK_1   to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SB_POK_1   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

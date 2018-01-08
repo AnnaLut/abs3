@@ -53,8 +53,6 @@ where  i.kl1=a.kl2(+)
 order by 1,2,3;
 
 PROMPT *** Create  grants  PROV31 ***
-grant SELECT                                                                 on PROV31          to BARSREADER_ROLE;
-grant SELECT                                                                 on PROV31          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PROV31          to WR_ALL_RIGHTS;
 
 

@@ -140,9 +140,7 @@ COMMENT ON COLUMN BARS.ERR$_SPECPARAM.R016 IS '';
 
 
 PROMPT *** Create  grants  ERR$_SPECPARAM ***
-grant SELECT                                                                 on ERR$_SPECPARAM  to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_SPECPARAM  to BARS_DM;
-grant SELECT                                                                 on ERR$_SPECPARAM  to UPLD;
 
 
 

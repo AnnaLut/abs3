@@ -18,10 +18,8 @@ PROMPT *** Create  view FIN_DEBVB ***
         ) x;
 
 PROMPT *** Create  grants  FIN_DEBVB ***
-grant SELECT                                                                 on FIN_DEBVB       to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_DEBVB       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_DEBVB       to START1;
-grant SELECT                                                                 on FIN_DEBVB       to UPLD;
 
 
 

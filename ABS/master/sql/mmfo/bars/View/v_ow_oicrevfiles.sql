@@ -13,9 +13,7 @@ PROMPT *** Create  view V_OW_OICREVFILES ***
   from ow_oicrevfiles f;
 
 PROMPT *** Create  grants  V_OW_OICREVFILES ***
-grant SELECT                                                                 on V_OW_OICREVFILES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_OICREVFILES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_OW_OICREVFILES to UPLD;
 
 
 

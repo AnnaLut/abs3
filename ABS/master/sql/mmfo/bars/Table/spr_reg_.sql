@@ -81,7 +81,7 @@ COMMENT ON COLUMN BARS.SPR_REG_.TYPE_STI IS '';
 
 
 PROMPT *** Create  grants  SPR_REG_ ***
-grant SELECT                                                                 on SPR_REG_        to UPLD;
+grant SELECT                                                                 on SPR_REG_        to BARS_DM;
 
 
 

@@ -86,11 +86,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_FIN_PROC ***
-grant SELECT                                                                 on CP_FIN_PROC     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_FIN_PROC     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_FIN_PROC     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_FIN_PROC     to CP_ROLE;
-grant SELECT                                                                 on CP_FIN_PROC     to UPLD;
 
 
 

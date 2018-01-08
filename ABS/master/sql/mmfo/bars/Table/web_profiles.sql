@@ -78,10 +78,8 @@ exception when others then
 
 PROMPT *** Create  grants  WEB_PROFILES ***
 grant SELECT                                                                 on WEB_PROFILES    to ABS_ADMIN;
-grant SELECT                                                                 on WEB_PROFILES    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_PROFILES    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WEB_PROFILES    to BARS_DM;
-grant SELECT                                                                 on WEB_PROFILES    to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WEB_PROFILES    to WEB_PROFILES;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_PROFILES    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on WEB_PROFILES    to WR_REFREAD;

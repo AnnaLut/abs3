@@ -108,9 +108,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  UNUSED$CC_APPL ***
-grant SELECT                                                                 on UNUSED$CC_APPL  to BARSREADER_ROLE;
 grant SELECT                                                                 on UNUSED$CC_APPL  to BARS_DM;
-grant SELECT                                                                 on UNUSED$CC_APPL  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on UNUSED$CC_APPL  to WR_ALL_RIGHTS;
 
 

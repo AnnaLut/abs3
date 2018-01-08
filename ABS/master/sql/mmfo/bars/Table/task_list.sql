@@ -79,11 +79,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TASK_LIST ***
-grant SELECT                                                                 on TASK_LIST       to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on TASK_LIST       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TASK_LIST       to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TASK_LIST       to TASK_LIST;
-grant SELECT                                                                 on TASK_LIST       to UPLD;
 grant FLASHBACK,SELECT                                                       on TASK_LIST       to WR_REFREAD;
 
 

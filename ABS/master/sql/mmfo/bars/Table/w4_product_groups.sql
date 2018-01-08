@@ -57,6 +57,19 @@ COMMENT ON COLUMN BARS.W4_PRODUCT_GROUPS.CLIENT_TYPE IS '';
 
 
 
+PROMPT *** Create  constraint FK_W4PRODUCTGROUPS_BPKSCHEME ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.W4_PRODUCT_GROUPS ADD CONSTRAINT FK_W4PRODUCTGROUPS_BPKSCHEME FOREIGN KEY (SCHEME_ID)
+	  REFERENCES BARS.BPK_SCHEME (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_W4PRODUCTGROUPS_CLIENTTYPE ***
 begin   
  execute immediate '
@@ -121,7 +134,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  W4_PRODUCT_GROUPS ***
-grant SELECT                                                                 on W4_PRODUCT_GROUPS to BARSREADER_ROLE;
 grant SELECT                                                                 on W4_PRODUCT_GROUPS to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on W4_PRODUCT_GROUPS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_PRODUCT_GROUPS to BARS_DM;

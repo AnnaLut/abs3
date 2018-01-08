@@ -52,11 +52,9 @@ PROMPT *** Create  view V_CREDIT_PRODUCTS_PORTFOLIO ***
       on ( c.rnk = p.rnk );
 
 PROMPT *** Create  grants  V_CREDIT_PRODUCTS_PORTFOLIO ***
-grant SELECT                                                                 on V_CREDIT_PRODUCTS_PORTFOLIO to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CREDIT_PRODUCTS_PORTFOLIO to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CREDIT_PRODUCTS_PORTFOLIO to DPT_ROLE;
 grant SELECT                                                                 on V_CREDIT_PRODUCTS_PORTFOLIO to START1;
-grant SELECT                                                                 on V_CREDIT_PRODUCTS_PORTFOLIO to UPLD;
 grant SELECT                                                                 on V_CREDIT_PRODUCTS_PORTFOLIO to WR_ALL_RIGHTS;
 
 

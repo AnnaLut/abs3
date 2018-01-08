@@ -101,6 +101,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SKRYNKAALL_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_ALL ADD CONSTRAINT FK_SKRYNKAALL_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_SKRYNKAALL ***
 begin   
  execute immediate '
@@ -129,7 +142,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_ALL ***
-grant SELECT                                                                 on SKRYNKA_ALL     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_ALL     to WR_ALL_RIGHTS;
 
 

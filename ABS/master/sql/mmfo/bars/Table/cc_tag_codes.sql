@@ -91,11 +91,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_TAG_CODES ***
-grant SELECT                                                                 on CC_TAG_CODES    to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_TAG_CODES    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_TAG_CODES    to BARS_DM;
 grant SELECT                                                                 on CC_TAG_CODES    to RCC_DEAL;
-grant SELECT                                                                 on CC_TAG_CODES    to UPLD;
 
 
 

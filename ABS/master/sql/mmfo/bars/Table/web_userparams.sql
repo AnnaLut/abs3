@@ -53,6 +53,19 @@ COMMENT ON COLUMN BARS.WEB_USERPARAMS.USRID IS '';
 
 
 
+PROMPT *** Create  constraint FK_WEB_USERPARAMS_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WEB_USERPARAMS ADD CONSTRAINT FK_WEB_USERPARAMS_STAFF FOREIGN KEY (USRID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_WEB_USERPARAMS ***
 begin   
  execute immediate '
@@ -81,9 +94,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  WEB_USERPARAMS ***
-grant SELECT                                                                 on WEB_USERPARAMS  to BARSREADER_ROLE;
 grant SELECT                                                                 on WEB_USERPARAMS  to BARS_DM;
-grant SELECT                                                                 on WEB_USERPARAMS  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_USERPARAMS  to WR_ALL_RIGHTS;
 
 

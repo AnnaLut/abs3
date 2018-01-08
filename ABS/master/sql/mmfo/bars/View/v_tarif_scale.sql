@@ -14,12 +14,10 @@ PROMPT *** Create  view V_TARIF_SCALE ***
  where s.kod = t.kod;
 
 PROMPT *** Create  grants  V_TARIF_SCALE ***
-grant SELECT                                                                 on V_TARIF_SCALE   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_TARIF_SCALE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TARIF_SCALE   to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_TARIF_SCALE   to TARIF;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_TARIF_SCALE   to TECH005;
-grant SELECT                                                                 on V_TARIF_SCALE   to UPLD;
 
 
 

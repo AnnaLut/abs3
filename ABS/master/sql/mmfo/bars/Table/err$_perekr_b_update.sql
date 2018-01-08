@@ -87,10 +87,6 @@ COMMENT ON COLUMN BARS.ERR$_PEREKR_B_UPDATE.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_PEREKR_B_UPDATE ***
-grant SELECT                                                                 on ERR$_PEREKR_B_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_PEREKR_B_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

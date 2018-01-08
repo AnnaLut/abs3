@@ -172,11 +172,9 @@ PROMPT *** Create  view V_RPTLIC4 ***
 
 PROMPT *** Create  grants  V_RPTLIC4 ***
 grant SELECT                                                                 on V_RPTLIC4       to ABS_ADMIN;
-grant SELECT                                                                 on V_RPTLIC4       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RPTLIC4       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_RPTLIC4       to RPBN001;
 grant SELECT                                                                 on V_RPTLIC4       to TASK_LIST;
-grant SELECT                                                                 on V_RPTLIC4       to UPLD;
 
 
 

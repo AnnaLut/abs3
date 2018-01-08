@@ -119,11 +119,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SEP_RATES_CALENDAR ***
-grant SELECT                                                                 on SEP_RATES_CALENDAR to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEP_RATES_CALENDAR to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEP_RATES_CALENDAR to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEP_RATES_CALENDAR to START1;
-grant SELECT                                                                 on SEP_RATES_CALENDAR to UPLD;
 
 
 

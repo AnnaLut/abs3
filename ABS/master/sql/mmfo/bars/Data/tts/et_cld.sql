@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CLD', 'SWT->VPS Транзит на дирекції по Claims Conferens', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 0, 0, 0, 0, '#(S)+225', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', 'Грошовий переказ з відрахуванням комісії банку-кор. CITI/London в сумі 2,25 Євро');
+    values ('CLD', 'SWT->VPS Транзит на дирекції по Claims Conferens', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 0, 0, 0, 0, '#(S)+225', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CLD', name='SWT->VPS Транзит на дирекції по Claims Conferens', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S)+225', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn='Грошовий переказ з відрахуванням комісії банку-кор. CITI/London в сумі 2,25 Євро'
+         set tt='CLD', name='SWT->VPS Транзит на дирекції по Claims Conferens', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S)+225', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='CLD';
   end;
   --------------------------------

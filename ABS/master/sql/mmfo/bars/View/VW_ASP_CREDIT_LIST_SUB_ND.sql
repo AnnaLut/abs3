@@ -1,14 +1,20 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/VW_ASP_CREDIT_LIST_SUB_ND.sql =========
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view VW_ASP_CREDIT_LIST_SUB_ND ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.VW_ASP_CREDIT_LIST_SUB_ND ("DPLAN", "FDAT", "NPP", "ACC", "TIP", "KV", "NLS", "NMS", "OSTB", "OSTC", "ND", "NDG") AS 
-  SELECT DPLAN,
+CREATE OR REPLACE FORCE VIEW BARS.VW_ASP_CREDIT_LIST_SUB_ND
+(
+   DPLAN,
+   FDAT,
+   NPP,
+   ACC,
+   TIP,
+   KV,
+   NLS,
+   NMS,
+   OSTB,
+   OSTC,
+   ND,
+   NDG
+)
+AS
+   SELECT DPLAN,
           FDAT,
           NPP,
           ACC,
@@ -99,12 +105,5 @@ PROMPT *** Create  view VW_ASP_CREDIT_LIST_SUB_ND ***
                   AND a.acc = ct.acc
                   AND (a.ostc / 100 + ct.ss / 100) > 0);
 
-PROMPT *** Create  grants  VW_ASP_CREDIT_LIST_SUB_ND ***
-grant SELECT                                                                 on VW_ASP_CREDIT_LIST_SUB_ND to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on VW_ASP_CREDIT_LIST_SUB_ND to UPLD;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/VW_ASP_CREDIT_LIST_SUB_ND.sql =========
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.VW_ASP_CREDIT_LIST_SUB_ND TO BARS_ACCESS_DEFROLE;

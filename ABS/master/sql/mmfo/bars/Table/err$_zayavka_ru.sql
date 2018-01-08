@@ -221,10 +221,6 @@ COMMENT ON COLUMN BARS.ERR$_ZAYAVKA_RU.REASON_COMM IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ZAYAVKA_RU ***
-grant SELECT                                                                 on ERR$_ZAYAVKA_RU to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ZAYAVKA_RU to UPLD;
-
 
 
 PROMPT ===================================================================================== 

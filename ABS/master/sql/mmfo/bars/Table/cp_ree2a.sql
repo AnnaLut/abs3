@@ -137,11 +137,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_REE2A ***
-grant SELECT                                                                 on CP_REE2A        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_REE2A        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_REE2A        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_REE2A        to START1;
-grant SELECT                                                                 on CP_REE2A        to UPLD;
 
 
 

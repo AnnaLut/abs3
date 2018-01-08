@@ -125,9 +125,7 @@ PROMPT *** Create  view V_INS_DEALS ***
           AND d.pay_freq = f.freq;
 
 PROMPT *** Create  grants  V_INS_DEALS ***
-grant SELECT                                                                 on V_INS_DEALS     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_DEALS     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INS_DEALS     to UPLD;
 
 
 

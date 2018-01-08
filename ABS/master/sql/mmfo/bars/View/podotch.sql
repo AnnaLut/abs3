@@ -20,10 +20,8 @@ PROMPT *** Create  view PODOTCH ***
  ;
 
 PROMPT *** Create  grants  PODOTCH ***
-grant SELECT                                                                 on PODOTCH         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PODOTCH         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PODOTCH         to PYOD001;
-grant SELECT                                                                 on PODOTCH         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PODOTCH         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on PODOTCH         to WR_REFREAD;
 

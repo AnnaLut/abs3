@@ -19,19 +19,14 @@ PROMPT *** Create  view NBUR_VIEW_QUEQUE ***
           DECODE (
              a.STATUS,
              0,    'Очікування (близько '
-                || f_nbur_get_wait_time ((case when a.proc_type = 1 then 1
-                                               when a.proc_type = 2 and b.PERIOD_TYPE in ('D', 'T') then 2
-                                               else 3
-                                          end))
+                || DECODE (a.proc_type,
+                           1, f_nbur_get_wait_time (1),
+                           f_nbur_get_wait_time (2))
                 || ' хв.)',
              'Формування')
              status
      FROM NBUR_QUEUE_FORMS a, nbur_ref_files b, staff$base c
     WHERE a.id = b.id AND a.user_id = c.id;
-
-PROMPT *** Create  grants  NBUR_VIEW_QUEQUE ***
-grant SELECT                                                                 on NBUR_VIEW_QUEQUE to BARSREADER_ROLE;
-grant SELECT                                                                 on NBUR_VIEW_QUEQUE to UPLD;
 
 
 

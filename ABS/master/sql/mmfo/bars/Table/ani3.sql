@@ -83,11 +83,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ANI3 ***
-grant SELECT                                                                 on ANI3            to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANI3            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANI3            to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ANI3            to SALGL;
-grant SELECT                                                                 on ANI3            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ANI3            to WR_ALL_RIGHTS;
 
 

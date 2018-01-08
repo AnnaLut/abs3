@@ -27,10 +27,8 @@ from (select MFO, decode(tipa,null, to_number(substr(nls,1,4)), tipa) TIPA, id, 
      );
 
 PROMPT *** Create  grants  VIREZ14 ***
-grant SELECT                                                                 on VIREZ14         to BARSREADER_ROLE;
 grant SELECT                                                                 on VIREZ14         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VIREZ14         to START1;
-grant SELECT                                                                 on VIREZ14         to UPLD;
 
 
 

@@ -85,10 +85,6 @@ COMMENT ON COLUMN BARS.ERR$_CCK_RESTR_UPDATE.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CCK_RESTR_UPDATE ***
-grant SELECT                                                                 on ERR$_CCK_RESTR_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CCK_RESTR_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

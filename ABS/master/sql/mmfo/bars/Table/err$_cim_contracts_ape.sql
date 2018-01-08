@@ -75,10 +75,6 @@ COMMENT ON COLUMN BARS.ERR$_CIM_CONTRACTS_APE.DELETE_UID IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIM_CONTRACTS_APE ***
-grant SELECT                                                                 on ERR$_CIM_CONTRACTS_APE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIM_CONTRACTS_APE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

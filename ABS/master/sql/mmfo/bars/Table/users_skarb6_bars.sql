@@ -78,11 +78,9 @@ exception when others then
 
 PROMPT *** Create  grants  USERS_SKARB6_BARS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on USERS_SKARB6_BARS to ABS_ADMIN;
-grant SELECT                                                                 on USERS_SKARB6_BARS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on USERS_SKARB6_BARS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on USERS_SKARB6_BARS to BARS_DM;
 grant SELECT                                                                 on USERS_SKARB6_BARS to START1;
-grant SELECT                                                                 on USERS_SKARB6_BARS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on USERS_SKARB6_BARS to WR_ALL_RIGHTS;
 
 

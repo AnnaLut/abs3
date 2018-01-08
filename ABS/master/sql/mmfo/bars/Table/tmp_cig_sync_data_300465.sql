@@ -59,10 +59,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_CIG_SYNC_DATA_300465 ***
-grant SELECT                                                                 on TMP_CIG_SYNC_DATA_300465 to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_CIG_SYNC_DATA_300465 to UPLD;
-
 
 
 PROMPT ===================================================================================== 

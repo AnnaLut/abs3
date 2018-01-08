@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_INTEREST_TO_ACCRUAL.sql =========*** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_INTEREST_TO_ACCRUAL ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_INTEREST_TO_ACCRUAL ("ID", "ACCOUNT_ID", "INTEREST_KIND_ID", "ACCOUNT_NUMBER", "CURRENCY_ID", "OKPO", "ACCOUNT_NAME", "INTEREST_KIND_NAME", "INTEREST_ACCOUNT_NUMBER", "DATE_FROM", "DATE_THROUGH", "ACCOUNT_REST", "INTEREST_RATE", "INTEREST_AMOUNT", "COUNTER_ACCOUNT", "ACCRUAL_PURPOSE", "STATE_ID", "RECKONING_STATE", "STATE_COMMENT", "MANAGER_ID", "MANAGER_NAME", "CORPORATION_CODE", "CORPORATION_NAME") AS 
-  select r.id,
+create or replace view v_interest_to_accrual as
+select r.id,
        r.account_id,
        r.interest_kind_id,
        a.nls account_number,
@@ -58,12 +49,21 @@ where  r.grouping_line_id is null and
         (r.state_id = 99 /*RECKONING_STATE_ONLY_INFO*/ and pul.get('SHOW_ZERO_RECKONINGS') = 'Y'))
 order by a.nls, r.date_from;
 
-PROMPT *** Create  grants  V_INTEREST_TO_ACCRUAL ***
-grant SELECT                                                                 on V_INTEREST_TO_ACCRUAL to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INTEREST_TO_ACCRUAL to UPLD;
+comment on column v_interest_to_accrual.ACCOUNT_ID              is 'Ідентифікатор рахунку';
+comment on column v_interest_to_accrual.INTEREST_KIND_ID        is 'Ідентифікатор виду нарахування';
+comment on column v_interest_to_accrual.ACCOUNT_NUMBER          is 'Номер рахунку';
+comment on column v_interest_to_accrual.CURRENCY_ID             is 'Валюта';
+comment on column v_interest_to_accrual.ACCOUNT_NAME            is 'Назва рахунку';
+comment on column v_interest_to_accrual.INTEREST_KIND_NAME      is 'Вид нарахування';
+comment on column v_interest_to_accrual.INTEREST_ACCOUNT_NUMBER is 'Рахунок відсотків';
+comment on column v_interest_to_accrual.DATE_FROM               is 'Дата з';
+comment on column v_interest_to_accrual.DATE_THROUGH            is 'Дата по';
+comment on column v_interest_to_accrual.ACCOUNT_REST            is 'Залишок рахунку';
+comment on column v_interest_to_accrual.INTEREST_RATE           is 'Відсоткова ставка';
+comment on column v_interest_to_accrual.INTEREST_AMOUNT         is 'Сума відсотків';
+comment on column v_interest_to_accrual.COUNTER_ACCOUNT         is 'Рахунок доходів\витрат';
+comment on column v_interest_to_accrual.RECKONING_STATE         is 'Стан обробки';
+comment on column v_interest_to_accrual.CORPORATION_CODE        is 'Код корпорації';
+comment on column v_interest_to_accrual.CORPORATION_NAME        is 'Назва корпорації';
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_INTEREST_TO_ACCRUAL.sql =========*** 
-PROMPT ===================================================================================== 
+grant select on v_interest_to_accrual to bars_access_defrole;

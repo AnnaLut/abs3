@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bro.sql =========*** Run *** =======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BRO IS
+CREATE OR REPLACE PACKAGE BARS.BRO IS
 
  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'ver.3/ 19.07.2017';
  ern CONSTANT POSITIVE := 203;  erm VARCHAR2(250);  err EXCEPTION;
@@ -130,6 +124,10 @@ function body_version return varchar2;
 
 END BRO;
 /
+
+
+
+
 CREATE OR REPLACE PACKAGE BODY BARS.BRO IS
  G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=   'ver.4 15.11.2017';
 
@@ -137,7 +135,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.BRO IS
                        Версия для ММФО под новый План счетов
                        --------------------------------------
 
- 15.11.2017 Sta TransFer-2017  : 6399.L1 => 6350.L1,  6399.L2 => 6350.L2
+ 15.11.2017 Sta TransFer-2017  : 6399.L1 => 6350.L1,  6399.L2 => 6350.L2 
 
  19.07.2017 Suf COBUSUPMMFO-686 + COBUMMFOTEST-1274
  19.07.2017 Поиск счета 2600 по РНК
@@ -760,15 +758,4 @@ begin
 
 END BRO;
 /
- show err;
- 
-PROMPT *** Create  grants  BRO ***
-grant EXECUTE                                                                on BRO             to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BRO             to START1;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bro.sql =========*** End *** =======
- PROMPT ===================================================================================== 
- 

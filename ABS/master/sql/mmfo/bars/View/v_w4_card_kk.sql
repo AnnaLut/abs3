@@ -16,10 +16,8 @@ where     c.sub_code = s.code
       and nvl (c.date_close, bankdate + 1) > bankdate;
 
 PROMPT *** Create  grants  V_W4_CARD_KK ***
-grant SELECT                                                                 on V_W4_CARD_KK    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_CARD_KK    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_W4_CARD_KK    to OW;
-grant SELECT                                                                 on V_W4_CARD_KK    to UPLD;
 
 
 

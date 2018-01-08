@@ -30,10 +30,8 @@ where o38.dk = 0 and o38.fdat >= d.B     and o38.fdat <= d.e   and o38.acc = a38
   and p.sos  = 5 and p.ref    = o38.ref  and o29.s     > 0     and o38.s >0  ;
 
 PROMPT *** Create  grants  V_KF3800 ***
-grant SELECT                                                                 on V_KF3800        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_KF3800        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_KF3800        to START1;
-grant SELECT                                                                 on V_KF3800        to UPLD;
 
 
 

@@ -20,9 +20,7 @@ PROMPT *** Create  view V_INS_TARIFFS ***
  order by t.id;
 
 PROMPT *** Create  grants  V_INS_TARIFFS ***
-grant SELECT                                                                 on V_INS_TARIFFS   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_TARIFFS   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INS_TARIFFS   to UPLD;
 
 
 

@@ -49,6 +49,19 @@ COMMENT ON COLUMN BARS.SW_STAFF_LIST.IO IS 'Тип сообщений Входящие/Исходящие';
 
 
 
+PROMPT *** Create  constraint FK_SWSTAFFLIST_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_STAFF_LIST ADD CONSTRAINT FK_SWSTAFFLIST_STAFF FOREIGN KEY (ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SWSTAFFLIST_ID_NN ***
 begin   
  execute immediate '
@@ -114,7 +127,6 @@ exception when others then
 
 PROMPT *** Create  grants  SW_STAFF_LIST ***
 grant DELETE,INSERT,SELECT                                                   on SW_STAFF_LIST   to BARS013;
-grant SELECT                                                                 on SW_STAFF_LIST   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_STAFF_LIST   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_STAFF_LIST   to SWIFT001;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_STAFF_LIST   to WR_ALL_RIGHTS;

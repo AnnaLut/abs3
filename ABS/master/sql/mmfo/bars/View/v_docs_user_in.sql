@@ -18,9 +18,7 @@ WHERE     t1.KV = op.KV and t2.KV = op.KV2
 		WHERE a.ISP = getcurrentuserid);
 
 PROMPT *** Create  grants  V_DOCS_USER_IN ***
-grant SELECT                                                                 on V_DOCS_USER_IN  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOCS_USER_IN  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DOCS_USER_IN  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DOCS_USER_IN  to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_DOCS_USER_IN  to WR_DOCLIST_USER;
 

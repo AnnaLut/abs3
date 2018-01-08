@@ -64,9 +64,7 @@ PROMPT *** Create  view V_ZAY_TRACK_FULL ***
    ORDER BY 1, 2;
 
 PROMPT *** Create  grants  V_ZAY_TRACK_FULL ***
-grant SELECT                                                                 on V_ZAY_TRACK_FULL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY_TRACK_FULL to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ZAY_TRACK_FULL to UPLD;
 grant SELECT                                                                 on V_ZAY_TRACK_FULL to ZAY;
 
 

@@ -91,10 +91,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_DICT_AGRTAG ***
-grant SELECT                                                                 on DPT_DICT_AGRTAG to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DPT_DICT_AGRTAG to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_DICT_AGRTAG to BARS_DM;
-grant SELECT                                                                 on DPT_DICT_AGRTAG to UPLD;
 
 
 

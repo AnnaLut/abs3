@@ -135,10 +135,23 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_ACC_OVER_DELETED ***
+PROMPT *** Create  constraint FK_ACCOVER_ACCOUNTS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_OVER MODIFY (DELETED CONSTRAINT NK_ACC_OVER_DELETED NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_OVER ADD CONSTRAINT FK_ACCOVER_ACCOUNTS FOREIGN KEY (KF, ACC_2096)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_ACC_OVER_ACCO ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER MODIFY (ACCO CONSTRAINT NK_ACC_OVER_ACCO NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -159,10 +172,127 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_ACC_OVER_ACCO ***
+PROMPT *** Create  constraint NK_ACC_OVER_DELETED ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACC_OVER MODIFY (ACCO CONSTRAINT NK_ACC_OVER_ACCO NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACC_OVER MODIFY (DELETED CONSTRAINT NK_ACC_OVER_DELETED NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCOVER_ACCOUNTS7 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER ADD CONSTRAINT FK_ACCOVER_ACCOUNTS7 FOREIGN KEY (KF, ACC_2067)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCOVER_STANKAT23 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER ADD CONSTRAINT FK_ACCOVER_STANKAT23 FOREIGN KEY (KAT23)
+	  REFERENCES BARS.STAN_KAT23 (KAT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCOVER_ACCOUNTS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER ADD CONSTRAINT FK_ACCOVER_ACCOUNTS2 FOREIGN KEY (KF, ACCO)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCOVER_ACCOUNTS3 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER ADD CONSTRAINT FK_ACCOVER_ACCOUNTS3 FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCOVER_ACCOUNTS4 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER ADD CONSTRAINT FK_ACCOVER_ACCOUNTS4 FOREIGN KEY (KF, ACC_9129)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCOVER_ACCOUNTS5 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER ADD CONSTRAINT FK_ACCOVER_ACCOUNTS5 FOREIGN KEY (KF, ACC_8000)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCOVER_ACCOUNTS6 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER ADD CONSTRAINT FK_ACCOVER_ACCOUNTS6 FOREIGN KEY (KF, ACC_2069)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCOVER_STANFIN23 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER ADD CONSTRAINT FK_ACCOVER_STANFIN23 FOREIGN KEY (FIN23)
+	  REFERENCES BARS.STAN_FIN23 (FIN) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ACCOVER_STANOBS23 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACC_OVER ADD CONSTRAINT FK_ACCOVER_STANOBS23 FOREIGN KEY (OBS23)
+	  REFERENCES BARS.STAN_OBS23 (OBS) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -187,7 +317,6 @@ exception when others then
 PROMPT *** Create  grants  ACC_OVER ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER        to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER        to BARS009;
-grant SELECT                                                                 on ACC_OVER        to BARSREADER_ROLE;
 grant SELECT                                                                 on ACC_OVER        to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_OVER        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_OVER        to BARS_DM;

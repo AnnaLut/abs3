@@ -1,17 +1,11 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpt_social.sql =========*** Run *** 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.DPT_SOCIAL 
+create or replace package DPT_SOCIAL 
 is
   -- ---------------------------------------------------- --
   --  Пакет работы с депозитами пенсионеров и безработных --
   -- ---------------------------------------------------- --
 
   -- поддержка версионности пакета
-  g_header_version  constant varchar2(64)  := 'version 14.2  08.09.2017';
+  g_header_version  constant varchar2(64)  := 'version 14.1  05.07.2017';
   
   -- фиксация типа данных и маск.размерности для текстов сообщений
   g_errmsg          varchar2(3000);
@@ -70,9 +64,9 @@ is
 
   -- оплата файла зачислений
   procedure pay_bankfile
-   (p_header_id     in  dpt_file_header.header_id%type,
-    p_typeid        in  social_file_types.type_id%type,
-    p_tt            in  tts.tt%type default 'DBF');
+   (p_header_id	 in  dpt_file_header.header_id%type,
+    p_typeid   	 in  social_file_types.type_id%type,
+    p_tt       	 in  tts.tt%type default 'DBF');
 
   -- оплата файла зачислений-2
   procedure pay_bankfile_ext
@@ -84,7 +78,7 @@ is
   procedure pay_bankfile_ext_center
    (p_header_id  in  dpt_file_header.header_id%type,
     p_typeid     in  social_file_types.type_id%type,
-    p_agency_id     in  social_agency.agency_id%type,
+    p_agency_id	 in  social_agency.agency_id%type,
     p_tt         in  tts.tt%type default 'DBF');
 
   -- начисление процентов по социальным договорам в конце месяца
@@ -181,7 +175,7 @@ is
 
   -- створення стрічки файла
   procedure create_file_row_group
-   (p_header_id    in    header_id_t,
+   (p_header_id    in	header_id_t,
     p_filename     in   filename_t,
     p_dat          in   dat_t,
     p_nls          in   nls_t,
@@ -240,20 +234,11 @@ is
   -- проставлення agency_id для прийнятого файла
   procedure set_agencyid (p_header_id  in  dpt_file_row.header_id%type);
 
-  -- Перевірка рахунка
-  function check_account
-  ( p_nls       in   accounts.nls%type,
-    p_branch    in   accounts.branch%type,
-    p_id_code   in   customer.okpo%type,
-    p_nmk       in   customer.nmk%type,
-    p_acc_type  in   dpt_file_row.acc_type%type
-  ) return varchar2;
-  
   -- Перевірка рахунка по saldo
   procedure check_account_access
-  ( p_nls       in   accounts.nls%type,
+   (p_nls       in   accounts.nls%type,
     p_branch    in   accounts.branch%type,
-    p_id_code   in   customer.okpo%type,
+	p_id_code   in   customer.okpo%type,
     p_nmk       in   customer.nmk%type,
     p_acc_type  in   dpt_file_row.acc_type%type,
     p_res       out  number);
@@ -262,7 +247,7 @@ is
   procedure check_account_closed
    (p_nls       in   accounts.nls%type,
     p_branch    in   accounts.branch%type,
-    p_id_code   in   customer.okpo%type,
+	p_id_code   in   customer.okpo%type,
     p_nmk       in   customer.nmk%type,
     p_acc_type  in   dpt_file_row.acc_type%type,
     p_res       out  number) ;
@@ -292,9 +277,9 @@ is
     return varchar2;
 
   -- функція підтягування реального рахунку проплати для соц. файлів
-  -- p_return_type:         0 - nls
-  --                1 - client_name
-  --                2 - client_okpo
+  -- p_return_type: 		0 - nls
+  --				1 - client_name
+  --				2 - client_okpo
   function f_file_account
    (p_accnum       in  accounts.nls%type,
     p_acccur       in  accounts.kv%type,
@@ -318,10 +303,15 @@ is
 
 end DPT_SOCIAL;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.DPT_SOCIAL 
+
+show errors
+
+----------------------------------------------------------------------------------------------------
+
+create or replace package body DPT_SOCIAL
 is
   
-  g_body_version  constant varchar2(64) := 'version 13.30  08.09.2017';
+  g_body_version  constant varchar2(64) := 'version 13.29  07.09.2017';
   g_modcode       constant varchar2(3)  := 'SOC';
 
 type acc_rec is record (id     accounts.acc%type,
@@ -1075,31 +1065,30 @@ begin
            and a.nbs in ('2620','2625','8620')
            and a.branch in ( select CHILD_BRANCH
                                from DPT_FILE_SUBST
-                              where PARENT_BRANCH = sys_context('bars_context','user_branch') )
-        ;
+                              where PARENT_BRANCH = sys_context('bars_context','user_branch') );
         bars_audit.trace( '%s migraccount found, accid = %s', title, to_char(l_acc.id) );
       exception
         when no_data_found or too_many_rows then
-          
-          begin
-            select a.acc, a.nls, a.kv, substr(c.nmk, 1, 38), c.okpo, a.ostc, a.pap
-              into l_acc
-              from accounts a, customer c
-             where a.rnk    = c.rnk
-               and (a.tip = p_acc_type or p_acc_type is null)
-               and a.kf     = p_bankmfo
-               and a.nlsalt = p_accnum
-               and p_okpo   not like '0000%'
-               and c.okpo   = p_okpo
-               and a.kv     = p_acccur
-               and a.nbs in ('2620','2625','8620')
-               and a.dazs   is null;
+/*
+      begin
+           select a.acc, a.nls, a.kv, substr(c.nmk, 1, 38), c.okpo, a.ostc, a.pap
+             into l_acc
+             from accounts a, customer c
+            where a.rnk    = c.rnk
+                    and (a.tip = p_acc_type or p_acc_type is null)
+              and a.kf     = p_bankmfo
+              and a.nlsalt = p_accnum
+        and p_okpo   not like '0000%'
+                    and c.okpo   = p_okpo
+              and a.kv     = p_acccur
+            and a.nbs in (2620,2625,8620)
+              and a.dazs   is null;
             exception
               when no_data_found or too_many_rows then
-                l_acc.num := null;
-                bars_audit.trace('%s migraccount not found', title);
-          end;
-          
+           */
+              l_acc.num := null;
+              bars_audit.trace('%s migraccount not found', title);
+     -- end;
        end;
      end if;
   end if;
@@ -1245,19 +1234,10 @@ begin
        where p_centre is not null)
   loop
 
-    if ( l_branch = cur_branch.branch )
-    then
-      null;
-    else
-
-      bars_context.set_context;
-
-      -- представляемся подразделением
-      l_branch := cur_branch.branch;
-      bars_context.subst_branch(l_branch);
-      bars_audit.trace('%s представились подразделением %s', title, l_branch);
-
-    end if;
+    -- представляемся подразделением
+    l_branch := cur_branch.branch;
+    bars_context.subst_branch(l_branch);
+    bars_audit.trace('%s представились подразделением %s', title, l_branch);
 
     -- реквизиты органа соц.защиты
     begin
@@ -3098,7 +3078,7 @@ end check_branch_access;
 --
 -- створення стрічки файла
 --
-procedure CREATE_FILEROW_UNI
+procedure create_filerow_uni
 ( p_header_id    in   dpt_file_row.header_id%type,
   p_filename     in   dpt_file_row.filename%type,
   p_dat          in   dpt_file_row.dat%type,
@@ -3487,55 +3467,14 @@ begin
   
 end SET_AGENCYID;
 
-  -- Перевірка рахунка
-  function CHECK_ACCOUNT
-  ( p_nls       in     accounts.nls%type,
-    p_branch    in     accounts.branch%type,
-    p_id_code   in     customer.okpo%type,
-    p_nmk       in     customer.nmk%type,
-    p_acc_type  in     dpt_file_row.acc_type%type
-  ) return varchar2
-  is
-    title   constant   varchar2(64)   := 'dpt_social.check_account';
-    l_ccy_id           tabval.kv%type := gl.baseval;
-    l_err_msg          varchar2(1024) := null;
-    l_csl_dt           date;
-  begin
-    
-    bars_audit.trace('%s: entry, nls=>%s, branch=>%s, id_code=>%s.', title, p_nls, p_branch, p_id_code );
-    
-    begin
-      
-      select DAZS
-        into l_csl_dt
-        from ACCOUNTS -- SALDO
-       where KF  = BARS_CONTEXT.EXTRACT_MFO(p_branch)
-         and NLS = p_nls
-         and KV  = l_ccy_id;
-      
-      if ( l_csl_dt Is Not Null )
-      then
-        l_err_msg := 'Рахунок '||p_nls||'/'||to_char(l_ccy_id)||' закритий!';
-      end if;
-      
-    exception
-      when NO_DATA_FOUND then
-        l_err_msg := 'Рахунок '||p_nls||'/'||to_char(l_ccy_id)||' не знайдено!';
-    end;
-    
-    bars_audit.trace('%s: exit, err_msg=>%s.', title, l_err_msg );
-    
-    return l_err_msg;
-    
-  end CHECK_ACCOUNT;
 --
 -- Перевірка доступу на перегляд до рахунку (повертає 0 / 1)
 --
-procedure CHECK_ACCOUNT_ACCESS
-( p_nls      in   accounts.nls%type,
+procedure check_account_access
+ (p_nls      in   accounts.nls%type,
   p_branch   in   accounts.branch%type,
   p_id_code  in   customer.okpo%type,
-  p_nmk      in   customer.nmk%type,
+  p_nmk       in   customer.nmk%type,
   p_acc_type in   dpt_file_row.acc_type%type,
   p_res      out  number)
 is
@@ -3548,10 +3487,10 @@ begin
 
   bars_audit.trace('%s entry, nls=>%s, branch=>%s', l_title, p_nls, p_branch);
 
-  if ( p_nls = l_newaccount /*or regexp_like(p_nls,l_newaccount2)*/)
-  then
-    p_res := 1;
-    return;
+
+  if (p_nls = l_newaccount /*or regexp_like(p_nls,l_newaccount2)*/) then
+      p_res := 1;
+      return;
   end if;
 
   select count(*)
@@ -3560,10 +3499,10 @@ begin
    where kf     = bars_context.extract_mfo(p_branch)
      and nls    = p_nls
      and kv     = l_currency
---   and branch = p_branch
+     and branch = p_branch
   ;
 
-  if ( p_res = 0 )
+  if p_res = 0 
   then
     select count (*)
       into p_res
@@ -3571,12 +3510,12 @@ begin
      where a.nlsalt = p_nls
        and (a.tip = p_acc_type or p_acc_type is null)
        and a.kv     = l_currency
-       and a.kf     = bars_context.extract_mfo(p_branch)
-       and a.branch = p_branch
+       and a.kf     = bars_context.extract_mfo (p_branch)
+--     and a.branch = p_branch
        and a.nbs in ('2620','2625','8620');
   end if;
   
-  if ( p_res = 0 )
+  if p_res = 0 
   then
      select count (*)
        into p_res
@@ -3588,11 +3527,11 @@ begin
         and c.okpo   = p_id_code
         and a.kv     = l_currency
         and a.kf     = bars_context.extract_mfo (p_branch)
---      and a.branch = p_branch
+        and a.branch = p_branch
         and a.nbs in ('2620','2625','8620');
   end if;
   
-  if ( p_res = 0 )
+  if p_res = 0 
   then
      select count (*)
        into p_res
@@ -3609,32 +3548,32 @@ begin
 
   bars_audit.trace('%s exit with %s', l_title, to_char(p_res));
 
-end CHECK_ACCOUNT_ACCESS;
+end check_account_access;
 
 --
 -- Перевірка закриття рахунку (повертає 0-відкритий / 1-закритий)
 --
-procedure CHECK_ACCOUNT_CLOSED
-( p_nls      in   accounts.nls%type,
-  p_branch   in   accounts.branch%type,
+procedure check_account_closed
+ (p_nls     in   accounts.nls%type,
+  p_branch  in   accounts.branch%type,
   p_id_code  in   customer.okpo%type,
-  p_nmk      in   customer.nmk%type,
+  p_nmk       in   customer.nmk%type,
   p_acc_type in   dpt_file_row.acc_type%type,
-  p_res      out  number
-) is
-  l_title         varchar2(64)          := 'dptsocial.checkclosed';
-  l_initbranch    branch.branch%type    := sys_context('bars_context','user_branch');
-  l_currency      tabval.kv%type        := gl.baseval;
-  l_newaccount    constant varchar2(20) := 'НОВИЙ';
-  l_newaccount2   constant varchar2(6)  := '^[0]+$';
+  p_res     out  number)
+is
+  l_title      varchar2(80) := 'dptsocial.checkclosed';
+  l_initbranch branch.branch%type := sys_context('bars_context','user_branch');
+  l_currency   tabval.kv%type     := gl.baseval;
+  l_newaccount     constant varchar2(20)                      := 'НОВИЙ';
+  l_newaccount2    constant varchar2(6) := '^[0]+$';
 begin
 
   bars_audit.trace('%s entry, nls=>%s, branch=>%s', l_title, p_nls, p_branch);
 
-  if ( p_nls = l_newaccount /*or regexp_like(p_nls,l_newaccount2)*/) 
-  then
-    p_res := 0;
-     return;
+
+  if (p_nls = l_newaccount /*or regexp_like(p_nls,l_newaccount2)*/) then
+      p_res := 0;
+      return;
   end if;
 
   select count(*)
@@ -3645,36 +3584,31 @@ begin
      and kv  = l_currency
      and dazs is not null;
 
-  if ( p_res = 0 )
-  then
-    select count(*)
-      into p_res
-      from accounts a
-     where a.kf     = bars_context.extract_mfo(p_branch)
-       and a.nlsalt = p_nls
-       and (a.tip = p_acc_type or p_acc_type is null)
-       and a.kv     = l_currency
-       and a.branch = p_branch
-       and a.dazs is not null
-       and a.nbs in ('2620','2625','8620');
+  if p_res = 0 then
+     select count (*)
+       into p_res
+       from accounts a
+      where a.nlsalt = p_nls
+        and (a.tip = p_acc_type or p_acc_type is null)
+        and a.kv     = l_currency
+        and a.kf     = bars_context.extract_mfo (p_branch)
+        and a.dazs is not null
+  and a.nbs in (2620,2625,8620);
   end if;
-
-  if ( p_res = 0 )
-  then
-    select count (*)
-      into p_res
-      from accounts a
-      join customer c
-        on ( c.rnk = a.rnk )
-     where a.kf     = bars_context.extract_mfo(p_branch)
-       and a.nlsalt = p_nls
-       and (a.tip = p_acc_type or p_acc_type is null)
-       and p_id_code not like '0000%'
-       and c.okpo   = p_id_code
-       and a.kv     = l_currency
---     and a.branch = p_branch
-       and a.dazs is not null
-       and a.nbs in ('2620','2625','8620');
+  if p_res = 0 then
+     select count (*)
+       into p_res
+       from accounts a, customer c
+      where a.rnk    = c.rnk
+  and a.nlsalt = p_nls
+        and (a.tip = p_acc_type or p_acc_type is null)
+        and p_id_code not like '0000%'
+        and c.okpo   = p_id_code
+        and a.kv     = l_currency
+        and a.kf     = bars_context.extract_mfo (p_branch)
+        and a.branch = p_branch
+  and a.dazs is not null
+  and a.nbs in (2620,2625,8620);
   end if;
 
   bars_audit.trace('%s exit with %s', l_title, to_char(p_res));
@@ -3979,10 +3913,8 @@ begin
        when others then
          -- ошибка чтения реквизитов процентного счета по соц.договору № %s: %s
          bars_error.raise_nerror(g_modcode, 'PREPARE2CLOS_INTACC_NOT_FOUND', l_deal.contract_num, sqlerrm);
-
      end;
      bars_audit.trace('%s interest account %s', title, l_intacc.nls);
-
 
      -- проверка отсутствия незавизированных документов по процентному счету
      if l_intacc.ostc != l_intacc.ostb or l_intacc.ostf != 0 then
@@ -4318,16 +4250,9 @@ end close_contract;
 
 END DPT_SOCIAL;
 /
- show err;
- 
-PROMPT *** Create  grants  DPT_SOCIAL ***
-grant EXECUTE                                                                on DPT_SOCIAL      to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on DPT_SOCIAL      to DPT_ROLE;
-grant EXECUTE                                                                on DPT_SOCIAL      to WR_ALL_RIGHTS;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_social.sql =========*** End *** 
- PROMPT ===================================================================================== 
- 
+show errors
+
+grant EXECUTE on DPT_SOCIAL to BARS_ACCESS_DEFROLE;
+grant EXECUTE on DPT_SOCIAL to DPT_ROLE;
+grant EXECUTE on DPT_SOCIAL to WR_ALL_RIGHTS;

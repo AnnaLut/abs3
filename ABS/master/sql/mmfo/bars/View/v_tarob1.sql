@@ -34,10 +34,8 @@ PROMPT *** Create  view V_TAROB1 ***
           AND a.ob22 = SUBSTR (k.kod, 5, 2);
 
 PROMPT *** Create  grants  V_TAROB1 ***
-grant SELECT                                                                 on V_TAROB1        to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_TAROB1        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TAROB1        to PYOD001;
-grant SELECT                                                                 on V_TAROB1        to UPLD;
 grant FLASHBACK,SELECT                                                       on V_TAROB1        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_TAROB1        to WR_REFREAD;
 

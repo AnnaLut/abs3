@@ -51,10 +51,6 @@ COMMENT ON COLUMN BARS.TMP_OW_FILE_TYPE.TYPE IS '';
 
 
 
-PROMPT *** Create  grants  TMP_OW_FILE_TYPE ***
-grant SELECT                                                                 on TMP_OW_FILE_TYPE to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_OW_FILE_TYPE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

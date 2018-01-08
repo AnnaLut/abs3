@@ -83,10 +83,6 @@ COMMENT ON COLUMN BARS.ERR$_CUST_REQUESTS.REQ_STATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CUST_REQUESTS ***
-grant SELECT                                                                 on ERR$_CUST_REQUESTS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CUST_REQUESTS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

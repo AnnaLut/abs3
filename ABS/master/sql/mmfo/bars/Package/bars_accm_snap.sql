@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_accm_snap.sql =========*** Run 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_ACCM_SNAP 
+create or replace package bars_accm_snap
 is
 
     -----------------------------------------------------------------
@@ -23,7 +17,7 @@ is
     -----------------------------------------------------------------
     --
     -- Список заданий для формирования снимков баланса, индексированный датой YYYYMMDD
-    --
+    -- 
     type t_joblist      is table of varchar2(30) index by varchar2(8);
 
     -----------------------------------------------------------------
@@ -43,7 +37,7 @@ is
     ALGORITHM_OLD        constant varchar2(30)  := 'OLD';
     ALGORITHM_SALNQC     constant varchar2(30)  := 'SALNQC';
     ALGORITHM_MIK        constant varchar2(30)  := 'ALGORITMIK';
-
+    
     -- таблица оборотов в номинале по банковским датам
     TAB_SALDOA           constant varchar2(30)  := 'SALDOA';
     -- таблица оборотов в эквиваленте по банковским датам
@@ -61,36 +55,36 @@ is
     --
     procedure lock_day_snap(
                   p_snapdtid in  number );
-
+    
     ----
     -- unlock_day_snap - разблокирование дневного снимка баланса
     --
     procedure unlock_day_snap(
-                  p_snapdtid in  number );
+                  p_snapdtid in  number );                       
 
     ----
-    -- lock_month_snap - блокирует месячный снимок баланса
+    -- lock_month_snap - блокирует месячный снимок баланса 
     --
     procedure lock_month_snap(
-                  p_snapdtid in  number );
-
+                  p_snapdtid in  number );                           
+    
     ----
     -- unlock_month_snap - разблокирует месячный снимок баланса
     --
     procedure unlock_month_snap(
-                  p_snapdtid in  number );
+                  p_snapdtid in  number );                       
 
     ----
-    -- lock_year_snap - блокирует годовой снимок баланса
+    -- lock_year_snap - блокирует годовой снимок баланса 
     --
     procedure lock_year_snap(
-                  p_snapdtid in  number );
-
+                  p_snapdtid in  number );                       
+    
     ----
     -- unlock_year_snap - разблокирует годовой снимок баланса
     --
     procedure unlock_year_snap(
-                  p_snapdtid in  number );
+                  p_snapdtid in  number );                       
 
     ----
     -- set_day_snap_state - установка состояния снимка баланса
@@ -101,7 +95,7 @@ is
         p_snapscn       in number,
         p_snapdate      in date
     );
-
+    
     ----
     -- set_month_snap_state - установка состояния снимка баланса
     --
@@ -111,7 +105,7 @@ is
         p_snapscn       in number,
         p_snapdate      in date
     );
-
+    
     ----
     -- set_year_snap_state - установка состояния снимка баланса
     --
@@ -130,7 +124,7 @@ is
         p_snapbalance   out varchar2,
         p_snapscn       out number,
         p_snapdate      out date    );
-
+    
     ----
     -- ask_month_snap_state - запрашиваем состояние месячного снимка баланса и scn его создания
     --
@@ -139,7 +133,7 @@ is
         p_snapbalance   out varchar2,
         p_snapscn       out number,
         p_snapdate      out date    );
-
+    
     ----
     -- ask_year_snap_state - запрашиваем состояние годового снимка баланса и scn его создания
     --
@@ -152,28 +146,28 @@ is
     ----
     -- set_day_call - установка scn, даты и времени обращения к дневному снимку баланса
     --
-    procedure set_day_call(
-        p_caldtid        in number,
+    procedure set_day_call(        
+        p_caldtid        in number,        
         p_callscn        in number,
         p_calldate       in date,
         p_callflag       in varchar2
     );
-
+    
     ----
     -- set_month_call - установка scn, даты и времени обращения к месячному снимку баланса
     --
-    procedure set_month_call(
-        p_caldtid        in number,
+    procedure set_month_call(        
+        p_caldtid        in number,        
         p_callscn        in number,
         p_calldate       in date,
         p_callflag       in varchar2
     );
-
+    
     ----
     -- set_year_call - установка scn, даты и времени обращения к годовому снимку баланса
     --
-    procedure set_year_call(
-        p_caldtid        in number,
+    procedure set_year_call(        
+        p_caldtid        in number,        
         p_callscn        in number,
         p_calldate       in date,
         p_callflag       in varchar2
@@ -185,32 +179,32 @@ is
     procedure drop_obsolete_partitions;
 
     ----
-    -- get_algorithm - возвращает алгоритм наполнения accm_snap_balances
+    -- get_algorithm - возвращает алгоритм наполнения accm_snap_balances 
     --
     function get_algorithm return varchar2;
-
+    
     ----
-    -- set_algorithm - устанавливает алгоритм наполнения accm_snap_balances
+    -- set_algorithm - устанавливает алгоритм наполнения accm_snap_balances 
     --
-    procedure set_algorithm(p_algorithm in varchar2);
-
+    procedure set_algorithm(p_algorithm in varchar2);    
+    
     ----
     -- is_partition_modified - возвращает флаг 0/1 модификации партиции таблицы с момента p_scn
-    --                         останавливает сканирование после первого положительного блока
+    --                         останавливает сканирование после первого положительного блока  
     --
     function is_partition_modified(p_table in varchar2, p_date in date, p_scn in number)
     return number;
-
+    
     ----
     -- get_snap_scn - возвращает scn последней генерации снимка баланса по партиции указанной таблицы
     --
     function get_snap_scn(p_table in varchar2, p_date in date)
     return number;
-
+    
     ----
     -- set_snap_scn - устанавливает scn последней генерации снимка баланса по партиции указанной таблицы
     --
-    procedure set_snap_scn(p_table in varchar2, p_date in date, p_scn in number);
+    procedure set_snap_scn(p_table in varchar2, p_date in date, p_scn in number);    
 
     -----------------------------------------------------------------
     -- SNAP_BALANCE()
@@ -221,7 +215,7 @@ is
     --
     --         p_mode      Режим создания/обновления
     --
-    --         p_bankdate  Банковская дата снимка
+    --         p_bankdate  Банковская дата снимка 
     --                     (для ручного режима)
     --
     procedure snap_balance(
@@ -242,7 +236,7 @@ is
     --         p_bankdate  Банковская дата снимка
     --                     (для ручного режима)
     --
-    --         p_requestscn Снимок нужен не ниже данного SCN
+    --         p_requestscn Снимок нужен не ниже данного SCN 
     --
     --         p_jobname    Имя задания
     --
@@ -251,7 +245,7 @@ is
                   p_snapmode    in  number,
                   p_requestscn  in  number default null,
                   p_jobname     out varchar2);
-
+                  
     -----------------------------------------------------------------
     -- SNAP_BALANCE_PERIOD()
     --
@@ -262,8 +256,8 @@ is
     --         p_startdate  Дата начала периода
     --
     --         p_finishdate Дата окончания периода
-    --
-    --         p_snapmode   Режим создания/обновления
+    -- 
+    --         p_snapmode   Режим создания/обновления 
     --                      0-полное, 1-частичное
     --
     procedure snap_balance_period(
@@ -304,7 +298,7 @@ is
     --
     function get_max_bankdate return date
     result_cache;
-
+    
     ----
     -- get_prev_bankdate - возвращает предыдущую банковскую дату по отношению к переданной
     --
@@ -313,7 +307,12 @@ is
 
 end BARS_ACCM_SNAP;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_ACCM_SNAP 
+
+show error
+
+----------------------------------------------------------------------------------------------------
+
+create or replace package body BARS_ACCM_SNAP
 is
 
     -----------------------------------------------------------------
@@ -348,47 +347,47 @@ is
 
     -- Формат даты
     FMT_DATE           constant varchar2(20)  := 'dd.mm.yyyy';
-
+    
     -- Формат дата+время
     FMT_DATETIME       constant varchar2(30)  := 'dd.mm.yyyy hh24:mi:ss';
 
     -- Время ожидания занятости ресурса
     SLEEP_TIMEOUT      constant number        := 10;
-
-    -- Время ожидания завершения работы заданий на формирование снимков баланса в минутах
+    
+    -- Время ожидания завершения работы заданий на формирование снимков баланса в минутах 
     WAIT_JOBS_TIMEOUT   constant number        := 10;
-
+    
     -- Время ожидания блокировки на снимке баланса в секундах
     WAIT_SNAP_LOCK_TIMEOUT constant number := 300;
-
+    
     WAIT_TIMEOUT_EXPIRED   exception;
     pragma exception_init(WAIT_TIMEOUT_EXPIRED, -30006);
-
+    
     PART_NOT_EXISTS exception;
     pragma exception_init(PART_NOT_EXISTS, -2149);
-
-    RESOURCE_BUSY   exception;
-    pragma exception_init(RESOURCE_BUSY,   -54  );
-
+    
+    RESOURCE_BUSY   exception;   
+    pragma exception_init(RESOURCE_BUSY,   -54  ); 
+    
     MQ_EMPTY_OR_TIMEOUT_EXCEPTION EXCEPTION;
     PRAGMA EXCEPTION_INIT(MQ_EMPTY_OR_TIMEOUT_EXCEPTION, -25228);
-
-
+       
+    
     -- алгоритм наполнения accm_snap_balances
     g_algorithm     varchar2(30);
-
+    
     -- sid и serial# собственной сессии
     g_own_sid       number := sys_context('userenv','sid');
     g_own_serial#   number;
-
+    
     -- время жизни неиспользуемого снимка в днях
     g_snap_life_time    number;
-
-    -- условие для запроса на модификацию партиций таблиц SALDOA, SALDOB, SALDOA_DEL_ROWS
-    -- (PMQC = Partition Modification Query Condition)
+    
+    -- условие для запроса на модификацию партиций таблиц SALDOA, SALDOB, SALDOA_DEL_ROWS 
+    -- (PMQC = Partition Modification Query Condition) 
     g_snap_pmqc          varchar2(4000);
-
-
+    
+    
     ----
     -- load_snap_life_time - читает время жизни неиспользуемого снимка в днях из таблицы параметров
     --
@@ -428,7 +427,7 @@ is
         end if;
         --
     end load_snap_pmqc;
-
+    
     ----
     -- drop_obsolete_partitions - удаление устаревших партиций в accm_snap_balances
     --
@@ -443,7 +442,7 @@ is
         --
         load_snap_life_time();
         --
-        for c in (  select s.caldt_id, s.snap_balance, c.caldt_date
+        for c in (  select s.caldt_id, s.snap_balance, c.caldt_date 
                       from accm_state_snap s, accm_calendar c
                      where s.caldt_id = c.caldt_id
                        and sysdate - nvl(s.call_date,to_date('01.01.1900','dd.mm.yyyy')) > g_snap_life_time
@@ -453,7 +452,7 @@ is
             -- лочим снимок баланса
             lock_day_snap(c.caldt_id);
             --
-            begin
+            begin                                
                 --
                 logger.trace('%s: partition #'||to_char(c.caldt_id)||'('||to_char(c.caldt_date, FMT_DATE)||') locked', p);
                 --
@@ -476,7 +475,7 @@ is
                 logger.trace('%s: snap partition dropped', p);
                 --
                 -- удаляем запись из accm_state_snap
-                delete
+                delete 
                   from accm_state_snap
                  where caldt_id = c.caldt_id;
                 --
@@ -488,7 +487,7 @@ is
                 --
             exception
                 when others then
-                    rollback;
+                    rollback;                    
                     --
                     logger.error(p||' Ошибка при работе со снимком баланса #'
                         ||to_char(c.caldt_id)||' за дату '||to_char(c.caldt_date, FMT_DATE)||' : '
@@ -504,16 +503,16 @@ is
     end drop_obsolete_partitions;
 
     ----
-    -- get_algorithm - возвращает алгоритм наполнения accm_snap_balances
+    -- get_algorithm - возвращает алгоритм наполнения accm_snap_balances 
     --
     function get_algorithm return varchar2
     is
     begin
-        return g_algorithm;
-    end get_algorithm;
-
+        return g_algorithm; 
+    end get_algorithm;  
+    
     ----
-    -- set_algorithm - устанавливает алгоритм наполнения accm_snap_balances
+    -- set_algorithm - устанавливает алгоритм наполнения accm_snap_balances 
     --
     procedure set_algorithm(p_algorithm in varchar2)
     is
@@ -522,7 +521,7 @@ is
     end set_algorithm;
 
     ----
-    -- load_algorithm - читает алгоритм наполнения accm_snap_balances
+    -- load_algorithm - читает алгоритм наполнения accm_snap_balances 
     --
     procedure load_algorithm
     is
@@ -541,31 +540,31 @@ is
           ||ALGORITHM_OLD||' или '||ALGORITHM_SALNQC||' или '||ALGORITHM_MIK);
        end if;
     end load_algorithm;
-
+    
     ----
     -- ilock_snap - блокировка снимка баланса
     --
     --      p_statetab      - таблица состояния снимков ACCM_STATE_SNAP, ACCM_STATE_MONTH, ACCM_STATE_YEAR
-    --      p_snapdtid      - id снимка баланса
+    --      p_snapdtid      - id снимка баланса  
     --      p_locked        - признак блокировки Y/null
     --
     procedure ilock_snap(
-                  p_statetab    in  varchar2,
+                  p_statetab    in  varchar2, 
                   p_snapdtid    in  number,
                   p_locked      in  varchar2
     )
     is
     pragma autonomous_transaction;
     p               constant varchar2(100) := PKG_CODE || '.ilocksnap';
-    -- кол-во секунд в сутках
+    -- кол-во секунд в сутках 
     c_day_secs      constant number := 86400; --24*60*60;
     --
-    l_locked        varchar2(1);
-    l_sid           number;
-    l_serial#       number;
+    l_locked        varchar2(1);           
+    l_sid           number;           
+    l_serial#       number;           
     l_time1         date;
     l_time2         date;
-    l_num           number;
+    l_num           number;    
     --
     begin
         if logger.trace_enabled()
@@ -596,13 +595,13 @@ is
                 'select locked, sid, serial#
                    from '||p_statetab||'
                   where caldt_id = :p_snapdtid
-                    for update wait 60'
+                    for update wait 60'                  
                    into l_locked, l_sid, l_serial#
                   using p_snapdtid;
                 --
                 if logger.trace_enabled()
                 then
-                    logger.trace('%s: locked=%s, sid=%s, serial#=%s', p,
+                    logger.trace('%s: locked=%s, sid=%s, serial#=%s', p, 
                     nvl(l_locked,'null'), nvl(to_char(l_sid),'null'), nvl(to_char(l_serial#),'null'));
                 end if;
                 --
@@ -613,8 +612,8 @@ is
                           into l_num
                           from v$session
                          where sid = l_sid
-                           and serial# = l_serial#;
-                    exception
+                           and serial# = l_serial#; 
+                    exception 
                         when no_data_found then
                             -- если сессии, заблокировавшей снимок баланса уже не существует,
                             -- снимаем блокировку
@@ -624,7 +623,7 @@ is
                                    sid     = null,
                                    serial# = null
                              where caldt_id = :p_snapdtid
-                             returning locked, sid, serial# into :l_locked, :l_sid, :l_serial#'
+                             returning locked, sid, serial# into :l_locked, :l_sid, :l_serial#'           
                              using p_snapdtid, out l_locked, out l_sid, out l_serial#;
                             --
                             if logger.trace_enabled()
@@ -634,12 +633,12 @@ is
                     end;
                 end if;
                 --
-                if l_locked='Y' and p_locked='Y'
+                if l_locked='Y' and p_locked='Y'                 
                 then
                     rollback to spl;
                     -- если лок наложен нашей сессией раньше, считаем его своим
                     if l_sid = g_own_sid and l_serial# = g_own_serial#
-                    then
+                    then                        
                         if logger.trace_enabled()
                         then
                             logger.trace('%s: secondary lock on snap# %s', p, to_char(p_snapdtid));
@@ -653,7 +652,7 @@ is
                 elsif l_locked is null and p_locked is null
                 then
                     rollback to spl;
-                    raise_application_error(-20000,
+                    raise_application_error(-20000, 
                     'Снимок баланса #'||to_char(p_snapdtid)||' от '
                     ||to_char(bars_accm_calendar.get_calendar_date(p_snapdtid), 'dd.mm.yyyy')
                     ||' уже разблокирован.');
@@ -663,7 +662,7 @@ is
                     -- если лок наложен нашей сессией раньше, освобождаем его
                     if l_sid = g_own_sid and l_serial# = g_own_serial#
                     then
-                        execute immediate
+                        execute immediate                                                
                         'update '||p_statetab||'
                             set locked  = :p_locked,
                                 sid     = null,
@@ -681,18 +680,18 @@ is
                         exit;
                     else
                         rollback to spl;
-                        raise_application_error(-20000,
+                        raise_application_error(-20000, 
                         'Снимок баланса #'||to_char(p_snapdtid)||' от '
                         ||to_char(bars_accm_calendar.get_calendar_date(p_snapdtid), 'dd.mm.yyyy')
                         ||' невозможно разблокировать в данной сессии, т.к. он был заблокирован в другой сессии.');
-                    end if;
+                    end if; 
                 elsif l_locked is null and p_locked='Y'
                 then
                     -- ставим блокировку
                     execute immediate
                     'update '||p_statetab||'
-                        set locked  = :p_locked,
-                            sid     = :g_own_sid,
+                        set locked  = :p_locked, 
+                            sid     = :g_own_sid, 
                             serial# = :g_own_serial#
                       where caldt_id = :p_snapdtid'
                     using p_locked, g_own_sid, g_own_serial#, p_snapdtid;
@@ -700,16 +699,16 @@ is
                     commit;
                     --
                     exit;
-                end if;
-            exception
+                end if;                   
+            exception 
                 when NO_DATA_FOUND then
                     raise_application_error(-20000, 'Снимок баланса #'||to_char(p_snapdtid)||' от '
                     ||to_char(bars_accm_calendar.get_calendar_date(p_snapdtid), 'dd.mm.yyyy')
                     ||' не найден(не размечен в '||p_statetab||').');
                 when RESOURCE_BUSY then
                     -- не дождались блокировки
-                    null;
-            end;
+                    null;                     
+            end;        
             l_time2 := sysdate;
             if l_time2 - l_time1 >= WAIT_SNAP_LOCK_TIMEOUT/c_day_secs
             then
@@ -727,12 +726,12 @@ is
         end if;
         --
     end ilock_snap;
-
+    
     ----
     -- lock_day_snap - блокировка дневного снимка баланса
     --
     procedure lock_day_snap(
-                  p_snapdtid in  number )
+                  p_snapdtid in  number )                       
     is
     --
     begin
@@ -740,12 +739,12 @@ is
         ilock_snap('ACCM_STATE_SNAP', p_snapdtid, 'Y');
         --
     end lock_day_snap;
-
+    
     ----
     -- unlock_day_snap - разблокирование дневного снимка баланса
     --
     procedure unlock_day_snap(
-                  p_snapdtid in  number )
+                  p_snapdtid in  number )                       
     is
     --
     begin
@@ -753,12 +752,12 @@ is
         ilock_snap('ACCM_STATE_SNAP', p_snapdtid, null);
         --
     end unlock_day_snap;
-
+    
     ----
-    -- lock_month_snap - блокирует месячный снимок баланса
+    -- lock_month_snap - блокирует месячный снимок баланса 
     --
     procedure lock_month_snap(
-                  p_snapdtid in  number )
+                  p_snapdtid in  number )                       
     is
     --
     begin
@@ -766,12 +765,12 @@ is
         ilock_snap('ACCM_STATE_MONTH', p_snapdtid, 'Y');
         --
     end lock_month_snap;
-
+    
     ----
     -- unlock_month_snap - разблокирует месячный снимок баланса
     --
     procedure unlock_month_snap(
-                  p_snapdtid in  number )
+                  p_snapdtid in  number )                       
     is
     --
     begin
@@ -781,10 +780,10 @@ is
     end unlock_month_snap;
 
     ----
-    -- lock_year_snap - блокирует годовой снимок баланса
+    -- lock_year_snap - блокирует годовой снимок баланса 
     --
     procedure lock_year_snap(
-                  p_snapdtid in  number )
+                  p_snapdtid in  number )                       
     is
     --
     begin
@@ -792,12 +791,12 @@ is
         ilock_snap('ACCM_STATE_YEAR', p_snapdtid, 'Y');
         --
     end lock_year_snap;
-
+    
     ----
     -- unlock_year_snap - разблокирует годовой снимок баланса
     --
     procedure unlock_year_snap(
-                  p_snapdtid in  number )
+                  p_snapdtid in  number )                       
     is
     --
     begin
@@ -805,7 +804,7 @@ is
         ilock_snap('ACCM_STATE_YEAR', p_snapdtid, null);
         --
     end unlock_year_snap;
-
+    
     ----
     -- iset_snap_state - установка состояния снимка баланса
     --
@@ -822,12 +821,12 @@ is
        'update '||p_statetab||'
            set snap_balance = :p_snapbalance,
                snap_scn     = :p_snapscn,
-               snap_date    = :p_snapdate
+               snap_date    = :p_snapdate 
          where caldt_id = :p_caldtid'
         using p_snapbalance, p_snapscn, p_snapdate, p_caldtid;
         --
     end iset_snap_state;
-
+    
     ----
     -- set_day_snap_state - установка состояния дневного снимка баланса
     --
@@ -842,8 +841,8 @@ is
         --
         iset_snap_state('ACCM_STATE_SNAP', p_caldtid, p_snapbalance, p_snapscn, p_snapdate);
         --
-    end set_day_snap_state;
-
+    end set_day_snap_state; 
+    
     ----
     -- set_month_snap_state - установка состояния месячного снимка баланса
     --
@@ -859,7 +858,7 @@ is
         iset_snap_state('ACCM_STATE_MONTH', p_caldtid, p_snapbalance, p_snapscn, p_snapdate);
         --
     end set_month_snap_state;
-
+    
     ----
     -- set_year_snap_state - установка состояния годового снимка баланса
     --
@@ -875,7 +874,7 @@ is
         iset_snap_state('ACCM_STATE_YEAR', p_caldtid, p_snapbalance, p_snapscn, p_snapdate);
         --
     end set_year_snap_state;
-
+    
     ----
     -- iask_snap_state - запрашиваем состояние снимка баланса и scn его создания
     --
@@ -889,11 +888,11 @@ is
     is
     begin
         execute immediate
-       'select snap_balance, snap_scn, snap_date
+       'select snap_balance, snap_scn, snap_date          
           from '||p_statetab||'
          where caldt_id = :p_caldtid'
           into p_snapbalance, p_snapscn, p_snapdate
-         using p_caldtid;
+         using p_caldtid; 
         --
     end iask_snap_state;
 
@@ -911,7 +910,7 @@ is
         iask_snap_state('ACCM_STATE_SNAP', p_caldtid, p_snapbalance, p_snapscn, p_snapdate);
         --
     end ask_day_snap_state;
-
+    
     ----
     -- ask_month_snap_state - запрашиваем состояние месячного снимка баланса и scn его создания
     --
@@ -926,7 +925,7 @@ is
         iask_snap_state('ACCM_STATE_MONTH', p_caldtid, p_snapbalance, p_snapscn, p_snapdate);
         --
     end ask_month_snap_state;
-
+    
     ----
     -- ask_year_snap_state - запрашиваем состояние годового снимка баланса и scn его создания
     --
@@ -947,7 +946,7 @@ is
     --
     procedure iset_call(
         p_statetab       in varchar2,
-        p_caldtid        in number,
+        p_caldtid        in number,        
         p_callscn        in number,
         p_calldate       in date,
         p_callflag       in varchar2
@@ -959,7 +958,7 @@ is
     begin
         begin
             execute immediate
-            'select caldt_id
+            'select caldt_id              
                from '||p_statetab||'
               where caldt_id = :p_caldtid
                 for update wait 10'
@@ -970,26 +969,26 @@ is
                 l_errmsg := 'Невозможно установить время обращения к снимку баланса #'||to_char(l_caldtid)
                 ||' в таблице '||p_statetab||'. Строка заблокирована.';
                 logger.error(l_errmsg);
-                raise_application_error(-20000, l_errmsg);
+                raise_application_error(-20000, l_errmsg); 
         end;
         --
         execute immediate
        'update '||p_statetab||'
            set call_scn  = :p_callscn,
                call_date = :p_calldate,
-               call_flag = :p_callflag
+               call_flag = :p_callflag  
          where caldt_id  = :p_caldtid'
          using p_callscn, p_calldate, p_callflag, p_caldtid;
         --
         commit;
-        --
-    end iset_call;
-
+        -- 
+    end iset_call; 
+    
     ----
     -- set_day_call - установка scn, даты и времени обращения к дневному снимку баланса
     --
-    procedure set_day_call(
-        p_caldtid        in number,
+    procedure set_day_call(        
+        p_caldtid        in number,        
         p_callscn        in number,
         p_calldate       in date,
         p_callflag       in varchar2
@@ -999,13 +998,13 @@ is
         --
         iset_call('ACCM_STATE_SNAP', p_caldtid, p_callscn, p_calldate, p_callflag);
         --
-    end set_day_call;
-
+    end set_day_call;    
+    
     ----
     -- set_month_call - установка scn, даты и времени обращения к месячному снимку баланса
     --
-    procedure set_month_call(
-        p_caldtid        in number,
+    procedure set_month_call(        
+        p_caldtid        in number,        
         p_callscn        in number,
         p_calldate       in date,
         p_callflag       in varchar2
@@ -1016,12 +1015,12 @@ is
         iset_call('ACCM_STATE_MONTH', p_caldtid, p_callscn, p_calldate, p_callflag);
         --
     end set_month_call;
-
+    
     ----
     -- set_year_call - установка scn, даты и времени обращения к годовому снимку баланса
     --
-    procedure set_year_call(
-        p_caldtid        in number,
+    procedure set_year_call(        
+        p_caldtid        in number,        
         p_callscn        in number,
         p_calldate       in date,
         p_callflag       in varchar2
@@ -1032,7 +1031,7 @@ is
         iset_call('ACCM_STATE_YEAR', p_caldtid, p_callscn, p_calldate, p_callflag);
         --
     end set_year_call;
-
+    
     -----------------------------------------------------------------
     -- CREATE_SNAP_BALANCE()
     --
@@ -1047,15 +1046,15 @@ is
                   p_snapdate    in  date,
                   p_requestscn  in  number default null,
                   p_state       out varchar2,
-                  p_stateinfo   out varchar2
+                  p_stateinfo   out varchar2     
     ) is
     --
-    p                   constant varchar2(100) := PKG_CODE || '.crsnpbal';
+    p                   constant varchar2(100) := PKG_CODE || '.crsnpbal';    
     --
     l_isclear           boolean;    -- признак очищенной секции
     l_now_scn           number;
     l_before_lock_scn   number;
-    l_snap_balance      accm_state_snap.snap_balance%type;
+    l_snap_balance      accm_state_snap.snap_balance%type;    
     l_snap_scn          accm_state_snap.snap_scn%type;
     l_snap_date         accm_state_snap.snap_date%type;
     --
@@ -1069,24 +1068,24 @@ is
         l_before_lock_scn := dbms_flashback.get_system_change_number();
         --
         -- лочим снимок баланса
-        lock_day_snap(p_snapdtid);
+        lock_day_snap(p_snapdtid);        
         --
         begin
-            -- маленькая хитрость:
+            -- маленькая хитрость: 
             -- если снимок построен после начала ожидания блокировки, значит заново строить его не надо
             ask_day_snap_state(p_snapdtid, l_snap_balance, l_snap_scn, l_snap_date);
             --
-            if  l_snap_balance = 'Y'
-            and l_snap_scn is not null
-            and (l_snap_scn > l_before_lock_scn or p_requestscn is not null and l_snap_scn > p_requestscn)
+            if  l_snap_balance = 'Y' 
+            and l_snap_scn is not null 
+            and (l_snap_scn > l_before_lock_scn or p_requestscn is not null and l_snap_scn > p_requestscn) 
             then
                 p_state     := 'N';
                 --
                 if l_snap_scn > l_before_lock_scn
-                then
+                then                    
                     p_stateinfo := 'Создание дневного снимка #'||to_char(p_snapdtid)||' от '||to_char(p_snapdate, FMT_DATE)||' пропущено, '
                         ||'т.к. он был создан другой сессией во время ожидания блокировки'
-                        ||chr(10)||'snap_scn='||to_char(l_snap_scn)||'('||to_char(scn2ts(l_snap_scn), FMT_DATETIME)||')'
+                        ||chr(10)||'snap_scn='||to_char(l_snap_scn)||'('||to_char(scn2ts(l_snap_scn), FMT_DATETIME)||')' 
                         ||chr(10)||'before_lock_scn='||to_char(l_before_lock_scn)||'('||to_char(scn2ts(l_before_lock_scn), FMT_DATETIME)||')';
                 end if;
                 --
@@ -1094,7 +1093,7 @@ is
                 then
                     p_stateinfo := 'Создание дневного снимка #'||to_char(p_snapdtid)||' от '||to_char(p_snapdate, FMT_DATE)||' пропущено, '
                         ||'т.к. он был создан другой сессией после запрашиваемого scn'
-                        ||chr(10)||'snap_scn='||to_char(l_snap_scn)||'('||to_char(scn2ts(l_snap_scn), FMT_DATETIME)||')'
+                        ||chr(10)||'snap_scn='||to_char(l_snap_scn)||'('||to_char(scn2ts(l_snap_scn), FMT_DATETIME)||')' 
                         ||chr(10)||'requestscn='||to_char(p_requestscn)||'('||to_char(scn2ts(p_requestscn), FMT_DATETIME)||')';
                 end if;
                 -- снимаем блокировку
@@ -1113,7 +1112,7 @@ is
             end if;
             --
 
-IF g_algorithm = ALGORITHM_MIK
+IF g_algorithm = ALGORITHM_MIK 
 THEN NULL;
 ELSE
             l_isclear := false;
@@ -1129,15 +1128,15 @@ ELSE
             end loop;
             bars_audit.trace('%s: snap partition truncated', p);
             -- ВАЖНО! после TRUNCATE был неявный COMMIT
-END IF;
+END IF;            
             -- получим текущий scn
-            l_now_scn := dbms_flashback.get_system_change_number();
-            --
+            l_now_scn := dbms_flashback.get_system_change_number(); 
+            --                        
             -- работаем по алгоритму с представлением SALNQC
             if g_algorithm = ALGORITHM_SALNQC
             then
                 bars_audit.trace('%s: new algorithm = %s', p, nvl(g_algorithm,'null'));
-                --
+                --            
                 insert into accm_snap_balances(caldt_id, acc, rnk, ost, dos, kos, ostq, dosq, kosq)
                 select p_snapdtid, acc, rnk, ost, dos, kos, ostq, dosq, kosq
                   from salnqc
@@ -1147,7 +1146,7 @@ END IF;
                          or ostq != 0
                        );
             elsif g_algorithm = ALGORITHM_OLD
-            then
+            then 
                 -- работаем по старому алгоритму
                 bars_audit.trace('%s: old algorithm = %s', p, nvl(g_algorithm,'null'));
                 --
@@ -1188,9 +1187,9 @@ END IF;
                     or ost  != 0
                     or ostq != 0;
             elsif g_algorithm = ALGORITHM_MIK
-            then
+            then 
                 bars_audit.trace('%s: old algorithm = %s', p, nvl(g_algorithm,'null'));
--- Нові драпси
+-- Нові драпси 
                 --draps(p_snapdate);
 -- Кінець нових драпсів
             else
@@ -1198,38 +1197,38 @@ END IF;
                  ||', ожидалось '
              	 ||ALGORITHM_OLD||' или '||ALGORITHM_SALNQC||' или '||ALGORITHM_MIK
 );
-            end if;
-
+            end if;            
+                         
             -- сохраняем scn'ы
             set_snap_scn(TAB_SALDOA,            p_snapdate, l_now_scn);
             set_snap_scn(TAB_SALDOB,            p_snapdate, l_now_scn);
             set_snap_scn(TAB_SALDOA_DEL_ROWS,   p_snapdate, l_now_scn);
-
+            
             -- проставляем признак созданного снимка баланса и scn его создания
             set_day_snap_state(p_snapdtid, 'Y', dbms_flashback.get_system_change_number(), sysdate);
-
+            
             --
             commit;
             --
             unlock_day_snap(p_snapdtid);
             --
-        exception
+        exception 
             when others then
                 rollback;
                 --
                 unlock_day_snap(p_snapdtid);
-                --
+                --                
                 raise_application_error(-20000, dbms_utility.format_error_stack()||chr(10)
                     ||dbms_utility.format_error_backtrace());
         end;
         --
         p_state := 'Y';
-        p_stateinfo := 'Дневной снимок #'||to_char(p_snapdtid)||' от '||to_char(p_snapdate, FMT_DATE)||' успешно создан';
+        p_stateinfo := 'Дневной снимок #'||to_char(p_snapdtid)||' от '||to_char(p_snapdate, FMT_DATE)||' успешно создан'; 
         --
         bars_audit.trace('%s: succ end', p);
         --
     end create_snap_balance;
-
+    
     ----
     -- map_scn_to_dateinfo - возвращает дату соотв. scn или ??? < min_date
     --
@@ -1245,7 +1244,7 @@ END IF;
                     cast(from_tz(cast(min(time_dp) as timestamp),'GMT') at time zone sessiontimezone as date),
                     'DD.MM.YYYY HH24:MI:SS')
               into l_dateinfo
-              from sys.smon_scn_time;
+              from sys.smon_scn_time;                 
         end;
         --
         return l_dateinfo;
@@ -1271,7 +1270,7 @@ END IF;
         --
     end get_max_bankdate;
 
-
+    
     ----
     -- get_prev_bankdate - возвращает предыдущую банковскую дату по отношению к переданной
     --
@@ -1285,16 +1284,16 @@ END IF;
           from fdat
          where fdat<p_bankdate;
         return l_bd;
-    end get_prev_bankdate;
-
+    end get_prev_bankdate; 
+    
     ----
     -- is_partition_modified - возвращает флаг 0/1 модификации партиции таблицы с момента p_scn
-    --                         останавливает сканирование после того, как найден первый измененный счет
+    --                         останавливает сканирование после того, как найден первый измененный счет  
     --
     function is_partition_modified(p_table in varchar2, p_date in date, p_scn in number)
     return number
     is
-        p               constant varchar2(100) := PKG_CODE || '.ispartmod';
+        p               constant varchar2(100) := PKG_CODE || '.ispartmod';        
         l_result        integer;
         l_acc           accounts.acc%type;
         l_nls           accounts.nls%type;
@@ -1309,11 +1308,11 @@ END IF;
         if logger.trace_enabled()
         then
             l_dateinfo := map_scn_to_dateinfo(p_scn);
-            logger.trace('%s: entry point p_table=>%s, p_date=>%s, p_scn=>%s(%s)',
+            logger.trace('%s: entry point p_table=>%s, p_date=>%s, p_scn=>%s(%s)', 
                 p, p_table, to_char(p_date, FMT_DATE), to_char(p_scn), l_dateinfo);
-        end if;
-        --
-        -- читаем параметр SNAP_PMQC (Partition Modification Query Condition)
+        end if;            
+        --    
+        -- читаем параметр SNAP_PMQC (Partition Modification Query Condition)  
         load_snap_pmqc();
         --
         if logger.trace_enabled()
@@ -1324,10 +1323,10 @@ END IF;
         -- фиксируем момент сканирования
         l_scan.scan_scn := dbms_flashback.get_system_change_number();
         --
-        -- выполняем сканирование
+        -- выполняем сканирование      
         begin
-            -- ищем первый модифицированный с момента p_scn счет с фильтром g_snap_pmqc
-            execute immediate
+            -- ищем первый модифицированный с момента p_scn счет с фильтром g_snap_pmqc 
+            execute immediate 
                   'select a.acc, a.nls, a.kv, t.ora_rowscn from '||p_table
                 ||' partition for (to_date('''||to_char(p_date,'DD.MM.YYYY')||''',''DD.MM.YYYY'')) t, accounts a'
                 ||' where t.ora_rowscn > '||to_char(p_scn)||' and rownum=1'
@@ -1347,7 +1346,7 @@ END IF;
             l_workdate := nvl(bars_accm_snap.get_max_bankdate(), trunc(sysdate));
             -- предыдущая банковская дата
             l_prevdate := bars_accm_snap.get_prev_bankdate(l_workdate);
-            -- изменения найдены в старых банковских днях (минимум 2 банковских дня назад)?
+            -- изменения найдены в старых банковских днях (минимум 2 банковских дня назад)? 
             if p_date < l_prevdate
             then
                 -- сохраним об этом всю информацию
@@ -1363,22 +1362,22 @@ END IF;
                 l_scan.query_condition      := g_snap_pmqc;
                 --
             end if;
-
+            
             if logger.trace_enabled()
             then
-                l_dateinfo := nvl(l_scan.mod_dateinfo, map_scn_to_dateinfo(l_rowscn));
-                logger.trace('%s: в таблице %s найдены изменения по счету acc=%s, nls=%s, kv=%s за банк.дату %s в момент scn=%s(%s)',
-                    p, p_table, to_char(l_acc), l_nls, to_char(l_kv), to_char(p_date, FMT_DATE),
+                l_dateinfo := nvl(l_scan.mod_dateinfo, map_scn_to_dateinfo(l_rowscn)); 
+                logger.trace('%s: в таблице %s найдены изменения по счету acc=%s, nls=%s, kv=%s за банк.дату %s в момент scn=%s(%s)', 
+                    p, p_table, to_char(l_acc), l_nls, to_char(l_kv), to_char(p_date, FMT_DATE), 
                     to_char(l_rowscn), to_char(l_dateinfo)
                 );
             end if;
         end if;
         --
         if logger.trace_enabled()
-        then
+        then            
             logger.trace('%s: succ end, result=%s', p, to_char(l_result));
         end if;
-        --
+        -- 
         return l_result;
         --
     end is_partition_modified;
@@ -1399,10 +1398,10 @@ END IF;
         then
             logger.trace('%s: entry point p_table=>%s, p_date=>%s', p, p_table, to_char(p_date, FMT_DATE));
         end if;
-        --
+        --        
         l_table := upper(p_table);
         l_date  := trunc(p_date);
-        --
+        --        
         begin
             select snap_scn
               into l_snap_scn
@@ -1413,16 +1412,16 @@ END IF;
             when no_data_found then
                 l_snap_scn := 0;
         end;
-        --
+        --    
         if logger.trace_enabled()
-        then
+        then            
             logger.trace('%s: succ end, snap_scn=%s', p, to_char(l_snap_scn));
-        end if;
+        end if;        
         --
         return l_snap_scn;
         --
     end get_snap_scn;
-
+    
     ----
     -- set_snap_scn - устанавливает scn последней генерации снимка баланса по партиции указанной таблицы
     --
@@ -1435,7 +1434,7 @@ END IF;
         --
         if logger.trace_enabled()
         then
-            logger.trace('%s: entry point p_table=>%s, p_date=>%s, p_scn=>%s',
+            logger.trace('%s: entry point p_table=>%s, p_date=>%s, p_scn=>%s', 
                 p, p_table, to_char(p_date, FMT_DATE), to_char(p_scn));
         end if;
         --
@@ -1448,20 +1447,20 @@ END IF;
          where fdat = l_date
            and table_name = l_table;
         --
-        if sql%rowcount=0
+        if sql%rowcount=0 
         then
             insert
               into accm_snap_scn(fdat, table_name, snap_scn, snap_date)
             values (l_date, l_table, p_scn, scn_to_timestamp(p_scn));
-        end if;
+        end if;         
         --
         if logger.trace_enabled()
         then
             logger.trace('%s: succ end', p);
         end if;
         --
-    end set_snap_scn;
-
+    end set_snap_scn;    
+    
     -----------------------------------------------------------------
     -- SNAP_BALANCE()
     --
@@ -1495,13 +1494,13 @@ END IF;
     l_callflag          accm_state_snap.call_flag%type;
     l_locked            accm_state_snap.locked%type;
     l_state             varchar2(1);
-    l_stateinfo         varchar2(4000);
+    l_stateinfo         varchar2(4000);     
     --
     begin
         bars_audit.trace('%s: entry point p_snapdate=>%s, p_snapmode=>%s', p, to_char(p_snapdate, FMT_DATE), to_char(p_snapmode));
 
         --raise_application_error(-20000, 'Непредвиденная ошибка');
-
+        
         -- Принудительно удаляем время из переданной даты
         l_snapdate := trunc(p_snapdate);
 
@@ -1525,7 +1524,7 @@ END IF;
                 --
                 l_snap_balance := 'N';
                 l_locked       := null;
-        end;
+        end;        
         --
         if p_snapmode = 0
         then
@@ -1552,44 +1551,44 @@ end if;
                    )
                 then
                     l_create_snap := true;
-                end if;
+                end if;            
                 --
-            end if;
+            end if;              
         end if;
         --
         if l_create_snap
         then
             -- создаем снимок баланса
             create_snap_balance(
-                p_snapdtid      => l_snapdtid,
-                p_snapdate      => l_snapdate,
-                p_requestscn    => p_requestscn,
-                p_state         => l_state,
+                p_snapdtid      => l_snapdtid, 
+                p_snapdate      => l_snapdate, 
+                p_requestscn    => p_requestscn, 
+                p_state         => l_state, 
                 p_stateinfo     => l_stateinfo
             );
             --
-            l_stateinfo := l_stateinfo || chr(10)
+            l_stateinfo := l_stateinfo || chr(10) 
             ||'Режим перенакопления - '||case when p_snapmode=0 then 'безусловный' else 'условный' end;
-            --
+            --                         
             logger.info(l_stateinfo);
         else
             logger.info('Снимок баланса #'||to_char(l_snapdtid)||' за дату '||to_char(p_snapdate, FMT_DATE)
                       ||' перенакапливаться не будет, т.к. не зафиксированы модификации соотв. партиций SALDOA, SALDOB.');
-        end if;
+        end if;                
         --
-        -- фиксируем scn, дату и время обращения к снимку баланса
+        -- фиксируем scn, дату и время обращения к снимку баланса 
         --
         set_day_call(l_snapdtid, l_callscn, l_calldate,
             case
-            when not l_create_snap
-            then
+            when not l_create_snap 
+            then 
                 FLAG_REUSED
-            when l_create_snap and nvl(l_snap_balance,'N')='N' and l_locked is null
-            then
+            when l_create_snap and nvl(l_snap_balance,'N')='N' and l_locked is null 
+            then 
                 FLAG_CREATED
-            else
+            else 
                 FLAG_RECREATED
-            end
+            end 
         );
         --
         bars_audit.trace('%s: succ end', p);
@@ -1608,7 +1607,7 @@ end if;
     --         p_bankdate  Банковская дата снимка
     --                     (для ручного режима)
     --
-    --         p_requestscn Снимок нужен не ниже данного SCN
+    --         p_requestscn Снимок нужен не ниже данного SCN 
     --
     --         p_jobname    Имя задания
     --
@@ -1617,7 +1616,7 @@ end if;
                   p_snapmode    in  number,
                   p_requestscn  in  number default null,
                   p_jobname     out varchar2)
-    is
+    is        
         p  constant varchar2(100) := PKG_CODE || '.snapbalinjob';
         l_jobaction     varchar2(4000);
     begin
@@ -1628,11 +1627,11 @@ end if;
         --
         logger.trace('%s: generated job_name=''%s''', p, p_jobname);
         --
-        l_jobaction :=
+        l_jobaction := 
         'begin
-            bars_accm_snap.snap_balance(
+            bars_accm_snap.snap_balance(                 
                 p_snapdate      => to_date('''||to_char(p_snapdate, FMT_DATE)||''',''dd.mm.yyyy''),
-                p_snapmode      => '||to_char(p_snapmode)||',
+                p_snapmode      => '||to_char(p_snapmode)||', 
                 p_requestscn    => '||case when p_requestscn is null then 'null' else to_char(p_requestscn) end||'
             );
         end;';
@@ -1645,7 +1644,7 @@ end if;
           ,end_date        => null
           ,job_class       => 'DEFAULT_JOB_CLASS'
           ,job_type        => 'PLSQL_BLOCK'
-          ,job_action      => l_jobaction
+          ,job_action      => l_jobaction 
           ,comments        => 'Формирование дневного снимка баланса за '||to_char(p_snapdate, FMT_DATE)
         );
         dbms_scheduler.set_attribute
@@ -1678,7 +1677,7 @@ end if;
                 l_jobenum := l_jobenum || ',';
             end if;
             l_jobenum := l_jobenum || ''''||p_joblist(l_index)||'''';
-            l_index := p_joblist.next(l_index);
+            l_index := p_joblist.next(l_index);  
         end loop;
         --
         return l_jobenum;
@@ -1697,7 +1696,7 @@ end if;
         --
         l_jobenum                 varchar2(2000);
         l_joblist                 t_joblist := p_joblist;
-        --
+        --        
         l_dequeue_options         dbms_aq.dequeue_options_t;
         l_msgprops                dbms_aq.message_properties_t;
         l_msgid                   RAW(16);
@@ -1706,7 +1705,7 @@ end if;
         l_cnt                     number := 0;
         l_index                   varchar2(8);
         l_jobstatuses             t_joblist;
-        l_errmsg                  varchar2(4000);
+        l_errmsg                  varchar2(4000);        
     begin
         logger.trace('%s: started', p);
         --
@@ -1724,16 +1723,16 @@ end if;
         --
         l_dequeue_options.consumer_name   := 'BARS';
         l_dequeue_options.wait            := dbms_aq.no_wait;
-        l_dequeue_options.navigation      := dbms_aq.first_message;
-        --
-        while (sysdate-l_starttime) < WAIT_JOBS_TIMEOUT/24.0/60.0
+        l_dequeue_options.navigation      := dbms_aq.first_message;        
+        --       
+        while (sysdate-l_starttime) < WAIT_JOBS_TIMEOUT/24.0/60.0 
           and l_joblist.count > 0
         loop
             l_index := l_joblist.first;
             --
             while l_index is not null
             loop
-                l_dequeue_options.deq_condition :=
+                l_dequeue_options.deq_condition := 
                     'tab.user_data.object_name='''||l_joblist(l_index)||''''
                     ||' and tab.user_data.event_type in (''JOB_SUCCEEDED'',''JOB_FAILED'')';
                 begin
@@ -1763,12 +1762,12 @@ end if;
                     --
                     l_joblist.delete(l_index);
                     --
-                exception
+                exception 
                     when MQ_EMPTY_OR_TIMEOUT_EXCEPTION then
-                        logger.trace('%s: состояние задания %s не найдено в очереди(м.б. все еще выполняется %s секунд)',
+                        logger.trace('%s: состояние задания %s не найдено в очереди(м.б. все еще выполняется %s секунд)', 
                             p, l_joblist(l_index), to_char(round((sysdate-l_starttime)*3600*24))
                         );
-                end;
+                end;                
                 --
                 if l_dequeue_options.navigation = dbms_aq.first_message
                 then
@@ -1776,7 +1775,7 @@ end if;
                 end if;
                 --
                 l_index := l_joblist.next(l_index);
-                --
+                --  
             end loop;
             --
             if l_joblist.count > 0
@@ -1787,7 +1786,7 @@ end if;
                 --
             end if;
             --
-        end loop;
+        end loop;            
         --
         commit;
         --
@@ -1801,7 +1800,7 @@ end if;
         logger.trace('%s: finished', p);
         --
     end wait_for_snap_jobs;
-
+                      
     -----------------------------------------------------------------
     -- SNAP_BALANCE_PERIOD()
     --
@@ -1812,8 +1811,8 @@ end if;
     --         p_startdate  Дата начала периода
     --
     --         p_finishdate Дата окончания периода
-    --
-    --         p_snapmode   Режим создания/обновления
+    -- 
+    --         p_snapmode   Режим создания/обновления 
     --                      0-полное, 1-частичное
     --
     procedure snap_balance_period(
@@ -1823,7 +1822,7 @@ end if;
     is
         --
         l_startdate         date;
-        l_finishdate        date;
+        l_finishdate        date;        
         l_found             boolean := false;
         l_saldoa_snap_scn   number;
         l_saldob_snap_scn   number;
@@ -1831,7 +1830,7 @@ end if;
         l_callscn           accm_state_snap.call_scn%type;
         l_calldate          accm_state_snap.call_date%type;
         l_jobname           varchar2(30);
-        l_joblist           t_joblist;
+        l_joblist           t_joblist;                
     begin
         logger.info('Запущена процедура накопления снимков балансов за период с '
                    ||to_char(p_startdate, FMT_DATE)||' по '||to_char(p_finishdate, FMT_DATE)
@@ -1848,23 +1847,23 @@ end if;
             raise_application_error(-20000, 'Задание периода синхронизации снимков баланса больше 31 дня запрещено!');
         end if;
         --
-        -- если задано частичное обновление,
+        -- если задано частичное обновление, 
         -- ищем первый ненакопленный снимок либо обновленную партицию с минимальной датой
-        -- дальше перенакапливаем все снимки вверх безусловно,
+        -- дальше перенакапливаем все снимки вверх безусловно, 
         -- т.к. на остатки в будущем влияют обороты в прошлом
         if p_snapmode = 1
         then
-            for c in (select c.caldt_id, c.caldt_date, s.snap_balance,
-                             s.locked, s.snap_scn, s.sid, s.serial#, s.call_scn
+            for c in (select c.caldt_id, c.caldt_date, s.snap_balance, 
+                             s.locked, s.snap_scn, s.sid, s.serial#, s.call_scn 
                         from accm_state_snap s, accm_calendar c
                        where s.caldt_id(+) = c.caldt_id
                          and c.caldt_date = c.bankdt_date -- только по банковским дням
                          and c.caldt_date between l_startdate and l_finishdate
                        order by c.caldt_date
                      )
-            loop
-                --
-                if c.snap_balance is null
+            loop  
+                --              
+                if c.snap_balance is null 
                 or c.snap_balance='N' and c.locked is null and c.call_scn is null
                 then
                     -- если снимок баланса раньше не создавался, берем его за основу
@@ -1887,8 +1886,8 @@ end if;
                     then
                         l_found := true;
                         l_startdate := c.caldt_date;
-                    end if;
-                    --
+                    end if;            
+                    -- 
                 end if;
                 --
                 if l_found
@@ -1900,50 +1899,50 @@ end if;
             --
             if not l_found
             then
-                l_startdate := l_finishdate + 1;
+                l_startdate := l_finishdate + 1; 
             end if;
             --
         end if;
         logger.info('Зафиксирована дата начала периода '||to_char(l_startdate, FMT_DATE)||
-                    case when l_startdate > l_finishdate
+                    case when l_startdate > l_finishdate 
                          then ' больше даты окончания периода '||to_char(l_finishdate, FMT_DATE)
                               ||' - накопление не выполняется'
-                         else ''
+                         else '' 
                     end
-                   );
+                   );              
         --
-        -- фиксируем scn, дату+время обращения к снимкам баланса и флаг REUSED,
-        -- которые будут повторно использованы без пересоздания
+        -- фиксируем scn, дату+время обращения к снимкам баланса и флаг REUSED, 
+        -- которые будут повторно использованы без пересоздания 
         --
-        l_callscn  := dbms_flashback.get_system_change_number();
+        l_callscn  := dbms_flashback.get_system_change_number(); 
         l_calldate := sysdate;
-        for c in (select c.caldt_id
+        for c in (select c.caldt_id 
                     from accm_state_snap s, accm_calendar c
                    where s.caldt_id = c.caldt_id
                      and c.caldt_date = c.bankdt_date -- только по банковским дням
                      and c.caldt_date between p_startdate and l_startdate-1
                    order by c.caldt_date
                  )
-        loop
+        loop            
             set_day_call(c.caldt_id, l_callscn, l_calldate, 'REUSED');
         end loop;
         --
-        -- запускаем параллельно задания для пересоздания снимков баланса
-        for c in (select caldt_id, caldt_date
+        -- запускаем параллельно задания для пересоздания снимков баланса         
+        for c in (select caldt_id, caldt_date 
                     from accm_calendar c
                    where caldt_date between l_startdate and l_finishdate
                      and c.caldt_date = c.bankdt_date -- только по банковским дням
                    order by caldt_date
                  )
-        loop
-            snap_balance_in_job(
+        loop            
+            snap_balance_in_job(                 
                 p_snapdate      => c.caldt_date,
-                p_snapmode      => bars_accm_sync.SNAPMODE_FULL,
+                p_snapmode      => bars_accm_sync.SNAPMODE_FULL, 
                 p_requestscn    => l_callscn,
                 p_jobname       => l_jobname
-            );
-            l_joblist(to_char(c.caldt_date, 'YYYYMMDD')) := l_jobname;
-        end loop;
+            );            
+            l_joblist(to_char(c.caldt_date, 'YYYYMMDD')) := l_jobname;                        
+        end loop;        
         --
         -- ожидаем завершения всех заданий для формирования снимков баланса
         --
@@ -1952,7 +1951,7 @@ end if;
         logger.info('Завершена процедура накопления снимков балансов за период с '
                    ||to_char(p_startdate, FMT_DATE)||' по '||to_char(p_finishdate, FMT_DATE)
                    ||' в режиме '||case when p_snapmode=0 then 'полного' else 'частичного' end||' накопления.'
-                   );
+                   );  
     end snap_balance_period;
 
     -----------------------------------------------------------------
@@ -1992,13 +1991,7 @@ end if;
 
 begin
   load_algorithm();
-end BARS_ACCM_SNAP;
+end BARS_ACCM_SNAP; 
 /
- show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_accm_snap.sql =========*** End 
- PROMPT ===================================================================================== 
- 
+
+show error

@@ -59,12 +59,10 @@ COMMENT ON COLUMN BARS.SB_DEC_2011.P080_B IS '';
 
 
 PROMPT *** Create  grants  SB_DEC_2011 ***
-grant SELECT                                                                 on SB_DEC_2011     to BARSREADER_ROLE;
 grant SELECT                                                                 on SB_DEC_2011     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SB_DEC_2011     to BARS_DM;
 grant SELECT                                                                 on SB_DEC_2011     to NALOG;
 grant SELECT                                                                 on SB_DEC_2011     to START1;
-grant SELECT                                                                 on SB_DEC_2011     to UPLD;
 
 
 

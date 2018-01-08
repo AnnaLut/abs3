@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_EBKC_RCIF.CUST_TYPE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_EBKC_RCIF ***
-grant SELECT                                                                 on ERR$_EBKC_RCIF  to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_EBKC_RCIF  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

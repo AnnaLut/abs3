@@ -131,7 +131,7 @@ CURSOR SaldoASeekOstf IS
                (select c.acc,max(c.fdat)
                 from saldoa c
                 where c.fdat <= dat_
-                group by c.acc)) a
+                group by c.acc)) a   
    WHERE a.kv=980
      and a.nbs LIKE '8%'
      and a.nbs not in ('8605','8625','8999')
@@ -142,7 +142,7 @@ CURSOR SaldoASeekOstf IS
 ---ќбороты грн.
 CURSOR SaldoASeekOs IS
    SELECT  a.acc, a.nls, a.kv, a.nbs, NVL(SUM(s.dos),0), NVL(SUM(s.kos),0), a.tobo, a.nms
-   FROM saldoa s, accounts a
+   FROM saldoa s, accounts a    
    WHERE s.fdat(+) >= Dat1_
      and s.fdat(+) <= dat_
      and a.acc=s.acc(+)
@@ -182,7 +182,7 @@ P_Proc_Set_Int(kodf_,sheme_,nbuc1_,typ_);
 DELETE FROM ref_kor ;
 IF to_char(Dat_,'MM')='12' THEN
    INSERT INTO ref_kor (REF, VOB, VDAT)
-   SELECT /*+ index(o,  IDX_OPER_VDAT_KF) */
+   SELECT /*+ index(o,  IDX_OPER_VDAT_KF) */ 
         ref, vob, vdat
    FROM oper
    WHERE vdat>=Dat1_-3 and vdat<=Dat2_ and
@@ -191,7 +191,7 @@ IF to_char(Dat_,'MM')='12' THEN
           (substr(nlsa,1,4) in ('5040','5041') and substr(nlsb,1,1) in ('6','7'))) ;
 ELSE
    INSERT INTO ref_kor (REF, VOB, VDAT)
-   SELECT /*+ index(o,  IDX_OPER_VDAT_KF) */
+   SELECT /*+ index(o,  IDX_OPER_VDAT_KF) */ 
         ref, vob, vdat
    FROM oper o
    WHERE vdat= Dat_ and
@@ -201,7 +201,7 @@ END IF ;
 DELETE FROM kor_prov ;
 INSERT INTO KOR_PROV (REF,  DK,  ACC , S,  FDAT , VDAT, SOS,  VOB)
 SELECT o.ref, o.dk, o.acc, o.s, o.fdat, p.vdat, o.sos, p.vob
-FROM opldok o, ref_kor p
+FROM opldok o, ref_kor p     
 WHERE o.fdat>Dat1_     AND
       o.fdat<=Dat2_    AND
       o.ref=p.ref      AND
@@ -250,7 +250,7 @@ LOOP
         Dosnk_ :=0 ;
         Kosnk_ :=0 ;
      END ;
-
+     
      Ostn8_:=Ostn8_-Dosnk_+Kosnk_;
 
      dk_:=IIF_N(Ostn8_,0,'1','2','2');
@@ -280,7 +280,7 @@ LOOP
 
    SELECT count(*) INTO f87_ FROM sb_p0853 WHERE r020=nbs_ ;
 
-   IF f87_>0 THEN
+   IF f87_>0 THEN    
 
       IF typ_>0 THEN
          nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
@@ -325,7 +325,7 @@ LOOP
 
      IF kol6_7=0 THEN
         IF pp_ not in ('0000','FFFF') and Kosn8_ > 0 THEN
-           kodp_:='6' || pp_ || r020_fa_ || zz_;
+           kodp_:='6' || pp_ || r020_fa_ || zz_;  
            znap_:=TO_CHAR(Kosn8_) ;
            INSERT INTO rnbu_trace     -- ƒт. обороты в номинале валюты (грн.+вал.)
                    (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc)
@@ -333,7 +333,7 @@ LOOP
         END IF;
 
         IF pp_ not in ('0000','FFFF') and Dosn8_ > 0 THEN
-           kodp_:='5' || pp_ || r020_fa_ || zz_;
+           kodp_:='5' || pp_ || r020_fa_ || zz_;  
            znap_:=TO_CHAR(Dosn8_);
            INSERT INTO rnbu_trace     --  р. обороты в номинале валюты (грн.+вал.)
                    (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc)

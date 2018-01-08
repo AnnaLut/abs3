@@ -24,10 +24,8 @@ WHERE  i.acc=a.acc  AND
        d.accs=a.acc;
 
 PROMPT *** Create  grants  KU_114 ***
-grant SELECT                                                                 on KU_114          to BARSREADER_ROLE;
 grant SELECT                                                                 on KU_114          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KU_114          to START1;
-grant SELECT                                                                 on KU_114          to UPLD;
 
 
 

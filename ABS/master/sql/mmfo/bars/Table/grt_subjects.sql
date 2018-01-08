@@ -65,6 +65,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_GRTSUBJ_GRTTYPES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_SUBJECTS ADD CONSTRAINT FK_GRTSUBJ_GRTTYPES FOREIGN KEY (TYPE_ID)
+	  REFERENCES BARS.GRT_TYPES (TYPE_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_GRTSUBJ_SUBJNAME_NN ***
 begin   
  execute immediate '
@@ -103,10 +116,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRT_SUBJECTS ***
-grant SELECT                                                                 on GRT_SUBJECTS    to BARSREADER_ROLE;
 grant SELECT                                                                 on GRT_SUBJECTS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRT_SUBJECTS    to BARS_DM;
-grant SELECT                                                                 on GRT_SUBJECTS    to UPLD;
 
 
 

@@ -49,10 +49,8 @@ COMMENT ON COLUMN BARS.KOD_SHEM.TXT IS '';
 
 
 PROMPT *** Create  grants  KOD_SHEM ***
-grant SELECT                                                                 on KOD_SHEM        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_SHEM        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_SHEM        to START1;
-grant SELECT                                                                 on KOD_SHEM        to UPLD;
 
 
 

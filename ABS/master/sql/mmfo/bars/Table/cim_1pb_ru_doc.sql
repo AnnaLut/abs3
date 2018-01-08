@@ -43,8 +43,7 @@ begin
 	CL_TYPE VARCHAR2(1), 
 	CL_IPN VARCHAR2(14), 
 	CL_NAME VARCHAR2(38), 
-	MD VARCHAR2(2), 
-	CHANGED_RU NUMBER(1,0)
+	MD VARCHAR2(2)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -62,7 +61,6 @@ PROMPT *** ALTER_POLICIES to CIM_1PB_RU_DOC ***
 
 
 COMMENT ON TABLE BARS.CIM_1PB_RU_DOC IS 'Документи РУ через котловий 2909 (для 1ПБ)';
-COMMENT ON COLUMN BARS.CIM_1PB_RU_DOC.CHANGED_RU IS 'Змінено у РУ';
 COMMENT ON COLUMN BARS.CIM_1PB_RU_DOC.REF IS '';
 COMMENT ON COLUMN BARS.CIM_1PB_RU_DOC.REF_CA IS 'Референс ЦА';
 COMMENT ON COLUMN BARS.CIM_1PB_RU_DOC.KF IS 'Код РУ';
@@ -87,12 +85,10 @@ COMMENT ON COLUMN BARS.CIM_1PB_RU_DOC.MD IS 'Автозаміна';
 
 
 
-PROMPT *** Create  constraint PK_CIM1PBRUDOC ***
+PROMPT *** Create  constraint CC_CIM1PBRUDOC_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_1PB_RU_DOC ADD CONSTRAINT PK_CIM1PBRUDOC PRIMARY KEY (REF_CA)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLD  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CIM_1PB_RU_DOC MODIFY (KF CONSTRAINT CC_CIM1PBRUDOC_KF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -101,10 +97,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIM1PBRUDOC_KF_NN ***
+PROMPT *** Create  constraint PK_CIM1PBRUDOC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_1PB_RU_DOC MODIFY (KF CONSTRAINT CC_CIM1PBRUDOC_KF_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_1PB_RU_DOC ADD CONSTRAINT PK_CIM1PBRUDOC PRIMARY KEY (REF_CA)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLD  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -201,11 +199,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_1PB_RU_DOC ***
-grant SELECT                                                                 on CIM_1PB_RU_DOC  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_1PB_RU_DOC  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_1PB_RU_DOC  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_1PB_RU_DOC  to CIM_ROLE;
-grant SELECT                                                                 on CIM_1PB_RU_DOC  to UPLD;
 
 
 

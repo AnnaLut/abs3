@@ -15,10 +15,8 @@ where a.bis = 1 and a.fn_a = b.fn_a and a.dat_a = b.dat_a and
 order by b.bis;
 
 PROMPT *** Create  grants  V_DOCUMENTVIEW_BIS ***
-grant SELECT                                                                 on V_DOCUMENTVIEW_BIS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOCUMENTVIEW_BIS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DOCUMENTVIEW_BIS to START1;
-grant SELECT                                                                 on V_DOCUMENTVIEW_BIS to UPLD;
 
 
 

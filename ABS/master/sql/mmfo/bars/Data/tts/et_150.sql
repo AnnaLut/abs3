@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции 151
-prompt Наименование операции: 151 d: Видано суму інкасованої ІВ
+prompt Наименование операции: d: Видано суму інкасованої ІВ
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('151', '151 d: Видано суму інкасованої ІВ', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, '#(S)', null, null, null, null, null, '0000100000000000000000000000000000010000000000000000000000000000', null);
+    values ('151', 'd: Видано суму інкасованої ІВ', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, '#(S)', null, null, null, null, null, '0000100000000000000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='151', name='151 d: Видано суму інкасованої ІВ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn=null
+         set tt='151', name='d: Видано суму інкасованої ІВ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn=null
        where tt='151';
   end;
   --------------------------------
@@ -68,7 +68,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции K80
-prompt Наименование операции: K80 d: Комісія за миттєве ІНКАСО (150)
+prompt Наименование операции: d: Комісія за миттєве ІНКАСО (150)
 declare
   cnt_  number;
 begin
@@ -77,11 +77,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K80', 'K80 d: Комісія за миттєве ІНКАСО (150)', 0, null, 980, '#(nbs_ob22 (''6514'',''10''))', 980, null, null, null, null, 0, 0, 1, 0, 'F_TARIF(96,980,#(NLSA),GL.P_ICURVAL(#(KVA),#(S),SYSDATE)) ', null, 5, null, '#(nbs_ob22 (''3800'',''03''))', null, '0000100000000000000010000000000000000000000000000000000000000000', null);
+    values ('K80', 'd: Комісія за миттєве ІНКАСО (150)', 0, null, 980, '#(nbs_ob22 (''6114'',''10''))', 980, null, null, null, null, 0, 0, 1, 0, 'F_TARIF(96,980,#(NLSA),GL.P_ICURVAL(#(KVA),#(S),SYSDATE)) ', null, 5, null, '#(nbs_ob22 (''3800'',''03''))', null, '0000100000000000000010000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K80', name='K80 d: Комісія за миттєве ІНКАСО (150)', dk=0, nlsm=null, kv=980, nlsk='#(nbs_ob22 (''6514'',''10''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='F_TARIF(96,980,#(NLSA),GL.P_ICURVAL(#(KVA),#(S),SYSDATE)) ', s2=null, sk=5, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='0000100000000000000010000000000000000000000000000000000000000000', nazn=null
+         set tt='K80', name='d: Комісія за миттєве ІНКАСО (150)', dk=0, nlsm=null, kv=980, nlsk='#(nbs_ob22 (''6114'',''10''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='F_TARIF(96,980,#(NLSA),GL.P_ICURVAL(#(KVA),#(S),SYSDATE)) ', s2=null, sk=5, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='0000100000000000000010000000000000000000000000000000000000000000', nazn=null
        where tt='K80';
   end;
   --------------------------------
@@ -120,11 +120,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('150', '150-Миттєве інкассо ВАЛ з комісією', 0, '#(nbs_ob22 (''2909'',''34''))', null, '#(get_nls_tt(''150'',''NLSK''))', null, null, '#(nbs_ob22 (''2909'',''34''))', '#(tobopack.GetToboParam(''CASH''))', null, 1, 0, 0, 0, 'f_sum_reqv(''#(NOMI1)'',''#(NOMI2)'',''#(NOMI3)'',''#(NOMI4)'',''#(NOMI5)'',''#(NOMI6)'',''#(NOMI7)'',''#(NOMI8)'',''#(NOMI9)'',''#(NOM10)'',''#(NOM11)'',''#(NOM12)'',''#(NOM13)'',''#(NOM14)'',''#(NOM15)'')', null, null, null, null, null, '1000110000000001100000000000000000010000000000000000000000000000', 'Прийнято на миттєве інкасо');
+    values ('150', '150-Миттєве інкассо ВАЛ з комісією', 0, '#(nbs_ob22 (''2909'',''34''))', null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, '#(nbs_ob22 (''2909'',''34''))', '#(tobopack.GetToboParam(''CASH''))', null, 1, 0, 0, 0, 'f_sum_reqv(''#(NOMI1)'',''#(NOMI2)'',''#(NOMI3)'',''#(NOMI4)'',''#(NOMI5)'',''#(NOMI6)'',''#(NOMI7)'',''#(NOMI8)'',''#(NOMI9)'',''#(NOM10)'',''#(NOM11)'',''#(NOM12)'',''#(NOM13)'',''#(NOM14)'',''#(NOM15)'')', null, null, null, null, null, '1000110000000001100000000000000000010000000000000000000000000000', 'Прийнято на миттєве інкасо');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='150', name='150-Миттєве інкассо ВАЛ з комісією', dk=0, nlsm='#(nbs_ob22 (''2909'',''34''))', kv=null, nlsk='#(get_nls_tt(''150'',''NLSK''))', kvk=null, nlss=null, nlsa='#(nbs_ob22 (''2909'',''34''))', nlsb='#(tobopack.GetToboParam(''CASH''))', mfob=null, flc=1, fli=0, flv=0, flr=0, s='f_sum_reqv(''#(NOMI1)'',''#(NOMI2)'',''#(NOMI3)'',''#(NOMI4)'',''#(NOMI5)'',''#(NOMI6)'',''#(NOMI7)'',''#(NOMI8)'',''#(NOMI9)'',''#(NOM10)'',''#(NOM11)'',''#(NOM12)'',''#(NOM13)'',''#(NOM14)'',''#(NOM15)'')', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1000110000000001100000000000000000010000000000000000000000000000', nazn='Прийнято на миттєве інкасо'
+         set tt='150', name='150-Миттєве інкассо ВАЛ з комісією', dk=0, nlsm='#(nbs_ob22 (''2909'',''34''))', kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=null, nlss=null, nlsa='#(nbs_ob22 (''2909'',''34''))', nlsb='#(tobopack.GetToboParam(''CASH''))', mfob=null, flc=1, fli=0, flv=0, flr=0, s='f_sum_reqv(''#(NOMI1)'',''#(NOMI2)'',''#(NOMI3)'',''#(NOMI4)'',''#(NOMI5)'',''#(NOMI6)'',''#(NOMI7)'',''#(NOMI8)'',''#(NOMI9)'',''#(NOM10)'',''#(NOM11)'',''#(NOM12)'',''#(NOM13)'',''#(NOM14)'',''#(NOM15)'')', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1000110000000001100000000000000000010000000000000000000000000000', nazn='Прийнято на миттєве інкасо'
        where tt='150';
   end;
   --------------------------------

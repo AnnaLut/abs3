@@ -69,11 +69,9 @@ COMMENT ON COLUMN BARS.TMP_VALK.RATES2 IS '';
 
 
 PROMPT *** Create  grants  TMP_VALK ***
-grant SELECT                                                                 on TMP_VALK        to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TMP_VALK        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_VALK        to OPERKKK;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TMP_VALK        to TECH_MOM1;
-grant SELECT                                                                 on TMP_VALK        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_VALK        to WR_ALL_RIGHTS;
 
 

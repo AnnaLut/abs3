@@ -97,70 +97,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_FXSWAP_NPP_NN ***
+PROMPT *** Create  constraint CC_FXSWAP_SUMB_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FX_SWAP MODIFY (NPP CONSTRAINT CC_FXSWAP_NPP_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_FXSWAP_DAT1_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FX_SWAP MODIFY (DAT1 CONSTRAINT CC_FXSWAP_DAT1_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_FXSWAP_DAT2_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FX_SWAP MODIFY (DAT2 CONSTRAINT CC_FXSWAP_DAT2_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_FXSWAP_VDAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FX_SWAP MODIFY (VDAT CONSTRAINT CC_FXSWAP_VDAT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_FXSWAP_KVA_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FX_SWAP MODIFY (KVA CONSTRAINT CC_FXSWAP_KVA_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_FXSWAP_SUMA_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FX_SWAP MODIFY (SUMA CONSTRAINT CC_FXSWAP_SUMA_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.FX_SWAP MODIFY (SUMB CONSTRAINT CC_FXSWAP_SUMB_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -181,10 +121,70 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_FXSWAP_SUMB_NN ***
+PROMPT *** Create  constraint CC_FXSWAP_SUMA_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FX_SWAP MODIFY (SUMB CONSTRAINT CC_FXSWAP_SUMB_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.FX_SWAP MODIFY (SUMA CONSTRAINT CC_FXSWAP_SUMA_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_FXSWAP_KVA_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FX_SWAP MODIFY (KVA CONSTRAINT CC_FXSWAP_KVA_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_FXSWAP_VDAT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FX_SWAP MODIFY (VDAT CONSTRAINT CC_FXSWAP_VDAT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_FXSWAP_DAT2_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FX_SWAP MODIFY (DAT2 CONSTRAINT CC_FXSWAP_DAT2_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_FXSWAP_DAT1_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FX_SWAP MODIFY (DAT1 CONSTRAINT CC_FXSWAP_DAT1_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_FXSWAP_NPP_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FX_SWAP MODIFY (NPP CONSTRAINT CC_FXSWAP_NPP_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -207,11 +207,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FX_SWAP ***
-grant SELECT                                                                 on FX_SWAP         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FX_SWAP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FX_SWAP         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FX_SWAP         to FOREX;
-grant SELECT                                                                 on FX_SWAP         to UPLD;
 
 
 

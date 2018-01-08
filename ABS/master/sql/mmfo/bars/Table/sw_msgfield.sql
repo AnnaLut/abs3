@@ -71,10 +71,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SWMSGFIELD_SWREF_NN ***
+PROMPT *** Create  constraint FK_SWMSGFIELD_SWJOURNAL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_MSGFIELD MODIFY (SWREF CONSTRAINT CC_SWMSGFIELD_SWREF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_MSGFIELD ADD CONSTRAINT FK_SWMSGFIELD_SWJOURNAL FOREIGN KEY (SWREF)
+	  REFERENCES BARS.SW_JOURNAL (SWREF) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -83,22 +84,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SWMSGFIELD_RECNUM_NN ***
+PROMPT *** Create  constraint CC_SWMSGFIELD_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_MSGFIELD MODIFY (RECNUM CONSTRAINT CC_SWMSGFIELD_RECNUM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWMSGFIELD_MSGBLK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_MSGFIELD MODIFY (MSGBLK CONSTRAINT CC_SWMSGFIELD_MSGBLK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_MSGFIELD MODIFY (KF CONSTRAINT CC_SWMSGFIELD_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -119,10 +108,73 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SWMSGFIELD_KF_NN ***
+PROMPT *** Create  constraint CC_SWMSGFIELD_MSGBLK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_MSGFIELD MODIFY (KF CONSTRAINT CC_SWMSGFIELD_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SW_MSGFIELD MODIFY (MSGBLK CONSTRAINT CC_SWMSGFIELD_MSGBLK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWMSGFIELD_RECNUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MSGFIELD MODIFY (RECNUM CONSTRAINT CC_SWMSGFIELD_RECNUM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWMSGFIELD_SWREF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MSGFIELD MODIFY (SWREF CONSTRAINT CC_SWMSGFIELD_SWREF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWMSGFIELD_SWJOURNAL2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MSGFIELD ADD CONSTRAINT FK_SWMSGFIELD_SWJOURNAL2 FOREIGN KEY (KF, SWREF)
+	  REFERENCES BARS.SW_JOURNAL (KF, SWREF) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWMSGFIELD_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MSGFIELD ADD CONSTRAINT FK_SWMSGFIELD_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWMSGFIELD_SWMSGTAG ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_MSGFIELD ADD CONSTRAINT FK_SWMSGFIELD_SWMSGTAG FOREIGN KEY (MSGBLK, MSGTAG)
+	  REFERENCES BARS.SW_MSGTAG (MSGBLK, MSGTAG) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -145,9 +197,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_MSGFIELD ***
-grant SELECT                                                                 on SW_MSGFIELD     to BARSREADER_ROLE;
 grant SELECT                                                                 on SW_MSGFIELD     to BARS_DM;
-grant SELECT                                                                 on SW_MSGFIELD     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_MSGFIELD     to WR_ALL_RIGHTS;
 
 

@@ -33,7 +33,7 @@ EXCEPTION
 
 END TIU_ZAPRET_26MFO;
 /
-ALTER TRIGGER BARS.TIU_ZAPRET_26MFO DISABLE;
+ALTER TRIGGER BARS.TIU_ZAPRET_26MFO ENABLE;
 
 
 PROMPT ===================================================================================== 

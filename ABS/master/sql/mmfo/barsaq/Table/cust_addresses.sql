@@ -42,10 +42,10 @@ COMMENT ON COLUMN BARSAQ.CUST_ADDRESSES.BANK_ID IS '';
 
 
 
-PROMPT *** Create  constraint CC_CUSTADDRESSES_CUSTID_NN ***
+PROMPT *** Create  constraint CC_CUSTADDRESSES_TYPEID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.CUST_ADDRESSES MODIFY (RNK CONSTRAINT CC_CUSTADDRESSES_CUSTID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.CUST_ADDRESSES MODIFY (TYPE_ID CONSTRAINT CC_CUSTADDRESSES_TYPEID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -54,10 +54,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTADDRESSES_TYPEID_NN ***
+PROMPT *** Create  constraint CC_CUSTADDRESSES_CUSTID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.CUST_ADDRESSES MODIFY (TYPE_ID CONSTRAINT CC_CUSTADDRESSES_TYPEID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.CUST_ADDRESSES MODIFY (RNK CONSTRAINT CC_CUSTADDRESSES_CUSTID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -116,9 +116,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  CUST_ADDRESSES ***
-grant SELECT                                                                 on CUST_ADDRESSES  to BARSREADER_ROLE;
 
 
 

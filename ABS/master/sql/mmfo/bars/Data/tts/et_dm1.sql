@@ -45,8 +45,8 @@ begin
   delete from folders_tts where tt='!DK';
 end;
 /
-prompt Создание / Обновление операции DM1
-prompt Наименование операции: DM1 Виплата з поточного металевого рахунку (готів.)
+prompt Создание / Обновление операции !DP
+prompt Наименование операции: STOP-правило. Обмеження виплати валюти, еквівалент 15000грн
 declare
   cnt_  number;
 begin
@@ -55,11 +55,65 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DM1', 'DM1 Виплата з поточного металевого рахунку (готів.)', 1, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', null, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000100000000000000000', 'Повернення злитків БМ згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('!DP', 'STOP-правило. Обмеження виплати валюти, еквівалент 15000грн', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(414,#(KVA),#(NLSA),#(S),#(REF))', null, null, null, null, 0, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DM1', name='DM1 Виплата з поточного металевого рахунку (готів.)', dk=1, nlsm=null, kv=null, nlsk='#(tobopack.GetTOBOParam(''CASH11''))', kvk=null, nlss=null, nlsa=null, nlsb='#(tobopack.GetTOBOParam(''CASH11''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000100000000000000000', nazn='Повернення злитків БМ згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='!DP', name='STOP-правило. Обмеження виплати валюти, еквівалент 15000грн', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(414,#(KVA),#(NLSA),#(S),#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+       where tt='!DP';
+  end;
+  --------------------------------
+  ----------- Реквизиты ----------
+  --------------------------------
+  delete from op_rules where tt='!DP';
+  --------------------------------
+  ------ Связанные операции ------
+  --------------------------------
+  delete from ttsap where tt='!DP';
+  --------------------------------
+  ------- Балансовые счета -------
+  --------------------------------
+  delete from ps_tts where tt='!DP';
+  --------------------------------
+  -------- Виды документов -------
+  --------------------------------
+  delete from tts_vob where tt='!DP';
+  --------------------------------
+  -------- Группы контроля -------
+  --------------------------------
+  delete from chklist_tts where tt='!DP';
+  --------------------------------
+  ------------- Папки ------------
+  --------------------------------
+  delete from folders_tts where tt='!DP';
+  begin
+    insert into folders_tts(idfo, tt)
+    values (1, '!DP');
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (folders_tts: 1, ''!DP'') - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+end;
+/
+prompt Создание / Обновление операции DM1
+prompt Наименование операции: Виплата з поточного металевого рахунку (готів.)
+declare
+  cnt_  number;
+begin
+  --------------------------------
+  -- Основные свойства операции --
+  --------------------------------
+  begin
+    insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
+    values ('DM1', 'Виплата з поточного металевого рахунку (готів.)', 1, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', null, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000100000000000000000', 'Повернення злитків БМ згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+  exception
+    when dup_val_on_index then 
+      update tts
+         set tt='DM1', name='Виплата з поточного металевого рахунку (готів.)', dk=1, nlsm=null, kv=null, nlsk='#(tobopack.GetTOBOParam(''CASH11''))', kvk=null, nlss=null, nlsa=null, nlsb='#(tobopack.GetTOBOParam(''CASH11''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000100000000000000000', nazn='Повернення злитків БМ згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DM1';
   end;
   --------------------------------
@@ -221,6 +275,17 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (ttsap: ''!DK'', ''DM1'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ttsap(ttap, tt, dk)
+    values ('!DP', 'DM1', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ttsap: ''!DP'', ''DM1'', 0) - первичный ключ не найден!');
       else raise;
       end if;
   end;

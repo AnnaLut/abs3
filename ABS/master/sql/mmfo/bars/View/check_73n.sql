@@ -31,10 +31,8 @@ where
       a.dk=1;
 
 PROMPT *** Create  grants  CHECK_73N ***
-grant SELECT                                                                 on CHECK_73N       to BARSREADER_ROLE;
 grant SELECT                                                                 on CHECK_73N       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHECK_73N       to START1;
-grant SELECT                                                                 on CHECK_73N       to UPLD;
 
 
 

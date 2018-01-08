@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_DPT_ACCOUNTS.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPT_ACCOUNTS ***
-grant SELECT                                                                 on ERR$_DPT_ACCOUNTS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPT_ACCOUNTS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

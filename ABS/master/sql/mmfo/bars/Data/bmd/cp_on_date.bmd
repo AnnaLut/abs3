@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,8 +58,7 @@ declare
 begin
 
   l_tabsemantic := 'ЦП Портфель на дату';
-  l_tablinesdef := '10';
-  l_tabselect_statement := '';
+  l_tablinesdef := '100';
   l_tabname     := 'CP_ON_DATE';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,35 +119,37 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'USER_ID', 'N', 'ІД ~користувача', '1', 20, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ID', 'N', '№ ЦП ~в системi', '1', 22, 5, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'CP_ID', 'C', 'Код ЦП', '1.5', 20, 6, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'RYN', 'N', 'Суб.~портфель', '1', 22, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'RYN_NAME', 'C', 'Суб.~портфель', '3', 22, 10, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'REF', 'N', 'Реф ~угоди ~купiвлi', '1.3', 22, 4, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'ERAT', 'N', 'Ефект. ~ставка %', '1', 22, 22, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'DOX', 'N', 'Вид ~Доходностi', '1', 22, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'EMI', 'N', 'Вид ~Емiтенту', '1', 22, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'KV', 'N', 'Вал', '1', 22, 7, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'MDATE', 'D', 'Дата ~погашення', '', 10, 11, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'OSTA', 'N', 'Сума ~Номiналу', '1.3', 22, 14, 1, 0, 0, 0, '', '', 1, 0, 'SUM(OSTA)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'PF', 'N', 'Портфель', '1', 22, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'PF_NAME', 'N', 'Портфель', '3', 22, 9, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'DATD', 'D', 'Дата ~угоди ~купiвлі', '', 10, 1, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'ND', 'C', '№ угоди ~купiвлi', '1.2', 10, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'RNK', 'N', '№ РНК ~емiт', '1', 22, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'SUMB', 'N', 'Сума ~угоди ~купiвлi', '1.5', 22, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'VIDD', 'N', 'Бал.Рах.', '1', 22, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'IR', 'N', 'Номінальна ~%ст. річна', '1.3', 22, 12, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'MO_PR', 'N', 'Ном.% ~ст.місячна', '1.5', 22, 13, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'OSTD', 'N', 'Сума ~дисконту', '1', 22, 15, 1, 0, 1, 0, '', '', 1, 0, 'SUM(OSTD)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'OSTP', 'N', 'Сума ~премії', '1', 22, 16, 1, 0, 1, 0, '', '', 1, 0, 'SUM(OSTP)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'OSTR', 'N', 'Сума ~нарах %', '1', 22, 17, 1, 0, 1, 0, '', '', 1, 0, 'SUM(OSTR)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'OSTR2', 'N', 'Сума ~куплених %', '1', 22, 18, 1, 0, 1, 0, '', '', 1, 0, 'SUM(OSTR2)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'OSTS', 'N', 'Сума ~переоц.', '1', 22, 19, 1, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'OSTAB', 'N', 'Сума ~ном ~N-план', '1', 22, 20, 1, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'OSTAF', 'N', 'Сума ~ном ~N-буд', '1', 22, 21, 1, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'P_DATE', 'D', 'На дату', '1', 10, 23, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'USER_ID', 'N', 'ІД ~користувача',       1, 20, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ID', 'N', '№ ЦП ~в системi',            1, 22, 5, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'CP_ID', 'C', 'Код ЦП',                 1.5, 20, 6, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'RYN', 'N', 'Суб.~портфель',             1, 22, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'RYN_NAME', 'C', 'Суб.~портфель',        3, 22, 10, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'REF', 'N', 'Реф ~угоди ~купiвлi',        1.3, 22, 4, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'ERAT', 'N', 'Ефект. ~ставка %',         1, 22, 22, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'DOX', 'N', 'Вид ~Доходностi',           1, 22, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'EMI', 'N', 'Вид ~Емiтенту',             1, 22, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,10, 'KV', 'N', 'Вал',                       1, 22, 7, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,11, 'MDATE', 'D', 'Дата ~погашення',         null, 10, 11, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,12, 'OSTA', 'N', 'Сума ~Номiналу',           1.3, 22, 14, 1, 0, 0, 0, '', '', 1, 0, 'SUM(OSTA)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,13, 'PF', 'N', 'Портфель',                  1, 22, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,14, 'PF_NAME', 'N', 'Портфель',             3, 22, 9, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,15, 'DATD', 'D', 'Дата ~угоди ~купiвлі',      null, 10, 1, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,16, 'ND', 'C', '№ угоди ~купiвлi',           1.2, 10, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,17, 'RNK', 'N', '№ РНК ~емiт',               1, 22, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,18, 'SUMB', 'N', 'Сума ~угоди ~купiвлi',      1.5, 22, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,19, 'VIDD', 'N', 'Бал.Рах.',                1, 22, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,20, 'IR', 'N', 'Номінальна ~%ст. річна',     1.3, 22, 12, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,21, 'MO_PR', 'N', 'Ном.% ~ст.місячна',       1.5, 22, 13, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,22, 'OSTD', 'N', 'Сума ~дисконту',           1, 22, 15, 1, 0, 1, 0, '', '', 1, 0, 'SUM(OSTD)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,23, 'OSTP', 'N', 'Сума ~премії',             1, 22, 16, 1, 0, 1, 0, '', '', 1, 0, 'SUM(OSTP)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,24, 'OSTR', 'N', 'Сума ~нарах %',            1, 22, 17, 1, 0, 1, 0, '', '', 1, 0, 'SUM(OSTR)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,25, 'OSTR2', 'N', 'Сума ~куплених %',        1, 22, 18, 1, 0, 1, 0, '', '', 1, 0, 'SUM(OSTR2)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,26, 'OSTS', 'N', 'Сума ~переоц.',            1, 22, 19, 1, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,27, 'OSTAB', 'N', 'Сума ~ном ~N-план',        1, 22, 20, 1, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,28, 'OSTAF', 'N', 'Сума ~ном ~N-буд',         1, 22, 21, 1, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,29, 'P_DATE', 'D', 'На дату',               1, 10, 23, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+
+
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

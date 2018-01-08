@@ -16,9 +16,7 @@ select 3, 'ף דנטגםÿץ ג³ה ×ֱ׀׀' from dual
 ;
 
 PROMPT *** Create  grants  V_CIM_KOD_34_1 ***
-grant SELECT                                                                 on V_CIM_KOD_34_1  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_KOD_34_1  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_KOD_34_1  to UPLD;
 
 
 

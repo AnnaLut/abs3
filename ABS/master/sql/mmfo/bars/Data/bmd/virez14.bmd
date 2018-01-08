@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Фінансовий результат  "Трансформаційних проводок"';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'VIREZ14';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,26 +119,26 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'EVENT', 'B', '~Знец~актив', '', null, 4, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'KV~Вал~акт', '', null, 5, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'P14', 'N', 'P14~НЕвизнанi ~%%~ за 2014~рік~05', '', null, 10, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P14 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'P15', 'N', 'P15~НЕвизнанi~%%~ з 01.01.2015~по 30.06.2015~11', '', null, 19, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P15 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'P152', 'N', 'P152~НЕвизнанi~%%~ з 01.07.2015~по 30.11.2015~12', '', null, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P152 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'P153', 'N', 'P153~НЕвизнанi~%%~ з 01.12.2015~по 31.12.2015~13', '', null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P153 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'R14', 'N', 'R14~Приріст~рез.2014~МСФЗ-НБУ~04=~01+02-03', '', null, 9, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( R14 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'R15', 'N', 'R14~Приріст~рез.2015~МСФЗ-НБУ~10=~07+08-09', '', null, 18, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( R15 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'TIPA', 'N', '~Тип~активу', '', null, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'Z14', 'N', 'Z14~Разом~ прибуток~ за 2014 рік~06=~-04+05', '', null, 11, 0, 0, 1, 0, '', '# ##0.00', 1, 0, 'Sum ( Z14 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'Z15', 'N', 'Z15~Разом ~прибуток~ за 2015 рік~14=~-10+04+11+12+13', '', null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( Z15 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'ID', 'C', '~ID~активу', '', null, 2, 0, 0, 0, 0, '', '', 1, 0, '''Разом''', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'MFO', 'C', '~МФО РУ', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, 'Min(MFO)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'VIDD', 'N', '~Вид ~КД', '', null, 30, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'A14', 'N', 'A14~Абс.знач~рез-2014~МСФЗ~Бал~01', '', null, 6, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (A14 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'B14', 'N', 'B14~Абс.знач~рез-2014~МСФЗ~9 кл~02', '', null, 7, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (B14 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'N14', 'N', 'N14~Абс.знач~рез-2014~НБУ~~03', '', null, 8, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (N14 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'A15', 'N', 'A15~Абс.знач~рез-2015~МСФЗ~Бал~07', '', null, 15, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (A15 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'B15', 'N', 'B15~Абс.знач~рез-2015~МСФЗ~9 кл~08', '', null, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (B15 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'N15', 'N', 'N14~Абс.знач~рез-2015~НБУ.23~~09', '', null, 17, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (N15 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'EVENT', 'B', '~Знец~актив', null, null, 4, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'KV~Вал~акт', null, null, 5, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'P14', 'N', 'P14~НЕвизнанi ~%%~ за 2014~рік~05', null, null, 10, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P14 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'P15', 'N', 'P15~НЕвизнанi~%%~ з 01.01.2015~по 30.06.2015~11', null, null, 19, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P15 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'P152', 'N', 'P152~НЕвизнанi~%%~ з 01.07.2015~по 30.11.2015~12', null, null, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P152 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'P153', 'N', 'P153~НЕвизнанi~%%~ з 01.12.2015~по 31.12.2015~13', null, null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P153 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'R14', 'N', 'R14~Приріст~рез.2014~МСФЗ-НБУ~04=~01+02-03', null, null, 9, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( R14 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'R15', 'N', 'R14~Приріст~рез.2015~МСФЗ-НБУ~10=~07+08-09', null, null, 18, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( R15 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'TIPA', 'N', '~Тип~активу', null, null, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'Z14', 'N', 'Z14~Разом~ прибуток~ за 2014 рік~06=~-04+05', null, null, 11, 0, 0, 1, 0, '', '# ##0.00', 1, 0, 'Sum ( Z14 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'Z15', 'N', 'Z15~Разом ~прибуток~ за 2015 рік~14=~-10+04+11+12+13', null, null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( Z15 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'ID', 'C', '~ID~активу', null, null, 2, 0, 0, 0, 0, '', '', 1, 0, '''Разом''', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'MFO', 'C', '~МФО РУ', null, null, 1, 0, 0, 0, 0, '', '', 1, 0, 'Min(MFO)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'VIDD', 'N', '~Вид ~КД', null, null, 30, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'A14', 'N', 'A14~Абс.знач~рез-2014~МСФЗ~Бал~01', null, null, 6, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (A14 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'B14', 'N', 'B14~Абс.знач~рез-2014~МСФЗ~9 кл~02', null, null, 7, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (B14 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'N14', 'N', 'N14~Абс.знач~рез-2014~НБУ~~03', null, null, 8, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (N14 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'A15', 'N', 'A15~Абс.знач~рез-2015~МСФЗ~Бал~07', null, null, 15, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (A15 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'B15', 'N', 'B15~Абс.знач~рез-2015~МСФЗ~9 кл~08', null, null, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (B15 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'N15', 'N', 'N14~Абс.знач~рез-2015~НБУ.23~~09', null, null, 17, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (N15 )', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CC_VIDD');

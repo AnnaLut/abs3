@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_DPT_FILE_AGENCY.AGENCY_ID IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_DPT_FILE_AGENCY ***
-grant SELECT                                                                 on ERR$_DPT_FILE_AGENCY to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_DPT_FILE_AGENCY to UPLD;
-
 
 
 PROMPT ===================================================================================== 

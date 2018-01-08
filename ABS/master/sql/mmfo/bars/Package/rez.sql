@@ -1,5 +1,3 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/rez.sql =========*** Run *** =======
  PROMPT ===================================================================================== 
@@ -277,6 +275,7 @@ FUNCTION ostc96_3 (acc_ INT, dat_ IN DATE)
 
 
 END rez;
+ 
 /
 CREATE OR REPLACE PACKAGE BODY BARS.REZ 
 /*
@@ -3347,18 +3346,18 @@ IS
                  a.nls, a.isp, SUBSTR (a.nbs, 3, 2) priz, a.nbs, c.crisk fin,
                  NVL (c.country, acountry) country,
                  DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) rz,
-                 cw.corp, a.daos, p.s182, p.s270
+                 cw.corp, a.daos, p.s182, p.s270 
             FROM accounts a, cust_acc cu, customer c, specparam p, cw
            WHERE cu.acc = a.acc
              AND cu.rnk = c.rnk
              AND a.acc = NVL (acckr_, a.acc)
              AND a.acc = p.acc(+)
              AND (a.dazs IS NULL OR a.dazs > dat_)
-             AND a.tip IN ( 'SPN')
+             AND a.tip IN ( 'SPN') 
              AND c.rnk = cw.rnk(+)
              union all
            --начисленные
-           SELECT a.tip, c.rnk, SUBSTR (c.nmk, 1, 35) nmk, DECODE (TRIM (c.sed),'91', DECODE (custtype, 3, 2, custtype),c.custtype) custtype,
+           SELECT a.tip, c.rnk, SUBSTR (c.nmk, 1, 35) nmk, DECODE (TRIM (c.sed),'91', DECODE (custtype, 3, 2, custtype),c.custtype) custtype, 
                  a.tobo,
                  NVL (p.s080, '') s080,
                  NVL (p.r013, '') r013,
@@ -3366,7 +3365,7 @@ IS
                  a.nls, a.isp, SUBSTR (a.nbs, 3, 2) priz, a.nbs, c.crisk fin,
                  NVL (c.country, acountry) country,
                  DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) rz,
-                 cw.corp, a.daos, p.s182, p.s270
+                 cw.corp, a.daos, p.s182, p.s270 
             FROM accounts a, cust_acc cu, customer c, specparam p, cw
            WHERE cu.acc = a.acc
              AND cu.rnk = c.rnk

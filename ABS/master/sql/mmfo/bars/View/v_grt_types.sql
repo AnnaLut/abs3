@@ -13,9 +13,7 @@ PROMPT *** Create  view V_GRT_TYPES ***
  where t.group_id = g.group_id;
 
 PROMPT *** Create  grants  V_GRT_TYPES ***
-grant SELECT                                                                 on V_GRT_TYPES     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GRT_TYPES     to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_GRT_TYPES     to UPLD;
 
 
 

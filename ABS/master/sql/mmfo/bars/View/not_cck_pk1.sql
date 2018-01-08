@@ -48,10 +48,8 @@ where  acc in
  );
 
 PROMPT *** Create  grants  NOT_CCK_PK1 ***
-grant SELECT                                                                 on NOT_CCK_PK1     to BARSREADER_ROLE;
 grant SELECT                                                                 on NOT_CCK_PK1     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NOT_CCK_PK1     to RCC_DEAL;
-grant SELECT                                                                 on NOT_CCK_PK1     to UPLD;
 
 
 

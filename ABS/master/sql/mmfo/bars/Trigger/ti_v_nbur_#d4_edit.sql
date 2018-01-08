@@ -13,13 +13,12 @@ ON BARS.V_NBUR_#D4_EDIT
 REFERENCING NEW AS New OLD AS Old
 FOR EACH ROW
 DECLARE
-    lv_kodp varchar2(200);
-    lv_mfo  varchar2(20) := bc.current_mfo;
+lv_kodp varchar2(200);
 BEGIN
    lv_kodp := :new.SEG_01 || :new.SEG_02 || :new.SEG_03 || :new.SEG_04;
         
    insert into tmp_nbu(KODP, DATF, KODF, ZNAP, NBUC, ERR_MSG, kf, FL_MOD)
-   values (lv_kodp, :new.datf, 'D4', :new.ZNAP, lv_mfo, null, lv_mfo, 1);
+   values (lv_kodp, :new.datf, 'D4', :new.ZNAP, '300465', null, '300465', 1);
 
    EXCEPTION
      WHEN OTHERS THEN

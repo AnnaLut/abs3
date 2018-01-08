@@ -1,5 +1,6 @@
 
 
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/PFU/Table/PFU_NO_TURNOVER_REQUEST.sql =========**
 PROMPT ===================================================================================== 
@@ -8,32 +9,29 @@ PROMPT =========================================================================
 PROMPT *** Create  table PFU_NO_TURNOVER_REQUEST ***
 begin 
   execute immediate '
-  CREATE TABLE PFU.PFU_NO_TURNOVER_REQUEST 
-   (	ID NUMBER(10,0), 
-	PFU_XML CLOB
-   ) SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSBIGD 
- LOB (PFU_XML) STORE AS BASICFILE (
-  TABLESPACE BRSBIGD ENABLE STORAGE IN ROW CHUNK 8192 RETENTION 
-  NOCACHE LOGGING ) ';
+create table PFU.PFU_NO_TURNOVER_REQUEST
+(
+  id      NUMBER(10),
+  pfu_xml CLOB
+)
+tablespace BRSBIGD
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  ) ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
 
-
-COMMENT ON TABLE PFU.PFU_NO_TURNOVER_REQUEST IS 'Запит на відправку квітанцій';
-COMMENT ON COLUMN PFU.PFU_NO_TURNOVER_REQUEST.ID IS '';
-COMMENT ON COLUMN PFU.PFU_NO_TURNOVER_REQUEST.PFU_XML IS 'Квитанция';
-
-
-
-PROMPT *** Create  grants  PFU_NO_TURNOVER_REQUEST ***
-grant SELECT                                                                 on PFU_NO_TURNOVER_REQUEST to UPLD;
-
-
+comment on table PFU.PFU_NO_TURNOVER_REQUEST is 'Запит на відправку квітанцій';
+comment on column PFU.PFU_NO_TURNOVER_REQUEST.pfu_xml is 'Квитанция';
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/PFU/Table/PFU_NO_TURNOVER_REQUEST.sql =========**

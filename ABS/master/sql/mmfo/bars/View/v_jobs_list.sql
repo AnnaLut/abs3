@@ -15,8 +15,6 @@ PROMPT *** Create  view V_JOBS_LIST ***
  ;
 
 PROMPT *** Create  grants  V_JOBS_LIST ***
-grant SELECT                                                                 on V_JOBS_LIST     to BARSREADER_ROLE;
-grant SELECT                                                                 on V_JOBS_LIST     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_JOBS_LIST     to WR_ALL_RIGHTS;
 
 

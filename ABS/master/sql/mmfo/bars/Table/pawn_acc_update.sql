@@ -157,10 +157,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  PAWN_ACC_UPDATE ***
-grant SELECT                                                                 on PAWN_ACC_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on PAWN_ACC_UPDATE to BARSUPL;
 grant SELECT                                                                 on PAWN_ACC_UPDATE to BARS_DM;
-grant SELECT                                                                 on PAWN_ACC_UPDATE to UPLD;
 
 
 

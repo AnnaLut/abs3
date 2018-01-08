@@ -18,10 +18,8 @@ PROMPT *** Create  view V_FXANI ***
      and f.ref  = od.ref and od.dk  = 0   and od.acc = ad.acc and f.ref  = ok.ref and ok.dk  = 1   and ok.acc = ak.acc and ok.stmt = od.stmt ;
 
 PROMPT *** Create  grants  V_FXANI ***
-grant SELECT                                                                 on V_FXANI         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FXANI         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FXANI         to START1;
-grant SELECT                                                                 on V_FXANI         to UPLD;
 
 
 

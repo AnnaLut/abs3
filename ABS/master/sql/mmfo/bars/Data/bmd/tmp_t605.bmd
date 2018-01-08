@@ -59,7 +59,7 @@ declare
 begin
 
   l_tabsemantic := 'Розрахунок простроченої заборгованості за основним боргом';
-  l_tablinesdef := '10';
+  l_tablinesdef := '50';
   l_tabselect_statement := '';
   l_tabname     := 'TMP_T605';
 

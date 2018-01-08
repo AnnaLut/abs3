@@ -77,11 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CM_CITY_AREA ***
-grant SELECT                                                                 on CM_CITY_AREA    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CM_CITY_AREA    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CM_CITY_AREA    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CM_CITY_AREA    to OW;
-grant SELECT                                                                 on CM_CITY_AREA    to UPLD;
 
 
 

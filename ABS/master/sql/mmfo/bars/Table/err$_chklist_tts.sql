@@ -66,11 +66,9 @@ COMMENT ON COLUMN BARS.ERR$_CHKLIST_TTS.FLAGS IS '';
 
 
 PROMPT *** Create  grants  ERR$_CHKLIST_TTS ***
-grant SELECT                                                                 on ERR$_CHKLIST_TTS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_CHKLIST_TTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ERR$_CHKLIST_TTS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ERR$_CHKLIST_TTS to START1;
-grant SELECT                                                                 on ERR$_CHKLIST_TTS to UPLD;
 
 
 

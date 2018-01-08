@@ -50,11 +50,9 @@ COMMENT ON COLUMN BARS.CM_CITY_STREET.STREET_NAME IS 'Назва вулиці';
 
 
 PROMPT *** Create  grants  CM_CITY_STREET ***
-grant SELECT                                                                 on CM_CITY_STREET  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CM_CITY_STREET  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CM_CITY_STREET  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CM_CITY_STREET  to OW;
-grant SELECT                                                                 on CM_CITY_STREET  to UPLD;
 
 
 

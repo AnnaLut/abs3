@@ -101,11 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_CONTRACT_TYPES ***
-grant SELECT                                                                 on CIM_CONTRACT_TYPES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONTRACT_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_CONTRACT_TYPES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONTRACT_TYPES to CIM_ROLE;
-grant SELECT                                                                 on CIM_CONTRACT_TYPES to UPLD;
 
 
 

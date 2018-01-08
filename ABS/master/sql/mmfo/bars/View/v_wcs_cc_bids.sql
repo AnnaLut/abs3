@@ -32,9 +32,7 @@ PROMPT *** Create  view V_WCS_CC_BIDS ***
               'CA') = sh.id;
 
 PROMPT *** Create  grants  V_WCS_CC_BIDS ***
-grant SELECT                                                                 on V_WCS_CC_BIDS   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_CC_BIDS   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_CC_BIDS   to UPLD;
 
 
 

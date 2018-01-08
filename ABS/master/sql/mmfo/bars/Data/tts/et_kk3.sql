@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции 540
-prompt Наименование операции: 540 STOP-правило. Обмеження готівки 150 тис.грн - 540 пост.НБУ
+prompt Наименование операции: STOP-правило. Обмеження готівки 150 тис.грн - 540 пост.НБУ
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('540', '540 STOP-правило. Обмеження готівки 150 тис.грн - 540 пост.НБУ', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(540,#(KVA),#(NLSA),0,#(REF))', null, null, null, null, 0, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('540', 'STOP-правило. Обмеження готівки 150 тис.грн - 540 пост.НБУ', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(540,#(KVA),#(NLSA),0,#(REF))', null, null, null, null, 0, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='540', name='540 STOP-правило. Обмеження готівки 150 тис.грн - 540 пост.НБУ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(540,#(KVA),#(NLSA),0,#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='540', name='STOP-правило. Обмеження готівки 150 тис.грн - 540 пост.НБУ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(540,#(KVA),#(NLSA),0,#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='540';
   end;
   --------------------------------
@@ -57,7 +57,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции KKS
-prompt Наименование операции: KKS --KKS/КП. STOP-правило на перебільшення ЛІМІТа
+prompt Наименование операции: --KKS/КП. STOP-правило на перебільшення ЛІМІТа
 declare
   cnt_  number;
 begin
@@ -66,11 +66,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KKS', 'KKS --KKS/КП. STOP-правило на перебільшення ЛІМІТа', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'STOP_KK ( #(REF) )', null, null, null, null, null, '0000100000000000000000000000000000000000000000100000000000000000', null);
+    values ('KKS', '--KKS/КП. STOP-правило на перебільшення ЛІМІТа', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'STOP_KK ( #(REF) )', null, null, null, null, null, '0000100000000000000000000000000000000000000000100000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KKS', name='KKS --KKS/КП. STOP-правило на перебільшення ЛІМІТа', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='STOP_KK ( #(REF) )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000100000000000000000', nazn=null
+         set tt='KKS', name='--KKS/КП. STOP-правило на перебільшення ЛІМІТа', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='STOP_KK ( #(REF) )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000100000000000000000', nazn=null
        where tt='KKS';
   end;
   --------------------------------
@@ -111,7 +111,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции KK3
-prompt Наименование операции: KK3 --KK3/КП. Видача кредита готівкою
+prompt Наименование операции: --KK3/КП. Видача кредита готівкою
 declare
   cnt_  number;
 begin
@@ -120,11 +120,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KK3', 'KK3 --KK3/КП. Видача кредита готівкою', 1, null, null, null, null, null, null, null, null, 1, 0, 0, 0, null, null, 45, null, null, null, '0000100001000000000000000000000000010000000000100000000000000000', null);
+    values ('KK3', '--KK3/КП. Видача кредита готівкою', 1, null, null, null, null, null, null, null, null, 1, 0, 0, 0, null, null, 45, null, null, null, '0000100001000000000000000000000000010000000000100000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KK3', name='KK3 --KK3/КП. Видача кредита готівкою', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=45, proc=null, s3800=null, rang=null, flags='0000100001000000000000000000000000010000000000100000000000000000', nazn=null
+         set tt='KK3', name='--KK3/КП. Видача кредита готівкою', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=45, proc=null, s3800=null, rang=null, flags='0000100001000000000000000000000000010000000000100000000000000000', nazn=null
        where tt='KK3';
   end;
   --------------------------------

@@ -38,9 +38,7 @@ PROMPT *** Create  view V_USERADM_USER_NBUREPS ***
 
 PROMPT *** Create  grants  V_USERADM_USER_NBUREPS ***
 grant SELECT                                                                 on V_USERADM_USER_NBUREPS to ABS_ADMIN;
-grant SELECT                                                                 on V_USERADM_USER_NBUREPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USERADM_USER_NBUREPS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_USERADM_USER_NBUREPS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USERADM_USER_NBUREPS to WR_ALL_RIGHTS;
 
 

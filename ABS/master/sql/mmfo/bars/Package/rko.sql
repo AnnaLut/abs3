@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/rko.sql =========*** Run *** =======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.RKO IS
+CREATE OR REPLACE PACKAGE rko IS
 /*
 --***************************************************************--
               ѕлата за расчетно-кассовое обслуживание
@@ -59,7 +53,11 @@ PROCEDURE pay2(mode_ VARCHAR2, dat_ DATE,filt_ VARCHAR2 DEFAULT NULL, p_acc numb
 PROCEDURE er(acc_ NUMBER);
 END;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.RKO IS
+
+
+-----------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE PACKAGE BODY BARS.rko IS
 
 /*
   
@@ -851,11 +849,6 @@ err  EXCEPTION               ;
 
 BEGIN
 
-   ----------------------------------------------------------------
-   OP_BS_OB  (P_BBBOO => '651006');  ---   открытие 6510/06
-   ----------------------------------------------------------------
-
-
 ----------  ѕровер€ем:  насторена ли операци€ "RKO" ?  ------------
    BEGIN
       SELECT substr(flags,38,1) INTO flg_
@@ -1502,16 +1495,3 @@ BEGIN
 END;
 END;
 /
- show err;
- 
-PROMPT *** Create  grants  RKO ***
-grant EXECUTE                                                                on RKO             to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on RKO             to RKO;
-grant EXECUTE                                                                on RKO             to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/rko.sql =========*** End *** =======
- PROMPT ===================================================================================== 
- 

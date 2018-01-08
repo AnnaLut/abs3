@@ -17,10 +17,8 @@ PROMPT *** Create  view OTCN_F71_PARAMS ***
    ORDER BY 1;
 
 PROMPT *** Create  grants  OTCN_F71_PARAMS ***
-grant SELECT                                                                 on OTCN_F71_PARAMS to BARSREADER_ROLE;
 grant SELECT                                                                 on OTCN_F71_PARAMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_F71_PARAMS to START1;
-grant SELECT                                                                 on OTCN_F71_PARAMS to UPLD;
 
 
 

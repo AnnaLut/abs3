@@ -35,10 +35,8 @@ PROMPT *** Create  view V12_SNO_FL ***
    AND d.branch LIKE sys_context('bars_context', 'user_branch') || '%';
 
 PROMPT *** Create  grants  V12_SNO_FL ***
-grant SELECT                                                                 on V12_SNO_FL      to BARSREADER_ROLE;
 grant SELECT                                                                 on V12_SNO_FL      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V12_SNO_FL      to START1;
-grant SELECT                                                                 on V12_SNO_FL      to UPLD;
 
 
 

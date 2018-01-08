@@ -16,10 +16,8 @@ PROMPT *** Create  view VPAY_ALT ***
  ;
 
 PROMPT *** Create  grants  VPAY_ALT ***
-grant SELECT                                                                 on VPAY_ALT        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VPAY_ALT        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VPAY_ALT        to PYOD001;
-grant SELECT                                                                 on VPAY_ALT        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VPAY_ALT        to WR_ALL_RIGHTS;
 
 

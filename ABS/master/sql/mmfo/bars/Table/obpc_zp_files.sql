@@ -125,11 +125,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_ZP_FILES ***
-grant SELECT                                                                 on OBPC_ZP_FILES   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_ZP_FILES   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_ZP_FILES   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_ZP_FILES   to OBPC;
-grant SELECT                                                                 on OBPC_ZP_FILES   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_ZP_FILES   to WR_ALL_RIGHTS;
 
 

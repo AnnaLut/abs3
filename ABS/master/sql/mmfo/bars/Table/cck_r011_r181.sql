@@ -107,11 +107,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CCK_R011_R181 ***
-grant SELECT                                                                 on CCK_R011_R181   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_R011_R181   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_R011_R181   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_R011_R181   to RCC_DEAL;
-grant SELECT                                                                 on CCK_R011_R181   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_R011_R181   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CCK_R011_R181   to WR_REFREAD;
 

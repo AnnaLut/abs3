@@ -93,6 +93,55 @@ COMMENT ON COLUMN BARS.CIG_CUST_COMPANY.BRANCH IS '';
 
 
 
+PROMPT *** Create  constraint CC_CIGCUSTCOMP_STATUSID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (STATUS_ID CONSTRAINT CC_CIGCUSTCOMP_STATUSID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CIGCUSTOMP_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (BRANCH CONSTRAINT CC_CIGCUSTOMP_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CIGCUSTCOMP_CUSTID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (CUST_ID CONSTRAINT CC_CIGCUSTCOMP_CUSTID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CIGCUSTCOMP_CIGCUSTOMERS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIG_CUST_COMPANY ADD CONSTRAINT FK_CIGCUSTCOMP_CIGCUSTOMERS FOREIGN KEY (CUST_ID, BRANCH)
+	  REFERENCES BARS.CIG_CUSTOMERS (CUST_ID, BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_CIGCUSTCOMP ***
 begin   
  execute immediate '
@@ -107,46 +156,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIGCUSTCOMP_CUSTID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (CUST_ID CONSTRAINT CC_CIGCUSTCOMP_CUSTID_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CIGCUSTCOMP_ROLEID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (ROLE_ID CONSTRAINT CC_CIGCUSTCOMP_ROLEID_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CIGCUSTCOMP_STATUSID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (STATUS_ID CONSTRAINT CC_CIGCUSTCOMP_STATUSID_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_CIGCUSTCOMP_LANGNAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (LANG_NAME CONSTRAINT CC_CIGCUSTCOMP_LANGNAME_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (LANG_NAME CONSTRAINT CC_CIGCUSTCOMP_LANGNAME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -158,7 +171,7 @@ exception when others then
 PROMPT *** Create  constraint CC_CIGCUSTCOMP_NAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (NAME CONSTRAINT CC_CIGCUSTCOMP_NAME_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (NAME CONSTRAINT CC_CIGCUSTCOMP_NAME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -170,7 +183,7 @@ exception when others then
 PROMPT *** Create  constraint CC_CIGCUSTCOMP_LANGABBREV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (LANG_ABBREVIATION CONSTRAINT CC_CIGCUSTCOMP_LANGABBREV_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (LANG_ABBREVIATION CONSTRAINT CC_CIGCUSTCOMP_LANGABBREV_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -182,7 +195,7 @@ exception when others then
 PROMPT *** Create  constraint CC_CIGCUSTCOMP_ABBREV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (ABBREVIATION CONSTRAINT CC_CIGCUSTCOMP_ABBREV_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (ABBREVIATION CONSTRAINT CC_CIGCUSTCOMP_ABBREV_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -194,7 +207,7 @@ exception when others then
 PROMPT *** Create  constraint CC_CIGCUSTCOMP_OWNERSHIP_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (OWNERSHIP CONSTRAINT CC_CIGCUSTCOMP_OWNERSHIP_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (OWNERSHIP CONSTRAINT CC_CIGCUSTCOMP_OWNERSHIP_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -206,7 +219,7 @@ exception when others then
 PROMPT *** Create  constraint CC_CIGCUSTCOMP_REGISTRDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (REGISTR_DATE CONSTRAINT CC_CIGCUSTCOMP_REGISTRDATE_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (REGISTR_DATE CONSTRAINT CC_CIGCUSTCOMP_REGISTRDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -218,7 +231,7 @@ exception when others then
 PROMPT *** Create  constraint CC_CIGCUSTCOMP_FACTTERRIT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (FACT_TERRITORY_ID CONSTRAINT CC_CIGCUSTCOMP_FACTTERRIT_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (FACT_TERRITORY_ID CONSTRAINT CC_CIGCUSTCOMP_FACTTERRIT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -230,7 +243,7 @@ exception when others then
 PROMPT *** Create  constraint CC_CIGCUSTCOMP_FACSTBUNUM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (FACT_STREET_BUILDNUM CONSTRAINT CC_CIGCUSTCOMP_FACSTBUNUM_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (FACT_STREET_BUILDNUM CONSTRAINT CC_CIGCUSTCOMP_FACSTBUNUM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -242,7 +255,7 @@ exception when others then
 PROMPT *** Create  constraint CC_CIGCUSTCOMP_REGSTBUNUM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (REG_STREET_BUILDNUM CONSTRAINT CC_CIGCUSTCOMP_REGSTBUNUM_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (REG_STREET_BUILDNUM CONSTRAINT CC_CIGCUSTCOMP_REGSTBUNUM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -251,10 +264,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIGCUSTOMP_BRANCH_NN ***
+PROMPT *** Create  constraint CC_CIGCUSTCOMP_ROLEID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (BRANCH CONSTRAINT CC_CIGCUSTOMP_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIG_CUST_COMPANY MODIFY (ROLE_ID CONSTRAINT CC_CIGCUSTCOMP_ROLEID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -277,11 +290,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_CUST_COMPANY ***
-grant SELECT                                                                 on CIG_CUST_COMPANY to BARSREADER_ROLE;
 grant SELECT                                                                 on CIG_CUST_COMPANY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_CUST_COMPANY to BARS_DM;
 grant SELECT                                                                 on CIG_CUST_COMPANY to CIG_ROLE;
-grant SELECT                                                                 on CIG_CUST_COMPANY to UPLD;
 
 
 

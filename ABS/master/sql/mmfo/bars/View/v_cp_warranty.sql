@@ -35,9 +35,7 @@ PROMPT *** Create  view V_CP_WARRANTY ***
           and ck.id = cd.id;
 
 PROMPT *** Create  grants  V_CP_WARRANTY ***
-grant SELECT                                                                 on V_CP_WARRANTY   to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_CP_WARRANTY   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CP_WARRANTY   to UPLD;
 grant FLASHBACK,SELECT                                                       on V_CP_WARRANTY   to WR_REFREAD;
 
 

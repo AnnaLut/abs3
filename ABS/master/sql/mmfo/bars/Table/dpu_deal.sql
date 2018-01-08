@@ -107,10 +107,348 @@ COMMENT ON COLUMN BARS.DPU_DEAL.OKPO_P IS 'Код ЄДРПОУ для виплати відсотків';
 
 
 
-PROMPT *** Create  constraint CC_DPUDEAL_TRUSTEEID_NN ***
+PROMPT *** Create  constraint FK_DPUDEAL_FREQ ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (TRUSTEE_ID CONSTRAINT CC_DPUDEAL_TRUSTEEID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT FK_DPUDEAL_FREQ FOREIGN KEY (FREQV)
+	  REFERENCES BARS.FREQ (FREQ) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPUDEAL_DPTSTOP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT FK_DPUDEAL_DPTSTOP FOREIGN KEY (ID_STOP)
+	  REFERENCES BARS.DPT_STOP (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL MODIFY (KF CONSTRAINT CC_DPUDEAL_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL MODIFY (BRANCH CONSTRAINT CC_DPUDEAL_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_IDSTOP_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL MODIFY (ID_STOP CONSTRAINT CC_DPUDEAL_IDSTOP_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_COMPROC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL MODIFY (COMPROC CONSTRAINT CC_DPUDEAL_COMPROC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_CLOSED_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL MODIFY (CLOSED CONSTRAINT CC_DPUDEAL_CLOSED_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_DATZ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL MODIFY (DATZ CONSTRAINT CC_DPUDEAL_DATZ_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_DATBEGIN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL MODIFY (DAT_BEGIN CONSTRAINT CC_DPUDEAL_DATBEGIN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_FREQV_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL MODIFY (FREQV CONSTRAINT CC_DPUDEAL_FREQV_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_USERID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL MODIFY (USER_ID CONSTRAINT CC_DPUDEAL_USERID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_ACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL MODIFY (ACC CONSTRAINT CC_DPUDEAL_ACC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_RNK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL MODIFY (RNK CONSTRAINT CC_DPUDEAL_RNK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_VIDD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL MODIFY (VIDD CONSTRAINT CC_DPUDEAL_VIDD_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_ND_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL MODIFY (ND CONSTRAINT CC_DPUDEAL_ND_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_DPUID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL MODIFY (DPU_ID CONSTRAINT CC_DPUDEAL_DPUID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPUDEAL_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT FK_DPUDEAL_STAFF FOREIGN KEY (USER_ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPUDEAL_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT FK_DPUDEAL_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPUDEAL_BANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT FK_DPUDEAL_BANKS FOREIGN KEY (MFO_D)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPUDEAL_DPUDEAL2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT FK_DPUDEAL_DPUDEAL2 FOREIGN KEY (KF, DPU_GEN)
+	  REFERENCES BARS.DPU_DEAL (KF, DPU_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPUDEAL_ACCOUNTS3 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT FK_DPUDEAL_ACCOUNTS3 FOREIGN KEY (KF, ACC2)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPUDEAL_ACCOUNTS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT FK_DPUDEAL_ACCOUNTS2 FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPUDEAL_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT FK_DPUDEAL_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPUDEAL_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT FK_DPUDEAL_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint UK_DPUDEAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT UK_DPUDEAL UNIQUE (KF, DPU_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_COMPROC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT CC_DPUDEAL_COMPROC CHECK (comproc in (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPUDEAL_CLOSED ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT CC_DPUDEAL_CLOSED CHECK (closed in (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_DPUDEAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT PK_DPUDEAL PRIMARY KEY (DPU_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -139,12 +477,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_DPUDEAL ***
+PROMPT *** Create  constraint CC_DPUDEAL_TRUSTEEID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT PK_DPUDEAL PRIMARY KEY (DPU_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
+  ALTER TABLE BARS.DPU_DEAL MODIFY (TRUSTEE_ID CONSTRAINT CC_DPUDEAL_TRUSTEEID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -153,10 +489,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUDEAL_CLOSED ***
+PROMPT *** Create  constraint FK_DPUDEAL_DPUVIDD ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT CC_DPUDEAL_CLOSED CHECK (closed in (0,1)) ENABLE';
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT FK_DPUDEAL_DPUVIDD FOREIGN KEY (VIDD)
+	  REFERENCES BARS.DPU_VIDD (VIDD) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -165,192 +502,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUDEAL_COMPROC ***
+PROMPT *** Create  constraint FK_DPUDEAL_BANKS2 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT CC_DPUDEAL_COMPROC CHECK (comproc in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint UK_DPUDEAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT UK_DPUDEAL UNIQUE (KF, DPU_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUDEAL_DPUID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (DPU_ID CONSTRAINT CC_DPUDEAL_DPUID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUDEAL_ND_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (ND CONSTRAINT CC_DPUDEAL_ND_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUDEAL_VIDD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (VIDD CONSTRAINT CC_DPUDEAL_VIDD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUDEAL_RNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (RNK CONSTRAINT CC_DPUDEAL_RNK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUDEAL_ACC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (ACC CONSTRAINT CC_DPUDEAL_ACC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUDEAL_USERID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (USER_ID CONSTRAINT CC_DPUDEAL_USERID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUDEAL_FREQV_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (FREQV CONSTRAINT CC_DPUDEAL_FREQV_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUDEAL_DATBEGIN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (DAT_BEGIN CONSTRAINT CC_DPUDEAL_DATBEGIN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUDEAL_DATZ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (DATZ CONSTRAINT CC_DPUDEAL_DATZ_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUDEAL_CLOSED_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (CLOSED CONSTRAINT CC_DPUDEAL_CLOSED_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUDEAL_COMPROC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (COMPROC CONSTRAINT CC_DPUDEAL_COMPROC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUDEAL_IDSTOP_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (ID_STOP CONSTRAINT CC_DPUDEAL_IDSTOP_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUDEAL_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (BRANCH CONSTRAINT CC_DPUDEAL_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUDEAL_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL MODIFY (KF CONSTRAINT CC_DPUDEAL_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPU_DEAL ADD CONSTRAINT FK_DPUDEAL_BANKS2 FOREIGN KEY (MFO_P)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -429,13 +585,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPU_DEAL ***
-grant SELECT                                                                 on DPU_DEAL        to BARSREADER_ROLE;
 grant SELECT                                                                 on DPU_DEAL        to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_DEAL        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_DEAL        to BARS_DM;
 grant SELECT                                                                 on DPU_DEAL        to DPT_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_DEAL        to DPT_ROLE;
-grant SELECT                                                                 on DPU_DEAL        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPU_DEAL        to WR_ALL_RIGHTS;
 grant SELECT,UPDATE                                                          on DPU_DEAL        to WR_DEPOSIT_U;
 

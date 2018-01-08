@@ -26,7 +26,6 @@ end;
  show err;
  
 PROMPT *** Create  grants  F_RET_KURS ***
-grant EXECUTE                                                                on F_RET_KURS      to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on F_RET_KURS      to WR_ALL_RIGHTS;
 
  

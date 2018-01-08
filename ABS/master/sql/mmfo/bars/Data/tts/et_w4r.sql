@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции !C9
-prompt Наименование операции: !C9 STOP-контроль C9
+prompt Наименование операции: STOP-контроль C9
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!C9', '!C9 STOP-контроль C9', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_CHECK_C9(#(REF))', null, null, null, null, null, '0040M0000000000000000000040M000000000000000000000000000000000000', null);
+    values ('!C9', 'STOP-контроль C9', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_CHECK_C9(#(REF))', null, null, null, null, null, '0040M0000000000000000000040M000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!C9', name='!C9 STOP-контроль C9', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_C9(#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0040M0000000000000000000040M000000000000000000000000000000000000', nazn=null
+         set tt='!C9', name='STOP-контроль C9', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_C9(#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0040M0000000000000000000040M000000000000000000000000000000000000', nazn=null
        where tt='!C9';
   end;
   --------------------------------
@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции W4R
-prompt Наименование операции: W4R W4. Зарахування переказів на карткові рахунки фізичних осіб
+prompt Наименование операции: W4. Зарахування переказів на карткові рахунки фізичних осіб 
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('W4R', 'W4R W4. Зарахування переказів на карткові рахунки фізичних осіб', 1, null, null, '#(bpk_get_transit('''',#(NLSA),#(NLSB),#(KVA)))', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1001100000010000000000000000000000010000000000000000000000000000', 'Зарахування переказів на карткові рахунки фізичних осіб ');
+    values ('W4R', 'W4. Зарахування переказів на карткові рахунки фізичних осіб ', 1, null, null, '#(bpk_get_transit('''',#(NLSA),#(NLSB),#(KVA)))', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1001100000010000000000000000000000010000000000000000000000000000', 'Зарахування переказів на карткові рахунки фізичних осіб ');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='W4R', name='W4R W4. Зарахування переказів на карткові рахунки фізичних осіб', dk=1, nlsm=null, kv=null, nlsk='#(bpk_get_transit('''',#(NLSA),#(NLSB),#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1001100000010000000000000000000000010000000000000000000000000000', nazn='Зарахування переказів на карткові рахунки фізичних осіб '
+         set tt='W4R', name='W4. Зарахування переказів на карткові рахунки фізичних осіб ', dk=1, nlsm=null, kv=null, nlsk='#(bpk_get_transit('''',#(NLSA),#(NLSB),#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1001100000010000000000000000000000010000000000000000000000000000', nazn='Зарахування переказів на карткові рахунки фізичних осіб '
        where tt='W4R';
   end;
   --------------------------------
@@ -85,17 +85,6 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''ATRT '', ''W4R'', ''O'', 1, 7, null, null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('D1#C9', 'W4R', 'O', 1, 10, '30', null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''D1#C9'', ''W4R'', ''O'', 1, 10, ''30'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

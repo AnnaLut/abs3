@@ -38,9 +38,6 @@ COMMENT ON COLUMN BARSAQ.AQ$_TR_QT_L.FLAGS IS '';
 
 
 
-PROMPT *** Create  grants  AQ$_TR_QT_L ***
-grant SELECT                                                                 on AQ$_TR_QT_L     to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

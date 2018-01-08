@@ -20,9 +20,7 @@ PROMPT *** Create  view V_FOREX_SWIFT ***
 FROM v_sw300_header;
 
 PROMPT *** Create  grants  V_FOREX_SWIFT ***
-grant SELECT                                                                 on V_FOREX_SWIFT   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FOREX_SWIFT   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_FOREX_SWIFT   to UPLD;
 
 
 

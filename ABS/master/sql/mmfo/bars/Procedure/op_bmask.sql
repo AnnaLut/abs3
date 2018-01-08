@@ -19,8 +19,6 @@ PROMPT *** Create  procedure OP_BMASK ***
     ) is
 
 /*
-   01-06-2017 Nvv перекодування ОБ22 в 36 розр. через функцію f_ob22_num.
-
    27.06.2013 Sta Умолчательный код вал (был 980, 959) - из пул переменной OP_BSOB_KV
 
    17-12-2012 Sta Для Небранчевой схемы (типа ГОУ ОБ)
@@ -59,7 +57,7 @@ A - (обычно - 1, но если несколько инших - то 2, 3,)
 --------------------
    l_mask NLSMASK.mask%type;
 
-   l_OB3  char(4) ;
+   l_OB3  char(3) ;
    l_ZZ   char(2) ;
    L_P4   INT     ;
    L_RNK  ACCOUNTS.RNK%TYPE ;
@@ -89,12 +87,12 @@ BEGIN
 
 
    -- найти РНК бранча
-         begin
-         select ru into l_ru from kf_ru
-        where kf=sys_context('bars_context','user_mfo');
-        exception when no_data_found then l_ru:='01';
-        end;
-        l_rnk:=1||l_ru;
+		 begin
+		 select ru into l_ru from kf_ru
+		where kf=sys_context('bars_context','user_mfo');
+		exception when no_data_found then l_ru:='01';
+		end;
+		l_rnk:=1||l_ru;
    begin
       If GetGlobalOption('HAVETOBO') = '2' then     EXECUTE IMMEDIATE
         'select to_number(val) from BRANCH_PARAMETERS where tag=''RNK'' and branch='''|| P_BRANCH||'''' into L_RNK ;
@@ -124,7 +122,6 @@ BEGIN
    end if;
 
   -- Превращение 2-х знач ОБ22 (симв) в 3-хнач цифровой
-  /*
   If    substr(P_ob22,1,1) = 'A' then l_ob3 := '10' ;
   ElsIf substr(P_ob22,1,1) = 'B' then l_ob3 := '11' ;
   ElsIf substr(P_ob22,1,1) = 'C' then l_ob3 := '12' ;
@@ -154,8 +151,8 @@ BEGIN
   else                                l_ob3 := '0' || substr(P_ob22,1,1);
   end if;
 
-  l_ob3  := substr(l_ob3,1,2) || substr(P_ob22,2,1) ; */
-  l_ob3  := f_ob22_num(P_ob22);
+  l_ob3  := substr(l_ob3,1,2) || substr(P_ob22,2,1) ;
+
 /*
     попытка смоделировать счет по маске
     -----------------------------------
@@ -187,7 +184,7 @@ NLSMASK       BR2 = Для авто-вiдкр внутр.рах Бранч-2
         --     ББББк9SSS00bbb - Для бранчей-3
         -- nls=9819к910301339 , branch =/351823/000339/       , ob22='A3'
         -- nls=9819к910300339 , branch =/351823/000339/060339/, ob22='A3'
-        p_NLS  := p_NBS||'0'||l_ob3||l_ZZ||substr(Substr(p_BRANCH,-7),4,3);
+        p_NLS  := p_NBS||'09'||l_ob3||l_ZZ||substr(Substr(p_BRANCH,-7),4,3);
 
      elsIf gl.aMfo in ('328845') then
         --    Маска Одессы
@@ -195,7 +192,7 @@ NLSMASK       BR2 = Для авто-вiдкр внутр.рах Бранч-2
         -- SSS - символ ОB22
         -- bbb - условный код ТВБВ
         -- A - (обычно - 1, но если несколько инших - то 2, 3,)
-        p_NLS  := p_NBS  || '09' || l_ob3|| substr( Substr(p_BRANCH,-7),4,3) ;
+        p_NLS  := p_NBS  || '090' || l_ob3|| substr( Substr(p_BRANCH,-7),4,3) ;
 
      else
         --  От Демкович

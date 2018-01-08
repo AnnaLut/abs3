@@ -106,10 +106,8 @@ COMMENT ON COLUMN BARS.TMP_LICK.FDAT IS '';
 
 
 PROMPT *** Create  grants  TMP_LICK ***
-grant SELECT                                                                 on TMP_LICK        to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_LICK        to BARS_DM;
 grant SELECT                                                                 on TMP_LICK        to KLB;
-grant SELECT                                                                 on TMP_LICK        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_LICK        to WR_ALL_RIGHTS;
 
 

@@ -126,10 +126,6 @@ PROMPT *** Create  view V_METALS_KP_16102015 ***
                     '0' || m.type_)
           AND (m.cena > 0 OR m.cena_k > 0);
 
-PROMPT *** Create  grants  V_METALS_KP_16102015 ***
-grant SELECT                                                                 on V_METALS_KP_16102015 to BARSREADER_ROLE;
-grant SELECT                                                                 on V_METALS_KP_16102015 to UPLD;
-
 
 
 PROMPT ===================================================================================== 

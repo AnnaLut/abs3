@@ -73,11 +73,9 @@ COMMENT ON COLUMN BARS.ZAY_CURRENCY_INCOME.TXT IS '';
 
 
 PROMPT *** Create  grants  ZAY_CURRENCY_INCOME ***
-grant SELECT                                                                 on ZAY_CURRENCY_INCOME to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_CURRENCY_INCOME to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAY_CURRENCY_INCOME to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_CURRENCY_INCOME to START1;
-grant SELECT                                                                 on ZAY_CURRENCY_INCOME to UPLD;
 
 
 

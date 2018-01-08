@@ -59,11 +59,9 @@ COMMENT ON COLUMN BARS.MIGR_RU.COMM IS '';
 
 
 PROMPT *** Create  grants  MIGR_RU ***
-grant SELECT                                                                 on MIGR_RU         to BARSREADER_ROLE;
 grant SELECT                                                                 on MIGR_RU         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MIGR_RU         to BARS_DM;
 grant SELECT                                                                 on MIGR_RU         to START1;
-grant SELECT                                                                 on MIGR_RU         to UPLD;
 
 
 

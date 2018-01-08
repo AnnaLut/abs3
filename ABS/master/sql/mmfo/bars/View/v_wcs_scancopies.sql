@@ -17,9 +17,7 @@ PROMPT *** Create  view V_WCS_SCANCOPIES ***
  order by s.id;
 
 PROMPT *** Create  grants  V_WCS_SCANCOPIES ***
-grant SELECT                                                                 on V_WCS_SCANCOPIES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SCANCOPIES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_SCANCOPIES to UPLD;
 
 
 

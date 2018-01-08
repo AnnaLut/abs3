@@ -1,14 +1,32 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_MBDK_CONTRACTOR_UO.sql =========*** R
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_MBDK_CONTRACTOR_UO ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_MBDK_CONTRACTOR_UO ("RNK", "NMK", "OKPO", "MFO", "BIC", "KOD_B", "CUSTTYPE", "DATE_ON", "DATE_OFF", "TGR", "C_DST", "C_REG", "ND", "CODCAGENT", "COD_NAME", "COUNTRY", "PRINSIDER", "PRINS_NAME", "STMT", "SAB", "CRISK", "ADR", "VED", "SED") AS 
-  SELECT c.rnk,
+CREATE OR REPLACE FORCE VIEW BARS.V_MBDK_CONTRACTOR_UO
+(
+   RNK,
+   NMK,
+   OKPO,
+   MFO,
+   BIC,
+   KOD_B,
+   CUSTTYPE,
+   DATE_ON,
+   DATE_OFF,
+   TGR,
+   C_DST,
+   C_REG,
+   ND,
+   CODCAGENT,
+   COD_NAME,
+   COUNTRY,
+   PRINSIDER,
+   PRINS_NAME,
+   STMT,
+   SAB,
+   CRISK,
+   ADR,
+   VED,
+   SED
+)
+AS 
+     SELECT c.rnk,
             c.NMK,
             c.okpo,
             NULL MFO,
@@ -42,12 +60,28 @@ PROMPT *** Create  view V_MBDK_CONTRACTOR_UO ***
             AND c.kf = SYS_CONTEXT ('bars_context', 'user_mfo')
             AND c.codcagent IN (3, 4)
       ORDER BY 1;
+      
+COMMENT ON TABLE BARS.V_MBDK_CONTRACTOR_UO IS 'Контрагенти МБДК (2700,3660)';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.RNK IS 'РНК~контрагента';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.NMK IS 'Найменування контрагента';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.OKPO IS 'Код ЗКПО';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.CUSTTYPE IS 'Тип (1-Банк,2-ЮО,~3-ФО)';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.DATE_ON IS 'Дата~відкриття';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.DATE_OFF IS 'Дата~закриття';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.TGR IS 'ТГР(1-ЄДР.,2-ДРФ.,~3-тимчас.)';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.C_DST IS 'Код район. ДПІ';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.C_REG IS 'Код обл.';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.ND IS '№ договору';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.CODCAGENT IS 'Хар-ка';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.COD_NAME IS 'Назва коду';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.COUNTRY IS 'Код країни';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.PRINSIDER IS 'Код інсайдера';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.PRINS_NAME IS 'Назва коду';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.STMT IS 'Формат~виписки';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.SAB IS 'Ел. код';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.CRISK IS 'Категорія';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.ADR IS 'Адреса';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.VED IS 'Викд~економічної~діяльності';
+COMMENT ON COLUMN BARS.V_MBDK_CONTRACTOR_UO.SED IS 'Код~галузі~економіки';
 
-PROMPT *** Create  grants  V_MBDK_CONTRACTOR_UO ***
-grant SELECT                                                                 on V_MBDK_CONTRACTOR_UO to BARS_ACCESS_DEFROLE;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_MBDK_CONTRACTOR_UO.sql =========*** E
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.V_MBDK_CONTRACTOR_UO TO BARS_ACCESS_DEFROLE;      

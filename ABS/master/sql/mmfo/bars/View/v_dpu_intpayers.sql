@@ -31,11 +31,9 @@ PROMPT *** Create  view V_DPU_INTPAYERS ***
    and dpu.get_intpay_state(d.dpu_id, d.freqv, d.dat_begin, d.dat_end, a.acc, bankdate) = 1;
 
 PROMPT *** Create  grants  V_DPU_INTPAYERS ***
-grant SELECT                                                                 on V_DPU_INTPAYERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPU_INTPAYERS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPU_INTPAYERS to DPT;
 grant SELECT                                                                 on V_DPU_INTPAYERS to DPT_ROLE;
-grant SELECT                                                                 on V_DPU_INTPAYERS to UPLD;
 
 
 

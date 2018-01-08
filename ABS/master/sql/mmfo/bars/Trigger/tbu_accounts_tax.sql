@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TBU_ACCOUNTS_TAX.sql =========*** Ru
 PROMPT ===================================================================================== 
@@ -7,13 +5,13 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TBU_ACCOUNTS_TAX ***
 
-  CREATE OR REPLACE TRIGGER BARS.TBU_ACCOUNTS_TAX 
+CREATE OR REPLACE TRIGGER bars.tbu_accounts_tax
    BEFORE UPDATE OF dazs, vid
    ON bars.accounts
    FOR EACH ROW
 DECLARE
   -----------------------------------------------------------------------------
-  -- version 2.18 12.10.17
+  -- version 2.19 09.11.17
   -----------------------------------------------------------------------------
 
   l_nbs       VARCHAR2(4);
@@ -36,6 +34,7 @@ DECLARE
   l_bankdate  DATE;
   l_acc_blkid NUMBER;
   l_trace     VARCHAR2(1000) := 'IN_REE: ';
+  l_check_nbs NUMBER(1);
 BEGIN
   -- Account already closed, do nothing
   IF (:old.dazs IS NOT NULL) AND (:new.dazs IS NOT NULL) THEN
@@ -56,7 +55,12 @@ BEGIN
   END IF;
 
   -- Accounts nbs not interested TaxPolice
-  BEGIN
+  l_check_nbs := bars_dpa.dpa_nbs(:new.nbs, :new.ob22);
+  IF l_check_nbs = 0 THEN
+    RETURN;
+  END IF;
+  
+  /*BEGIN
     SELECT UNIQUE nbs
       INTO l_nbs
       FROM dpa_nbs
@@ -67,7 +71,7 @@ BEGIN
   EXCEPTION
     WHEN no_data_found THEN
       RETURN;
-  END;
+  END;*/
 
   l_bankdate := :new.dazs; --- gl.bdate;
 
@@ -78,7 +82,7 @@ BEGIN
        AND ot = 3
        AND odat = l_bankdate
        AND fn_o IS NULL;
-
+  
     IF SQL%ROWCOUNT = 0 THEN
       NULL;
     ELSE
@@ -170,7 +174,7 @@ BEGIN
       WHEN no_data_found THEN
         l_passp := NULL;
     END;
-
+  
     IF l_passp IS NULL THEN
       RETURN;
     ELSE
@@ -191,7 +195,7 @@ BEGIN
        AND ot = 1
        AND odat = l_bankdate
        AND fn_o IS NULL;
-
+  
     IF SQL%ROWCOUNT > 0 THEN
       bars_audit.info(l_trace || 'Рахунок ' || nls_ || '(' || kv_ ||
                       ') було вiдкрито та закрито в один день (' ||
@@ -201,7 +205,7 @@ BEGIN
       RETURN;
     END IF;
   END IF;
-
+  
   -- счёт открываем - дата открытия
   IF ot_ = 1 THEN
     l_bankdate := :new.daos;
@@ -232,7 +236,7 @@ BEGIN
     IF ot_ = 2 THEN
       ot_ := 1;
     END IF;
-
+  
     -- временный залипон, для сделок, по которым квитанцию принимают вручную
     IF (ot_ = 1 AND (:old.dazs IS NULL) AND (:new.dazs IS NULL)) THEN
       l_bankdate := :new.daos;
@@ -241,12 +245,12 @@ BEGIN
           (:new.dazs IS NULL)) THEN
       RETURN;
     END IF;
-
+  
   bars_audit.info('DPA tbu_accounts_tax: :new.nls - ' || :new.nls ||
                   ' :new.nbs - ' || :new.nbs || ' ot - ' || ot_ ||
                   ' l_bankdate - ' || l_bankdate || ' :new.vid - ' ||
                   :new.vid);
-
+  
     INSERT INTO ree_tmp
       (mfo
       ,id_a
@@ -290,3 +294,4 @@ ALTER TRIGGER BARS.TBU_ACCOUNTS_TAX ENABLE;
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TBU_ACCOUNTS_TAX.sql =========*** En
 PROMPT ===================================================================================== 
+/

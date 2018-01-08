@@ -72,7 +72,7 @@ exception when others then
 PROMPT *** Create  constraint PK_DPTPOABRANCHES ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_POA_BRANCHES ADD CONSTRAINT PK_DPTPOABRANCHES PRIMARY KEY (BRANCH, ORD, POA_ID)
+  ALTER TABLE BARS.DPT_POA_BRANCHES ADD CONSTRAINT PK_DPTPOABRANCHES PRIMARY KEY (BRANCH, ORD)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE';
 exception when others then
@@ -158,7 +158,7 @@ exception when others then
 PROMPT *** Create  index PK_DPTPOABRANCHES ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_DPTPOABRANCHES ON BARS.DPT_POA_BRANCHES (BRANCH, ORD, POA_ID) 
+  CREATE UNIQUE INDEX BARS.PK_DPTPOABRANCHES ON BARS.DPT_POA_BRANCHES (BRANCH, ORD) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND ';
 exception when others then
@@ -169,11 +169,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_POA_BRANCHES ***
-grant SELECT                                                                 on DPT_POA_BRANCHES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_POA_BRANCHES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_POA_BRANCHES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_POA_BRANCHES to DPT_ADMIN;
-grant SELECT                                                                 on DPT_POA_BRANCHES to UPLD;
 
 
 

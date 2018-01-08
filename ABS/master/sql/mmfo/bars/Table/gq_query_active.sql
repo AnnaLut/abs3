@@ -63,6 +63,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_GQQUERYACTIVE_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GQ_QUERY_ACTIVE ADD CONSTRAINT FK_GQQUERYACTIVE_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_GQQUERYACTIVE_GQQUERY ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GQ_QUERY_ACTIVE ADD CONSTRAINT FK_GQQUERYACTIVE_GQQUERY FOREIGN KEY (QUERY_ID)
+	  REFERENCES BARS.GQ_QUERY (QUERY_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_GQQUERYACTIVE_QUERYID_NN ***
 begin   
  execute immediate '
@@ -101,9 +127,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  GQ_QUERY_ACTIVE ***
-grant SELECT                                                                 on GQ_QUERY_ACTIVE to BARSREADER_ROLE;
 grant SELECT                                                                 on GQ_QUERY_ACTIVE to BARS_DM;
-grant SELECT                                                                 on GQ_QUERY_ACTIVE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on GQ_QUERY_ACTIVE to WR_ALL_RIGHTS;
 
 

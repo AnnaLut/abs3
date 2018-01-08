@@ -15,22 +15,22 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :   Процедура формирования #2G для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     :   10/11/2017 (19/03/2015)
+% VERSION     :   10/11/2017 (19/03/2015) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-19/03/2015 - для всех банков код "MM" в показателе будет формироваться
+19/03/2015 - для всех банков код "MM" в показателе будет формироваться 
              как "01"
 17/03/2015 - для 300120 код "MM" в показателе будет формироваться как "01"
 16/03/2015 - для 300120 будут включаться проводки Дт 1500 Кт 3540
 13/03/2015 - для проводок Дт 2900 Кт 3800 не будет включаться конверсия
-12/03/2015 - первый вариант
+12/03/2015 - первый вариант 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
    kodf_      VARCHAR2 (2)   := '2G';
    sql_z      VARCHAR2 (200);
    typ_       NUMBER;
-   gr_sum_    NUMBER         := 1;
+   gr_sum_    NUMBER         := 1;  
    -- для продажу i надходження вiд нерезидентiв
    flag_      NUMBER;
    -- флаг для определение наличия поля BENEFCOUNTRY т.TOP_CONTRACTS
@@ -58,7 +58,7 @@ IS
    rnk_       NUMBER;
    okpo_      VARCHAR2 (14);
    ourOKPO_   varchar2(14);
-   ourGLB_    varchar2(3);
+   ourGLB_    varchar2(3); 
    nmk_       VARCHAR2 (70);
    adr_       VARCHAR2 (70);
    nazn_      VARCHAR2 (160);
@@ -97,7 +97,7 @@ IS
 --- Сума для купівлі
    CURSOR opl_dok
    IS
-      SELECT   t.ko, t.REF, t.accd, t.nlsd, t.kv, t.acck, t.nlsk, t.nazn,
+      SELECT   t.ko, t.REF, t.accd, t.nlsd, t.kv, t.acck, t.nlsk, t.nazn, 
                SUM (t.s_nom),
                SUM (t.s_kom)
           FROM OTCN_PROV_TEMP t
@@ -146,7 +146,7 @@ BEGIN
    p_proc_set (kodf_, sheme_, nbuc1_, typ_);
    --- выбор курса долара для пересчета суммы
    nbuc_ := nbuc1_;
-
+   
    kurs_ := f_ret_kurs (840, dat_);
 
    ourOKPO_ := lpad(F_Get_Params('OKPO',null), 8, '0');
@@ -164,48 +164,48 @@ BEGIN
    INSERT INTO OTCN_PROV_TEMP
                (ko, rnk, REF, acck, nlsk, kv, accd, nlsd, nazn, s_nom, s_eqv)
       SELECT *
-        FROM (  SELECT   '1' ko, ca.rnk, o.REF, o.accd, o.nlsd, o.kv, o.acck, o.nlsk, o.nazn,
+        FROM (  SELECT   '1' ko, ca.rnk, o.REF, o.accd, o.nlsd, o.kv, o.acck, o.nlsk, o.nazn, 
                        SUM (o.s * 100) s_nom,
                        SUM (gl.p_icurval (o.kv, o.s * 100, dat_)) s_eqv
                   FROM provodki o, cust_acc ca
                  WHERE o.fdat = dat_
                    AND o.kv not in (959, 961, 962, 964, 980)
                    AND (   ( SUBSTR (o.nlsd, 1, 4) IN
-                                     ('2600', '2603', '2620', '2650')
+                                     ('2600', '2603', '2620', '2650')   
                              AND SUBSTR (o.nlsk, 1, 4) = '2900'
                             AND LOWER (TRIM (o.nazn)) not like '%конверс%'
                             AND LOWER (TRIM (o.nazn)) not like '%конверт%'
-                            AND LOWER (TRIM (o.nazn)) not like '%куп_вля%'
+                            AND LOWER (TRIM (o.nazn)) not like '%куп_вля%' 
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '2900'
                             AND SUBSTR (o.nlsk, 1, 4) = '2900'
-                            AND mfou_ = 300465 AND mfou_ <> mfo_
-                            AND LOWER (TRIM (o.nazn)) like '%продаж%'
+                            AND mfou_ = 300465 AND mfou_ <> mfo_ 
+                            AND LOWER (TRIM (o.nazn)) like '%продаж%'                            
                           )
-                        OR (    o.nlsd LIKE '2900205%'    -- по письму Уманец от 16.04.2013
+                        OR (    o.nlsd LIKE '2900205%'    -- по письму Уманец от 16.04.2013 
                             AND o.nlsk LIKE '29003%'
-                            AND mfo_ = 300465
+                            AND mfo_ = 300465 
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '2603'
                             AND SUBSTR (o.nlsk, 1, 4) = '3739'
-                            AND mfou_ = 300465
-                            AND LOWER (TRIM (o.nazn)) like '%перерахування кошт_в для обов_язкового продажу%'
+                            AND mfou_ = 300465 
+                            AND LOWER (TRIM (o.nazn)) like '%перерахування кошт_в для обов_язкового продажу%' 
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) in ('2900', '2600', '2620', '2650')
                             AND SUBSTR (o.nlsk, 1, 4) = '3739'
-                            AND mfou_ = 300465
-                            AND LOWER (TRIM (o.nazn)) like '%перерахування кошт_в на продаж%'
+                            AND mfou_ = 300465 
+                            AND LOWER (TRIM (o.nazn)) like '%перерахування кошт_в на продаж%' 
                            )
                         OR (    SUBSTR(o.nlsd, 1, 4) in ('3800')
-                            AND SUBSTR (o.nlsk, 1, 4) = '1819'
+                            AND SUBSTR (o.nlsk, 1, 4) = '1819' 
                             AND lower(nazn) like '%куп_вля%'
                            )
-                       )
+                       ) 
                    AND o.accd = ca.acc
-               GROUP BY '1', ca.rnk, o.REF, o.accd, o.nlsd, o.kv, o.acck, o.nlsk, o.nazn
+               GROUP BY '1', ca.rnk, o.REF, o.accd, o.nlsd, o.kv, o.acck, o.nlsk, o.nazn 
                UNION ALL -- продаж валюти
 	       SELECT '2' ko, ca.rnk, o.REF, o.accd, o.nlsd,
-	              o.kv, o.acck, o.nlsk, o.nazn,
+	              o.kv, o.acck, o.nlsk, o.nazn, 
                       SUM (o.s * 100) s_nom,
                       SUM (gl.p_icurval (o.kv, o.s * 100, dat_)) s_eqv
                FROM provodki o, cust_acc ca
@@ -222,26 +222,26 @@ BEGIN
                             AND SUBSTR (o.nlsk, 1, 4) = '2900'
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '3540'
-                            AND SUBSTR (o.nlsk, 1, 4) = '1819'
+                            AND SUBSTR (o.nlsk, 1, 4) = '1819' 
                             AND LOWER (TRIM (o.nazn)) like '%куп_вля%'
                             AND mfou_ = 380764
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) IN ('1819', '2800', '2900')
-                            AND SUBSTR (o.nlsk, 1, 4) in ('3800')
+                            AND SUBSTR (o.nlsk, 1, 4) in ('3800')  
                             AND LOWER (TRIM (o.nazn)) not like '%продаж%'
                             AND LOWER (TRIM (o.nazn)) not like '%конверс%'
                             AND LOWER (TRIM (o.nazn)) not like '%конверт%'
                            )
                        )
                    AND o.acck = ca.acc
-              GROUP BY '2', ca.rnk, o.REF, o.acck, o.nlsk, o.kv, o.accd, o.nlsd, o.nazn
+              GROUP BY '2', ca.rnk, o.REF, o.acck, o.nlsk, o.kv, o.accd, o.nlsd, o.nazn 
              );
-
+   
    -- удаление лишних проводок
    if mfou_ = 300205 then
-      delete from otcn_prov_temp
+      delete from otcn_prov_temp 
       where substr (nlsd, 1, 4) IN ('2600', '2603', '2620', '2650')
-        and nlsk not like '290009228%';
+        and nlsk not like '290009228%'; 
    end if;
 
          --- сума для купівлі валюти
@@ -267,20 +267,20 @@ BEGIN
 
             sum0_ := gl.p_icurval(kv_, sum0_, dat_);
 
-            if ko_1 = 1 and nlsk_ not like '1819%' and nlsk_ not like '1500%'
+            if ko_1 = 1 and nlsk_ not like '1819%' and nlsk_ not like '1500%' 
             then
-               -- сума купівлі у клієнтів
+               -- сума купівлі у клієнтів 
                p_ins ('11' || '01', to_char (sum0_));
             end if;
 
-            if ko_1 = 1 and (nlsk_ like '1819%' or nlsk_ like '1500%') and
+            if ko_1 = 1 and (nlsk_ like '1819%' or nlsk_ like '1500%') and 
                lower(nazn_) not like '%swap%' and lower(nazn_) not like '%нбу%'
             then
                -- сума купівлі у банків
                p_ins ('12' || '01', to_char (sum0_));
             end if;
 
-            if ko_1 = 1 and (nlsk_ like '1819%' or nlsk_ like '1500%') and
+            if ko_1 = 1 and (nlsk_ like '1819%' or nlsk_ like '1500%') and 
                lower(nazn_) like '%нбу%'
             then
                -- сума купівлі у НБУ
@@ -288,20 +288,20 @@ BEGIN
             end if;
 
 
-            if ko_1 = 2 and nls_ not like '1819%' and nls_ not like '1919%'
+            if ko_1 = 2 and nls_ not like '1819%' and nls_ not like '1919%' 
             then
-               -- сума продажу клієнтам
+               -- сума продажу клієнтам 
                p_ins ('21' || '01', to_char (sum0_));
             end if;
 
-            if ko_1 = 2 and (nls_ like '1819%' or nls_ like '1919%') and
+            if ko_1 = 2 and (nls_ like '1819%' or nls_ like '1919%') and 
                lower(nazn_) not like '%swap%' and lower(nazn_) not like '%нбу%'
             then
                -- сума продажу банкам
                p_ins ('22' || '01', to_char (sum0_));
             end if;
 
-            if ko_1 = 2 and (nls_ like '1819%' or nls_ like '1919%') and
+            if ko_1 = 2 and (nls_ like '1819%' or nls_ like '1919%') and 
                lower(nazn_) like '%нбу%'
             then
                -- сума продажу НБУ
@@ -316,8 +316,8 @@ BEGIN
          WHERE kodf = kodf_ AND datf = dat_;
 
 ---------------------------------------------------
-   INSERT INTO tmp_nbu
-   (kodf, datf, kodp, znap, nbuc)
+   INSERT INTO tmp_nbu 
+   (kodf, datf, kodp, znap, nbuc) 
       SELECT kodf_, dat_, kodp, sum(znap), nbuc
         FROM rnbu_trace
       GROUP BY kodf_, dat_, kodp, nbuc ;

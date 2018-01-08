@@ -35,10 +35,8 @@ PROMPT *** Create  view V_W4_ACCOUNTS ***
    and substr(a.branch,1,length(sys_context ('bars_context', 'user_branch'))) = sys_context ('bars_context', 'user_branch');
 
 PROMPT *** Create  grants  V_W4_ACCOUNTS ***
-grant SELECT                                                                 on V_W4_ACCOUNTS   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_W4_ACCOUNTS   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_W4_ACCOUNTS   to OW;
-grant SELECT                                                                 on V_W4_ACCOUNTS   to UPLD;
 grant FLASHBACK,SELECT                                                       on V_W4_ACCOUNTS   to WR_REFREAD;
 
 

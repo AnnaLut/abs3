@@ -31,10 +31,8 @@ from (select F FDAT, sum(D) DOS, sum(K) KOS
 ;
 
 PROMPT *** Create  grants  DOK_DN1 ***
-grant SELECT                                                                 on DOK_DN1         to BARSREADER_ROLE;
 grant SELECT                                                                 on DOK_DN1         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DOK_DN1         to START1;
-grant SELECT                                                                 on DOK_DN1         to UPLD;
 
 
 

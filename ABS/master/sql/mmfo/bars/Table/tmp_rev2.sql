@@ -51,10 +51,8 @@ COMMENT ON COLUMN BARS.TMP_REV2.TV IS '';
 
 
 PROMPT *** Create  grants  TMP_REV2 ***
-grant SELECT                                                                 on TMP_REV2        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_REV2        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_REV2        to START1;
-grant SELECT                                                                 on TMP_REV2        to UPLD;
 
 
 

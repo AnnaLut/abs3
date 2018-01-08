@@ -93,6 +93,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_BRNORMALEDITUPDATE_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BR_NORMAL_EDIT_UPDATE ADD CONSTRAINT FK_BRNORMALEDITUPDATE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C005718 ***
 begin   
  execute immediate '
@@ -183,10 +196,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  BR_NORMAL_EDIT_UPDATE ***
-grant SELECT                                                                 on BR_NORMAL_EDIT_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on BR_NORMAL_EDIT_UPDATE to BARSUPL;
 grant SELECT                                                                 on BR_NORMAL_EDIT_UPDATE to BARS_DM;
-grant SELECT                                                                 on BR_NORMAL_EDIT_UPDATE to UPLD;
 
 
 

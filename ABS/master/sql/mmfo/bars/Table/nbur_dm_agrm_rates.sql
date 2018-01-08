@@ -192,10 +192,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMAGRMRATES_AGRMID_NN ***
+PROMPT *** Create  constraint CC_DMAGRMRATES_RATETP_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_AGRM_RATES MODIFY (AGRM_ID CONSTRAINT CC_DMAGRMRATES_AGRMID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_AGRM_RATES MODIFY (RATE_TP CONSTRAINT CC_DMAGRMRATES_RATETP_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -216,10 +216,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMAGRMRATES_RATETP_NN ***
+PROMPT *** Create  constraint CC_DMAGRMRATES_AGRMID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_AGRM_RATES MODIFY (RATE_TP CONSTRAINT CC_DMAGRMRATES_RATETP_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_AGRM_RATES MODIFY (AGRM_ID CONSTRAINT CC_DMAGRMRATES_AGRMID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -412,9 +412,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_DM_AGRM_RATES ***
-grant SELECT                                                                 on NBUR_DM_AGRM_RATES to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_DM_AGRM_RATES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on NBUR_DM_AGRM_RATES to UPLD;
 
 
 

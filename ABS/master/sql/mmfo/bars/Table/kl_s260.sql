@@ -55,12 +55,10 @@ COMMENT ON COLUMN BARS.KL_S260.D_MODE IS '';
 
 
 PROMPT *** Create  grants  KL_S260 ***
-grant SELECT                                                                 on KL_S260         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_S260         to BARSUPL;
 grant SELECT                                                                 on KL_S260         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_S260         to BARS_DM;
 grant SELECT                                                                 on KL_S260         to START1;
-grant SELECT                                                                 on KL_S260         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_S260         to WR_ALL_RIGHTS;
 
 

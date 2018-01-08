@@ -61,6 +61,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_RKO_NBS_PS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.RKO_NBS ADD CONSTRAINT FK_RKO_NBS_PS FOREIGN KEY (NBS)
+	  REFERENCES BARS.PS (NBS) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_RKO_NBS ***
 begin   
  execute immediate '
@@ -75,7 +88,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  RKO_NBS ***
-grant SELECT                                                                 on RKO_NBS         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RKO_NBS         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RKO_NBS         to RKO;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RKO_NBS         to WR_ALL_RIGHTS;

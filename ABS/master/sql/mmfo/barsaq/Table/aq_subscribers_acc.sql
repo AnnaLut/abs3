@@ -66,6 +66,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_AQ_SUBSCRIBERS_ACC_NAME ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.AQ_SUBSCRIBERS_ACC ADD CONSTRAINT FK_AQ_SUBSCRIBERS_ACC_NAME FOREIGN KEY (NAME)
+	  REFERENCES BARSAQ.AQ_SUBSCRIBERS (NAME) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_AQ_SUBSCRIBERS_ACC ***
 begin   
  execute immediate '
@@ -95,7 +108,6 @@ exception when others then
 
 PROMPT *** Create  grants  AQ_SUBSCRIBERS_ACC ***
 grant DELETE                                                                 on AQ_SUBSCRIBERS_ACC to BARS;
-grant SELECT                                                                 on AQ_SUBSCRIBERS_ACC to BARSREADER_ROLE;
 
 
 

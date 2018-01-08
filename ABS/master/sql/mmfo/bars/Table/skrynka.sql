@@ -89,6 +89,118 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_SKRYNKA_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA MODIFY (KF CONSTRAINT CC_SKRYNKA_KF_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SKRYNKA_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA MODIFY (BRANCH CONSTRAINT CC_SKRYNKA_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SKRYNKA_SNUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA MODIFY (SNUM CONSTRAINT CC_SKRYNKA_SNUM_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SKRYNKA_NSK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA MODIFY (N_SK CONSTRAINT CC_SKRYNKA_NSK_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SKRYNKA_OSK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA MODIFY (O_SK CONSTRAINT CC_SKRYNKA_OSK_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKA_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA ADD CONSTRAINT FK_SKRYNKA_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKA_ISP_MO ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA ADD CONSTRAINT FK_SKRYNKA_ISP_MO FOREIGN KEY (ISP_MO)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKA_SKRYNKATIP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA ADD CONSTRAINT FK_SKRYNKA_SKRYNKATIP FOREIGN KEY (KF, O_SK)
+	  REFERENCES BARS.SKRYNKA_TIP (KF, O_SK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SKRYNKA_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA ADD CONSTRAINT FK_SKRYNKA_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SKRYNKA_BRANCH_CC ***
 begin   
  execute immediate '
@@ -115,58 +227,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SKRYNKA_OSK_NN ***
+PROMPT *** Create  constraint FK_SKRYNKA_SKRYNKAALL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA MODIFY (O_SK CONSTRAINT CC_SKRYNKA_OSK_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SKRYNKA_NSK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA MODIFY (N_SK CONSTRAINT CC_SKRYNKA_NSK_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SKRYNKA_SNUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA MODIFY (SNUM CONSTRAINT CC_SKRYNKA_SNUM_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SKRYNKA_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA MODIFY (BRANCH CONSTRAINT CC_SKRYNKA_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SKRYNKA_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA MODIFY (KF CONSTRAINT CC_SKRYNKA_KF_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SKRYNKA ADD CONSTRAINT FK_SKRYNKA_SKRYNKAALL FOREIGN KEY (KF, N_SK)
+	  REFERENCES BARS.SKRYNKA_ALL (KF, N_SK) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -217,13 +282,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA ***
-grant SELECT                                                                 on SKRYNKA         to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SKRYNKA         to BARS_DM;
 grant SELECT                                                                 on SKRYNKA         to CC_DOC;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA         to DEP_SKRN;
 grant SELECT                                                                 on SKRYNKA         to START1;
-grant SELECT                                                                 on SKRYNKA         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SKRYNKA         to WR_REFREAD;
 

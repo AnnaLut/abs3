@@ -101,9 +101,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_TIP_ETALON ***
-grant SELECT                                                                 on SKRYNKA_TIP_ETALON to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_TIP_ETALON to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on SKRYNKA_TIP_ETALON to UPLD;
 
 
 

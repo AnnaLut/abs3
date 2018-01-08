@@ -1,8 +1,8 @@
 
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/DPT_INT_QUEUE.sql =========*** Run ***
-PROMPT ===================================================================================== 
+PROMPT ========================================================================================= 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/DPT_INT_QUEUE.sql =========*** Run *** ===
+PROMPT ========================================================================================= 
 
 
 PROMPT *** ALTER_POLICY_INFO to DPT_INT_QUEUE ***
@@ -23,31 +23,28 @@ END;
 PROMPT *** Create  table DPT_INT_QUEUE ***
 begin 
   execute immediate '
-  CREATE TABLE BARS.DPT_INT_QUEUE 
-   (	ID NUMBER(38,0), 
-	KF VARCHAR2(12), 
-	BRANCH VARCHAR2(30), 
-	INT_ID NUMBER(1,0), 
-	ACC_ID NUMBER(38,0), 
-	ACC_NUM VARCHAR2(15), 
-	ACC_CUR NUMBER(3,0), 
-	ACC_NBS CHAR(4), 
-	ACC_NAME VARCHAR2(38), 
-	ACC_ISO CHAR(3), 
-	ACC_OPEN DATE, 
-	ACC_AMOUNT NUMBER(38,0), 
-	INT_DETAILS VARCHAR2(160), 
-	INT_TT CHAR(3), 
-	DEAL_ID NUMBER(38,0), 
-	DEAL_NUM VARCHAR2(35), 
-	DEAL_DAT DATE, 
-	CUST_ID NUMBER(38,0), 
-	MOD_CODE CHAR(3), 
-	INS_TIME DATE
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSDYND ';
+create table DPT_INT_QUEUE
+ (ID          number(38), 
+  kf          VARCHAR2(12),
+  branch      VARCHAR2(30),
+  int_id      NUMBER(1),
+  acc_id      NUMBER(38),
+  acc_num     VARCHAR2(15),
+  acc_cur     NUMBER(3),
+  acc_nbs     CHAR(4),
+  acc_name    VARCHAR2(38),
+  acc_iso     CHAR(3),
+  acc_open    DATE,
+  acc_amount  NUMBER(38),
+  int_details VARCHAR2(160),
+  int_tt      CHAR(3),
+  deal_id     NUMBER(38),
+  deal_num    VARCHAR2(35),
+  deal_dat    DATE,
+  cust_id     NUMBER(38),
+  mod_code    CHAR(3),
+  ins_time    DATE
+  )';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
@@ -61,7 +58,6 @@ PROMPT *** ALTER_POLICIES to DPT_INT_QUEUE ***
 
 
 COMMENT ON TABLE BARS.DPT_INT_QUEUE IS 'Накопительная таблица с данными по нач%%';
-COMMENT ON COLUMN BARS.DPT_INT_QUEUE.ID IS '';
 COMMENT ON COLUMN BARS.DPT_INT_QUEUE.KF IS 'МФО';
 COMMENT ON COLUMN BARS.DPT_INT_QUEUE.BRANCH IS 'Код подразделения счета';
 COMMENT ON COLUMN BARS.DPT_INT_QUEUE.INT_ID IS 'Код процентной карточки';
@@ -80,7 +76,6 @@ COMMENT ON COLUMN BARS.DPT_INT_QUEUE.DEAL_NUM IS 'Номер договора';
 COMMENT ON COLUMN BARS.DPT_INT_QUEUE.DEAL_DAT IS 'Дата договора';
 COMMENT ON COLUMN BARS.DPT_INT_QUEUE.CUST_ID IS 'Рег.№ клиента';
 COMMENT ON COLUMN BARS.DPT_INT_QUEUE.MOD_CODE IS 'Код модуля';
-COMMENT ON COLUMN BARS.DPT_INT_QUEUE.INS_TIME IS '';
 
 
 
@@ -88,23 +83,16 @@ COMMENT ON COLUMN BARS.DPT_INT_QUEUE.INS_TIME IS '';
 PROMPT *** Create  constraint PK_DPTINTQUEUE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_INT_QUEUE ADD CONSTRAINT PK_DPTINTQUEUE PRIMARY KEY (ID, ACC_ID, INT_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.DPT_INT_QUEUE ADD CONSTRAINT PK_DPTINTQUEUE PRIMARY KEY (ID, ACC_ID, INT_ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
-
-
-
 PROMPT *** Create  index PK_DPTINTQUEUE ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_DPTINTQUEUE ON BARS.DPT_INT_QUEUE (ID, ACC_ID, INT_ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND ';
+  CREATE UNIQUE INDEX BARS.PK_DPTINTQUEUE ON BARS.DPT_INT_QUEUE (ID, ACC_ID, INT_ID) ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
@@ -113,13 +101,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_INT_QUEUE ***
-grant INSERT,SELECT                                                          on DPT_INT_QUEUE   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on DPT_INT_QUEUE   to BARS_DM;
-grant SELECT                                                                 on DPT_INT_QUEUE   to UPLD;
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_INT_QUEUE   to WR_ALL_RIGHTS;
+grant INSERT,SELECT                                                          on DPT_INT_QUEUE       to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on DPT_INT_QUEUE       to BARS_DM;
+grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_INT_QUEUE       to WR_ALL_RIGHTS;
 
 
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/DPT_INT_QUEUE.sql =========*** End ***
-PROMPT ===================================================================================== 
+
+PROMPT =========================================================================================
+PROMPT *** End *** ========== Scripts /Sql/BARS/Table/DPT_INT_QUEUE.sql =========*** End *** ===
+PROMPT ========================================================================================= 

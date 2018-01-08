@@ -13,10 +13,8 @@ PROMPT *** Create  view CC_POTRA ***
               and  (s.d_close >nvl(gl.bd,sysdate) or s.d_close is null);
 
 PROMPT *** Create  grants  CC_POTRA ***
-grant SELECT                                                                 on CC_POTRA        to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_POTRA        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_POTRA        to RCC_DEAL;
-grant SELECT                                                                 on CC_POTRA        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_POTRA        to WR_ALL_RIGHTS;
 
 

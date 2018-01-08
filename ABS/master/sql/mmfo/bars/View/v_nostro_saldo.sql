@@ -18,10 +18,8 @@ and case
  ;
 
 PROMPT *** Create  grants  V_NOSTRO_SALDO ***
-grant SELECT                                                                 on V_NOSTRO_SALDO  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NOSTRO_SALDO  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NOSTRO_SALDO  to TOSS;
-grant SELECT                                                                 on V_NOSTRO_SALDO  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_NOSTRO_SALDO  to WR_ALL_RIGHTS;
 
 

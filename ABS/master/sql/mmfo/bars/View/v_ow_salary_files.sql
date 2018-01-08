@@ -21,10 +21,8 @@ select f.id, f.file_name, f.file_date, file_n,
  where not exists ( select 1 from ow_salary_data where id = f.id );
 
 PROMPT *** Create  grants  V_OW_SALARY_FILES ***
-grant SELECT                                                                 on V_OW_SALARY_FILES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_SALARY_FILES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_SALARY_FILES to OW;
-grant SELECT                                                                 on V_OW_SALARY_FILES to UPLD;
 
 
 

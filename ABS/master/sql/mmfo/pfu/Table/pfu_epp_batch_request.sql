@@ -39,6 +39,19 @@ COMMENT ON COLUMN PFU.PFU_EPP_BATCH_REQUEST.BATCH_DATA IS '';
 
 
 
+PROMPT *** Create  constraint FK_EPP_REF_REQUEST ***
+begin   
+ execute immediate '
+  ALTER TABLE PFU.PFU_EPP_BATCH_REQUEST ADD CONSTRAINT FK_EPP_REF_REQUEST FOREIGN KEY (ID)
+	  REFERENCES PFU.PFU_REQUEST (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C00111535 ***
 begin   
  execute immediate '
@@ -51,10 +64,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111536 ***
+PROMPT *** Create  constraint PK_PFU_EPP_BATCH_REQUEST ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_EPP_BATCH_REQUEST MODIFY (PFU_BATCH_ID NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_EPP_BATCH_REQUEST ADD CONSTRAINT PK_PFU_EPP_BATCH_REQUEST PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -87,12 +102,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_PFU_EPP_BATCH_REQUEST ***
+PROMPT *** Create  constraint SYS_C00111536 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_EPP_BATCH_REQUEST ADD CONSTRAINT PK_PFU_EPP_BATCH_REQUEST PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGD  ENABLE';
+  ALTER TABLE PFU.PFU_EPP_BATCH_REQUEST MODIFY (PFU_BATCH_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -113,10 +126,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  PFU_EPP_BATCH_REQUEST ***
-grant SELECT                                                                 on PFU_EPP_BATCH_REQUEST to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_EPP_BATCH_REQUEST to UPLD;
 
 
 

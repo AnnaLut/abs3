@@ -63,6 +63,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OBPCTIPS_TIPS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OBPC_TIPS ADD CONSTRAINT FK_OBPCTIPS_TIPS FOREIGN KEY (TIP)
+	  REFERENCES BARS.TIPS (TIP) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_OBPCTIPS_TIP_NN ***
 begin   
  execute immediate '
@@ -101,11 +114,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_TIPS ***
-grant SELECT                                                                 on OBPC_TIPS       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_TIPS       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_TIPS       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_TIPS       to OBPC;
-grant SELECT                                                                 on OBPC_TIPS       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_TIPS       to WR_ALL_RIGHTS;
 
 

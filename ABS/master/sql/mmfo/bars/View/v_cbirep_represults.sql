@@ -41,9 +41,7 @@ PROMPT *** Create  view V_CBIREP_REPRESULTS ***
    and cq.rep_id = r.id;
 
 PROMPT *** Create  grants  V_CBIREP_REPRESULTS ***
-grant SELECT                                                                 on V_CBIREP_REPRESULTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CBIREP_REPRESULTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CBIREP_REPRESULTS to UPLD;
 grant SELECT                                                                 on V_CBIREP_REPRESULTS to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_CBIREP_REPRESULTS to WR_CBIREP;
 

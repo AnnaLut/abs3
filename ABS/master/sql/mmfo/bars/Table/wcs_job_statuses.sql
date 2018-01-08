@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_JOB_STATUSES ***
-grant SELECT                                                                 on WCS_JOB_STATUSES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_JOB_STATUSES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_JOB_STATUSES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_JOB_STATUSES to START1;
-grant SELECT                                                                 on WCS_JOB_STATUSES to UPLD;
 
 
 

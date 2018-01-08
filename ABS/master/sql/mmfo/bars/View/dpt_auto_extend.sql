@@ -70,10 +70,8 @@ PROMPT *** Create  view DPT_AUTO_EXTEND ***
  ;
 
 PROMPT *** Create  grants  DPT_AUTO_EXTEND ***
-grant SELECT                                                                 on DPT_AUTO_EXTEND to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_AUTO_EXTEND to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_AUTO_EXTEND to DPT_ROLE;
-grant SELECT                                                                 on DPT_AUTO_EXTEND to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_AUTO_EXTEND to WR_ALL_RIGHTS;
 
 

@@ -16,9 +16,7 @@ and dazs is null group by
 g.id,substr(g.name,1,15),a.nls,a.isp,f.id,s.secg,substr(f.fio,1,20);
 
 PROMPT *** Create  grants  DOST ***
-grant SELECT                                                                 on DOST            to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on DOST            to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on DOST            to UPLD;
 grant FLASHBACK,SELECT                                                       on DOST            to WR_REFREAD;
 
 

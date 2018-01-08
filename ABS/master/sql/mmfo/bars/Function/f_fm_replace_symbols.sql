@@ -1,10 +1,5 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_fm_replace_symbols.sql =========*
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.F_FM_REPLACE_SYMBOLS (p_string in varchar2)
+prompt function f_fm_replace_symbols
+create or replace function f_fm_replace_symbols(p_string in varchar2)
 return varchar2
 is
 p_out_string varchar2(4000);
@@ -19,16 +14,6 @@ begin
   return p_out_string;
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  F_FM_REPLACE_SYMBOLS ***
-grant EXECUTE                                                                on F_FM_REPLACE_SYMBOLS to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on F_FM_REPLACE_SYMBOLS to FINMON;
-grant EXECUTE                                                                on F_FM_REPLACE_SYMBOLS to START1;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_fm_replace_symbols.sql =========*
- PROMPT ===================================================================================== 
- 
+GRANT EXECUTE ON BARS.f_fm_replace_symbols TO BARS_ACCESS_DEFROLE;
+GRANT EXECUTE ON BARS.f_fm_replace_symbols TO FINMON;
+GRANT EXECUTE ON BARS.f_fm_replace_symbols TO START1;

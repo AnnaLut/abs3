@@ -1,164 +1,188 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/META_CALL_SETTINGS.sql =========*** Ru
-PROMPT ===================================================================================== 
-
-
-PROMPT *** ALTER_POLICY_INFO to META_CALL_SETTINGS ***
-
-
-BEGIN 
-        execute immediate  
-          'begin  
-               bpa.alter_policy_info(''META_CALL_SETTINGS'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''META_CALL_SETTINGS'', ''WHOLE'' , null, null, null, null);
-               null;
-           end; 
-          '; 
-END; 
-/
-
-PROMPT *** Create  table META_CALL_SETTINGS ***
+prompt ... 
 begin 
-  execute immediate '
-  CREATE TABLE BARS.META_CALL_SETTINGS 
-   (	ID NUMBER(38,0), 
-	CODE VARCHAR2(30), 
-	CALL_FROM VARCHAR2(30), 
-	WEB_FORM_NAME VARCHAR2(400), 
-	TABID NUMBER(38,0), 
-	FUNCID NUMBER(38,0), 
-	ACCESSCODE NUMBER(2,0), 
-	SHOW_DIALOG VARCHAR2(30), 
-	LINK_TYPE VARCHAR2(30), 
-	INSERT_AFTER NUMBER(1,0) DEFAULT 0, 
-	EDIT_MODE VARCHAR2(30) DEFAULT ''ROW_EDIT'', 
-	SUMM_VISIBLE NUMBER(1,0) DEFAULT 0, 
-	CONDITIONS CLOB, 
-	EXCEL_OPT VARCHAR2(30), 
-	ADD_WITH_WINDOW NUMBER(1,0) DEFAULT 0, 
-	SWITCH_OF_DEPS NUMBER(1,0) DEFAULT 0, 
-	SHOW_COUNT NUMBER(1,0) DEFAULT 0, 
-	SAVE_COLUMN VARCHAR2(30), 
-	CODEAPP VARCHAR2(30 CHAR), 
-	BASE_OPTIONS VARCHAR2(1000)
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSDYND 
- LOB (CONDITIONS) STORE AS BASICFILE (
-  TABLESPACE BRSDYND ENABLE STORAGE IN ROW CHUNK 8192 RETENTION 
-  NOCACHE LOGGING ) ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
-end; 
+  BPA.ALTER_POLICY_INFO( 'META_CALL_SETTINGS', 'WHOLE' , null, null, null, null );
+  BPA.ALTER_POLICY_INFO( 'META_CALL_SETTINGS', 'FILIAL', null, null, null, null );
+end;
 /
 
+prompt ... 
+
+
+-- Create table
+begin
+    execute immediate 'create table META_CALL_SETTINGS
+(
+  id              NUMBER(38) not null,
+  code            VARCHAR2(30),
+  call_from       VARCHAR2(30),
+  web_form_name   VARCHAR2(400),
+  tabid           NUMBER(38),
+  funcid          NUMBER(38),
+  accesscode      NUMBER(2),
+  show_dialog     VARCHAR2(30),
+  link_type       VARCHAR2(30),
+  insert_after    NUMBER(1) default 0,
+  edit_mode       VARCHAR2(30) default ''ROW_EDIT'',
+  summ_visible    NUMBER(1) default 0,
+  conditions      CLOB,
+  excel_opt       VARCHAR2(30),
+  add_with_window NUMBER(1) default 0,
+  switch_of_deps  NUMBER(1) default 0,
+  show_count      NUMBER(1) default 0,
+  save_column     VARCHAR2(30),
+  codeapp         VARCHAR2(30 CHAR),
+  base_options    VARCHAR2(1000)
+)
+tablespace BRSDYND
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  )';
+ exception when others then 
+    if sqlcode = -955 then null; else raise; 
+    end if; 
+end;
+/ 
+
+-- Add comments to the table 
+comment on table META_CALL_SETTINGS
+  is 'Описание вызова метаданных';
+-- Add comments to the columns 
+comment on column META_CALL_SETTINGS.id
+  is 'идентификатор';
+comment on column META_CALL_SETTINGS.code
+  is 'строковой уникальный идентификатор для вызова из кода других приложений.';
+comment on column META_CALL_SETTINGS.call_from
+  is 'строковое поле, определяет где планируется использование. Т.к. строка создается для конкретной цели.';
+comment on column META_CALL_SETTINGS.web_form_name
+  is 'Для url, либо как альтернатива старой строке, если по каким либо причинам не получится вынести настройки в столбцы.';
+comment on column META_CALL_SETTINGS.tabid
+  is 'если есть процедура before - описываем её в meta_nsifunction часть ключа,';
+comment on column META_CALL_SETTINGS.funcid
+  is 'если есть процедура before - описываем её в meta_nsifunction часть ключа';
+comment on column META_CALL_SETTINGS.accesscode
+  is 'альтернатива старого ACCESSCODE.';
+comment on column META_CALL_SETTINGS.show_dialog
+  is 'показывать ли окно с фильтрами в любом случае.';
+comment on column META_CALL_SETTINGS.link_type
+  is 'относится к переходу в новый справочник. OPEN_IN_WINDOW - Будет открыт в модальном окне(по умолчанию в новой вкладке). OPEN_IN_TUBE - В НОВОЙ ВКЛАДКЕ. ';
+comment on column META_CALL_SETTINGS.insert_after
+  is 'добавление новой строки не в начале, в конце грида';
+comment on column META_CALL_SETTINGS.edit_mode
+  is 'тип редактирования MULTI_EDIT - множественное редактирование ROW_EDIT - построчное(по умолчанию)';
+comment on column META_CALL_SETTINGS.summ_visible
+  is 'считать итоговую строку по видимым записям 0 - по всей выборке(по умолчанию).';
+comment on column META_CALL_SETTINGS.conditions
+  is 'условия отбора';
+comment on column META_CALL_SETTINGS.excel_opt
+  is 'перечисление для настройки выгрузки в EXCEL WITHOUT_EXCEL , XLSX, XLSX_XLS, XLS';
+comment on column META_CALL_SETTINGS.add_with_window
+  is 'Добавление новой строки будет с помощью окна, 0 - вставка строки в грид.';
+comment on column META_CALL_SETTINGS.switch_of_deps
+  is 'Выключить все ONLINE зависимости.';
+comment on column META_CALL_SETTINGS.show_count
+  is 'показывать кол-во записей в выборке 0 - не показывать';
+comment on column META_CALL_SETTINGS.save_column
+  is 'текстовое, сохранять колонки, настроенные ';
+comment on column META_CALL_SETTINGS.codeapp
+  is 'для вызова справочника, составной ключ. Вместе с TABID.';
+comment on column META_CALL_SETTINGS.base_options
+  is 'Параметры, которые будут перекрывать параметры дочерних табличных форм';
+
+-- Create/Recreate primary, unique and foreign key constraints 
+begin
+    execute immediate 'alter table META_CALL_SETTINGS
+  add constraint PK_METACALLSETTINGS primary key (ID)
+  using index 
+  tablespace BRSDYND
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  )';
+ exception when others then 
+    if sqlcode = -2261 or sqlcode = -2260 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table META_CALL_SETTINGS
+  add constraint UK_METACALLSETTINGS_CODE unique (CODE)
+  using index 
+  tablespace BRSDYND
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  )';
+ exception when others then 
+    if sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table META_CALL_SETTINGS
+  add constraint FK_METACALLSETTINGS_CALLFROM foreign key (CALL_FROM)
+  references CALL_TAB_NAME (NAME)';
+ exception when others then 
+    if sqlcode = -2275 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table META_CALL_SETTINGS
+  add constraint FK_METACALLSETTINGS_CODEAPP foreign key (TABID, CODEAPP)
+  references REFAPP (TABID, CODEAPP)';
+ exception when others then 
+    if sqlcode = -2275 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table META_CALL_SETTINGS
+  add constraint FK_METACALLSETTINGS_FUNCID foreign key (TABID, FUNCID)
+  references META_NSIFUNCTION (TABID, FUNCID)';
+ exception when others then 
+    if sqlcode = -2275 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table META_CALL_SETTINGS
+  add constraint FK_METACALLSETTINGS_TABID foreign key (TABID)
+  references META_TABLES (TABID)';
+ exception when others then 
+    if sqlcode = -2275 then null; else raise; 
+    end if; 
+end;
+/ 
 
 
 
-PROMPT *** ALTER_POLICIES to META_CALL_SETTINGS ***
- exec bpa.alter_policies('META_CALL_SETTINGS');
 
-
-COMMENT ON TABLE BARS.META_CALL_SETTINGS IS 'Описание вызова метаданных';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.ID IS 'идентификатор';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.CODE IS 'строковой уникальный идентификатор для вызова из кода других приложений.';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.CALL_FROM IS 'строковое поле, определяет где планируется использование. Т.к. строка создается для конкретной цели.';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.WEB_FORM_NAME IS 'Для url, либо как альтернатива старой строке, если по каким либо причинам не получится вынести настройки в столбцы.';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.TABID IS 'если есть процедура before - описываем её в meta_nsifunction часть ключа,';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.FUNCID IS 'если есть процедура before - описываем её в meta_nsifunction часть ключа';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.ACCESSCODE IS 'альтернатива старого ACCESSCODE.';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.SHOW_DIALOG IS 'показывать ли окно с фильтрами в любом случае.';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.LINK_TYPE IS 'относится к переходу в новый справочник. OPEN_IN_WINDOW - Будет открыт в модальном окне(по умолчанию в новой вкладке). OPEN_IN_TUBE - В НОВОЙ ВКЛАДКЕ. ';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.INSERT_AFTER IS 'добавление новой строки не в начале, в конце грида';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.EDIT_MODE IS 'тип редактирования MULTI_EDIT - множественное редактирование ROW_EDIT - построчное(по умолчанию)';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.SUMM_VISIBLE IS 'считать итоговую строку по видимым записям 0 - по всей выборке(по умолчанию).';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.CONDITIONS IS 'условия отбора';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.EXCEL_OPT IS 'перечисление для настройки выгрузки в EXCEL WITHOUT_EXCEL , XLSX, XLSX_XLS, XLS';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.ADD_WITH_WINDOW IS 'Добавление новой строки будет с помощью окна, 0 - вставка строки в грид.';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.SWITCH_OF_DEPS IS 'Выключить все ONLINE зависимости.';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.SHOW_COUNT IS 'показывать кол-во записей в выборке 0 - не показывать';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.SAVE_COLUMN IS 'текстовое, сохранять колонки, настроенные ';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.CODEAPP IS 'для вызова справочника, составной ключ. Вместе с TABID.';
-COMMENT ON COLUMN BARS.META_CALL_SETTINGS.BASE_OPTIONS IS 'Параметры, которые будут перекрывать параметры дочерних табличных форм';
-
-
-
-
-PROMPT *** Create  constraint SYS_C00138709 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_CALL_SETTINGS MODIFY (ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint PK_METACALLSETTINGS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_CALL_SETTINGS ADD CONSTRAINT PK_METACALLSETTINGS PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint UK_METACALLSETTINGS_CODE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.META_CALL_SETTINGS ADD CONSTRAINT UK_METACALLSETTINGS_CODE UNIQUE (CODE)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index PK_METACALLSETTINGS ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_METACALLSETTINGS ON BARS.META_CALL_SETTINGS (ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index UK_METACALLSETTINGS_CODE ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.UK_METACALLSETTINGS_CODE ON BARS.META_CALL_SETTINGS (CODE) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-PROMPT *** Create  grants  META_CALL_SETTINGS ***
-grant SELECT                                                                 on META_CALL_SETTINGS to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/META_CALL_SETTINGS.sql =========*** En
-PROMPT ===================================================================================== 

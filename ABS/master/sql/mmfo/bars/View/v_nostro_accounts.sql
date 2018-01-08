@@ -15,10 +15,8 @@ PROMPT *** Create  view V_NOSTRO_ACCOUNTS ***
 
 PROMPT *** Create  grants  V_NOSTRO_ACCOUNTS ***
 grant SELECT                                                                 on V_NOSTRO_ACCOUNTS to BARS013;
-grant SELECT                                                                 on V_NOSTRO_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NOSTRO_ACCOUNTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NOSTRO_ACCOUNTS to START1;
-grant SELECT                                                                 on V_NOSTRO_ACCOUNTS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_NOSTRO_ACCOUNTS to WR_ALL_RIGHTS;
 
 

@@ -77,10 +77,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  VQB_VISIBILITY ***
-grant SELECT                                                                 on VQB_VISIBILITY  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VQB_VISIBILITY  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VQB_VISIBILITY  to BARS_DM;
-grant SELECT                                                                 on VQB_VISIBILITY  to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VQB_VISIBILITY  to VQB_VISIBILITY;
 grant FLASHBACK,SELECT                                                       on VQB_VISIBILITY  to WR_REFREAD;
 

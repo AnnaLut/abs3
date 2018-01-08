@@ -26,7 +26,6 @@ PROMPT *** Create  view V_UPL_FILE_GROUPS ***
     where f.ISACTIVE = 1;
 
 PROMPT *** Create  grants  V_UPL_FILE_GROUPS ***
-grant SELECT                                                                 on V_UPL_FILE_GROUPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_UPL_FILE_GROUPS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_UPL_FILE_GROUPS to UPLD;
 

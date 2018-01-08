@@ -20,10 +20,8 @@ FROM PODOTC
 GROUP BY ID;
 
 PROMPT *** Create  grants  PODOTK ***
-grant SELECT                                                                 on PODOTK          to BARSREADER_ROLE;
 grant SELECT                                                                 on PODOTK          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PODOTK          to START1;
-grant SELECT                                                                 on PODOTK          to UPLD;
 
 
 

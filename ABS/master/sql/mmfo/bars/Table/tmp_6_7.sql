@@ -53,10 +53,8 @@ COMMENT ON COLUMN BARS.TMP_6_7.ERR IS 'Опис помилки ';
 
 PROMPT *** Create  grants  TMP_6_7 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_6_7         to ABS_ADMIN;
-grant SELECT                                                                 on TMP_6_7         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_6_7         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_6_7         to START1;
-grant SELECT                                                                 on TMP_6_7         to UPLD;
 grant FLASHBACK,SELECT                                                       on TMP_6_7         to WR_REFREAD;
 
 

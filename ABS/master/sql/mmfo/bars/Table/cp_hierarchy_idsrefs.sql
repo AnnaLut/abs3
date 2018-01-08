@@ -112,9 +112,7 @@ COMMENT ON COLUMN BARS.CP_HIERARCHY_IDSREFS.NBS IS '';
 
 
 PROMPT *** Create  grants  CP_HIERARCHY_IDSREFS ***
-grant SELECT                                                                 on CP_HIERARCHY_IDSREFS to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CP_HIERARCHY_IDSREFS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on CP_HIERARCHY_IDSREFS to UPLD;
 
 
 

@@ -92,7 +92,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  AQ$_BARS_MAIL_QT_H ***
-grant SELECT                                                                 on AQ$_BARS_MAIL_QT_H to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on AQ$_BARS_MAIL_QT_H to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AQ$_BARS_MAIL_QT_H to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on AQ$_BARS_MAIL_QT_H to START1;

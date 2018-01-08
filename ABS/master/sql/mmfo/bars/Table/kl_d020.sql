@@ -28,7 +28,7 @@ begin
 	R020 VARCHAR2(4), 
 	D020 VARCHAR2(2), 
 	T020 VARCHAR2(1), 
-	TXT VARCHAR2(250), 
+	TXT VARCHAR2(144), 
 	A010 VARCHAR2(2), 
 	D_OPEN DATE, 
 	D_CLOSE DATE, 
@@ -61,6 +61,12 @@ COMMENT ON COLUMN BARS.KL_D020.D_CLOSE IS '';
 COMMENT ON COLUMN BARS.KL_D020.D_MODE IS '';
 
 
+
+PROMPT *** Create  grants  KL_D020 ***
+grant DELETE,INSERT,SELECT,UPDATE                                            on KL_D020         to ABS_ADMIN;
+grant DELETE,INSERT,SELECT,UPDATE                                            on KL_D020         to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on KL_D020         to BARS_DM;
+grant SELECT                                                                 on KL_D020         to START1;
 
 
 

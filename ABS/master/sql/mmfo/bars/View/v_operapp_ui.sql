@@ -87,9 +87,7 @@ where  frontend = 1 and
 order by top, hits desc, last_hit desc nulls last, appname, opername;
 
 PROMPT *** Create  grants  V_OPERAPP_UI ***
-grant SELECT                                                                 on V_OPERAPP_UI    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OPERAPP_UI    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_OPERAPP_UI    to UPLD;
 
 
 

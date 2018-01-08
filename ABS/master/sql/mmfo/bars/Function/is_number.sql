@@ -19,7 +19,6 @@ END;
  
 PROMPT *** Create  grants  IS_NUMBER ***
 grant EXECUTE                                                                on IS_NUMBER       to BARSUPL;
-grant EXECUTE                                                                on IS_NUMBER       to UPLD;
 
  
  

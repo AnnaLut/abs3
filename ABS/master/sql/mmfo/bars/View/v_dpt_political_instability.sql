@@ -42,9 +42,7 @@ PROMPT *** Create  view V_DPT_POLITICAL_INSTABILITY ***
  order by pi.crt_date desc;
 
 PROMPT *** Create  grants  V_DPT_POLITICAL_INSTABILITY ***
-grant SELECT                                                                 on V_DPT_POLITICAL_INSTABILITY to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_POLITICAL_INSTABILITY to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DPT_POLITICAL_INSTABILITY to UPLD;
 
 
 

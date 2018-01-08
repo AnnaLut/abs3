@@ -13,10 +13,8 @@ PROMPT *** Create  view V_STTYPE ***
    SELECT 'проценти' name, 1 id FROM DUAL;
 
 PROMPT *** Create  grants  V_STTYPE ***
-grant SELECT                                                                 on V_STTYPE        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STTYPE        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_STTYPE        to START1;
-grant SELECT                                                                 on V_STTYPE        to UPLD;
 
 
 

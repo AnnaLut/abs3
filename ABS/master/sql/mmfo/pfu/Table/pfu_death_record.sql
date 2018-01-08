@@ -30,13 +30,7 @@ begin
 	TYPE_BLOCK NUMBER(1,0), 
 	PFU_NUM VARCHAR2(20), 
 	STATE VARCHAR2(30), 
-	COMM VARCHAR2(3000), 
-	SUM_PAYED NUMBER(38,0), 
-	REF NUMBER(38,0), 
-	SIGN VARCHAR2(1000), 
-	TYP VARCHAR2(30), 
-	DATE_PAYBACK DATE, 
-	NUM_PAYM VARCHAR2(1000)
+	COMM VARCHAR2(3000)
    ) SEGMENT CREATION DEFERRED 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -48,12 +42,6 @@ end;
 
 
 COMMENT ON TABLE PFU.PFU_DEATH_RECORD IS 'Информационная строка списка умерших';
-COMMENT ON COLUMN PFU.PFU_DEATH_RECORD.SUM_PAYED IS 'Сума фактичного списання ';
-COMMENT ON COLUMN PFU.PFU_DEATH_RECORD.REF IS 'Референс списання';
-COMMENT ON COLUMN PFU.PFU_DEATH_RECORD.SIGN IS 'Подпись';
-COMMENT ON COLUMN PFU.PFU_DEATH_RECORD.TYP IS 'Тит оплаты';
-COMMENT ON COLUMN PFU.PFU_DEATH_RECORD.DATE_PAYBACK IS '';
-COMMENT ON COLUMN PFU.PFU_DEATH_RECORD.NUM_PAYM IS '';
 COMMENT ON COLUMN PFU.PFU_DEATH_RECORD.ID IS '';
 COMMENT ON COLUMN PFU.PFU_DEATH_RECORD.LIST_ID IS '';
 COMMENT ON COLUMN PFU.PFU_DEATH_RECORD.REC_NUM IS 'Порядковий номер запису';
@@ -92,10 +80,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111463 ***
+PROMPT *** Create  constraint FK_PFU_DEATH_RECORD ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_DEATH_RECORD MODIFY (LIST_ID NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_DEATH_RECORD ADD CONSTRAINT FK_PFU_DEATH_RECORD FOREIGN KEY (LIST_ID)
+	  REFERENCES PFU.PFU_DEATH (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -118,6 +107,18 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint SYS_C00111463 ***
+begin   
+ execute immediate '
+  ALTER TABLE PFU.PFU_DEATH_RECORD MODIFY (LIST_ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_PFU_DEATH_RECORD ***
 begin   
  execute immediate '
@@ -129,12 +130,66 @@ exception when others then
  end;
 /
 
+PROMPT *** ADD field sum_payed ***
+begin
+    execute immediate 'alter table PFU.PFU_DEATH_RECORD add sum_payed NUMBER(38)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+PROMPT *** ADD field ref ***
+begin
+    execute immediate 'alter table PFU.PFU_DEATH_RECORD add ref NUMBER(38)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+PROMPT *** ADD field sign ***
+begin
+    execute immediate 'alter table PFU.PFU_DEATH_RECORD add sign VARCHAR2(1000)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+PROMPT *** ADD field typ ***
+begin
+    execute immediate 'alter table PFU.PFU_DEATH_RECORD add typ VARCHAR2(30)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+PROMPT *** ADD field date_payback ***
+begin
+    execute immediate 'alter table PFU_DEATH_RECORD add date_payback date';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+PROMPT *** ADD field num_paym ***
+begin
+    execute immediate 'alter table PFU_DEATH_RECORD add num_paym varchar2(1000)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
 
 
-PROMPT *** Create  grants  PFU_DEATH_RECORD ***
-grant SELECT                                                                 on PFU_DEATH_RECORD to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_DEATH_RECORD to UPLD;
-
+-- Add comments to the columns 
+comment on column PFU.PFU_DEATH_RECORD.sum_payed is 'Сума фактичного списання ';
+comment on column PFU.PFU_DEATH_RECORD.ref is 'Референс списання';
+comment on column PFU.PFU_DEATH_RECORD.sign is 'Подпись';
+comment on column PFU.PFU_DEATH_RECORD.typ is 'Тит оплаты';
 
 
 PROMPT ===================================================================================== 

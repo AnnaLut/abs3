@@ -61,10 +61,6 @@ COMMENT ON COLUMN BARS.ERR$_CIN_TAG_TK.SK_A1 IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIN_TAG_TK ***
-grant SELECT                                                                 on ERR$_CIN_TAG_TK to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIN_TAG_TK to UPLD;
-
 
 
 PROMPT ===================================================================================== 

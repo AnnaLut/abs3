@@ -63,6 +63,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_STAFFTIPTTS_STAFFTIPS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFFTIP_TTS ADD CONSTRAINT FK_STAFFTIPTTS_STAFFTIPS FOREIGN KEY (ID)
+	  REFERENCES BARS.STAFF_TIPS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STAFFTIPTTS_TTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFFTIP_TTS ADD CONSTRAINT FK_STAFFTIPTTS_TTS FOREIGN KEY (TT)
+	  REFERENCES BARS.TTS (TT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_STAFFTIPTTS_ID_NN ***
 begin   
  execute immediate '
@@ -102,10 +128,8 @@ exception when others then
 
 PROMPT *** Create  grants  STAFFTIP_TTS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFFTIP_TTS    to ABS_ADMIN;
-grant SELECT                                                                 on STAFFTIP_TTS    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFFTIP_TTS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFFTIP_TTS    to BARS_DM;
-grant SELECT                                                                 on STAFFTIP_TTS    to UPLD;
 
 
 

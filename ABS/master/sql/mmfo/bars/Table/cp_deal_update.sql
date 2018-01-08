@@ -135,6 +135,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CPDEALUPDATE_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_DEAL_UPDATE ADD CONSTRAINT FK_CPDEALUPDATE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C007505 ***
 begin   
  execute immediate '
@@ -189,7 +202,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_DEAL_UPDATE ***
-grant SELECT                                                                 on CP_DEAL_UPDATE  to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_DEAL_UPDATE  to BARSUPL;
 grant SELECT,UPDATE                                                          on CP_DEAL_UPDATE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_DEAL_UPDATE  to BARS_DM;

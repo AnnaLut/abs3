@@ -15,10 +15,8 @@ PROMPT *** Create  view NBU23_9129 ***
    and a.nls like ('9129%') and exists ( select nls from v_rez_9129 where fin is null );
 
 PROMPT *** Create  grants  NBU23_9129 ***
-grant SELECT                                                                 on NBU23_9129      to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on NBU23_9129      to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on NBU23_9129      to START1;
-grant SELECT                                                                 on NBU23_9129      to UPLD;
 
 
 

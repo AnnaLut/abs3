@@ -49,6 +49,19 @@ COMMENT ON COLUMN BARS.CP_PAYMENTS.OP_REF IS 'Референс операції';
 
 
 
+PROMPT *** Create  constraint FK_CPREF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CP_PAYMENTS ADD CONSTRAINT FK_CPREF FOREIGN KEY (CP_REF)
+	  REFERENCES BARS.CP_DEAL (REF) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C005481 ***
 begin   
  execute immediate '
@@ -101,10 +114,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_PAYMENTS ***
-grant SELECT                                                                 on CP_PAYMENTS     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_PAYMENTS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_PAYMENTS     to BARS_DM;
-grant SELECT                                                                 on CP_PAYMENTS     to UPLD;
 
 
 

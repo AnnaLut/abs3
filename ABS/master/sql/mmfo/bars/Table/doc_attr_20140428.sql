@@ -77,9 +77,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  DOC_ATTR_20140428 ***
-grant SELECT                                                                 on DOC_ATTR_20140428 to BARSREADER_ROLE;
 grant SELECT                                                                 on DOC_ATTR_20140428 to BARS_DM;
-grant SELECT                                                                 on DOC_ATTR_20140428 to UPLD;
 
 
 

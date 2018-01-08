@@ -122,12 +122,10 @@ exception when others then
 
 PROMPT *** Create  grants  RS_TMP_SESSION_DATA ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on RS_TMP_SESSION_DATA to ABS_ADMIN;
-grant SELECT                                                                 on RS_TMP_SESSION_DATA to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RS_TMP_SESSION_DATA to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RS_TMP_SESSION_DATA to BARS_DM;
 grant SELECT                                                                 on RS_TMP_SESSION_DATA to RS;
 grant SELECT                                                                 on RS_TMP_SESSION_DATA to START1;
-grant SELECT                                                                 on RS_TMP_SESSION_DATA to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RS_TMP_SESSION_DATA to WR_ALL_RIGHTS;
 
 

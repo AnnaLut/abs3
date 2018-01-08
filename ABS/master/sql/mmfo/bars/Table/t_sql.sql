@@ -57,10 +57,8 @@ COMMENT ON COLUMN BARS.T_SQL.TXT4 IS '';
 
 
 PROMPT *** Create  grants  T_SQL ***
-grant SELECT                                                                 on T_SQL           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on T_SQL           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on T_SQL           to START1;
-grant SELECT                                                                 on T_SQL           to UPLD;
 
 
 

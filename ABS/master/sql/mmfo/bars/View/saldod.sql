@@ -44,11 +44,9 @@ PROMPT *** Create  view SALDOD ***
 
 PROMPT *** Create  grants  SALDOD ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDOD          to ABS_ADMIN;
-grant SELECT                                                                 on SALDOD          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDOD          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALDOD          to PYOD001;
 grant SELECT                                                                 on SALDOD          to START1;
-grant SELECT                                                                 on SALDOD          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SALDOD          to WR_ALL_RIGHTS;
 grant SELECT                                                                 on SALDOD          to WR_DOCHAND;
 grant SELECT                                                                 on SALDOD          to WR_DOC_INPUT;

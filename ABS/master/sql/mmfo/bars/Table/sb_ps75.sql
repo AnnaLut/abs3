@@ -57,9 +57,7 @@ COMMENT ON COLUMN BARS.SB_PS75.D_CLOSE IS '';
 
 
 PROMPT *** Create  grants  SB_PS75 ***
-grant SELECT                                                                 on SB_PS75         to BARSREADER_ROLE;
 grant SELECT                                                                 on SB_PS75         to BARS_DM;
-grant SELECT                                                                 on SB_PS75         to UPLD;
 
 
 

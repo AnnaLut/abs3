@@ -43,10 +43,6 @@ COMMENT ON COLUMN BARS.TMP_INV_2208_23.ACC IS '';
 
 
 
-PROMPT *** Create  grants  TMP_INV_2208_23 ***
-grant SELECT                                                                 on TMP_INV_2208_23 to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_INV_2208_23 to UPLD;
-
 
 
 PROMPT ===================================================================================== 

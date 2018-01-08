@@ -59,6 +59,19 @@ COMMENT ON COLUMN BARS.BM_NLS.S1107 IS '';
 
 
 
+PROMPT *** Create  constraint FK_BMNLS_TIP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BM_NLS ADD CONSTRAINT FK_BMNLS_TIP FOREIGN KEY (TIP)
+	  REFERENCES BARS.BANK_METALS_TYPE (KOD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_BMNLS ***
 begin   
  execute immediate '
@@ -87,11 +100,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BM_NLS ***
-grant SELECT                                                                 on BM_NLS          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BM_NLS          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BM_NLS          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BM_NLS          to PYOD001;
-grant SELECT                                                                 on BM_NLS          to UPLD;
 grant FLASHBACK,SELECT                                                       on BM_NLS          to WR_REFREAD;
 
 

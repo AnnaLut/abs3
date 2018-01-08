@@ -40,6 +40,15 @@ exception when others then
 end; 
 /
 
+begin 
+  execute immediate 
+
+
+    ' ALTER TABLE BARS.NLK_REF ADD (AMOUNT NUMBER)';
+exception when others then 
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
 
 
 
@@ -56,6 +65,32 @@ COMMENT ON COLUMN BARS.NLK_REF.REF2_STATE IS 'Состояние документа ref2: P - план
 Для ref2 is null всегда ref2_state is null';
 COMMENT ON COLUMN BARS.NLK_REF.ERR_TXT IS '';
 COMMENT ON COLUMN BARS.NLK_REF.AMOUNT IS 'Залишок суми картотеки по реф.';
+
+
+
+
+PROMPT *** Create  constraint FK_NLKREF_ACCOUNTS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NLK_REF ADD CONSTRAINT FK_NLKREF_ACCOUNTS2 FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_NLKREF_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NLK_REF ADD CONSTRAINT FK_NLKREF_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 
@@ -179,12 +214,10 @@ exception when others then
 
 PROMPT *** Create  grants  NLK_REF ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on NLK_REF         to ABS_ADMIN;
-grant SELECT                                                                 on NLK_REF         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NLK_REF         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NLK_REF         to BARS_DM;
 grant DELETE,SELECT,UPDATE                                                   on NLK_REF         to PYOD001;
 grant SELECT,UPDATE                                                          on NLK_REF         to START1;
-grant SELECT                                                                 on NLK_REF         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NLK_REF         to WR_ALL_RIGHTS;
 grant DELETE,SELECT,UPDATE                                                   on NLK_REF         to WR_DEPOSIT_U;
 grant FLASHBACK,SELECT                                                       on NLK_REF         to WR_REFREAD;

@@ -27,10 +27,6 @@ PROMPT *** Create  view V_ZAY_KV_CONV_KURS ***
      FROM zay_conv_kv c, tabval t1, tabval t2
     WHERE c.kv1 = t1.kv AND c.kv2 = t2.kv;
 
-PROMPT *** Create  grants  V_ZAY_KV_CONV_KURS ***
-grant SELECT                                                                 on V_ZAY_KV_CONV_KURS to BARSREADER_ROLE;
-grant SELECT                                                                 on V_ZAY_KV_CONV_KURS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

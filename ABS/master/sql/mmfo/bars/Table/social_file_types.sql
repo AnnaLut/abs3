@@ -67,6 +67,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SOCIALFILETYPES_TTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_FILE_TYPES ADD CONSTRAINT FK_SOCIALFILETYPES_TTS FOREIGN KEY (TT)
+	  REFERENCES BARS.TTS (TT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SOCIALFTYPES_TYPEID_NN ***
 begin   
  execute immediate '
@@ -117,12 +130,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SOCIAL_FILE_TYPES ***
-grant SELECT                                                                 on SOCIAL_FILE_TYPES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SOCIAL_FILE_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SOCIAL_FILE_TYPES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SOCIAL_FILE_TYPES to DPT_ADMIN;
 grant SELECT                                                                 on SOCIAL_FILE_TYPES to DPT_ROLE;
-grant SELECT                                                                 on SOCIAL_FILE_TYPES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SOCIAL_FILE_TYPES to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SOCIAL_FILE_TYPES to WR_REFREAD;
 

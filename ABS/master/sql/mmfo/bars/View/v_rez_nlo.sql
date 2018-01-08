@@ -66,10 +66,8 @@ PROMPT *** Create  view V_REZ_NLO ***
                                 a.nbs) < 0);
 
 PROMPT *** Create  grants  V_REZ_NLO ***
-grant SELECT                                                                 on V_REZ_NLO       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REZ_NLO       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_REZ_NLO       to START1;
-grant SELECT                                                                 on V_REZ_NLO       to UPLD;
 
 
 

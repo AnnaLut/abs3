@@ -79,12 +79,10 @@ COMMENT ON COLUMN BARS.CIM_ACT_BOUND.BORG_REASON IS 'Причина заборгованості';
 
 
 
-PROMPT *** Create  constraint PK_CIMACTBOUND ***
+PROMPT *** Create  constraint CC_CIMACTBOUND_DIRECT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_ACT_BOUND ADD CONSTRAINT PK_CIMACTBOUND PRIMARY KEY (BOUND_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CIM_ACT_BOUND MODIFY (DIRECT CONSTRAINT CC_CIMACTBOUND_DIRECT_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -93,10 +91,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMACTBOUND_DIRECT_NN ***
+PROMPT *** Create  constraint PK_CIMACTBOUND ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_ACT_BOUND MODIFY (DIRECT CONSTRAINT CC_CIMACTBOUND_DIRECT_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_ACT_BOUND ADD CONSTRAINT PK_CIMACTBOUND PRIMARY KEY (BOUND_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -191,11 +191,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_ACT_BOUND ***
-grant SELECT                                                                 on CIM_ACT_BOUND   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_ACT_BOUND   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_ACT_BOUND   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_ACT_BOUND   to CIM_ROLE;
-grant SELECT                                                                 on CIM_ACT_BOUND   to UPLD;
 
 
 

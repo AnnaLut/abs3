@@ -12,10 +12,8 @@ PROMPT *** Create  view CC_INIC ***
      FROM DUAL;
 
 PROMPT *** Create  grants  CC_INIC ***
-grant SELECT                                                                 on CC_INIC         to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on CC_INIC         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_INIC         to RCC_DEAL;
-grant SELECT                                                                 on CC_INIC         to UPLD;
 grant SELECT                                                                 on CC_INIC         to WR_ALL_RIGHTS;
 
 

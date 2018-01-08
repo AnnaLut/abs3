@@ -47,14 +47,27 @@ COMMENT ON COLUMN BARS.STAFF_AD_USER.ACTIVE_DIRECTORY_NAME IS '';
 
 
 
-PROMPT *** Create  index UIX_STAFF_AD_USER_ID ***
+PROMPT *** Create  constraint FK_STAFF_AD_USER_REF_STAFF ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.UIX_STAFF_AD_USER_ID ON BARS.STAFF_AD_USER (USER_ID) 
+  ALTER TABLE BARS.STAFF_AD_USER ADD CONSTRAINT FK_STAFF_AD_USER_REF_STAFF FOREIGN KEY (USER_ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index STAFF_AD_USER_IDX ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.STAFF_AD_USER_IDX ON BARS.STAFF_AD_USER (USER_ID) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI ';
 exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
+  if  sqlcode=-955  or sqlcode=-1408 then null; else raise; end if;
  end;
 /
 
@@ -68,16 +81,14 @@ begin
   PCTFREE 10 INITRANS 2 MAXTRANS 167 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI ';
 exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
+  if  sqlcode=-955  or sqlcode=-1408 then null; else raise; end if;
  end;
 /
 
 
 
 PROMPT *** Create  grants  STAFF_AD_USER ***
-grant SELECT                                                                 on STAFF_AD_USER   to BARSREADER_ROLE;
 grant SELECT                                                                 on STAFF_AD_USER   to BARS_DM;
-grant SELECT                                                                 on STAFF_AD_USER   to UPLD;
 
 
 

@@ -77,11 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_NF_SPOK ***
-grant SELECT                                                                 on CC_NF_SPOK      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_NF_SPOK      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_NF_SPOK      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_NF_SPOK      to RCC_DEAL;
-grant SELECT                                                                 on CC_NF_SPOK      to UPLD;
 grant FLASHBACK,SELECT                                                       on CC_NF_SPOK      to WR_REFREAD;
 
 

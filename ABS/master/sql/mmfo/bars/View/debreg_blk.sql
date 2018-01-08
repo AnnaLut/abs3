@@ -30,10 +30,8 @@ PROMPT *** Create  view DEBREG_BLK ***
           AND TO_NUMBER (q.errorcode) > 0;
 
 PROMPT *** Create  grants  DEBREG_BLK ***
-grant SELECT                                                                 on DEBREG_BLK      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEBREG_BLK      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEBREG_BLK      to DEB_REG;
-grant SELECT                                                                 on DEBREG_BLK      to UPLD;
 
 
 

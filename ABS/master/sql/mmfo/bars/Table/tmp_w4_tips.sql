@@ -47,10 +47,6 @@ COMMENT ON COLUMN BARS.TMP_W4_TIPS.TERM_MAX IS '';
 
 
 
-PROMPT *** Create  grants  TMP_W4_TIPS ***
-grant SELECT                                                                 on TMP_W4_TIPS     to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_W4_TIPS     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

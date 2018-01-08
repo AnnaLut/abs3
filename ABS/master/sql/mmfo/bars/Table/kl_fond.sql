@@ -54,13 +54,11 @@ COMMENT ON COLUMN BARS.KL_FOND.COMM IS 'Примiтка';
 
 PROMPT *** Create  grants  KL_FOND ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_FOND         to ABS_ADMIN;
-grant SELECT                                                                 on KL_FOND         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_FOND         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_FOND         to BARS_DM;
 grant SELECT                                                                 on KL_FOND         to RPBN002;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_FOND         to SALGL;
 grant SELECT                                                                 on KL_FOND         to START1;
-grant SELECT                                                                 on KL_FOND         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_FOND         to WR_ALL_RIGHTS;
 
 

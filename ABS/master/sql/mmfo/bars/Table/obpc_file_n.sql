@@ -91,11 +91,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_FILE_N ***
-grant SELECT                                                                 on OBPC_FILE_N     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_FILE_N     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_FILE_N     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_FILE_N     to OBPC;
-grant SELECT                                                                 on OBPC_FILE_N     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_FILE_N     to WR_ALL_RIGHTS;
 
 

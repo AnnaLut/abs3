@@ -47,11 +47,9 @@ COMMENT ON COLUMN BARS.CHECK_TIME_TTS.TT IS '';
 
 
 PROMPT *** Create  grants  CHECK_TIME_TTS ***
-grant SELECT                                                                 on CHECK_TIME_TTS  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CHECK_TIME_TTS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHECK_TIME_TTS  to BARS_DM;
 grant SELECT                                                                 on CHECK_TIME_TTS  to START1;
-grant SELECT                                                                 on CHECK_TIME_TTS  to UPLD;
 
 
 

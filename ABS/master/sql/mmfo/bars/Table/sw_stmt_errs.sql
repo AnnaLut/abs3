@@ -53,6 +53,32 @@ COMMENT ON COLUMN BARS.SW_STMT_ERRS.KF IS '';
 
 
 
+PROMPT *** Create  constraint FK_SWSTMTERRS_SWJOURNAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_STMT_ERRS ADD CONSTRAINT FK_SWSTMTERRS_SWJOURNAL FOREIGN KEY (STMT_SWREF)
+	  REFERENCES BARS.SW_JOURNAL (SWREF) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SWSTMTERRS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_STMT_ERRS ADD CONSTRAINT FK_SWSTMTERRS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint PK_SWSTMTERRS ***
 begin   
  execute immediate '
@@ -129,9 +155,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_STMT_ERRS ***
-grant SELECT                                                                 on SW_STMT_ERRS    to BARSREADER_ROLE;
 grant SELECT                                                                 on SW_STMT_ERRS    to BARS_DM;
-grant SELECT                                                                 on SW_STMT_ERRS    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_STMT_ERRS    to WR_ALL_RIGHTS;
 
 

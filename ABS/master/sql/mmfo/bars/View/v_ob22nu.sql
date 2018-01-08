@@ -50,13 +50,11 @@ PROMPT *** Create  view V_OB22NU ***
     WHERE a.acc = s.acc AND a.nbs = n.r020_fa AND s.ob22 = n.ob22 AND a.vid<>89;
 
 PROMPT *** Create  grants  V_OB22NU ***
-grant SELECT                                                                 on V_OB22NU        to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_OB22NU        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OB22NU        to CUST001;
 grant SELECT,UPDATE                                                          on V_OB22NU        to NALOG;
 grant SELECT                                                                 on V_OB22NU        to RPBN001;
 grant SELECT                                                                 on V_OB22NU        to START1;
-grant SELECT                                                                 on V_OB22NU        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OB22NU        to WR_ALL_RIGHTS;
 
 

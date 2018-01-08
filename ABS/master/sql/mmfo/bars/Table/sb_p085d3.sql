@@ -70,13 +70,11 @@ COMMENT ON COLUMN BARS.SB_P085D3.GR_IN IS '';
 
 PROMPT *** Create  grants  SB_P085D3 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_P085D3       to ABS_ADMIN;
-grant SELECT                                                                 on SB_P085D3       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SB_P085D3       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SB_P085D3       to BARS_DM;
 grant SELECT                                                                 on SB_P085D3       to RPBN002;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_P085D3       to SB_P085D3;
 grant SELECT                                                                 on SB_P085D3       to START1;
-grant SELECT                                                                 on SB_P085D3       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SB_P085D3       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SB_P085D3       to WR_REFREAD;
 

@@ -45,9 +45,6 @@ end nbs_ob22_bra;
 /
  show err;
  
-PROMPT *** Create  grants  NBS_OB22_BRA ***
-grant EXECUTE                                                                on NBS_OB22_BRA    to BARS_ACCESS_USER;
-
  
  
  PROMPT ===================================================================================== 

@@ -1,12 +1,9 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_OB22NU_AUTO.sql =========*** Run
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_OB22NU_AUTO ***
-
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/p_ob22nu_auto.sql =========*** Run
+ PROMPT ===================================================================================== 
+ 
   CREATE OR REPLACE PROCEDURE BARS.P_OB22NU_AUTO (p_dat1 date,  p_dat2 date ) is
  l_prizn char(1) ;
  l_dat1 date;
@@ -253,14 +250,15 @@ end loop;
 GL.bdate:=dat_tek;
 end  P_OB22NU_AUTO ;
 /
-show err;
-
+ show err;
+ 
 PROMPT *** Create  grants  P_OB22NU_AUTO ***
 grant EXECUTE                                                                on P_OB22NU_AUTO   to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on P_OB22NU_AUTO   to START1;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_OB22NU_AUTO.sql =========*** End
-PROMPT ===================================================================================== 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/procedure/p_ob22nu_auto.sql =========*** End
+ PROMPT ===================================================================================== 
+ 

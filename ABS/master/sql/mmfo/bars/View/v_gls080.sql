@@ -12,10 +12,6 @@ PROMPT *** Create  view V_GLS080 ***
    FROM accounts a, specparam s, customer c
    WHERE a.acc = s.acc(+) AND a.rnk = c.rnk;
 
-PROMPT *** Create  grants  V_GLS080 ***
-grant SELECT                                                                 on V_GLS080        to BARSREADER_ROLE;
-grant SELECT                                                                 on V_GLS080        to UPLD;
-
 
 
 PROMPT ===================================================================================== 

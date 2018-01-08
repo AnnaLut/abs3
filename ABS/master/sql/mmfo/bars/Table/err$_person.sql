@@ -90,9 +90,7 @@ COMMENT ON COLUMN BARS.ERR$_PERSON.NUMDOC IS '';
 
 
 PROMPT *** Create  grants  ERR$_PERSON ***
-grant SELECT                                                                 on ERR$_PERSON     to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_PERSON     to BARS_DM;
-grant SELECT                                                                 on ERR$_PERSON     to UPLD;
 
 
 

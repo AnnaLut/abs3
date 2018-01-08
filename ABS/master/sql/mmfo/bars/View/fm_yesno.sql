@@ -13,7 +13,6 @@ UNION ALL
 select 'ͳ' name, 'NO' id from dual;
 
 PROMPT *** Create  grants  FM_YESNO ***
-grant SELECT                                                                 on FM_YESNO        to BARSREADER_ROLE;
 grant SELECT                                                                 on FM_YESNO        to BARSUPL;
 grant SELECT                                                                 on FM_YESNO        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_YESNO        to FINMON01;

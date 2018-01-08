@@ -40,9 +40,7 @@ PROMPT *** Create  view V_E_DEAL_ACCOUNTS ***
            and d.nd = to_number(pul.get('DEAL_ND')));
 
 PROMPT *** Create  grants  V_E_DEAL_ACCOUNTS ***
-grant SELECT                                                                 on V_E_DEAL_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_E_DEAL_ACCOUNTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_E_DEAL_ACCOUNTS to UPLD;
 
 
 

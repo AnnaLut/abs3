@@ -72,9 +72,7 @@ PROMPT *** Create  view V_USER_SELFVISA_DOCS ***
           AND NVL (a.mfob, 1) = bb.mfo;
 
 PROMPT *** Create  grants  V_USER_SELFVISA_DOCS ***
-grant SELECT                                                                 on V_USER_SELFVISA_DOCS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USER_SELFVISA_DOCS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_USER_SELFVISA_DOCS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USER_SELFVISA_DOCS to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_USER_SELFVISA_DOCS to WR_CHCKINNR_SELF;
 

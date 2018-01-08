@@ -67,6 +67,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_FINMONQUEVID3_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FINMON_QUE_VID3 ADD CONSTRAINT FK_FINMONQUEVID3_ID FOREIGN KEY (ID)
+	  REFERENCES BARS.FINMON_QUE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_FINMONQUEVID3_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FINMON_QUE_VID3 ADD CONSTRAINT FK_FINMONQUEVID3_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint NK_FINMONQUEVID3_ID ***
 begin   
  execute immediate '
@@ -117,11 +143,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FINMON_QUE_VID3 ***
-grant SELECT                                                                 on FINMON_QUE_VID3 to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FINMON_QUE_VID3 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FINMON_QUE_VID3 to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on FINMON_QUE_VID3 to FINMON;
-grant SELECT                                                                 on FINMON_QUE_VID3 to UPLD;
 
 
 

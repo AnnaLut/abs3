@@ -41,11 +41,9 @@ PROMPT *** Create  view V_DPU_RELATION_ACC ***
             WHERE g.dpu_gen = 0 );
 
 PROMPT *** Create  grants  V_DPU_RELATION_ACC ***
-grant SELECT                                                                 on V_DPU_RELATION_ACC to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPU_RELATION_ACC to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPU_RELATION_ACC to DPT_ROLE;
 grant SELECT                                                                 on V_DPU_RELATION_ACC to START1;
-grant SELECT                                                                 on V_DPU_RELATION_ACC to UPLD;
 
 
 

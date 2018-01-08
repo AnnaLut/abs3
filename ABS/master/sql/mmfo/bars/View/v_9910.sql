@@ -28,10 +28,8 @@ PROMPT *** Create  view V_9910 ***
      FROM DUAL;
 
 PROMPT *** Create  grants  V_9910 ***
-grant SELECT                                                                 on V_9910          to BARSREADER_ROLE;
 grant SELECT                                                                 on V_9910          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_9910          to PYOD001;
-grant SELECT                                                                 on V_9910          to UPLD;
 grant SELECT                                                                 on V_9910          to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_9910          to WR_REFREAD;
 

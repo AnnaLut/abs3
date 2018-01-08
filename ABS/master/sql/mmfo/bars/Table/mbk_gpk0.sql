@@ -71,9 +71,7 @@ COMMENT ON COLUMN BARS.MBK_GPK0.OSTI IS '';
 
 
 PROMPT *** Create  grants  MBK_GPK0 ***
-grant SELECT                                                                 on MBK_GPK0        to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MBK_GPK0        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on MBK_GPK0        to UPLD;
 
 
 

@@ -53,9 +53,7 @@ COMMENT ON COLUMN BARS.CUSTOMER_BUSS.BUSSLINE IS 'Бізнес-напрямок';
 
 
 PROMPT *** Create  grants  CUSTOMER_BUSS ***
-grant SELECT                                                                 on CUSTOMER_BUSS   to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTOMER_BUSS   to BARS_DM;
-grant SELECT                                                                 on CUSTOMER_BUSS   to UPLD;
 
 
 

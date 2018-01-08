@@ -89,10 +89,8 @@ PROMPT *** Create  view KAS_VV3 ***
                    WHERE kod_nbu = m.KOD_MONEY);
 
 PROMPT *** Create  grants  KAS_VV3 ***
-grant SELECT                                                                 on KAS_VV3         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_VV3         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_VV3         to PYOD001;
-grant SELECT                                                                 on KAS_VV3         to UPLD;
 
 
 

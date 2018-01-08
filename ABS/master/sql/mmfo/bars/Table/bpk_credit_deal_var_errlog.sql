@@ -80,9 +80,7 @@ COMMENT ON COLUMN BARS.BPK_CREDIT_DEAL_VAR_ERRLOG.ADJ_FLG IS '';
 
 
 PROMPT *** Create  grants  BPK_CREDIT_DEAL_VAR_ERRLOG ***
-grant SELECT                                                                 on BPK_CREDIT_DEAL_VAR_ERRLOG to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_CREDIT_DEAL_VAR_ERRLOG to BARS_DM;
-grant SELECT                                                                 on BPK_CREDIT_DEAL_VAR_ERRLOG to UPLD;
 
 
 

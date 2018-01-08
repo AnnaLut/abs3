@@ -101,10 +101,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_IDÑ_NN ***
+PROMPT *** Create  constraint FK_SEPRATESTOTALS_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (ID CONSTRAINT CC_SEPRATESTOTALS_IDÑ_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEP_RATES_TOTALS ADD CONSTRAINT FK_SEPRATESTOTALS_ID FOREIGN KEY (ID)
+	  REFERENCES BARS.SEP_RATES_CALENDAR (ID) DISABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -113,190 +114,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_MFO_NN ***
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUMTT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (MFO CONSTRAINT CC_SEPRATESTOTALS_MFO_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT1_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_1 CONSTRAINT CC_SEPRATESTOTALS_CNT1_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT2_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_2 CONSTRAINT CC_SEPRATESTOTALS_CNT2_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT3_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_3 CONSTRAINT CC_SEPRATESTOTALS_CNT3_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT4_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_4 CONSTRAINT CC_SEPRATESTOTALS_CNT4_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT5_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_5 CONSTRAINT CC_SEPRATESTOTALS_CNT5_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT6_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_6 CONSTRAINT CC_SEPRATESTOTALS_CNT6_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT7_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_7 CONSTRAINT CC_SEPRATESTOTALS_CNT7_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT8_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_8 CONSTRAINT CC_SEPRATESTOTALS_CNT8_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUM1_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_1 CONSTRAINT CC_SEPRATESTOTALS_SUM1_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUM2_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_2 CONSTRAINT CC_SEPRATESTOTALS_SUM2_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUM3_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_3 CONSTRAINT CC_SEPRATESTOTALS_SUM3_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUM4_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_4 CONSTRAINT CC_SEPRATESTOTALS_SUM4_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUM5_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_5 CONSTRAINT CC_SEPRATESTOTALS_SUM5_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUM6_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_6 CONSTRAINT CC_SEPRATESTOTALS_SUM6_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUM7_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_7 CONSTRAINT CC_SEPRATESTOTALS_SUM7_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_TOTAL CONSTRAINT CC_SEPRATESTOTALS_SUMTT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -317,10 +138,202 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUMTT_NN ***
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUM7_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_TOTAL CONSTRAINT CC_SEPRATESTOTALS_SUMTT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_7 CONSTRAINT CC_SEPRATESTOTALS_SUM7_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUM6_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_6 CONSTRAINT CC_SEPRATESTOTALS_SUM6_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUM5_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_5 CONSTRAINT CC_SEPRATESTOTALS_SUM5_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUM4_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_4 CONSTRAINT CC_SEPRATESTOTALS_SUM4_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUM3_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_3 CONSTRAINT CC_SEPRATESTOTALS_SUM3_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUM2_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_2 CONSTRAINT CC_SEPRATESTOTALS_SUM2_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_SUM1_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (SUM_1 CONSTRAINT CC_SEPRATESTOTALS_SUM1_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT8_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_8 CONSTRAINT CC_SEPRATESTOTALS_CNT8_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT7_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_7 CONSTRAINT CC_SEPRATESTOTALS_CNT7_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT6_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_6 CONSTRAINT CC_SEPRATESTOTALS_CNT6_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT5_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_5 CONSTRAINT CC_SEPRATESTOTALS_CNT5_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT4_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_4 CONSTRAINT CC_SEPRATESTOTALS_CNT4_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT3_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_3 CONSTRAINT CC_SEPRATESTOTALS_CNT3_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT2_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_2 CONSTRAINT CC_SEPRATESTOTALS_CNT2_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_CNT1_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (CNT_1 CONSTRAINT CC_SEPRATESTOTALS_CNT1_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_MFO_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (MFO CONSTRAINT CC_SEPRATESTOTALS_MFO_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SEPRATESTOTALS_IDÑ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEP_RATES_TOTALS MODIFY (ID CONSTRAINT CC_SEPRATESTOTALS_IDÑ_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -343,11 +356,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SEP_RATES_TOTALS ***
-grant SELECT                                                                 on SEP_RATES_TOTALS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEP_RATES_TOTALS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEP_RATES_TOTALS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEP_RATES_TOTALS to START1;
-grant SELECT                                                                 on SEP_RATES_TOTALS to UPLD;
 
 
 

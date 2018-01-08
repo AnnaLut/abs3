@@ -482,13 +482,12 @@ BEGIN
     --вираховування сум  перерахувань, враховуючи округлення та формули
 
        --відбір рахунку А
-        for A in (select distinct NLSA, KVA, suma_sps from TSEL015 where US_ID  = sys_context('bars_global','user_id'))
+        for A in (select distinct NLSA, suma_sps from TSEL015 where US_ID  = sys_context('bars_global','user_id'))
             loop
                   s2:=A.suma_sps;
                            for B in (  SELECT
                                            NLSA,
                                            NLSB,
-                                           KVB,
                                            KOEF,
                                            SUMA_SPS,
                                            SUMA,
@@ -502,7 +501,6 @@ BEGIN
                                            COUNT (*) OVER (PARTITION BY nlsa ORDER BY formula, kod, koef ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS total_count --к-ть рядків в пачці, використовується для порівняння
                                          from tsel015
                                          where NLSA   =  A.NLSA
-                                          and  KVA = A.KVA
                                           and  US_ID  =  sys_context('bars_global','user_id')
                                          order by kod, koef, row_number) -- сортування спочатку по формулі потім код і коефіцієнт, важливо при обрахунках
                         loop
@@ -555,7 +553,7 @@ BEGIN
                                 --перевірка чи сума не менша за 0
                                 IF l_sf<0
                                     THEN
-                                    RAISE_APPLICATION_ERROR (-20001,'Сума для перерахування з рахунку '|| A.NLSA ||' на рахунок '||B.NLSB || ' менша за 0');
+                                    RAISE_APPLICATION_ERROR (-20001,'Сума для перерахування на рахунок '||B.NLSB||' менша за 0');
                                     END IF;
 
                                 update tsel015 --апдейтимо суму документу (рядка)
@@ -586,16 +584,9 @@ BEGIN
                                U_ID=B.U_ID;
                           s3:=s3-round(s2 * b.koef,0); --залишкова сума, якщо використ. коефіц + формули.
                         --перевірка чи сума не менша за 0
-                          /*logger.info('SPS debug A.NLSA: '    ||A.NLSA);
-                          logger.info('SPS debug A.KVA: '     ||A.KVA);
-                          logger.info('SPS debug A.suma_sps: '||A.suma_sps);
-                          logger.info('SPS debug s2: '        ||s2);                          
-                          logger.info('SPS debug s2 B.NLSB: ' ||B.NLSB);
-                          logger.info('SPS debug s2 B.NLSA: ' ||B.NLSA);
-                          logger.info('SPS debug s2 B.KVB: '  ||B.KVB);*/
                           IF s2<0
                              THEN
-                             RAISE_APPLICATION_ERROR (-20002,'Сума для перерахування з рахунку '|| A.NLSA ||' на рахунок '||B.NLSB || ' менша за 0');
+                             RAISE_APPLICATION_ERROR (-20002,'Сума для перерахування на рахунок '||B.NLSB||' менша за 0');
                           END IF;
 
                           --перевірка, якщо рядок не останній то від поточного залишку віднімаємо обраховану суму (поточний залишок * на коефіцієнт)

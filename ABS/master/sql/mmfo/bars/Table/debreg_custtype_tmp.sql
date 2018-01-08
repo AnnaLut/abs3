@@ -48,10 +48,8 @@ COMMENT ON COLUMN BARS.DEBREG_CUSTTYPE_TMP.CUSTTYPE IS '';
 
 
 PROMPT *** Create  grants  DEBREG_CUSTTYPE_TMP ***
-grant SELECT                                                                 on DEBREG_CUSTTYPE_TMP to BARSREADER_ROLE;
 grant SELECT                                                                 on DEBREG_CUSTTYPE_TMP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEBREG_CUSTTYPE_TMP to DEB_REG;
-grant SELECT                                                                 on DEBREG_CUSTTYPE_TMP to UPLD;
 
 
 

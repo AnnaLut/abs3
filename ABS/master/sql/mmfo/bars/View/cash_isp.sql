@@ -14,11 +14,9 @@ where a.kv=980 and a.isp=s.id and a.tip='KAS' and a.dazs is null
 
 PROMPT *** Create  grants  CASH_ISP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CASH_ISP        to ABS_ADMIN;
-grant SELECT                                                                 on CASH_ISP        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CASH_ISP        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CASH_ISP        to PYOD001;
 grant SELECT                                                                 on CASH_ISP        to START1;
-grant SELECT                                                                 on CASH_ISP        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CASH_ISP        to WR_ALL_RIGHTS;
 
 

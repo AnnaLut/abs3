@@ -75,10 +75,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_COUNTER ***
-grant SELECT                                                                 on WCS_COUNTER     to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_COUNTER     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_COUNTER     to BARS_DM;
-grant SELECT                                                                 on WCS_COUNTER     to UPLD;
 
 
 

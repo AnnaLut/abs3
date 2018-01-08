@@ -22,10 +22,8 @@ PROMPT *** Create  view KL_BANK ***
    ORDER BY   c.SAB;
 
 PROMPT *** Create  grants  KL_BANK ***
-grant SELECT                                                                 on KL_BANK         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_BANK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_BANK         to START1;
-grant SELECT                                                                 on KL_BANK         to UPLD;
 
 
 

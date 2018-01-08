@@ -15,10 +15,8 @@ substr(a.nls,1,4)=c.r020_fa and
 substr(b.nls,1,4)=c.r020;
 
 PROMPT *** Create  grants  S_FN1 ***
-grant SELECT                                                                 on S_FN1           to BARSREADER_ROLE;
 grant SELECT                                                                 on S_FN1           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on S_FN1           to START1;
-grant SELECT                                                                 on S_FN1           to UPLD;
 
 
 

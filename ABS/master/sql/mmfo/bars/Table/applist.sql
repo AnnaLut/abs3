@@ -70,6 +70,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_APPLIST_FRONTEND ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.APPLIST ADD CONSTRAINT FK_APPLIST_FRONTEND FOREIGN KEY (FRONTEND)
+	  REFERENCES BARS.FRONTEND (FID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint UK_APPLIST ***
 begin   
  execute immediate '
@@ -150,11 +163,9 @@ exception when others then
 PROMPT *** Create  grants  APPLIST ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on APPLIST         to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on APPLIST         to APPLIST;
-grant SELECT                                                                 on APPLIST         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on APPLIST         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on APPLIST         to BARS_DM;
 grant SELECT                                                                 on APPLIST         to START1;
-grant SELECT                                                                 on APPLIST         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on APPLIST         to WR_ALL_RIGHTS;
 grant SELECT                                                                 on APPLIST         to WR_DIAGNOSTICS;
 grant FLASHBACK,SELECT                                                       on APPLIST         to WR_REFREAD;

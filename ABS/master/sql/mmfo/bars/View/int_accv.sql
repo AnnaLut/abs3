@@ -12,11 +12,9 @@ PROMPT *** Create  view INT_ACCV ***
  ;
 
 PROMPT *** Create  grants  INT_ACCV ***
-grant SELECT                                                                 on INT_ACCV        to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on INT_ACCV        to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on INT_ACCV        to CUST001;
 grant SELECT                                                                 on INT_ACCV        to START1;
-grant SELECT                                                                 on INT_ACCV        to UPLD;
 
 
 

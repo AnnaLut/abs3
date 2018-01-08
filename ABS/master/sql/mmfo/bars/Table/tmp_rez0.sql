@@ -57,10 +57,8 @@ COMMENT ON COLUMN BARS.TMP_REZ0.OST1F IS '';
 
 
 PROMPT *** Create  grants  TMP_REZ0 ***
-grant SELECT                                                                 on TMP_REZ0        to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_REZ0        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_REZ0        to SALGL;
-grant SELECT                                                                 on TMP_REZ0        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_REZ0        to WR_ALL_RIGHTS;
 
 

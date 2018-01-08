@@ -25,17 +25,10 @@ begin
       from fdat where fdat < l_date;
 
       for c in (select kf from mv_kf) loop
-         begin
-             bars_audit.info(l_trace||' старт выполнения для '||c.kf);
-             
-             bc.subst_mfo(c.kf);
-             
-             bars.p_arc_otcn(l_max_date, l_mode);
-             commit;
-         exception
-            when others then
-                null;
-         end;
+         bars_audit.info(l_trace||' старт выполнения для '||c.kf);
+         bc.go('/'||c.kf||'/');
+         bars.p_arc_otcn(l_max_date, l_mode);
+         commit;
       end loop;
 
       bc.go(l_curr_branch);

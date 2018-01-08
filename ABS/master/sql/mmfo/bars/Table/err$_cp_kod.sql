@@ -145,10 +145,6 @@ COMMENT ON COLUMN BARS.ERR$_CP_KOD.PD IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CP_KOD ***
-grant SELECT                                                                 on ERR$_CP_KOD     to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CP_KOD     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

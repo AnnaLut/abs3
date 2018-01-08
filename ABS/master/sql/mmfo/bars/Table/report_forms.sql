@@ -101,11 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  REPORT_FORMS ***
-grant SELECT                                                                 on REPORT_FORMS    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPORT_FORMS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REPORT_FORMS    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPORT_FORMS    to START1;
-grant SELECT                                                                 on REPORT_FORMS    to UPLD;
 
 
 

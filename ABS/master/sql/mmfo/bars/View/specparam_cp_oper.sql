@@ -37,9 +37,7 @@ SELECT o1.REF,
           AND (o1.nlsa = a1.nls OR o1.nlsb = a1.nls);
 
 PROMPT *** Create  grants  SPECPARAM_CP_OPER ***
-grant SELECT                                                                 on SPECPARAM_CP_OPER to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on SPECPARAM_CP_OPER to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on SPECPARAM_CP_OPER to UPLD;
 grant FLASHBACK,SELECT                                                       on SPECPARAM_CP_OPER to WR_REFREAD;
 
 

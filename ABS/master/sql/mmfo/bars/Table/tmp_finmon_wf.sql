@@ -41,10 +41,8 @@ COMMENT ON COLUMN BARS.TMP_FINMON_WF.WORD_FORM IS '';
 
 
 PROMPT *** Create  grants  TMP_FINMON_WF ***
-grant SELECT                                                                 on TMP_FINMON_WF   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FINMON_WF   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FINMON_WF   to START1;
-grant SELECT                                                                 on TMP_FINMON_WF   to UPLD;
 
 
 

@@ -97,46 +97,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OWPKKQUE_DK ***
+PROMPT *** Create  constraint CC_OWPKKQUE_SOS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OW_PKK_QUE ADD CONSTRAINT CC_OWPKKQUE_DK CHECK (dk in (0,1)) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OWPKKQUE_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_PKK_QUE MODIFY (KF CONSTRAINT CC_OWPKKQUE_KF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OWPKKQUE_REF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_PKK_QUE MODIFY (REF CONSTRAINT CC_OWPKKQUE_REF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OWPKKQUE_ACC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_PKK_QUE MODIFY (ACC CONSTRAINT CC_OWPKKQUE_ACC_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.OW_PKK_QUE MODIFY (SOS CONSTRAINT CC_OWPKKQUE_SOS_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -157,10 +121,85 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OWPKKQUE_SOS_NN ***
+PROMPT *** Create  constraint CC_OWPKKQUE_ACC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OW_PKK_QUE MODIFY (SOS CONSTRAINT CC_OWPKKQUE_SOS_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.OW_PKK_QUE MODIFY (ACC CONSTRAINT CC_OWPKKQUE_ACC_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OWPKKQUE_REF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_PKK_QUE MODIFY (REF CONSTRAINT CC_OWPKKQUE_REF_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OWPKKQUE_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_PKK_QUE ADD CONSTRAINT FK_OWPKKQUE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OWPKKQUE_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_PKK_QUE MODIFY (KF CONSTRAINT CC_OWPKKQUE_KF_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OWPKKQUE_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_PKK_QUE ADD CONSTRAINT FK_OWPKKQUE_STAFF FOREIGN KEY (UNFORM_USER)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_OWPKKQUE_DK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_PKK_QUE ADD CONSTRAINT CC_OWPKKQUE_DK CHECK (dk in (0,1)) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_OWPKKQUE_OWIICFILES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_PKK_QUE ADD CONSTRAINT FK_OWPKKQUE_OWIICFILES FOREIGN KEY (F_N)
+	  REFERENCES BARS.OW_IICFILES (FILE_NAME) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -225,11 +264,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_PKK_QUE ***
-grant SELECT                                                                 on OW_PKK_QUE      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_PKK_QUE      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_PKK_QUE      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_PKK_QUE      to OW;
-grant SELECT                                                                 on OW_PKK_QUE      to UPLD;
 
 
 

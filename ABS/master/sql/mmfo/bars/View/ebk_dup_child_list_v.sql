@@ -1,14 +1,21 @@
+prompt ==================================
+prompt Create view EBK_DUP_CHILD_LIST_V
+prompt ==================================
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/EBK_DUP_CHILD_LIST_V.sql =========*** R
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view EBK_DUP_CHILD_LIST_V ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.EBK_DUP_CHILD_LIST_V ("KF", "M_RNK", "D_RNK", "OKPO", "NMK", "DOCUMENT", "BIRTH_DAY", "PRODUCT", "LAST_MODIFC_DATE", "CARD_QUALITY", "SORT_NUM") AS 
-  select KF
+create or replace view BARS.EBK_DUP_CHILD_LIST_V
+( KF
+, M_RNK
+, D_RNK
+, OKPO
+, NMK
+, DOCUMENT
+, BIRTH_DAY
+, PRODUCT
+, LAST_MODIFC_DATE
+, CARD_QUALITY
+, SORT_NUM
+) as /* открытые дубликаты */
+select KF
      , M_RNK
      , D_RNK
      , OKPO
@@ -26,8 +33,8 @@ PROMPT *** Create  view EBK_DUP_CHILD_LIST_V ***
                     from EBK_QUALITYATTR_GOURPS
                    where kf  = edg.kf
                      and rnk = edg.d_rnk
-                     and name = 'card'
-                ) as card_quality,
+                     and name = 'card' 
+                ) as card_quality,  
                 c.okpo,
                 c.nmk,
                 p.ser||' '||p.numdoc as DOCUMENT,
@@ -42,13 +49,10 @@ PROMPT *** Create  view EBK_DUP_CHILD_LIST_V ***
           where edg.KF = SYS_CONTEXT('BARS_CONTEXT','USER_MFO')
             and c.DATE_OFF is null );
 
-PROMPT *** Create  grants  EBK_DUP_CHILD_LIST_V ***
-grant SELECT                                                                 on EBK_DUP_CHILD_LIST_V to BARSREADER_ROLE;
-grant SELECT                                                                 on EBK_DUP_CHILD_LIST_V to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on EBK_DUP_CHILD_LIST_V to UPLD;
+show err
 
+prompt ==================================
+prompt Grants
+prompt ==================================
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/EBK_DUP_CHILD_LIST_V.sql =========*** E
-PROMPT ===================================================================================== 
+grant select on EBK_DUP_CHILD_LIST_V to BARS_ACCESS_DEFROLE;

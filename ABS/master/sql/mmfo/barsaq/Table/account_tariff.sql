@@ -107,9 +107,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  ACCOUNT_TARIFF ***
-grant SELECT                                                                 on ACCOUNT_TARIFF  to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

@@ -73,6 +73,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_TASK_STAFF_TASK_LIST ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TASK_STAFF ADD CONSTRAINT FK_TASK_STAFF_TASK_LIST FOREIGN KEY (TASK_ID)
+	  REFERENCES BARS.TASK_LIST (TASK_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_TASK_STAFF_METHOD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TASK_STAFF ADD CONSTRAINT FK_TASK_STAFF_METHOD FOREIGN KEY (METHOD)
+	  REFERENCES BARS.TASK_METHOD (METHOD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index SYS_C0011532 ***
 begin   
  execute immediate '
@@ -101,12 +127,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TASK_STAFF ***
-grant SELECT                                                                 on TASK_STAFF      to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on TASK_STAFF      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TASK_STAFF      to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TASK_STAFF      to TASK_LIST;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TASK_STAFF      to TASK_STAFF;
-grant SELECT                                                                 on TASK_STAFF      to UPLD;
 grant FLASHBACK,SELECT                                                       on TASK_STAFF      to WR_REFREAD;
 
 

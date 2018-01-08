@@ -63,10 +63,8 @@ PROMPT *** Create  view V_CUSTOMS_DECL ***
      FROM CUSTOMS_DECL;
 
 PROMPT *** Create  grants  V_CUSTOMS_DECL ***
-grant SELECT                                                                 on V_CUSTOMS_DECL  to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_CUSTOMS_DECL  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUSTOMS_DECL  to START1;
-grant SELECT                                                                 on V_CUSTOMS_DECL  to UPLD;
 
 
 

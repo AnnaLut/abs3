@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/CP_POPULATE_ON_DATE.sql =========*
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure CP_POPULATE_ON_DATE ***
-
-  CREATE OR REPLACE PROCEDURE BARS.CP_POPULATE_ON_DATE (p_date date, p_o_c number)
-/* Процедура для населення даними для функції ЦП Портфель на дату
+create or replace procedure cp_populate_on_date(p_date date, p_o_c number)
+/* Процедура для населення даними для функції ЦП Портфель на дату 
    p_o_c =NULL або 0 - відкриті угоди
    p_o_c =1 - закриті
 */
@@ -53,7 +44,7 @@ begin
            v.datd, v.nd, v.rnk, v.sumb,
            v.vidd, v.ir, round(power((v.ir + 100)/100, 1/12) * 100 -100, 12) as mo_pr, fost_h(v.accd, l_date)/100 as ostd,
            fost_h(v.accp, l_date)/100 as ostp, fost_h(v.accr, l_date)/100 as ostr, fost_h(v.accr2, l_date)/100 as ostr2, fost_h(v.accs, l_date)/100 as osts,
-           v.ostab, v.ostaf, l_date
+           v.ostab, v.ostaf, l_date 
       from cp_v v, cp_ryn r
       where v.ryn = r.ryn
         and v.datd <= l_date
@@ -65,11 +56,5 @@ end;
 /
 show err;
 
-PROMPT *** Create  grants  CP_POPULATE_ON_DATE ***
-grant EXECUTE                                                                on CP_POPULATE_ON_DATE to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on cp_populate_on_date        to BARS_ACCESS_DEFROLE;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/CP_POPULATE_ON_DATE.sql =========*
-PROMPT ===================================================================================== 

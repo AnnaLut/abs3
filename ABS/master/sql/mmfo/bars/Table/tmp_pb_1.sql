@@ -83,10 +83,6 @@ COMMENT ON COLUMN BARS.TMP_PB_1.KF IS '';
 
 
 
-PROMPT *** Create  grants  TMP_PB_1 ***
-grant SELECT                                                                 on TMP_PB_1        to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_PB_1        to UPLD;
-
 
 
 PROMPT ===================================================================================== 

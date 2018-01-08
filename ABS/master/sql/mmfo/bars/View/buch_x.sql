@@ -15,10 +15,8 @@ where
   vdat=bankdate;
 
 PROMPT *** Create  grants  BUCH_X ***
-grant SELECT                                                                 on BUCH_X          to BARSREADER_ROLE;
 grant SELECT                                                                 on BUCH_X          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BUCH_X          to START1;
-grant SELECT                                                                 on BUCH_X          to UPLD;
 
 
 

@@ -166,10 +166,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTVIDDARC_TYPENAME_NN ***
+PROMPT *** Create  constraint CC_DPTVIDDARC_USER_OFF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_ARC MODIFY (TYPE_NAME CONSTRAINT CC_DPTVIDDARC_TYPENAME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_VIDD_ARC MODIFY (USER_OFF CONSTRAINT CC_DPTVIDDARC_USER_OFF NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -478,10 +478,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTVIDDARC_USER_OFF ***
+PROMPT *** Create  constraint CC_DPTVIDDARC_TYPENAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_ARC MODIFY (USER_OFF CONSTRAINT CC_DPTVIDDARC_USER_OFF NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_VIDD_ARC MODIFY (TYPE_NAME CONSTRAINT CC_DPTVIDDARC_TYPENAME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -490,10 +490,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_VIDD_ARC ***
-grant SELECT                                                                 on DPT_VIDD_ARC    to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DPT_VIDD_ARC    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VIDD_ARC    to BARS_DM;
-grant SELECT                                                                 on DPT_VIDD_ARC    to UPLD;
 
 
 

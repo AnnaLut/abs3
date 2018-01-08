@@ -13,9 +13,7 @@ FROM OPER op, TABVAL t1, TABVAL t2
 WHERE t1.KV = op.KV and t2.KV = op.KV2 and op.USERID = getcurrentuserid;
 
 PROMPT *** Create  grants  V_DOCS_USER_OUT ***
-grant SELECT                                                                 on V_DOCS_USER_OUT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOCS_USER_OUT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DOCS_USER_OUT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DOCS_USER_OUT to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_DOCS_USER_OUT to WR_DOCLIST_USER;
 

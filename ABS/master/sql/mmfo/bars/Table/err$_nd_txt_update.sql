@@ -71,10 +71,6 @@ COMMENT ON COLUMN BARS.ERR$_ND_TXT_UPDATE.GLOBAL_BDATE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ND_TXT_UPDATE ***
-grant SELECT                                                                 on ERR$_ND_TXT_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ND_TXT_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

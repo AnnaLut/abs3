@@ -29,9 +29,6 @@ COMMENT ON COLUMN FINMON.DICT_K_DFM03.NAME IS '';
 
 
 
-PROMPT *** Create  grants  DICT_K_DFM03 ***
-grant SELECT                                                                 on DICT_K_DFM03    to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

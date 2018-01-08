@@ -79,10 +79,6 @@ COMMENT ON COLUMN BARS.ERR$_CIM_BORG_MESSAGE.APPROVE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIM_BORG_MESSAGE ***
-grant SELECT                                                                 on ERR$_CIM_BORG_MESSAGE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIM_BORG_MESSAGE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

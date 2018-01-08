@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Нарахування відсотків (Кредитні ресурси)';
   l_tablinesdef := '30';
-  l_tabselect_statement := '';
   l_tabname     := 'V_CRSOUR_INT_RECKONING';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,26 +119,26 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'Ідентифікатор періоду нарахування', '', 38, null, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DEAL_ID', 'N', 'Ідентифікатор угоди', '', 30, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'ACCOUNT_ID', 'N', 'Ідентифікатор рахунку', '', 30, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'INTEREST_KIND', 'N', 'Вид відсоткової картки', '', 30, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DEAL_NUMBER', 'C', 'Номер угоди', '', 30, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'CURRENCY_ID', 'N', 'Валюта', '', 22, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'PARTNER_MFO', 'C', 'МФО партнера', '', 100, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'PARTNER_NAME', 'C', 'Назва партнера', '', 160, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'ACCOUNT_NUMBER', 'C', 'Номер рахунку', '', 15, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'DATE_FROM', 'D', 'Дата з', '', 10, 8, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'DATE_TO', 'D', 'Дата по', '', 10, 9, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'INTEREST_AMOUNT', 'N', 'Сума відсотків', '', 22, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'INTEREST_RATE', 'N', 'Відсоткова ставка', '', 22, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'ACCOUNT_REST', 'N', 'Залишок рахунку', '', 22, 12, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'MESSAGE', 'C', 'Коментар', '', 200, 50, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'STATE_ID', 'N', 'Стан обробки', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'INTEREST_ACCOUNT_NUMBER', 'C', 'Рах. нарах відсотків', '', 22, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'INCOME_ACCOUNT', 'C', 'Рахунок доходів/витрат', '', 22, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'PURPOSE', 'C', 'Призначення проводки', '', 122, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'OPERATION_TYPE', 'C', 'Тип операції', '', 22, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'Ідентифікатор періоду нарахування', null, 38, null, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DEAL_ID', 'N', 'Ідентифікатор угоди', null, 30, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'ACCOUNT_ID', 'N', 'Ідентифікатор рахунку', null, 30, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'INTEREST_KIND', 'N', 'Вид відсоткової картки', null, 30, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DEAL_NUMBER', 'C', 'Номер угоди', null, 30, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'CURRENCY_ID', 'N', 'Валюта', null, 22, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'PARTNER_MFO', 'C', 'МФО партнера', null, 100, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'PARTNER_NAME', 'C', 'Назва партнера', null, 160, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'ACCOUNT_NUMBER', 'C', 'Номер рахунку', null, 15, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'DATE_FROM', 'D', 'Дата з', null, 10, 8, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'DATE_TO', 'D', 'Дата по', null, 10, 9, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'INTEREST_AMOUNT', 'N', 'Сума відсотків', null, 22, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'INTEREST_RATE', 'N', 'Відсоткова ставка', null, 22, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'ACCOUNT_REST', 'N', 'Залишок рахунку', null, 22, 12, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'MESSAGE', 'C', 'Коментар', null, 200, 50, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'STATE_ID', 'N', 'Стан обробки', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'INTEREST_ACCOUNT_NUMBER', 'C', 'Рах. нарах відсотків', null, 22, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'INCOME_ACCOUNT', 'C', 'Рахунок доходів/витрат', null, 22, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'PURPOSE', 'C', 'Призначення проводки', null, 122, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'OPERATION_TYPE', 'C', 'Тип операції', null, 22, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

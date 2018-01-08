@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции !$V
-prompt Наименование операции: !$V STOP правило для облігацій заповнення доп реквізитів
+prompt Наименование операции: STOP правило для облігацій заповнення доп реквізитів
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!$V', '!$V STOP правило для облігацій заповнення доп реквізитів', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'f_stop(80840,#(ref),'''',0)', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('!$V', 'STOP правило для облігацій заповнення доп реквізитів', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'f_stop(80840,#(ref),'''',0)', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!$V', name='!$V STOP правило для облігацій заповнення доп реквізитів', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='f_stop(80840,#(ref),'''',0)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='!$V', name='STOP правило для облігацій заповнення доп реквізитів', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='f_stop(80840,#(ref),'''',0)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='!$V';
   end;
   --------------------------------
@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции $V9
-prompt Наименование операции: $V9 2.9.Викуп ЦП:кiлькiсть
+prompt Наименование операции: 2.9.Викуп ЦП:кiлькiсть
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('$V9', '$V9 2.9.Викуп ЦП:кiлькiсть', 1, '#(f_dop(#(REF), ''O9819''))', 980, '#(branch_usr.get_branch_param2(''NLS_9910'',0))', 980, null, null, null, null, 0, 0, 0, 0, '#(S_KIL)*100', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('$V9', '2.9.Викуп ЦП:кiлькiсть', 1, '#(f_dop(#(REF), ''O9819''))', 980, '#(branch_usr.get_branch_param2(''NLS_9910'',0))', 980, null, null, null, null, 0, 0, 0, 0, '#(S_KIL)*100', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='$V9', name='$V9 2.9.Викуп ЦП:кiлькiсть', dk=1, nlsm='#(f_dop(#(REF), ''O9819''))', kv=980, nlsk='#(branch_usr.get_branch_param2(''NLS_9910'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S_KIL)*100', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='$V9', name='2.9.Викуп ЦП:кiлькiсть', dk=1, nlsm='#(f_dop(#(REF), ''O9819''))', kv=980, nlsk='#(branch_usr.get_branch_param2(''NLS_9910'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S_KIL)*100', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='$V9';
   end;
   --------------------------------
@@ -89,7 +89,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции $VN
-prompt Наименование операции: $VN 2.2.Викуп ЦП
+prompt Наименование операции: 2.2.Викуп ЦП
 declare
   cnt_  number;
 begin
@@ -98,11 +98,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('$VN', '$VN 2.2.Викуп ЦП', 0, '#(bpk_get_transit(''10'',#(NLSB),#(NLSA),#(KVA)))', null, null, null, null, null, null, null, 1, 0, 0, 0, '( #(S_NOM) + #(S_KUT) ) * #(S_KIL)  ', null, null, null, null, null, '0000100000000001100000000000000000010000000000000000000000000000', 'Викуп сертифiкатiв казначейських зобов`язань у фiзичних осiб:кiлькiсть #(S_KIL) шт.');
+    values ('$VN', '2.2.Викуп ЦП', 0, '#(bpk_get_transit(''10'',#(NLSB),#(NLSA),#(KVA)))', null, null, null, null, null, null, null, 1, 0, 0, 0, '( #(S_NOM) + #(S_KUT) ) * #(S_KIL)  ', null, null, null, null, null, '0000100000000001100000000000000000010000000000000000000000000000', 'Викуп сертифiкатiв казначейських зобов`язань у фiзичних осiб:кiлькiсть #(S_KIL) шт.');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='$VN', name='$VN 2.2.Викуп ЦП', dk=0, nlsm='#(bpk_get_transit(''10'',#(NLSB),#(NLSA),#(KVA)))', kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s='( #(S_NOM) + #(S_KUT) ) * #(S_KIL)  ', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000001100000000000000000010000000000000000000000000000', nazn='Викуп сертифiкатiв казначейських зобов`язань у фiзичних осiб:кiлькiсть #(S_KIL) шт.'
+         set tt='$VN', name='2.2.Викуп ЦП', dk=0, nlsm='#(bpk_get_transit(''10'',#(NLSB),#(NLSA),#(KVA)))', kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s='( #(S_NOM) + #(S_KUT) ) * #(S_KIL)  ', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000001100000000000000000010000000000000000000000000000', nazn='Викуп сертифiкатiв казначейських зобов`язань у фiзичних осiб:кiлькiсть #(S_KIL) шт.'
        where tt='$VN';
   end;
   --------------------------------

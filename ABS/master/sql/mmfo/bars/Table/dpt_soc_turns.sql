@@ -67,9 +67,7 @@ COMMENT ON COLUMN BARS.DPT_SOC_TURNS.OST_FOR_TAX IS '';
 
 
 PROMPT *** Create  grants  DPT_SOC_TURNS ***
-grant SELECT                                                                 on DPT_SOC_TURNS   to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_SOC_TURNS   to BARS_DM;
-grant SELECT                                                                 on DPT_SOC_TURNS   to UPLD;
 
 
 

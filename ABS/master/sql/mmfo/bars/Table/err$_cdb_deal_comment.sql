@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_CDB_DEAL_COMMENT.COMMENT_MESSAGE IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CDB_DEAL_COMMENT ***
-grant SELECT                                                                 on ERR$_CDB_DEAL_COMMENT to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CDB_DEAL_COMMENT to UPLD;
-
 
 
 PROMPT ===================================================================================== 

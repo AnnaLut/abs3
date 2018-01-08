@@ -81,10 +81,8 @@ COMMENT ON COLUMN BARS.TMP_FINREZ.SQ_OLDF2 IS 'Остаток на счетах фонда на текущу
 
 
 PROMPT *** Create  grants  TMP_FINREZ ***
-grant SELECT                                                                 on TMP_FINREZ      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FINREZ      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_FINREZ      to RCC_DEAL;
-grant SELECT                                                                 on TMP_FINREZ      to UPLD;
 
 
 

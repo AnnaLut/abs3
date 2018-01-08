@@ -73,6 +73,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_NAEKHEADERS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_HEADERS ADD CONSTRAINT FK_NAEKHEADERS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_NAEKHEADERS_FILEYEAR_NN ***
 begin   
  execute immediate '
@@ -187,9 +200,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NAEK_HEADERS ***
-grant SELECT                                                                 on NAEK_HEADERS    to BARSREADER_ROLE;
 grant SELECT                                                                 on NAEK_HEADERS    to BARS_DM;
-grant SELECT                                                                 on NAEK_HEADERS    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NAEK_HEADERS    to WR_ALL_RIGHTS;
 
 

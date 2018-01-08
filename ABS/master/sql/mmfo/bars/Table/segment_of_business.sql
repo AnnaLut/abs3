@@ -142,10 +142,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  SEGMENT_OF_BUSINESS ***
-grant SELECT                                                                 on SEGMENT_OF_BUSINESS to BARSREADER_ROLE;
-grant SELECT                                                                 on SEGMENT_OF_BUSINESS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

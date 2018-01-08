@@ -61,9 +61,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ANI_DEL3 ***
-grant SELECT                                                                 on ANI_DEL3        to BARSREADER_ROLE;
 grant SELECT                                                                 on ANI_DEL3        to BARS_DM;
-grant SELECT                                                                 on ANI_DEL3        to UPLD;
 
 
 

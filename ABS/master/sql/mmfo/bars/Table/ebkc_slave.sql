@@ -66,6 +66,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_EBKCSLAVE_CUSTTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.EBKC_SLAVE ADD CONSTRAINT FK_EBKCSLAVE_CUSTTYPE FOREIGN KEY (CUST_TYPE)
+	  REFERENCES BARS.EBKC_CUST_TYPES (CUST_TYPE) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_EBKC_SLAVE ***
 begin   
  execute immediate '
@@ -80,7 +93,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBKC_SLAVE ***
-grant SELECT                                                                 on EBKC_SLAVE      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBKC_SLAVE      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBKC_SLAVE      to BARS_DM;
 

@@ -65,10 +65,6 @@ COMMENT ON COLUMN BARS.ERR$_SPOT.RATE_SPOT IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SPOT ***
-grant SELECT                                                                 on ERR$_SPOT       to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SPOT       to UPLD;
-
 
 
 PROMPT ===================================================================================== 

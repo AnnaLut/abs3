@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DPE
-prompt Наименование операции: DPE Виплата вкладу в іноз.валюті в еквіваленті(поточний рахунок)
+prompt Наименование операции: Виплата вкладу в іноз.валюті в еквіваленті(поточний рахунок)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DPE', 'DPE Виплата вкладу в іноз.валюті в еквіваленті(поточний рахунок)', 1, null, null, '#(bpk_get_transit_dpe(''20'',#(NLSA),#(NLSB),#(KVA)))', 980, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''10''))', 0, '0000100000000000000000000000000000010000000000000000000000010000', 'Повернення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DPE', 'Виплата вкладу в іноз.валюті в еквіваленті(поточний рахунок)', 1, null, null, '#(bpk_get_transit_dpe(''20'',#(NLSA),#(NLSB),#(KVA)))', 980, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''10''))', 0, '0000100000000000000000000000000000010000000000000000000000010000', 'Повернення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DPE', name='DPE Виплата вкладу в іноз.валюті в еквіваленті(поточний рахунок)', dk=1, nlsm=null, kv=null, nlsk='#(bpk_get_transit_dpe(''20'',#(NLSA),#(NLSB),#(KVA)))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=0, flags='0000100000000000000000000000000000010000000000000000000000010000', nazn='Повернення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DPE', name='Виплата вкладу в іноз.валюті в еквіваленті(поточний рахунок)', dk=1, nlsm=null, kv=null, nlsk='#(bpk_get_transit_dpe(''20'',#(NLSA),#(NLSB),#(KVA)))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=0, flags='0000100000000000000000000000000000010000000000000000000000010000', nazn='Повернення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DPE';
   end;
   --------------------------------

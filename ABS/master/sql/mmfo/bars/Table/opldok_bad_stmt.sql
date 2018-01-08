@@ -68,11 +68,9 @@ COMMENT ON COLUMN BARS.OPLDOK_BAD_STMT.ID IS '';
 
 
 PROMPT *** Create  grants  OPLDOK_BAD_STMT ***
-grant SELECT                                                                 on OPLDOK_BAD_STMT to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPLDOK_BAD_STMT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OPLDOK_BAD_STMT to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPLDOK_BAD_STMT to START1;
-grant SELECT                                                                 on OPLDOK_BAD_STMT to UPLD;
 
 
 

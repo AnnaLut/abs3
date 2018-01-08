@@ -13,10 +13,8 @@ FROM nal_dec  n,      accounts a,      accounts b
 WHERE n.nls = a.nls  AND  a.acc = b.accc  AND  substr(b.nls,1,1)='8';
 
 PROMPT *** Create  grants  NAL_ISP ***
-grant SELECT                                                                 on NAL_ISP         to BARSREADER_ROLE;
 grant SELECT                                                                 on NAL_ISP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NAL_ISP         to START1;
-grant SELECT                                                                 on NAL_ISP         to UPLD;
 
 
 

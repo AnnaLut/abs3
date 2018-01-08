@@ -222,7 +222,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции BP8
-prompt Наименование операции: BP8 d Відправка інвестиційних монет до філій-відділень
+prompt Наименование операции: d Відправка інвестиційних монет до філій-відділень
 declare
   cnt_  number;
 begin
@@ -231,11 +231,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('BP8', 'BP8 d Відправка інвестиційних монет до філій-відділень', 1, '#(NBS_OB22(''3903'',''46''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 1, 0, 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', 72, null, null, null, '0000100001000001000000000000000000010000000000000000000000000000', null);
+    values ('BP8', 'd Відправка інвестиційних монет до філій-відділень', 1, '#(NBS_OB22(''3903'',''46''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 1, 0, 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', 72, null, null, null, '0000100001000001000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='BP8', name='BP8 d Відправка інвестиційних монет до філій-відділень', dk=1, nlsm='#(NBS_OB22(''3903'',''46''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', s2='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', sk=72, proc=null, s3800=null, rang=null, flags='0000100001000001000000000000000000010000000000000000000000000000', nazn=null
+         set tt='BP8', name='d Відправка інвестиційних монет до філій-відділень', dk=1, nlsm='#(NBS_OB22(''3903'',''46''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', s2='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', sk=72, proc=null, s3800=null, rang=null, flags='0000100001000001000000000000000000010000000000000000000000000000', nazn=null
        where tt='BP8';
   end;
   --------------------------------

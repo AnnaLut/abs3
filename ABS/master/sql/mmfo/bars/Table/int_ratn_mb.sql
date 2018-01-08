@@ -81,11 +81,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  INT_RATN_MB ***
-grant SELECT                                                                 on INT_RATN_MB     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_RATN_MB     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_RATN_MB     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_RATN_MB     to START1;
-grant SELECT                                                                 on INT_RATN_MB     to UPLD;
 
 
 

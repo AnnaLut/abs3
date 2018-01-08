@@ -17,10 +17,8 @@ PROMPT *** Create  view V_FIN_REZ_BRANCH ***
 from CCK_AN_TMP;
 
 PROMPT *** Create  grants  V_FIN_REZ_BRANCH ***
-grant SELECT                                                                 on V_FIN_REZ_BRANCH to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FIN_REZ_BRANCH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FIN_REZ_BRANCH to SALGL;
-grant SELECT                                                                 on V_FIN_REZ_BRANCH to UPLD;
 
 
 

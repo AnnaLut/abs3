@@ -20,9 +20,7 @@ where   t.kv in (select a.kv
                                                                          p_check_exist => 0));
 
 PROMPT *** Create  grants  V_MBDK_CURRENCY ***
-grant SELECT                                                                 on V_MBDK_CURRENCY to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBDK_CURRENCY to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_MBDK_CURRENCY to UPLD;
 
 
 

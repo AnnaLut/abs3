@@ -47,6 +47,19 @@ COMMENT ON COLUMN BARS.UNIVERSAL_BOX.ID IS '';
 
 
 
+PROMPT *** Create  constraint FK_UNIVERSALBOX_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.UNIVERSAL_BOX ADD CONSTRAINT FK_UNIVERSALBOX_STAFF FOREIGN KEY (ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C009633 ***
 begin   
  execute immediate '
@@ -88,11 +101,9 @@ exception when others then
 
 PROMPT *** Create  grants  UNIVERSAL_BOX ***
 grant INSERT,SELECT,UPDATE                                                   on UNIVERSAL_BOX   to ABS_ADMIN;
-grant SELECT                                                                 on UNIVERSAL_BOX   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on UNIVERSAL_BOX   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on UNIVERSAL_BOX   to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on UNIVERSAL_BOX   to START1;
-grant SELECT                                                                 on UNIVERSAL_BOX   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on UNIVERSAL_BOX   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on UNIVERSAL_BOX   to WR_REFREAD;
 

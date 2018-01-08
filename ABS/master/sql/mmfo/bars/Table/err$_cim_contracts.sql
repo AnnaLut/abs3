@@ -89,10 +89,6 @@ COMMENT ON COLUMN BARS.ERR$_CIM_CONTRACTS.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIM_CONTRACTS ***
-grant SELECT                                                                 on ERR$_CIM_CONTRACTS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIM_CONTRACTS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

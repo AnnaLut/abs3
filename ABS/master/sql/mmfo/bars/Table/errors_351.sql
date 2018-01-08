@@ -71,9 +71,22 @@ COMMENT ON COLUMN BARS.ERRORS_351.KF IS '';
 PROMPT *** Create  constraint PK_ERRORS_351 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ERRORS_351 ADD CONSTRAINT PK_ERRORS_351 PRIMARY KEY (FDAT, ND, RNK, TIP)
+  ALTER TABLE BARS.ERRORS_351 ADD CONSTRAINT PK_ERRORS_351 PRIMARY KEY (FDAT, ND, RNK)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ERRORS351_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ERRORS_351 ADD CONSTRAINT FK_ERRORS351_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -97,9 +110,9 @@ exception when others then
 PROMPT *** Create  index PK_ERRORS_351 ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_ERRORS_351 ON BARS.ERRORS_351 (FDAT, ND, RNK, TIP) 
+  CREATE UNIQUE INDEX BARS.PK_ERRORS_351 ON BARS.ERRORS_351 (FDAT, ND, RNK) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI ';
+  TABLESPACE BRSDYND ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
@@ -108,11 +121,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ERRORS_351 ***
-grant SELECT                                                                 on ERRORS_351      to BARSREADER_ROLE;
 grant SELECT                                                                 on ERRORS_351      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ERRORS_351      to RCC_DEAL;
 grant SELECT                                                                 on ERRORS_351      to START1;
-grant SELECT                                                                 on ERRORS_351      to UPLD;
 
 
 

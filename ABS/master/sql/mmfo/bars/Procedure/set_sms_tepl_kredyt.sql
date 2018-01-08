@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/SET_SMS_TEPL_KREDYT.sql =========*
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure SET_SMS_TEPL_KREDYT ***
-
-  CREATE OR REPLACE PROCEDURE BARS.SET_SMS_TEPL_KREDYT (in_ number) IS
+CREATE OR REPLACE PROCEDURE BARS.set_sms_tepl_kredyt(in_ number) IS
 
 err    EXCEPTION;
 BEGIN
@@ -55,14 +46,3 @@ loop
  end loop;
 END set_sms_tepl_kredyt;
 /
-show err;
-
-PROMPT *** Create  grants  SET_SMS_TEPL_KREDYT ***
-grant EXECUTE                                                                on SET_SMS_TEPL_KREDYT to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on SET_SMS_TEPL_KREDYT to START1;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/SET_SMS_TEPL_KREDYT.sql =========*
-PROMPT ===================================================================================== 

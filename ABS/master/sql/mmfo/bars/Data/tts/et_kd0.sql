@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции KD0
-prompt Наименование операции: KD0 КD0 Комісія за оформлення довіреності по рахунках ФО
+prompt Наименование операции: КD0 Комісія за оформлення довіреності по рахунках ФО
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KD0', 'KD0 КD0 Комісія за оформлення довіреності по рахунках ФО', 0, null, 980, null, 980, null, '#(nbs_ob22 (''6510'',''28''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, 'GET_DPTAGR_TARIF(TO_NUMBER(#(ND)),51)', null, 5, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', ' Комісія за оформлення довіреності  до депозитного договору №#{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('KD0', 'КD0 Комісія за оформлення довіреності по рахунках ФО', 0, null, 980, null, 980, null, '#(nbs_ob22 (''6110'',''28''))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, 'GET_DPTAGR_TARIF(TO_NUMBER(#(ND)),51)', null, 5, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', ' Комісія за оформлення довіреності  до депозитного договору №#{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KD0', name='KD0 КD0 Комісія за оформлення довіреності по рахунках ФО', dk=0, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa='#(nbs_ob22 (''6510'',''28''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s='GET_DPTAGR_TARIF(TO_NUMBER(#(ND)),51)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=' Комісія за оформлення довіреності  до депозитного договору №#{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='KD0', name='КD0 Комісія за оформлення довіреності по рахунках ФО', dk=0, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa='#(nbs_ob22 (''6110'',''28''))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s='GET_DPTAGR_TARIF(TO_NUMBER(#(ND)),51)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=' Комісія за оформлення довіреності  до депозитного договору №#{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='KD0';
   end;
   --------------------------------

@@ -83,12 +83,49 @@ COMMENT ON COLUMN BARS.PERSON.EDDR_ID IS 'Унікальний номер запису в ЄДДР';
 
 
 
-PROMPT *** Create  constraint PK_PERSON ***
+PROMPT *** Create  constraint FK_PERSON_PASSP ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PERSON ADD CONSTRAINT PK_PERSON PRIMARY KEY (RNK)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
+  ALTER TABLE BARS.PERSON ADD CONSTRAINT FK_PERSON_PASSP FOREIGN KEY (PASSP)
+	  REFERENCES BARS.PASSP (PASSP) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_PERSON_SEX ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PERSON ADD CONSTRAINT FK_PERSON_SEX FOREIGN KEY (SEX)
+	  REFERENCES BARS.SEX (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_PERSON_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PERSON ADD CONSTRAINT FK_PERSON_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_PERSON_PDATE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PERSON ADD CONSTRAINT CC_PERSON_PDATE CHECK (nvl(pdate,to_date(''01/01/3000'', ''dd/mm/yyyy'')) >= bday) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -109,10 +146,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PERSON_PDATE ***
+PROMPT *** Create  constraint PK_PERSON ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PERSON ADD CONSTRAINT CC_PERSON_PDATE CHECK (nvl(pdate,to_date(''01/01/3000'', ''dd/mm/yyyy'')) >= bday) ENABLE';
+  ALTER TABLE BARS.PERSON ADD CONSTRAINT PK_PERSON PRIMARY KEY (RNK)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -179,7 +218,6 @@ grant DELETE,INSERT,SELECT,UPDATE                                            on 
 grant REFERENCES,SELECT                                                      on PERSON          to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on PERSON          to BARSAQ_ADM with grant option;
 grant SELECT                                                                 on PERSON          to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on PERSON          to BARSREADER_ROLE;
 grant SELECT                                                                 on PERSON          to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PERSON          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PERSON          to BARS_DM;
@@ -192,7 +230,6 @@ grant SELECT                                                                 on 
 grant SELECT,SELECT                                                          on PERSON          to KLBX;
 grant SELECT                                                                 on PERSON          to RPBN001;
 grant SELECT                                                                 on PERSON          to START1;
-grant SELECT                                                                 on PERSON          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PERSON          to WR_ALL_RIGHTS;
 grant SELECT                                                                 on PERSON          to WR_CREDIT;
 grant SELECT                                                                 on PERSON          to WR_CUSTREG;

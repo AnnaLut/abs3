@@ -68,8 +68,6 @@ PROMPT *** Create  view PER_INK_N ***
 
 PROMPT *** Create  grants  PER_INK_N ***
 grant DELETE,SELECT,UPDATE                                                   on PER_INK_N       to BARS015;
-grant SELECT                                                                 on PER_INK_N       to BARSREADER_ROLE;
-grant SELECT                                                                 on PER_INK_N       to UPLD;
 
 
 

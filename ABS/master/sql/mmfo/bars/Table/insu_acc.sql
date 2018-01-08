@@ -81,6 +81,58 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_INSU_ACC_RNKI ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INSU_ACC ADD CONSTRAINT FK_INSU_ACC_RNKI FOREIGN KEY (RNKI)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INSU_ACC_VID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INSU_ACC ADD CONSTRAINT FK_INSU_ACC_VID FOREIGN KEY (VID)
+	  REFERENCES BARS.INSU_VID (INSU) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INSUACC_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INSU_ACC ADD CONSTRAINT FK_INSUACC_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INSUACC_ACCOUNTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INSU_ACC ADD CONSTRAINT FK_INSUACC_ACCOUNTS FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_INSUACC_KF_NN ***
 begin   
  execute immediate '
@@ -107,11 +159,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  INSU_ACC ***
-grant SELECT                                                                 on INSU_ACC        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INSU_ACC        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INSU_ACC        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INSU_ACC        to RCC_DEAL;
-grant SELECT                                                                 on INSU_ACC        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INSU_ACC        to WR_ALL_RIGHTS;
 
 

@@ -1,61 +1,55 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ebk_wforms_utl.sql =========*** Run 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.EBK_WFORMS_UTL 
+create or replace package EBK_WFORMS_UTL
 is
-
+  
   --
   -- constants
   --
   g_header_version  constant varchar2(64)  := 'version 1.03  2016.08.19';
-
-  function show_card_accord_quality( p_kf in varchar2,
-                                     p_rnk in number,
-                                     p_quality_group in varchar2,
-                                     p_percent in number) return number;
-  function show_card_accord_quality2( p_kf in varchar2,
-                                     p_rnk in number,
-                                     p_quality_group in varchar2,
+  
+  function show_card_accord_quality( p_kf in varchar2, 
+                                     p_rnk in number, 
+                                     p_quality_group in varchar2, 
+                                     p_percent in number) return number; 
+  function show_card_accord_quality2( p_kf in varchar2, 
+                                     p_rnk in number, 
+                                     p_quality_group in varchar2, 
                                      p_percent_from in number,
-                                     p_percent_to in number) return number;
+                                     p_percent_to in number) return number; 
   procedure add_card_qlt_log(p_rnk in number);
-
+  
   procedure del_subgr(p_group_id in number,
                       p_subgr_id in number
                      );
   procedure add_subgr(p_group_id in number,
-                      p_sign in varchar2,
-                      p_percent in integer);
-
+                      p_sign in varchar2, 
+                      p_percent in integer);                   
+   
   function get_cust_quantity_for_group(p_group_id in number ) return number;
-
+  
   function get_cust_quantity_for_subgr(p_group_id in number,
                                        p_subgr_id in number) return number;
   function get_cust_subgrp( p_group_id in number
-                           ,p_quality in number) return number DETERMINISTIC;
-
+                           ,p_quality in number) return number DETERMINISTIC; 
+                           
   procedure change_cust_attr (p_rnk in number,
                               p_attr_name in varchar2,
                               p_new_val in varchar2
                               );
-  procedure add_rnk_queue (p_rnk in number);
-
+  procedure add_rnk_queue (p_rnk in number);  
+  
   function get_db_value(p_rnk in number,p_attr_name in varchar2)  return varchar2;
-
+  
   -- на случай если бы была кнопка на случай сохранить все сделанные изменения
   procedure save_card_changes( p_kf in varchar2,
                                p_rnk in number);
-
+  
   --нажатии кнопки изменить атрибут,после изменения рекомендация должна быть стерта
   procedure dell_one_recomm (p_kf in varchar2,
-                             p_rnk in number,
+                             p_rnk in number, 
                              p_attr_name in varchar2
                              );
-
-  -- Возвращает колличество строк для фильтров "Арм Якості"
+   
+  -- Возвращает колличество строк для фильтров "Арм Якості"                             
   procedure get_cust_subgrp_count( p_group_id       in number default 1, /*БПК,Кредиты,Депозиты,,, */
                                    p_prc_quality_id in number default null, /* Подгруппы на первой стр.,null значит Все*/
                                    p_nmk            in varchar2 default null,
@@ -68,17 +62,17 @@ is
                                    p_attr_qty       in number default null, /*Кол-во атрибутов для правки*/
                                    p_branch         in varchar2 default null,
                                    p_count_row      out number);
-
+  
   --
-  --
+  -- 
   --
   function GET_RNK
   ( p_rnk  customer.rnk%type
   , p_kf   customer.kf%type default sys_context('bars_context','user_mfo')
   ) return customer.rnk%type;
-
+  
   --
-  --
+  -- 
   --
   function CUT_RNK
   ( p_rnk  customer.rnk%type
@@ -87,18 +81,23 @@ is
 
 end EBK_WFORMS_UTL;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.EBK_WFORMS_UTL 
-is
 
+show err
+
+----------------------------------------------------------------------------------------------------
+
+create or replace package body EBK_WFORMS_UTL
+is
+  
   --
   -- constants
   --
   g_body_version  constant varchar2(64)  := 'version 1.04  2017.04.13';
-
+  
   --
   -- variables
   --
-
+  
   function show_card_accord_quality
   ( p_kf            in     varchar2,
     p_rnk           in     number,
@@ -253,36 +252,36 @@ is
  is
    l_id_prc_q number;
  begin
-
+   
    bars_audit.trace( '%s.GET_CUST_SUBGRP: Entry with ( p_group_id=%s, p_quality=%s ).'
                    , $$PLSQL_UNIT, to_char(p_group_id), to_char(p_quality) );
-
+   
    for x in ( select esg.id_prc_quality,
                      ( select name  from ebk_prc_quality where id = id_prc_quality ) as prc_level
                 from EBK_SUB_GROUPS esg
                where id_grp = p_group_id
                order by esg.id_prc_quality desc )
    loop
-
+     
      bars_audit.trace( '%s.GET_CUST_SUBGRP: ( id_prc_quality=%s, p_quality=%s ).'
                      , $$PLSQL_UNIT, to_char(x.id_prc_quality), to_char(x.prc_level) );
-
+     
      execute immediate 'select nvl(max(:id_prc_quality),0) from dual where :p_quality '||x.prc_level
-                  into l_id_prc_q
+                  into l_id_prc_q 
                  using x.id_prc_quality, p_quality;
 
      bars_audit.trace( '%s.GET_CUST_SUBGRP: ( l_id_prc_q=%s ).'
                      , $$PLSQL_UNIT, to_char(l_id_prc_q) );
-
-     if l_id_prc_q <> 0
+     
+     if l_id_prc_q <> 0 
      then
        exit;
      end if;
-
+     
    end loop;
-
+   
    return nvl(l_id_prc_q,0);
-
+   
  end GET_CUST_SUBGRP;
 
  procedure change_cust_attr (p_rnk in number,
@@ -460,9 +459,9 @@ is
                and (a.recommendvalue is not null or
                    a.descr is not null)) = p_attr_qty);
   end;
-
+  
   --
-  --
+  -- 
   --
   function GET_RNK
   ( p_rnk  customer.rnk%type
@@ -508,9 +507,9 @@ $else
 $end
     return l_rnk;
   end GET_RNK;
-
+  
   --
-  --
+  -- 
   --
   function CUT_RNK
   ( p_rnk  customer.rnk%type
@@ -531,14 +530,7 @@ begin
   null;
 end EBK_WFORMS_UTL;
 /
- show err;
- 
-PROMPT *** Create  grants  EBK_WFORMS_UTL ***
-grant EXECUTE                                                                on EBK_WFORMS_UTL  to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/ebk_wforms_utl.sql =========*** End 
- PROMPT ===================================================================================== 
- 
+show err
+
+grant execute on EBK_WFORMS_UTL to BARS_ACCESS_DEFROLE;

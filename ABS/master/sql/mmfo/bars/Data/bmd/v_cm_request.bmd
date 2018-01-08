@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'W4. Запити до CardMake';
   l_tablinesdef := '30';
-  l_tabselect_statement := '';
   l_tabname     := 'V_CM_REQUEST';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,24 +119,24 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC', '', 22, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Відділення', '1.8', 30, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'CLIENTTYPE', 'N', 'Тип клієнта', '1.2', 22, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DATEIN', 'D', 'Дата запиту', '1.2', 10, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DATEMOD', 'D', 'Дата модифікації', '1.6', 10, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'ID', 'N', 'Ід. запиту', '1.2', 22, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NAME', 'C', 'ПІБ Клієнта', '', 200, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NLS', 'C', 'Рахунок', '', 19, 15, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/viewaccounts/accountform.aspx?type=0'||chr(38)||'acc=:ACC'||chr(38)||'rnk='||chr(38)||'accessmode=1', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'OKPO', 'C', 'ЗКПО клієнта', '1.2', 10, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'OPERSTATUS_NAME', 'C', 'Статус запису', '1.4', 28, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'OPERTYPE_NAME', 'C', 'Тип запиту', '2', 100, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'OPER_STATUS', 'N', 'Статус операції (1,2,3,10)', '', 22, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'OPER_TYPE', 'N', 'Тип операції (1,3,4,5)', '', 22, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'RESP_TXT', 'C', 'Опис помилки', '', 1000, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'RNK', 'N', 'РНК', '1.2', 22, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/clientregister/registration.aspx?readonly=0'||chr(38)||'rnk=:RNK', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'CARD_TIP', 'C', 'Тип (LC/W4)', '1.2', 2, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'PRODUCT_CODE', 'C', 'Продукт', '2.5', 32, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'CARD_CODE', 'C', 'Картка', '2.5', 32, 18, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC', null, 22, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Відділення', 1.8, 30, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'CLIENTTYPE', 'N', 'Тип клієнта', 1.2, 22, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DATEIN', 'D', 'Дата запиту', 1.2, 10, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DATEMOD', 'D', 'Дата модифікації', 1.6, 10, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'ID', 'N', 'Ід. запиту', 1.2, 22, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NAME', 'C', 'ПІБ Клієнта', null, 200, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NLS', 'C', 'Рахунок', null, 19, 15, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/viewaccounts/accountform.aspx?type=0'||chr(38)||'acc=:ACC'||chr(38)||'rnk='||chr(38)||'accessmode=1', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'OKPO', 'C', 'ЗКПО клієнта', 1.2, 10, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'OPERSTATUS_NAME', 'C', 'Статус запису', 1.4, 28, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'OPERTYPE_NAME', 'C', 'Тип запиту', 2, 100, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'OPER_STATUS', 'N', 'Статус операції (1,2,3,10)', null, 22, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'OPER_TYPE', 'N', 'Тип операції (1,3,4,5)', null, 22, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'RESP_TXT', 'C', 'Опис помилки', null, 1000, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'RNK', 'N', 'РНК', 1.2, 22, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/clientregister/registration.aspx?readonly=0'||chr(38)||'rnk=:RNK', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'CARD_TIP', 'C', 'Тип (LC/W4)', 1.2, 2, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'PRODUCT_CODE', 'C', 'Продукт', 2.5, 32, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'CARD_CODE', 'C', 'Картка', 2.5, 32, 18, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

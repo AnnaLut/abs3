@@ -25,10 +25,8 @@ where d.vidd in (1,2,3,11,12,13)
  ;
 
 PROMPT *** Create  grants  V_CC_SDI ***
-grant SELECT                                                                 on V_CC_SDI        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CC_SDI        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CC_SDI        to RCC_DEAL;
-grant SELECT                                                                 on V_CC_SDI        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CC_SDI        to WR_ALL_RIGHTS;
 
 

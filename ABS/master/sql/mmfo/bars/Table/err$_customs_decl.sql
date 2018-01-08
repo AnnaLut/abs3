@@ -161,10 +161,6 @@ COMMENT ON COLUMN BARS.ERR$_CUSTOMS_DECL.CIM_BOUNDSUM IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CUSTOMS_DECL ***
-grant SELECT                                                                 on ERR$_CUSTOMS_DECL to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CUSTOMS_DECL to UPLD;
-
 
 
 PROMPT ===================================================================================== 

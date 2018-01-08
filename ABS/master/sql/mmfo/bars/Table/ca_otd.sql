@@ -53,9 +53,7 @@ COMMENT ON COLUMN BARS.CA_OTD.DEPT_RELATION IS '';
 
 
 PROMPT *** Create  grants  CA_OTD ***
-grant SELECT                                                                 on CA_OTD          to BARSREADER_ROLE;
 grant SELECT                                                                 on CA_OTD          to BARS_DM;
-grant SELECT                                                                 on CA_OTD          to UPLD;
 
 
 

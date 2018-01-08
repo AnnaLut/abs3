@@ -57,10 +57,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  OTCN_OPERW ***
-grant SELECT                                                                 on OTCN_OPERW      to BARSREADER_ROLE;
-grant SELECT                                                                 on OTCN_OPERW      to UPLD;
-
 
 
 PROMPT ===================================================================================== 

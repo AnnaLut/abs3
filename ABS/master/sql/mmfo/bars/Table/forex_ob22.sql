@@ -71,10 +71,10 @@ COMMENT ON COLUMN BARS.FOREX_OB22.S9PV IS 'БР/Об22~позаб.зобов. для ВАЛ-СВОПА';
 
 
 
-PROMPT *** Create  constraint UK_FOREXOB22_KOD ***
+PROMPT *** Create  constraint PK_FOREXOB22 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FOREX_OB22 ADD CONSTRAINT UK_FOREXOB22_KOD UNIQUE (KOD)
+  ALTER TABLE BARS.FOREX_OB22 ADD CONSTRAINT PK_FOREXOB22 PRIMARY KEY (ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE';
 exception when others then
@@ -85,10 +85,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_FOREXOB22 ***
+PROMPT *** Create  constraint UK_FOREXOB22_KOD ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FOREX_OB22 ADD CONSTRAINT PK_FOREXOB22 PRIMARY KEY (ID)
+  ALTER TABLE BARS.FOREX_OB22 ADD CONSTRAINT UK_FOREXOB22_KOD UNIQUE (KOD)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE';
 exception when others then
@@ -127,12 +127,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  FOREX_OB22 ***
-grant SELECT                                                                 on FOREX_OB22      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FOREX_OB22      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FOREX_OB22      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FOREX_OB22      to RCH_1;
 grant SELECT,UPDATE                                                          on FOREX_OB22      to START1;
-grant SELECT                                                                 on FOREX_OB22      to UPLD;
 grant FLASHBACK,SELECT                                                       on FOREX_OB22      to WR_REFREAD;
 
 

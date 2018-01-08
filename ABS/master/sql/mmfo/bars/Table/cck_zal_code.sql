@@ -49,11 +49,9 @@ COMMENT ON COLUMN BARS.CCK_ZAL_CODE.DESCR_CODE IS 'Опис коду';
 
 
 PROMPT *** Create  grants  CCK_ZAL_CODE ***
-grant SELECT                                                                 on CCK_ZAL_CODE    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_ZAL_CODE    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_ZAL_CODE    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_ZAL_CODE    to RCC_DEAL;
-grant SELECT                                                                 on CCK_ZAL_CODE    to UPLD;
 
 
 

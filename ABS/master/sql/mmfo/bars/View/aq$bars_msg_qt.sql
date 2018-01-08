@@ -59,10 +59,6 @@ PROMPT *** Create  view AQ$BARS_MSG_QT ***
 							        h.name),
 					  s.name) CONSUMER_NAME,  s.address ADDRESS,  s.protocol PROTOCOL  FROM "BARS_MSG_QT" qt, "AQ$_BARS_MSG_QT_H" h LEFT OUTER JOIN "AQ$_BARS_MSG_QT_L" l  ON h.msgid = l.msgid AND h.subscriber# = l.subscriber# AND h.name = l.name AND h.address# = l.address#, "AQ$_BARS_MSG_QT_S" s  WHERE  qt.msgid = h.msgid AND  ((h.subscriber# != 0 AND h.subscriber# = s.subscriber_id)  OR (h.subscriber# = 0 AND h.address# = s.subscriber_id)) AND (qt.state != 7 OR   qt.state != 9 )     WITH READ ONLY;
 
-PROMPT *** Create  grants  AQ$BARS_MSG_QT ***
-grant SELECT                                                                 on AQ$BARS_MSG_QT  to BARSREADER_ROLE;
-grant SELECT                                                                 on AQ$BARS_MSG_QT  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -1,14 +1,7 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_FM_OSC_RULE18.sql =========*** Run **
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_FM_OSC_RULE18 ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_FM_OSC_RULE18 ("REF", "VDAT") AS 
-  select R.ref, R.vdat from
+create or replace view v_fm_osc_rule18(ref, vdat) as
+/* Учасник платежу, країна переказу належить до офшорної зони
+cobusupabs-5558, cobusupabs-4408 */
+select R.ref, R.vdat from 
 (
   SELECT o.REF, o.vdat
      FROM oper o, operw w, kl_k040 k
@@ -39,7 +32,7 @@ PROMPT *** Create  view V_FM_OSC_RULE18 ***
           AND k.k042 = '1'
           AND gl.p_icurval (NVL (o.kv, 980), NVL (o.s, 0), o.vdat) >=  15000000
     union
-    select
+    select 
     o.ref, o.vdat
     from bars.oper o
     left join bars.accounts accA on o.kf = accA.kf and o.nlsa = accA.nls and o.kv = accA.kv
@@ -53,15 +46,5 @@ PROMPT *** Create  view V_FM_OSC_RULE18 ***
     and bars.gl.p_icurval(nvl(o.kv,980), nvl(o.s,0), o.vdat) >= 15000000
 ) R;
 
-PROMPT *** Create  grants  V_FM_OSC_RULE18 ***
-grant SELECT                                                                 on V_FM_OSC_RULE18 to BARSREADER_ROLE;
-grant SELECT                                                                 on V_FM_OSC_RULE18 to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_FM_OSC_RULE18 to FINMON01;
-grant SELECT                                                                 on V_FM_OSC_RULE18 to START1;
-grant SELECT                                                                 on V_FM_OSC_RULE18 to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_FM_OSC_RULE18.sql =========*** End **
-PROMPT ===================================================================================== 
+grant select on v_fm_osc_rule18 to finmon01;
+grant select on v_fm_osc_rule18 to bars_access_defrole;

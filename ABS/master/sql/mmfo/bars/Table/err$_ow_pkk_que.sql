@@ -77,10 +77,6 @@ COMMENT ON COLUMN BARS.ERR$_OW_PKK_QUE.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OW_PKK_QUE ***
-grant SELECT                                                                 on ERR$_OW_PKK_QUE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OW_PKK_QUE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -19,7 +19,7 @@ end;
 
 
 /
-ALTER TRIGGER BARS.TAU_NLKREF DISABLE;
+ALTER TRIGGER BARS.TAU_NLKREF ENABLE;
 
 
 PROMPT ===================================================================================== 

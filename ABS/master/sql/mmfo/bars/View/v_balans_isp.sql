@@ -30,9 +30,7 @@ where s.isp = f.id (+)
  ;
 
 PROMPT *** Create  grants  V_BALANS_ISP ***
-grant SELECT                                                                 on V_BALANS_ISP    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BALANS_ISP    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_BALANS_ISP    to UPLD;
 grant SELECT                                                                 on V_BALANS_ISP    to WEB_BALANS;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BALANS_ISP    to WR_ALL_RIGHTS;
 

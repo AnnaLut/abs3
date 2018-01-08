@@ -77,6 +77,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_DPTVIDDFIELD_DPTVIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_FIELD ADD CONSTRAINT FK_DPTVIDDFIELD_DPTVIDD FOREIGN KEY (VIDD)
+	  REFERENCES BARS.DPT_VIDD (VIDD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTVIDDFIELD_DPTFIELD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_FIELD ADD CONSTRAINT FK_DPTVIDDFIELD_DPTFIELD FOREIGN KEY (TAG)
+	  REFERENCES BARS.DPT_FIELD (TAG) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DPTVIDDFIELD_TAG_NN ***
 begin   
  execute immediate '
@@ -115,12 +141,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_VIDD_FIELD ***
-grant SELECT                                                                 on DPT_VIDD_FIELD  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VIDD_FIELD  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VIDD_FIELD  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_FIELD  to DPT_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_FIELD  to DPT_ROLE;
-grant SELECT                                                                 on DPT_VIDD_FIELD  to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_FIELD  to VKLAD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VIDD_FIELD  to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_VIDD_FIELD  to WR_REFREAD;

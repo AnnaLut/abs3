@@ -65,10 +65,6 @@ COMMENT ON COLUMN BARS.ERR$_SKRYNKA_ATTORNEY.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SKRYNKA_ATTORNEY ***
-grant SELECT                                                                 on ERR$_SKRYNKA_ATTORNEY to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SKRYNKA_ATTORNEY to UPLD;
-
 
 
 PROMPT ===================================================================================== 

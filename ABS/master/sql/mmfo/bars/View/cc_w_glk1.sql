@@ -41,10 +41,8 @@ PROMPT *** Create  view CC_W_GLK1 ***
          WHERE nd = to_number(pul.get_mas_ini_val('ND'))) x;
 
 PROMPT *** Create  grants  CC_W_GLK1 ***
-grant SELECT                                                                 on CC_W_GLK1       to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_W_GLK1       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_W_GLK1       to START1;
-grant SELECT                                                                 on CC_W_GLK1       to UPLD;
 
 
 

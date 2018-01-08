@@ -11,9 +11,7 @@ PROMPT *** Create  view V_CIM_KL_R040 ***
   select lpad(c.country,3,'0') country, c.name from country c;
 
 PROMPT *** Create  grants  V_CIM_KL_R040 ***
-grant SELECT                                                                 on V_CIM_KL_R040   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_KL_R040   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_KL_R040   to UPLD;
 
 
 

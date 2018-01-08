@@ -122,10 +122,8 @@ exception when others then
 
 PROMPT *** Create  grants  KAS_U ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_U           to ABS_ADMIN;
-grant SELECT                                                                 on KAS_U           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KAS_U           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KAS_U           to PYOD001;
-grant SELECT                                                                 on KAS_U           to UPLD;
 grant FLASHBACK,SELECT                                                       on KAS_U           to WR_REFREAD;
 
 

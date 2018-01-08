@@ -71,6 +71,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_ENUM_VAL_REF_PARENT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.LIST_ITEM ADD CONSTRAINT FK_ENUM_VAL_REF_PARENT FOREIGN KEY (LIST_TYPE_ID, PARENT_LIST_ITEM_ID)
+	  REFERENCES BARS.LIST_ITEM (LIST_TYPE_ID, LIST_ITEM_ID) DISABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ENUM_VAL_REF_EN_TYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.LIST_ITEM ADD CONSTRAINT FK_ENUM_VAL_REF_EN_TYPE FOREIGN KEY (LIST_TYPE_ID)
+	  REFERENCES BARS.LIST_TYPE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C008118 ***
 begin   
  execute immediate '
@@ -159,10 +185,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  LIST_ITEM ***
-grant SELECT                                                                 on LIST_ITEM       to BARSREADER_ROLE;
 grant SELECT                                                                 on LIST_ITEM       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LIST_ITEM       to BARS_DM;
-grant SELECT                                                                 on LIST_ITEM       to UPLD;
 
 
 

@@ -211,7 +211,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  S6_Contract ***
-grant SELECT                                                                 on S6_Contract     to BARSREADER_ROLE;
 grant SELECT                                                                 on S6_Contract     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on S6_Contract     to RPBN002;
 

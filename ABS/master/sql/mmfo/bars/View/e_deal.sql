@@ -44,11 +44,9 @@ PROMPT *** Create  view E_DEAL ***
           AND e.accd = ad.acc(+);
 
 PROMPT *** Create  grants  E_DEAL ***
-grant SELECT                                                                 on E_DEAL          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on E_DEAL          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on E_DEAL          to ELT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on E_DEAL          to START1;
-grant SELECT                                                                 on E_DEAL          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on E_DEAL          to WR_ALL_RIGHTS;
 
 

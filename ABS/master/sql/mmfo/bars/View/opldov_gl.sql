@@ -35,10 +35,8 @@ PROMPT *** Create  view OPLDOV_GL ***
     WHERE o.acc = a.acc AND a.nbs IS NULL AND a.accc IS NOT NULL;
 
 PROMPT *** Create  grants  OPLDOV_GL ***
-grant SELECT                                                                 on OPLDOV_GL       to BARSREADER_ROLE;
 grant SELECT                                                                 on OPLDOV_GL       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OPLDOV_GL       to RPBN001;
-grant SELECT                                                                 on OPLDOV_GL       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OPLDOV_GL       to WR_ALL_RIGHTS;
 
 

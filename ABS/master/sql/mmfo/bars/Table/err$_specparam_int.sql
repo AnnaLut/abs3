@@ -116,9 +116,7 @@ COMMENT ON COLUMN BARS.ERR$_SPECPARAM_INT.KREDIT_ZARPLATA IS '';
 
 
 PROMPT *** Create  grants  ERR$_SPECPARAM_INT ***
-grant SELECT                                                                 on ERR$_SPECPARAM_INT to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_SPECPARAM_INT to BARS_DM;
-grant SELECT                                                                 on ERR$_SPECPARAM_INT to UPLD;
 
 
 

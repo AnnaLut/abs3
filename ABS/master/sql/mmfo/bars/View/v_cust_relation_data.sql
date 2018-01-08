@@ -136,9 +136,7 @@ PROMPT *** Create  view V_CUST_RELATION_DATA ***
 ;
 
 PROMPT *** Create  grants  V_CUST_RELATION_DATA ***
-grant SELECT                                                                 on V_CUST_RELATION_DATA to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUST_RELATION_DATA to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CUST_RELATION_DATA to UPLD;
 
 
 

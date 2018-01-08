@@ -73,6 +73,58 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_BPKIMPPROECTFILES_BPKPROD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_IMP_PROECT_FILES ADD CONSTRAINT FK_BPKIMPPROECTFILES_BPKPROD FOREIGN KEY (PRODUCT_ID)
+	  REFERENCES BARS.BPK_PRODUCT (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_BPKIMPPROECTFILES_FILIAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_IMP_PROECT_FILES ADD CONSTRAINT FK_BPKIMPPROECTFILES_FILIAL FOREIGN KEY (FILIAL)
+	  REFERENCES BARS.DEMAND_FILIALES (CODE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_BPKIMPPROECTFILES_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_IMP_PROECT_FILES ADD CONSTRAINT FK_BPKIMPPROECTFILES_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_BPKIMPPROECTFILES_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_IMP_PROECT_FILES ADD CONSTRAINT FK_BPKIMPPROECTFILES_STAFF FOREIGN KEY (ISP)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_BPKIMPPROECTFILES_ID_NN ***
 begin   
  execute immediate '
@@ -85,10 +137,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKIMPPROECTFILES_FNAME_NN ***
+PROMPT *** Create  constraint CC_BPKIMPPROECTFILES_FDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_IMP_PROECT_FILES MODIFY (FILE_NAME CONSTRAINT CC_BPKIMPPROECTFILES_FNAME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BPK_IMP_PROECT_FILES MODIFY (FILE_DATE CONSTRAINT CC_BPKIMPPROECTFILES_FDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -97,10 +149,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKIMPPROECTFILES_FDATE_NN ***
+PROMPT *** Create  constraint CC_BPKIMPPROECTFILES_FNAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_IMP_PROECT_FILES MODIFY (FILE_DATE CONSTRAINT CC_BPKIMPPROECTFILES_FDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BPK_IMP_PROECT_FILES MODIFY (FILE_NAME CONSTRAINT CC_BPKIMPPROECTFILES_FNAME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -123,11 +175,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_IMP_PROECT_FILES ***
-grant SELECT                                                                 on BPK_IMP_PROECT_FILES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_IMP_PROECT_FILES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_IMP_PROECT_FILES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_IMP_PROECT_FILES to OBPC;
-grant SELECT                                                                 on BPK_IMP_PROECT_FILES to UPLD;
 
 
 

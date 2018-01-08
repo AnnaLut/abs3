@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/VW_ESCR_REG_ALL_CREDITS.sql =========**
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view VW_ESCR_REG_ALL_CREDITS ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.VW_ESCR_REG_ALL_CREDITS ("CUSTOMER_ID", "CUSTOMER_NAME", "CUSTOMER_OKPO", "CUSTOMER_REGION", "CUSTOMER_FULL_ADDRESS", "CUSTOMER_TYPE", "SUBS_NUMB", "SUBS_DATE", "SUBS_DOC_TYPE", "DEAL_ID", "DEAL_NUMBER", "DEAL_DATE_FROM", "DEAL_DATE_TO", "DEAL_TERM", "DEAL_PRODUCT", "DEAL_STATE", "DEAL_TYPE_CODE", "DEAL_TYPE_NAME", "DEAL_SUM", "CREDIT_STATUS_ID", "CREDIT_STATUS_NAME", "CREDIT_STATUS_CODE", "CREDIT_COMMENT", "STATE_FOR_UI", "GOOD_COST", "NLS", "ACC", "DOC_DATE", "MONEY_DATE", "COMP_SUM", "VALID_STATUS", "BRANCH_CODE", "BRANCH_NAME", "MFO", "USER_ID", "USER_NAME", "REG_KIND_CODE", "REG_KIND_NAME", "REG_TYPE_CODE", "REG_TYPE_NAME", "CREDIT_STATUS_DATE", "OUTER_NUMBER", "NEW_DEAL_SUM", "NEW_COMP_SUM", "NEW_GOOD_COST", "REG_TYPE_ID", "REG_KIND_ID", "STATE_PRIORITY", "SUBS_AVAILABLE", "AVR_DATE") AS 
-  SELECT rez.customer_id,
+CREATE OR REPLACE VIEW VW_ESCR_REG_ALL_CREDITS AS
+SELECT rez.customer_id,
           rez.customer_name,
           rez.customer_okpo,
           CASE
@@ -567,14 +558,10 @@ PROMPT *** Create  view VW_ESCR_REG_ALL_CREDITS ***
           JOIN bars.escr_reg_kind ek ON rez.reg_kind_id = ek.id
           JOIN bars.escr_reg_types et ON rez.reg_type_id = et.id
 ;
-
-PROMPT *** Create  grants  VW_ESCR_REG_ALL_CREDITS ***
-grant SELECT                                                                 on VW_ESCR_REG_ALL_CREDITS to BARSREADER_ROLE;
-grant SELECT                                                                 on VW_ESCR_REG_ALL_CREDITS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on VW_ESCR_REG_ALL_CREDITS to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/VW_ESCR_REG_ALL_CREDITS.sql =========**
-PROMPT ===================================================================================== 
+comment on table VW_ESCR_REG_ALL_CREDITS is 'Кредитний портфель для енерго';
+comment on column VW_ESCR_REG_ALL_CREDITS.CUSTOMER_ID is 'Реєстраційний номер  картки платника';
+comment on column VW_ESCR_REG_ALL_CREDITS.CUSTOMER_NAME is 'Прізвище, ім’я,  по-батькові фізичної особи-позичальника';
+comment on column VW_ESCR_REG_ALL_CREDITS.CUSTOMER_OKPO is 'ІНН особи-позичальника ';
+comment on column VW_ESCR_REG_ALL_CREDITS.CUSTOMER_REGION is 'Клієнт адреса проживання (область)';
+comment on column VW_ESCR_REG_ALL_CREDITS.CUSTOMER_FULL_ADDRESS is 'Клієнт повна адреса проживання';
+comment on column VW_ESCR_REG_ALL_CREDITS.AVR_DATE is 'Дата надання актів виконаних робіт або заяви про власноручне встановлення';

@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.ERR$_ACR_DOCS.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ACR_DOCS ***
-grant SELECT                                                                 on ERR$_ACR_DOCS   to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ACR_DOCS   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

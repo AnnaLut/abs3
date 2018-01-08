@@ -33,9 +33,7 @@ PROMPT *** Create  view V_CBIREP_REPPARAMS ***
  where r.form in ('frm_UniReport','frm_FastReport') and substr(r.param, 0, instr(r.param, ',') - 1) = z.kodz;
 
 PROMPT *** Create  grants  V_CBIREP_REPPARAMS ***
-grant SELECT                                                                 on V_CBIREP_REPPARAMS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CBIREP_REPPARAMS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CBIREP_REPPARAMS to UPLD;
 grant SELECT                                                                 on V_CBIREP_REPPARAMS to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_CBIREP_REPPARAMS to WR_CBIREP;
 

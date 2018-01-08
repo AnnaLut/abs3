@@ -26,9 +26,7 @@ PROMPT *** Create  view V_MBDK_ACCOUNT_MODEL ***
 ORDER BY o.fdat, o.ref, o.stmt, o.dk;
 
 PROMPT *** Create  grants  V_MBDK_ACCOUNT_MODEL ***
-grant SELECT                                                                 on V_MBDK_ACCOUNT_MODEL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBDK_ACCOUNT_MODEL to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_MBDK_ACCOUNT_MODEL to UPLD;
 
 
 

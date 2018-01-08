@@ -28,10 +28,8 @@ FROM v_kas_z kz
 ORDER BY branch, kodv DESC;
 
 PROMPT *** Create  grants  V_KAS_ZZ ***
-grant SELECT                                                                 on V_KAS_ZZ        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_KAS_ZZ        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_KAS_ZZ        to PYOD001;
-grant SELECT                                                                 on V_KAS_ZZ        to UPLD;
 
 
 

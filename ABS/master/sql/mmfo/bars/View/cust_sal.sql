@@ -23,10 +23,8 @@ WHERE a.acc=s.acc AND
                        );
 
 PROMPT *** Create  grants  CUST_SAL ***
-grant SELECT                                                                 on CUST_SAL        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUST_SAL        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_SAL        to CUST_SAL;
-grant SELECT                                                                 on CUST_SAL        to UPLD;
 grant FLASHBACK,SELECT                                                       on CUST_SAL        to WR_REFREAD;
 
 

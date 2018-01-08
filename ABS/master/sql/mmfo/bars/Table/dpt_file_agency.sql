@@ -64,6 +64,45 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_DPTFILEAGENCY_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_FILE_AGENCY ADD CONSTRAINT FK_DPTFILEAGENCY_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTFILEAGENCY_AGENCYID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_FILE_AGENCY ADD CONSTRAINT FK_DPTFILEAGENCY_AGENCYID FOREIGN KEY (AGENCY_ID)
+	  REFERENCES BARS.SOCIAL_AGENCY (AGENCY_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTFILEAGENCY_HEADERID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_FILE_AGENCY ADD CONSTRAINT FK_DPTFILEAGENCY_HEADERID FOREIGN KEY (HEADER_ID)
+	  REFERENCES BARS.DPT_FILE_HEADER (HEADER_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DPTFILEAGENCY_HEADERID_NN ***
 begin   
  execute immediate '
@@ -114,11 +153,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_FILE_AGENCY ***
-grant SELECT                                                                 on DPT_FILE_AGENCY to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on DPT_FILE_AGENCY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_FILE_AGENCY to BARS_DM;
 grant INSERT,SELECT,UPDATE                                                   on DPT_FILE_AGENCY to DPT_ROLE;
-grant SELECT                                                                 on DPT_FILE_AGENCY to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_FILE_AGENCY to WR_ALL_RIGHTS;
 
 

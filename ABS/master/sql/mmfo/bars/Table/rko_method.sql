@@ -91,10 +91,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  RKO_METHOD ***
-grant SELECT                                                                 on RKO_METHOD      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RKO_METHOD      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RKO_METHOD      to CUST001;
-grant SELECT                                                                 on RKO_METHOD      to UPLD;
 
 
 

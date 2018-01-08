@@ -51,10 +51,8 @@ PROMPT *** Create  view NADA4 ***
     WHERE a.nbs || a.ob22 = o.kod(+) AND a.acc = s.acc(+);
 
 PROMPT *** Create  grants  NADA4 ***
-grant SELECT                                                                 on NADA4           to BARSREADER_ROLE;
 grant SELECT                                                                 on NADA4           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NADA4           to SALGL;
-grant SELECT                                                                 on NADA4           to UPLD;
 
 
 

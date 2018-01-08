@@ -101,10 +101,6 @@ COMMENT ON COLUMN BARS.ERR$_REZ_DOC_MAKET.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_REZ_DOC_MAKET ***
-grant SELECT                                                                 on ERR$_REZ_DOC_MAKET to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_REZ_DOC_MAKET to UPLD;
-
 
 
 PROMPT ===================================================================================== 

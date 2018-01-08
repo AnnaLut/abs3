@@ -85,7 +85,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_FORMA2M ***
-grant SELECT                                                                 on FIN_FORMA2M     to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_FORMA2M     to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_FORMA2M     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_FORMA2M     to BARS_DM;

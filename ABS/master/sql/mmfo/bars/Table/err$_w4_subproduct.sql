@@ -61,10 +61,6 @@ COMMENT ON COLUMN BARS.ERR$_W4_SUBPRODUCT.DATE_INSTANT IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_W4_SUBPRODUCT ***
-grant SELECT                                                                 on ERR$_W4_SUBPRODUCT to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_W4_SUBPRODUCT to UPLD;
-
 
 
 PROMPT ===================================================================================== 

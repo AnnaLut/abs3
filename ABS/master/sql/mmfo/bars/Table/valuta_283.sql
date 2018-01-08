@@ -64,10 +64,8 @@ COMMENT ON COLUMN BARS.VALUTA_283.KURS_PROD IS '';
 
 
 PROMPT *** Create  grants  VALUTA_283 ***
-grant SELECT                                                                 on VALUTA_283      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VALUTA_283      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VALUTA_283      to START1;
-grant SELECT                                                                 on VALUTA_283      to UPLD;
 
 
 

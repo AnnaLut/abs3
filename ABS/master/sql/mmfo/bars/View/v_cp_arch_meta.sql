@@ -94,10 +94,8 @@ PROMPT *** Create  view V_CP_ARCH_META ***
           AND ct.REF(+) = a.REF;
 
 PROMPT *** Create  grants  V_CP_ARCH_META ***
-grant SELECT                                                                 on V_CP_ARCH_META  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_ARCH_META  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_ARCH_META  to CP_ROLE;
-grant SELECT                                                                 on V_CP_ARCH_META  to UPLD;
 
 
 

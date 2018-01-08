@@ -63,10 +63,6 @@ COMMENT ON COLUMN BARS.TMP_2501_REP_APP.ACODE IS '';
 
 
 
-PROMPT *** Create  grants  TMP_2501_REP_APP ***
-grant SELECT                                                                 on TMP_2501_REP_APP to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_2501_REP_APP to UPLD;
-
 
 
 PROMPT ===================================================================================== 

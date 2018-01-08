@@ -71,6 +71,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_QUESTREFERPARS_QID_QUEST_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_QUESTION_REFER_PARAMS ADD CONSTRAINT FK_QUESTREFERPARS_QID_QUEST_ID FOREIGN KEY (QUESTION_ID)
+	  REFERENCES BARS.WCS_QUESTIONS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_QUESTREFERPARS_TABID_NN ***
 begin   
  execute immediate '
@@ -97,11 +110,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_QUESTION_REFER_PARAMS ***
-grant SELECT                                                                 on WCS_QUESTION_REFER_PARAMS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_QUESTION_REFER_PARAMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_QUESTION_REFER_PARAMS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_QUESTION_REFER_PARAMS to START1;
-grant SELECT                                                                 on WCS_QUESTION_REFER_PARAMS to UPLD;
 
 
 

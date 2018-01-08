@@ -72,9 +72,6 @@ COMMENT ON COLUMN BARS.SPR_KL.DATA_C IS '';
 
 
 
-PROMPT *** Create  grants  SPR_KL ***
-grant SELECT                                                                 on SPR_KL          to UPLD;
-
 
 
 PROMPT ===================================================================================== 

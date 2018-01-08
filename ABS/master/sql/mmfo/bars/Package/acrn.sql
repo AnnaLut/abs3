@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/acrn.sql =========*** Run *** ======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.ACRN 
+create or replace package ACRN
 is
 
 G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'версия 5.13 22/06/2017';
@@ -52,7 +46,7 @@ procedure P_BNS
 , ostf_   in     number                -- account balance
 , op_     in     smallint default null -- rate amend op code
 , amnd_   in     number   default null -- rate amend value
-, kf_     in     varchar  default null --
+, kf_     in     varchar  default null -- 
 );
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -268,7 +262,12 @@ function get_collect_salho return number deterministic;
 
 END acrN;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.ACRN 
+
+show errors
+
+----------------------------------------------------------------------------------------------------
+
+create or replace package body ACRN 
 IS
   g_body_version constant varchar2(64) := 'версия 5.7 22/06/2017';
   acc_FORM int := null;
@@ -563,7 +562,7 @@ procedure P_BNS
 , ostf_   in     number                -- account balance
 , op_     in     smallint default null -- rate amend op code
 , amnd_   in     number   default null -- rate amend value
-, kf_     in     varchar  default null --
+, kf_     in     varchar  default null -- 
 ) IS
   br_    NUMBER;
   ostp_  NUMBER;
@@ -589,36 +588,36 @@ procedure P_BNS
    ORDER BY s;
 
 BEGIN
-
+  
   br_  := 0;
   ostp_:= 0;
   osts_:= ostf_;
-
+  
   if ( kf_ Is Null )
   then l_kf := sys_context('bars_context','user_mfo');
   else l_kf := kf_;
   end if;
-
+  
   if ( l_kf Is Null )
   then
     raise_application_error( -20666, 'Не вказано МФО для розрахунку значення базової ставки!' );
   end if;
 
-  select BR_TYPE ,FORMULA
+  select BR_TYPE ,FORMULA 
     into type_, form_
     from BRATES
    where br_id=nb_;
 
-  if type_ in (1,4)
+  if type_ in (1,4) 
   then
     declare
       c_CURSOR int;
       i_CURSOR int;
       dyn_SQL_ varchar2(250);
     begin
-      if type_ = 4 and FORM_ is not null
+      if type_ = 4 and FORM_ is not null 
       then -- 4 - По внешней формуле (Этот блок добавила Сухова)
-
+        
         c_CURSOR:=DBMS_SQL.OPEN_CURSOR;
         --приготовить дин.SQL с предполагаемыми параметрами ДАТА и АСС
         dyn_SQL_:=
@@ -633,9 +632,9 @@ BEGIN
            --снять результирующую переменную
            DBMS_SQL.COLUMN_VALUE(c_CURSOR,1, br_ );
         end if;
-
+        
       else -- 1 - Простая процентная ставка
-
+        
         -- ищем явное значение БАЗ % ставки, действующее на нужную дату
         select RATE
           into br_
@@ -647,27 +646,27 @@ BEGIN
                                                 and KV    = kv_
                                                 and BDATE <=dat_
                                               group by KF, BR_ID, KV );
-
+         
        end if;
-
+       
        IF    op_ = 1 THEN  br_ := br_ + amnd_;
        ELSIF op_ = 2 THEN  br_ := br_ - amnd_;
        ELSIF op_ = 3 THEN  br_ := br_ * amnd_;
        ELSIF op_ = 4 THEN  br_ := br_ / amnd_;
        END IF;
-
+       
      exception
        when others then br_:=0;
      end;
 /**************************************************************************/
 /***      2-Ступ., 3-Ступ.,пропорциаонльная, 7-Ступ.,с формулой порога  ***/
 /**************************************************************************/
-  elsif type_ in (2,3,7)
+  elsif type_ in (2,3,7) 
   then
-
+    
     tmps_ := 0;
     FOR tie IN ( select RATE
-                      , case
+                      , case 
                         when t.S = 0 and type_=7
                         then GET_DPTAMOUNT(G_acc)
                         else t.S
@@ -689,7 +688,7 @@ BEGIN
       ELSIF op_ = 4 THEN  br_ := br_ / amnd_;
       END IF;
       EXIT WHEN tie.s >= ostf_;
-      IF type_ IN (3,7)
+      IF type_ IN (3,7) 
       THEN
         ostp_ := ostp_ + br_ * (tie.s - tmps_);
         osts_ := osts_ - tie.s + tmps_;
@@ -704,11 +703,11 @@ BEGIN
 /**************************************************************************/
 /***      5-Ступенчатая в другой валюте, 6-Ступенчатая, пропорциональная **/
 /**************************************************************************/
-  ELSIF type_ IN (5,6)
+  ELSIF type_ IN (5,6) 
   THEN
 
     BEGIN
-      SELECT UNIQUE kv
+      SELECT UNIQUE kv 
         INTO kvs_
         FROM br_tier
        WHERE br_id=nb_;
@@ -736,8 +735,8 @@ BEGIN
       END IF;
 
       gl.x_rat( rato_,ratb_,rats_,kvs_,kv_,dat_ );
-
-      IF deb.debug
+      
+      IF deb.debug 
       THEN
         deb.trace(1,'rat_o '||kvs_||','||kv_,rato_);
         deb.trace(1,tie.rate||'%',tie.s);
@@ -746,7 +745,7 @@ BEGIN
 
       IF tie.s * rato_ >= ostf_ THEN EXIT; END IF;
 
-      IF type_=6
+      IF type_=6 
       THEN
         ostp_ := ostp_ + br_ * (tie.s * rato_ - tmps_);
         osts_ := osts_ - tie.s * rato_ + tmps_;
@@ -757,10 +756,10 @@ BEGIN
         tmps_   := tie.s * rato_;
       END IF;
     END LOOP;
-
+     
   end if;
-
-  IF deb.debug
+  
+  IF deb.debug 
   THEN
     deb.trace(1,TO_CHAR(osts_)||' at '||TO_CHAR(br_)||'%',nb_);
   END IF;
@@ -1727,7 +1726,7 @@ BEGIN
               , ps p
           WHERE a.acc=s.acc
             AND a.nbs=p.nbs
-            AND a.acc=acc_
+            AND a.acc=acc_ 
             AND s.fdat =( SELECT MAX(fdat) FROM saldoa WHERE acc=acc_ AND fdat<=dat_ );
 
          IF    ostc_<0 OR  ostc_=0 AND ppap_=1 OR
@@ -1748,12 +1747,12 @@ BEGIN
          SELECT a.KF, a.KV, nvl(s.OSTF-s.DOS+s.KOS,0)
            INTO kf_, kv_, ostc_
            FROM accounts a
-              , ( SELECT x.*
+              , ( SELECT x.* 
                     FROM saldoa x
-                   WHERE x.acc=acc_
+                   WHERE x.acc=acc_ 
                      AND x.fdat = ( SELECT MAX(fdat) FROM saldoa WHERE acc=acc_ AND fdat<=dat_ )
                 ) s
-          WHERE a.acc = s.acc(+)
+          WHERE a.acc = s.acc(+) 
             and a.acc = acc_;
          i_:= id_;
       END IF;
@@ -1764,8 +1763,8 @@ BEGIN
    BEGIN
       SELECT ir, br, op
         INTO ir_,br_,op_
-        FROM int_ratn
-       WHERE acc=acc_
+        FROM int_ratn 
+       WHERE acc=acc_ 
          AND id=i_
          AND bdat = ( SELECT MAX(bdat) FROM int_ratn
                        WHERE acc=acc_ AND id=i_ AND bdat<=dat_);
@@ -1774,14 +1773,14 @@ BEGIN
    END;
 
   -- Учитываем шкалы процентных ставок
-  IF br_>0
+  IF br_>0 
   THEN
     P_BNS( br_, ostp_, dat_, br_, kv_, ABS(ostc_), op_, ir_, kf_ );
     RETURN br_;
   ELSE
     RETURN ir_;
   END IF;
-
+  
 END FPROCN;
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2124,9 +2123,9 @@ end get_collect_salho;
 
         if ( sys_context('bars_context','policy_group') = 'CENTER' )
         then -- для всіх РУ (тіль вставка - існуючі значення не перетираємо)
-
+          
           bars_audit.trace( '%s: policy_group="CENTER" (run by all KF).', title, to_char(l_br_tp) );
-
+          
           for c in ( select KF
                        from MV_KF )
           loop
@@ -2197,7 +2196,7 @@ end get_collect_salho;
 
                 if ( l_br_tp = 5 or l_br_tp = 6 )
                 then -- логіка тригера TIU_TIER
-
+                  
                   select case
                          when exists ( select 1 from BR_TIER_EDIT where BR_ID = p_br_id and KV <> p_ccy_id )
                          then 'No more then one currency for the scale alowed'
@@ -2205,12 +2204,12 @@ end get_collect_salho;
                          end
                     into p_err_msg
                     from dual;
-
+                  
                 end if;
-
+                
                 if ( p_err_msg Is Null )
                 then
-                  insert
+                  insert 
                     into BR_TIER_EDIT
                        ( BR_ID, BDATE, KV, S, RATE )
                   values
@@ -2319,27 +2318,15 @@ begin
   null;
 END acrN;
 /
- show err;
- 
-PROMPT *** Create  grants  ACRN ***
-grant EXECUTE                                                                on ACRN            to BARS009;
-grant EXECUTE                                                                on ACRN            to BARS010;
-grant EXECUTE                                                                on ACRN            to BARSUPL;
-grant EXECUTE                                                                on ACRN            to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on ACRN            to BARS_DM;
-grant EXECUTE                                                                on ACRN            to CC_DOC;
-grant EXECUTE                                                                on ACRN            to DPT_ROLE;
-grant EXECUTE                                                                on ACRN            to FOREX;
-grant EXECUTE                                                                on ACRN            to RCC_DEAL;
-grant EXECUTE                                                                on ACRN            to START1;
-grant EXECUTE                                                                on ACRN            to UPLD;
-grant EXECUTE                                                                on ACRN            to WR_ACRINT;
-grant EXECUTE                                                                on ACRN            to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on ACRN            to WR_DEPOSIT_U;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/acrn.sql =========*** End *** ======
- PROMPT ===================================================================================== 
- 
+show errors;
+
+grant EXECUTE on ACRN to BARS_ACCESS_DEFROLE; 
+grant EXECUTE on ACRN to BARSUPL;
+grant EXECUTE on ACRN to BARS_DM;
+grant EXECUTE on ACRN to DPT_ROLE;
+grant EXECUTE on ACRN to FOREX;
+grant EXECUTE on ACRN to RCC_DEAL;
+grant EXECUTE on ACRN to START1;
+grant EXECUTE on ACRN to WR_ACRINT;
+grant EXECUTE on ACRN to WR_ALL_RIGHTS;

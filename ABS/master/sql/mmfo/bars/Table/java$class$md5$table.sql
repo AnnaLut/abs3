@@ -74,9 +74,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  JAVA$CLASS$MD5$TABLE ***
-grant SELECT                                                                 on JAVA$CLASS$MD5$TABLE to BARSREADER_ROLE;
 grant SELECT                                                                 on JAVA$CLASS$MD5$TABLE to BARS_DM;
-grant SELECT                                                                 on JAVA$CLASS$MD5$TABLE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on JAVA$CLASS$MD5$TABLE to WR_ALL_RIGHTS;
 
 

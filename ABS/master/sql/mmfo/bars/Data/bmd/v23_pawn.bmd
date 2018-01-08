@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Виды обеспечения (с расширенными параметрами)';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'V23_PAWN';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,24 +119,24 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'PAWN', 'N', 'Код вида~забезпечення~(внутрiшнiй)', '', 22, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'NAME', 'C', 'Найменування~виду забезпечення~згідно пост.№23', '', 170, 2, 1, 0, 1, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NBSZ', 'C', 'Бал.рах.~забезп.~(знаход.у~заст-давця)', '', 4, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NBSZ2', 'C', 'Бал.рах.~забезп.~(передано~банку)', '', 4, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NBSZ3', 'C', 'Бал.рах.~забезп.~(у третiх~осiб)', '', 4, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'S031', 'C', 'Код виду~забезпечення~по классификации~НБУ', '', 2, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'D_CLOSE', 'D', 'Дата~закрыття', '', 10, 40, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'GRP23', 'C', 'Група~лiквiдностi~згідно~пост.№23', '', 1, 11, 1, 0, 0, 1, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'DAY_IMP', 'N', 'Кількість~днів~на реаліз.', '', null, 22, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'SUM_IMP', 'N', 'Затрати~(коп.)~на реаліз.', '', null, 23, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'PROC_IMP', 'N', 'Затрати~(%)~на реаліз.', '', null, 24, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'EF', 'N', 'Фактор~ефективності~реалізації~майна', '', null, 25, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'HCC_M', 'N', 'Мультиплі-~кативний~фактор~ризику', '', null, 26, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'ATR', 'N', 'Середній~строк~реалізації~забезпечення~(дні)', '', null, 27, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'KL_351', 'N', 'Коефіцієнт~ліквідності~згідно~пост.№351', '', null, 29, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'KPZ_351', 'N', 'Мінім.коеф.~покриття боргу~забезп.(КПЗі)~пост.№351', '', null, 30, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'NAME_351', 'C', 'Найменування~виду забезпечення~згідно пост.№351', '5', 250, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'KOD_351', 'C', 'Код~забезпечення~згідно~пост.№351', '', null, 35, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'PAWN', 'N', 'Код вида~забезпечення~(внутрiшнiй)', null, 22, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'NAME', 'C', 'Найменування~виду забезпечення~згідно пост.№23', null, 170, 2, 1, 0, 1, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NBSZ', 'C', 'Бал.рах.~забезп.~(знаход.у~заст-давця)', null, 4, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NBSZ2', 'C', 'Бал.рах.~забезп.~(передано~банку)', null, 4, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NBSZ3', 'C', 'Бал.рах.~забезп.~(у третiх~осiб)', null, 4, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'S031', 'C', 'Код виду~забезпечення~по классификации~НБУ', null, 2, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'D_CLOSE', 'D', 'Дата~закрыття', null, 10, 40, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'GRP23', 'C', 'Група~лiквiдностi~згідно~пост.№23', null, 1, 11, 1, 0, 0, 1, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'DAY_IMP', 'N', 'Кількість~днів~на реаліз.', null, null, 22, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'SUM_IMP', 'N', 'Затрати~(коп.)~на реаліз.', null, null, 23, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'PROC_IMP', 'N', 'Затрати~(%)~на реаліз.', null, null, 24, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'EF', 'N', 'Фактор~ефективності~реалізації~майна', null, null, 25, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'HCC_M', 'N', 'Мультиплі-~кативний~фактор~ризику', null, null, 26, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'ATR', 'N', 'Середній~строк~реалізації~забезпечення~(дні)', null, null, 27, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'KL_351', 'N', 'Коефіцієнт~ліквідності~згідно~пост.№351', null, null, 29, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'KPZ_351', 'N', 'Мінім.коеф.~покриття боргу~забезп.(КПЗі)~пост.№351', null, null, 30, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'NAME_351', 'C', 'Найменування~виду забезпечення~згідно пост.№351', 5, 250, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'KOD_351', 'C', 'Код~забезпечення~згідно~пост.№351', null, null, 35, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CC_PAWN_23');

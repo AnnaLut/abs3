@@ -76,10 +76,8 @@ COMMENT ON COLUMN BARS.TMP_NU_STAT.ACCN IS '';
 
 
 PROMPT *** Create  grants  TMP_NU_STAT ***
-grant SELECT                                                                 on TMP_NU_STAT     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_NU_STAT     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_NU_STAT     to START1;
-grant SELECT                                                                 on TMP_NU_STAT     to UPLD;
 
 
 

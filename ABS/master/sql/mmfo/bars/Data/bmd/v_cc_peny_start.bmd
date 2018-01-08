@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Стартовая загрузка пени';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'V_CC_PENY_START';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,16 +119,16 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Бранч', '', null, 1, 1, 0, 0, 0, '', '', 1, 0, 'count(V_CC_PENY_START.NLS)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'KV', 'N', 'Вал~боргу', '', null, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NLS', 'C', 'Рахунок~Просрочки', '', null, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NMK', 'C', 'ФIО~позичальника', '', null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'OSTC', 'C', 'Сумма~ пенi~ + або -', '', null, 10, 1, 0, 0, 0, '', '', 1, 0, 'sum(V_CC_PENY_START.OSTC)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'SUM', 'C', 'Залишок~ на рахунку~просрочки', '', null, 4, 0, 0, 0, 0, '', '', 0, 0, 'sum(V_CC_PENY_START.SUM)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'OST_SN8', 'C', 'Залишок~ на рахунку~ПЕНI', '', null, 11, 1, 0, 0, 0, '', '', 1, 0, 'sum(V_CC_PENY_START.OST_SN8)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NLS_SN8', 'C', 'Pахунoк~ПЕНI', '', null, 12, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'ACC', 'N', 'ACC ~ Рахунку', '', null, 14, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'IR', 'C', 'Ставка ~Пенi', '', null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Бранч', null, null, 1, 1, 0, 0, 0, '', '', 1, 0, 'count(V_CC_PENY_START.NLS)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'KV', 'N', 'Вал~боргу', null, null, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NLS', 'C', 'Рахунок~Просрочки', null, null, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NMK', 'C', 'ФIО~позичальника', null, null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'OSTC', 'C', 'Сумма~ пенi~ + або -', null, null, 10, 1, 0, 0, 0, '', '', 1, 0, 'sum(V_CC_PENY_START.OSTC)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'SUM', 'C', 'Залишок~ на рахунку~просрочки', null, null, 4, 0, 0, 0, 0, '', '', 0, 0, 'sum(V_CC_PENY_START.SUM)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'OST_SN8', 'C', 'Залишок~ на рахунку~ПЕНI', null, null, 11, 1, 0, 0, 0, '', '', 1, 0, 'sum(V_CC_PENY_START.OST_SN8)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NLS_SN8', 'C', 'Pахунoк~ПЕНI', null, null, 12, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'ACC', 'N', 'ACC ~ Рахунку', null, null, 14, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'IR', 'C', 'Ставка ~Пенi', null, null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

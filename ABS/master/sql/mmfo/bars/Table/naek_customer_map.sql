@@ -65,6 +65,45 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_NAEKCUSTMAP_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_CUSTOMER_MAP ADD CONSTRAINT FK_NAEKCUSTMAP_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_NAEKCUSTOMERMAP_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_CUSTOMER_MAP ADD CONSTRAINT FK_NAEKCUSTOMERMAP_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_NAEKCUSTMAP_ECOUNTERS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NAEK_CUSTOMER_MAP ADD CONSTRAINT FK_NAEKCUSTMAP_ECOUNTERS FOREIGN KEY (KF, ECODE)
+	  REFERENCES BARS.NAEK_ECOUNTERS (KF, ECODE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_NAEKCUSTMAP_RNK_NN ***
 begin   
  execute immediate '
@@ -77,10 +116,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_NAEKCUSTMAP_ECODE_NN ***
+PROMPT *** Create  constraint CC_NAEKCUSTOMERMAP_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NAEK_CUSTOMER_MAP MODIFY (ECODE CONSTRAINT CC_NAEKCUSTMAP_ECODE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NAEK_CUSTOMER_MAP MODIFY (KF CONSTRAINT CC_NAEKCUSTOMERMAP_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -89,10 +128,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_NAEKCUSTOMERMAP_KF_NN ***
+PROMPT *** Create  constraint CC_NAEKCUSTMAP_ECODE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NAEK_CUSTOMER_MAP MODIFY (KF CONSTRAINT CC_NAEKCUSTOMERMAP_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NAEK_CUSTOMER_MAP MODIFY (ECODE CONSTRAINT CC_NAEKCUSTMAP_ECODE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -116,10 +155,8 @@ exception when others then
 
 PROMPT *** Create  grants  NAEK_CUSTOMER_MAP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAEK_CUSTOMER_MAP to ABS_ADMIN;
-grant SELECT                                                                 on NAEK_CUSTOMER_MAP to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NAEK_CUSTOMER_MAP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NAEK_CUSTOMER_MAP to BARS_DM;
-grant SELECT                                                                 on NAEK_CUSTOMER_MAP to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NAEK_CUSTOMER_MAP to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on NAEK_CUSTOMER_MAP to WR_REFREAD;
 

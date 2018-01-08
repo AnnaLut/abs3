@@ -119,96 +119,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_INTACCN ***
+PROMPT *** Create  constraint CC_INTACCN_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT UK_INTACCN UNIQUE (KF, ACC, ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INTACCN_ACC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_ACCN MODIFY (ACC CONSTRAINT CC_INTACCN_ACC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INTACCN_ID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_ACCN MODIFY (ID CONSTRAINT CC_INTACCN_ID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INTACCN_METR_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_ACCN MODIFY (METR CONSTRAINT CC_INTACCN_METR_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INTACCN_BASEY_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_ACCN MODIFY (BASEY CONSTRAINT CC_INTACCN_BASEY_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INTACCN_FREQ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_ACCN MODIFY (FREQ CONSTRAINT CC_INTACCN_FREQ_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INTACCN_ACRDAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_ACCN MODIFY (ACR_DAT CONSTRAINT CC_INTACCN_ACRDAT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INTACCN_S_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_ACCN MODIFY (S CONSTRAINT CC_INTACCN_S_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.INT_ACCN MODIFY (KF CONSTRAINT CC_INTACCN_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -229,10 +143,278 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_INTACCN_KF_NN ***
+PROMPT *** Create  constraint CC_INTACCN_S_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_ACCN MODIFY (KF CONSTRAINT CC_INTACCN_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.INT_ACCN MODIFY (S CONSTRAINT CC_INTACCN_S_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INTACCN_ACRDAT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN MODIFY (ACR_DAT CONSTRAINT CC_INTACCN_ACRDAT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INTACCN_FREQ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN MODIFY (FREQ CONSTRAINT CC_INTACCN_FREQ_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INTACCN_BASEY_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN MODIFY (BASEY CONSTRAINT CC_INTACCN_BASEY_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INTACCN_METR_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN MODIFY (METR CONSTRAINT CC_INTACCN_METR_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INTACCN_ID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN MODIFY (ID CONSTRAINT CC_INTACCN_ID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INTACCN_ACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN MODIFY (ACC CONSTRAINT CC_INTACCN_ACC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTACCN_INTIDN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT FK_INTACCN_INTIDN FOREIGN KEY (ID)
+	  REFERENCES BARS.INT_IDN (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTACCN_TTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT FK_INTACCN_TTS FOREIGN KEY (TT)
+	  REFERENCES BARS.TTS (TT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTACCN_TTS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT FK_INTACCN_TTS2 FOREIGN KEY (TTB)
+	  REFERENCES BARS.TTS (TT) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTACCN_BASEY ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT FK_INTACCN_BASEY FOREIGN KEY (BASEY)
+	  REFERENCES BARS.BASEY (BASEY) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTACCN_BASEM ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT FK_INTACCN_BASEM FOREIGN KEY (BASEM)
+	  REFERENCES BARS.BASEM (BASEM) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTACCN_INTMETR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT FK_INTACCN_INTMETR FOREIGN KEY (METR)
+	  REFERENCES BARS.INT_METR (METR) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTACCN_BANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT FK_INTACCN_BANKS FOREIGN KEY (MFOB)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTACCN_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT FK_INTACCN_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTACCN_FREQ ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT FK_INTACCN_FREQ FOREIGN KEY (FREQ)
+	  REFERENCES BARS.FREQ (FREQ) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTACCN_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT FK_INTACCN_TABVAL FOREIGN KEY (KVB)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint UK_INTACCN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT UK_INTACCN UNIQUE (KF, ACC, ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTACCN_INTION ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT FK_INTACCN_INTION FOREIGN KEY (IO)
+	  REFERENCES BARS.INT_ION (IO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTACCN_ACCOUNTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT FK_INTACCN_ACCOUNTS FOREIGN KEY (ACRA)
+	  REFERENCES BARS.ACCOUNTS (ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTACCN_ACCOUNTS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT FK_INTACCN_ACCOUNTS2 FOREIGN KEY (ACRB)
+	  REFERENCES BARS.ACCOUNTS (ACC) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_INTACCN_ACCOUNTS4 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN ADD CONSTRAINT FK_INTACCN_ACCOUNTS4 FOREIGN KEY (ACC)
+	  REFERENCES BARS.ACCOUNTS (ACC) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -300,7 +482,6 @@ PROMPT *** Create  grants  INT_ACCN ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_ACCN        to ABS_ADMIN;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on INT_ACCN        to BARS009;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on INT_ACCN        to BARS010;
-grant SELECT                                                                 on INT_ACCN        to BARSREADER_ROLE;
 grant SELECT                                                                 on INT_ACCN        to BARSUPL;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on INT_ACCN        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_ACCN        to BARS_DM;
@@ -315,7 +496,6 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on INT_ACCN        to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_ACCN        to TECH005;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_ACCN        to TECH006;
-grant SELECT                                                                 on INT_ACCN        to UPLD;
 grant INSERT,SELECT,UPDATE                                                   on INT_ACCN        to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_ACCN        to WR_ALL_RIGHTS;
 grant SELECT,UPDATE                                                          on INT_ACCN        to WR_DEPOSIT_U;

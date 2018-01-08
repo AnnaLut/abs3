@@ -31,10 +31,8 @@ PROMPT *** Create  view CCK_RESTR_V ***
 ;
 
 PROMPT *** Create  grants  CCK_RESTR_V ***
-grant SELECT                                                                 on CCK_RESTR_V     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_RESTR_V     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_RESTR_V     to RCC_DEAL;
-grant SELECT                                                                 on CCK_RESTR_V     to UPLD;
 
 
 

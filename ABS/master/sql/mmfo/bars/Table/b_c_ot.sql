@@ -49,11 +49,9 @@ COMMENT ON COLUMN BARS.B_C_OT.N_C_OTV IS '';
 
 
 PROMPT *** Create  grants  B_C_OT ***
-grant SELECT                                                                 on B_C_OT          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on B_C_OT          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on B_C_OT          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on B_C_OT          to START1;
-grant SELECT                                                                 on B_C_OT          to UPLD;
 
 
 

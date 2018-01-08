@@ -79,6 +79,45 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SURVEYQDEP_SURVEYANSWOPT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_QUEST_DEP ADD CONSTRAINT FK_SURVEYQDEP_SURVEYANSWOPT FOREIGN KEY (OPT_ID)
+	  REFERENCES BARS.SURVEY_ANSWER_OPT (OPT_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SURVEYQDEP_SURVEYQUEST ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_QUEST_DEP ADD CONSTRAINT FK_SURVEYQDEP_SURVEYQUEST FOREIGN KEY (QUEST_ID)
+	  REFERENCES BARS.SURVEY_QUEST (QUEST_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SURVEYQDEP_SURVEYQUEST2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_QUEST_DEP ADD CONSTRAINT FK_SURVEYQDEP_SURVEYQUEST2 FOREIGN KEY (CHILD_ID)
+	  REFERENCES BARS.SURVEY_QUEST (QUEST_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SURVEYQDEP_QUESTID_NN ***
 begin   
  execute immediate '
@@ -103,10 +142,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SURVEYQDEP_CHILDID_NN ***
+PROMPT *** Create  constraint CC_SURVEYQDEP_CHILDSTATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SURVEY_QUEST_DEP MODIFY (CHILD_ID CONSTRAINT CC_SURVEYQDEP_CHILDID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SURVEY_QUEST_DEP MODIFY (CHILD_STATE CONSTRAINT CC_SURVEYQDEP_CHILDSTATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -115,10 +154,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SURVEYQDEP_CHILDSTATE_NN ***
+PROMPT *** Create  constraint CC_SURVEYQDEP_CHILDID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SURVEY_QUEST_DEP MODIFY (CHILD_STATE CONSTRAINT CC_SURVEYQDEP_CHILDSTATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SURVEY_QUEST_DEP MODIFY (CHILD_ID CONSTRAINT CC_SURVEYQDEP_CHILDID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -155,11 +194,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SURVEY_QUEST_DEP ***
-grant SELECT                                                                 on SURVEY_QUEST_DEP to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY_QUEST_DEP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SURVEY_QUEST_DEP to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY_QUEST_DEP to DPT_ADMIN;
-grant SELECT                                                                 on SURVEY_QUEST_DEP to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SURVEY_QUEST_DEP to WR_ALL_RIGHTS;
 
 

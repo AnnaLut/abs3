@@ -89,12 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  MS_VD_K ***
-grant SELECT                                                                 on MS_VD_K         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MS_VD_K         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MS_VD_K         to CC_AIM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MS_VD_K         to RCC_DEAL;
 grant SELECT                                                                 on MS_VD_K         to START1;
-grant SELECT                                                                 on MS_VD_K         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MS_VD_K         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on MS_VD_K         to WR_REFREAD;
 

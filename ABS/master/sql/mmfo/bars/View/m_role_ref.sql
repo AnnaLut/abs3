@@ -15,10 +15,8 @@ where GRANTEE_TYPE_ID  = resource_utl.get_resource_type_id ( PUL.GET('WC') )
   and RESOURCE_TYPE_ID = resource_utl.get_resource_type_id ('DIRECTORIES');
 
 PROMPT *** Create  grants  M_ROLE_REF ***
-grant SELECT                                                                 on M_ROLE_REF      to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_REF      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on M_ROLE_REF      to START1;
-grant SELECT                                                                 on M_ROLE_REF      to UPLD;
 
 
 

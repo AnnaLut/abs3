@@ -104,11 +104,9 @@ exception when others then
 
 PROMPT *** Create  grants  SP_S180 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SP_S180         to ABS_ADMIN;
-grant SELECT                                                                 on SP_S180         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SP_S180         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SP_S180         to SP_S180;
 grant SELECT                                                                 on SP_S180         to START1;
-grant SELECT                                                                 on SP_S180         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SP_S180         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SP_S180         to WR_REFREAD;
 

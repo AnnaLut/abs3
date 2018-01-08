@@ -119,7 +119,7 @@ if p_mode = 4 then
         else
             if l_cclc is not null then
                 --дабы избежать разночтений (расход в копейку) - будем не разницу в валюте конвертировать в грн, а прям в гривне находить разницу.
-                --старое :
+                --старое : 
                 --return gl.p_icurval( kv_, ssq_, l_date_tran);
                 return (gl.p_icurval(kv_, saq_, l_date_tran) - gl.p_icurval(kv_, sbq_, l_date_tran));
             else

@@ -12,10 +12,8 @@ PROMPT *** Create  view DPT_DPU ***
                         union all select a.rnk,a.nms, d.Dpu_id     id from DPU_DEAL    d, accounts a where d.acc=a.acc and a.dazs is null;
 
 PROMPT *** Create  grants  DPT_DPU ***
-grant SELECT                                                                 on DPT_DPU         to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_DPU         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_DPU         to START1;
-grant SELECT                                                                 on DPT_DPU         to UPLD;
 
 
 

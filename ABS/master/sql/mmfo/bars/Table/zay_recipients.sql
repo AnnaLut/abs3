@@ -51,6 +51,20 @@ COMMENT ON COLUMN BARS.ZAY_RECIPIENTS.KF IS '';
 
 
 
+PROMPT *** Create  constraint PK_RECIPIENTS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ZAY_RECIPIENTS ADD CONSTRAINT PK_RECIPIENTS PRIMARY KEY (URL, MFO)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_ZAYRECIPIENTS_KF_NN ***
 begin   
  execute immediate '
@@ -62,11 +76,64 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint FK_ZAYRECIPIENTS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ZAY_RECIPIENTS ADD CONSTRAINT FK_ZAYRECIPIENTS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint UK_ZAYRECIPIENTSMFO ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ZAY_RECIPIENTS ADD CONSTRAINT UK_ZAYRECIPIENTSMFO UNIQUE (MFO)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLD  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index UK_ZAYRECIPIENTSMFO ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.UK_ZAYRECIPIENTSMFO ON BARS.ZAY_RECIPIENTS (MFO) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLD ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index PK_RECIPIENTS ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.PK_RECIPIENTS ON BARS.ZAY_RECIPIENTS (URL, MFO) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  ZAY_RECIPIENTS ***
-grant SELECT                                                                 on ZAY_RECIPIENTS  to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on ZAY_RECIPIENTS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAY_RECIPIENTS  to BARS_DM;
-grant SELECT                                                                 on ZAY_RECIPIENTS  to UPLD;
 
 
 

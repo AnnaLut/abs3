@@ -73,10 +73,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  OKPO_AFD ***
-grant SELECT                                                                 on OKPO_AFD        to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on OKPO_AFD        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OKPO_AFD        to BARS_DM;
-grant SELECT                                                                 on OKPO_AFD        to UPLD;
 grant FLASHBACK,SELECT                                                       on OKPO_AFD        to WR_REFREAD;
 
 

@@ -43,9 +43,7 @@ where d.nd = ca.nd
   and ca.kv = t.kv;
 
 PROMPT *** Create  grants  V_CRD_DEALS_MIN ***
-grant SELECT                                                                 on V_CRD_DEALS_MIN to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CRD_DEALS_MIN to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CRD_DEALS_MIN to UPLD;
 
 
 

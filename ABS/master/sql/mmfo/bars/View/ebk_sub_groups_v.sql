@@ -49,9 +49,7 @@ PROMPT *** Create  view EBK_SUB_GROUPS_V ***
      from ebk_sub_groups esg );
 
 PROMPT *** Create  grants  EBK_SUB_GROUPS_V ***
-grant SELECT                                                                 on EBK_SUB_GROUPS_V to BARSREADER_ROLE;
 grant SELECT                                                                 on EBK_SUB_GROUPS_V to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on EBK_SUB_GROUPS_V to UPLD;
 
 
 

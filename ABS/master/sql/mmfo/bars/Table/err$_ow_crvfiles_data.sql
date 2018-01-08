@@ -123,10 +123,6 @@ COMMENT ON COLUMN BARS.ERR$_OW_CRVFILES_DATA.WORD IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OW_CRVFILES_DATA ***
-grant SELECT                                                                 on ERR$_OW_CRVFILES_DATA to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OW_CRVFILES_DATA to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -73,11 +73,9 @@ COMMENT ON COLUMN BARS.KL_K040.D_MODE IS '';
 
 
 PROMPT *** Create  grants  KL_K040 ***
-grant SELECT                                                                 on KL_K040         to BARSREADER_ROLE;
 grant FLASHBACK,SELECT,UPDATE                                                on KL_K040         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_K040         to BARS_DM;
 grant SELECT,UPDATE                                                          on KL_K040         to START1;
-grant SELECT                                                                 on KL_K040         to UPLD;
 grant FLASHBACK,SELECT                                                       on KL_K040         to WR_REFREAD;
 
 

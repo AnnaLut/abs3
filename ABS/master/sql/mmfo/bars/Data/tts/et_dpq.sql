@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DPQ
-prompt Наименование операции: DPQ Стягнення штрафу при повному/частковому знятті аванс.вкладу
+prompt Наименование операции: Стягнення штрафу при повному/частковому знятті аванс.вкладу
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DPQ', 'DPQ Стягнення штрафу при повному/частковому знятті аванс.вкладу', 1, null, null, null, null, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''03''))', 0, '0000100000000000000000000000000000000000000000100000000000000000', '#{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DPQ', 'Стягнення штрафу при повному/частковому знятті аванс.вкладу', 1, null, null, null, null, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''03''))', 0, '0000100000000000000000000000000000000000000000100000000000000000', '#{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DPQ', name='DPQ Стягнення штрафу при повному/частковому знятті аванс.вкладу', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=0, flags='0000100000000000000000000000000000000000000000100000000000000000', nazn='#{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DPQ', name='Стягнення штрафу при повному/частковому знятті аванс.вкладу', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=0, flags='0000100000000000000000000000000000000000000000100000000000000000', nazn='#{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DPQ';
   end;
   --------------------------------

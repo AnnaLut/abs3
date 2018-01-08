@@ -83,6 +83,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SECUSERAUDIT_SECRECTYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEC_USERAUDIT ADD CONSTRAINT FK_SECUSERAUDIT_SECRECTYPE FOREIGN KEY (LOG_LEVEL)
+	  REFERENCES BARS.SEC_RECTYPE (SEC_RECTYPE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_SECUSERAUDIT_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SEC_USERAUDIT ADD CONSTRAINT FK_SECUSERAUDIT_STAFF FOREIGN KEY (STAFF_ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SECUSERAUDIT_STAFFID_NN ***
 begin   
  execute immediate '
@@ -107,10 +133,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SECUSERAUDIT_TRCSTACK_NN ***
+PROMPT *** Create  constraint CC_SECUSERAUD_UPDTIME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_USERAUDIT MODIFY (TRACE_STACK CONSTRAINT CC_SECUSERAUDIT_TRCSTACK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEC_USERAUDIT MODIFY (UPDATE_TIME CONSTRAINT CC_SECUSERAUD_UPDTIME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -119,10 +145,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SECUSERAUD_UPDTIME_NN ***
+PROMPT *** Create  constraint CC_SECUSERAUDIT_TRCSTACK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_USERAUDIT MODIFY (UPDATE_TIME CONSTRAINT CC_SECUSERAUD_UPDTIME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEC_USERAUDIT MODIFY (TRACE_STACK CONSTRAINT CC_SECUSERAUDIT_TRCSTACK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -146,11 +172,9 @@ exception when others then
 
 PROMPT *** Create  grants  SEC_USERAUDIT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEC_USERAUDIT   to ABS_ADMIN;
-grant SELECT                                                                 on SEC_USERAUDIT   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEC_USERAUDIT   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEC_USERAUDIT   to BARS_DM;
 grant SELECT                                                                 on SEC_USERAUDIT   to START1;
-grant SELECT                                                                 on SEC_USERAUDIT   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SEC_USERAUDIT   to WR_ALL_RIGHTS;
 
 

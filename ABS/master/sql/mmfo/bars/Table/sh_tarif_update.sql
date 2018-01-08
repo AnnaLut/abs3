@@ -73,22 +73,10 @@ COMMENT ON COLUMN BARS.SH_TARIF_UPDATE.NBS_OB22 IS '';
 
 
 
-PROMPT *** Create  constraint CC_SHTARIFUPD_IDUPD_NN ***
+PROMPT *** Create  constraint CC_SHTARIFUPD_GLOBALBD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SH_TARIF_UPDATE MODIFY (IDUPD CONSTRAINT CC_SHTARIFUPD_IDUPD_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SHTARIFUPD_CHGACTION_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SH_TARIF_UPDATE MODIFY (CHGACTION CONSTRAINT CC_SHTARIFUPD_CHGACTION_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SH_TARIF_UPDATE MODIFY (GLOBAL_BDATE CONSTRAINT CC_SHTARIFUPD_GLOBALBD_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -109,10 +97,22 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SHTARIFUPD_GLOBALBD_NN ***
+PROMPT *** Create  constraint CC_SHTARIFUPD_CHGACTION_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SH_TARIF_UPDATE MODIFY (GLOBAL_BDATE CONSTRAINT CC_SHTARIFUPD_GLOBALBD_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SH_TARIF_UPDATE MODIFY (CHGACTION CONSTRAINT CC_SHTARIFUPD_CHGACTION_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SHTARIFUPD_IDUPD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SH_TARIF_UPDATE MODIFY (IDUPD CONSTRAINT CC_SHTARIFUPD_IDUPD_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -133,10 +133,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SHTARIFUPD_DONEBY_NN ***
+PROMPT *** Create  constraint PK_SHTARIFUPD ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SH_TARIF_UPDATE MODIFY (DONEBY CONSTRAINT CC_SHTARIFUPD_DONEBY_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SH_TARIF_UPDATE ADD CONSTRAINT PK_SHTARIFUPD PRIMARY KEY (IDUPD)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -205,12 +207,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_SHTARIFUPD ***
+PROMPT *** Create  constraint CC_SHTARIFUPD_DONEBY_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SH_TARIF_UPDATE ADD CONSTRAINT PK_SHTARIFUPD PRIMARY KEY (IDUPD)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.SH_TARIF_UPDATE MODIFY (DONEBY CONSTRAINT CC_SHTARIFUPD_DONEBY_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -261,7 +261,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  SH_TARIF_UPDATE ***
-grant SELECT                                                                 on SH_TARIF_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on SH_TARIF_UPDATE to BARSUPL;
 grant SELECT                                                                 on SH_TARIF_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SH_TARIF_UPDATE to START1;

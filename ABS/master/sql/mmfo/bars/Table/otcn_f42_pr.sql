@@ -65,6 +65,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_OTCNF42PR_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OTCN_F42_PR ADD CONSTRAINT FK_OTCNF42PR_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C006748 ***
 begin   
  execute immediate '
@@ -104,13 +117,11 @@ exception when others then
 
 PROMPT *** Create  grants  OTCN_F42_PR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F42_PR     to ABS_ADMIN;
-grant SELECT                                                                 on OTCN_F42_PR     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F42_PR     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_F42_PR     to BARS_DM;
 grant INSERT,SELECT,UPDATE                                                   on OTCN_F42_PR     to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F42_PR     to RPBN002;
 grant SELECT                                                                 on OTCN_F42_PR     to START1;
-grant SELECT                                                                 on OTCN_F42_PR     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_F42_PR     to WR_ALL_RIGHTS;
 
 

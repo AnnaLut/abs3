@@ -57,10 +57,8 @@ PROMPT *** Create  view V_SAFE_DEPOSIT_ARCHIVE ***
 	 AND sa.acc(+) = na.acc;
 
 PROMPT *** Create  grants  V_SAFE_DEPOSIT_ARCHIVE ***
-grant SELECT                                                                 on V_SAFE_DEPOSIT_ARCHIVE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SAFE_DEPOSIT_ARCHIVE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SAFE_DEPOSIT_ARCHIVE to DEP_SKRN;
-grant SELECT                                                                 on V_SAFE_DEPOSIT_ARCHIVE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SAFE_DEPOSIT_ARCHIVE to WR_ALL_RIGHTS;
 
 

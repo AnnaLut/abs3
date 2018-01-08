@@ -83,10 +83,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  DILER_KURS_CONV ***
-grant SELECT                                                                 on DILER_KURS_CONV to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DILER_KURS_CONV to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DILER_KURS_CONV to BARS_DM;
-grant SELECT                                                                 on DILER_KURS_CONV to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DILER_KURS_CONV to ZAY;
 
 

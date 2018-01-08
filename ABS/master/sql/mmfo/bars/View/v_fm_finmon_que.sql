@@ -135,11 +135,9 @@ PROMPT *** Create  view V_FM_FINMON_QUE ***
     WHERE p.REF IS NOT NULL AND ( (S.ID = p.AGENT_ID AND p.AGENT_ID IS NOT NULL) OR (S.ID = O.USERID AND p.AGENT_ID IS NULL)) AND V.VOB = O.VOB AND O.REF = p.REF;
 
 PROMPT *** Create  grants  V_FM_FINMON_QUE ***
-grant SELECT                                                                 on V_FM_FINMON_QUE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FM_FINMON_QUE to BARS_ACCESS_DEFROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on V_FM_FINMON_QUE to FINMON;
 grant SELECT                                                                 on V_FM_FINMON_QUE to FINMON01;
-grant SELECT                                                                 on V_FM_FINMON_QUE to UPLD;
 
 
 

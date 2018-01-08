@@ -77,7 +77,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_REF_PERIODS ***
-grant SELECT                                                                 on NBUR_REF_PERIODS to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_REF_PERIODS to BARS_ACCESS_DEFROLE;
 
 

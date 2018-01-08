@@ -2,9 +2,9 @@
  
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/kost.sql =========*** Run *** =====
- PROMPT ===================================================================================== 
+ PROMPT =====================================================================================  
  
-  CREATE OR REPLACE FUNCTION BARS.KOST (p_acc number, p_dat date) return number is
+create or replace function kost(p_acc number, p_dat date) return number is
   -- получение расчетного значени€ остатка по счету p_acc на календарную дату  P_dat
 
   b2_dat date := dat_next_u(p_dat, 0); -- банк.дата . котора€ должна была быть установленной дл€ календарной p_dat
@@ -18,7 +18,7 @@ begin
   if false then
     --   b2_dat  = P_dat then
     l_ost := fost(p_acc, b2_dat); --- кал.дата = банковской дате.
-
+  
   else
     b1_dat := dat_next_u(p_dat, -1); -- кал.дата <  банковской дате. (бќЋ№Ў≈ не ƒќЋ∆Ќќ Ѕџ“№ !)
     l_ost  := fost(p_acc, b1_dat); -- остаток пред раб дн€
@@ -40,13 +40,14 @@ begin
   return l_ost;
 end kost;
 
+ 
 /
  show err;
  
-PROMPT *** Create  grants  KOST ***
-grant EXECUTE                                                                on KOST            to ABS_ADMIN;
-grant EXECUTE                                                                on KOST            to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on KOST            to WR_ALL_RIGHTS;
+PROMPT *** Create  grants  kost ***
+grant EXECUTE                                                                on kost        to ABS_ADMIN;
+grant EXECUTE                                                                on kost        to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on kost        to WR_ALL_RIGHTS;
 
  
  

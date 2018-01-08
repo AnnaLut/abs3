@@ -101,7 +101,6 @@ exception when others then
 
 PROMPT *** Create  grants  DPU_TYPES_TERM ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_TYPES_TERM  to ABS_ADMIN;
-grant SELECT                                                                 on DPU_TYPES_TERM  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_TYPES_TERM  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_TYPES_TERM  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_TYPES_TERM  to DPT_ADMIN;

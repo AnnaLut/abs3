@@ -14,10 +14,8 @@ PROMPT *** Create  view V_DPT_INCOME ***
  where r.attr_income = m.attr_income;
 
 PROMPT *** Create  grants  V_DPT_INCOME ***
-grant SELECT                                                                 on V_DPT_INCOME    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_INCOME    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_INCOME    to DPT_ROLE;
-grant SELECT                                                                 on V_DPT_INCOME    to UPLD;
 
 
 

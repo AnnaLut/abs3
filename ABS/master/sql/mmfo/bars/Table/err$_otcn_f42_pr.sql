@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_OTCN_F42_PR.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OTCN_F42_PR ***
-grant SELECT                                                                 on ERR$_OTCN_F42_PR to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OTCN_F42_PR to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F3A_NN ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F3A_NN (dat_ DATE, sheme_ VARCHAR2 DEFAULT 'D')
+CREATE OR REPLACE PROCEDURE BARS.P_F3A_NN (dat_ DATE, sheme_ VARCHAR2 DEFAULT 'D')
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #3A для КБ (универсальная) с 01.06.2009
@@ -20,8 +20,8 @@ IS
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-27/12/2017 - с 26.12.2017 (на 27.12.2017) в показателе вместо параметра R013
-             будет формироваться параметр R011
+27/12/2017 - с 26.12.2017 (на 27.12.2017) в показателе вместо параметра R013 
+             будет формироваться параметр R011 
 26/12/2017 - для KL_R020 изменено условие для поля D_CLOSE
 06/11/2017 - вместо кл-ра KL_F3_29 будем использовать кл-р KOD_R020
 27/10/2017 - для бал.рах.2630 добавил обробку OB22 IN ('B2','B3','B4','B5')
@@ -725,7 +725,7 @@ BEGIN
                    THEN
                    null;
                 END;
-             end if;
+             end if;    
           else
              if r011_ <> '0' then
                 BEGIN
@@ -1237,7 +1237,7 @@ BEGIN
                 THEN
                    sdos_ := Gl.P_Icurval (kv_, sdos_, data_);
 
-                   if dat_ < dat_izm1
+                   if dat_ < dat_izm1 
                    then
                       kodp_ :=
                             '5'
@@ -1256,7 +1256,7 @@ BEGIN
                          || TO_CHAR (2 - cntr_)
                          || d020_
                          || LPAD (kv_, 3, '0');
-                   end if;
+                   end if;  
 
                    IF s180_ = '0' THEN
                       nls_ := 'X' || nls_;
@@ -1308,7 +1308,7 @@ BEGIN
                 END IF;
 
                 -- обороты пролонгации
-                IF s_prol_ > 0 AND spcnt_ >= 0 AND r050_ = '11' and se_ < 0
+                IF s_prol_ > 0 AND spcnt_ >= 0 AND r050_ = '11' and se_ < 0 
                 THEN
 
                    s_prol_ := Gl.P_Icurval (kv_, s_prol_, data_);
@@ -1380,7 +1380,7 @@ BEGIN
                                     kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
                                     skos_, mdate_, k112_, r011_, d020_, isp_, se_, acc_
                                    );
-                   end if;
+                   end if;  
                 END IF;
              END IF;
 
@@ -1419,7 +1419,7 @@ BEGIN
                     OR
                 (mfou_ <> 300465 and
                    (nbs_ = '2605' AND r013_ in ('1','3') OR
-                    nbs_ = '2655' AND r013_ = '3') and skos_ > 0) and
+                    nbs_ = '2655' AND r013_ = '3') and skos_ > 0) and 
                  dat_ < dat_izm1
                      OR
                 (mfou_ <> 300465 and
@@ -1428,18 +1428,18 @@ BEGIN
                      OR
                  mfou_ in (300465) and
                    ((nbs_ = '2605' and r013_ in ('1','3') and skos_ > 0 and spcnt_ <> 0)   OR
-                    (nbs_ = '2655' and r013_ = '3' and skos_ > 0) ) and
-                    dat_ < dat_izm1
+                    (nbs_ = '2655' and r013_ = '3' and skos_ > 0) ) and 
+                    dat_ < dat_izm1  
                      OR
                  mfou_ in (300465) and
                    ((nbs_ ='2605' and r011_ = '3' and skos_ > 0 and spcnt_ <> 0)   OR
                     (nbs_ = '2655' and r011_ = '3' and skos_ > 0) ) and
                     dat_ >= dat_izm1
                      OR
-                (nbs_ = '2650' and r013_ in ('1','3','8') and skos_ > 0) and
+                (nbs_ = '2650' and r013_ in ('1','3','8') and skos_ > 0) and 
                 dat_ < dat_izm1
                      OR
-                (nbs_ = '2650' and r011_ = '3' and skos_ > 0) and
+                (nbs_ = '2650' and r011_ = '3' and skos_ > 0) and 
                 dat_ >= dat_izm1
              THEN
                 if nbs_ in ('2610','2611','2615','2616','2617','2630','2635',
@@ -2716,7 +2716,7 @@ BEGIN
                    --END IF;
 
                    if dat_ < dat_izm1
-                   then
+                   then 
                    kodp_ :=
                       '6' || nbs_ || r013_ || s180_ || cntr1_ || '02' || LPAD (kv_, 3, '0');
                    else
@@ -2774,7 +2774,7 @@ BEGIN
                                          kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
                                         skos_, mdate_, k112_, r011_, d020_, isp_, se_, acc_
                                        );
-                      end if;
+                      end if;  
                    END IF;
                 END IF;
              END IF;

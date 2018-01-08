@@ -101,11 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_PAWN_S_VID ***
-grant SELECT                                                                 on CC_PAWN_S_VID   to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_PAWN_S_VID   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_PAWN_S_VID   to BARS_DM;
 grant SELECT                                                                 on CC_PAWN_S_VID   to RCC_DEAL;
-grant SELECT                                                                 on CC_PAWN_S_VID   to UPLD;
 
 
 

@@ -1,5 +1,3 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ead_integration.sql =========*** Run
  PROMPT ===================================================================================== 
@@ -353,11 +351,14 @@ IS
    -----------------------------------------------------------------------
 
 END ead_integration;
-
 /
-CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION 
+show errors
+
+
+
+CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 2.4   01.01.2018 MMFO';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 2.3   01.12.2017 MMFO';
 
    FUNCTION body_version
       RETURN VARCHAR2
@@ -554,7 +555,6 @@ IS
    begin
     bc.go('/');
     bars_audit.debug('get_MergedRNK startes p_rnk = ' || p_rnk);
-/*
     for i in (  SELECT DISTINCT rnkfrom AS mrg_rnk
                   FROM (SELECT rn.rnkfrom, rn.rnkto
                           FROM rnk2nls rn
@@ -562,16 +562,11 @@ IS
                         SELECT rt.rnkfrom, rt.rnkto
                           FROM rnk2tbl rt)
                  WHERE rnkfrom != p_rnk and rnkto = p_rnk order by rnkfrom desc)
-*/
-    for i in (select rnk as mrg_rnk from customer
-               where rnk in (select rnkfrom from rnk2nls where rnkfrom != p_rnk and rnkto = p_rnk)
-                 and rnk in (select rnkfrom from rnk2tbl where rnkfrom != p_rnk and rnkto = p_rnk)
-                 and date_off is not null)
     loop
         l_MergedRNK_Rec.mrg_rnk := ead_integration.split_key(i.mrg_rnk);
         PIPE ROW (l_MergedRNK_Rec);
     end loop;
-   end get_MergedRNK;
+   end;
 
    -----------------------------------------------------------------------
    -- EADService.cs         Structs.Params.UClient.GetInstance        BMS.Method = SetClientDataU
@@ -1286,7 +1281,7 @@ IS
         l_ACC_Instance_Rec.remote_controled := barsAQ.Ibank_Accounts.is_subscribed(p_acc);
 
         if l_ACC_Instance_Rec.agr_code is null then
-          raise_application_error(-20001, 'Код угоди не заповнений [agr_code]');
+          raise_application_error(-20001, 'Код угоди не заповнений [agr_code]'); 
         end if;
 
         PIPE ROW (l_ACC_Instance_Rec);
@@ -1326,12 +1321,13 @@ IS
    -----------------------------------------------------------------------
 
 END ead_integration;
-
 /
- show err;
- 
+show errors
+
+
+
 PROMPT *** Create  grants  EAD_INTEGRATION ***
-grant EXECUTE                                                                on EAD_INTEGRATION to BARS_ACCESS_DEFROLE;
+grant EXECUTE on EAD_INTEGRATION to BARS_ACCESS_DEFROLE;
 
  
  

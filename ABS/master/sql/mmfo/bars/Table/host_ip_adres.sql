@@ -102,11 +102,9 @@ exception when others then
 
 PROMPT *** Create  grants  HOST_IP_ADRES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on HOST_IP_ADRES   to ABS_ADMIN;
-grant SELECT                                                                 on HOST_IP_ADRES   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on HOST_IP_ADRES   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on HOST_IP_ADRES   to BARS_DM;
 grant INSERT,SELECT,UPDATE                                                   on HOST_IP_ADRES   to START1;
-grant SELECT                                                                 on HOST_IP_ADRES   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on HOST_IP_ADRES   to WR_ALL_RIGHTS;
 
 

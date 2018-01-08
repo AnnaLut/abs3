@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_FC9 ***
 
-  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_FC9 (p_kod_filii        varchar2,
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_FC9 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -18,7 +18,7 @@ is
 % DESCRIPTION : Процедура формирования #C9 для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.16.021 22/10/2017
+% VERSION     : v.16.022   10/11/2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    Структура показника DD NNN
@@ -317,11 +317,17 @@ BEGIN
                                               or
                                               r.acc_num_db in ('1500', '1502', '1600') and
                                               r.acc_num_cr = '3800' and
-                                              ( o.dk = 0 and (o.nlsa like '60%' or o.nlsa like '610%' or o.nlsa like '611%' )
+                                              ((o.dk = 0 and (o.nlsa like '60%' or o.nlsa like '610%' or o.nlsa like '611%' )
+                                                    or
+                                                o.dk = 1 and (o.nlsb like '60%' or o.nlsb like '610%' or o.nlsb like '611%'))
+                                                and newnbs.g_state = 0 -- до зміни ПР
                                                 or
-                                                o.dk = 1 and (o.nlsb like '60%' or o.nlsb like '610%' or o.nlsb like '611%')
-                                              ) and
-                                              gl.p_icurval (o.kv, o.s, p_report_date) > l_sum_kom  
+                                                (o.dk = 0 and (o.nlsa like '60%' or o.nlsa like '61%' or o.nlsa like '650%' or o.nlsa like '651%' )
+                                                    or
+                                                o.dk = 1 and (o.nlsb like '60%' or o.nlsb like '61%' or o.nlsb like '650%' or o.nlsb like '651%')) 
+                                                and newnbs.g_state = 1 -- після зміни ПР
+                                              )
+                                              and gl.p_icurval (o.kv, o.s, p_report_date) > l_sum_kom  
                                             )
                     -----------------------------------------------------------
                                 union all

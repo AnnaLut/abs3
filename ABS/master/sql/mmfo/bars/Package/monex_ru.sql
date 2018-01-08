@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/monex_ru.sql =========*** Run *** ==
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.MONEX_RU IS
+CREATE OR REPLACE PACKAGE BARS.MONEX_RU IS
 
  -- Системы педеводов. Единое онко. Клиринг. Профикс.
  -- Уровень РУ (там, где есть точки обслуживания клиентов)
@@ -45,7 +39,11 @@ procedure OP_nls_MTI (b1_ varchar2, b2_ varchar2, b3_ varchar2, b4_ varchar2, b5
 
 end monex_RU;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.MONEX_RU IS
+
+GRANT execute ON BARS.monex_RU  TO BARS_ACCESS_DEFROLE;
+
+
+CREATE OR REPLACE PACKAGE BODY BARS.monex_RU IS
 
  -- Системы педеводов. Единое онко. Клиринг. Профикс.
  -- Уровень РУ (там, где есть точки обслуживания клиентов)
@@ -86,8 +84,8 @@ procedure op_NLSM ( p_nbs    accounts.nbs%type,    p_ob22   accounts.ob22%type, 
 begin
 
   begin select substr( P_ob22||' '|| replace (txt,'у','i'), 1,50), r020        into ra.nms, ra.nbs  from sb_ob22 where r020 = p_NBS   and ob22= P_OB22 and d_close is null;
-  EXCEPTION WHEN NO_DATA_FOUND THEN
-     If p_NBS ='6110' then
+  EXCEPTION WHEN NO_DATA_FOUND THEN   
+     If p_NBS ='6110' then 
         begin select substr( P_ob22||' '|| replace (txt,'у','i'), 1,50), r020  into ra.nms, ra.nbs  from sb_ob22  where r020 = '6510' and ob22= P_OB22 and d_close is null;
         EXCEPTION WHEN NO_DATA_FOUND THEN   null ;
         end;
@@ -224,15 +222,3 @@ end OP_nls_MTI ;
 
 end monex_RU;
 /
- show err;
- 
-PROMPT *** Create  grants  MONEX_RU ***
-grant EXECUTE                                                                on MONEX_RU        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on MONEX_RU        to CUST001;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/monex_ru.sql =========*** End *** ==
- PROMPT ===================================================================================== 
- 

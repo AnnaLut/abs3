@@ -38,9 +38,7 @@ PROMPT *** Create  view V_WCS_BID_GRT_INS_SUR_GROUPS ***
           sg.ord;
 
 PROMPT *** Create  grants  V_WCS_BID_GRT_INS_SUR_GROUPS ***
-grant SELECT                                                                 on V_WCS_BID_GRT_INS_SUR_GROUPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_BID_GRT_INS_SUR_GROUPS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_BID_GRT_INS_SUR_GROUPS to UPLD;
 
 
 

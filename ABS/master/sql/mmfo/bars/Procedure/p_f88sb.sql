@@ -12,13 +12,13 @@ PROMPT *** Create  procedure P_F88SB ***
 % FILE NAME   :	otcn.sql
 % DESCRIPTION :	ќтчетность —берЅанка: формирование файлов
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     : 14/11/2017 (26.05.2012, 30.04.2011)
+% VERSION     : 14/11/2017 (26.05.2012, 30.04.2011) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-14.11.2017 - удалил ненужные строки и изменил некоторые блоки формировани€
+14.11.2017 - удалил ненужные строки и изменил некоторые блоки формировани€ 
 26.05.2012 - формируем в разрезе кодов территорий
 30.04.2011 - добавил†acc,tobo в протокол
 09.03.2011 - в поле комментарий вносим код TOBO и название счета
-11.01.2010 - новый годовой файл
+11.01.2010 - новый годовой файл 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 kodf_   varchar2(2) := '88';
 acc_    Number;
@@ -55,7 +55,7 @@ mfo_    varchar2(12);
 tobo_   accounts.tobo%TYPE;
 nms_    accounts.nms%TYPE;
 comm_   rnbu_trace.comm%TYPE;
-typ_    Number;
+typ_    Number; 
 nbuc1_  VARCHAR2(12);
 nbuc_   VARCHAR2(12);
 
@@ -63,11 +63,11 @@ nbuc_   VARCHAR2(12);
 CURSOR SaldoASeekOstf IS
    SELECT /* + INDEX(L XIE_K040_KL_K040) INDEX (C XPK_CUSTOMER) */
          a.acc, a.nls, a.kv, a.fdat, a.nbs, a.ostf-a.dos+a.kos,
-         a.tobo, a.nms,
-         NVL(trim(sp.r020_fa),'0000'), NVL(trim(sp.p080),'0000'),
+         a.tobo, a.nms, 
+         NVL(trim(sp.r020_fa),'0000'), NVL(trim(sp.p080),'0000'), 
          NVL(trim(sp.ob88),'0000'), NVL(trim(sp.ob22),'00')
    FROM  (SELECT s.acc, s.nls, s.kv, aa.fdat, s.nbs, aa.ostf,
-         aa.dos, aa.kos, s.tobo, s.nms
+         aa.dos, aa.kos, s.tobo, s.nms 
          FROM saldoa aa, accounts s
          WHERE aa.acc=s.acc     AND
               (s.acc,aa.fdat) =
@@ -77,26 +77,26 @@ CURSOR SaldoASeekOstf IS
                 group by c.acc)) a,
               (select distinct r020
                from sb_p088
-               where d_close is null) k, specparam_int sp
-   WHERE a.kv = 980
-     and a.nbs = k.r020
+               where d_close is null) k, specparam_int sp 
+   WHERE a.kv = 980           
+     and a.nbs = k.r020 
      and a.acc = sp.acc(+);
 
 ---ќбороты (по грн. + по валюте номиналы)
 CURSOR SaldoASeekOs IS
    SELECT /* + INDEX(L XIE_K040_KL_K040) INDEX (C XPK_CUSTOMER) */
           a.acc, a.nls, a.kv, a.nbs, SUM(s.dos), SUM(s.kos),
-          a.tobo, a.nms,
-          NVL(trim(sp.r020_fa),'0000'), NVL(trim(sp.p080),'0000'),
+          a.tobo, a.nms, 
+          NVL(trim(sp.r020_fa),'0000'), NVL(trim(sp.p080),'0000'), 
           NVL(trim(sp.ob88),'0000'), NVL(trim(sp.ob22),'00')
    FROM saldoa s, accounts a,
         (select distinct r020
          from sb_p088
          where d_close is null) k,
         specparam_int sp
-   WHERE s.fdat between Dat1_ AND Dat_
-     and a.acc = s.acc
-     and a.kv = 980
+   WHERE s.fdat between Dat1_ AND Dat_ 
+     and a.acc = s.acc                   
+     and a.kv = 980                      
      and a.nbs = k.r020
      and a.acc = sp.acc(+)
    GROUP BY a.acc, a.nls, a.kv, a.nbs, a.tobo, a.nms, sp.r020_fa, sp.p080, sp.ob88, sp.ob22 ;
@@ -119,25 +119,25 @@ P_Proc_Set_Int(kodf_,sheme_,nbuc1_,typ_);
 -- ќстатки (грн. + валюта номиналы) --
 OPEN SaldoASeekOstf;
 LOOP
-   FETCH SaldoASeekOstf INTO acc_, nls_, kv_, data_, Nbs_, Ostn_, tobo_, nms_,
+   FETCH SaldoASeekOstf INTO acc_, nls_, kv_, data_, Nbs_, Ostn_, tobo_, nms_, 
                              r020_, pp_, zz_, ob22_ ;
    EXIT WHEN SaldoASeekOstf%NOTFOUND;
 
    f88_ := 1 ;
    comm_ := '';
 
-   IF typ_ > 0
+   IF typ_ > 0 
    THEN
       nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
    ELSE
       nbuc_ := nbuc1_;
    END IF;
 
-   IF f88_ > 0 and Ostn_ <> 0
+   IF f88_ > 0 and Ostn_ <> 0 
    THEN
       comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
-
-      if mfo_ = 300465
+      
+      if mfo_ = 300465 
       then
          dk_ := IIF_N(Ostn_,0,'2','1','1');
       else
@@ -162,21 +162,21 @@ LOOP
    f88_ := 1 ;
    comm_ := '';
 
-   IF typ_ > 0
+   IF typ_ > 0 
    THEN
       nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
    ELSE
       nbuc_ := nbuc1_;
    END IF;
 
-   IF f88_ > 0 and (Dosn_ > 0 OR Kosn_ > 0)
+   IF f88_ > 0 and (Dosn_ > 0 OR Kosn_ > 0) 
    THEN
       comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
 
-      IF Kosn_ > 0
+      IF Kosn_ > 0 
       THEN
 
-         if mfo_ = 300465
+         if mfo_ = 300465 
          then
             kodp_ := '5' || nbs_ || pp_ || r020_ || ob22_ || zz_ ;
          else
@@ -189,10 +189,10 @@ LOOP
          VALUES  (nls_, kv_, dat_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
       END IF;
 
-      IF Dosn_ > 0
+      IF Dosn_ > 0 
       THEN
 
-         if mfo_ = 300465
+         if mfo_ = 300465 
          then
             kodp_ := '6' || nbs_ || pp_ || r020_ || ob22_ || zz_ ;
          else

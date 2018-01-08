@@ -63,6 +63,32 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_DPUVIDDCOMB_DPUVIDD_MAIN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_VIDD_COMB ADD CONSTRAINT FK_DPUVIDDCOMB_DPUVIDD_MAIN FOREIGN KEY (MAIN_VIDD)
+	  REFERENCES BARS.DPU_VIDD (VIDD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPUVIDDCOMB_DPUVIDD_DMND ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPU_VIDD_COMB ADD CONSTRAINT FK_DPUVIDDCOMB_DPUVIDD_DMND FOREIGN KEY (DMND_VIDD)
+	  REFERENCES BARS.DPU_VIDD (VIDD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_DPUVIDDCOMB_MAINVIDD_NN ***
 begin   
  execute immediate '
@@ -101,13 +127,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPU_VIDD_COMB ***
-grant SELECT                                                                 on DPU_VIDD_COMB   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPU_VIDD_COMB   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_VIDD_COMB   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_VIDD_COMB   to DPT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_VIDD_COMB   to DPT_ADMIN;
 grant SELECT                                                                 on DPU_VIDD_COMB   to DPT_ROLE;
-grant SELECT                                                                 on DPU_VIDD_COMB   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPU_VIDD_COMB   to WR_ALL_RIGHTS;
 grant SELECT                                                                 on DPU_VIDD_COMB   to WR_DEPOSIT_U;
 

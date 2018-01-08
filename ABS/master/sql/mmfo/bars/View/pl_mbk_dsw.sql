@@ -243,10 +243,8 @@ PROMPT *** Create  view PL_MBK_DSW ***
                                    (zag1, kv)));
 
 PROMPT *** Create  grants  PL_MBK_DSW ***
-grant SELECT                                                                 on PL_MBK_DSW      to BARSREADER_ROLE;
 grant SELECT                                                                 on PL_MBK_DSW      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PL_MBK_DSW      to START1;
-grant SELECT                                                                 on PL_MBK_DSW      to UPLD;
 
 
 

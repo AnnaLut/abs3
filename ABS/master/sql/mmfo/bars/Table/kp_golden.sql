@@ -108,11 +108,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  KP_GOLDEN ***
-grant SELECT                                                                 on KP_GOLDEN       to BARSREADER_ROLE;
 grant DELETE,INSERT,UPDATE                                                   on KP_GOLDEN       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KP_GOLDEN       to BARS_DM;
 grant DELETE,INSERT,UPDATE                                                   on KP_GOLDEN       to START1;
-grant SELECT                                                                 on KP_GOLDEN       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KP_GOLDEN       to WR_ALL_RIGHTS;
 
 

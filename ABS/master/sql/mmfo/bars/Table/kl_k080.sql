@@ -63,7 +63,6 @@ COMMENT ON COLUMN BARS.KL_K080.K081_OLD IS '';
 
 
 PROMPT *** Create  grants  KL_K080 ***
-grant SELECT                                                                 on KL_K080         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_K080         to BARSUPL;
 grant SELECT                                                                 on KL_K080         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_K080         to BARS_DM;

@@ -80,9 +80,7 @@ COMMENT ON COLUMN BARS.ERR$_E_DEAL$BASE.NDI IS '';
 
 
 PROMPT *** Create  grants  ERR$_E_DEAL$BASE ***
-grant SELECT                                                                 on ERR$_E_DEAL$BASE to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_E_DEAL$BASE to BARS_DM;
-grant SELECT                                                                 on ERR$_E_DEAL$BASE to UPLD;
 
 
 

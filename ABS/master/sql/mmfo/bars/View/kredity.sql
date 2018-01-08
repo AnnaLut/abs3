@@ -15,10 +15,8 @@ WHERE  i.acc in (select accs from cc_add) AND
        i.acc=s.acc;
 
 PROMPT *** Create  grants  KREDITY ***
-grant SELECT                                                                 on KREDITY         to BARSREADER_ROLE;
 grant SELECT                                                                 on KREDITY         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KREDITY         to START1;
-grant SELECT                                                                 on KREDITY         to UPLD;
 
 
 

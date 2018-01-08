@@ -62,9 +62,7 @@ COMMENT ON COLUMN BARS.ERR$_CUSTOMER_CATEGORY.USER_ID IS '';
 
 
 PROMPT *** Create  grants  ERR$_CUSTOMER_CATEGORY ***
-grant SELECT                                                                 on ERR$_CUSTOMER_CATEGORY to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_CUSTOMER_CATEGORY to BARS_DM;
-grant SELECT                                                                 on ERR$_CUSTOMER_CATEGORY to UPLD;
 
 
 

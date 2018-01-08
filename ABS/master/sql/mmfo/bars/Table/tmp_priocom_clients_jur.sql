@@ -156,10 +156,8 @@ COMMENT ON COLUMN BARS.TMP_PRIOCOM_CLIENTS_JUR.CREATEDATE IS '';
 
 
 PROMPT *** Create  grants  TMP_PRIOCOM_CLIENTS_JUR ***
-grant SELECT                                                                 on TMP_PRIOCOM_CLIENTS_JUR to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_PRIOCOM_CLIENTS_JUR to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_PRIOCOM_CLIENTS_JUR to START1;
-grant SELECT                                                                 on TMP_PRIOCOM_CLIENTS_JUR to UPLD;
 
 
 

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции W2P
-prompt Наименование операции: W2P Перерахування коштів з транзиту(2924) на поточний рах.
+prompt Наименование операции: Перерахування коштів з транзиту(2924) на поточний рах.
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('W2P', 'W2P Перерахування коштів з транзиту(2924) на поточний рах.', 1, null, null, null, null, null, null, null, null, 0, 0, 1, 0, null, null, null, null, null, null, '0100100000000000000000000000000000000100000000000000000000000000', 'Зарахування коштів на поточний рахунок');
+    values ('W2P', 'Перерахування коштів з транзиту(2924) на поточний рах.', 1, null, null, null, null, null, null, null, null, 0, 0, 1, 0, null, null, null, null, null, null, '0100100000000000000000000000000000000100000000000000000000000000', 'Зарахування коштів на поточний рахунок');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='W2P', name='W2P Перерахування коштів з транзиту(2924) на поточний рах.', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000100000000000000000000000000', nazn='Зарахування коштів на поточний рахунок'
+         set tt='W2P', name='Перерахування коштів з транзиту(2924) на поточний рах.', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000100000000000000000000000000', nazn='Зарахування коштів на поточний рахунок'
        where tt='W2P';
   end;
   --------------------------------

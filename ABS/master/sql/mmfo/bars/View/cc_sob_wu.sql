@@ -32,9 +32,7 @@ SELECT 4,  d.ND, d.cc_id, d.sdate, d.rnk, d.sos, d.CHGDATE, d.IDUPD,  d.DONEBY, 
 ) x;
 
 PROMPT *** Create  grants  CC_SOB_WU ***
-grant SELECT                                                                 on CC_SOB_WU       to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_SOB_WU       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on CC_SOB_WU       to UPLD;
 
 
 

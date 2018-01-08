@@ -39,11 +39,6 @@ COMMENT ON COLUMN PFU.TMP_KVITOVKA2.TXT IS '';
 
 
 
-PROMPT *** Create  grants  TMP_KVITOVKA2 ***
-grant SELECT                                                                 on TMP_KVITOVKA2   to BARSREADER_ROLE;
-grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_KVITOVKA2   to SHEVCHENKOOVO;
-grant SELECT                                                                 on TMP_KVITOVKA2   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

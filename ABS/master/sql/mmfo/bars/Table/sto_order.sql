@@ -91,10 +91,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C008126 ***
+PROMPT *** Create  constraint FK_ORDER_TVBV_REF_BRANCH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STO_ORDER MODIFY (ORDER_TYPE_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.STO_ORDER ADD CONSTRAINT FK_ORDER_TVBV_REF_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -103,22 +104,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C008125 ***
+PROMPT *** Create  constraint SYS_C008129 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STO_ORDER MODIFY (ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008127 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STO_ORDER MODIFY (PAYER_ACCOUNT_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.STO_ORDER MODIFY (PRIORITY NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -139,10 +128,73 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C008129 ***
+PROMPT *** Create  constraint SYS_C008127 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STO_ORDER MODIFY (PRIORITY NOT NULL ENABLE)';
+  ALTER TABLE BARS.STO_ORDER MODIFY (PAYER_ACCOUNT_ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008125 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STO_ORDER MODIFY (ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008126 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STO_ORDER MODIFY (ORDER_TYPE_ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STO_ORDE_REFERENCE_STO_TYPE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STO_ORDER ADD CONSTRAINT FK_STO_ORDE_REFERENCE_STO_TYPE FOREIGN KEY (ORDER_TYPE_ID)
+	  REFERENCES BARS.STO_TYPE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STO_ORDE_REFERENCE_STAFF$BA ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STO_ORDER ADD CONSTRAINT FK_STO_ORDE_REFERENCE_STAFF$BA FOREIGN KEY (USER_ID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_STO_ORDE_REFERENCE_STO_PROD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STO_ORDER ADD CONSTRAINT FK_STO_ORDE_REFERENCE_STO_PROD FOREIGN KEY (PRODUCT_ID)
+	  REFERENCES BARS.STO_PRODUCT (ID) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -179,10 +231,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  STO_ORDER ***
-grant SELECT                                                                 on STO_ORDER       to BARSREADER_ROLE;
 grant SELECT                                                                 on STO_ORDER       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on STO_ORDER       to SBON;
-grant SELECT                                                                 on STO_ORDER       to UPLD;
 
 
 

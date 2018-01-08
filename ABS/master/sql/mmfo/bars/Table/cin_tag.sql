@@ -71,6 +71,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CINTAG_TAG ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIN_TAG ADD CONSTRAINT FK_CINTAG_TAG FOREIGN KEY (TAG)
+	  REFERENCES BARS.OP_FIELD (TAG) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C009776 ***
 begin   
  execute immediate '
@@ -145,11 +158,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIN_TAG ***
-grant SELECT                                                                 on CIN_TAG         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CIN_TAG         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIN_TAG         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIN_TAG         to PYOD001;
-grant SELECT                                                                 on CIN_TAG         to UPLD;
 grant FLASHBACK,SELECT                                                       on CIN_TAG         to WR_REFREAD;
 
 

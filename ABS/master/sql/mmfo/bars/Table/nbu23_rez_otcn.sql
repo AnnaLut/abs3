@@ -339,6 +339,19 @@ COMMENT ON COLUMN BARS.NBU23_REZ_OTCN.TIPA IS 'Тип.актива';
 
 
 
+PROMPT *** Create  constraint FK_NBU23REZOTCN_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NBU23_REZ_OTCN ADD CONSTRAINT FK_NBU23REZOTCN_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_NBU23REZOTCN_KF_NN ***
 begin   
  execute immediate '
@@ -352,7 +365,6 @@ exception when others then
 
 PROMPT *** Create  grants  NBU23_REZ_OTCN ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBU23_REZ_OTCN  to BARSDWH_ACCESS_USER;
-grant SELECT                                                                 on NBU23_REZ_OTCN  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBU23_REZ_OTCN  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBU23_REZ_OTCN  to RPBN002;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBU23_REZ_OTCN  to START1;

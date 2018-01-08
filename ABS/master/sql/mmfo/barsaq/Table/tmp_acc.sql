@@ -30,9 +30,6 @@ COMMENT ON COLUMN BARSAQ.TMP_ACC.DAPP IS 'Дата последнего движения';
 
 
 
-PROMPT *** Create  grants  TMP_ACC ***
-grant SELECT                                                                 on TMP_ACC         to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

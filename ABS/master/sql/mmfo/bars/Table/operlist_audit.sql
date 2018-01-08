@@ -55,10 +55,6 @@ COMMENT ON COLUMN BARS.OPERLIST_AUDIT.CHANGE_TYPE IS '';
 
 
 
-PROMPT *** Create  grants  OPERLIST_AUDIT ***
-grant SELECT                                                                 on OPERLIST_AUDIT  to BARSREADER_ROLE;
-grant SELECT                                                                 on OPERLIST_AUDIT  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

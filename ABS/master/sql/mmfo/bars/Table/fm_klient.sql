@@ -83,11 +83,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_KLIENT ***
-grant SELECT                                                                 on FM_KLIENT       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FM_KLIENT       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_KLIENT       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FM_KLIENT       to FINMON01;
-grant SELECT                                                                 on FM_KLIENT       to UPLD;
 
 
 

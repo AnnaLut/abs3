@@ -68,9 +68,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CD_DATE_HIST ***
-grant SELECT                                                                 on CD_DATE_HIST    to BARSREADER_ROLE;
 grant SELECT                                                                 on CD_DATE_HIST    to BARS_DM;
-grant SELECT                                                                 on CD_DATE_HIST    to UPLD;
 
 
 

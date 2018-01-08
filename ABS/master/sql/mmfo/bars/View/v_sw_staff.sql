@@ -19,9 +19,7 @@ with read only
 
 PROMPT *** Create  grants  V_SW_STAFF ***
 grant SELECT                                                                 on V_SW_STAFF      to BARS013;
-grant SELECT                                                                 on V_SW_STAFF      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW_STAFF      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_SW_STAFF      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SW_STAFF      to WR_ALL_RIGHTS;
 
 

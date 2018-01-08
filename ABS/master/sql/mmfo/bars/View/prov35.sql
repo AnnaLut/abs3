@@ -30,8 +30,6 @@ group  by a.kk
  ;
 
 PROMPT *** Create  grants  PROV35 ***
-grant SELECT                                                                 on PROV35          to BARSREADER_ROLE;
-grant SELECT                                                                 on PROV35          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PROV35          to WR_ALL_RIGHTS;
 
 

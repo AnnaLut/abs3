@@ -24,10 +24,8 @@ PROMPT *** Create  view V_TAMOZHDOC_NR ***
    AND tc.benefcountry = co.country AND trim(tm.name) IS NOT NULL;
 
 PROMPT *** Create  grants  V_TAMOZHDOC_NR ***
-grant SELECT                                                                 on V_TAMOZHDOC_NR  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TAMOZHDOC_NR  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TAMOZHDOC_NR  to START1;
-grant SELECT                                                                 on V_TAMOZHDOC_NR  to UPLD;
 
 
 

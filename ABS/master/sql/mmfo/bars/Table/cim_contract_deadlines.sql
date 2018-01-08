@@ -79,11 +79,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_CONTRACT_DEADLINES ***
-grant SELECT                                                                 on CIM_CONTRACT_DEADLINES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONTRACT_DEADLINES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_CONTRACT_DEADLINES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONTRACT_DEADLINES to CIM_ROLE;
-grant SELECT                                                                 on CIM_CONTRACT_DEADLINES to UPLD;
 
 
 

@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DCP_ZAG ***
-grant SELECT                                                                 on DCP_ZAG         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DCP_ZAG         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DCP_ZAG         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DCP_ZAG         to START1;
-grant SELECT                                                                 on DCP_ZAG         to UPLD;
 
 
 

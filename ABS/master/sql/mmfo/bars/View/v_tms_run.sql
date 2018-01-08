@@ -11,10 +11,6 @@ PROMPT *** Create  view V_TMS_RUN ***
   select t.id, t.current_bank_date, t.new_bank_date, list_utl.get_item_name('BANKDATE_RUN_STATE', t.state_id) run_state
 from   tms_run t;
 
-PROMPT *** Create  grants  V_TMS_RUN ***
-grant SELECT                                                                 on V_TMS_RUN       to BARSREADER_ROLE;
-grant SELECT                                                                 on V_TMS_RUN       to UPLD;
-
 
 
 PROMPT ===================================================================================== 

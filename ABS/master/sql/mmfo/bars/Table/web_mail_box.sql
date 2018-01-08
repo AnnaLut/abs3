@@ -55,6 +55,19 @@ COMMENT ON COLUMN BARS.WEB_MAIL_BOX.MAIL_DATE IS '';
 
 
 
+PROMPT *** Create  constraint FK_WEBMAILBOX_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WEB_MAIL_BOX ADD CONSTRAINT FK_WEBMAILBOX_STAFF FOREIGN KEY (MAIL_SENDER_ID)
+	  REFERENCES BARS.WEB_MAIL_FROM (USER_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_WEBMAILBOX_MAILID_NN ***
 begin   
  execute immediate '
@@ -95,10 +108,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  WEB_MAIL_BOX ***
-grant SELECT                                                                 on WEB_MAIL_BOX    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WEB_MAIL_BOX    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WEB_MAIL_BOX    to START1;
-grant SELECT                                                                 on WEB_MAIL_BOX    to UPLD;
 
 
 

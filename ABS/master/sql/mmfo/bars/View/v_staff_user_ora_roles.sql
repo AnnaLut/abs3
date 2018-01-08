@@ -24,10 +24,6 @@ PROMPT *** Create  view V_STAFF_USER_ORA_ROLES ***
           left join table(user_utl.get_ora_user_roles(s.logname)) r
             on trim(upper(r.column_value)) = trim(upper(t1.role_name)));
 
-PROMPT *** Create  grants  V_STAFF_USER_ORA_ROLES ***
-grant SELECT                                                                 on V_STAFF_USER_ORA_ROLES to BARSREADER_ROLE;
-grant SELECT                                                                 on V_STAFF_USER_ORA_ROLES to UPLD;
-
 
 
 PROMPT ===================================================================================== 

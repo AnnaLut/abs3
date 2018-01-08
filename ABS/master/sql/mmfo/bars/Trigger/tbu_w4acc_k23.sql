@@ -7,8 +7,9 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TBU_W4ACC_K23 ***
 
-  CREATE OR REPLACE TRIGGER BARS.TBU_W4ACC_K23 BEFORE UPDATE OF "FIN23", "OBS23" ON "BARS"."W4_ACC" FOR EACH ROW 
-  WHEN (
+  CREATE OR REPLACE TRIGGER BARS.TBU_W4ACC_K23 
+  before update of FIN23, OBS23  ON BARS.W4_ACC  for each row
+ WHEN (
 new.FIN23>0 OR   new.OBS23>0
       ) declare
   l_cus int; l_fin23 int; l_obs23 int; l_nd number; l_rnk number; l_kat23 int; l_k23 number;
@@ -55,7 +56,6 @@ begin
 
 
 end tbu_W4ACC_K23;
-
 /
 ALTER TRIGGER BARS.TBU_W4ACC_K23 ENABLE;
 

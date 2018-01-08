@@ -118,10 +118,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  OW_QUERY_LOG ***
-grant SELECT                                                                 on OW_QUERY_LOG    to BARSREADER_ROLE;
-grant SELECT                                                                 on OW_QUERY_LOG    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

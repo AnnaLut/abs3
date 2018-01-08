@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/obpc.sql =========*** Run *** ======
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.OBPC is
+CREATE OR REPLACE PACKAGE BARS.OBPC is
 
 g_head_version constant varchar2(64)  := 'Version 5.1 14/08/2017';
 g_head_defs    constant varchar2(512) := '';
@@ -1187,8 +1187,7 @@ begin
         client, type, card_acct, acc_type, currency, lacct, client_n,
         street, city, cntry, pcode, status, post_date, crd, begin_bal,
         debit, credit, end_bal, avail_amt, mprew_bal, used_amnt, obu,
-        card_type, open_date, works, office, quan_card, expiry, stop_date,
-
+        card_type, open_date, works, office, quan_card, expiry, stop_date,
         cond_set, id_numb, serv_code, acc)
      values (l_file_id, l_region, l_region_n, l_branch, l_branch_n, l_mfo,
         l_client, l_type, l_card_acct, l_acc_type, l_currency, l_lacct, l_client_n,
@@ -2362,8 +2361,7 @@ begin
                  nam_b, nlsb, mfob, id_b, kv, s, kv2, s2, nazn, userid)
               values (l_ref, l_tt, l_vob, l_ref, l_dk, sysdate, l_bankdate, l_bankdate,
                  l_nam1, l_nls1, l_mfo, k.okpo,
-                 l_nam2, l_nls2, l_mfo, l_okpo,
-
+                 l_nam2, l_nls2, l_mfo, l_okpo,
                  l_kv1, l_s1, l_kv2, l_s2, l_nazn, user_id);
 
               -- варианты проводок:
@@ -2379,8 +2377,7 @@ begin
                  if l_nls_t is not null and l_nls_t <> l_nls2 then
 
                     -- Д2625 - К2924 - одновалютная проводка
-                    gl.payv(l_flag, l_ref, l_bankdate, l_tt, l_dk,
-
+                    gl.payv(l_flag, l_ref, l_bankdate, l_tt, l_dk,
                        l_kv1, l_nls1,  l_s1,
                        l_kv1, l_nls_t, l_s1);
 
@@ -2632,8 +2629,7 @@ begin
                   sign1_  => null,
                   sign2_  => null );
 
-              b_kvt := true;
-
+              b_kvt := true;
 
            end if;
 
@@ -3230,8 +3226,7 @@ procedure pay_dp_one (
   p_kv      number,
   p_okpo    varchar2,
   p_cardacct varchar2 )
-is
-
+is
   l_bankdate date;
   l_mfo    varchar2(6);
   l_okpo   varchar2(14);
@@ -3537,7 +3532,7 @@ procedure pay_clob (
   p_transit_acc  accounts.acc%type,
   p_filename     operw.value%type,
   p_buffer       clob,
-  p_file_id out   number
+  p_file_id out   number  
   )
 is
   l_clob   clob;
@@ -3564,10 +3559,10 @@ is
   l_s       number;
 
   l_ref      oper.REF%type    ;
-
+  
   type  l_obpc_salary_import_log is  table of obpc_salary_import_log%rowtype;
-  l_tab                  l_obpc_salary_import_log :=l_obpc_salary_import_log();
-
+  l_tab                  l_obpc_salary_import_log :=l_obpc_salary_import_log();  
+  
   l_file_id   number;
 
 begin
@@ -3609,31 +3604,31 @@ begin
   l_length   := dbms_xmldom.getLength(l_children);
 
   l_file_id := bars_sqnc.get_nextval('s_obpc_salary_import');
-
+  
   for i in 0 .. l_length -1
   loop
-
+     
      l_tab.extend;
      l_tab(i+1).file_id   := l_file_id;
      l_tab(i+1).file_name := p_filename;
      l_tab(i+1).crt_date  := sysdate;
-
+     
 
      l_child := dbms_xmldom.item(l_children, i);
-
+ 
 
      begin
         get_xml_attr      (l_child, l_pk_nls, l_pk_nms, l_pk_okpo, l_s);
      exception when others then
-        l_tab(i+1).error    := sqlerrm;
+        l_tab(i+1).error    := sqlerrm; 
         get_xml_attr_parse(l_child, l_pk_nls, l_pk_nms, l_pk_okpo, l_s);
      end;
-
-
-     l_tab(i+1).nls    := l_pk_nls;
-     l_tab(i+1).fio    := l_pk_nms;
-     l_tab(i+1).inn    := l_pk_okpo;
-     l_tab(i+1).summa  := l_s;
+     
+     
+     l_tab(i+1).nls    := l_pk_nls;     
+     l_tab(i+1).fio    := l_pk_nms;     
+     l_tab(i+1).inn    := l_pk_okpo;     
+     l_tab(i+1).summa  := l_s;    
 
      if l_pk_nls        is not null and
         l_pk_nms        is not null and
@@ -3681,32 +3676,32 @@ begin
        insert into operw (ref, tag, value) values (l_ref, 'IMPFL', p_filename);
        insert into operw (ref, tag, value) values (l_ref, 'SK_ZB', '84');
 
-       l_tab(i+1).status  := 'Документ створено';
-       l_tab(i+1).ref  :=l_ref;
-
+       l_tab(i+1).status  := 'Документ створено';   
+       l_tab(i+1).ref  :=l_ref;   
+       
      elsif l_pk_nls        is not null and instr(l_tab(i+1).error,'BPK-00021')>0
      then
-       l_tab(i+1).status  := 'Документ не створено';
-       l_tab(i+1).link    := 'Посилання для введеня документу';
-     else
-       l_tab(i+1).status  := 'Документ не створено';
+       l_tab(i+1).status  := 'Документ не створено';   
+       l_tab(i+1).link    := 'Посилання для введеня документу';  
+     else 
+       l_tab(i+1).status  := 'Документ не створено'; 
      end if;
 
      if l_tab(i+1).error is not null
-     then
+     then 
      p_file_id:=l_file_id;
      end if;
-
+     
   end loop;
-
+  
      forall j in indices of l_tab
-
+      
      insert into obpc_salary_import_log values l_tab(j) ;
-
+  
      l_tab.delete();
      l_tab := null;
-
-
+  
+  
 end pay_clob;
 
 -------------------------------------------------------------------------------

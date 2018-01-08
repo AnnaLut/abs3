@@ -27,10 +27,8 @@ PROMPT *** Create  view MBK_ARC ***
    and i.acra = n.acc;
 
 PROMPT *** Create  grants  MBK_ARC ***
-grant SELECT                                                                 on MBK_ARC         to BARSREADER_ROLE;
 grant SELECT                                                                 on MBK_ARC         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MBK_ARC         to FOREX;
-grant SELECT                                                                 on MBK_ARC         to UPLD;
 
 
 

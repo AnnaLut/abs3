@@ -93,58 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C009458 ***
+PROMPT *** Create  constraint SYS_C009465 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_950_ARCH MODIFY (SWREF NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009459 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_950_ARCH MODIFY (NUM NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009460 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_950_ARCH MODIFY (STMT_DATE NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009461 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_950_ARCH MODIFY (OBAL NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009463 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_950_ARCH MODIFY (STMT_BDATE NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SW_950_ARCH MODIFY (KF NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -165,10 +117,58 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C009465 ***
+PROMPT *** Create  constraint SYS_C009463 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_950_ARCH MODIFY (KF NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SW_950_ARCH MODIFY (STMT_BDATE NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009461 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_950_ARCH MODIFY (OBAL NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009460 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_950_ARCH MODIFY (STMT_DATE NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009459 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_950_ARCH MODIFY (NUM NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009458 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_950_ARCH MODIFY (SWREF NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -191,10 +191,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_950_ARCH ***
-grant SELECT                                                                 on SW_950_ARCH     to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on SW_950_ARCH     to BARS_ACCESS_DEFROLE;
 grant INSERT,SELECT,UPDATE                                                   on SW_950_ARCH     to START1;
-grant SELECT                                                                 on SW_950_ARCH     to UPLD;
 
 
 

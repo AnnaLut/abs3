@@ -104,12 +104,10 @@ exception when others then
 
 PROMPT *** Create  grants  ALIEN_NAZN ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ALIEN_NAZN      to ABS_ADMIN;
-grant SELECT                                                                 on ALIEN_NAZN      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ALIEN_NAZN      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ALIEN_NAZN      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ALIEN_NAZN      to PYOD001;
 grant SELECT                                                                 on ALIEN_NAZN      to START1;
-grant SELECT                                                                 on ALIEN_NAZN      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ALIEN_NAZN      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on ALIEN_NAZN      to WR_REFREAD;
 

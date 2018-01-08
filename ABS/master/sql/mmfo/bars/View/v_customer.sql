@@ -122,10 +122,8 @@ PROMPT *** Create  view V_CUSTOMER ***
           AND c.custtype = t.custtype;
 
 PROMPT *** Create  grants  V_CUSTOMER ***
-grant SELECT                                                                 on V_CUSTOMER      to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_CUSTOMER      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUSTOMER      to CUST001;
-grant SELECT                                                                 on V_CUSTOMER      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CUSTOMER      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_CUSTOMER      to WR_REFREAD;
 

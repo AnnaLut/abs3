@@ -89,11 +89,9 @@ PROMPT *** Create  view MBK_ADD_9100 ***
           AND (deal.wdate >= bankdate OR deal.ostc <> 0);
 
 PROMPT *** Create  grants  MBK_ADD_9100 ***
-grant SELECT                                                                 on MBK_ADD_9100    to BARSREADER_ROLE;
 grant DELETE,SELECT,UPDATE                                                   on MBK_ADD_9100    to BARS_ACCESS_DEFROLE;
 grant DELETE,SELECT,UPDATE                                                   on MBK_ADD_9100    to FOREX;
 grant SELECT                                                                 on MBK_ADD_9100    to START1;
-grant SELECT                                                                 on MBK_ADD_9100    to UPLD;
 
 
 

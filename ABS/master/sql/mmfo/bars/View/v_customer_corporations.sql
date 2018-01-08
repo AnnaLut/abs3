@@ -25,10 +25,8 @@ left join V_ORG_CORPORATIONS vo  on vo.EXTERNAL_ID = cwc.VALUE and vo.base_extid
 ;
 
 PROMPT *** Create  grants  V_CUSTOMER_CORPORATIONS ***
-grant SELECT                                                                 on V_CUSTOMER_CORPORATIONS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_CUSTOMER_CORPORATIONS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUSTOMER_CORPORATIONS to CORP_CLIENT;
-grant SELECT                                                                 on V_CUSTOMER_CORPORATIONS to UPLD;
 grant FLASHBACK,SELECT                                                       on V_CUSTOMER_CORPORATIONS to WR_REFREAD;
 
 

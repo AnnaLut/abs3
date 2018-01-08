@@ -31,9 +31,7 @@ join branch b on b.branch = t.branch
 order by t.branch nulls first, t.record_level, t.activity_segment nulls first;
 
 PROMPT *** Create  grants  V_CUSTOMER_SEGMENT_REPORT ***
-grant SELECT                                                                 on V_CUSTOMER_SEGMENT_REPORT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTOMER_SEGMENT_REPORT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CUSTOMER_SEGMENT_REPORT to UPLD;
 
 
 

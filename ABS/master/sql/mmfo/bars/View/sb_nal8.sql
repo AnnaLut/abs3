@@ -16,10 +16,8 @@ and substr (nbs,1,2) not like '89%'
  ;
 
 PROMPT *** Create  grants  SB_NAL8 ***
-grant SELECT                                                                 on SB_NAL8         to BARSREADER_ROLE;
 grant SELECT                                                                 on SB_NAL8         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SB_NAL8         to NALOG;
-grant SELECT                                                                 on SB_NAL8         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SB_NAL8         to WR_ALL_RIGHTS;
 
 

@@ -69,10 +69,6 @@ COMMENT ON COLUMN BARS.ERR$_FIN_FM_UPDATE.IDUPD IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_FIN_FM_UPDATE ***
-grant SELECT                                                                 on ERR$_FIN_FM_UPDATE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_FIN_FM_UPDATE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

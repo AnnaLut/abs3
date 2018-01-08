@@ -112,10 +112,8 @@ COMMENT ON COLUMN BARS.CP_HIERARCHY_IDS.RECLASS_INTO IS 'Реклассификация в урове
 
 
 PROMPT *** Create  grants  CP_HIERARCHY_IDS ***
-grant SELECT                                                                 on CP_HIERARCHY_IDS to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CP_HIERARCHY_IDS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_HIERARCHY_IDS to BARS_DM;
-grant SELECT                                                                 on CP_HIERARCHY_IDS to UPLD;
 
 
 

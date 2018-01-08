@@ -16,10 +16,8 @@ PROMPT *** Create  view BIRJA ***
 
 PROMPT *** Create  grants  BIRJA ***
 grant FLASHBACK,REFERENCES,SELECT                                            on BIRJA           to BARSAQ with grant option;
-grant SELECT                                                                 on BIRJA           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BIRJA           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BIRJA           to F_500;
-grant SELECT                                                                 on BIRJA           to UPLD;
 
 
 

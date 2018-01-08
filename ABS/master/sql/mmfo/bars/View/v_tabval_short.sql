@@ -11,10 +11,8 @@ PROMPT *** Create  view V_TABVAL_SHORT ***
   select kv, lcv||' '||name name from tabval where d_close is null;
 
 PROMPT *** Create  grants  V_TABVAL_SHORT ***
-grant SELECT                                                                 on V_TABVAL_SHORT  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TABVAL_SHORT  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TABVAL_SHORT  to START1;
-grant SELECT                                                                 on V_TABVAL_SHORT  to UPLD;
 grant SELECT                                                                 on V_TABVAL_SHORT  to ZAY;
 
 

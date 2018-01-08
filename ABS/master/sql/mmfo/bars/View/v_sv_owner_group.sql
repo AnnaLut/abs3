@@ -12,10 +12,8 @@ PROMPT *** Create  view V_SV_OWNER_GROUP ***
   from sv_owner o;
 
 PROMPT *** Create  grants  V_SV_OWNER_GROUP ***
-grant SELECT                                                                 on V_SV_OWNER_GROUP to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SV_OWNER_GROUP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SV_OWNER_GROUP to RPBN002;
-grant SELECT                                                                 on V_SV_OWNER_GROUP to UPLD;
 
 
 

@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_CIM_UNHELD_QUE.VDAT IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_CIM_UNHELD_QUE ***
-grant SELECT                                                                 on ERR$_CIM_UNHELD_QUE to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_CIM_UNHELD_QUE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

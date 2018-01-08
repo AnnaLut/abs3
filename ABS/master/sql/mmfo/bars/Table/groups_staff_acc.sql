@@ -49,6 +49,19 @@ COMMENT ON COLUMN BARS.GROUPS_STAFF_ACC.IDG IS 'Идентификатор группы пользовател
 
 
 
+PROMPT *** Create  constraint FK_GROUPSSTAFFACC_GROUPS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GROUPS_STAFF_ACC ADD CONSTRAINT FK_GROUPSSTAFFACC_GROUPS FOREIGN KEY (IDG)
+	  REFERENCES BARS.GROUPS (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_GROUPSSTAFFACC_IDA_NN ***
 begin   
  execute immediate '
@@ -102,7 +115,6 @@ exception when others then
 
 PROMPT *** Create  grants  GROUPS_STAFF_ACC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on GROUPS_STAFF_ACC to ABS_ADMIN;
-grant SELECT                                                                 on GROUPS_STAFF_ACC to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on GROUPS_STAFF_ACC to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GROUPS_STAFF_ACC to BARS_DM;
 grant SELECT                                                                 on GROUPS_STAFF_ACC to KLBX;

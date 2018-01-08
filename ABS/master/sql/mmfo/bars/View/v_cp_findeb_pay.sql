@@ -55,10 +55,8 @@ PROMPT *** Create  view V_CP_FINDEB_PAY ***
    ORDER BY id DESC, REF ASC;
 
 PROMPT *** Create  grants  V_CP_FINDEB_PAY ***
-grant SELECT                                                                 on V_CP_FINDEB_PAY to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_CP_FINDEB_PAY to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_CP_FINDEB_PAY to CP_ROLE;
-grant SELECT                                                                 on V_CP_FINDEB_PAY to UPLD;
 grant FLASHBACK,SELECT                                                       on V_CP_FINDEB_PAY to WR_REFREAD;
 
 

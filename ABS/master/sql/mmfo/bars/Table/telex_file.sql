@@ -103,11 +103,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TELEX_FILE ***
-grant SELECT                                                                 on TELEX_FILE      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TELEX_FILE      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TELEX_FILE      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TELEX_FILE      to START1;
-grant SELECT                                                                 on TELEX_FILE      to UPLD;
 
 
 

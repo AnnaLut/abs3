@@ -78,11 +78,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_RATING ***
-grant SELECT                                                                 on FIN_RATING      to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_RATING      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_RATING      to RCC_DEAL;
 grant SELECT                                                                 on FIN_RATING      to START1;
-grant SELECT                                                                 on FIN_RATING      to UPLD;
 
 
 

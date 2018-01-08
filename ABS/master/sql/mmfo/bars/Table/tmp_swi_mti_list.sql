@@ -86,10 +86,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119144 ***
+PROMPT *** Create  constraint SYS_C00119147 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_SWI_MTI_LIST MODIFY (NAME NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_SWI_MTI_LIST MODIFY (OB22_KOM NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -122,20 +122,16 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119147 ***
+PROMPT *** Create  constraint SYS_C00119144 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_SWI_MTI_LIST MODIFY (OB22_KOM NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_SWI_MTI_LIST MODIFY (NAME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-
-PROMPT *** Create  grants  TMP_SWI_MTI_LIST ***
-grant SELECT                                                                 on TMP_SWI_MTI_LIST to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_SWI_MTI_LIST to UPLD;
 
 
 

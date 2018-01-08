@@ -81,10 +81,8 @@ COMMENT ON COLUMN BARS.TMP_EMI_LOT1.SD_2805VZ IS '';
 
 
 PROMPT *** Create  grants  TMP_EMI_LOT1 ***
-grant SELECT                                                                 on TMP_EMI_LOT1    to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_EMI_LOT1    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_EMI_LOT1    to RPBN001;
-grant SELECT                                                                 on TMP_EMI_LOT1    to UPLD;
 
 
 

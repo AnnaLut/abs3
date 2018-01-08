@@ -23,9 +23,7 @@ PROMPT *** Create  view V_WCS_BID_STATES ***
  order by bs.checkout_dat desc nulls last;
 
 PROMPT *** Create  grants  V_WCS_BID_STATES ***
-grant SELECT                                                                 on V_WCS_BID_STATES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_BID_STATES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_BID_STATES to UPLD;
 
 
 

@@ -121,11 +121,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SWI_MTI_CURR ***
-grant SELECT                                                                 on SWI_MTI_CURR    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SWI_MTI_CURR    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SWI_MTI_CURR    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SWI_MTI_CURR    to START1;
-grant SELECT                                                                 on SWI_MTI_CURR    to UPLD;
 
 
 

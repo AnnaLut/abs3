@@ -33,9 +33,7 @@ PROMPT *** Create  view V_CP_WARRANTY_REFS_W ***
           AND CW.NLS = o.nlsb;
 
 PROMPT *** Create  grants  V_CP_WARRANTY_REFS_W ***
-grant SELECT                                                                 on V_CP_WARRANTY_REFS_W to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_WARRANTY_REFS_W to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CP_WARRANTY_REFS_W to UPLD;
 
 
 

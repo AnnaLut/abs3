@@ -65,11 +65,9 @@ PROMPT *** Create  view TMPR_CCK5 ***
                     e1);
 
 PROMPT *** Create  grants  TMPR_CCK5 ***
-grant SELECT                                                                 on TMPR_CCK5       to BARSREADER_ROLE;
 grant SELECT                                                                 on TMPR_CCK5       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMPR_CCK5       to RCC_DEAL;
 grant SELECT                                                                 on TMPR_CCK5       to SALGL;
-grant SELECT                                                                 on TMPR_CCK5       to UPLD;
 
 
 

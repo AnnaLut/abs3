@@ -95,11 +95,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SB_OB22 ***
-grant SELECT                                                                 on SB_OB22         to BARSREADER_ROLE;
 grant SELECT                                                                 on SB_OB22         to BARSUPL;
 grant INSERT,SELECT,UPDATE                                                   on SB_OB22         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SB_OB22         to BARS_DM;
-grant SELECT                                                                 on SB_OB22         to UPLD;
 
 
 

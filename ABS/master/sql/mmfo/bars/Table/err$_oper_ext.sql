@@ -60,9 +60,7 @@ COMMENT ON COLUMN BARS.ERR$_OPER_EXT.PAY_CALDATE IS '';
 
 
 PROMPT *** Create  grants  ERR$_OPER_EXT ***
-grant SELECT                                                                 on ERR$_OPER_EXT   to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR$_OPER_EXT   to BARS_DM;
-grant SELECT                                                                 on ERR$_OPER_EXT   to UPLD;
 
 
 

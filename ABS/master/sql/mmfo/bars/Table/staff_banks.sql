@@ -46,11 +46,9 @@ COMMENT ON COLUMN BARS.STAFF_BANKS.MFO IS '';
 
 
 PROMPT *** Create  grants  STAFF_BANKS ***
-grant SELECT                                                                 on STAFF_BANKS     to BARSREADER_ROLE;
 grant SELECT                                                                 on STAFF_BANKS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF_BANKS     to BARS_DM;
 grant SELECT                                                                 on STAFF_BANKS     to PYOD001;
-grant SELECT                                                                 on STAFF_BANKS     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF_BANKS     to WR_ALL_RIGHTS;
 
 

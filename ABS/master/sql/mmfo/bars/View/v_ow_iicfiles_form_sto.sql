@@ -158,10 +158,8 @@ PROMPT *** Create  view V_OW_IICFILES_FORM_STO ***
           AND p.nlsa LIKE m.nlsa(+);
 
 PROMPT *** Create  grants  V_OW_IICFILES_FORM_STO ***
-grant SELECT                                                                 on V_OW_IICFILES_FORM_STO to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_IICFILES_FORM_STO to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_IICFILES_FORM_STO to OW;
-grant SELECT                                                                 on V_OW_IICFILES_FORM_STO to UPLD;
 
 
 

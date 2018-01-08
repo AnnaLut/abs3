@@ -105,10 +105,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  VCTL_BINLIST ***
-grant SELECT                                                                 on VCTL_BINLIST    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VCTL_BINLIST    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VCTL_BINLIST    to START1;
-grant SELECT                                                                 on VCTL_BINLIST    to UPLD;
 
 
 

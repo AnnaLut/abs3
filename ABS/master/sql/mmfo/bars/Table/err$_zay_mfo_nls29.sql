@@ -57,10 +57,6 @@ COMMENT ON COLUMN BARS.ERR$_ZAY_MFO_NLS29.NLS29CA IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ZAY_MFO_NLS29 ***
-grant SELECT                                                                 on ERR$_ZAY_MFO_NLS29 to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ZAY_MFO_NLS29 to UPLD;
-
 
 
 PROMPT ===================================================================================== 

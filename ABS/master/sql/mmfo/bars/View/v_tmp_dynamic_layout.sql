@@ -31,9 +31,7 @@ from bars.tmp_dynamic_layout v
 where  v.userid = bars.user_id;
 
 PROMPT *** Create  grants  V_TMP_DYNAMIC_LAYOUT ***
-grant SELECT                                                                 on V_TMP_DYNAMIC_LAYOUT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TMP_DYNAMIC_LAYOUT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_TMP_DYNAMIC_LAYOUT to UPLD;
 
 
 

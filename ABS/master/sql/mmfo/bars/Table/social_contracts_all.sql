@@ -63,6 +63,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_SOCCONTRALL_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SOCIAL_CONTRACTS_ALL ADD CONSTRAINT FK_SOCCONTRALL_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_SOCCONTRALL_CONTRACTID_NN ***
 begin   
  execute immediate '
@@ -101,9 +114,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  SOCIAL_CONTRACTS_ALL ***
-grant SELECT                                                                 on SOCIAL_CONTRACTS_ALL to BARSREADER_ROLE;
 grant SELECT                                                                 on SOCIAL_CONTRACTS_ALL to BARS_DM;
-grant SELECT                                                                 on SOCIAL_CONTRACTS_ALL to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SOCIAL_CONTRACTS_ALL to WR_ALL_RIGHTS;
 
 

@@ -28,10 +28,10 @@ COMMENT ON COLUMN BARSAQ.STREAMS_HEARTBEAT.HEARTBEAT_TIME IS 'Временная метка се
 
 
 
-PROMPT *** Create  constraint CC_STREAMSHB_GLOBALNAME_NN ***
+PROMPT *** Create  constraint CC_STREAMSHB_HBTIME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.STREAMS_HEARTBEAT MODIFY (GLOBAL_NAME CONSTRAINT CC_STREAMSHB_GLOBALNAME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.STREAMS_HEARTBEAT MODIFY (HEARTBEAT_TIME CONSTRAINT CC_STREAMSHB_HBTIME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -40,10 +40,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_STREAMSHB_HBTIME_NN ***
+PROMPT *** Create  constraint CC_STREAMSHB_GLOBALNAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.STREAMS_HEARTBEAT MODIFY (HEARTBEAT_TIME CONSTRAINT CC_STREAMSHB_HBTIME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARSAQ.STREAMS_HEARTBEAT MODIFY (GLOBAL_NAME CONSTRAINT CC_STREAMSHB_GLOBALNAME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -78,9 +78,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  STREAMS_HEARTBEAT ***
-grant SELECT                                                                 on STREAMS_HEARTBEAT to BARSREADER_ROLE;
 
 
 

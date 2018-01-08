@@ -93,10 +93,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  VOB_RU ***
-grant SELECT                                                                 on VOB_RU          to BARSREADER_ROLE;
-grant SELECT                                                                 on VOB_RU          to UPLD;
-
 
 
 PROMPT ===================================================================================== 

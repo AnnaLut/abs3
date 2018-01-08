@@ -12,10 +12,8 @@ PROMPT *** Create  view V_CCK_REP_LIST_YL ***
 ;
 
 PROMPT *** Create  grants  V_CCK_REP_LIST_YL ***
-grant SELECT                                                                 on V_CCK_REP_LIST_YL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CCK_REP_LIST_YL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CCK_REP_LIST_YL to RCC_DEAL;
-grant SELECT                                                                 on V_CCK_REP_LIST_YL to UPLD;
 
 
 

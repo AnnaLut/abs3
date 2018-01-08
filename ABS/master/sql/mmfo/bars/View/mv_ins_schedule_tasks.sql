@@ -58,10 +58,6 @@ select tt.id as type_id,
    and (sysdate - ps.plan_date) >
        nvl(ts.days_from, (sysdate - ps.plan_date));
 
-PROMPT *** Create  grants  MV_INS_SCHEDULE_TASKS ***
-grant SELECT                                                                 on MV_INS_SCHEDULE_TASKS to BARSREADER_ROLE;
-grant SELECT                                                                 on MV_INS_SCHEDULE_TASKS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

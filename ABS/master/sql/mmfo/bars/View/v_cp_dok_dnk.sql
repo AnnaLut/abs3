@@ -13,9 +13,7 @@ where trunc(date_run) = trunc(sysdate)
 order by ID;
 
 PROMPT *** Create  grants  V_CP_DOK_DNK ***
-grant SELECT                                                                 on V_CP_DOK_DNK    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_DOK_DNK    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CP_DOK_DNK    to UPLD;
 
 
 

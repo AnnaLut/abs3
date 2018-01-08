@@ -115,10 +115,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCMSTATESNAP_CALID_NN ***
+PROMPT *** Create  constraint CC_ACCMSTATESNAP_SNAPBAL_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCM_STATE_SNAP MODIFY (CALDT_ID CONSTRAINT CC_ACCMSTATESNAP_CALID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACCM_STATE_SNAP MODIFY (SNAP_BALANCE CONSTRAINT CC_ACCMSTATESNAP_SNAPBAL_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -127,10 +127,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCMSTATESNAP_SNAPBAL_NN ***
+PROMPT *** Create  constraint CC_ACCMSTATESNAP_CALID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCM_STATE_SNAP MODIFY (SNAP_BALANCE CONSTRAINT CC_ACCMSTATESNAP_SNAPBAL_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACCM_STATE_SNAP MODIFY (CALDT_ID CONSTRAINT CC_ACCMSTATESNAP_CALID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -153,11 +153,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACCM_STATE_SNAP ***
-grant SELECT                                                                 on ACCM_STATE_SNAP to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_STATE_SNAP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCM_STATE_SNAP to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_STATE_SNAP to START1;
-grant SELECT                                                                 on ACCM_STATE_SNAP to UPLD;
 
 
 

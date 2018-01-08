@@ -62,9 +62,7 @@ PROMPT *** Create  view V_WEB_USERMAP ***
 PROMPT *** Create  grants  V_WEB_USERMAP ***
 grant SELECT                                                                 on V_WEB_USERMAP   to APPCORPLIGHT;
 grant SELECT                                                                 on V_WEB_USERMAP   to APPSERVER;
-grant SELECT                                                                 on V_WEB_USERMAP   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WEB_USERMAP   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WEB_USERMAP   to UPLD;
 grant SELECT                                                                 on V_WEB_USERMAP   to WEBTECH;
 
 

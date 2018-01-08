@@ -78,10 +78,8 @@ COMMENT ON COLUMN BARS.TMP_DYNAMIC_LAYOUT.USERID IS '';
 
 
 PROMPT *** Create  grants  TMP_DYNAMIC_LAYOUT ***
-grant SELECT                                                                 on TMP_DYNAMIC_LAYOUT to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DYNAMIC_LAYOUT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_DYNAMIC_LAYOUT to BARS_DM;
-grant SELECT                                                                 on TMP_DYNAMIC_LAYOUT to UPLD;
 
 
 

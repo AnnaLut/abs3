@@ -62,10 +62,21 @@ COMMENT ON COLUMN BARS.DWH_CBIREP_QUERIES_DATA.FIL IS '';
 
 
 
+
+PROMPT *** Create  constraint FK_DWHCBIREPQDATA_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DWH_CBIREP_QUERIES_DATA ADD CONSTRAINT FK_DWHCBIREPQDATA_ID FOREIGN KEY (CBIREP_QUERIES_ID)
+	  REFERENCES BARS.DWH_CBIREP_QUERIES (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  DWH_CBIREP_QUERIES_DATA ***
-grant SELECT                                                                 on DWH_CBIREP_QUERIES_DATA to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DWH_CBIREP_QUERIES_DATA to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on DWH_CBIREP_QUERIES_DATA to UPLD;
 
 
 

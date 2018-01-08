@@ -169,7 +169,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SYNC_RU is
      where pp.kf = p_kf
        and pp.rnk = p_rnk
        for update nowait;
-
+       
       update pfu_pensioner pp
          set branch          = p_branch,
              nmk             = p_nmk,
@@ -186,14 +186,14 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SYNC_RU is
              bplace          = p_bplace,
              cellphone       = p_cellphone,
              sys_time        = sysdate,
-             is_okpo_well    = case to_char(bars.get_bday_byokpo(p_okpo), 'dd.mm.yyyy') when to_char(p_bday,'dd.mm.yyyy')
+             is_okpo_well    = case to_char(bars.get_bday_byokpo(p_okpo), 'dd.mm.yyyy') when to_char(p_bday,'dd.mm.yyyy') 
                                     then 1
                                     else 0 end,
              last_ru_idupd   = p_last_idupd,
              last_ru_chgdate = p_last_chgdate
        where pp.kf = p_kf
          and pp.rnk = p_rnk;
-
+         
       p_res := 2;
 
   exception
@@ -240,8 +240,8 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SYNC_RU is
          p_bplace,
          p_cellphone,
          sysdate,
-         case to_char(bars.get_bday_byokpo(p_okpo), 'dd.mm.yyyy')
-            when to_char(p_bday,'dd.mm.yyyy')
+         case to_char(bars.get_bday_byokpo(p_okpo), 'dd.mm.yyyy') 
+            when to_char(p_bday,'dd.mm.yyyy') 
             then 1
             else 0 end,
          p_last_idupd,

@@ -32,9 +32,7 @@ PROMPT *** Create  view V_STO_DET_NEW ***
        and f.freq = s.freq;
 
 PROMPT *** Create  grants  V_STO_DET_NEW ***
-grant SELECT                                                                 on V_STO_DET_NEW   to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_STO_DET_NEW   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_STO_DET_NEW   to UPLD;
 
 
 

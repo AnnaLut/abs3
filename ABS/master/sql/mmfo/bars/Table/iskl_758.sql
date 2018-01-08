@@ -47,11 +47,9 @@ COMMENT ON COLUMN BARS.ISKL_758.TXT IS '';
 
 
 PROMPT *** Create  grants  ISKL_758 ***
-grant SELECT                                                                 on ISKL_758        to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on ISKL_758        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ISKL_758        to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on ISKL_758        to START1;
-grant SELECT                                                                 on ISKL_758        to UPLD;
 
 
 

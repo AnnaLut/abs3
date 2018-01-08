@@ -33,10 +33,8 @@ PROMPT *** Create  view V_SOCRECEIPTS_CASHLESS ***
  ;
 
 PROMPT *** Create  grants  V_SOCRECEIPTS_CASHLESS ***
-grant SELECT                                                                 on V_SOCRECEIPTS_CASHLESS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SOCRECEIPTS_CASHLESS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SOCRECEIPTS_CASHLESS to RPBN001;
-grant SELECT                                                                 on V_SOCRECEIPTS_CASHLESS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SOCRECEIPTS_CASHLESS to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_SOCRECEIPTS_CASHLESS to WR_CBIREP;
 

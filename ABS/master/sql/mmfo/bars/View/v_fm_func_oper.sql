@@ -28,10 +28,8 @@ PROMPT *** Create  view V_FM_FUNC_OPER ***
 ;
 
 PROMPT *** Create  grants  V_FM_FUNC_OPER ***
-grant SELECT                                                                 on V_FM_FUNC_OPER  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FM_FUNC_OPER  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FM_FUNC_OPER  to FINMON01;
-grant SELECT                                                                 on V_FM_FUNC_OPER  to UPLD;
 
 
 

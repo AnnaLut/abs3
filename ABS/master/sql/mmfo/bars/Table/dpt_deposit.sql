@@ -143,144 +143,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK2_DPTDEPOSIT ***
+PROMPT *** Create  constraint CC_DPTDEPOSIT_ARCHDOCID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT UK2_DPTDEPOSIT UNIQUE (KF, DEPOSIT_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTDEPOSIT_DPTID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (DEPOSIT_ID CONSTRAINT CC_DPTDEPOSIT_DPTID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTDEPOSIT_VIDD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (VIDD CONSTRAINT CC_DPTDEPOSIT_VIDD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTDEPOSIT_ACC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (ACC CONSTRAINT CC_DPTDEPOSIT_ACC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTDEPOSIT_KV_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (KV CONSTRAINT CC_DPTDEPOSIT_KV_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTDEPOSIT_RNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (RNK CONSTRAINT CC_DPTDEPOSIT_RNK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTDEPOSIT_DATBEGIN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (DAT_BEGIN CONSTRAINT CC_DPTDEPOSIT_DATBEGIN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTDEPOSIT_DATZ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (DATZ CONSTRAINT CC_DPTDEPOSIT_DATZ_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTDEPOSIT_FREQ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (FREQ CONSTRAINT CC_DPTDEPOSIT_FREQ_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTDEPOSIT_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (BRANCH CONSTRAINT CC_DPTDEPOSIT_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTDEPOSIT_STOPID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (STOP_ID CONSTRAINT CC_DPTDEPOSIT_STOPID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTDEPOSIT_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (KF CONSTRAINT CC_DPTDEPOSIT_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (ARCHDOC_ID CONSTRAINT CC_DPTDEPOSIT_ARCHDOCID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -301,10 +167,339 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTDEPOSIT_ARCHDOCID_NN ***
+PROMPT *** Create  constraint CC_DPTDEPOSIT_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (ARCHDOC_ID CONSTRAINT CC_DPTDEPOSIT_ARCHDOCID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (KF CONSTRAINT CC_DPTDEPOSIT_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTDEPOSIT_STOPID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (STOP_ID CONSTRAINT CC_DPTDEPOSIT_STOPID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTDEPOSIT_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (BRANCH CONSTRAINT CC_DPTDEPOSIT_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTDEPOSIT_FREQ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (FREQ CONSTRAINT CC_DPTDEPOSIT_FREQ_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTDEPOSIT_DATZ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (DATZ CONSTRAINT CC_DPTDEPOSIT_DATZ_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTDEPOSIT_DATBEGIN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (DAT_BEGIN CONSTRAINT CC_DPTDEPOSIT_DATBEGIN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTDEPOSIT_RNK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (RNK CONSTRAINT CC_DPTDEPOSIT_RNK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTDEPOSIT_KV_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (KV CONSTRAINT CC_DPTDEPOSIT_KV_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTDEPOSIT_ACC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (ACC CONSTRAINT CC_DPTDEPOSIT_ACC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTDEPOSIT_VIDD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (VIDD CONSTRAINT CC_DPTDEPOSIT_VIDD_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTDEPOSIT_DPTID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT MODIFY (DEPOSIT_ID CONSTRAINT CC_DPTDEPOSIT_DPTID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTDEPOSIT_DPTDPTALL2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPTDEPOSIT_DPTDPTALL2 FOREIGN KEY (KF, DEPOSIT_ID)
+	  REFERENCES BARS.DPT_DEPOSIT_ALL (KF, DEPOSIT_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTDEPOSIT_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPTDEPOSIT_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTDEPOSIT_DPTSTOP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPTDEPOSIT_DPTSTOP FOREIGN KEY (STOP_ID)
+	  REFERENCES BARS.DPT_STOP (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTDEPOSIT_DPTVIDD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPTDEPOSIT_DPTVIDD FOREIGN KEY (VIDD)
+	  REFERENCES BARS.DPT_VIDD (VIDD) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTDEPOSIT_TABVAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPTDEPOSIT_TABVAL FOREIGN KEY (KV)
+	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTDEPOSIT_FREQ ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPTDEPOSIT_FREQ FOREIGN KEY (FREQ)
+	  REFERENCES BARS.FREQ (FREQ) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTDEPOSIT_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPTDEPOSIT_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTDEPOSIT_BANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPTDEPOSIT_BANKS FOREIGN KEY (MFO_P)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTDEPOSIT_BANKS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPTDEPOSIT_BANKS2 FOREIGN KEY (MFO_D)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTDEPOSIT_STAFF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPTDEPOSIT_STAFF FOREIGN KEY (USERID)
+	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTDEPOSIT_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPTDEPOSIT_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTDEPOSIT_DPTDEPOSIT2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPTDEPOSIT_DPTDEPOSIT2 FOREIGN KEY (KF, DPT_D)
+	  REFERENCES BARS.DPT_DEPOSIT (KF, DEPOSIT_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint UK2_DPTDEPOSIT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT UK2_DPTDEPOSIT UNIQUE (KF, DEPOSIT_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPT_DEPOSIT_DPT_D ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPT_DEPOSIT_DPT_D FOREIGN KEY (DPT_D)
+	  REFERENCES BARS.DPT_DEPOSIT (DEPOSIT_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTDEPOSIT_ACCOUNTS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPTDEPOSIT_ACCOUNTS2 FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTDEPOSIT_ACCOUNTS3 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_DEPOSIT ADD CONSTRAINT FK_DPTDEPOSIT_ACCOUNTS3 FOREIGN KEY (KF, ACC_D)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -426,7 +621,6 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_DEPOSIT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_DEPOSIT     to ABS_ADMIN;
-grant SELECT                                                                 on DPT_DEPOSIT     to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_DEPOSIT     to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_DEPOSIT     to BARS_ACCESS_DEFROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on DPT_DEPOSIT     to BARS_DM;
@@ -437,7 +631,6 @@ grant DELETE,INSERT,SELECT,UPDATE                                            on 
 grant SELECT                                                                 on DPT_DEPOSIT     to DPT_ROLE;
 grant SELECT                                                                 on DPT_DEPOSIT     to KLBX;
 grant SELECT                                                                 on DPT_DEPOSIT     to START1;
-grant SELECT                                                                 on DPT_DEPOSIT     to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_DEPOSIT     to VKLAD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_DEPOSIT     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_DEPOSIT     to WR_REFREAD;

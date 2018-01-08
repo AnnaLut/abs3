@@ -30,10 +30,8 @@ PROMPT *** Create  view V_MON3 ***
     WHERE nom_mon = 0;
 
 PROMPT *** Create  grants  V_MON3 ***
-grant SELECT                                                                 on V_MON3          to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_MON3          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_MON3          to PYOD001;
-grant SELECT                                                                 on V_MON3          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_MON3          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_MON3          to WR_REFREAD;
 

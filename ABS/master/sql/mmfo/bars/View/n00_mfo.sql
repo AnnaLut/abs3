@@ -43,10 +43,8 @@ GROUP BY MFO));
 
 PROMPT *** Create  grants  N00_MFO ***
 grant SELECT                                                                 on N00_MFO         to BARS014;
-grant SELECT                                                                 on N00_MFO         to BARSREADER_ROLE;
 grant SELECT                                                                 on N00_MFO         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on N00_MFO         to SALGL;
-grant SELECT                                                                 on N00_MFO         to UPLD;
 
 
 

@@ -80,11 +80,9 @@ exception when others then
 
 PROMPT *** Create  grants  SEC_ACTION ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEC_ACTION      to ABS_ADMIN;
-grant SELECT                                                                 on SEC_ACTION      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEC_ACTION      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEC_ACTION      to BARS_DM;
 grant SELECT                                                                 on SEC_ACTION      to START1;
-grant SELECT                                                                 on SEC_ACTION      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SEC_ACTION      to WR_ALL_RIGHTS;
 
 

@@ -14,7 +14,7 @@ DECLARE
 BEGIN
    IF :NEW.n_sk IS NULL
    THEN
-      SELECT bars_sqnc.get_nextval('S_SKRYNKA_N_SK')
+      SELECT s_skrynka_n_sk.NEXTVAL
         INTO :NEW.n_sk
         FROM DUAL;
    END IF;
@@ -23,6 +23,7 @@ BEGIN
    VALUES (:NEW.n_sk, sys_context('bars_context','user_mfo'));
 
 END;
+
 /
 ALTER TRIGGER BARS.TI_SKRYNKA ENABLE;
 

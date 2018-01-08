@@ -81,10 +81,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_KORDATAF48_KF_NN ***
+PROMPT *** Create  constraint PK_KORDATAF48 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_KOR_DATA_F48 MODIFY (KF CONSTRAINT CC_KORDATAF48_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_KOR_DATA_F48 ADD CONSTRAINT PK_KORDATAF48 PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -105,12 +107,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_KORDATAF48 ***
+PROMPT *** Create  constraint CC_KORDATAF48_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_KOR_DATA_F48 ADD CONSTRAINT PK_KORDATAF48 PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.NBUR_KOR_DATA_F48 MODIFY (KF CONSTRAINT CC_KORDATAF48_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -133,11 +133,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_KOR_DATA_F48 ***
-grant SELECT                                                                 on NBUR_KOR_DATA_F48 to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_KOR_DATA_F48 to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBUR_KOR_DATA_F48 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_KOR_DATA_F48 to RPBN002;
-grant SELECT                                                                 on NBUR_KOR_DATA_F48 to UPLD;
 
 
 

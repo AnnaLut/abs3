@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Покупюрный состав заявки';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'CIN_OPERW';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,18 +119,18 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'REF', 'N', 'Реф.док~заявки~ в АБС', '', null, 1, 0, 1, 1, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KOL', 'N', 'Кол-во~ лотов ~в заявке', '', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'LOT', 'N', 'Размер~лота', '', null, 93, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'MFO', 'C', 'МФО~ ТК', '', null, 96, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NAME_TAG', 'C', 'Наименование~ номинала', '', null, 2, 0, 0, 0, 0, '', '', 0, 0, '''Итого:Сумма ком-А1 ''', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NAME_TK', 'C', 'Наименовани~ ТК', '', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NLS', 'C', 'Счет~ ТК', '', null, 97, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NOM', 'N', 'Сумма ~номинала', '', null, 94, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'SK_A1', 'N', 'Тариф~ком-А1~за 1 лот', '', null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'TAG', 'C', 'Код~номинала', '', null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'TK', 'N', 'Код~ТК', '', null, 95, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'A1', 'N', 'Сумма~ком-А1', '', null, 5, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(A1)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'REF', 'N', 'Реф.док~заявки~ в АБС', null, null, 1, 0, 1, 1, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KOL', 'N', 'Кол-во~ лотов ~в заявке', null, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'LOT', 'N', 'Размер~лота', null, null, 93, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'MFO', 'C', 'МФО~ ТК', null, null, 96, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NAME_TAG', 'C', 'Наименование~ номинала', null, null, 2, 0, 0, 0, 0, '', '', 0, 0, '''Итого:Сумма ком-А1 ''', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NAME_TK', 'C', 'Наименовани~ ТК', null, null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NLS', 'C', 'Счет~ ТК', null, null, 97, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NOM', 'N', 'Сумма ~номинала', null, null, 94, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'SK_A1', 'N', 'Тариф~ком-А1~за 1 лот', null, null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'TAG', 'C', 'Код~номинала', null, null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'TK', 'N', 'Код~ТК', null, null, 95, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'A1', 'N', 'Сумма~ком-А1', null, null, 5, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(A1)', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 10, 1, 'ASC ');

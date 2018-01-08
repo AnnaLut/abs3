@@ -91,9 +91,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  WSM_PARAMS ***
-grant SELECT                                                                 on WSM_PARAMS      to BARSREADER_ROLE;
 grant SELECT                                                                 on WSM_PARAMS      to BARS_DM;
-grant SELECT                                                                 on WSM_PARAMS      to UPLD;
 
 
 

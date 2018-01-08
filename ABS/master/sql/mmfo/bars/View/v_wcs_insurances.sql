@@ -20,9 +20,7 @@ PROMPT *** Create  view V_WCS_INSURANCES ***
  order by i.id;
 
 PROMPT *** Create  grants  V_WCS_INSURANCES ***
-grant SELECT                                                                 on V_WCS_INSURANCES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_INSURANCES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_WCS_INSURANCES to UPLD;
 
 
 

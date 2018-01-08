@@ -16,10 +16,8 @@ where o.ref = za.ref(+) and o.ref = zb.ref(+)
 ;
 
 PROMPT *** Create  grants  V_DOCUMENTVIEW_TECH ***
-grant SELECT                                                                 on V_DOCUMENTVIEW_TECH to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOCUMENTVIEW_TECH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DOCUMENTVIEW_TECH to START1;
-grant SELECT                                                                 on V_DOCUMENTVIEW_TECH to UPLD;
 
 
 

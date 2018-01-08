@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TU_ACC_88_NEW.sql =========*** Run *
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  trigger TU_ACC_88_NEW ***
-
-  CREATE OR REPLACE TRIGGER BARS.TU_ACC_88_NEW 
-instead of update on ACC_88_NEW
+create or replace trigger TU_ACC_88_NEW 
+instead of update on ACC_88_NEW 
 for each row
 declare
   l_tmp    integer:=null;
@@ -17,7 +8,7 @@ declare
   l_pap    ps.pap%type;
   MODCODE  constant varchar2(3) := 'NAL';
 begin
-
+  
   begin
     select rnk
       into p_rnk
@@ -27,7 +18,7 @@ begin
     when no_data_found then
       bars_error.raise_nerror( MODCODE, 'NAL_NU_KS7' );
   end;
-
+  
   -- определим pap по плану счетов
   begin
     select pap into l_pap from ps where nbs=:new.r020;
@@ -35,10 +26,10 @@ begin
     when no_data_found then
       bars_error.raise_nerror( MODCODE, 'NAL_NBS_PS' );
   end;
-
+  
   -- откроем счет
   begin
-
+  
     accreg.SetAccountAttr
     ( mod_     => 99
     , p1_      => 0
@@ -64,19 +55,19 @@ begin
     , nlsalt_  => null
     , branch_  => substr(SYS_CONTEXT('bars_context','user_branch'),1,8)
     );
-
+    
   end;
 
   if l_acc is null
   then
     bars_error.raise_nerror( MODCODE, 'NAL_ACC_ERR' );
   else
-
+    
     -- замена даты открытия счета, если открываем после даты ввода показателя
     update accounts
        set daos = :new.d_open
      where acc  = l_acc;
-
+    
     -- установка спецпараметров
     begin
       insert
@@ -91,14 +82,10 @@ begin
            , r020_fa = :new.R020_FA
        where acc     = l_acc;
     end;
-
+    
   end if;
 
 end TU_ACC_88_NEW;
 /
-ALTER TRIGGER BARS.TU_ACC_88_NEW ENABLE;
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TU_ACC_88_NEW.sql =========*** End *
-PROMPT ===================================================================================== 
+show errors

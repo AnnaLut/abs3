@@ -99,10 +99,8 @@ COMMENT ON COLUMN BARS.D_DPA.NLSK IS '';
 
 
 PROMPT *** Create  grants  D_DPA ***
-grant SELECT                                                                 on D_DPA           to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on D_DPA           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on D_DPA           to BARS_DM;
-grant SELECT                                                                 on D_DPA           to UPLD;
 grant FLASHBACK,SELECT                                                       on D_DPA           to WR_REFREAD;
 
 

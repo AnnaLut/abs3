@@ -48,18 +48,6 @@ COMMENT ON COLUMN BARS.TMP_BACKUP_CHKLIST_TTS.F_IN_CHARGE IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C0048355 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_BACKUP_CHKLIST_TTS MODIFY (TT NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C0048356 ***
 begin   
  execute immediate '
@@ -71,9 +59,17 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_BACKUP_CHKLIST_TTS ***
-grant SELECT                                                                 on TMP_BACKUP_CHKLIST_TTS to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_BACKUP_CHKLIST_TTS to UPLD;
+
+PROMPT *** Create  constraint SYS_C0048355 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_BACKUP_CHKLIST_TTS MODIFY (TT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
 
 
 

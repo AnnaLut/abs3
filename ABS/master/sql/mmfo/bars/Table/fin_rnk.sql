@@ -57,7 +57,26 @@ COMMENT ON COLUMN BARS.FIN_RNK.BRANCH IS '';
 COMMENT ON COLUMN BARS.FIN_RNK.SS IS 'Значення для звіту';
 
 
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.FIN_RNK  DROP CONSTRAINT XPK_FIN_RNK';
+exception when others then 
+  if sqlcode=-2443 then null; else raise; end if;
+end;
+/
 
+
+delete from fin_rnk
+ where  rowid not in (select min(rowid)  from fin_rnk group by okpo,  idf, fdat, kod );
+commit;
+
+begin 
+  execute immediate 
+    ' DROP INDEX BARS.XPK_FIN_RNK';
+exception when others then 
+  if sqlcode=-1418 then null; else raise; end if;
+end;
+/
 
 PROMPT *** Create  constraint XPK_FIN_RNK ***
 begin   
@@ -65,6 +84,19 @@ begin
   ALTER TABLE BARS.FIN_RNK ADD CONSTRAINT XPK_FIN_RNK PRIMARY KEY (OKPO, FDAT, IDF, KOD)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_FIN_RNK_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FIN_RNK ADD CONSTRAINT FK_FIN_RNK_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -100,7 +132,6 @@ exception when others then
 
 PROMPT *** Create  grants  FIN_RNK ***
 grant SELECT                                                                 on FIN_RNK         to BARS009;
-grant SELECT                                                                 on FIN_RNK         to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_RNK         to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_RNK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_RNK         to BARS_DM;

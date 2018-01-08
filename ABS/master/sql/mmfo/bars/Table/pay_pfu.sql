@@ -102,9 +102,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  PAY_PFU ***
-grant SELECT                                                                 on PAY_PFU         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PAY_PFU         to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on PAY_PFU         to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PAY_PFU         to WR_ALL_RIGHTS;
 
 

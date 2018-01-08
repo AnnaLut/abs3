@@ -45,10 +45,6 @@ COMMENT ON COLUMN BARS.TMP_CM_STREET_TYPE.NAME IS '';
 
 
 
-PROMPT *** Create  grants  TMP_CM_STREET_TYPE ***
-grant SELECT                                                                 on TMP_CM_STREET_TYPE to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_CM_STREET_TYPE to UPLD;
-
 
 
 PROMPT ===================================================================================== 

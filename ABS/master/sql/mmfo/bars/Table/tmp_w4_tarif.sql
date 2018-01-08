@@ -80,18 +80,6 @@ COMMENT ON COLUMN BARS.TMP_W4_TARIF.MWORLD IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C00119210 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_W4_TARIF MODIFY (PRODUCT_GROUPS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C00119211 ***
 begin   
  execute immediate '
@@ -103,9 +91,17 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_W4_TARIF ***
-grant SELECT                                                                 on TMP_W4_TARIF    to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_W4_TARIF    to UPLD;
+
+PROMPT *** Create  constraint SYS_C00119210 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_W4_TARIF MODIFY (PRODUCT_GROUPS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
 
 
 

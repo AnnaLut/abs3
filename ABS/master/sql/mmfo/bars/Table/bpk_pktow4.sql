@@ -77,10 +77,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_PKTOW4 ***
-grant SELECT                                                                 on BPK_PKTOW4      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on BPK_PKTOW4      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_PKTOW4      to BARS_DM;
-grant SELECT                                                                 on BPK_PKTOW4      to UPLD;
 
 
 

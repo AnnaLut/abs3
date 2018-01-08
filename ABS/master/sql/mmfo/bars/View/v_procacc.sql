@@ -50,9 +50,7 @@ PROMPT *** Create  view V_PROCACC ***
 
 PROMPT *** Create  grants  V_PROCACC ***
 grant SELECT                                                                 on V_PROCACC       to BARS014;
-grant SELECT                                                                 on V_PROCACC       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PROCACC       to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_PROCACC       to UPLD;
 grant SELECT                                                                 on V_PROCACC       to WR_ALL_RIGHTS;
 
 

@@ -103,9 +103,7 @@ COMMENT ON COLUMN BARS.CONTRACTS_JOURNAL.CONTROL_DAYS IS '';
 
 
 PROMPT *** Create  grants  CONTRACTS_JOURNAL ***
-grant SELECT                                                                 on CONTRACTS_JOURNAL to BARSREADER_ROLE;
 grant SELECT                                                                 on CONTRACTS_JOURNAL to BARS_DM;
-grant SELECT                                                                 on CONTRACTS_JOURNAL to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CONTRACTS_JOURNAL to WR_ALL_RIGHTS;
 
 

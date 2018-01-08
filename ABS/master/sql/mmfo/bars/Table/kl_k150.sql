@@ -55,13 +55,11 @@ COMMENT ON COLUMN BARS.KL_K150.DATA_M IS '';
 
 
 PROMPT *** Create  grants  KL_K150 ***
-grant SELECT                                                                 on KL_K150         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_K150         to BARSUPL;
 grant SELECT                                                                 on KL_K150         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_K150         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_K150         to KL_K150;
 grant SELECT                                                                 on KL_K150         to START1;
-grant SELECT                                                                 on KL_K150         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_K150         to WR_ALL_RIGHTS;
 
 

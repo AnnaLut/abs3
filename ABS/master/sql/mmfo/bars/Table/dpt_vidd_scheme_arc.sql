@@ -54,18 +54,6 @@ COMMENT ON COLUMN BARS.DPT_VIDD_SCHEME_ARC.ID_FR IS 'Ідентифікатор шаблону (Fast
 
 
 
-PROMPT *** Create  constraint CC_DPTVIDDSCHEME_ARC_TID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_SCHEME_ARC MODIFY (TYPE_ID CONSTRAINT CC_DPTVIDDSCHEME_ARC_TID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DPTVIDDSCHEME_ARC_FLAGS_NN ***
 begin   
  execute immediate '
@@ -77,11 +65,21 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint CC_DPTVIDDSCHEME_ARC_TID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_SCHEME_ARC MODIFY (TYPE_ID CONSTRAINT CC_DPTVIDDSCHEME_ARC_TID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  DPT_VIDD_SCHEME_ARC ***
-grant SELECT                                                                 on DPT_VIDD_SCHEME_ARC to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DPT_VIDD_SCHEME_ARC to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VIDD_SCHEME_ARC to BARS_DM;
-grant SELECT                                                                 on DPT_VIDD_SCHEME_ARC to UPLD;
 
 
 

@@ -76,12 +76,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_NBS_2401 ***
-grant SELECT                                                                 on TMP_NBS_2401    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_NBS_2401    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_NBS_2401    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_NBS_2401    to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_NBS_2401    to START1;
-grant SELECT                                                                 on TMP_NBS_2401    to UPLD;
 grant FLASHBACK,SELECT                                                       on TMP_NBS_2401    to WR_REFREAD;
 
 

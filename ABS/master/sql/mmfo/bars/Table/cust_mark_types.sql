@@ -106,11 +106,9 @@ exception when others then
 
 PROMPT *** Create  grants  CUST_MARK_TYPES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_MARK_TYPES to ABS_ADMIN;
-grant SELECT                                                                 on CUST_MARK_TYPES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_MARK_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUST_MARK_TYPES to BARS_DM;
 grant SELECT                                                                 on CUST_MARK_TYPES to START1;
-grant SELECT                                                                 on CUST_MARK_TYPES to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_MARK_TYPES to WR_ALL_RIGHTS;
 
 

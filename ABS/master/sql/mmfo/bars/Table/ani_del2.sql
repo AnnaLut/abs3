@@ -87,11 +87,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ANI_DEL2 ***
-grant SELECT                                                                 on ANI_DEL2        to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on ANI_DEL2        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANI_DEL2        to BARS_DM;
 grant SELECT,UPDATE                                                          on ANI_DEL2        to START1;
-grant SELECT                                                                 on ANI_DEL2        to UPLD;
 
 
 

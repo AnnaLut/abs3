@@ -22,10 +22,8 @@ PROMPT *** Create  view V_VQB_META_TABLES ***
  HAVING COUNT(c.colid)>0;
 
 PROMPT *** Create  grants  V_VQB_META_TABLES ***
-grant SELECT                                                                 on V_VQB_META_TABLES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_VQB_META_TABLES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_VQB_META_TABLES to START1;
-grant SELECT                                                                 on V_VQB_META_TABLES to UPLD;
 
 
 

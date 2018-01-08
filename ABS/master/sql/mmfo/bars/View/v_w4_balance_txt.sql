@@ -1,14 +1,54 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_W4_BALANCE_TXT.sql =========*** Run *
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_W4_BALANCE_TXT ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_W4_BALANCE_TXT ("BRANCH", "NMK", "ACC", "NLS", "DAT", "KV", "A_PK_OST", "W_PK_OST", "DELTA_PK_OST", "A_OVR_OST", "W_OVR_OST", "DELTA_OVR_OST", "A2207_OST", "W2207_OST", "DELTA_2207_OST", "A2208_OST", "W2208_OST", "DELTA_2208_OST", "A2209_OST", "W2209_OST", "DELTA_2209_OST", "A2625D_OST", "W2625D_OST", "DELTA_2625D_OST", "A2627_OST", "W2627_OST", "DELTA_2627_OST", "A2627X_OST", "W2627X_OST", "DELTA_2627X_OST", "A2628_OST", "W2628_OST", "DELTA_2628_OST", "A3570_OST", "W3570_OST", "DELTA_3570_OST", "A3579_OST", "W3579_OST", "DELTA_3579_OST", "A9129_OST", "W9129_OST", "DELTA_9129_OST", "AAR_OST", "WAR_OST", "DELTA_AR_OST", "WPEN") AS 
-  SELECT BRANCH,
+CREATE OR REPLACE FORCE VIEW BARS.V_W4_BALANCE_TXT
+(
+   BRANCH,
+   NMK,
+   ACC,
+   NLS,
+   DAT,
+   KV,
+   A_PK_OST,
+   W_PK_OST,
+   DELTA_PK_OST,
+   A_OVR_OST,
+   W_OVR_OST,
+   DELTA_OVR_OST,
+   A2207_OST,
+   W2207_OST,
+   DELTA_2207_OST,
+   A2208_OST,
+   W2208_OST,
+   DELTA_2208_OST,
+   A2209_OST,
+   W2209_OST,
+   DELTA_2209_OST,
+   A2625D_OST,
+   W2625D_OST,
+   DELTA_2625D_OST,
+   A2627_OST,
+   W2627_OST,
+   DELTA_2627_OST,
+   A2627X_OST,
+   W2627X_OST,
+   DELTA_2627X_OST,
+   A2628_OST,
+   W2628_OST,
+   DELTA_2628_OST,
+   A3570_OST,
+   W3570_OST,
+   DELTA_3570_OST,
+   A3579_OST,
+   W3579_OST,
+   DELTA_3579_OST,
+   A9129_OST,
+   W9129_OST,
+   DELTA_9129_OST,
+   AAR_OST,
+   WAR_OST,
+   DELTA_AR_OST,
+   WPEN
+)
+AS
+           SELECT BRANCH,
            NMK,
            ACC,
            NLS,
@@ -294,15 +334,8 @@ PROMPT *** Create  view V_W4_BALANCE_TXT ***
           OR delta_3579_ost <> 0
           OR delta_9129_ost <> 0
           OR delta_ar_ost <> 0;
-
-PROMPT *** Create  grants  V_W4_BALANCE_TXT ***
-grant SELECT                                                                 on V_W4_BALANCE_TXT to BARSREADER_ROLE;
-grant SELECT                                                                 on V_W4_BALANCE_TXT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_W4_BALANCE_TXT to OW;
-grant SELECT                                                                 on V_W4_BALANCE_TXT to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_W4_BALANCE_TXT.sql =========*** End *
-PROMPT ===================================================================================== 
+/
+GRANT SELECT ON BARS.V_W4_BALANCE_TXT TO BARS_ACCESS_DEFROLE;
+/
+GRANT SELECT ON BARS.V_W4_BALANCE_TXT TO OW;
+/

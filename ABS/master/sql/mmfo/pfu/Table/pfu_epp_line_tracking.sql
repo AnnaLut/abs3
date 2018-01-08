@@ -39,6 +39,19 @@ COMMENT ON COLUMN PFU.PFU_EPP_LINE_TRACKING.LINE_ID IS '';
 
 
 
+PROMPT *** Create  constraint FK_EPP_LINE_TRACK_REF_EPP_LINE ***
+begin   
+ execute immediate '
+  ALTER TABLE PFU.PFU_EPP_LINE_TRACKING ADD CONSTRAINT FK_EPP_LINE_TRACK_REF_EPP_LINE FOREIGN KEY (LINE_ID)
+	  REFERENCES PFU.PFU_EPP_LINE (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C00111528 ***
 begin   
  execute immediate '
@@ -51,10 +64,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111529 ***
+PROMPT *** Create  constraint PK_PFU_EPP_LINE_TRACKING ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_EPP_LINE_TRACKING MODIFY (LINE_ID NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_EPP_LINE_TRACKING ADD CONSTRAINT PK_PFU_EPP_LINE_TRACKING PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -87,12 +102,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_PFU_EPP_LINE_TRACKING ***
+PROMPT *** Create  constraint SYS_C00111529 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_EPP_LINE_TRACKING ADD CONSTRAINT PK_PFU_EPP_LINE_TRACKING PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGD  ENABLE';
+  ALTER TABLE PFU.PFU_EPP_LINE_TRACKING MODIFY (LINE_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -127,10 +140,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  PFU_EPP_LINE_TRACKING ***
-grant SELECT                                                                 on PFU_EPP_LINE_TRACKING to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_EPP_LINE_TRACKING to UPLD;
 
 
 

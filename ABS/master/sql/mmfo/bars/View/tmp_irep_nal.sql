@@ -13,10 +13,8 @@ PROMPT *** Create  view TMP_IREP_NAL ***
  ;
 
 PROMPT *** Create  grants  TMP_IREP_NAL ***
-grant SELECT                                                                 on TMP_IREP_NAL    to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_IREP_NAL    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_IREP_NAL    to RPBN001;
-grant SELECT                                                                 on TMP_IREP_NAL    to UPLD;
 
 
 

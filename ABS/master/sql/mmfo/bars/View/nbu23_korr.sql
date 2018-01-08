@@ -18,10 +18,8 @@ PROMPT *** Create  view NBU23_KORR ***
                  ('1500', '1502', '1508', '1509');
 
 PROMPT *** Create  grants  NBU23_KORR ***
-grant SELECT                                                                 on NBU23_KORR      to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on NBU23_KORR      to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on NBU23_KORR      to START1;
-grant SELECT                                                                 on NBU23_KORR      to UPLD;
 
 
 

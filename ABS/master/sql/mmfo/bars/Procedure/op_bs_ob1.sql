@@ -1,15 +1,6 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/OP_BS_OB1.sql =========*** Run ***
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure OP_BS_OB1 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.OP_BS_OB1 
+CREATE OR REPLACE PROCEDURE BARS.OP_BS_OB1
 ( PP_BRANCH       varchar2
-, P_BBBOO         varchar2
+, P_BBBOO         varchar2 
 ) is
 /*
  16.05.2017 - BAA: прикидаємся МФО на основі значення параметру PP_BRANCH
@@ -34,11 +25,11 @@ PROMPT *** Create  procedure OP_BS_OB1 ***
   nms_  varchar2(38);
   kv_   int;
 begin
-
+  
   bars_audit.trace( $$PLSQL_UNIT||': Entry with ( PP_BRANCH=%s, P_BBBOO=%s ).', PP_BRANCH, P_BBBOO );
-
+  
   kv_ := to_number( PUL.GET_MAS_INI_VAL('OP_BSOB_KV') );
-
+  
   if ( gl.aMFO Is Null )
   then
     bars_context.subst_mfo( bars_context.extract_mfo( PP_BRANCH ) );
@@ -48,30 +39,30 @@ begin
       raise_application_error( -20666, 'Вказаний код підрозділу '||PP_BRANCH||' належить іншому філіалу!', true );
     end if;
   end if;
-
+  
   kv_ := nvl( kv_, gl.baseval );
-
+  
   execute immediate 'truncate table CCK_AN_TMP';
-
-  for p in ( select branch
+  
+  for p in ( select branch 
                from branch
               where length(branch) in (15,22)
                 and branch like PP_BRANCH
                 and DATE_CLOSED is null )
   loop
-
+    
     begin
       --  м.б. уже есть
-      select a.ACC
-        into acc_
+      select a.ACC 
+        into acc_ 
         from ACCOUNTS a
-       where a.branch = p.BRANCH
+       where a.branch = p.BRANCH 
          and a.nbs    = NBS_
          and a.ob22   = ob22_
          and a.kv     = kv_
-         and a.dazs is null
+         and a.dazs is null 
          and rownum = 1;
-    exception
+    exception 
       when NO_DATA_FOUND THEN
         OP_BMASK( p.BRANCH, NBS_, OB22_, null, null, null, NLS_, ACC_ );
         -- дополнительно к открытию счета
@@ -80,23 +71,16 @@ begin
              , OB22 = OB22_
          where ACC  = ACC_;
     end;
-
+    
   end loop;
-
+  
   -- commit;
-
+  
   bars_audit.trace( $$PLSQL_UNIT||': Exit.' );
-
+  
 end OP_BS_OB1;
 /
-show err;
 
-PROMPT *** Create  grants  OP_BS_OB1 ***
-grant EXECUTE                                                                on OP_BS_OB1       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on OP_BS_OB1       to CUST001;
+show err
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/OP_BS_OB1.sql =========*** End ***
-PROMPT ===================================================================================== 
+grant EXECUTE on OP_BSOBV to BARS_ACCESS_DEFROLE;

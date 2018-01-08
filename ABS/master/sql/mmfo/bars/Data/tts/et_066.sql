@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции !!H
-prompt Наименование операции: !!H обов’язкового заповнення  реквізитів клієнта суму >150000.00
+prompt Наименование операции:  обов’язкового заповнення  реквізитів клієнта суму >150000.00
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!!H', '!!H обов’язкового заповнення  реквізитів клієнта суму >150000.00', 1, null, null, null, null, null, null, null, null, 1, 0, 0, 0, 'F_STOP(80014,#(REF),'''',0)', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('!!H', ' обов’язкового заповнення  реквізитів клієнта суму >150000.00', 1, null, null, null, null, null, null, null, null, 1, 0, 0, 0, 'F_STOP(80014,#(REF),'''',0)', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!!H', name='!!H обов’язкового заповнення  реквізитів клієнта суму >150000.00', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s='F_STOP(80014,#(REF),'''',0)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='!!H', name=' обов’язкового заповнення  реквізитів клієнта суму >150000.00', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s='F_STOP(80014,#(REF),'''',0)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='!!H';
   end;
   --------------------------------
@@ -45,6 +45,60 @@ begin
   delete from folders_tts where tt='!!H';
 end;
 /
+prompt Создание / Обновление операции G66
+prompt Наименование операции: Погаш.нарах.комiсiї за ЧЕК
+declare
+  cnt_  number;
+begin
+  --------------------------------
+  -- Основные свойства операции --
+  --------------------------------
+  begin
+    insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
+    values ('G66', 'Погаш.нарах.комiсiї за ЧЕК', 1, '#(nbs_ob22_RKO (''2600'',''01'',#(NLSA),980))', 980, '#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(32, #(KVA),#(NLSA), #(S))', null, 5, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
+  exception
+    when dup_val_on_index then 
+      update tts
+         set tt='G66', name='Погаш.нарах.комiсiї за ЧЕК', dk=1, nlsm='#(nbs_ob22_RKO (''2600'',''01'',#(NLSA),980))', kv=980, nlsk='#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(32, #(KVA),#(NLSA), #(S))', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+       where tt='G66';
+  end;
+  --------------------------------
+  ----------- Реквизиты ----------
+  --------------------------------
+  delete from op_rules where tt='G66';
+  --------------------------------
+  ------ Связанные операции ------
+  --------------------------------
+  delete from ttsap where tt='G66';
+  --------------------------------
+  ------- Балансовые счета -------
+  --------------------------------
+  delete from ps_tts where tt='G66';
+  --------------------------------
+  -------- Виды документов -------
+  --------------------------------
+  delete from tts_vob where tt='G66';
+  --------------------------------
+  -------- Группы контроля -------
+  --------------------------------
+  delete from chklist_tts where tt='G66';
+  --------------------------------
+  ------------- Папки ------------
+  --------------------------------
+  delete from folders_tts where tt='G66';
+  begin
+    insert into folders_tts(idfo, tt)
+    values (2, 'G66');
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (folders_tts: 2, ''G66'') - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+end;
+/
 prompt Создание / Обновление операции K66
 prompt Наименование операции: K66 Нарах. 3570 комiсiї за ЧЕК Укрпошти (пенсiя)
 declare
@@ -55,11 +109,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K66', 'K66 Нарах. 3570 комiсiї за ЧЕК Укрпошти (пенсiя)', 1, '#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))', 980, '#(nbs_ob22 (''6510'',''78''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(32, #(KVA),#(NLSA), #(S))', null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('K66', 'K66 Нарах. 3570 комiсiї за ЧЕК Укрпошти (пенсiя)', 1, '#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))', 980, '#(nbs_ob22 (''6110'',''78''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(32, #(KVA),#(NLSA), #(S))', null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K66', name='K66 Нарах. 3570 комiсiї за ЧЕК Укрпошти (пенсiя)', dk=1, nlsm='#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))', kv=980, nlsk='#(nbs_ob22 (''6510'',''78''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(32, #(KVA),#(NLSA), #(S))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='K66', name='K66 Нарах. 3570 комiсiї за ЧЕК Укрпошти (пенсiя)', dk=1, nlsm='#(nbs_ob22_3570 (''3570'',''03'',#(NLSA),980))', kv=980, nlsk='#(nbs_ob22 (''6110'',''78''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(32, #(KVA),#(NLSA), #(S))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='K66';
   end;
   --------------------------------
@@ -269,6 +323,17 @@ begin
   end;
   begin
     insert into ttsap(ttap, tt, dk)
+    values ('G66', '066', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ttsap: ''G66'', ''066'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ttsap(ttap, tt, dk)
     values ('K66', '066', 0);
   exception
     when dup_val_on_index then null;
@@ -332,12 +397,12 @@ begin
   delete from tts_vob where tt='066';
   begin
     insert into tts_vob(vob, tt, ord)
-    values (81, '066', null);
+    values (82, '066', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (tts_vob: 81, ''066'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (tts_vob: 82, ''066'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

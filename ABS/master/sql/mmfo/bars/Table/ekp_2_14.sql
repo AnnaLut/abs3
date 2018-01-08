@@ -79,11 +79,9 @@ COMMENT ON COLUMN BARS.EKP_2_14.DATA_C IS '';
 
 
 PROMPT *** Create  grants  EKP_2_14 ***
-grant SELECT                                                                 on EKP_2_14        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EKP_2_14        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EKP_2_14        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EKP_2_14        to START1;
-grant SELECT                                                                 on EKP_2_14        to UPLD;
 
 
 

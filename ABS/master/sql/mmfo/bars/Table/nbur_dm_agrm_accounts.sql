@@ -206,10 +206,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMAGRMACCOUNTS_AGRMID_NN ***
+PROMPT *** Create  constraint CC_DMAGRMACCOUNTS_BEGDT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_AGRM_ACCOUNTS MODIFY (AGRM_ID CONSTRAINT CC_DMAGRMACCOUNTS_AGRMID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_AGRM_ACCOUNTS MODIFY (BEG_DT CONSTRAINT CC_DMAGRMACCOUNTS_BEGDT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -242,10 +242,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMAGRMACCOUNTS_BEGDT_NN ***
+PROMPT *** Create  constraint CC_DMAGRMACCOUNTS_AGRMID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_AGRM_ACCOUNTS MODIFY (BEG_DT CONSTRAINT CC_DMAGRMACCOUNTS_BEGDT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_AGRM_ACCOUNTS MODIFY (AGRM_ID CONSTRAINT CC_DMAGRMACCOUNTS_AGRMID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -346,9 +346,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_DM_AGRM_ACCOUNTS ***
-grant SELECT                                                                 on NBUR_DM_AGRM_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_DM_AGRM_ACCOUNTS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on NBUR_DM_AGRM_ACCOUNTS to UPLD;
 
 
 

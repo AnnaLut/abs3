@@ -25,9 +25,7 @@ where   g.column_value = gs.id and
  ;
 
 PROMPT *** Create  grants  V_KLBX_ACCOUNTS_CTX ***
-grant SELECT                                                                 on V_KLBX_ACCOUNTS_CTX to BARSREADER_ROLE;
 grant SELECT                                                                 on V_KLBX_ACCOUNTS_CTX to KLBX;
-grant SELECT                                                                 on V_KLBX_ACCOUNTS_CTX to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_KLBX_ACCOUNTS_CTX to WR_ALL_RIGHTS;
 
 

@@ -32,11 +32,11 @@ begin
           r020 = p_nbs and
           r013 = p_r013 and
           d_open <p_fdat and
-          (d_close IS NULL OR d_close >= p_fdat);
-
+          (d_close IS NULL OR d_close >= p_fdat);   
+           
     return l_ret;
 exception
-    when no_data_found then
+    when no_data_found then 
          return 1;
 end;
 /

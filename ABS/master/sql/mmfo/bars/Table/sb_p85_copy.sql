@@ -69,11 +69,9 @@ COMMENT ON COLUMN BARS.SB_P85_COPY.GR_IN IS '';
 
 
 PROMPT *** Create  grants  SB_P85_COPY ***
-grant SELECT                                                                 on SB_P85_COPY     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_P85_COPY     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SB_P85_COPY     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_P85_COPY     to START1;
-grant SELECT                                                                 on SB_P85_COPY     to UPLD;
 
 
 

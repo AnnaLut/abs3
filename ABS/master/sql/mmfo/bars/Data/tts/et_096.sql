@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('096', '096-Коригуючі за Місяць', 1, null, null, null, null, null, null, null, null, 1, 0, 1, 0, null, null, null, null, '0', null, '1001100000000000000000000000000000010000000000000000000000030000', null);
+    values ('096', '096-Коригуючі за Місяць', 1, null, null, null, null, null, null, null, null, 1, 0, 1, 0, null, null, null, null, '#(nbs_ob22(''3800'',''03''))', null, '1001100000000000000000000000000000010000000000000000000000030000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='096', name='096-Коригуючі за Місяць', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='0', rang=null, flags='1001100000000000000000000000000000010000000000000000000000030000', nazn=null
+         set tt='096', name='096-Коригуючі за Місяць', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22(''3800'',''03''))', rang=null, flags='1001100000000000000000000000000000010000000000000000000000030000', nazn=null
        where tt='096';
   end;
   --------------------------------

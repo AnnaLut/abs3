@@ -12,10 +12,8 @@ PROMPT *** Create  view TMP_IMPKLBX ***
  ;
 
 PROMPT *** Create  grants  TMP_IMPKLBX ***
-grant SELECT                                                                 on TMP_IMPKLBX     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_IMPKLBX     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_IMPKLBX     to OPER000;
-grant SELECT                                                                 on TMP_IMPKLBX     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_IMPKLBX     to WR_ALL_RIGHTS;
 
 

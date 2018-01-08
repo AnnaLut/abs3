@@ -188,10 +188,8 @@ select    -- дата предыдущего движения относительно отчетной
 );
 
 PROMPT *** Create  grants  SALNQC ***
-grant SELECT                                                                 on SALNQC          to BARSREADER_ROLE;
 grant SELECT                                                                 on SALNQC          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALNQC          to START1;
-grant SELECT                                                                 on SALNQC          to UPLD;
 
 
 

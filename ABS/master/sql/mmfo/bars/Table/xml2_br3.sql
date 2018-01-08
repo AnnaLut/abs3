@@ -80,10 +80,8 @@ exception when others then
 
 PROMPT *** Create  grants  XML2_BR3 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on XML2_BR3        to ABS_ADMIN;
-grant SELECT                                                                 on XML2_BR3        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML2_BR3        to BARS_ACCESS_DEFROLE;
 grant DELETE,SELECT,UPDATE                                                   on XML2_BR3        to PYOD001;
-grant SELECT                                                                 on XML2_BR3        to UPLD;
 grant FLASHBACK,SELECT                                                       on XML2_BR3        to WR_REFREAD;
 
 

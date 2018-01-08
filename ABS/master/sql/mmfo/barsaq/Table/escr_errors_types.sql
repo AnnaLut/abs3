@@ -27,9 +27,6 @@ COMMENT ON COLUMN BARSAQ.ESCR_ERRORS_TYPES.DESCRIPTION IS '';
 
 
 
-PROMPT *** Create  grants  ESCR_ERRORS_TYPES ***
-grant SELECT                                                                 on ESCR_ERRORS_TYPES to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

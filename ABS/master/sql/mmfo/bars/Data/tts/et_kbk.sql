@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции KBK
-prompt Наименование операции: KBK off DPT - Повернення суми вкладу в нац.валюті (міжбанк)
+prompt Наименование операции: off DPT - Повернення суми вкладу в нац.валюті (міжбанк)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KBK', 'KBK off DPT - Повернення суми вкладу в нац.валюті (міжбанк)', 1, null, 980, '#(get_proc_nls(''T00'',#(KVA)))', 980, null, null, null, null, 0, 1, 0, 0, null, null, null, null, null, null, '0300100000000000000000000000000000010000000000000000000000000000', 'Повернення депозиту згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('KBK', 'off DPT - Повернення суми вкладу в нац.валюті (міжбанк)', 1, null, 980, '#(get_proc_nls(''T00'',#(KVA)))', 980, null, null, null, null, 0, 1, 0, 0, null, null, null, null, null, null, '0300100000000000000000000000000000010000000000000000000000000000', 'Повернення депозиту згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KBK', name='KBK off DPT - Повернення суми вкладу в нац.валюті (міжбанк)', dk=1, nlsm=null, kv=980, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0300100000000000000000000000000000010000000000000000000000000000', nazn='Повернення депозиту згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='KBK', name='off DPT - Повернення суми вкладу в нац.валюті (міжбанк)', dk=1, nlsm=null, kv=980, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0300100000000000000000000000000000010000000000000000000000000000', nazn='Повернення депозиту згідно договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='KBK';
   end;
   --------------------------------

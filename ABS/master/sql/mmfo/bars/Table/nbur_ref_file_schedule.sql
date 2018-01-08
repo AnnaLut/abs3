@@ -65,10 +65,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0084954 ***
+PROMPT *** Create  constraint FK_NBUR_REF_FILES ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_REF_FILE_SCHEDULE MODIFY (DAYS_FORM NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_REF_FILE_SCHEDULE ADD CONSTRAINT FK_NBUR_REF_FILES FOREIGN KEY (FILE_ID)
+	  REFERENCES BARS.NBUR_REF_FILES (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -91,6 +92,18 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint SYS_C0084954 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NBUR_REF_FILE_SCHEDULE MODIFY (DAYS_FORM NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index UK_NBUR_REF_FILE_SCHEDULE ***
 begin   
  execute immediate '
@@ -105,9 +118,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_REF_FILE_SCHEDULE ***
-grant SELECT                                                                 on NBUR_REF_FILE_SCHEDULE to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_REF_FILE_SCHEDULE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on NBUR_REF_FILE_SCHEDULE to UPLD;
 
 
 

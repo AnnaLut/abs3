@@ -71,10 +71,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_OW6_LOG ***
-grant SELECT                                                                 on TMP_OW6_LOG     to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_OW6_LOG     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -101,9 +101,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  S6_Credit_Percent ***
-grant SELECT                                                                 on S6_Credit_Percent to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

@@ -60,10 +60,8 @@ COMMENT ON COLUMN BARS.TMP_ACCOUNTSW_UPDATE.KF IS '';
 
 
 PROMPT *** Create  grants  TMP_ACCOUNTSW_UPDATE ***
-grant SELECT                                                                 on TMP_ACCOUNTSW_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_ACCOUNTSW_UPDATE to BARSUPL;
 grant SELECT                                                                 on TMP_ACCOUNTSW_UPDATE to BARS_DM;
-grant SELECT                                                                 on TMP_ACCOUNTSW_UPDATE to UPLD;
 
 
 

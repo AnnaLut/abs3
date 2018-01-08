@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Вантажно-митні декларації';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'V_CUSTOMS_DECL';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,48 +119,48 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ALLOW_DAT', 'D', 'Дата разрешения', '', 10, 1, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CCY_MFO', 'C', 'МФО доверенного банка (валюта)', '', 6, 2, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'CCY_NLS', 'C', 'Р/р счет по валюте', '', 35, 3, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'CDAT', 'D', 'Дата создания дкларации', '', 10, 4, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'CMODE_CODE', 'N', 'Код режима декларации', '', 22, 5, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'CNUM_CST', 'C', 'Номер декларации: таможня', '', 9, 6, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'CNUM_NUM', 'C', 'Номер дкларации: номер', '', 6, 7, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'CNUM_YEAR', 'C', 'Номер декларации: год', '', 4, 8, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'CTYPE', 'C', 'Тип декларации', '', 4000, 9, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'DAT', 'D', 'Дата создания файла', '', 10, 10, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'DATJ', 'D', 'Дата привязки ТД км одулю "Валютный контроль"', '', 10, 11, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'DOC', 'C', 'Документ (контракт)', '', 50, 12, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'FDATE', 'D', 'Дата окончания документа (контракта)', '', 10, 14, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'FL_EIK', 'N', 'Признак обработки ТД модулем "Валютный контроль"', '', 22, 15, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'F_ADRES', 'C', 'ФинОбеспечитель: адрес', '', 4000, 16, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'F_COUNTRY', 'C', 'ФинОбеспечитель: код страны нерезидента', '', 3, 17, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'F_NAME', 'C', 'ФинОбеспечитель: наименование', '', 4000, 18, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'F_OKPO', 'C', 'ФинОбеспечитель: код ОКПО или ДРФО', '', 10, 19, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'F_TAXID', 'C', 'ФинОбеспечитель: код налогоплательщика', '', 12, 20, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'F_TYPE', 'N', 'ФинОбеспечитель: тип', '', 22, 21, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'IDT', 'N', 'Код ТД из модуля "Валютный контроль"', '', 22, 22, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'ISNULL', 'N', 'Признак обнуления', '', 22, 23, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'KURS', 'N', 'Курс валюты', '', 22, 24, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'KV', 'N', 'Код валюты', '', 22, 25, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'MDAT', 'D', 'Дата модификации', '', 10, 26, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'MVM_FEAT', 'C', 'Особенности передвижения', '', 3, 27, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'NDAT', 'D', 'Дата обнуления', '', 10, 28, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'R_ADRES', 'C', 'Получатель: адрес', '', 4000, 29, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 36, 'R_NAME', 'C', 'Получатель: наименование', '', 4000, 30, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 37, 'R_OKPO', 'C', 'Получатель: код ОКПО или ДРФО', '', 10, 31, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 38, 'R_TAXID', 'C', 'Получатель: код налогоплательщика', '', 12, 32, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 39, 'R_TYPE', 'N', 'Получатель: тип', '', 22, 33, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 40, 'S', 'N', 'Сумма', '', 22, 34, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 41, 'SDATE', 'D', 'Дата начала документа (контракта)', '', 10, 13, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 44, 'S_ADRES', 'C', 'Отправитель: адрес', '', 4000, 35, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 45, 'S_NAME', 'C', 'Отправитель: наименование', '', 4000, 36, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 46, 'S_OKPO', 'C', 'Отправитель: код ОКПО или ДРФО', '', 10, 37, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 47, 'S_TAXID', 'C', 'Отправитель: код налогоплателщика', '', 12, 38, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 48, 'S_TYPE', 'N', 'Отправитель: тип', '', 22, 39, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 49, 'UAH_MFO', 'C', 'МФО доверенного банка (гривна)', '', 6, 40, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 50, 'UAH_NLS', 'C', 'Р/р счет по гривне', '', 35, 41, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 53, 'NOM', 'N', 'Сума(номінал)', '', 22, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ALLOW_DAT', 'D', 'Дата разрешения', null, 10, 1, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CCY_MFO', 'C', 'МФО доверенного банка (валюта)', null, 6, 2, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'CCY_NLS', 'C', 'Р/р счет по валюте', null, 35, 3, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'CDAT', 'D', 'Дата создания дкларации', null, 10, 4, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'CMODE_CODE', 'N', 'Код режима декларации', null, 22, 5, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'CNUM_CST', 'C', 'Номер декларации: таможня', null, 9, 6, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'CNUM_NUM', 'C', 'Номер дкларации: номер', null, 6, 7, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'CNUM_YEAR', 'C', 'Номер декларации: год', null, 4, 8, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'CTYPE', 'C', 'Тип декларации', null, 4000, 9, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'DAT', 'D', 'Дата создания файла', null, 10, 10, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'DATJ', 'D', 'Дата привязки ТД км одулю "Валютный контроль"', null, 10, 11, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'DOC', 'C', 'Документ (контракт)', null, 50, 12, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'FDATE', 'D', 'Дата окончания документа (контракта)', null, 10, 14, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'FL_EIK', 'N', 'Признак обработки ТД модулем "Валютный контроль"', null, 22, 15, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'F_ADRES', 'C', 'ФинОбеспечитель: адрес', null, 4000, 16, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'F_COUNTRY', 'C', 'ФинОбеспечитель: код страны нерезидента', null, 3, 17, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'F_NAME', 'C', 'ФинОбеспечитель: наименование', null, 4000, 18, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'F_OKPO', 'C', 'ФинОбеспечитель: код ОКПО или ДРФО', null, 10, 19, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'F_TAXID', 'C', 'ФинОбеспечитель: код налогоплательщика', null, 12, 20, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'F_TYPE', 'N', 'ФинОбеспечитель: тип', null, 22, 21, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'IDT', 'N', 'Код ТД из модуля "Валютный контроль"', null, 22, 22, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'ISNULL', 'N', 'Признак обнуления', null, 22, 23, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'KURS', 'N', 'Курс валюты', null, 22, 24, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'KV', 'N', 'Код валюты', null, 22, 25, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'MDAT', 'D', 'Дата модификации', null, 10, 26, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'MVM_FEAT', 'C', 'Особенности передвижения', null, 3, 27, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'NDAT', 'D', 'Дата обнуления', null, 10, 28, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'R_ADRES', 'C', 'Получатель: адрес', null, 4000, 29, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'R_NAME', 'C', 'Получатель: наименование', null, 4000, 30, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'R_OKPO', 'C', 'Получатель: код ОКПО или ДРФО', null, 10, 31, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'R_TAXID', 'C', 'Получатель: код налогоплательщика', null, 12, 32, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'R_TYPE', 'N', 'Получатель: тип', null, 22, 33, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'S', 'N', 'Сумма', null, 22, 34, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 41, 'SDATE', 'D', 'Дата начала документа (контракта)', null, 10, 13, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 44, 'S_ADRES', 'C', 'Отправитель: адрес', null, 4000, 35, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 45, 'S_NAME', 'C', 'Отправитель: наименование', null, 4000, 36, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 46, 'S_OKPO', 'C', 'Отправитель: код ОКПО или ДРФО', null, 10, 37, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 47, 'S_TAXID', 'C', 'Отправитель: код налогоплателщика', null, 12, 38, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 48, 'S_TYPE', 'N', 'Отправитель: тип', null, 22, 39, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 49, 'UAH_MFO', 'C', 'МФО доверенного банка (гривна)', null, 6, 40, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 50, 'UAH_NLS', 'C', 'Р/р счет по гривне', null, 35, 41, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 53, 'NOM', 'N', 'Сума(номінал)', null, 22, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

@@ -67,10 +67,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0035433 ***
+PROMPT *** Create  constraint SYS_C0035435 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMS_BRANCH_STAGE MODIFY (STAGE_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMS_BRANCH_STAGE MODIFY (USER_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -91,20 +91,16 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0035435 ***
+PROMPT *** Create  constraint SYS_C0035433 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMS_BRANCH_STAGE MODIFY (USER_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMS_BRANCH_STAGE MODIFY (STAGE_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-
-PROMPT *** Create  grants  TMS_BRANCH_STAGE ***
-grant SELECT                                                                 on TMS_BRANCH_STAGE to BARSREADER_ROLE;
-grant SELECT                                                                 on TMS_BRANCH_STAGE to UPLD;
 
 
 

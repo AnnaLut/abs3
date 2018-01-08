@@ -83,11 +83,9 @@ COMMENT ON COLUMN BARS.TMP_GPK.IRR_BANK IS 'Ёф ставка банка';
 
 
 PROMPT *** Create  grants  TMP_GPK ***
-grant SELECT                                                                 on TMP_GPK         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_GPK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_GPK         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_GPK         to RCC_DEAL;
-grant SELECT                                                                 on TMP_GPK         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_GPK         to WR_ALL_RIGHTS;
 
 

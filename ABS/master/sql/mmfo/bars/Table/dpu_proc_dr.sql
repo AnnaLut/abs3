@@ -93,11 +93,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPU_PROC_DR ***
-grant SELECT                                                                 on DPU_PROC_DR     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPU_PROC_DR     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_PROC_DR     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_PROC_DR     to START1;
-grant SELECT                                                                 on DPU_PROC_DR     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPU_PROC_DR     to WR_ALL_RIGHTS;
 
 

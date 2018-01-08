@@ -41,7 +41,7 @@ userid_ Number;
 tobo_   accounts.tobo%TYPE;
 nms_    accounts.nms%TYPE;
 comm_   rnbu_trace.comm%TYPE;
-typ_    Number;
+typ_    Number; 
 nbuc1_  VARCHAR2(12);
 nbuc_   VARCHAR2(12);
 
@@ -49,7 +49,7 @@ CURSOR SaldoASeekOstf IS
    SELECT s.acc, s.nls, s.kv, aa.fdat, s.nbs, aa.ostf-aa.dos+aa.kos, s.tobo, s.nms
          FROM saldoa aa, accounts s, kl_f3_29_int k
          WHERE aa.acc= s.acc
-           AND s.NBS = k.R020
+           AND s.NBS = k.R020 
            AND s.kv  = 980
            AND k.kf  = '57'
            AND aa.fdat = (select max(c.fdat)
@@ -57,10 +57,10 @@ CURSOR SaldoASeekOstf IS
                           where c.acc=aa.acc and c.fdat <= Dat_) ;
 
 CURSOR OBOROTY IS
-   SELECT a.acc, a.nls, a.kv, a.nbs, SUM(s.dos), SUM(s.kos), a.tobo, a.nms
+   SELECT a.acc, a.nls, a.kv, a.nbs, SUM(s.dos), SUM(s.kos), a.tobo, a.nms 
    FROM saldoa s, accounts a, kl_f3_29_int k
    WHERE s.fdat = Dat_
-     AND a.NBS  = k.R020
+     AND a.NBS  = k.R020 
      AND a.kv   = 980
      AND k.kf   = '57'
      AND s.acc  = a.acc

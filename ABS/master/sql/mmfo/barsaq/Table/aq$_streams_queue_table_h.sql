@@ -73,9 +73,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  AQ$_STREAMS_QUEUE_TABLE_H ***
-grant SELECT                                                                 on AQ$_STREAMS_QUEUE_TABLE_H to BARSREADER_ROLE;
-
 
 
 PROMPT ===================================================================================== 

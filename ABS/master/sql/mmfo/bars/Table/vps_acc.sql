@@ -115,6 +115,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_VPSACC_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.VPS_ACC ADD CONSTRAINT FK_VPSACC_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_VPSACC ***
 begin   
  execute immediate '
@@ -129,7 +142,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  VPS_ACC ***
-grant SELECT                                                                 on VPS_ACC         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VPS_ACC         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VPS_ACC         to SEP_ROLE;
 grant SELECT                                                                 on VPS_ACC         to START1;

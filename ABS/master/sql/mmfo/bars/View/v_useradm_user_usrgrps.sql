@@ -46,9 +46,7 @@ where a.id=c.idg
 
 PROMPT *** Create  grants  V_USERADM_USER_USRGRPS ***
 grant SELECT                                                                 on V_USERADM_USER_USRGRPS to ABS_ADMIN;
-grant SELECT                                                                 on V_USERADM_USER_USRGRPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USERADM_USER_USRGRPS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_USERADM_USER_USRGRPS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USERADM_USER_USRGRPS to WR_ALL_RIGHTS;
 
 

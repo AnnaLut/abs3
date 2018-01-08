@@ -97,10 +97,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_RKO_LST_S0_NN ***
+PROMPT *** Create  constraint FK_RKOLST_ACCOUNTS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.RKO_LST MODIFY (S0 CONSTRAINT CC_RKO_LST_S0_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.RKO_LST ADD CONSTRAINT FK_RKOLST_ACCOUNTS FOREIGN KEY (KF, ACC2)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -109,22 +110,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_RKOLST_KF_NN ***
+PROMPT *** Create  constraint CC_RKOLST_SOS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.RKO_LST MODIFY (KF CONSTRAINT CC_RKOLST_KF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_RKO_LST_KOLDOK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.RKO_LST MODIFY (KOLDOK CONSTRAINT CC_RKO_LST_KOLDOK_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.RKO_LST MODIFY (SOS CONSTRAINT CC_RKOLST_SOS_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -145,10 +134,99 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_RKOLST_SOS_NN ***
+PROMPT *** Create  constraint CC_RKO_LST_KOLDOK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.RKO_LST MODIFY (SOS CONSTRAINT CC_RKOLST_SOS_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.RKO_LST MODIFY (KOLDOK CONSTRAINT CC_RKO_LST_KOLDOK_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_RKOLST_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.RKO_LST MODIFY (KF CONSTRAINT CC_RKOLST_KF_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_RKO_LST_S0_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.RKO_LST MODIFY (S0 CONSTRAINT CC_RKO_LST_S0_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_RKOLST_CCSOS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.RKO_LST ADD CONSTRAINT FK_RKOLST_CCSOS FOREIGN KEY (SOS)
+	  REFERENCES BARS.CC_SOS (SOS) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_RKOLST_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.RKO_LST ADD CONSTRAINT FK_RKOLST_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_RKOLST_ACCOUNTS4 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.RKO_LST ADD CONSTRAINT FK_RKOLST_ACCOUNTS4 FOREIGN KEY (KF, ACC)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_RKOLST_ACCOUNTS3 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.RKO_LST ADD CONSTRAINT FK_RKOLST_ACCOUNTS3 FOREIGN KEY (KF, ACCD)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_RKOLST_ACCOUNTS2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.RKO_LST ADD CONSTRAINT FK_RKOLST_ACCOUNTS2 FOREIGN KEY (KF, ACC1)
+	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -185,7 +263,6 @@ exception when others then
 
 
 PROMPT *** Create  grants  RKO_LST ***
-grant SELECT                                                                 on RKO_LST         to BARSREADER_ROLE;
 grant SELECT                                                                 on RKO_LST         to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RKO_LST         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RKO_LST         to BARS_DM;

@@ -15,9 +15,7 @@ union all
 select 3 as id, 'Скасований' as name from dual;
 
 PROMPT *** Create  grants  V_STO_ORDER_STATE ***
-grant SELECT                                                                 on V_STO_ORDER_STATE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STO_ORDER_STATE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_STO_ORDER_STATE to UPLD;
 
 
 

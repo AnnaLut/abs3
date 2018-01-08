@@ -51,9 +51,7 @@ COMMENT ON COLUMN BARS.SPR_OBL_.KOD_REG IS '';
 
 
 PROMPT *** Create  grants  SPR_OBL_ ***
-grant SELECT                                                                 on SPR_OBL_        to BARSREADER_ROLE;
 grant SELECT                                                                 on SPR_OBL_        to BARS_DM;
-grant SELECT                                                                 on SPR_OBL_        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPR_OBL_        to WR_ALL_RIGHTS;
 
 

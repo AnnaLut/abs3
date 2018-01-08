@@ -19,10 +19,8 @@ WHERE m.nls = c.nls and c.kv=980
  ;
 
 PROMPT *** Create  grants  NAL_ISP3 ***
-grant SELECT                                                                 on NAL_ISP3        to BARSREADER_ROLE;
 grant SELECT                                                                 on NAL_ISP3        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NAL_ISP3        to NALOG;
-grant SELECT                                                                 on NAL_ISP3        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NAL_ISP3        to WR_ALL_RIGHTS;
 
 

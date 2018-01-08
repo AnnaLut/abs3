@@ -107,6 +107,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_ANKLK_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.AN_KL_K ADD CONSTRAINT FK_ANKLK_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_ANKLK_KF_NN ***
 begin   
  execute immediate '
@@ -134,10 +147,8 @@ exception when others then
 
 PROMPT *** Create  grants  AN_KL_K ***
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on AN_KL_K         to AN_KL;
-grant SELECT                                                                 on AN_KL_K         to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on AN_KL_K         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AN_KL_K         to BARS_DM;
-grant SELECT                                                                 on AN_KL_K         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on AN_KL_K         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on AN_KL_K         to WR_REFREAD;
 

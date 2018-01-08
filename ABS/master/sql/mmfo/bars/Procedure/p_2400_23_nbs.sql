@@ -1,13 +1,10 @@
-
-
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_2400_23_NBS.sql =========*** Run
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_2400_23_nbs.sql =========*** Run ***
 PROMPT ===================================================================================== 
 
+PROMPT *** Create  procedure P_2400_23_nbs ***
 
-PROMPT *** Create  procedure P_2400_23_NBS ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_2400_23_NBS (dat01_ DATE )  IS
+  CREATE OR REPLACE PROCEDURE BARS.P_2400_23_nbs (dat01_ DATE )  IS
 -- Выполнение процедуры заполнения счетов резервирования
 REZ_PORT_  NUMBER  DEFAULT 0;
 /*
@@ -40,13 +37,13 @@ end;
 /
 show err;
 
-PROMPT *** Create  grants  P_2400_23_NBS ***
-grant EXECUTE                                                                on P_2400_23_NBS   to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_2400_23_NBS   to RCC_DEAL;
-grant EXECUTE                                                                on P_2400_23_NBS   to START1;
+PROMPT *** Create  grants  P_2400_23_nbs ***
+grant EXECUTE   on P_2400_23_nbs   to BARS_ACCESS_DEFROLE;
+grant EXECUTE   on P_2400_23_nbs   to RCC_DEAL;
+grant EXECUTE   on P_2400_23_nbs   to START1;
 
 
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_2400_23_NBS.sql =========*** End
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_2400_23.sql =========*** End ***
 PROMPT ===================================================================================== 

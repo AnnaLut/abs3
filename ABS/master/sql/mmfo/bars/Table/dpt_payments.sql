@@ -69,34 +69,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTPAYMENTS_DPTID_NN ***
+PROMPT *** Create  constraint FK_DPTPAYMENTS_BRANCH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_PAYMENTS MODIFY (DPT_ID CONSTRAINT CC_DPTPAYMENTS_DPTID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTPAYMENTS_REF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_PAYMENTS MODIFY (REF CONSTRAINT CC_DPTPAYMENTS_REF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTPAYMENTS_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_PAYMENTS MODIFY (KF CONSTRAINT CC_DPTPAYMENTS_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_PAYMENTS ADD CONSTRAINT FK_DPTPAYMENTS_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -117,13 +94,74 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_DPTPAYMENTS_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_PAYMENTS MODIFY (KF CONSTRAINT CC_DPTPAYMENTS_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTPAYMENTS_REF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_PAYMENTS MODIFY (REF CONSTRAINT CC_DPTPAYMENTS_REF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTPAYMENTS_DPTID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_PAYMENTS MODIFY (DPT_ID CONSTRAINT CC_DPTPAYMENTS_DPTID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTPAYMENTS_DPTDPTALL2 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_PAYMENTS ADD CONSTRAINT FK_DPTPAYMENTS_DPTDPTALL2 FOREIGN KEY (KF, DPT_ID)
+	  REFERENCES BARS.DPT_DEPOSIT_ALL (KF, DEPOSIT_ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_DPTPAYMENTS_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_PAYMENTS ADD CONSTRAINT FK_DPTPAYMENTS_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_DPTPAYMENTS ***
 begin   
  execute immediate '
   CREATE UNIQUE INDEX BARS.PK_DPTPAYMENTS ON BARS.DPT_PAYMENTS (DPT_ID, REF) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI 
-  PARALLEL 24 ';
+  TABLESPACE BRSBIGI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
@@ -137,8 +175,7 @@ begin
  execute immediate '
   CREATE INDEX BARS.I1_DPTPAYMENTS ON BARS.DPT_PAYMENTS (DPT_ID) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI 
-  PARALLEL 24 ';
+  TABLESPACE BRSBIGI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
@@ -147,12 +184,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_PAYMENTS ***
-grant SELECT                                                                 on DPT_PAYMENTS    to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_PAYMENTS    to BARSUPL;
 grant SELECT                                                                 on DPT_PAYMENTS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_PAYMENTS    to BARS_DM;
 grant SELECT                                                                 on DPT_PAYMENTS    to RPBN001;
-grant SELECT                                                                 on DPT_PAYMENTS    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_PAYMENTS    to WR_ALL_RIGHTS;
 
 

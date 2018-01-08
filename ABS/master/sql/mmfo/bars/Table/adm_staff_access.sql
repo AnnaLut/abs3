@@ -77,6 +77,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_ADMSTAFFACCESS_METACOLUMNS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADM_STAFF_ACCESS ADD CONSTRAINT FK_ADMSTAFFACCESS_METACOLUMNS FOREIGN KEY (TABID, COLID)
+	  REFERENCES BARS.META_COLUMNS (TABID, COLID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_ADMSTAFFACCESS_TABID_NN ***
 begin   
  execute immediate '
@@ -128,10 +141,8 @@ exception when others then
 
 PROMPT *** Create  grants  ADM_STAFF_ACCESS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ADM_STAFF_ACCESS to ABS_ADMIN;
-grant SELECT                                                                 on ADM_STAFF_ACCESS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ADM_STAFF_ACCESS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ADM_STAFF_ACCESS to BARS_DM;
-grant SELECT                                                                 on ADM_STAFF_ACCESS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ADM_STAFF_ACCESS to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on ADM_STAFF_ACCESS to WR_REFREAD;
 

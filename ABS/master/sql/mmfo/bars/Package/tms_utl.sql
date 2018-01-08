@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/tms_utl.sql =========*** Run *** ===
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.TMS_UTL 
+create or replace package TMS_UTL
 is
     -------------------------------------------------------------------------------
     LT_TASK_GROUP                  constant varchar2(30 char) := 'BANKDATE_TASK_GROUP';
@@ -178,9 +172,10 @@ is
     return integer
     result_cache;
 
-end TMS_UTL;
+end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.TMS_UTL 
+
+CREATE OR REPLACE PACKAGE BODY BARS.TMS_UTL
 is
 
     TASK_RUN_WRAPPER_PROGRAM_NAME constant varchar2(30 char) := 'TMS_TASK_RUN_WRAPPER_PROGRAM';
@@ -1125,8 +1120,6 @@ is
             end loop;
         end loop;
 
-        commit;
-
         -- отримуємо мінімальний порядковий номер для завдань, що очікують на виконання
         -- (завдання з порядковим номером null - виконуватимуться в останню чергу)
         select min(t.sequence_number)
@@ -1290,9 +1283,9 @@ is
     , p_bnk_dt in     varchar2
     ) is
     begin
-
+      
       DBMS_MVIEW.REFRESH('MV_GLOBAL_CONTEXT');
-
+      
       for u in ( select CLIENT_IDENTIFIER
                    from MV_GLOBAL_CONTEXT
                   where CURRENT_BRANCH like '/'||p_kf||'/%'
@@ -1300,7 +1293,7 @@ is
       loop
         BARS_LOGIN.CLEAR_SESSION( u.CLIENT_IDENTIFIER );
       end loop;
-
+      
     end CLOSE_USER_SESSIONS;
 
     procedure CLOSES_ACCESS
@@ -1308,9 +1301,7 @@ is
     ) is
       l_bnk_dt varchar2(10);
     begin
-
-      bars_audit.info( $$PLSQL_UNIT||'.CLOSES_ACCESS: ( kf='||p_kf||' ).' );
-
+      
       -- set ban on logging in
       begin
         insert
@@ -1320,17 +1311,17 @@ is
         when DUP_VAL_ON_INDEX then
           null;
       end;
-
+      
       l_bnk_dt := BRANCH_ATTRIBUTE_UTL.GET_VALUE('BANKDATE');
-
+      
       -- close all user sessions that logged in with previous bank date
       CLOSE_USER_SESSIONS( p_kf, l_bnk_dt );
-
+      
       -- accumulate a balance snapshot
       -- BARS_CONTEXT.SUBST_MFO( p_kf );
       -- DDRAPS( DAT_NEXT_U( to_date(l_bnk_dt,'MM/DD/YYYY'), -1 ) );
       -- BARS_CONTEXT.SET_CONTEXT;
-
+      
     end CLOSES_ACCESS;
 
     procedure OPEN_ACCESS
@@ -1338,11 +1329,9 @@ is
     ) is
     begin
       
-      bars_audit.info( $$PLSQL_UNIT||'.OPEN_ACCESS: ( kf='||p_kf||' ).' );
-      
       delete FDAT_KF
        where KF = p_kf;
-
+       
     end OPEN_ACCESS;
 
     procedure SET_BANK_DATE_ACCESS
@@ -1356,7 +1345,7 @@ is
       else
         OPEN_ACCESS( p_kf );
       end if;
-
+    
     end SET_BANK_DATE_ACCESS;
 
     --
@@ -1370,14 +1359,14 @@ is
       l_access       number(1);
       l_kf           fdat_kf.kf%type;
     begin
-
+      
       if ( p_kf Is Null )
-      then
+      then 
         l_kf := sys_context('bars_context','user_mfo');
       else
         l_kf := p_kf;
       end if;
-
+      
       begin
         select 0
           into l_access
@@ -1387,9 +1376,9 @@ is
         when NO_DATA_FOUND then
           l_access := 1;
       end;
-
+      
       return l_access;
-
+      
     end CHECK_ACCESS;
 
     procedure SET_BANK_DATE_STATE
@@ -1397,14 +1386,11 @@ is
     , p_stat  in integer
     ) is
     begin
-
-      bars_audit.info( $$PLSQL_UNIT||'.SET_BANK_DATE_STATE: ( p_fdat='||to_char(p_fdat,'dd.mm.yyyy')||', p_stat='||to_char(p_stat)||' ).' );
-
+      
       update FDAT
-         set STAT    = case p_stat when 1 then 9 else 0 end
-           , CHGDATE = sysdate
-       where FDAT    = p_fdat;
-
+         set STAT = case p_stat when 1 then 9 else 0 end
+       where FDAT = p_fdat;
+      
     end SET_BANK_DATE_STATE;
 
     function GET_BANKDATE_STATE
@@ -1414,7 +1400,7 @@ is
     is
       l_state     fdat.stat%type;
     begin
-
+      
       begin
         select case STAT when 9 then 1 else 0 end
           into l_state
@@ -1424,9 +1410,9 @@ is
         when NO_DATA_FOUND then
           l_state := 1;
       end;
-
+      
       return l_state;
-
+      
     end GET_BANKDATE_STATE;
 
     procedure switch_bank_date
@@ -1570,17 +1556,10 @@ is
                                             '} - зупинити її виконання не можливо');
         end if;
     end;
-
+    
 end TMS_UTL;
 /
- show err;
- 
-PROMPT *** Create  grants  TMS_UTL ***
-grant EXECUTE                                                                on TMS_UTL         to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/tms_utl.sql =========*** End *** ===
- PROMPT ===================================================================================== 
- 
+show err;
+
+grant EXECUTE on TMS_UTL to BARS_ACCESS_DEFROLE;

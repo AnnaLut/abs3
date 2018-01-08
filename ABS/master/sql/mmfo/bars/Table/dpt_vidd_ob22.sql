@@ -65,6 +65,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_DPT_VIDD_OB22 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_OB22 ADD CONSTRAINT FK_DPT_VIDD_OB22 FOREIGN KEY (VIDD)
+	  REFERENCES BARS.DPT_VIDD (VIDD) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C005439 ***
 begin   
  execute immediate '
@@ -115,10 +128,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_VIDD_OB22 ***
-grant SELECT                                                                 on DPT_VIDD_OB22   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VIDD_OB22   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VIDD_OB22   to BARS_DM;
-grant SELECT                                                                 on DPT_VIDD_OB22   to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_OB22   to VKLAD;
 grant FLASHBACK,SELECT                                                       on DPT_VIDD_OB22   to WR_REFREAD;
 

@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/stop_kk.sql =========*** Run *** ==
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.STOP_KK ( p_ref  number )  RETURN NUMBER IS
+CREATE OR REPLACE function BARS.Stop_KK ( p_ref  number )  RETURN NUMBER IS
 --28.10.2015 Сухова  Дополнение к cck.CC_STOP ( ref_  int )
   l_nd number;
 begin
@@ -25,15 +19,3 @@ begin
   RETURN 0 ;
 end Stop_KK;
 /
- show err;
- 
-PROMPT *** Create  grants  STOP_KK ***
-grant EXECUTE                                                                on STOP_KK         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on STOP_KK         to START1;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/stop_kk.sql =========*** End *** ==
- PROMPT ===================================================================================== 
- 

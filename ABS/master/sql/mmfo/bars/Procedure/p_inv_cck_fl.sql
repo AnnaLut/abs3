@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_INV_CCK_FL.sql =========*** Run 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_INV_CCK_FL ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_INV_CCK_FL (p_dat date, p_frm int, p_type int default 1) is
+CREATE OR REPLACE PROCEDURE BARS.P_INV_CCK_FL (p_dat date, p_frm int, p_type int default 1) is
 
 -- ============================================================================
 --                    Инвентаризационная ведомость
@@ -175,7 +166,7 @@ PROMPT *** Create  procedure P_INV_CCK_FL ***
   l_errcode   number;          -- код выполнения
 
 begin
-
+    
     l_newnbs := NEWNBS.GET_STATE;
    --
    -- проверка на возможность пересчета инв. ведомости
@@ -2128,16 +2119,3 @@ exception when others then
 
 end P_INV_CCK_FL ;
 /
-show err;
-
-PROMPT *** Create  grants  P_INV_CCK_FL ***
-grant EXECUTE                                                                on P_INV_CCK_FL    to BARSDWH_ACCESS_USER;
-grant EXECUTE                                                                on P_INV_CCK_FL    to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_INV_CCK_FL    to RCC_DEAL;
-grant EXECUTE                                                                on P_INV_CCK_FL    to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_INV_CCK_FL.sql =========*** End 
-PROMPT ===================================================================================== 

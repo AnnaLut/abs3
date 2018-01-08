@@ -14,13 +14,14 @@ begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
     values ('IB5', 'IB5-Internet-Banking: Поповнення карт.рахунку внутрішнє', 1, null, null, '#(bpk_get_transit(''19'',#(NLSA),#(NLSB),#(KVA)))', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0101000000000000000000000000000000010000000000000000000000000000', null);
   exception
-    when dup_val_on_index then 
-      update tts
-         set tt='IB5', name='IB5-Internet-Banking: Поповнення карт.рахунку внутрішнє', dk=1, nlsm=null, kv=null, nlsk='#(bpk_get_transit(''19'',#(NLSA),#(NLSB),#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0101000000000000000000000000000000010000000000000000000000000000', nazn=null
+    when dup_val_on_index then
+      update tts set
+        tt='IB5', name='IB5-Internet-Banking: Поповнення карт.рахунку внутрішнє', dk=1, nlsm=null, kv=null, nlsk='#(bpk_get_transit(''19'',#(NLSA),#(NLSB),#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0101000000000000000000000000000000010000000000000000000000000000', nazn=null
        where tt='IB5';
   end;
+  
   --------------------------------
-  ----------- Реквизиты ----------
+  ---------- Реквизиты -----------
   --------------------------------
   delete from op_rules where tt='IB5';
   begin
@@ -28,7 +29,7 @@ begin
     values ('EXREF', 'IB5', 'O', 0, null, null, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''EXREF'', ''IB5'', ''O'', 0, null, null, null) - первичный ключ не найден!');
       else raise;
@@ -39,7 +40,7 @@ begin
     values ('IBTIM', 'IB5', 'O', 0, null, null, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''IBTIM'', ''IB5'', ''O'', 0, null, null, null) - первичный ключ не найден!');
       else raise;
@@ -50,7 +51,7 @@ begin
     values ('IBV01', 'IB5', 'O', 0, null, null, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''IBV01'', ''IB5'', ''O'', 0, null, null, null) - первичный ключ не найден!');
       else raise;
@@ -61,7 +62,7 @@ begin
     values ('IBV02', 'IB5', 'O', 0, null, null, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''IBV02'', ''IB5'', ''O'', 0, null, null, null) - первичный ключ не найден!');
       else raise;
@@ -72,7 +73,7 @@ begin
     values ('IBV03', 'IB5', 'O', 0, null, null, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''IBV03'', ''IB5'', ''O'', 0, null, null, null) - первичный ключ не найден!');
       else raise;
@@ -83,7 +84,7 @@ begin
     values ('IBV04', 'IB5', 'O', 0, null, null, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''IBV04'', ''IB5'', ''O'', 0, null, null, null) - первичный ключ не найден!');
       else raise;
@@ -94,7 +95,7 @@ begin
     values ('IBV05', 'IB5', 'O', 0, null, null, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''IBV05'', ''IB5'', ''O'', 0, null, null, null) - первичный ключ не найден!');
       else raise;
@@ -105,7 +106,7 @@ begin
     values ('IBV06', 'IB5', 'O', 0, null, null, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''IBV06'', ''IB5'', ''O'', 0, null, null, null) - первичный ключ не найден!');
       else raise;
@@ -116,7 +117,7 @@ begin
     values ('IBV07', 'IB5', 'O', 0, null, null, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''IBV07'', ''IB5'', ''O'', 0, null, null, null) - первичный ключ не найден!');
       else raise;
@@ -127,7 +128,7 @@ begin
     values ('IBV08', 'IB5', 'O', 0, null, null, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''IBV08'', ''IB5'', ''O'', 0, null, null, null) - первичный ключ не найден!');
       else raise;
@@ -138,102 +139,106 @@ begin
     values ('IBV09', 'IB5', 'O', 0, null, null, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''IBV09'', ''IB5'', ''O'', 0, null, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
+  
   --------------------------------
   ------ Связанные операции ------
   --------------------------------
   delete from ttsap where tt='IB5';
+  
   --------------------------------
   ------- Балансовые счета -------
   --------------------------------
   delete from ps_tts where tt='IB5';
   begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('2605', 'IB5', 1);
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('2605', 'IB5', 1, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2605'', ''IB5'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2605'', ''IB5'', 1, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('2625', 'IB5', 1);
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('2625', 'IB5', 1, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2625'', ''IB5'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2625'', ''IB5'', 1, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
-    insert into ps_tts(nbs, tt, dk)
-    values ('2655', 'IB5', 1);
+    insert into ps_tts(nbs, tt, dk, ob22)
+    values ('2655', 'IB5', 1, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2655'', ''IB5'', 1) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2655'', ''IB5'', 1, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
+  
   --------------------------------
-  -------- Виды документов -------
+  ------- Виды документов --------
   --------------------------------
   delete from tts_vob where tt='IB5';
   begin
-    insert into tts_vob(vob, tt, ord)
-    values (1, 'IB5', null);
+    insert into tts_vob(vob, tt)
+    values (1, 'IB5');
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (tts_vob: 1, ''IB5'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (tts_vob: 1, ''IB5'') - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
-    insert into tts_vob(vob, tt, ord)
-    values (6, 'IB5', null);
+    insert into tts_vob(vob, tt)
+    values (6, 'IB5');
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (tts_vob: 6, ''IB5'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (tts_vob: 6, ''IB5'') - первичный ключ не найден!');
       else raise;
       end if;
   end;
+  
   --------------------------------
   -------- Группы контроля -------
   --------------------------------
   delete from chklist_tts where tt='IB5';
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (7, 'IB5', 2, null, 'kv<>980', null);
+    values (5, 'IB5', 1, null, null, null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 7, ''IB5'', 2, null, ''kv<>980'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''IB5'', 1, null, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (25, 'IB5', 1, null, null, null);
+    values (7, 'IB5', 2, null, 'kv<>980', null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 25, ''IB5'', 1, null, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 7, ''IB5'', 2, null, ''kv<>980'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -242,16 +247,21 @@ begin
     values (30, 'IB5', 3, null, 'bpk_visa30(ref, 1)=1', null);
   exception
     when dup_val_on_index then null;
-    when others then
+    when others then 
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (chklist_tts: 30, ''IB5'', 3, null, ''bpk_visa30(ref, 1)=1'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
+  
   --------------------------------
-  ------------- Папки ------------
+  ------------ Папки -------------
   --------------------------------
   delete from folders_tts where tt='IB5';
+  
+  
 end;
 /
+
+
 commit;

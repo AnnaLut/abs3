@@ -1,14 +1,35 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CCK_SBON.sql =========*** Run *** ===
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_CCK_SBON ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_SBON ("RNK", "OKPO", "SER", "NUMDOC", "CC_ID", "SDATE", "BRANCH", "KV", "NLS", "ACCOUNT_BRANCH", "ND", "NBS", "WDATE", "NMK", "KN_DPK", "Z1", "Z2", "Z3", "Z4", "Z5", "R1", "R2", "K0", "K1", "MES", "DAT_MOD", "K2") AS 
-  SELECT RNK,
+CREATE OR REPLACE FORCE VIEW BARS.V_CCK_SBON
+(
+   RNK,
+   OKPO,
+   SER,
+   NUMDOC,
+   CC_ID,
+   SDATE,
+   BRANCH,
+   KV,
+   NLS,
+   ACCOUNT_BRANCH,
+   ND,
+   NBS,
+   WDATE,
+   NMK,
+   KN_DPK,
+   Z1,
+   Z2,
+   Z3,
+   Z4,
+   Z5,
+   R1,
+   R2,
+   K0,
+   K1,
+   MES,
+   DAT_MOD,
+   K2
+)
+AS
+   SELECT RNK,
           OKPO,
           SER,
           NUMDOC,
@@ -83,14 +104,9 @@ PROMPT *** Create  view V_CCK_SBON ***
 --where NOT ( Z1> 0 and  NBS ='2525') --  НЕ выполнять досрочное погашение с 2625 с перестроением ГПК при наличии ПРОСРОЧЕК.
 ;
 
-PROMPT *** Create  grants  V_CCK_SBON ***
-grant FLASHBACK,SELECT                                                       on V_CCK_SBON      to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CCK_SBON      to SBON;
-grant SELECT                                                                 on V_CCK_SBON      to START1;
-grant SELECT                                                                 on V_CCK_SBON      to UPLD;
 
+GRANT SELECT, FLASHBACK ON BARS.V_CCK_SBON TO BARS_ACCESS_DEFROLE;
 
+GRANT SELECT ON BARS.V_CCK_SBON TO SBON;
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CCK_SBON.sql =========*** End *** ===
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.V_CCK_SBON TO START1;

@@ -108,10 +108,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  NU_OB22_FUNU ***
-grant SELECT                                                                 on NU_OB22_FUNU    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NU_OB22_FUNU    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NU_OB22_FUNU    to NALOG;
-grant SELECT                                                                 on NU_OB22_FUNU    to UPLD;
 
 
 

@@ -12,11 +12,9 @@ PROMPT *** Create  view V_DEMAND_OUR_FILIALES ***
  ;
 
 PROMPT *** Create  grants  V_DEMAND_OUR_FILIALES ***
-grant SELECT                                                                 on V_DEMAND_OUR_FILIALES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DEMAND_OUR_FILIALES to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DEMAND_OUR_FILIALES to DEMAND;
 grant SELECT                                                                 on V_DEMAND_OUR_FILIALES to START1;
-grant SELECT                                                                 on V_DEMAND_OUR_FILIALES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DEMAND_OUR_FILIALES to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_DEMAND_OUR_FILIALES to WR_REFREAD;
 

@@ -14,10 +14,8 @@ where o.ref=s.ref and o.acc=a.acc and o.sos=4
  ;
 
 PROMPT *** Create  grants  OPL4 ***
-grant SELECT                                                                 on OPL4            to BARSREADER_ROLE;
 grant SELECT                                                                 on OPL4            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OPL4            to TECH005;
-grant SELECT                                                                 on OPL4            to UPLD;
 
 
 

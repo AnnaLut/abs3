@@ -22,9 +22,7 @@ PROMPT *** Create  view V_INS_USER_PARTNER_TYPES ***
  order by pt.partner_id, pt.type_id;
 
 PROMPT *** Create  grants  V_INS_USER_PARTNER_TYPES ***
-grant SELECT                                                                 on V_INS_USER_PARTNER_TYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_USER_PARTNER_TYPES to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_INS_USER_PARTNER_TYPES to UPLD;
 
 
 

@@ -89,11 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_SYNC_TYPES ***
-grant SELECT                                                                 on CIG_SYNC_TYPES  to BARSREADER_ROLE;
 grant SELECT                                                                 on CIG_SYNC_TYPES  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_SYNC_TYPES  to BARS_DM;
 grant SELECT                                                                 on CIG_SYNC_TYPES  to CIG_ROLE;
-grant SELECT                                                                 on CIG_SYNC_TYPES  to UPLD;
 
 
 

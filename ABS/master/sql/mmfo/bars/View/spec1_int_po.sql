@@ -20,10 +20,8 @@ WHERE a.acc=b.acc and a.nbs=n.r020_fa
  ;
 
 PROMPT *** Create  grants  SPEC1_INT_PO ***
-grant SELECT                                                                 on SPEC1_INT_PO    to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on SPEC1_INT_PO    to BARS_ACCESS_DEFROLE;
 grant INSERT,SELECT,UPDATE                                                   on SPEC1_INT_PO    to NALOG;
-grant SELECT                                                                 on SPEC1_INT_PO    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPEC1_INT_PO    to WR_ALL_RIGHTS;
 
 

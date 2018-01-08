@@ -16,10 +16,8 @@ PROMPT *** Create  view V_BPK_IMP_PROECT_FILES ***
 from bpk_imp_proect_files i;
 
 PROMPT *** Create  grants  V_BPK_IMP_PROECT_FILES ***
-grant SELECT                                                                 on V_BPK_IMP_PROECT_FILES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BPK_IMP_PROECT_FILES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BPK_IMP_PROECT_FILES to OBPC;
-grant SELECT                                                                 on V_BPK_IMP_PROECT_FILES to UPLD;
 
 
 

@@ -72,10 +72,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  UPL_SQL ***
-grant SELECT                                                                 on UPL_SQL         to BARSREADER_ROLE;
-grant SELECT                                                                 on UPL_SQL         to UPLD;
-
 
 
 PROMPT ===================================================================================== 

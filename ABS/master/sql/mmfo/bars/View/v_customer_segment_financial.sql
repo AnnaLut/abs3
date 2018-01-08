@@ -15,10 +15,8 @@ where  li.list_type_id = (select id
                           where  lt.list_code = 'CUSTOMER_SEGMENT_FINANCIAL');
 
 PROMPT *** Create  grants  V_CUSTOMER_SEGMENT_FINANCIAL ***
-grant SELECT                                                                 on V_CUSTOMER_SEGMENT_FINANCIAL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUSTOMER_SEGMENT_FINANCIAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUSTOMER_SEGMENT_FINANCIAL to START1;
-grant SELECT                                                                 on V_CUSTOMER_SEGMENT_FINANCIAL to UPLD;
 
 
 

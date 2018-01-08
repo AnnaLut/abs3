@@ -94,9 +94,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ESCR_REG_STATUS ***
-grant SELECT                                                                 on ESCR_REG_STATUS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ESCR_REG_STATUS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on ESCR_REG_STATUS to UPLD;
 
 
 

@@ -45,6 +45,114 @@ begin
   delete from folders_tts where tt='!DK';
 end;
 /
+prompt Создание / Обновление операции !DP
+prompt Наименование операции: STOP-правило. Обмеження виплати валюти, еквівалент 15000грн
+declare
+  cnt_  number;
+begin
+  --------------------------------
+  -- Основные свойства операции --
+  --------------------------------
+  begin
+    insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
+    values ('!DP', 'STOP-правило. Обмеження виплати валюти, еквівалент 15000грн', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(414,#(KVA),#(NLSA),#(S),#(REF))', null, null, null, null, 0, '0000100000000000000000000000000000000100000000000000000000000000', null);
+  exception
+    when dup_val_on_index then 
+      update tts
+         set tt='!DP', name='STOP-правило. Обмеження виплати валюти, еквівалент 15000грн', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(414,#(KVA),#(NLSA),#(S),#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+       where tt='!DP';
+  end;
+  --------------------------------
+  ----------- Реквизиты ----------
+  --------------------------------
+  delete from op_rules where tt='!DP';
+  --------------------------------
+  ------ Связанные операции ------
+  --------------------------------
+  delete from ttsap where tt='!DP';
+  --------------------------------
+  ------- Балансовые счета -------
+  --------------------------------
+  delete from ps_tts where tt='!DP';
+  --------------------------------
+  -------- Виды документов -------
+  --------------------------------
+  delete from tts_vob where tt='!DP';
+  --------------------------------
+  -------- Группы контроля -------
+  --------------------------------
+  delete from chklist_tts where tt='!DP';
+  --------------------------------
+  ------------- Папки ------------
+  --------------------------------
+  delete from folders_tts where tt='!DP';
+  begin
+    insert into folders_tts(idfo, tt)
+    values (1, '!DP');
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (folders_tts: 1, ''!DP'') - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+end;
+/
+prompt Создание / Обновление операции !DV
+prompt Наименование операции: !Стоп-правило пост.160  03 березня 2015 р (15 тис в екв для вал. опер)
+declare
+  cnt_  number;
+begin
+  --------------------------------
+  -- Основные свойства операции --
+  --------------------------------
+  begin
+    insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
+    values ('!DV', '!Стоп-правило пост.160  03 березня 2015 р (15 тис в екв для вал. опер)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(160,#(KVA),#(NLSA),#(S), #(REF))', null, null, null, null, 0, '0000100000000000000000000000000000000100000000000000000000000000', null);
+  exception
+    when dup_val_on_index then 
+      update tts
+         set tt='!DV', name='!Стоп-правило пост.160  03 березня 2015 р (15 тис в екв для вал. опер)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(160,#(KVA),#(NLSA),#(S), #(REF))', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+       where tt='!DV';
+  end;
+  --------------------------------
+  ----------- Реквизиты ----------
+  --------------------------------
+  delete from op_rules where tt='!DV';
+  --------------------------------
+  ------ Связанные операции ------
+  --------------------------------
+  delete from ttsap where tt='!DV';
+  --------------------------------
+  ------- Балансовые счета -------
+  --------------------------------
+  delete from ps_tts where tt='!DV';
+  --------------------------------
+  -------- Виды документов -------
+  --------------------------------
+  delete from tts_vob where tt='!DV';
+  --------------------------------
+  -------- Группы контроля -------
+  --------------------------------
+  delete from chklist_tts where tt='!DV';
+  --------------------------------
+  ------------- Папки ------------
+  --------------------------------
+  delete from folders_tts where tt='!DV';
+  begin
+    insert into folders_tts(idfo, tt)
+    values (1, '!DV');
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (folders_tts: 1, ''!DV'') - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+end;
+/
 prompt Создание / Обновление операции KD1
 prompt Наименование операции: KD1 Комісія за ВИДАТОК каси одноч.
 declare
@@ -55,11 +163,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KD1', 'KD1 Комісія за ВИДАТОК каси одноч.', 1, '#(tobopack.GetToboCASH)', 980, '#(nbs_ob22 (''6510'',''96''))', 980, null, '#(tobopack.GetToboCASH)', '#(nbs_ob22 (''6510'',''96''))', null, 0, 0, 0, 0, 'EQV_OBS ( #(KVA),F_TARIF(20, #(KVA),#(NLSA), #(S)),SYSDATE)', null, 5, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('KD1', 'KD1 Комісія за ВИДАТОК каси одноч.', 1, '#(tobopack.GetToboCASH)', 980, '#(nbs_ob22 (''6110'',''96''))', 980, null, '#(tobopack.GetToboCASH)', '#(nbs_ob22 (''6110'',''96''))', null, 0, 0, 0, 0, 'EQV_OBS ( #(KVA),F_TARIF(20, #(KVA),#(NLSA), #(S)),SYSDATE)', null, 5, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KD1', name='KD1 Комісія за ВИДАТОК каси одноч.', dk=1, nlsm='#(tobopack.GetToboCASH)', kv=980, nlsk='#(nbs_ob22 (''6510'',''96''))', kvk=980, nlss=null, nlsa='#(tobopack.GetToboCASH)', nlsb='#(nbs_ob22 (''6510'',''96''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s='EQV_OBS ( #(KVA),F_TARIF(20, #(KVA),#(NLSA), #(S)),SYSDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='KD1', name='KD1 Комісія за ВИДАТОК каси одноч.', dk=1, nlsm='#(tobopack.GetToboCASH)', kv=980, nlsk='#(nbs_ob22 (''6110'',''96''))', kvk=980, nlss=null, nlsa='#(tobopack.GetToboCASH)', nlsb='#(nbs_ob22 (''6110'',''96''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s='EQV_OBS ( #(KVA),F_TARIF(20, #(KVA),#(NLSA), #(S)),SYSDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='KD1';
   end;
   --------------------------------
@@ -341,6 +449,28 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (ttsap: ''!DK'', ''DPV'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ttsap(ttap, tt, dk)
+    values ('!DP', 'DPV', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ttsap: ''!DP'', ''DPV'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ttsap(ttap, tt, dk)
+    values ('!DV', 'DPV', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ttsap: ''!DV'', ''DPV'', 0) - первичный ключ не найден!');
       else raise;
       end if;
   end;

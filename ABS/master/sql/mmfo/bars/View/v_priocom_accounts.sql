@@ -36,10 +36,8 @@ from accounts a, cust_acc c, specparam sp, specparam_int spi
 where a.acc=c.acc and a.acc=sp.acc(+) and a.acc=spi.acc(+);
 
 PROMPT *** Create  grants  V_PRIOCOM_ACCOUNTS ***
-grant SELECT                                                                 on V_PRIOCOM_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PRIOCOM_ACCOUNTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PRIOCOM_ACCOUNTS to START1;
-grant SELECT                                                                 on V_PRIOCOM_ACCOUNTS to UPLD;
 
 
 

@@ -77,10 +77,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  KP_LOG ***
-grant SELECT                                                                 on KP_LOG          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KP_LOG          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KP_LOG          to R_KP;
-grant SELECT                                                                 on KP_LOG          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KP_LOG          to WR_ALL_RIGHTS;
 
 

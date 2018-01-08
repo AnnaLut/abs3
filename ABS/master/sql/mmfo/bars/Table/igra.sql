@@ -54,11 +54,9 @@ COMMENT ON COLUMN BARS.IGRA.S1 IS '';
 
 
 PROMPT *** Create  grants  IGRA ***
-grant SELECT                                                                 on IGRA            to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on IGRA            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on IGRA            to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on IGRA            to START1;
-grant SELECT                                                                 on IGRA            to UPLD;
 
 
 

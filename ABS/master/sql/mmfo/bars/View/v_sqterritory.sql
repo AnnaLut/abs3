@@ -15,10 +15,8 @@ PROMPT *** Create  view V_SQTERRITORY ***
     FROM TERRITORY;
 
 PROMPT *** Create  grants  V_SQTERRITORY ***
-grant SELECT                                                                 on V_SQTERRITORY   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SQTERRITORY   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SQTERRITORY   to START1;
-grant SELECT                                                                 on V_SQTERRITORY   to UPLD;
 
 
 

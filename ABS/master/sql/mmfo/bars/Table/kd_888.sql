@@ -107,11 +107,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  KD_888 ***
-grant SELECT                                                                 on KD_888          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KD_888          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KD_888          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KD_888          to KD_888;
-grant SELECT                                                                 on KD_888          to UPLD;
 grant FLASHBACK,SELECT                                                       on KD_888          to WR_REFREAD;
 
 

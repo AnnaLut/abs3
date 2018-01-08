@@ -89,12 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  EVENT ***
-grant SELECT                                                                 on EVENT           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on EVENT           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EVENT           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EVENT           to EVENT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EVENT           to START1;
-grant SELECT                                                                 on EVENT           to UPLD;
 grant FLASHBACK,SELECT                                                       on EVENT           to WR_REFREAD;
 
 

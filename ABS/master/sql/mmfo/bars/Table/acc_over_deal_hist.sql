@@ -63,12 +63,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACC_OVER_DEAL_HIST ***
-grant SELECT                                                                 on ACC_OVER_DEAL_HIST to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_DEAL_HIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_OVER_DEAL_HIST to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_DEAL_HIST to RPBN002;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_DEAL_HIST to START1;
-grant SELECT                                                                 on ACC_OVER_DEAL_HIST to UPLD;
 
 
 

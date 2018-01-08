@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции KK8
-prompt Наименование операции: KK8 --KK8/КП. Списання пені по КП
+prompt Наименование операции: --KK8/КП. Списання пені по КП
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KK8', 'KK8 --KK8/КП. Списання пені по КП', 1, null, 980, null, 980, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000100000000100000000000000000', null);
+    values ('KK8', '--KK8/КП. Списання пені по КП', 1, null, 980, null, 980, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000100000000100000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KK8', name='KK8 --KK8/КП. Списання пені по КП', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000100000000000000000', nazn=null
+         set tt='KK8', name='--KK8/КП. Списання пені по КП', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000100000000000000000', nazn=null
        where tt='KK8';
   end;
   --------------------------------

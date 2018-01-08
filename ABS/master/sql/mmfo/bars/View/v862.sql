@@ -26,11 +26,9 @@ PROMPT *** Create  view V862 ***
  ;
 
 PROMPT *** Create  grants  V862 ***
-grant SELECT                                                                 on V862            to BARSREADER_ROLE;
 grant SELECT                                                                 on V862            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V862            to OPERKKK;
 grant SELECT                                                                 on V862            to START1;
-grant SELECT                                                                 on V862            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V862            to WR_ALL_RIGHTS;
 
 

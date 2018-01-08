@@ -58,9 +58,7 @@ COMMENT ON COLUMN BARS.PCIMP_FILIALES.ABVR_NAME IS '';
 
 
 PROMPT *** Create  grants  PCIMP_FILIALES ***
-grant SELECT                                                                 on PCIMP_FILIALES  to BARSREADER_ROLE;
 grant SELECT                                                                 on PCIMP_FILIALES  to BARS_DM;
-grant SELECT                                                                 on PCIMP_FILIALES  to UPLD;
 
 
 

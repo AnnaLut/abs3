@@ -48,9 +48,7 @@ COMMENT ON COLUMN BARS.CP_OKPO_CORPORATION.CHILD_OKPO IS 'Äî÷³ðíº ÇÊÏÎ';
 
 
 PROMPT *** Create  grants  CP_OKPO_CORPORATION ***
-grant SELECT                                                                 on CP_OKPO_CORPORATION to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CP_OKPO_CORPORATION to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on CP_OKPO_CORPORATION to UPLD;
 
 
 

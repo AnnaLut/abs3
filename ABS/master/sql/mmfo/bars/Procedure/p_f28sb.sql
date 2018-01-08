@@ -7,25 +7,25 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F28SB ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F28SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C' )  IS
+  CREATE OR REPLACE PROCEDURE BARS.P_F28SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C' )  IS  
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FILE NAME   : otcn.sql
 % DESCRIPTION : ќтчетность ЌЅ”: формирование файлов
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     : 13/11/2017 (16/02/2016)
+% VERSION     : 13/11/2017 (16/02/2016) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-13.11.2017 - удалил ненужные строки и изменил некоторые блоки формировани€
+13.11.2017 - удалил ненужные строки и изменил некоторые блоки формировани€ 
 16.02.2016 - дл€ декабр€ мес€ца будут включатьс€ годовые корректирующие
              обороты
 26.05.2012 - формируем в разрезе кодов территорий
 10.08.2011 - исправление ошибки
-09.08.2011 - помен€ла f_pop_otcn на f_pop_otcn_snp
+09.08.2011 - помен€ла f_pop_otcn на f_pop_otcn_snp 
 30.04.2011 - добавил†acc,tobo в протокол
 28.02.2011 - в поле комментарий вносим код TOBO и название счета
-06.05.2010 - отключил блок заполнени€ спецпараметра OB22
-08.11.2007 - “.к. дл€ счетов начисленных процентов 2628,2638 выполн€ютс€
+06.05.2010 - отключил блок заполнени€ спецпараметра OB22 
+08.11.2007 - “.к. дл€ счетов начисленных процентов 2628,2638 выполн€ютс€ 
              корректирующие проводки, то выполн€ем корректирову остатка
-             и при нулевом значении на конец мес€ца
+             и при нулевом значении на конец мес€ца  
              (в предыдущей версии кор.проводки добавл€лись только при
               ненулевом остатке на счете)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -82,7 +82,7 @@ ret_	 number;
 tobo_    accounts.tobo%TYPE;
 nms_     accounts.nms%TYPE;
 comm_    rnbu_trace.comm%TYPE;
-typ_     Number;
+typ_     Number; 
 nbuc1_   VARCHAR2(12);
 nbuc_    VARCHAR2(12);
 d_sum_   number;
@@ -95,7 +95,7 @@ CURSOR Saldo IS
           s.dos96, s.dosq96, s.kos96, s.kosq96,
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
-          a.tobo, a.nms, NVL(trim(sp.ob22),'00')
+          a.tobo, a.nms, NVL(trim(sp.ob22),'00')  
     FROM  otcn_saldo s, otcn_acc a, specparam_int sp
     WHERE s.acc = a.acc
       and s.acc = sp.acc(+);
@@ -112,7 +112,7 @@ Dat2_ := TRUNC(Dat_ + 28);
 -- определение начальных параметров
 P_Proc_Set_Int(kodf_,sheme_,nbuc1_,typ_);
 
--- используем классификатор SB_R020
+-- используем классификатор SB_R020 
 sql_acc_ := 'select r020 from sb_r020 where f_28=''1'' ';
 
 logger.info ('P_F28SB: Begin ');
@@ -130,13 +130,13 @@ OPEN Saldo;
                     Dos96p_, Dosq96p_, Kos96p_, Kosq96p_,
                     Dos96_, Dosq96_, Kos96_, Kosq96_,
                     Dos99_, Dosq99_, Kos99_, Kosq99_,
-                    Doszg_, Koszg_, Dos96zg_, Kos96zg_,
+                    Doszg_, Koszg_, Dos96zg_, Kos96zg_, 
                     tobo_, nms_, zz_;
    EXIT WHEN Saldo%NOTFOUND;
 
    comm_ := '';
 
-   IF typ_ > 0
+   IF typ_ > 0 
    THEN
       nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
    ELSE
@@ -148,19 +148,19 @@ OPEN Saldo;
 
    -- добавив 16.02.2016
    --- обороты по перекрытию 6,7 классов на 5040,5041
-   IF to_char(Dat_,'MM') = '12' and
-      (nls_ like '6%' or nls_ like '7%' or nls_ like '504%' or nls_ like '390%')
+   IF to_char(Dat_,'MM') = '12' and 
+      (nls_ like '6%' or nls_ like '7%' or nls_ like '504%' or nls_ like '390%') 
    THEN
       SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
              NVL(SUM(decode(dk,1,1,0)*s),0)
           INTO d_sum_, k_sum_
-      FROM opldok
+      FROM opldok 
       WHERE fdat  between Dat_  AND Dat_+29 AND
             acc  = acc_   AND
             (tt like 'ZG8%'  or tt like 'ZG9%');
 
-      IF Dos96_ <> 0
-      then
+      IF Dos96_ <> 0 
+      then 
          Dos96_ := Dos96_ - d_sum_;
       END IF;
       IF Kos96_ <> 0 THEN
@@ -168,7 +168,7 @@ OPEN Saldo;
       END IF;
    END IF;
 
-   if nbs_ not in ('3902','3903','5040','5041') and nbs_ not like '6%' and nbs_ not like '7%'
+   if nbs_ not in ('3902','3903','5040','5041') and nbs_ not like '6%' and nbs_ not like '7%' 
    then
       Ostn_ := Ostn_-Dos96_+Kos96_-Dos99_+Kos99_;
    else
@@ -177,7 +177,7 @@ OPEN Saldo;
 
    Ostq_ := Ostq_ - Dosq96_ + Kosq96_ - Dosq99_ + Kosq99_;
 
-   if kv_ = 980
+   if kv_ = 980 
    then
       se_ := Ostn_;
    else
@@ -187,8 +187,8 @@ OPEN Saldo;
 
    comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
 
-   IF se_ <> 0
-   THEN
+   IF se_ <> 0 
+   THEN 
       dk_ := IIF_N(se_,0,'1','2','2') ;
       kk_ := nbs_ || zz_ || LPAD(to_char(kv_),3,'0') ;
       kodp_ := dk_ || '0' || kk_ ;
@@ -197,8 +197,8 @@ OPEN Saldo;
                              (nls_, kv_, data_, kodp_,znap_, acc_, comm_, tobo_, nbuc_) ;
    END IF;
 
-   IF sn_ <> 0
-   THEN
+   IF sn_ <> 0 
+   THEN 
       dk_ := IIF_N(sn_,0,'1','2','2') ;
       kk_ := nbs_ || zz_ || LPAD(to_char(kv_),3,'0') ;
       kodp_ := dk_ || '1' || kk_ ;
@@ -214,13 +214,13 @@ DELETE FROM tmp_irep WHERE kodf = kodf_ AND datf = Dat_;
 ---------------------------------------------------
 INSERT INTO tmp_irep (kodf, datf, kodp, znap, nbuc)
 select '28', Dat_, KODP, SUM(znap), nbuc
-from  RNBU_TRACE
+from  RNBU_TRACE   
 GROUP BY kodp, nbuc;
 
 logger.info ('P_F28SB: End ');
 
 exception
-    when others then
+    when others then 
         logger.info ('P_F28SB: Error '||sqlerrm);
 ------------------------------------------------------------------
 END p_f28sb;

@@ -42,7 +42,6 @@ end fost;
 PROMPT *** Create  grants  FOST ***
 grant EXECUTE                                                                on FOST            to ABS_ADMIN;
 grant EXECUTE                                                                on FOST            to BARSDWH_ACCESS_USER;
-grant EXECUTE                                                                on FOST            to BARSR;
 grant EXECUTE                                                                on FOST            to BARSUPL;
 grant EXECUTE                                                                on FOST            to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on FOST            to BARS_DM;

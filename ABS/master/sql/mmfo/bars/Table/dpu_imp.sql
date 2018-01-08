@@ -95,12 +95,10 @@ COMMENT ON COLUMN BARS.DPU_IMP.OUT_MSG IS 'Вихідне повідомлення';
 
 PROMPT *** Create  grants  DPU_IMP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_IMP         to ABS_ADMIN;
-grant SELECT                                                                 on DPU_IMP         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_IMP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_IMP         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_IMP         to DPT_ADMIN;
 grant SELECT                                                                 on DPU_IMP         to START1;
-grant SELECT                                                                 on DPU_IMP         to UPLD;
 
 
 

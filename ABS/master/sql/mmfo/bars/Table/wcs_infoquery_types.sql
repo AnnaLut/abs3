@@ -89,10 +89,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_INFOQUERY_TYPES ***
-grant SELECT                                                                 on WCS_INFOQUERY_TYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_INFOQUERY_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_INFOQUERY_TYPES to BARS_DM;
-grant SELECT                                                                 on WCS_INFOQUERY_TYPES to UPLD;
 
 
 

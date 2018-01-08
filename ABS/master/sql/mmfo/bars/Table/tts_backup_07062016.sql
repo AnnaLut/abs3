@@ -130,10 +130,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0030730 ***
+PROMPT *** Create  constraint SYS_C0030733 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TTS_BACKUP_07062016 MODIFY (FLI NOT NULL ENABLE)';
+  ALTER TABLE BARS.TTS_BACKUP_07062016 MODIFY (FLAGS NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -166,20 +166,16 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0030733 ***
+PROMPT *** Create  constraint SYS_C0030730 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TTS_BACKUP_07062016 MODIFY (FLAGS NOT NULL ENABLE)';
+  ALTER TABLE BARS.TTS_BACKUP_07062016 MODIFY (FLI NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-
-PROMPT *** Create  grants  TTS_BACKUP_07062016 ***
-grant SELECT                                                                 on TTS_BACKUP_07062016 to BARSREADER_ROLE;
-grant SELECT                                                                 on TTS_BACKUP_07062016 to UPLD;
 
 
 

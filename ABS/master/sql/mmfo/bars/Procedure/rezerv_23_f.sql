@@ -1,24 +1,15 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/REZERV_23_F.sql =========*** Run *
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure REZERV_23_F ***
-
-  CREATE OR REPLACE PROCEDURE BARS.REZERV_23_F (dat01_   in date) is
+CREATE OR REPLACE PROCEDURE BARS.rezerv_23_f (dat01_   in date) is
 /* Версия 1.0  23-11-2017
    Рівчачок з проміжними комітами для формування резерву припереході на новий планг рахунків
 */
 
-l_oschad   BOOLEAN;
+l_oschad   BOOLEAN;  
 l_commit   number:=  0 ;
 IDR_       number;   ost_nal    number;   szn_       number;   sznq_      number;   s_kos      number;   n_n        number;
 ARJK_      number;   r013_      number;   rez_       number;   pv_        number;   pv_z       number;   pvz_       number;
 mfo_       NUMBER;   mfou_      NUMBER;   freq_      number;   l_rez      number;   l_rez_30   number;   l_rezq_30  number;
 l_rez_0    number;   l_rezq_0   number;   l_koef     number;   l_tipa     number;   l_diskont  number;   se1_       DECIMAL (24);
-l_xoz_fv   number := 1;
+l_xoz_fv   number := 1; 
 -- ДО 30 ДНЕЙ
 o_r013_1   VARCHAR2 (1); o_se_1     DECIMAL (24); o_comm_1   rnbu_trace.comm%TYPE;
 -- ПОСЛЕ 30 ДНЕЙ
@@ -86,9 +77,9 @@ begin
    LOOP
       l_tipa := k.tipa  ;
       begin
-         if k.id like 'DEBH%' or k.id like 'XOZ%'  THEN
+         if k.id like 'DEBH%' or k.id like 'XOZ%'  THEN  
             if l_xoz_fv = 0 THEN
-               k.rez  := k.rez23 ;    k.rezq := k.rezq23;
+               k.rez  := k.rez23 ;    k.rezq := k.rezq23; 
             end if;
          end if;
 
@@ -111,7 +102,7 @@ begin
 
          ARJK_    := 0    ; szn_      := 0 ; sznq_    := 0    ; s_kos     := 0     ; ND_CP_   := k.nd ; freq_     := NULL;
          o_r013_1 := null ; o_se_1    := 0 ; o_comm_1 := null ; o_r013_2  := null  ; o_se_2   := 0    ; o_comm_2  := null;
-         l_rez_30 := 0    ; l_rezq_30 := 0 ; l_rez_0  := k.rez; l_rezq_0  := k.rezq;
+         l_rez_30 := 0    ; l_rezq_30 := 0 ; l_rez_0  := k.rez; l_rezq_0  := k.rezq; 
 
          If l_oschad then  -- только ОЩАДБАНК
             --Тип актива
@@ -176,7 +167,7 @@ begin
                   EXCEPTION  WHEN NO_DATA_FOUND  THEN      szn_ := 0;  sznq_:= 0;
                   end;
                end if;
-
+               
             -- дебиторка, ценные бумаги, гарантии (не включается в налоговый)
             elsif (k.nbs='3579' and k.ob22 in ('07','08','09','19','23','24','31','33','35','37','39','57','66','67','68','69',
                                                '70','71','72','73','74','75','76','77','78','79','80','81','82','83','84','85',
@@ -204,9 +195,9 @@ begin
             end if;
 
             -- определение по начисленным процентам не погашенные до 30 дней и более 30 дней
-            if (k.tip in ('SN ','SNO') or
+            if (k.tip in ('SN ','SNO') or 
                (k.nbs in ('3570') and k.ob22 in ('01','02','03','04','09','11','13','14','15','16','17','18','19','20','21','22',
-                                               '23','24','25','26','27','28','29','30','31','32','33','34','35','36')) or
+                                               '23','24','25','26','27','28','29','30','31','32','33','34','35','36')) or 
                (k.nbs in ('3578') and k.ob22 in ('01','05','09','15','17','19','21','24','26','28','30','32','33','34','35','36',
                                                '37','38'))) and k.rez<>0 THEN
                se1_ := -k.bv*100;
@@ -255,7 +246,7 @@ begin
 
             elsif (k.tip in ('SK9','OFR') or k.nbs in ('3570','3578')) and k. nbs not in ('3548') and k.rez<>0  THEN   --k.nbs in ('3579') and k.rez<>0  THEN
                   o_se_2   := -k.bv*100; l_rez_30 := k.rez; l_rezq_30:= k.rezq;
-                  l_rez_0  := 0        ; l_rezq_0 := 0    ;
+                  l_rez_0  := 0        ; l_rezq_0 := 0    ; 
             else
                   o_se_2   := 0        ; l_rez_30 := 0; l_rezq_30:= 0;
 
@@ -330,17 +321,17 @@ begin
            k.branch := k.branch||'000000/';
          end if;
 
-         if k.custtype = 3 THEN
+         if k.custtype = 3 THEN  
             begin
-               select c.sed into l_sed from  customer c where c.rnk = k.rnk and sed='91';
-               k.custtype := 2;
+               select c.sed into l_sed from  customer c where c.rnk = k.rnk and sed='91'; 
+               k.custtype := 2; 
             EXCEPTION WHEN NO_DATA_FOUND THEN NULL;
             end;
          end if;
 
          update nbu23_rez set idr    = idr_    , ARJK    = ARJK_    , rz    = k.rz       , cc_id    = k.cc_id    , rez    = k.rez      , rezq     = k.rezq  ,
                               kat    = k.kat   , s250    = k.s250   , nd    = k.nd       , nd_cp    = nd_cp_     , id     = k.idkod    , branch   = k.branch,
-                              rezn   = 0       , reznq   = 0        , bv_30 = -o_se_2/100, custtype = k. custtype, bvq_30 = -gl.p_icurval (k.kv, o_se_2 , dat31_)/100,
+                              rezn   = 0       , reznq   = 0        , bv_30 = -o_se_2/100, custtype = k. custtype, bvq_30 = -gl.p_icurval (k.kv, o_se_2 , dat31_)/100, 
                               rez_30 = l_rez_30, rezq_30 = l_rezq_30, tipa  = l_tipa     , rez_0    = l_rez_0    ,rezq_0  = l_rezq_0
          where rowid = k.RI ;
 
@@ -399,14 +390,7 @@ begin
 end;
 /
 show err;
-
-PROMPT *** Create  grants  REZERV_23_F ***
-grant EXECUTE                                                                on REZERV_23_F     to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on REZERV_23_F     to RCC_DEAL;
-grant EXECUTE                                                                on REZERV_23_F     to START1;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/REZERV_23_F.sql =========*** End *
-PROMPT ===================================================================================== 
+/
+grant EXECUTE  on rezerv_23_F  to BARS_ACCESS_DEFROLE;
+grant EXECUTE  on rezerv_23_F  to RCC_DEAL;
+grant EXECUTE  on rezerv_23_F  to START1;

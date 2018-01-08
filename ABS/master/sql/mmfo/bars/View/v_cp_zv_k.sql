@@ -12,28 +12,20 @@ PROMPT *** Create  view V_CP_ZV_K ***
        where frm like '_k');
 
 PROMPT *** Create  grants  V_CP_ZV7K ***
-grant SELECT                                                                 on V_CP_ZV7K       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_ZV7K       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_ZV7K       to START1;
-grant SELECT                                                                 on V_CP_ZV7K       to UPLD;
 
 PROMPT *** Create  grants  V_CP_ZV8K ***
-grant SELECT                                                                 on V_CP_ZV8K       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_ZV8K       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_ZV8K       to START1;
-grant SELECT                                                                 on V_CP_ZV8K       to UPLD;
 
 PROMPT *** Create  grants  V_CP_ZV9K ***
-grant SELECT                                                                 on V_CP_ZV9K       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_ZV9K       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_ZV9K       to START1;
-grant SELECT                                                                 on V_CP_ZV9K       to UPLD;
 
 PROMPT *** Create  grants  V_CP_ZV_K ***
-grant SELECT                                                                 on V_CP_ZV_K       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_ZV_K       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_ZV_K       to START1;
-grant SELECT                                                                 on V_CP_ZV_K       to UPLD;
 
 
 

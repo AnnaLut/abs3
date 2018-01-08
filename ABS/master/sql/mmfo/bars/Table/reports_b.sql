@@ -67,10 +67,8 @@ COMMENT ON COLUMN BARS.REPORTS_B.PARAMS_DEFAULTS IS '';
 
 
 PROMPT *** Create  grants  REPORTS_B ***
-grant SELECT                                                                 on REPORTS_B       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPORTS_B       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPORTS_B       to START1;
-grant SELECT                                                                 on REPORTS_B       to UPLD;
 
 
 

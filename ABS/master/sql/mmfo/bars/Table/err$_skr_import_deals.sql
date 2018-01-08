@@ -111,10 +111,6 @@ COMMENT ON COLUMN BARS.ERR$_SKR_IMPORT_DEALS.NLS3600 IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SKR_IMPORT_DEALS ***
-grant SELECT                                                                 on ERR$_SKR_IMPORT_DEALS to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SKR_IMPORT_DEALS to UPLD;
-
 
 
 PROMPT ===================================================================================== 

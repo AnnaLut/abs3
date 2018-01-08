@@ -105,13 +105,11 @@ exception when others then
 PROMPT *** Create  grants  ACC_OVER_NBS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_NBS    to ABS_ADMIN;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on ACC_OVER_NBS    to BARS009;
-grant SELECT                                                                 on ACC_OVER_NBS    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_OVER_NBS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_OVER_NBS    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_NBS    to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_NBS    to TECH005;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_NBS    to TECH006;
-grant SELECT                                                                 on ACC_OVER_NBS    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_OVER_NBS    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on ACC_OVER_NBS    to WR_REFREAD;
 

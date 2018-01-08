@@ -68,9 +68,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  PERIOD_TYPE ***
-grant SELECT                                                                 on PERIOD_TYPE     to BARSREADER_ROLE;
 grant SELECT                                                                 on PERIOD_TYPE     to BARSUPL;
-grant SELECT                                                                 on PERIOD_TYPE     to UPLD;
 
 
 

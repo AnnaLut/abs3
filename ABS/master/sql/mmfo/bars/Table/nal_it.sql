@@ -109,10 +109,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  NAL_IT ***
-grant SELECT                                                                 on NAL_IT          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAL_IT          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAL_IT          to START1;
-grant SELECT                                                                 on NAL_IT          to UPLD;
 
 
 

@@ -62,10 +62,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111447 ***
+PROMPT *** Create  constraint FK_PFU_REQUEST_REF_PARENT ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_REQUEST MODIFY (STATE NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_REQUEST ADD CONSTRAINT FK_PFU_REQUEST_REF_PARENT FOREIGN KEY (PARENT_REQUEST_ID)
+	  REFERENCES PFU.PFU_REQUEST (ID) DISABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -100,6 +101,18 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint SYS_C00111447 ***
+begin   
+ execute immediate '
+  ALTER TABLE PFU.PFU_REQUEST MODIFY (STATE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_PFU_REQUEST ***
 begin   
  execute immediate '
@@ -112,10 +125,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  PFU_REQUEST ***
-grant SELECT                                                                 on PFU_REQUEST     to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_REQUEST     to UPLD;
 
 
 

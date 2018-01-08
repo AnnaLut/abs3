@@ -111,10 +111,6 @@ exception when others then
 
 
 
-PROMPT *** Create  grants  TMP_OB23_K11 ***
-grant SELECT                                                                 on TMP_OB23_K11    to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_OB23_K11    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

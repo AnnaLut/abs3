@@ -13,10 +13,8 @@ where  nbs like '7%' and accc is null and dazs is null
  ;
 
 PROMPT *** Create  grants  SB_NAL7 ***
-grant SELECT                                                                 on SB_NAL7         to BARSREADER_ROLE;
 grant SELECT                                                                 on SB_NAL7         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SB_NAL7         to NALOG;
-grant SELECT                                                                 on SB_NAL7         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SB_NAL7         to WR_ALL_RIGHTS;
 
 

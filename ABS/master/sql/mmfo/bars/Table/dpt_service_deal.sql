@@ -51,11 +51,9 @@ COMMENT ON COLUMN BARS.DPT_SERVICE_DEAL.COMMENTS IS '';
 
 
 PROMPT *** Create  grants  DPT_SERVICE_DEAL ***
-grant SELECT                                                                 on DPT_SERVICE_DEAL to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_SERVICE_DEAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_SERVICE_DEAL to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_SERVICE_DEAL to START1;
-grant SELECT                                                                 on DPT_SERVICE_DEAL to UPLD;
 
 
 

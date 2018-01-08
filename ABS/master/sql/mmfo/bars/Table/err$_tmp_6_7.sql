@@ -61,10 +61,6 @@ COMMENT ON COLUMN BARS.ERR$_TMP_6_7.ERR IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_TMP_6_7 ***
-grant SELECT                                                                 on ERR$_TMP_6_7    to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_TMP_6_7    to UPLD;
-
 
 
 PROMPT ===================================================================================== 

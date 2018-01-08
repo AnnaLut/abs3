@@ -58,10 +58,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119347 ***
+PROMPT *** Create  constraint SYS_C00119349 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.TMP_PFU_EPP_KILLED MODIFY (KILL_TYPE NOT NULL ENABLE)';
+  ALTER TABLE PFU.TMP_PFU_EPP_KILLED MODIFY (STATE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -82,10 +82,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119349 ***
+PROMPT *** Create  constraint SYS_C00119347 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.TMP_PFU_EPP_KILLED MODIFY (STATE NOT NULL ENABLE)';
+  ALTER TABLE PFU.TMP_PFU_EPP_KILLED MODIFY (KILL_TYPE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -94,9 +94,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_PFU_EPP_KILLED ***
-grant SELECT                                                                 on TMP_PFU_EPP_KILLED to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_PFU_EPP_KILLED to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on TMP_PFU_EPP_KILLED to UPLD;
 
 
 

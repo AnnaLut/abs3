@@ -105,6 +105,92 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_CUSTOMERFIELD_NOTTOEDIT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_FIELD MODIFY (NOT_TO_EDIT CONSTRAINT CC_CUSTOMERFIELD_NOTTOEDIT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERFIELD_CODE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_FIELD MODIFY (CODE CONSTRAINT CC_CUSTOMERFIELD_CODE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERFIELD_NAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_FIELD MODIFY (NAME CONSTRAINT CC_CUSTOMERFIELD_NAME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERFIELD_TAG_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_FIELD MODIFY (TAG CONSTRAINT CC_CUSTOMERFIELD_TAG_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMERFIELD_CODES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_FIELD ADD CONSTRAINT FK_CUSTOMERFIELD_CODES FOREIGN KEY (CODE)
+	  REFERENCES BARS.CUSTOMER_FIELD_CODES (CODE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CUSTOMERFIELD_METACOLTYPES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_FIELD ADD CONSTRAINT FK_CUSTOMERFIELD_METACOLTYPES FOREIGN KEY (TYPE)
+	  REFERENCES BARS.META_COLTYPES (COLTYPE) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CUSTOMERFIELD_OPT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUSTOMER_FIELD ADD CONSTRAINT CC_CUSTOMERFIELD_OPT CHECK (opt in (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_CUSTOMERFIELD_F ***
 begin   
  execute immediate '
@@ -193,66 +279,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_OPT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD ADD CONSTRAINT CC_CUSTOMERFIELD_OPT CHECK (opt in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_TAG_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD MODIFY (TAG CONSTRAINT CC_CUSTOMERFIELD_TAG_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_NAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD MODIFY (NAME CONSTRAINT CC_CUSTOMERFIELD_NAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_CODE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD MODIFY (CODE CONSTRAINT CC_CUSTOMERFIELD_CODE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_NOTTOEDIT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD MODIFY (NOT_TO_EDIT CONSTRAINT CC_CUSTOMERFIELD_NOTTOEDIT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_CUSTOMERFIELD ***
 begin   
  execute immediate '
@@ -282,7 +308,6 @@ exception when others then
 
 PROMPT *** Create  grants  CUSTOMER_FIELD ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_FIELD  to ABS_ADMIN;
-grant SELECT                                                                 on CUSTOMER_FIELD  to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTOMER_FIELD  to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTOMER_FIELD  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_FIELD  to BARS_DM;

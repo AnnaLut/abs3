@@ -29,10 +29,8 @@ where a.acc=i.acc and i.acra=n.acc and i.id=0 and
     (a.dazs is null or a.dazs <f.fdat1);
 
 PROMPT *** Create  grants  V_OLA ***
-grant SELECT                                                                 on V_OLA           to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OLA           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OLA           to START1;
-grant SELECT                                                                 on V_OLA           to UPLD;
 
 
 

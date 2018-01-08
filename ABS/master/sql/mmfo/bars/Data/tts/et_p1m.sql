@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции P1M
-prompt Наименование операции: P1M p) Видатковий позабалансовий ордер 96-98
+prompt Наименование операции: p) Видатковий позабалансовий ордер 96-98
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('P1M', 'P1M p) Видатковий позабалансовий ордер 96-98', 1, null, null, null, null, null, null, '#(branch_usr.get_branch_param2(''NLS_9910'',0))', null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', 'Передача цiнностей до каси банку');
+    values ('P1M', 'p) Видатковий позабалансовий ордер 96-98', 1, null, null, null, null, null, null, '#(branch_usr.get_branch_param2(''NLS_9910'',0))', null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', 'Передача цiнностей до каси банку');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='P1M', name='P1M p) Видатковий позабалансовий ордер 96-98', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb='#(branch_usr.get_branch_param2(''NLS_9910'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='Передача цiнностей до каси банку'
+         set tt='P1M', name='p) Видатковий позабалансовий ордер 96-98', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb='#(branch_usr.get_branch_param2(''NLS_9910'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='Передача цiнностей до каси банку'
        where tt='P1M';
   end;
   --------------------------------

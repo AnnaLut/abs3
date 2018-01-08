@@ -36,9 +36,7 @@ PROMPT *** Create  view V_CP_FDZ_REFS ***
           AND CR.QUALITY = -1;
 
 PROMPT *** Create  grants  V_CP_FDZ_REFS ***
-grant SELECT                                                                 on V_CP_FDZ_REFS   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_FDZ_REFS   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CP_FDZ_REFS   to UPLD;
 
 
 

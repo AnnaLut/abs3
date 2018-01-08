@@ -519,10 +519,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_HIERARCHY_REPORT ***
-grant SELECT                                                                 on CP_HIERARCHY_REPORT to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_HIERARCHY_REPORT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_HIERARCHY_REPORT to BARS_DM;
-grant SELECT                                                                 on CP_HIERARCHY_REPORT to UPLD;
 
 
 

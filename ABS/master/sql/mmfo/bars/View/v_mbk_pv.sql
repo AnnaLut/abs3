@@ -15,10 +15,6 @@ FROM test_many_mbk m, cc_deal e
 WHERE e.nd = m.ND AND m.fdat >= TO_DATE (pul.get_mas_ini_val ('sFdat1'), 'dd.mm.yyyy')
   and e.vidd >1500 and e.vidd < 1600  and Dat_Next_U (e.sdate, 1) < e.wdate group by e.nd ;
 
-PROMPT *** Create  grants  V_MBK_PV ***
-grant SELECT                                                                 on V_MBK_PV        to BARSREADER_ROLE;
-grant SELECT                                                                 on V_MBK_PV        to UPLD;
-
 
 
 PROMPT ===================================================================================== 

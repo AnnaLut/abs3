@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_ACC_OVER_PAR.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_ACC_OVER_PAR ***
-grant SELECT                                                                 on ERR$_ACC_OVER_PAR to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_ACC_OVER_PAR to UPLD;
-
 
 
 PROMPT ===================================================================================== 

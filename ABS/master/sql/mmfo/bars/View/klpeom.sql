@@ -12,10 +12,8 @@ PROMPT *** Create  view KLPEOM ***
  ;
 
 PROMPT *** Create  grants  KLPEOM ***
-grant SELECT                                                                 on KLPEOM          to BARSREADER_ROLE;
 grant SELECT                                                                 on KLPEOM          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KLPEOM          to START1;
-grant SELECT                                                                 on KLPEOM          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLPEOM          to WR_ALL_RIGHTS;
 
 

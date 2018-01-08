@@ -55,12 +55,11 @@ COMMENT ON COLUMN BARS.FIN_DEBT.COMM IS '';
 
 
 
-PROMPT *** Create  constraint UK_FINDEBT_NBSP ***
+PROMPT *** Create  constraint FK_FINDEBT_FINDEBM ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FIN_DEBT ADD CONSTRAINT UK_FINDEBT_NBSP UNIQUE (NBS_P)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.FIN_DEBT ADD CONSTRAINT FK_FINDEBT_FINDEBM FOREIGN KEY (MOD_ABS)
+	  REFERENCES BARS.FIN_DEBM (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -83,20 +82,6 @@ exception when others then
 
 
 
-PROMPT *** Create  index UK_FINDEBT_NBSP ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.UK_FINDEBT_NBSP ON BARS.FIN_DEBT (NBS_P) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_FINDEB ***
 begin   
  execute immediate '
@@ -111,11 +96,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_DEBT ***
-grant SELECT                                                                 on FIN_DEBT        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_DEBT        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_DEBT        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_DEBT        to START1;
-grant SELECT                                                                 on FIN_DEBT        to UPLD;
 
 
 

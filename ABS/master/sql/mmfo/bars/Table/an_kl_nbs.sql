@@ -76,11 +76,9 @@ exception when others then
 
 PROMPT *** Create  grants  AN_KL_NBS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on AN_KL_NBS       to ABS_ADMIN;
-grant SELECT                                                                 on AN_KL_NBS       to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on AN_KL_NBS       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AN_KL_NBS       to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on AN_KL_NBS       to START1;
-grant SELECT                                                                 on AN_KL_NBS       to UPLD;
 grant FLASHBACK,SELECT                                                       on AN_KL_NBS       to WR_REFREAD;
 
 

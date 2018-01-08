@@ -75,10 +75,6 @@ COMMENT ON COLUMN BARS.ERR$_SB_P085_L.GR_IN IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_SB_P085_L ***
-grant SELECT                                                                 on ERR$_SB_P085_L  to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_SB_P085_L  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

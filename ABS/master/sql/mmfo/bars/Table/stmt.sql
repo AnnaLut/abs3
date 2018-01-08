@@ -51,6 +51,19 @@ COMMENT ON COLUMN BARS.STMT.NAME IS 'Наименование';
 
 
 
+PROMPT *** Create  constraint FK_STMT_FREQ ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STMT ADD CONSTRAINT FK_STMT_FREQ FOREIGN KEY (FREQ)
+	  REFERENCES BARS.FREQ (FREQ) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_STMT_STMT_NN ***
 begin   
  execute immediate '
@@ -104,13 +117,11 @@ exception when others then
 
 PROMPT *** Create  grants  STMT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STMT            to ABS_ADMIN;
-grant SELECT                                                                 on STMT            to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STMT            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STMT            to BARS_DM;
 grant SELECT                                                                 on STMT            to CUST001;
 grant SELECT                                                                 on STMT            to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STMT            to STMT;
-grant SELECT                                                                 on STMT            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STMT            to WR_ALL_RIGHTS;
 grant SELECT                                                                 on STMT            to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on STMT            to WR_REFREAD;

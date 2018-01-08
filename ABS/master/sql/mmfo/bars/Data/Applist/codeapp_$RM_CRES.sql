@@ -1,3 +1,5 @@
+SET SERVEROUTPUT ON 
+SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_CRES.sql =========*
 PROMPT ===================================================================================== 
@@ -16,11 +18,11 @@ PROMPT *** Create/replace  ARM  $RM_CRES ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-	d integer := 0;
+    d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_CRES створюємо (або оновлюємо) АРМ АРМ Кредитні ресурси. Адміністрування3 ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
-                             P_ARM_NAME              => l_application_name,
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
+                             P_ARM_NAME              => l_application_name, 
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -28,38 +30,38 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Монітор заявок ЦБД ********** ');
           --  Створюємо функцію Монітор заявок ЦБД
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Монітор заявок ЦБД',
                                                   p_funcname => '/barsroot/CRSOUR/dealMonitor/AcceptList',
-                                                  p_rolename => 'RCC_DEAL' ,
+                                                  p_rolename => 'RCC_DEAL' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Список заявок ЦБД для акцепту ********** ');
           --  Створюємо функцію Список заявок ЦБД для акцепту
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Список заявок ЦБД для акцепту',
                                                   p_funcname => '/barsroot/CRSOUR/dealMonitor/SimpleAcceptList',
-                                                  p_rolename => 'RCC_DEAL' ,
+                                                  p_rolename => 'RCC_DEAL' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Повний список транзакцій АБС ********** ');
           --  Створюємо функцію Повний список транзакцій АБС
       l := l +1;
-      l_function_ids.extend(l);
+      l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Повний список транзакцій АБС',
                                                   p_funcname => '/barsroot/CRSOUR/dealMonitor/TranasactionList',
-                                                  p_rolename => 'RCC_DEAL' ,
+                                                  p_rolename => 'RCC_DEAL' ,    
                                                   p_frontend => l_application_type_id
                                                   );
-
+     
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_CRES) - АРМ Кредитні ресурси. Адміністрування3  ');
     l := l_function_ids.first;
@@ -67,8 +69,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-
-
+     
+     
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -82,7 +84,6 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
-commit;
 end;
 /
 

@@ -102,10 +102,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00109899 ***
+PROMPT *** Create  constraint SYS_C00109903 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_ADM_RESOURCE_ACT_BACK_2402 MODIFY (RESOURCE_TYPE_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_ADM_RESOURCE_ACT_BACK_2402 MODIFY (ACTION_USER_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -150,20 +150,16 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00109903 ***
+PROMPT *** Create  constraint SYS_C00109899 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_ADM_RESOURCE_ACT_BACK_2402 MODIFY (ACTION_USER_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_ADM_RESOURCE_ACT_BACK_2402 MODIFY (RESOURCE_TYPE_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
-
-PROMPT *** Create  grants  TMP_ADM_RESOURCE_ACT_BACK_2402 ***
-grant SELECT                                                                 on TMP_ADM_RESOURCE_ACT_BACK_2402 to BARSREADER_ROLE;
-grant SELECT                                                                 on TMP_ADM_RESOURCE_ACT_BACK_2402 to UPLD;
 
 
 

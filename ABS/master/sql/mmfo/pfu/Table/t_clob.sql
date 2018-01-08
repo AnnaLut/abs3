@@ -59,8 +59,6 @@ COMMENT ON COLUMN PFU.T_CLOB.SYS_TIME IS '';
 
 PROMPT *** Create  grants  T_CLOB ***
 grant INSERT,SELECT                                                          on T_CLOB          to BARS;
-grant SELECT                                                                 on T_CLOB          to BARSREADER_ROLE;
-grant SELECT                                                                 on T_CLOB          to UPLD;
 
 
 

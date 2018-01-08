@@ -232,10 +232,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMCHRONAVGBALS_R030_NN ***
+PROMPT *** Create  constraint CC_DMCHRONAVGBALS_SUMDBUAH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_CHRON_AVG_BALS MODIFY (R030 CONSTRAINT CC_DMCHRONAVGBALS_R030_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_CHRON_AVG_BALS MODIFY (SUM_DB_UAH CONSTRAINT CC_DMCHRONAVGBALS_SUMDBUAH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -304,10 +304,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMCHRONAVGBALS_SUMDBUAH_NN ***
+PROMPT *** Create  constraint CC_DMCHRONAVGBALS_R030_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_CHRON_AVG_BALS MODIFY (SUM_DB_UAH CONSTRAINT CC_DMCHRONAVGBALS_SUMDBUAH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_CHRON_AVG_BALS MODIFY (R030 CONSTRAINT CC_DMCHRONAVGBALS_R030_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -500,9 +500,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_DM_CHRON_AVG_BALS ***
-grant SELECT                                                                 on NBUR_DM_CHRON_AVG_BALS to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_DM_CHRON_AVG_BALS to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on NBUR_DM_CHRON_AVG_BALS to UPLD;
 
 
 

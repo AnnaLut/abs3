@@ -69,6 +69,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_BRANCHCONN_BRANCH ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BRANCH_CONN ADD CONSTRAINT FK_BRANCHCONN_BRANCH FOREIGN KEY (BRANCH)
+	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_BRANCHCONN_BRANCH_NN ***
 begin   
  execute immediate '
@@ -95,11 +108,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BRANCH_CONN ***
-grant SELECT                                                                 on BRANCH_CONN     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRANCH_CONN     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH_CONN     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BRANCH_CONN     to START1;
-grant SELECT                                                                 on BRANCH_CONN     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRANCH_CONN     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BRANCH_CONN     to WR_REFREAD;
 

@@ -65,8 +65,7 @@ PROMPT *** Create  view MONEXRI ***
                FROM monexr r
                     INNER JOIN V_SFDAT v ON r.fdat >= v.B AND r.fdat <= v.E
                     LEFT JOIN monex0 m ON m.KOD_NBU = r.KOD_NBU
-                    LEFT JOIN
-                    SWI_MTI_LIST l
+                    LEFT JOIN SWI_MTI_LIST l
                        ON     NVL (l.OB22_2909, '0') = NVL (m.OB22, '0')
                           AND NVL (l.OB22_2809, '0') = NVL (m.OB22_2809, '0')
                           AND NVL (l.OB22_KOM, '0') = NVL (m.OB22_KOM, '0')
@@ -113,8 +112,7 @@ PROMPT *** Create  view MONEXRI ***
        FROM monexr r
             INNER JOIN V_SFDAT v ON r.fdat >= v.B AND r.fdat <= v.E
             LEFT JOIN monex0 m ON m.KOD_NBU = r.KOD_NBU
-            LEFT JOIN
-            SWI_MTI_LIST l
+            LEFT JOIN SWI_MTI_LIST l
                ON     NVL (l.OB22_2909, '0') = NVL (m.OB22, '0')
                   AND NVL (l.OB22_2809, '0') = NVL (m.OB22_2809, '0')
                   AND NVL (l.OB22_KOM, '0') = NVL (m.OB22_KOM, '0')
@@ -155,8 +153,7 @@ PROMPT *** Create  view MONEXRI ***
        FROM monexr r
             INNER JOIN V_SFDAT v ON r.fdat >= v.B AND r.fdat <= v.E
             LEFT JOIN monex0 m ON m.KOD_NBU = r.KOD_NBU
-            LEFT JOIN
-            SWI_MTI_LIST l
+            LEFT JOIN SWI_MTI_LIST l
                ON     NVL (l.OB22_2909, '0') = NVL (m.OB22, '0')
                   AND NVL (l.OB22_2809, '0') = NVL (m.OB22_2809, '0')
                   AND NVL (l.OB22_KOM, '0') = NVL (m.OB22_KOM, '0')
@@ -165,10 +162,8 @@ PROMPT *** Create  view MONEXRI ***
    GROUP BY r.kod_nbu, r.fl, r.ob22;
 
 PROMPT *** Create  grants  MONEXRI ***
-grant SELECT                                                                 on MONEXRI         to BARSREADER_ROLE;
 grant SELECT                                                                 on MONEXRI         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MONEXRI         to START1;
-grant SELECT                                                                 on MONEXRI         to UPLD;
 
 
 

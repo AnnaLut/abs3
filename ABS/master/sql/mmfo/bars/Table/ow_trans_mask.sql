@@ -46,10 +46,6 @@ COMMENT ON COLUMN BARS.OW_TRANS_MASK.COMM IS '';
 
 
 
-PROMPT *** Create  grants  OW_TRANS_MASK ***
-grant SELECT                                                                 on OW_TRANS_MASK   to BARSREADER_ROLE;
-grant SELECT                                                                 on OW_TRANS_MASK   to UPLD;
-
 
 
 PROMPT ===================================================================================== 

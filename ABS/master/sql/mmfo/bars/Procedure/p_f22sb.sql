@@ -11,7 +11,7 @@ PROMPT *** Create  procedure P_F22SB ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла @22 для Сбербанк
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.All Rights Reserved.
-% VERSION     : 13/05/2017 (17/02/2016)
+% VERSION     : 17/02/2016 (13/01/2016, 03/07/2014)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -65,10 +65,10 @@ Kos99_   DECIMAL(24);
 Kosq99_  DECIMAL(24);
 Doszg_   DECIMAL(24);
 Koszg_   DECIMAL(24);
-Dos96zg_ DECIMAL(24) := 0;
-Kos96zg_ DECIMAL(24) := 0;
-Dos99zg_ DECIMAL(24) := 0;
-Kos99zg_ DECIMAL(24) := 0;
+Dos96zg_ DECIMAL(24);
+Kos96zg_ DECIMAL(24);
+Dos99zg_ DECIMAL(24);
+Kos99zg_ DECIMAL(24);
 se_      DECIMAL(24);
 Ostn_    DECIMAL(24);
 Ostq_    DECIMAL(24);

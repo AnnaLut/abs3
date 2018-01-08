@@ -14,10 +14,8 @@ PROMPT *** Create  view A_S180 ***
 from CCK_AN_TMP_UPB;
 
 PROMPT *** Create  grants  A_S180 ***
-grant SELECT                                                                 on A_S180          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on A_S180          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on A_S180          to SALGL;
-grant SELECT                                                                 on A_S180          to UPLD;
 
 
 

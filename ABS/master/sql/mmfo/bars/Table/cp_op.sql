@@ -77,12 +77,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_OP ***
-grant SELECT                                                                 on CP_OP           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_OP           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_OP           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_OP           to CP_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_OP           to START1;
-grant SELECT                                                                 on CP_OP           to UPLD;
 
 
 

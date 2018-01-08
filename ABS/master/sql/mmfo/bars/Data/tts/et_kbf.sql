@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции KBF
-prompt Наименование операции: KBF off DPT - Виплата відсотків гот. ВАЛ
+prompt Наименование операции: off DPT - Виплата відсотків гот. ВАЛ
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KBF', 'KBF off DPT - Виплата відсотків гот. ВАЛ', 1, null, null, null, null, null, null, '#(TOBOPACK.GetToboCASH)', null, 0, 0, 0, 0, null, null, null, null, null, null, '0001100000000000000000000000000000010000000000000000000000000000', null);
+    values ('KBF', 'off DPT - Виплата відсотків гот. ВАЛ', 1, null, null, null, null, null, null, '#(TOBOPACK.GetToboCASH)', null, 0, 0, 0, 0, null, null, null, null, null, null, '0001100000000000000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KBF', name='KBF off DPT - Виплата відсотків гот. ВАЛ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb='#(TOBOPACK.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0001100000000000000000000000000000010000000000000000000000000000', nazn=null
+         set tt='KBF', name='off DPT - Виплата відсотків гот. ВАЛ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb='#(TOBOPACK.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0001100000000000000000000000000000010000000000000000000000000000', nazn=null
        where tt='KBF';
   end;
   --------------------------------

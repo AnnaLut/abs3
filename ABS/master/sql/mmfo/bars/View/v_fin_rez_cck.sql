@@ -32,10 +32,8 @@ TO_DATE (SUBSTR(t.name1,10,8),'yyyymmdd') DAT2,
 FROM CCK_AN_TMP t, customer c where t.reg=c.rnk ;
 
 PROMPT *** Create  grants  V_FIN_REZ_CCK ***
-grant SELECT                                                                 on V_FIN_REZ_CCK   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FIN_REZ_CCK   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FIN_REZ_CCK   to START1;
-grant SELECT                                                                 on V_FIN_REZ_CCK   to UPLD;
 
 
 

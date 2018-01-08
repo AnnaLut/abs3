@@ -104,11 +104,9 @@ exception when others then
 
 PROMPT *** Create  grants  CHKNBS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CHKNBS          to ABS_ADMIN;
-grant SELECT                                                                 on CHKNBS          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CHKNBS          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHKNBS          to BARS_DM;
 grant SELECT                                                                 on CHKNBS          to START1;
-grant SELECT                                                                 on CHKNBS          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CHKNBS          to WR_ALL_RIGHTS;
 
 

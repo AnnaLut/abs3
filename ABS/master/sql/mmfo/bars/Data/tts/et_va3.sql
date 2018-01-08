@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции VA9
-prompt Наименование операции: VA9 4) Списання виданих лотерейних білетів (позабал.)
+prompt Наименование операции: 4) Списання виданих лотерейних білетів (позабал.)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('VA9', 'VA9 4) Списання виданих лотерейних білетів (позабал.)', 1, '#(VA(''98'') )', null, '#(branch_usr.get_branch_param2(''NLS_9910'',0))', null, null, null, null, null, 0, 0, 0, 0, 'VAK(''9819'')', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('VA9', '4) Списання виданих лотерейних білетів (позабал.)', 1, '#(VA(''98'') )', null, '#(branch_usr.get_branch_param2(''NLS_9910'',0))', null, null, null, null, null, 0, 0, 0, 0, 'VAK(''9819'')', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='VA9', name='VA9 4) Списання виданих лотерейних білетів (позабал.)', dk=1, nlsm='#(VA(''98'') )', kv=null, nlsk='#(branch_usr.get_branch_param2(''NLS_9910'',0))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='VAK(''9819'')', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='VA9', name='4) Списання виданих лотерейних білетів (позабал.)', dk=1, nlsm='#(VA(''98'') )', kv=null, nlsk='#(branch_usr.get_branch_param2(''NLS_9910'',0))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='VAK(''9819'')', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='VA9';
   end;
   --------------------------------
@@ -57,7 +57,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции VA3
-prompt Наименование операции: VA3 Розповсюдження лотерейних білетів (каса)
+prompt Наименование операции: Розповсюдження лотерейних білетів (каса)
 declare
   cnt_  number;
 begin
@@ -66,11 +66,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('VA3', 'VA3 Розповсюдження лотерейних білетів (каса)', 1, null, 980, null, 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, 0, 0, 0, 0, '#(VA_KK)*#(VA_CC)', null, 5, null, null, null, '0000100001000001100000000000000000010000000000000000000000000000', 'Розповсюдження: #(VA_NC) , кiлькiсть #(VA_KK) шт.');
+    values ('VA3', 'Розповсюдження лотерейних білетів (каса)', 1, null, 980, null, 980, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, 0, 0, 0, 0, '#(VA_KK)*#(VA_CC)', null, 5, null, null, null, '0000100001000001100000000000000000010000000000000000000000000000', 'Розповсюдження: #(VA_NC) , кiлькiсть #(VA_KK) шт.');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='VA3', name='VA3 Розповсюдження лотерейних білетів (каса)', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(VA_KK)*#(VA_CC)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100001000001100000000000000000010000000000000000000000000000', nazn='Розповсюдження: #(VA_NC) , кiлькiсть #(VA_KK) шт.'
+         set tt='VA3', name='Розповсюдження лотерейних білетів (каса)', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(VA_KK)*#(VA_CC)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100001000001100000000000000000010000000000000000000000000000', nazn='Розповсюдження: #(VA_NC) , кiлькiсть #(VA_KK) шт.'
        where tt='VA3';
   end;
   --------------------------------

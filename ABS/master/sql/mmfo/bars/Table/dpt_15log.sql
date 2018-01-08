@@ -111,10 +111,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_15LOG ***
-grant SELECT                                                                 on DPT_15LOG       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_15LOG       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_15LOG       to BARS_DM;
-grant SELECT                                                                 on DPT_15LOG       to UPLD;
 
 
 

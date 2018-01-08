@@ -79,10 +79,6 @@ COMMENT ON COLUMN BARS.ERR$_NBU23_CCK_UL_KOR.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_NBU23_CCK_UL_KOR ***
-grant SELECT                                                                 on ERR$_NBU23_CCK_UL_KOR to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_NBU23_CCK_UL_KOR to UPLD;
-
 
 
 PROMPT ===================================================================================== 

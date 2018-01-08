@@ -73,12 +73,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_REP_TT ***
-grant SELECT                                                                 on OW_REP_TT       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OW_REP_TT       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_REP_TT       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_REP_TT       to OW;
 grant SELECT                                                                 on OW_REP_TT       to RPBN001;
-grant SELECT                                                                 on OW_REP_TT       to UPLD;
 grant FLASHBACK,SELECT                                                       on OW_REP_TT       to WR_REFREAD;
 
 

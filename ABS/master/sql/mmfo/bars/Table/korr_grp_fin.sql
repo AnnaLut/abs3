@@ -101,10 +101,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  KORR_GRP_FIN ***
-grant SELECT                                                                 on KORR_GRP_FIN    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KORR_GRP_FIN    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KORR_GRP_FIN    to START1;
-grant SELECT                                                                 on KORR_GRP_FIN    to UPLD;
 
 
 

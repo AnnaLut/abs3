@@ -25,9 +25,7 @@ PROMPT *** Create  view V_MBM_ACCOUNTS_COUNT ***
            GROUP BY a.cust_id, A.cur_id, a.cur_code) g;
 
 PROMPT *** Create  grants  V_MBM_ACCOUNTS_COUNT ***
-grant SELECT                                                                 on V_MBM_ACCOUNTS_COUNT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBM_ACCOUNTS_COUNT to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_MBM_ACCOUNTS_COUNT to UPLD;
 
 
 

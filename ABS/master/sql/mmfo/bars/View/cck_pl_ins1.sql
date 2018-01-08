@@ -13,10 +13,8 @@ PROMPT *** Create  view CCK_PL_INS1 ***
  WHERE nd = to_number(pul.get_mas_ini_val('ND'));
 
 PROMPT *** Create  grants  CCK_PL_INS1 ***
-grant SELECT                                                                 on CCK_PL_INS1     to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on CCK_PL_INS1     to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on CCK_PL_INS1     to START1;
-grant SELECT                                                                 on CCK_PL_INS1     to UPLD;
 
 
 

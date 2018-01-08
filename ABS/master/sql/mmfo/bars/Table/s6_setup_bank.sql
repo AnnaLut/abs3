@@ -129,166 +129,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C009138 ***
+PROMPT *** Create  constraint SYS_C009153 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_NIV_ED NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009139 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_NIV_SOT NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009140 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_KSH NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009141 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_IDEN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009142 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_KC NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009143 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_KO NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009144 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_NLGI NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009145 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_PROB NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009146 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_SIGN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009147 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_START NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009148 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_END NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009149 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_PR_END NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009150 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009151 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (VerDB NOT NULL ENABLE)';
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_PROBN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -309,10 +153,166 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C009153 ***
+PROMPT *** Create  constraint SYS_C009151 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_PROBN NOT NULL ENABLE)';
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (VerDB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009150 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009149 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_PR_END NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009148 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_END NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009147 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_START NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009146 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_SIGN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009145 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_PROB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009144 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_NLGI NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009143 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_KO NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009142 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_KC NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009141 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_IDEN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009140 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_KSH NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009139 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_NIV_SOT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009138 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.S6_SETUP_BANK MODIFY (C_NIV_ED NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -321,11 +321,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  S6_SETUP_BANK ***
-grant SELECT                                                                 on S6_SETUP_BANK   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_SETUP_BANK   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on S6_SETUP_BANK   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_SETUP_BANK   to START1;
-grant SELECT                                                                 on S6_SETUP_BANK   to UPLD;
 
 
 

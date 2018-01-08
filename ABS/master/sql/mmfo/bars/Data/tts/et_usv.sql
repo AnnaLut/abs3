@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции USV
-prompt Наименование операции: USV Переказ коштів(ін.вал) зг.кред.дог. на рах. ПАТ"УкрСоцБанк"
+prompt Наименование операции: Переказ коштів(ін.вал) зг.кред.дог. на рах. ПАТ"УкрСоцБанк"
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('USV', 'USV Переказ коштів(ін.вал) зг.кред.дог. на рах. ПАТ"УкрСоцБанк"', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, '191992', '300465', 0, 1, 0, 0, null, null, null, null, null, null, '0201100000000000000000000011000000010000000000000000000000000000', null);
+    values ('USV', 'Переказ коштів(ін.вал) зг.кред.дог. на рах. ПАТ"УкрСоцБанк"', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, '191992', '300465', 0, 1, 0, 0, null, null, null, null, null, null, '0201100000000000000000000011000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='USV', name='USV Переказ коштів(ін.вал) зг.кред.дог. на рах. ПАТ"УкрСоцБанк"', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb='191992', mfob='300465', flc=0, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0201100000000000000000000011000000010000000000000000000000000000', nazn=null
+         set tt='USV', name='Переказ коштів(ін.вал) зг.кред.дог. на рах. ПАТ"УкрСоцБанк"', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb='191992', mfob='300465', flc=0, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0201100000000000000000000011000000010000000000000000000000000000', nazn=null
        where tt='USV';
   end;
   --------------------------------

@@ -12,8 +12,8 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''ZAY_DATA_TRANSFER'', ''CENTER'' , null, ''E'', ''E'', ''E'');
-               bpa.alter_policy_info(''ZAY_DATA_TRANSFER'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
-               bpa.alter_policy_info(''ZAY_DATA_TRANSFER'', ''WHOLE'' , null, null, null, null);
+               bpa.alter_policy_info(''ZAY_DATA_TRANSFER'', ''FILIAL'' , ''M'', null, null, null);
+               bpa.alter_policy_info(''ZAY_DATA_TRANSFER'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
           '; 
@@ -78,6 +78,19 @@ begin
   ALTER TABLE BARS.ZAY_DATA_TRANSFER ADD CONSTRAINT PK_ZAYDATATRANSFER PRIMARY KEY (ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSBIGD  ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_ZAYDATATRANSFER_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ZAY_DATA_TRANSFER ADD CONSTRAINT FK_ZAYDATATRANSFER_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -172,10 +185,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAY_DATA_TRANSFER ***
-grant SELECT                                                                 on ZAY_DATA_TRANSFER to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on ZAY_DATA_TRANSFER to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAY_DATA_TRANSFER to BARS_DM;
-grant SELECT                                                                 on ZAY_DATA_TRANSFER to UPLD;
 
 
 

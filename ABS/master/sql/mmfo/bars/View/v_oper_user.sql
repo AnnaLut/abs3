@@ -14,10 +14,8 @@ WHERE A.ACC=O.ACC AND R.REF=O.REF
   AND ((R.USERID=USER_ID) OR (A.ISP=USER_ID));
 
 PROMPT *** Create  grants  V_OPER_USER ***
-grant SELECT                                                                 on V_OPER_USER     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OPER_USER     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OPER_USER     to START1;
-grant SELECT                                                                 on V_OPER_USER     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OPER_USER     to WR_ALL_RIGHTS;
 
 

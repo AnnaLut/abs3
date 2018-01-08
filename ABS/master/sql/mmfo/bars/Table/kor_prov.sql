@@ -57,8 +57,6 @@ COMMENT ON COLUMN BARS.KOR_PROV.SQ IS '';
 
 
 PROMPT *** Create  grants  KOR_PROV ***
-grant SELECT                                                                 on KOR_PROV        to BARSREADER_ROLE;
-grant SELECT                                                                 on KOR_PROV        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KOR_PROV        to WR_ALL_RIGHTS;
 
 

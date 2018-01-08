@@ -22,10 +22,8 @@ PROMPT *** Create  view SALO ***
 
 PROMPT *** Create  grants  SALO ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALO            to ABS_ADMIN;
-grant SELECT                                                                 on SALO            to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALO            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALO            to START1;
-grant SELECT                                                                 on SALO            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SALO            to WR_ALL_RIGHTS;
 
 

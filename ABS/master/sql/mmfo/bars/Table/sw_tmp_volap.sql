@@ -51,10 +51,8 @@ COMMENT ON COLUMN BARS.SW_TMP_VOLAP.CHRSET IS '';
 
 
 PROMPT *** Create  grants  SW_TMP_VOLAP ***
-grant SELECT                                                                 on SW_TMP_VOLAP    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_TMP_VOLAP    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_TMP_VOLAP    to START1;
-grant SELECT                                                                 on SW_TMP_VOLAP    to UPLD;
 
 
 

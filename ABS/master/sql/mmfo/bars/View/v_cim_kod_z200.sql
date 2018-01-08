@@ -13,9 +13,7 @@ where delete_date is null
 and id between 1 and 6;
 
 PROMPT *** Create  grants  V_CIM_KOD_Z200 ***
-grant SELECT                                                                 on V_CIM_KOD_Z200  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_KOD_Z200  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CIM_KOD_Z200  to UPLD;
 
 
 

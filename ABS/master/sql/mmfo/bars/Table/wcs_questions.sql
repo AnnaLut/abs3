@@ -55,6 +55,19 @@ COMMENT ON COLUMN BARS.WCS_QUESTIONS.CALC_PROC IS 'Текст вычисления';
 
 
 
+PROMPT *** Create  constraint FK_QUESTS_TID_QUESTTYPES_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.WCS_QUESTIONS ADD CONSTRAINT FK_QUESTS_TID_QUESTTYPES_ID FOREIGN KEY (TYPE_ID)
+	  REFERENCES BARS.WCS_QUESTION_TYPES (ID) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_WCSQUESTIONS_NAME_NN ***
 begin   
  execute immediate '
@@ -135,11 +148,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_QUESTIONS ***
-grant SELECT                                                                 on WCS_QUESTIONS   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_QUESTIONS   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_QUESTIONS   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_QUESTIONS   to START1;
-grant SELECT                                                                 on WCS_QUESTIONS   to UPLD;
 
 
 

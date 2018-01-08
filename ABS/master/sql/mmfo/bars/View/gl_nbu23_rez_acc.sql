@@ -98,10 +98,8 @@ PROMPT *** Create  view GL_NBU23_REZ_ACC ***
             WHERE q.acc = r.acc(+) AND (q.OSTq + NVL (r.BVq, 0)) <> 0);
 
 PROMPT *** Create  grants  GL_NBU23_REZ_ACC ***
-grant SELECT                                                                 on GL_NBU23_REZ_ACC to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on GL_NBU23_REZ_ACC to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on GL_NBU23_REZ_ACC to START1;
-grant SELECT                                                                 on GL_NBU23_REZ_ACC to UPLD;
 
 
 

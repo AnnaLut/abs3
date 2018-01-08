@@ -47,10 +47,8 @@ COMMENT ON COLUMN BARS.TMP_KOVAR.KOEF IS '';
 
 
 PROMPT *** Create  grants  TMP_KOVAR ***
-grant SELECT                                                                 on TMP_KOVAR       to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_KOVAR       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_KOVAR       to RPBN001;
-grant SELECT                                                                 on TMP_KOVAR       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_KOVAR       to WR_ALL_RIGHTS;
 
 

@@ -28,12 +28,10 @@ COMMENT ON COLUMN PFU.PFU_PENS_BLOCK_TYPE.NAME IS '';
 
 
 
-PROMPT *** Create  constraint PK_PENSBLKTYPE ***
+PROMPT *** Create  constraint SYS_C00111483 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_PENS_BLOCK_TYPE ADD CONSTRAINT PK_PENSBLKTYPE PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGD  ENABLE';
+  ALTER TABLE PFU.PFU_PENS_BLOCK_TYPE MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -42,10 +40,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111483 ***
+PROMPT *** Create  constraint PK_PENSBLKTYPE ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_PENS_BLOCK_TYPE MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_PENS_BLOCK_TYPE ADD CONSTRAINT PK_PENSBLKTYPE PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -66,10 +66,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  PFU_PENS_BLOCK_TYPE ***
-grant SELECT                                                                 on PFU_PENS_BLOCK_TYPE to BARSREADER_ROLE;
-grant SELECT                                                                 on PFU_PENS_BLOCK_TYPE to UPLD;
 
 
 

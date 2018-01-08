@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.ERR$_OW_PARAMS.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_OW_PARAMS ***
-grant SELECT                                                                 on ERR$_OW_PARAMS  to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_OW_PARAMS  to UPLD;
-
 
 
 PROMPT ===================================================================================== 

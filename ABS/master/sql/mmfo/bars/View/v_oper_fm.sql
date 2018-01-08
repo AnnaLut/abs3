@@ -49,10 +49,8 @@ PROMPT *** Create  view V_OPER_FM ***
 ;
 
 PROMPT *** Create  grants  V_OPER_FM ***
-grant SELECT                                                                 on V_OPER_FM       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OPER_FM       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OPER_FM       to START1;
-grant SELECT                                                                 on V_OPER_FM       to UPLD;
 
 
 

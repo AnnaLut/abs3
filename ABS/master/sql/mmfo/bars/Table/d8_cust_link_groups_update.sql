@@ -65,11 +65,9 @@ COMMENT ON COLUMN BARS.D8_CUST_LINK_GROUPS_UPDATE.GLOBALBD IS '';
 
 
 PROMPT *** Create  grants  D8_CUST_LINK_GROUPS_UPDATE ***
-grant SELECT                                                                 on D8_CUST_LINK_GROUPS_UPDATE to BARSREADER_ROLE;
 grant DELETE,INSERT                                                          on D8_CUST_LINK_GROUPS_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on D8_CUST_LINK_GROUPS_UPDATE to BARS_DM;
 grant DELETE,INSERT                                                          on D8_CUST_LINK_GROUPS_UPDATE to START1;
-grant SELECT                                                                 on D8_CUST_LINK_GROUPS_UPDATE to UPLD;
 
 
 

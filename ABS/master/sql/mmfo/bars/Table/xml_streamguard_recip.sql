@@ -82,8 +82,6 @@ exception when others then
 
 PROMPT *** Create  grants  XML_STREAMGUARD_RECIP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on XML_STREAMGUARD_RECIP to BARSAQ;
-grant SELECT                                                                 on XML_STREAMGUARD_RECIP to BARSREADER_ROLE;
-grant SELECT                                                                 on XML_STREAMGUARD_RECIP to UPLD;
 
 
 

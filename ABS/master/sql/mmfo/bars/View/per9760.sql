@@ -86,10 +86,8 @@ PROMPT *** Create  view PER9760 ***
 ORDER BY a.REF DESC;
 
 PROMPT *** Create  grants  PER9760 ***
-grant SELECT                                                                 on PER9760         to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on PER9760         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PER9760         to PYOD001;
-grant SELECT                                                                 on PER9760         to UPLD;
 grant FLASHBACK,SELECT                                                       on PER9760         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on PER9760         to WR_REFREAD;
 

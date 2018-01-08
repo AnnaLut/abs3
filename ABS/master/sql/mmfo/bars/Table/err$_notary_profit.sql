@@ -67,10 +67,6 @@ COMMENT ON COLUMN BARS.ERR$_NOTARY_PROFIT.PROFIT IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_NOTARY_PROFIT ***
-grant SELECT                                                                 on ERR$_NOTARY_PROFIT to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_NOTARY_PROFIT to UPLD;
-
 
 
 PROMPT ===================================================================================== 

@@ -24,10 +24,8 @@ select id, file_type, file_name, file_date, file_status, err_text, file_n,
  where file_type not in ('ATRANSFERS', 'FTRANSFERS', 'STRANSFERS', 'DOCUMENTS', 'R_IIC_DOCUMENTS');
 
 PROMPT *** Create  grants  V_OW_FILES ***
-grant SELECT                                                                 on V_OW_FILES      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_FILES      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_FILES      to OW;
-grant SELECT                                                                 on V_OW_FILES      to UPLD;
 
 
 

@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Куплено-Продано-Погашено';
   l_tablinesdef := '50';
-  l_tabselect_statement := '';
   l_tabname     := 'V_CP_TOTALS';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,33 +119,33 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'CENA', 'N', 'Ціна~номіналу~1 шт', '1', 22, 7, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CP_ID', 'C', 'ISIN', '2', 20, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'D1', 'N', 'Куплено~D1', '1.5', 22, 19, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DATP', 'D', 'Дата погашення', '1.5', 10, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'ID', 'N', 'ID', '.3', 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KV', 'N', 'Валюта', '.3', 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'N1', 'N', 'Куплено~N1', '1.5', 22, 11, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'P1', 'N', 'Куплено~P1', '1.5', 22, 23, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'R1', 'N', 'Куплено~R1', '1.5', 22, 14, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'TIP', 'N', 'А/П', '.1', 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'VIDD', 'C', 'Бал.', '.3', 4, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'CENAA', 'N', 'Ціна~амортизації~1 шт', '1.5', 22, 10, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'CENAK', 'N', 'Ціна~купівлі~1 шт', '1.5', 22, 8, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'CENAP', 'N', 'Ціна~продажу~1 шт', '1.5', 22, 9, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'D2', 'N', 'Амортиз.~D2', '1.5', 22, 20, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'D3', 'N', 'Продано~D3', '1.5', 22, 21, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'KF', 'N', '', '.5', 22, 27, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'N2', 'N', 'Продано~N2', '1.5', 22, 12, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'OSTD', 'N', 'Залишок~D=1-2-3', '1.5', 22, 22, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'OSTN', 'N', 'Залишок~N=1-2', '1.5', 22, 13, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'OSTP', 'N', 'Залишок~P=1-2-3', '1.5', 22, 26, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'OSTR', 'N', 'Залишок~R=1+2-3-4', '1.5', 22, 18, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'P2', 'N', 'Амортиз.~P2', '1.5', 22, 24, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'P3', 'N', 'Продано~P3', '1.5', 22, 25, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'R2', 'N', 'Нараховано~R2', '1.5', 22, 15, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'R3', 'N', 'Продано~R3', '1.5', 22, 16, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'R4', 'N', 'Сплачено~R4', '1.5', 22, 17, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'CENA', 'N', 'Ціна~номіналу~1 шт', 1, 22, 7, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CP_ID', 'C', 'ISIN', 2, 20, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'D1', 'N', 'Куплено~D1', 1.5, 22, 19, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DATP', 'D', 'Дата погашення', 1.5, 10, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'ID', 'N', 'ID', .3, 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KV', 'N', 'Валюта', .3, 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'N1', 'N', 'Куплено~N1', 1.5, 22, 11, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'P1', 'N', 'Куплено~P1', 1.5, 22, 23, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'R1', 'N', 'Куплено~R1', 1.5, 22, 14, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'TIP', 'N', 'А/П', .1, 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'VIDD', 'C', 'Бал.', .3, 4, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'CENAA', 'N', 'Ціна~амортизації~1 шт', 1.5, 22, 10, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'CENAK', 'N', 'Ціна~купівлі~1 шт', 1.5, 22, 8, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'CENAP', 'N', 'Ціна~продажу~1 шт', 1.5, 22, 9, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'D2', 'N', 'Амортиз.~D2', 1.5, 22, 20, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'D3', 'N', 'Продано~D3', 1.5, 22, 21, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'KF', 'N', '', .5, 22, 27, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'N2', 'N', 'Продано~N2', 1.5, 22, 12, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'OSTD', 'N', 'Залишок~D=1-2-3', 1.5, 22, 22, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'OSTN', 'N', 'Залишок~N=1-2', 1.5, 22, 13, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'OSTP', 'N', 'Залишок~P=1-2-3', 1.5, 22, 26, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'OSTR', 'N', 'Залишок~R=1+2-3-4', 1.5, 22, 18, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'P2', 'N', 'Амортиз.~P2', 1.5, 22, 24, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'P3', 'N', 'Продано~P3', 1.5, 22, 25, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'R2', 'N', 'Нараховано~R2', 1.5, 22, 15, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'R3', 'N', 'Продано~R3', 1.5, 22, 16, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'R4', 'N', 'Сплачено~R4', 1.5, 22, 17, 0, 0, 0, 0, '', '#99.99', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

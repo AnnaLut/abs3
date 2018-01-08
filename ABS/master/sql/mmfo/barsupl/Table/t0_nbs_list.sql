@@ -57,7 +57,6 @@ exception when others then
 
 PROMPT *** Create  grants  T0_NBS_LIST ***
 grant SELECT                                                                 on T0_NBS_LIST     to BARS;
-grant SELECT                                                                 on T0_NBS_LIST     to BARSREADER_ROLE;
 grant SELECT                                                                 on T0_NBS_LIST     to UPLD;
 
 

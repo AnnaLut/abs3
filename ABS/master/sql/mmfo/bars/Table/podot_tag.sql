@@ -49,10 +49,8 @@ COMMENT ON COLUMN BARS.PODOT_TAG.COMM IS '';
 
 
 PROMPT *** Create  grants  PODOT_TAG ***
-grant SELECT                                                                 on PODOT_TAG       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PODOT_TAG       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PODOT_TAG       to START1;
-grant SELECT                                                                 on PODOT_TAG       to UPLD;
 
 
 

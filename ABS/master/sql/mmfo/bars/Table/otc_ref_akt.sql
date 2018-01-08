@@ -59,10 +59,6 @@ COMMENT ON COLUMN BARS.OTC_REF_AKT.OSTQ_A IS '';
 
 
 
-PROMPT *** Create  grants  OTC_REF_AKT ***
-grant SELECT                                                                 on OTC_REF_AKT     to BARSREADER_ROLE;
-grant SELECT                                                                 on OTC_REF_AKT     to UPLD;
-
 
 
 PROMPT ===================================================================================== 

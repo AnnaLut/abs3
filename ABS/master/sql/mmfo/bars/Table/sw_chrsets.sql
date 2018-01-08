@@ -102,10 +102,8 @@ exception when others then
 
 PROMPT *** Create  grants  SW_CHRSETS ***
 grant SELECT                                                                 on SW_CHRSETS      to BARS013;
-grant SELECT                                                                 on SW_CHRSETS      to BARSREADER_ROLE;
 grant SELECT                                                                 on SW_CHRSETS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_CHRSETS      to BARS_DM;
-grant SELECT                                                                 on SW_CHRSETS      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_CHRSETS      to WR_ALL_RIGHTS;
 
 

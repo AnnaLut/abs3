@@ -17,10 +17,8 @@ where a.acc=s.acc and (a.acc,s.fdat) =
 group by c.acc);
 
 PROMPT *** Create  grants  SAL_NBS2 ***
-grant SELECT                                                                 on SAL_NBS2        to BARSREADER_ROLE;
 grant SELECT                                                                 on SAL_NBS2        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SAL_NBS2        to START1;
-grant SELECT                                                                 on SAL_NBS2        to UPLD;
 
 
 

@@ -84,8 +84,61 @@ exception when others then
 end; 
 /
 
+PROMPT *** ADD COLUMN EFFECTDATE to SKRYNKA_ND_UPDATE ***
+begin
+    dbms_output.put_line('... ADD COLUMN EFFECTDATE');
+    EXECUTE IMMEDIATE 'ALTER TABLE BARS.SKRYNKA_ND_UPDATE ADD (EFFECTDATE DATE)';
+EXCEPTION WHEN OTHERS
+   THEN
+      IF SQLCODE = -01430
+          THEN dbms_output.put_line('column EFFECTDATE already exists in table SKRYNKA_ND_UPDATE');
+      ELSE RAISE;
+      END IF;
+end;
+/
 
+PROMPT *** ADD COLUMN GLOBAL_BDATE to SKRYNKA_ND_UPDATE ***
+begin
+    dbms_output.put_line('... ADD COLUMN GLOBAL_BDATE');
+    EXECUTE IMMEDIATE 'ALTER TABLE BARS.SKRYNKA_ND_UPDATE ADD (GLOBAL_BDATE DATE)';
+EXCEPTION WHEN OTHERS
+   THEN
+      IF SQLCODE = -01430
+          THEN dbms_output.put_line('column GLOBAL_BDATE already exists in table SKRYNKA_ND_UPDATE');
+      ELSE RAISE;
+      END IF;
+end;
+/
 
+prompt -- ======================================================
+prompt -- ... FILL COLUMNs EFFECTDATE, GLOBAL_BDATE
+prompt -- !!! Warning - the procedure can be performed for a long time !!! 
+prompt -- ======================================================
+DECLARE
+    portion_size NUMBER := 500000; i NUMBER := 0; 
+begin
+    LOOP
+        i:= i+1;
+        dbms_output.put_line(TO_CHAR(sysdate,'HH24:MI:SS')||' - Iteration '||TO_CHAR(i)); 
+        --LOCK TABLE SKRYNKA_ND IN EXCLUSIVE MODE;
+        LOCK TABLE SKRYNKA_ND_UPDATE IN EXCLUSIVE MODE;
+
+        update /*+ PARALLEL(BARS.SKRYNKA_ND_UPDATE) */ BARS.SKRYNKA_ND_UPDATE
+            set EFFECTDATE =  COALESCE(TRUNC(chgdate),TRUNC(sysdate)),
+                GLOBAL_BDATE =  COALESCE(TRUNC(chgdate),TRUNC(sysdate))
+            where GLOBAL_BDATE is Null AND ROWNUM <= portion_size;
+
+        dbms_output.put_line( TO_CHAR(sysdate,'HH24:MI:SS')||' - '||to_char(sql%rowcount) || ' rows updated.');
+        IF sql%rowcount < portion_size THEN
+            EXIT;
+        ELSE 
+            COMMIT;
+        END IF;    
+    END LOOP;
+    
+    COMMIT;
+end;
+/
 
 PROMPT *** ALTER_POLICIES to SKRYNKA_ND_UPDATE ***
  exec bpa.alter_policies('SKRYNKA_ND_UPDATE');
@@ -143,51 +196,26 @@ COMMENT ON COLUMN BARS.SKRYNKA_ND_UPDATE.CHGDATE IS 'Дата изменения';
 COMMENT ON COLUMN BARS.SKRYNKA_ND_UPDATE.CHGACTION IS 'Тип изменения';
 COMMENT ON COLUMN BARS.SKRYNKA_ND_UPDATE.DONEBY IS 'Кто изменил';
 COMMENT ON COLUMN BARS.SKRYNKA_ND_UPDATE.IDUPD IS 'Id';
+COMMENT ON COLUMN BARS.SKRYNKA_ND_UPDATE.EFFECTDATE IS 'Банківська дата внесення зміни';
+COMMENT ON COLUMN BARS.SKRYNKA_ND_UPDATE.GLOBAL_BDATE IS 'Глобальна банківська дата';
 
-
-
-
-PROMPT *** Create  constraint PK_SKRYNKANDUPD ***
+PROMPT *** Create  constraint CC_SKRYNKAND_GLOBALBD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ND_UPDATE ADD CONSTRAINT PK_SKRYNKANDUPD PRIMARY KEY (IDUPD)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.SKRYNKA_ND_UPDATE MODIFY (GLOBAL_BDATE CONSTRAINT CC_SKRYNKAND_GLOBALBD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
-
-
-
-PROMPT *** Create  index I2_SKRYNKANDUPDATE ***
+PROMPT *** Create  constraint CC_SKRYNKAND_EFFECTDATE_NN ***
 begin   
  execute immediate '
-  CREATE INDEX BARS.I2_SKRYNKANDUPDATE ON BARS.SKRYNKA_ND_UPDATE (ND) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND ';
+  ALTER TABLE BARS.SKRYNKA_ND_UPDATE MODIFY (EFFECTDATE CONSTRAINT CC_SKRYNKAND_EFFECTDATE_NN NOT NULL ENABLE)';
 exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
-
-PROMPT *** Create  index XIE_SKRYNKANDUPD_CHGDATE ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.XIE_SKRYNKANDUPD_CHGDATE ON BARS.SKRYNKA_ND_UPDATE (CHGDATE) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
 
 PROMPT *** Create  index PK_SKRYNKANDUPD ***
 begin   
@@ -200,13 +228,50 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  constraint PK_SKRYNKANDUPD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SKRYNKA_ND_UPDATE ADD CONSTRAINT PK_SKRYNKANDUPD PRIMARY KEY (IDUPD)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
+PROMPT *** Create  index I2_SKRYNKANDUPDATE ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I2_SKRYNKANDUPDATE ON BARS.SKRYNKA_ND_UPDATE (ND) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index XIE_SKRYNKANDUPD_CHGDATE ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.XIE_SKRYNKANDUPD_CHGDATE ON BARS.SKRYNKA_ND_UPDATE (CHGDATE) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index XIE_SKRYNKANDUPD_GLBDT_EFFDT ***
+begin   
+ execute immediate 'CREATE INDEX BARS.XIE_SKRYNKANDUPD_GLBDT_EFFDT ON BARS.SKRYNKA_ND_UPDATE (GLOBAL_BDATE, EFFECTDATE) TABLESPACE BRSDYND';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 PROMPT *** Create  grants  SKRYNKA_ND_UPDATE ***
-grant SELECT                                                                 on SKRYNKA_ND_UPDATE to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_ND_UPDATE to BARS_ACCESS_DEFROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_ND_UPDATE to START1;
-grant SELECT                                                                 on SKRYNKA_ND_UPDATE to UPLD;
 
 
 

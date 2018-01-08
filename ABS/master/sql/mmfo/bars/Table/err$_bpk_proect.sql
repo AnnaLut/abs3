@@ -65,10 +65,6 @@ COMMENT ON COLUMN BARS.ERR$_BPK_PROECT.KF IS '';
 
 
 
-PROMPT *** Create  grants  ERR$_BPK_PROECT ***
-grant SELECT                                                                 on ERR$_BPK_PROECT to BARSREADER_ROLE;
-grant SELECT                                                                 on ERR$_BPK_PROECT to UPLD;
-
 
 
 PROMPT ===================================================================================== 

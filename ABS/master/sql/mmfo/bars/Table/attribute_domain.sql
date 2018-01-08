@@ -133,9 +133,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ATTRIBUTE_DOMAIN ***
-grant SELECT                                                                 on ATTRIBUTE_DOMAIN to BARSREADER_ROLE;
 grant SELECT                                                                 on ATTRIBUTE_DOMAIN to BARS_DM;
-grant SELECT                                                                 on ATTRIBUTE_DOMAIN to UPLD;
 
 
 

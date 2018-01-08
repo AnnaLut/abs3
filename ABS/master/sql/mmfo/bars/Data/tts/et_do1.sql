@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DO1
-prompt Наименование операции: DO1 Нарах. доходи банку від оренди (приміщень,POS-термінал) без ПДВ
+prompt Наименование операции: Нарах. доходи банку від оренди (приміщень,POS-термінал) без ПДВ
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DO1', 'DO1 Нарах. доходи банку від оренди (приміщень,POS-термінал) без ПДВ', 1, null, 980, null, 980, null, null, null, null, 0, 0, 0, 0, '#(S)-round(#(S)/6)', null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('DO1', 'Нарах. доходи банку від оренди (приміщень,POS-термінал) без ПДВ', 1, null, 980, null, 980, null, null, null, null, 0, 0, 0, 0, '#(S)-round(#(S)/6)', null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DO1', name='DO1 Нарах. доходи банку від оренди (приміщень,POS-термінал) без ПДВ', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S)-round(#(S)/6)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='DO1', name='Нарах. доходи банку від оренди (приміщень,POS-термінал) без ПДВ', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S)-round(#(S)/6)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='DO1';
   end;
   --------------------------------

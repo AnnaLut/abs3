@@ -694,11 +694,6 @@ end;
  
 PROMPT *** Create  grants  STO_UTL ***
 grant DEBUG,EXECUTE                                                          on STO_UTL         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on STO_UTL         to SBON;
-grant EXECUTE                                                                on STO_UTL         to SBON06;
-grant EXECUTE                                                                on STO_UTL         to SBON11;
-grant EXECUTE                                                                on STO_UTL         to SBON13;
-grant EXECUTE                                                                on STO_UTL         to SBON21;
 
  
  

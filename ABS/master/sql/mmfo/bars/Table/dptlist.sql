@@ -57,9 +57,7 @@ COMMENT ON COLUMN BARS.DPTLIST.D_CLOSE IS '';
 
 
 PROMPT *** Create  grants  DPTLIST ***
-grant SELECT                                                                 on DPTLIST         to BARSREADER_ROLE;
 grant SELECT                                                                 on DPTLIST         to BARS_DM;
-grant SELECT                                                                 on DPTLIST         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPTLIST         to WR_ALL_RIGHTS;
 
 

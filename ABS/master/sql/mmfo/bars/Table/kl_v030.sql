@@ -55,11 +55,9 @@ COMMENT ON COLUMN BARS.KL_V030.Z_KURS IS '';
 
 
 PROMPT *** Create  grants  KL_V030 ***
-grant SELECT                                                                 on KL_V030         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_V030         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_V030         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_V030         to START1;
-grant SELECT                                                                 on KL_V030         to UPLD;
 
 
 

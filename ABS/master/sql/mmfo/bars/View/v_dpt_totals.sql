@@ -147,9 +147,7 @@ PROMPT *** Create  view V_DPT_TOTALS ***
                   u.FIO);
 
 PROMPT *** Create  grants  V_DPT_TOTALS ***
-grant SELECT                                                                 on V_DPT_TOTALS    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_TOTALS    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_DPT_TOTALS    to UPLD;
 
 
 

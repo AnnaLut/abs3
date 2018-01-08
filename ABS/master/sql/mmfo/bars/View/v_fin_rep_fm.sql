@@ -14,9 +14,7 @@ union all Select 'C' fm, 'ф.№1МС та ф.№2МС– малого підприємства  '              
 ;
 
 PROMPT *** Create  grants  V_FIN_REP_FM ***
-grant SELECT                                                                 on V_FIN_REP_FM    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FIN_REP_FM    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_FIN_REP_FM    to UPLD;
 
 
 

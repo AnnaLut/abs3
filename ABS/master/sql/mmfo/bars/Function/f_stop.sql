@@ -1,4 +1,5 @@
 
+
  
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_stop.sql =========*** Run *** ===
@@ -83,23 +84,6 @@ IS
    p_value        operw.VALUE%TYPE;
    l_exs          NUMBER := 0;
    l_count_157    NUMBER := 0;
-   --1478
-  l_deposit   dpt_deposit.deposit_id%type;
-  l_term_add  dpt_vidd.term_add%type;
-  l_term_add1 number(5);
-  l_acc       accounts.acc%type;
-  l_dat_begin dpt_deposit.dat_begin%type;
-  l_limit     dpt_deposit.limit%type;
-  l_res       number(10);
-  l_sum       number;
-  l_kv        number(3);
-  l_count_mm  number(5);
-  l_dat_start date;
-  l_dat_end   date;
-  l_dat_s     date;
-  l_dat_po    date;
-  l_sum_month oper.s%type;
-  l_comproc   dpt_vidd.comproc%type;
 
    p_value2       operw.VALUE%TYPE;
    n1_            NUMBER;
@@ -339,7 +323,6 @@ BEGIN
 
       ------------------------------------
 
-      RETURN 0; --Постанова НБУ 81
 
       IF kv_ = 980
       THEN                                 -----  1).  ГРН - Постанова НБУ 140
@@ -519,7 +502,7 @@ BEGIN
    --------------  758  (теперь это 863 постанова) :
 
    ELSIF kod_ = 758
-   THEN RETURN 0;  --Постанова НБУ  81
+   THEN
       SELECT COUNT (*)
         INTO l_kk
         FROM OperW
@@ -773,7 +756,7 @@ BEGIN
          RAISE err;
       END IF;
    ELSIF KOD_ = 414
-   THEN      RETURN 0; --Постанова НБУ  81        -- Видача депозиту в ВАЛЮТЕ (в эквиваленте) до 20 тис.грн
+   THEN              -- Видача депозиту в ВАЛЮТЕ (в эквиваленте) до 20 тис.грн
       bars_audit.info (
          'f_stop#414: start check for p_ref = ' || TO_CHAR (p_ref));
 
@@ -966,21 +949,21 @@ BEGIN
           -- перевірка на відповідніст кодів держакупівлі та сум для кодів.
        for k in (
                     select   w.tag  tag1,  w.value value1,
-                             w2.tag tag2, w2.value value2
-                      FROM (select * from operw  where ref = p_ref and  tag  LIKE 'K_DZ%') w
-                          full join  (select * from operw  where ref = p_ref and  tag  LIKE 'S_DZ%') w2
-                               on (substr(w.tag,5,2) = substr(w2.tag,5,2))
-                      where  w.value is null or w2.value is null
-                )
-        loop
-
-          if k.value1 is null
-               then p_value :=p_value|| 'Для суми='||k.value2||' не вказано код  держ.закупівлі' ||e_br;
-          elsif k.value2 is null
-               then p_value :=p_value|| 'Для кода держ.закупівлі='||k.value1||' не вказано суму' ||e_br;
-          end if;
-
-        end loop;
+							 w2.tag tag2, w2.value value2
+					  FROM (select * from operw  where ref = p_ref and  tag  LIKE 'K_DZ%') w 
+						  full join  (select * from operw  where ref = p_ref and  tag  LIKE 'S_DZ%') w2  
+							   on (substr(w.tag,5,2) = substr(w2.tag,5,2))
+					  where  w.value is null or w2.value is null
+				)	   
+		loop
+		  
+		  if k.value1 is null  
+		       then p_value :=p_value|| 'Для суми='||k.value2||' не вказано код  держ.закупівлі' ||e_br;
+		  elsif k.value2 is null  
+		       then p_value :=p_value|| 'Для кода держ.закупівлі='||k.value1||' не вказано суму' ||e_br;
+		  end if;
+		  
+		end loop;
 
       IF p_value IS NULL
          THEN NULL;
@@ -2993,7 +2976,7 @@ BEGIN
       Все тоже самое, но замена 15000 на 20000*/
 
    ELSIF KOD_ = 160
-   THEN   RETURN 0;  --Постанова НБУ  81
+   THEN
       IF KV_ = 980                --в іноземній валюті або банківських металах
       THEN
          RETURN 0;
@@ -3107,161 +3090,29 @@ BEGIN
    /*
    По БПК добавлено перевірку ліміту на операції поповнення з каси в рамках одного РУ
    Ліміт передавит в параметр REf_ в копійках
-
+   
    */
-
+   
    ELSIF KOD_ = 8888 THEN
       select nvl(gl.p_icurval(kv_, sum(decode(dk, 0, s, 1, s2, 0)), gl.bd), 0)
-        into l_sq_t
+        into l_sq_t    
         from oper t
-       where t.pdat between trunc(sysdate, 'mm') and
-             trunc(sysdate) + 1 - interval '1' second and
+       where t.pdat between trunc(sysdate) and
+             trunc(sysdate) + 1 - interval '1' second and 
              ((t.dk = 1 and t.nlsb = nls_ and t.kv2 = kv_ and t.nlsa like '10%') or
-             (t.dk = 0 and t.nlsa = nls_ and t.kv = kv_ and t.nlsb like '10%'))and
-             sos >= 0;
-
-      l_sq := p_ref - l_sq_t;
-
+             (t.dk = 0 and t.nlsa = nls_ and t.kv = kv_ and t.nlsb like '10%'))and 
+             sos >= 0;     
+      
+      l_sq := p_ref - l_sq_t - gl.p_icurval(kv_, s_, gl.bd);  
+      
       IF l_sq < 0
       THEN
          bars_audit.info ('!f_stop#8888 перевищено ліміт операції по рахунку #'||nls_||'# на суму: '|| abs(l_sq)/100 ||' грн.');
-         erm := 'Ліміт операції без РКО перевищено на суму: '|| abs(l_sq)/100 ||' грн.';
+         erm := 'Перевищено ліміт операції на суму: '|| abs(l_sq)/100 ||' грн.';
          RAISE err;
       END IF;
-
-
-
-       /*
-    COBUSUPABS-6352 щодо обмеження поповнення нових строкових вкладів
-    */
-
-  elsif kod_ = 1478 then
-
-    begin
-      l_kv := kv_;
-
-      -- 1.вычисляем возможный срок пополения, если без срока = выходим
-      select dd.deposit_id, dd.acc, v.term_add, dd.dat_begin, dd.limit, v.comproc
-        into l_deposit, l_acc, l_term_add, l_dat_begin, l_limit, l_comproc
-        from dpt_payments p, oper o, dpt_deposit dd, dpt_vidd v
-       where o.ref = p_ref
-         and p.ref = o.ref
-         and dd.deposit_id = p.dpt_id
-         and dd.vidd = v.vidd;
-
-      l_term_add1 := to_number(floor(l_term_add));
-
-      bars_audit.info('1478 ' || l_deposit || ' ' || l_term_add1 || ' ' ||
-                      l_dat_begin || ' ' || l_limit);
-
-      --безсрочный вид вклада
-      if nvl(l_term_add1, 0) = 0 then
-        bars_audit.info('1478 ' || 'безсрочный вид вклада');
-        return 0;
-      end if;
-
-      -- 2.вычислить вид вклада, является он пополняемым
-      l_res := dpt_web.forbidden_amount(l_acc, s_);
-      bars_audit.info('1478 ' || 'l_res0: ' || l_res);
-      if (l_res = 0) then
-        bars_audit.info('1478 ' || 'l_res1: ' || l_res);
-        null;
-      elsif (l_res = 1) then
-        bars_audit.info('1478 ' ||
-                        'Вклад не передбачає поповнення! l_res2: ' ||
-                        l_res);
-        erm := '******Вклад не передбачає поповнення!';
-        raise err;
-      else
-        bars_audit.info('1478 ' ||
-                        'Cума зарахування на депозитний рахунок');
-        erm := '******Cума зарахування на депозитний рахунок #' ||
-               to_char(l_acc) ||
-               ' менша за мінімальну суму поповнення вкладу (' ||
-               to_char(l_res / 100) || ' / ' || l_kv || ')';
-        raise err;
-      end if;
-
-      -- 3.проверить можно ли его пополнить в указанных сроках на виде вклада
-      l_dat_start := l_dat_begin;
-      l_dat_end   := add_months(l_dat_begin, l_term_add1) - 1;
-
-      bars_audit.info('1478 ' ||
-                      'проверить можно ли его пополнить в указанных сроках на виде вклада ' ||
-                      l_dat_start || ' ' || l_dat_end);
-
-      if --Все ОК, пополнять можно
-       trunc(sysdate) between l_dat_start and l_dat_end then
-        bars_audit.info('1478 ' || 'Все ОК, пополнять можно ');
-        null;
-      else
-        bars_audit.info('1478 ' || 'Закончился срок пополнения');
-        -- Закончился срок пополнения
-        erm := '******По вкладу закічився термін поповнення! Вклад можливо було поповнювати протягом ' ||
-               to_char(l_term_add1) || ' міcяців.';
-        raise err;
-      end if;
-
-      -- 4.вычислить граничные даты  месяца
-      select floor(months_between(trunc(sysdate), (l_dat_begin)))
-        into l_count_mm
-        from dual;
-
-      bars_audit.info('1478 ' || 'l_count_mm ' || l_count_mm);
-
-      l_dat_s  := add_months(l_dat_begin, l_count_mm);
-      l_dat_po := add_months(l_dat_s, 1) - 1;
-
-      bars_audit.info('1478 ' || l_dat_s || ' - ' || l_dat_po);
-
-      --5.вычислить за этот период сумму пополнений по вкладу
-    if nvl(l_comproc, 0) = 0 then
-     --нет капитализации-то учитываем сумму пополнения операций 'DP5' и 'DPL
-    select nvl(sum(o.s), 0)
-      into l_sum_month
-      from dpt_payments p, oper o
-     where p.ref = o.ref
-       and p.dpt_id = l_deposit
-       and o.sos in (5) --....
-       and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DP5', 'DPD', 'DPI', 'DPL', 'W2D', 'DBF', 'ALT')
-       and o.pdat between l_dat_s and l_dat_po;
-
-     else
-       --есть капитализация-то не учитываем в сумму пополнения операций 'DP5' и 'DPL'
-         select nvl(sum(o.s), 0)
-      into l_sum_month
-      from dpt_payments p, oper o
-     where p.ref = o.ref
-       and p.dpt_id = l_deposit
-       and o.sos in (5) --....
-       and o.tt in ('PKD', 'OW4', 'PK!', '215', '015', '515', '013', 'R01', 'DP0', 'DP2', 'DPD', 'DPI', 'W2D', 'DBF', 'ALT')
-       and o.pdat between l_dat_s and l_dat_po;
-
-    end if;
-
-      bars_audit.info('1478 ' || 'l_sum_month ' || l_sum_month);
-
-      -- прибавить общую сумму к сумме документу
-      l_sum := l_sum_month + s_;
-
-      --6.сравнить лимит депозита с полученной суммой
-      -- если общая сумма не превышает лимит = позволяем вставить документ, если нет = выдаем сообщение при вставке документа
-      bars_audit.info('1478 l_sum:' || l_sum || ' l_limit: ' || l_limit);
-
-      if l_sum > l_limit then
-        bars_audit.info('1478 ' || 'Перевищено сумму ліміту!');
-        erm := '******Перевищено сумму ліміту ' || to_char(l_limit) ||
-               ' за місць з ' || to_char(l_dat_s) || ' по ' ||
-               to_char(l_dat_po);
-        raise err;
-      else
-        null;
-      end if;
-
-    end;
-
-  end if;
-
+	  
+   END IF;
 
    RETURN 0;
 EXCEPTION

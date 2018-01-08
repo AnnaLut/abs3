@@ -22,10 +22,8 @@ select r.id, r.name, c.acc,
  where c.request_id = r.id;
 
 PROMPT *** Create  grants  V_OW_CRVACC_REQUEST_HISTORY ***
-grant SELECT                                                                 on V_OW_CRVACC_REQUEST_HISTORY to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_CRVACC_REQUEST_HISTORY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_CRVACC_REQUEST_HISTORY to OW;
-grant SELECT                                                                 on V_OW_CRVACC_REQUEST_HISTORY to UPLD;
 
 
 
