@@ -123,6 +123,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  FILE_ATTACH ***
+grant SELECT                                                                 on FILE_ATTACH     to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

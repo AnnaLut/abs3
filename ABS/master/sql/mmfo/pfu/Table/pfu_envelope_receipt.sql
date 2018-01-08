@@ -38,6 +38,10 @@ COMMENT ON COLUMN PFU.PFU_ENVELOPE_RECEIPT.RECEIPT_DATA IS '';
 
 
 
+PROMPT *** Create  grants  PFU_ENVELOPE_RECEIPT ***
+grant SELECT                                                                 on PFU_ENVELOPE_RECEIPT to BARSREADER_ROLE;
+grant SELECT                                                                 on PFU_ENVELOPE_RECEIPT to UPLD;
+
 
 
 PROMPT ===================================================================================== 

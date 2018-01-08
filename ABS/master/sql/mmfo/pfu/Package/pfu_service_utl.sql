@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/PFU/package/pfu_service_utl.sql =========*** Run 
  PROMPT ===================================================================================== 
  
- CREATE OR REPLACE PACKAGE PFU_SERVICE_UTL is
+  CREATE OR REPLACE PACKAGE PFU.PFU_SERVICE_UTL is
 
     SESS_STATE_NEW                 constant integer := 1;
     SESS_STATE_SIGNED              constant integer := 7;
@@ -296,8 +296,7 @@
 	procedure process_all_stages;
 end;
 /
-
-create or replace package body pfu_service_utl as
+CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
 
 	function extract_clob(p_xml     in xmltype,
 												p_xpath   in varchar2,
@@ -5548,7 +5547,7 @@ create or replace package body pfu_service_utl as
 				elsif c0.transport_type_code = transport_utl.TRANS_TYPE_SET_CARD_BLOCK then
 					pfu_epp_utl.r_card_block_procesing(l_clob, c0.id);
         elsif c0.transport_type_code = transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK then
-					pfu_epp_utl.r_card_unblock_procesing(l_clob, c0.id);  
+					pfu_epp_utl.r_card_unblock_procesing(l_clob, c0.id);
 				end if;
 				dbms_lob.freetemporary(l_clob);
 			exception
@@ -5717,12 +5716,12 @@ end;
 /
  show err;
  
-PROMPT *** Create  grants  PFU_EPP_UTL ***
-grant EXECUTE                                                                on PFU_EPP_UTL     to BARS_ACCESS_DEFROLE;
+PROMPT *** Create  grants  PFU_SERVICE_UTL ***
+grant EXECUTE                                                                on PFU_SERVICE_UTL to BARS_ACCESS_DEFROLE;
 
  
  
  PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/PFU/package/pfu_epp_utl.sql =========*** End *** 
+ PROMPT *** End *** ========== Scripts /Sql/PFU/package/pfu_service_utl.sql =========*** End 
  PROMPT ===================================================================================== 
-
+ 
