@@ -602,6 +602,7 @@
 
                                 SumC_t: sum.toFixed(2),
                                 nazn: docTarget,
+                                BPROC: encodeURI("set role bars_access_defrole@begin sep.check_t902_dok(" + record.REF + "); end;"),
                                 APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
                             };
 
@@ -641,6 +642,7 @@
 
                                 SumC_t: sum.toFixed(2),
                                 nazn: 'Док ' + record.ND + 'від ' + kendo.toString(record.DATD, 'dd/MM/yyyy') + ' ' + record.NAZN,
+                                BPROC: encodeURI("set role bars_access_defrole@begin sep.check_t902_dok(" + record.REF + "); end;"),
                                 APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
                             };
                             $("#Sep3720Window").kendoWindow({
@@ -675,6 +677,7 @@
 
                                 SumC_t: sum.toFixed(2),
                                 nazn: 'Перекр.док ' + record.ND + ' від ' + kendo.toString(record.DATD, 'dd/MM/yyyy') + '. Платник МФО ' + record.MFOA + ' Рах ' + record.NLSA + ' ' + record.NAMA + ' ' + record.NAZN,
+                                BPROC: encodeURI("set role bars_access_defrole@begin sep.check_t902_dok(" + record.REF + "); end;"),
                                 APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
                             };
 
