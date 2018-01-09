@@ -402,7 +402,7 @@ end dpt;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.DPT IS
 
-g_body_version  CONSTANT VARCHAR2(64)  := 'version 71.5 22.02.2017';
+g_body_version  CONSTANT VARCHAR2(64)  := 'version 71.6 09.01.2018';
 g_awk_body_defs CONSTANT VARCHAR2(512) := ''
     ||'СБЕРБАНК' ||chr(10)
     ||'BRANCH - схема с иерарх.отделениями и мульти-МФО'||chr(10)
@@ -503,7 +503,8 @@ procedure open1acc
    p1_type     in   accounts.tip%type,
    p1_isp      in   accounts.isp%type,
    p1_grp      in   accounts.grp%type,
-   p1_acc      out  acc_rec)
+   p1_acc      out  acc_rec,
+   p1_ob22     in   accounts.ob22%type)
 is
    l_title   varchar2(60) := 'dptopen.acc1:';
    l_tmp     number;
@@ -542,10 +543,17 @@ begin
 -- inga 05/01/2015 Ощадбанк - устанавливать признак АП счета 2620 при открытии = 2 (П), а не по плану счетов (АП)
 --    op_reg(99, 0, 0, p1_grp, l_tmp, p1_custid, l_tmpacc.acc_num, l_tmpacc.acc_cur,
 --           l_tmpacc.acc_name, p1_type, p1_isp, l_tmpacc.acc_id);
-   op_reg_exfl(99, 0, 0, p1_grp, l_tmp, p1_custid, l_tmpacc.acc_num, l_tmpacc.acc_cur,
-           l_tmpacc.acc_name, p1_type, p1_isp, l_tmpacc.acc_id, 1, 2);
+
+ --===== COBUSUPABS-6687  09/01/2018 ======---  
+ --op_reg_exfl(99, 0, 0, p1_grp, l_tmp, p1_custid, l_tmpacc.acc_num, l_tmpacc.acc_cur,
+ --          l_tmpacc.acc_name, p1_type, p1_isp, l_tmpacc.acc_id, 1, 2);
+  
+  accreg.SetAccountAttr( 99, 0, 0, p1_grp, l_tmp, p1_custid, l_tmpacc.acc_num, l_tmpacc.acc_cur
+                        , l_tmpacc.acc_name, p1_type, p1_isp, l_tmpacc.acc_id, '1', p1_ob22, 2 );         
+  --===== COBUSUPABS-6687 ======---                      
   exception
     when others then
+      bars_audit.info('OPENACC_FAILED' || dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());
       -- ошибка при открытии счета № %s / %s : %s
       bars_error.raise_nerror(g_modcode, 'OPENACC_FAILED',
                               l_tmpacc.acc_num,to_char(l_tmpacc.acc_cur), substr(sqlerrm,1,g_errmsgD));
@@ -583,6 +591,9 @@ is
    l_depacc  acc_rec;
    l_intacc  acc_rec;
    l_amracc  acc_rec;
+   l_dep_ob22 accounts.ob22%type;
+   l_int_ob22 accounts.ob22%type;
+   l_amr_ob22 accounts.ob22%type;
 begin
 
   bars_audit.trace('%s договор № %s (%s), РНК %s, вид вклада %s, валюта %s',
@@ -598,6 +609,15 @@ begin
   end if;
   bars_audit.trace('%s ответ.исп. = %s', l_title, to_char(l_isp));
 
+  select max(case when tag = 'DPT_OB22' then val else null end),
+         max(case when tag = 'INT_OB22' then val else null end),
+         max(case when tag = 'AMR_OB22' then val else null end)
+    into l_dep_ob22
+       , l_int_ob22
+       , l_amr_ob22
+    from dpt_vidd_params
+    where vidd = p_typeid;
+    
   open1acc (p1_dptid    =>  p_dptid,
             p1_dptnum   =>  p_dptnum,
             p1_custid   =>  p_custid,
@@ -607,7 +627,8 @@ begin
             p1_type     =>  p_deptype,
             p1_isp      =>  l_isp,
             p1_grp      =>  p_grp,
-            p1_acc      =>  l_depacc);
+            p1_acc      =>  l_depacc,
+            p1_ob22     =>  l_dep_ob22);
   bars_audit.trace('%s открыт депозитный счет %s / %s', l_title, l_depacc.acc_num, to_char(l_depacc.acc_cur));
 
   open1acc (p1_dptid    =>  p_dptid,
@@ -619,7 +640,8 @@ begin
             p1_type     =>  p_inttype,
             p1_isp      =>  l_isp,
             p1_grp      =>  p_grp,
-            p1_acc      =>  l_intacc);
+            p1_acc      =>  l_intacc,
+            p1_ob22     =>  l_int_ob22);
   bars_audit.trace('%s открыт счет начисл.процентов %s / %s', l_title, l_intacc.acc_num, to_char(l_intacc.acc_cur));
 
   -- счет амортизации для авансовых вкладов
@@ -633,7 +655,8 @@ begin
                p1_type     =>  p_inttype,
                p1_isp      =>  l_isp,
                p1_grp      =>  p_grp,
-               p1_acc      =>  l_amracc);
+               p1_acc      =>  l_amracc,
+               p1_ob22     =>  l_amr_ob22);
      bars_audit.trace('%s открыт счет аморт.процентов %s / %s', l_title, l_amracc.acc_num, to_char(l_amracc.acc_cur));
   end if;
 
@@ -864,7 +887,7 @@ begin
        and prem    = 'КБ'
        and d_open <= l_bdate
        and nvl(d_close, l_bdate) >= l_bdate
-       and ((r020 = '2630' and newnbs.g_state = 1) or (newnbs.g_state = 0 and r020 in ('2630', '2635')));
+       and ((r020 = '2630' and newnbs.get_state = 1) or (newnbs.get_state = 0 and r020 in ('2630', '2635')));
   exception
     when no_data_found then
       l_s181et := null;
@@ -921,7 +944,8 @@ begin
   end if;
 
   -- заполнение спецпараметра OB22 для деп.счета
-    UPDATE accounts
+  --==== COBUSUPABS-6687 09/01/2018====-- 
+  /*  UPDATE accounts
        SET ob22 =
               (SELECT SUBSTR (val, 1, 2)
                  FROM dpt_vidd_params
@@ -942,7 +966,8 @@ begin
                  FROM dpt_vidd_params
                 WHERE vidd = p_dpttype AND tag = 'AMR_OB22')
      WHERE acc = p_amraccid;
-
+   */
+   --==== COBUSUPABS-6687 ====-- 
   begin
     insert into specparam_int (acc, ob22)
     select p_depaccid, substr(val, 1, 2)
