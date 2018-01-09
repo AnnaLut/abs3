@@ -1,0 +1,197 @@
+﻿@using BarsWeb.Areas.Finp.Models
+@using Kendo.Mvc.UI
+@using System
+@model FinpQuestionParamsModel
+
+@{
+    Layout = null;
+    ViewBag.Title = "Розрахунок фін. стану";
+}
+
+@foreach (var item in Model.SurQuestionParams.OrderBy(i => i.ORD))
+{
+    <ul>
+        @{ var valueStr = Model.SesAnswers.Where(i => i.QUESTION_ID == item.QUESTION_ID && i.OBJ_ID == item.OBJ_ID).Count() > 0 ? Model.SesAnswers.Where(i => i.QUESTION_ID == item.QUESTION_ID && i.OBJ_ID == item.OBJ_ID).First().VAL_TEXT : item.TEXT_VAL_DEFAULT; }
+        @switch (item.TYPE_ID)
+        {
+            case "SECTION":
+                <li>
+                    <h3>@item.NAME</h3>
+                </li>
+                break;
+            case "TEXT":
+            <li @(item.ISHIDDEN == 1 ? "hidden" : "")>
+                <label for="@item.QUESTION_ID">
+                    @item.NAME
+                    @if (item.REQUIRED == "1")
+                    {
+                        <span style="color:red">*</span>
+                    }
+                </label>
+                <input type="text" class="k-textbox"
+                       name="text_@item.QUESTION_ID" id="@item.QUESTION_ID"
+                       @(item.REQUIRED == "0" ? "" : " required data-required-msg=Обов'язкове&nbsp;до&nbsp;заповнення")
+                       @(item.TEXT_LENG_MAX == null ? "" : " maxlength=" + item.TEXT_LENG_MAX) @(item.TEXT_WIDTH == null ? "" : " style=width:" + item.TEXT_WIDTH + "px")
+                       value="@valueStr"></input>
+            </li>
+                    break;
+            case "INTEGER":
+            <li @(item.ISHIDDEN == 1 ? "hidden" : "")>
+                <label for="@item.QUESTION_ID">
+                    @item.NAME
+                    @if (item.REQUIRED == "1")
+                    {
+                        <span style="color:red">*</span>
+                    }
+                </label>
+                <input type="text" class="k-textbox"
+                       name="integer_@item.QUESTION_ID" id="@item.QUESTION_ID"
+                       @(item.REQUIRED == "0" ? "" : (item.ISHIDDEN == 0 ? "required data-required-msg=Обов'язкове&nbsp;до&nbsp;заповнення" : ""))
+                       @(item.TEXT_LENG_MAX == null ? "" : "maxlength=" + item.TEXT_LENG_MAX) @(item.TEXT_WIDTH == null ? "" : "style=width:" + item.TEXT_WIDTH + "px")
+                       @(item.NMBDEC_VAL_MIN == null ? "" : "data-mindec=" + item.NMBDEC_VAL_MIN + " data-decminval-msg=Значення&nbsp;меньше&nbsp;за&nbsp;мінімальне&nbsp;(" + item.NMBDEC_VAL_MIN + ")")
+                       @(item.NMBDEC_VAL_MAX == null ? "" : "data-maxdec=" + item.NMBDEC_VAL_MAX + " data-decmaxval-msg=Значення&nbsp;більше&nbsp;за&nbsp;максимальне&nbsp;(" + item.NMBDEC_VAL_MAX + ")")
+                       value="@valueStr"></input>
+            </li>
+                    break;
+            case "DECIMAL":
+            <li @(item.ISHIDDEN == 1 ? "hidden" : "")>
+                <label for="@item.QUESTION_ID">
+                    @item.NAME
+                    @if (item.REQUIRED == "1")
+                    {
+                        <span style="color:red">*</span>
+                    }
+                </label>
+                <input type="number" class="k-input" id="@item.QUESTION_ID"
+                       name="decimal_@item.QUESTION_ID" @(item.REQUIRED == "0" ? "" : (item.ISHIDDEN == 0 ? "required data-required-msg=Обов'язкове&nbsp;до&nbsp;заповнення" : ""))
+                       @(item.TEXT_LENG_MAX == null ? "" : " maxlength=" + item.TEXT_LENG_MAX) @(item.TEXT_WIDTH == null ? "" : " style=width:" + item.TEXT_WIDTH + "px")
+                       @(item.NMBDEC_VAL_MIN == null ? "" : "data-mindec=" + item.NMBDEC_VAL_MIN + " data-decminval-msg=Значення&nbsp;меньше&nbsp;за&nbsp;мінімальне&nbsp;(" + item.NMBDEC_VAL_MIN + ")")
+                       @(item.NMBDEC_VAL_MAX == null ? "" : "data-maxdec=" + item.NMBDEC_VAL_MAX + " data-decmaxval-msg=Значення&nbsp;більше&nbsp;за&nbsp;максимальне&nbsp;(" + item.NMBDEC_VAL_MAX + ")")
+                       value="@valueStr"></input>
+            </li>
+                    break;
+            case "DATE":
+            <li @(item.ISHIDDEN == 1 ? "hidden" : "")>
+                <label for="@item.QUESTION_ID">
+                    @item.NAME
+                    @if (item.REQUIRED == "1")
+                    {
+                        <span style="color:red">*</span>
+                    }
+                </label>
+                <input class="k-input" id="@item.QUESTION_ID"
+                       name="date_@item.QUESTION_ID" @(item.REQUIRED == "0" ? "" : (item.ISHIDDEN == 0 ? "required data-required-msg=Обов'язкове&nbsp;до&nbsp;заповнення" : ""))
+                       @(item.TEXT_LENG_MAX == null ? "" : " maxlength=" + item.TEXT_LENG_MAX) @(item.TEXT_WIDTH == null ? "" : " style=width:" + item.TEXT_WIDTH + "px")
+                       @(item.DAT_VAL_MIN == null ? "" : "data-mindate=" + item.DAT_VAL_MIN + " data-dateminval-msg=Дата&nbsp;меньша&nbsp;за&nbsp;мінімальну&nbsp;(" + item.DAT_VAL_MIN + ")")
+                       @(item.DAT_VAL_MAX == null ? "" : "data-maxdate=" + item.DAT_VAL_MAX + " data-datemaxval-msg=Дата&nbsp;більша&nbsp;за&nbsp;максимальну&nbsp;(" + item.DAT_VAL_MAX + ")")
+                       value="@valueStr"></input>
+            </li>
+                    break;
+            case "LIST":
+            <li @(item.ISHIDDEN == 1 ? "hidden" : "")>
+                <label for="@item.QUESTION_ID">
+                    @item.NAME
+                    @if (item.REQUIRED == "1")
+                    {
+                        <span style="color:red">*</span>
+                    }
+                </label>
+                @if (Model.SesAnswers.Where(i => i.QUESTION_ID == item.QUESTION_ID && i.OBJ_ID == item.OBJ_ID).Count() > 0)
+                {
+                    var itemAnsw = Model.SesAnswers.Where(i => i.QUESTION_ID == item.QUESTION_ID && i.OBJ_ID == item.OBJ_ID).First();
+                    @(Html.Kendo().DropDownList()
+                        .Name(item.QUESTION_ID)
+                        .DataTextField("NAME")
+                        .DataValueField("ORD")
+                        .BindTo(Model.SurQuestionListItem.Where(i => i.QUESTION_ID == item.QUESTION_ID).Where(i => i.VISIBLE == 1).OrderBy(i => i.ORD))
+                            .HtmlAttributes(new { style = "width: 300px" })
+                        .SelectedIndex(Convert.ToInt16(itemAnsw.VAL_TEXT))
+                    )
+                }
+                else
+                {
+                    @(Html.Kendo().DropDownList()
+                        .Name(item.QUESTION_ID)
+                        .DataTextField("NAME")
+                        .DataValueField("ORD")
+                        .BindTo(Model.SurQuestionListItem.Where(i => i.QUESTION_ID == item.QUESTION_ID).Where(i => i.VISIBLE == 1).OrderBy(i => i.ORD))
+                            .HtmlAttributes(new { style = "width: 200px" })
+                        .SelectedIndex(item.LIST_SID_DEFAULT == "" ? 0 : Convert.ToInt16(item.LIST_SID_DEFAULT))
+                    )
+                }
+            </li>
+                break;
+            case "REFER":
+            <li @(item.ISHIDDEN == 1 ? "hidden" : "")>
+                <label for="@item.QUESTION_ID">
+                    @item.NAME
+                    @if (item.REQUIRED == "1")
+                    {
+                        <span style="color:red">*</span>
+                    }
+                </label>
+                @if (Model.SesAnswers.Where(i => i.QUESTION_ID == item.QUESTION_ID && i.OBJ_ID == item.OBJ_ID).Count() > 0)
+                {
+                    var itemAnsw = Model.SesAnswers.Where(i => i.QUESTION_ID == item.QUESTION_ID && i.OBJ_ID == item.OBJ_ID).First();
+                    <input type="text" disabled="disabled" class="k-textbox" id="@item.QUESTION_ID" value="@itemAnsw.VAL_TEXT" />
+                }
+                else
+                {
+                    <input type="text" disabled="disabled" class="k-textbox" id="@item.QUESTION_ID" value="@item.REFER_SID_DEFAULT" />
+                }
+                @foreach (var itemRef in Model.SurQuestionRefParams.Where(i => i.QUESTION_ID == item.QUESTION_ID))
+                {
+                    <a class="k-button" onclick='showReferen("@itemRef.QUESTION_ID", "@itemRef.TAB_NAME", "@itemRef.WHERE_CLAUSE", "@itemRef.SHOW_FIELDS")'>
+                        <i class="pf-icon pf-16 pf-book"></i>
+                    </a>
+                }
+            </li>
+                break;
+            case "BOOL":
+            <li @(item.ISHIDDEN == 1 ? "hidden" : "")>
+                <label for="@item.QUESTION_ID">
+                    @item.NAME
+                    @if (item.REQUIRED == "1")
+                    {
+                        <span style="color:red">*</span>
+                    }
+                </label>
+                <div class="btn-group btn-toggle">
+                    @if (Model.SesAnswers.Where(i => i.QUESTION_ID == item.QUESTION_ID && i.OBJ_ID == item.OBJ_ID).Count() > 0)
+                    {
+                        var itemAnsw = Model.SesAnswers.Where(i => i.QUESTION_ID == item.QUESTION_ID && i.OBJ_ID == item.OBJ_ID).First();
+                        <button class="@(itemAnsw.VAL_TEXT == "1" ? "btn btn-xs btn-primary active" : "btn btn-xs btn-default")" value="1" name="@item.QUESTION_ID">Так</button>
+                        <button class="@(itemAnsw.VAL_TEXT == "0" ? "btn btn-xs btn-primary active" : "btn btn-xs btn-default")" value="0" name="@item.QUESTION_ID">Ні</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-xs btn-default" value="1" name="@item.QUESTION_ID">Так</button>
+                        <button class="btn btn-xs btn-primary active" value="0" name="@item.QUESTION_ID">Ні</button>
+                    }
+                </div>
+            </li>
+                    break;
+            default: break;
+        }
+    </ul>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('[name^=date]').kendoMaskedTextBox({
+            mask: "99.99.9999"
+        }).kendoDatePicker({
+            culture: "uk-UA",
+            format: "dd.MM.yyyy"
+        }).removeClass('k-textbox').parent().parent().removeClass('k-textbox');
+        $('[name^=decimal]').kendoNumericTextBox({
+            format: "#.00"
+        });
+
+        $("[name^=integer]").keyup(function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+        $("[name^=decimal]").keyup(function () {
+            this.value = this.value.replace(/[^0-9\.]/g, '');
+        });
+    });
+</script>

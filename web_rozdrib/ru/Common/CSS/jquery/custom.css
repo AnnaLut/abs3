@@ -1,0 +1,28 @@
+.sprite-icon {background-image: url(images/sprite32.gif); }
+
+.sprite-accounts_32 { background-position: 0 0; } 
+.sprite-add_32 { background-position: -72px 0; } 
+.sprite-apps_32 { background-position: -144px 0; } 
+.sprite-cancl_32 { background-position: -216px 0; } 
+.sprite-cart_32 { background-position: -288px 0; } 
+.sprite-close_32 { background-position: -360px 0; } 
+.sprite-copy_32 { background-position: -432px 0; } 
+.sprite-del_32 { background-position: -504px 0; } 
+.sprite-docs_32 { background-position: -576px 0; } 
+.sprite-edit_32 { background-position: -648px 0; } 
+.sprite-error_32 { background-position: -720px 0; } 
+.sprite-favs_32 { background-position: -792px 0; } 
+.sprite-flag_32 { background-position: -864px 0; } 
+.sprite-foldr_32 { background-position: -936px 0; } 
+.sprite-group_32 { background-position: -1008px 0; } 
+.sprite-info_32 { background-position: -1080px 0; } 
+.sprite-lock_32 { background-position: -1152px 0; } 
+.sprite-mail_32 { background-position: -1224px 0; } 
+.sprite-new_32 { background-position: -1296px 0; } 
+.sprite-question_32 { background-position: -1368px 0; } 
+.sprite-refresh_32 { background-position: -1440px 0; } 
+.sprite-srch_32 { background-position: -1512px 0; } 
+.sprite-ulock_32 { background-position: -1584px 0; } 
+.sprite-user_32 { background-position: -1656px 0; } 
+.sprite-warning_32 { background-position: -1728px 0; } 
+.sprite-web_32 { background-position: -1800px 0; }

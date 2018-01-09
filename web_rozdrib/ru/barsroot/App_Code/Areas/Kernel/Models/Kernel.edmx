@@ -1,0 +1,436 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Model.Store" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="FDAT">
+          <Key>
+            <PropertyRef Name="FDAT" />
+            <PropertyRef Name="KF" />
+          </Key>
+          <Property Name="FDAT" Type="date" Nullable="false" />
+          <Property Name="STAT" Type="number" Precision="1" Scale="0" />
+          <Property Name="KF" Type="varchar2" MaxLength="6" Nullable="false" />
+          <Property Name="CHGDATE" Type="date" />
+        </EntityType>
+        <EntityType Name="KRN_MODULE_VERSIONS">
+          <Key>
+            <PropertyRef Name="MODULE" />
+            <PropertyRef Name="VERSION" />
+          </Key>
+          <Property Name="MODULE" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="VERSION" Type="varchar2" MaxLength="256" Nullable="false" />
+          <Property Name="VERIFICATION_VALUE" Type="varchar2" MaxLength="256" Nullable="false" />
+          <Property Name="LOG" Type="clob" />
+          <Property Name="HOST" Type="varchar2" MaxLength="256" Nullable="false" />
+          <Property Name="OS_USER" Type="varchar2" MaxLength="256" Nullable="false" />
+          <Property Name="INSTALLATION_DATE" Type="date" Nullable="false" />
+        </EntityType>
+        <EntityType Name="KRN_MODULE_VRS_HIST">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="UPD_NAME" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="MODULE" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="UPD_HASH" Type="varchar2" MaxLength="256" Nullable="false" />
+          <Property Name="INST_DT" Type="date" Nullable="false" />
+          <Property Name="LOG" Type="clob" />
+          <Property Name="HOST" Type="varchar2" MaxLength="256" Nullable="false" />
+          <Property Name="OS_USER" Type="varchar2" MaxLength="256" Nullable="false" />
+          <Property Name="IS_SYNC" Type="number" Precision="38" Scale="0" Nullable="false" />
+        </EntityType>
+        <EntityType Name="S_ER">
+          <Key>
+            <PropertyRef Name="K_ER" />
+          </Key>
+          <Property Name="K_ER" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="N_ER" Type="varchar2" MaxLength="100" Nullable="false" />
+          <Property Name="K_TASK" Type="varchar2" MaxLength="10" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.TABVAL' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="TABVAL">
+          <Key>
+            <PropertyRef Name="KV" />
+            <PropertyRef Name="NAME" />
+            <PropertyRef Name="LCV" />
+            <PropertyRef Name="NOMINAL" />
+            <PropertyRef Name="DIG" />
+            <PropertyRef Name="DENOM" />
+            <PropertyRef Name="PRV" />
+          </Key>
+          <Property Name="COIN" Type="number" Precision="10" Scale="0" />
+          <Property Name="KV" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="GRP" Type="number" Precision="1" Scale="0" />
+          <Property Name="NAME" Type="varchar2" MaxLength="35" Nullable="false" />
+          <Property Name="LCV" Type="char" MaxLength="3" Nullable="false" />
+          <Property Name="NOMINAL" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="SV" Type="char" MaxLength="1" />
+          <Property Name="DIG" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="DENOM" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="UNIT" Type="char" MaxLength="3" />
+          <Property Name="COUNTRY" Type="number" Precision="3" Scale="0" />
+          <Property Name="BASEY" Type="number" Precision="38" Scale="0" />
+          <Property Name="GENDER" Type="char" MaxLength="1" />
+          <Property Name="PRV" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="D_CLOSE" Type="date" />
+          <Property Name="SKV" Type="number" Precision="5" Scale="0" />
+          <Property Name="S0000" Type="varchar2" MaxLength="15" />
+          <Property Name="S3800" Type="varchar2" MaxLength="15" />
+          <Property Name="S3801" Type="number" Precision="38" Scale="0" />
+          <Property Name="S3802" Type="varchar2" MaxLength="15" />
+          <Property Name="S6201" Type="varchar2" MaxLength="15" />
+          <Property Name="S7201" Type="varchar2" MaxLength="15" />
+          <Property Name="S9282" Type="varchar2" MaxLength="15" />
+          <Property Name="S9280" Type="varchar2" MaxLength="15" />
+          <Property Name="S9281" Type="varchar2" MaxLength="15" />
+          <Property Name="S0009" Type="varchar2" MaxLength="15" />
+          <Property Name="G0000" Type="varchar2" MaxLength="15" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_USER_BRANCHES' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_USER_BRANCHES">
+          <Key>
+            <PropertyRef Name="BRANCH" />
+            <PropertyRef Name="NAME" />
+            <PropertyRef Name="DATE_OPENED" />
+          </Key>
+          <Property Name="BRANCH" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="70" Nullable="false" />
+          <Property Name="B040" Type="varchar2" MaxLength="20" />
+          <Property Name="DESCRIPTION" Type="varchar2" MaxLength="70" />
+          <Property Name="IDPDR" Type="number" Precision="38" Scale="0" />
+          <Property Name="DATE_OPENED" Type="date" Nullable="false" />
+          <Property Name="DATE_CLOSED" Type="date" />
+          <Property Name="DELETED" Type="date" />
+          <Property Name="SAB" Type="varchar2" MaxLength="6" />
+        </EntityType>
+        <Function Name="KRN_INSTALL_MGR_INS_MODULE_VERSION" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="KRN_INSTALL_MGR.INS_MODULE_VERSION">
+          <Parameter Name="P_MODULE" Type="varchar2" Mode="In" />
+          <Parameter Name="P_VERSION" Type="varchar2" Mode="In" />
+          <Parameter Name="P_LOG" Type="clob" Mode="In" />
+          <Parameter Name="P_HOST" Type="varchar2" Mode="In" />
+          <Parameter Name="P_OS_USER" Type="varchar2" Mode="In" />
+          <Parameter Name="P_INST_DT" Type="date" Mode="In" />
+          <Parameter Name="P_HASH" Type="varchar2" Mode="In" />
+        </Function>
+        <Function Name="KRN_INSTALL_MGR_INS_UPD_HIST" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="KRN_INSTALL_MGR.INS_UPD_HIST">
+          <Parameter Name="P_UPD_NAME" Type="varchar2" Mode="In" />
+          <Parameter Name="P_HASH" Type="varchar2" Mode="In" />
+          <Parameter Name="P_LOG" Type="clob" Mode="In" />
+          <Parameter Name="P_MODULE" Type="varchar2" Mode="In" />
+          <Parameter Name="P_INST_DT" Type="date" Mode="In" />
+          <Parameter Name="P_HOST" Type="varchar2" Mode="In" />
+          <Parameter Name="P_OS_USER" Type="varchar2" Mode="In" />
+          <Parameter Name="P_IS_SYNC" Type="number" Mode="In" />
+        </Function>
+        <EntityContainer Name="ModelStoreContainer">
+          <EntitySet Name="FDAT" EntityType="Self.FDAT" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="KRN_MODULE_VERSIONS" EntityType="Self.KRN_MODULE_VERSIONS" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="KRN_MODULE_VRS_HIST" EntityType="Self.KRN_MODULE_VRS_HIST" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="S_ER" EntityType="Self.S_ER" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="TABVAL" EntityType="Self.TABVAL" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"TABVAL"."COIN" AS "COIN", 
+"TABVAL"."KV" AS "KV", 
+"TABVAL"."GRP" AS "GRP", 
+"TABVAL"."NAME" AS "NAME", 
+"TABVAL"."LCV" AS "LCV", 
+"TABVAL"."NOMINAL" AS "NOMINAL", 
+"TABVAL"."SV" AS "SV", 
+"TABVAL"."DIG" AS "DIG", 
+"TABVAL"."DENOM" AS "DENOM", 
+"TABVAL"."UNIT" AS "UNIT", 
+"TABVAL"."COUNTRY" AS "COUNTRY", 
+"TABVAL"."BASEY" AS "BASEY", 
+"TABVAL"."GENDER" AS "GENDER", 
+"TABVAL"."PRV" AS "PRV", 
+"TABVAL"."D_CLOSE" AS "D_CLOSE", 
+"TABVAL"."SKV" AS "SKV", 
+"TABVAL"."S0000" AS "S0000", 
+"TABVAL"."S3800" AS "S3800", 
+"TABVAL"."S3801" AS "S3801", 
+"TABVAL"."S3802" AS "S3802", 
+"TABVAL"."S6201" AS "S6201", 
+"TABVAL"."S7201" AS "S7201", 
+"TABVAL"."S9282" AS "S9282", 
+"TABVAL"."S9280" AS "S9280", 
+"TABVAL"."S9281" AS "S9281", 
+"TABVAL"."S0009" AS "S0009", 
+"TABVAL"."G0000" AS "G0000"
+FROM "BARS"."TABVAL" "TABVAL"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_USER_BRANCHES" EntityType="Self.V_USER_BRANCHES" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_USER_BRANCHES"."BRANCH" AS "BRANCH", 
+"V_USER_BRANCHES"."NAME" AS "NAME", 
+"V_USER_BRANCHES"."B040" AS "B040", 
+"V_USER_BRANCHES"."DESCRIPTION" AS "DESCRIPTION", 
+"V_USER_BRANCHES"."IDPDR" AS "IDPDR", 
+"V_USER_BRANCHES"."DATE_OPENED" AS "DATE_OPENED", 
+"V_USER_BRANCHES"."DATE_CLOSED" AS "DATE_CLOSED", 
+"V_USER_BRANCHES"."DELETED" AS "DELETED", 
+"V_USER_BRANCHES"."SAB" AS "SAB"
+FROM "BARS"."V_USER_BRANCHES" "V_USER_BRANCHES"</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Model" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityType Name="TABVAL">
+          <Key>
+            <PropertyRef Name="KV" />
+            <PropertyRef Name="NAME" />
+            <PropertyRef Name="LCV" />
+            <PropertyRef Name="NOMINAL" />
+            <PropertyRef Name="DIG" />
+            <PropertyRef Name="DENOM" />
+            <PropertyRef Name="PRV" />
+          </Key>
+          <Property Name="COIN" Type="Int64" />
+          <Property Name="KV" Type="Int16" Nullable="false" />
+          <Property Name="GRP" Type="Int16" />
+          <Property Name="NAME" Type="String" MaxLength="35" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="LCV" Type="String" MaxLength="3" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="NOMINAL" Type="Int64" Nullable="false" />
+          <Property Name="SV" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="DIG" Type="Int64" Nullable="false" />
+          <Property Name="DENOM" Type="Decimal" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="UNIT" Type="String" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="COUNTRY" Type="Int16" />
+          <Property Name="BASEY" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="GENDER" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="PRV" Type="Int16" Nullable="false" />
+          <Property Name="D_CLOSE" Type="DateTime" />
+          <Property Name="SKV" Type="Int32" />
+          <Property Name="S0000" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S3800" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S3801" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="S3802" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S6201" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S7201" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S9282" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S9280" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S9281" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="S0009" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="G0000" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityContainer Name="KernelContext" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="TABVAL" EntityType="Self.TABVAL" />
+          <EntitySet Name="S_ER" EntityType="Model.S_ER" />
+          <EntitySet Name="V_USER_BRANCHES" EntityType="Model.V_USER_BRANCHES" />
+          <EntitySet Name="FDATs" EntityType="Model.FDAT" />
+          <FunctionImport Name="KRN_INSTALL_MGR_INS_UPD_HIST">
+            <Parameter Name="P_UPD_NAME" Mode="In" Type="String" />
+            <Parameter Name="P_HASH" Mode="In" Type="String" />
+            <Parameter Name="P_LOG" Mode="In" Type="String" />
+            <Parameter Name="P_MODULE" Mode="In" Type="String" />
+            <Parameter Name="P_INST_DT" Mode="In" Type="DateTime" />
+            <Parameter Name="P_HOST" Mode="In" Type="String" />
+            <Parameter Name="P_OS_USER" Mode="In" Type="String" />
+            <Parameter Name="P_IS_SYNC" Mode="In" Type="Decimal" />
+          </FunctionImport>
+          <EntitySet Name="KRN_MODULE_VERSIONS" EntityType="Model.KRN_MODULE_VERSIONS" />
+          <EntitySet Name="KRN_MODULE_VRS_HIST" EntityType="Model.KRN_MODULE_VRS_HIST" />
+          <FunctionImport Name="KRN_INSTALL_MGR_INS_MODULE_VERSION">
+            <Parameter Name="P_MODULE" Mode="In" Type="String" />
+            <Parameter Name="P_VERSION" Mode="In" Type="String" />
+            <Parameter Name="P_LOG" Mode="In" Type="String" />
+            <Parameter Name="P_HOST" Mode="In" Type="String" />
+            <Parameter Name="P_OS_USER" Mode="In" Type="String" />
+            <Parameter Name="P_INST_DT" Mode="In" Type="DateTime" />
+            <Parameter Name="P_HASH" Mode="In" Type="String" />
+          </FunctionImport>
+        </EntityContainer>
+        <EntityType Name="S_ER">
+          <Key>
+            <PropertyRef Name="K_ER" />
+          </Key>
+          <Property Name="K_ER" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="N_ER" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="K_TASK" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_USER_BRANCHES">
+          <Key>
+            <PropertyRef Name="BRANCH" />
+            <PropertyRef Name="NAME" />
+            <PropertyRef Name="DATE_OPENED" />
+          </Key>
+          <Property Name="BRANCH" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="NAME" Type="String" Nullable="false" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="B040" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="DESCRIPTION" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="IDPDR" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="DATE_OPENED" Type="DateTime" Nullable="false" />
+          <Property Name="DATE_CLOSED" Type="DateTime" />
+          <Property Name="DELETED" Type="DateTime" />
+          <Property Name="SAB" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="FDAT">
+          <Key>
+            <PropertyRef Name="FDAT1" />
+            <PropertyRef Name="KF" />
+          </Key>
+          <Property Name="FDAT1" Type="DateTime" Nullable="false" />
+          <Property Name="STAT" Type="Int16" />
+          <Property Name="KF" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="CHGDATE" Type="DateTime" />
+        </EntityType>
+        <EntityType Name="KRN_MODULE_VERSIONS">
+          <Key>
+            <PropertyRef Name="MODULE" />
+            <PropertyRef Name="VERSION" />
+          </Key>
+          <Property Name="MODULE" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="VERSION" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="VERIFICATION_VALUE" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="LOG" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="HOST" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="OS_USER" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="INSTALLATION_DATE" Type="DateTime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="KRN_MODULE_VRS_HIST">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="UPD_NAME" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="MODULE" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="UPD_HASH" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="INST_DT" Type="DateTime" Nullable="false" />
+          <Property Name="LOG" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="HOST" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="OS_USER" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="IS_SYNC" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ModelStoreContainer" CdmEntityContainer="KernelContext">
+          <EntitySetMapping Name="TABVAL">
+            <EntityTypeMapping TypeName="Model.TABVAL">
+              <MappingFragment StoreEntitySet="TABVAL">
+                <ScalarProperty Name="COIN" ColumnName="COIN" />
+                <ScalarProperty Name="KV" ColumnName="KV" />
+                <ScalarProperty Name="GRP" ColumnName="GRP" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="LCV" ColumnName="LCV" />
+                <ScalarProperty Name="NOMINAL" ColumnName="NOMINAL" />
+                <ScalarProperty Name="SV" ColumnName="SV" />
+                <ScalarProperty Name="DIG" ColumnName="DIG" />
+                <ScalarProperty Name="DENOM" ColumnName="DENOM" />
+                <ScalarProperty Name="UNIT" ColumnName="UNIT" />
+                <ScalarProperty Name="COUNTRY" ColumnName="COUNTRY" />
+                <ScalarProperty Name="BASEY" ColumnName="BASEY" />
+                <ScalarProperty Name="GENDER" ColumnName="GENDER" />
+                <ScalarProperty Name="PRV" ColumnName="PRV" />
+                <ScalarProperty Name="D_CLOSE" ColumnName="D_CLOSE" />
+                <ScalarProperty Name="SKV" ColumnName="SKV" />
+                <ScalarProperty Name="S0000" ColumnName="S0000" />
+                <ScalarProperty Name="S3800" ColumnName="S3800" />
+                <ScalarProperty Name="S3801" ColumnName="S3801" />
+                <ScalarProperty Name="S3802" ColumnName="S3802" />
+                <ScalarProperty Name="S6201" ColumnName="S6201" />
+                <ScalarProperty Name="S7201" ColumnName="S7201" />
+                <ScalarProperty Name="S9282" ColumnName="S9282" />
+                <ScalarProperty Name="S9280" ColumnName="S9280" />
+                <ScalarProperty Name="S9281" ColumnName="S9281" />
+                <ScalarProperty Name="S0009" ColumnName="S0009" />
+                <ScalarProperty Name="G0000" ColumnName="G0000" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="S_ER">
+            <EntityTypeMapping TypeName="Model.S_ER">
+              <MappingFragment StoreEntitySet="S_ER">
+                <ScalarProperty Name="K_TASK" ColumnName="K_TASK" />
+                <ScalarProperty Name="N_ER" ColumnName="N_ER" />
+                <ScalarProperty Name="K_ER" ColumnName="K_ER" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_USER_BRANCHES">
+            <EntityTypeMapping TypeName="Model.V_USER_BRANCHES">
+              <MappingFragment StoreEntitySet="V_USER_BRANCHES">
+                <ScalarProperty Name="SAB" ColumnName="SAB" />
+                <ScalarProperty Name="DELETED" ColumnName="DELETED" />
+                <ScalarProperty Name="DATE_CLOSED" ColumnName="DATE_CLOSED" />
+                <ScalarProperty Name="DATE_OPENED" ColumnName="DATE_OPENED" />
+                <ScalarProperty Name="IDPDR" ColumnName="IDPDR" />
+                <ScalarProperty Name="DESCRIPTION" ColumnName="DESCRIPTION" />
+                <ScalarProperty Name="B040" ColumnName="B040" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="BRANCH" ColumnName="BRANCH" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FDATs">
+            <EntityTypeMapping TypeName="Model.FDAT">
+              <MappingFragment StoreEntitySet="FDAT">
+                <ScalarProperty Name="CHGDATE" ColumnName="CHGDATE" />
+                <ScalarProperty Name="KF" ColumnName="KF" />
+                <ScalarProperty Name="STAT" ColumnName="STAT" />
+                <ScalarProperty Name="FDAT1" ColumnName="FDAT" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="KRN_INSTALL_MGR_INS_UPD_HIST" FunctionName="Model.Store.KRN_INSTALL_MGR_INS_UPD_HIST" />
+          <EntitySetMapping Name="KRN_MODULE_VERSIONS">
+            <EntityTypeMapping TypeName="Model.KRN_MODULE_VERSIONS">
+              <MappingFragment StoreEntitySet="KRN_MODULE_VERSIONS">
+                <ScalarProperty Name="INSTALLATION_DATE" ColumnName="INSTALLATION_DATE" />
+                <ScalarProperty Name="OS_USER" ColumnName="OS_USER" />
+                <ScalarProperty Name="HOST" ColumnName="HOST" />
+                <ScalarProperty Name="LOG" ColumnName="LOG" />
+                <ScalarProperty Name="VERIFICATION_VALUE" ColumnName="VERIFICATION_VALUE" />
+                <ScalarProperty Name="VERSION" ColumnName="VERSION" />
+                <ScalarProperty Name="MODULE" ColumnName="MODULE" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="KRN_MODULE_VRS_HIST">
+            <EntityTypeMapping TypeName="Model.KRN_MODULE_VRS_HIST">
+              <MappingFragment StoreEntitySet="KRN_MODULE_VRS_HIST">
+                <ScalarProperty Name="IS_SYNC" ColumnName="IS_SYNC" />
+                <ScalarProperty Name="OS_USER" ColumnName="OS_USER" />
+                <ScalarProperty Name="HOST" ColumnName="HOST" />
+                <ScalarProperty Name="LOG" ColumnName="LOG" />
+                <ScalarProperty Name="INST_DT" ColumnName="INST_DT" />
+                <ScalarProperty Name="UPD_HASH" ColumnName="UPD_HASH" />
+                <ScalarProperty Name="MODULE" ColumnName="MODULE" />
+                <ScalarProperty Name="UPD_NAME" ColumnName="UPD_NAME" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="KRN_INSTALL_MGR_INS_MODULE_VERSION" FunctionName="Model.Store.KRN_INSTALL_MGR_INS_MODULE_VERSION" />
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="False" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Default" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

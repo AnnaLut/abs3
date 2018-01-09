@@ -1,0 +1,71 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+	<HEAD>
+		<title>Загрузка компонентов для цифровой подписи</title>
+		<style>
+		 .BarsLabel {font-family:Verdana;font-size:10pt;color:Navy}
+		 .lnk {FONT-SIZE: 10pt; CURSOR: hand; FONT-FAMILY: verdana;color:Red}
+		</style>
+		<script language="JavaScript">
+		function Install(type)
+		{
+		   var res = window.showModalDialog("InstallBarsAx.htm",type,"dialogWidth:200px;dialogHeight:30px;center:yes;edge:sunken;help:no;status:no;");
+		}
+	</script>
+	<HEAD>
+	<body scroll="no" topMargin="2">
+	<div align="center" style="font-family:Verdana;font-size:10pt;color:white;background-color:gray">Необходимые для цифровой подписи компоненты:</div>
+	<table align="center" class=BarsLabel bgcolor="#f0f0f0" cellpadding="3" cellspacing="2">
+		<tr>
+			<td valign="top">
+				<div class=lnk>1.</div>
+			<td>
+			<td width="400px">
+				<div style="font-weight:bold">Windows Installer 3</div> 
+				<div>Обновление инсталлятора до версии 3.0</div>
+			<td>
+			<td>
+				<A HREF="#" onclick="Install(0)" class=lnk>Загрузка</A>
+			<td>
+		<tr>
+		<tr>
+			<td valign="top">
+				<div class=lnk>2.</div>
+			<td>
+			<td width="400px">
+				<div style="font-weight:bold">VC++ 2005 redistributable</div> 
+				<div>Системные библиотеки для работы с елементом ActiveX</div>
+			<td>
+			<td>
+				<A HREF="#" onclick="Install(1)" class=lnk>Загрузка</A>
+			<td>
+		<tr>
+		<tr>
+			<td valign="top">
+				<div class=lnk>3.</div>
+			<td>
+			<td width="400px">
+				<div style="font-weight:bold">Bars ActiveX </div> 
+				<div>Установка активного елемента для работы с ЭЦП</div>
+			<td>
+			<td>
+				<A HREF="#" onclick="Install(2)" class=lnk>Загрузка</A>
+			<td>
+		<tr>
+		<tr>
+			<td valign="top">
+				<div class=lnk>4.</div>
+			<td>
+			<td width="400px">
+				<div style="font-weight:bold">Библиотеки и ключи</div> 
+				<div>Установка библиотек для работы с определенным типом ЭЦП, а также публичных ключей</div>
+			<td>
+			<td>
+				<A HREF="#" onclick="Install(3)" class=lnk>Загрузка</A>
+			<td>
+		<tr>
+	</table>	
+	<BR><BR>
+	<div align="center"><input type=button value="Закрыть" class="BarsLabel" onclick="window.close()"></div>	
+	</body>
+</HTML>	

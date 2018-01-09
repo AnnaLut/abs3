@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "";
+}
+<script src="@Url.Content("~/lib/jsZip/jszip.min.js")"></script>
+@Scripts.Render("~/bundles/Cash/scripts/LimitsDistributionMfoCtrl")
+<style>
+    [kendo-grid="limitsGrid"] table tbody tr td{
+        padding-top: .2em;
+        padding-bottom: .2em;
+    }
+    .red {
+        color: #d14;
+    }
+</style>
+
+<div data-ng-controller="Cash.LimitsDistributionMfo">
+    <h1>Ліміти на МФО</h1>
+    <div data-kendo-toolbar="" k-options="toolbarFilterOptions"></div>  
+    
+    @*<div kendo-grid="limitsGrid" data-options="limitsGridOptions" style="height: 100px"></div>*@
+
+    <h3>Розподіл лімітів на МФО</h3>
+    <div data-kendo-toolbar="" k-options="toolbarOptions"></div>
+    <div data-kendo-grid="limDistGrid" data-options="limDistGridOptions" style="height: 140px"></div>
+    
+    <div data-kendo-window="historyWindow" data-options="historyWindowOptions">
+        <h2 ng-bind="historyWindowTitle"></h2>
+        <div data-kendo-grid="historyGrid" data-options="historyGridOptions"></div>
+    </div>
+    
+</div>

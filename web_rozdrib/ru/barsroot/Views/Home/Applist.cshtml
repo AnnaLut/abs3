@@ -1,0 +1,472 @@
+﻿@using Kendo.Mvc.UI
+@inherits WebViewPage<IEnumerable<BarsWeb.Models.V_OPERAPP_UI>>
+@{
+   Layout = null;
+  string lastArmId = "~~1";
+  string topArmId = "~~2";
+
+  //для роботи з _LayoutKendo
+  bool isKendo = false;
+  var getType = HttpContext.Current.Request.Params.GetValues("type");
+  if (getType != null)
+  {
+      isKendo = (getType[0].ToLower() == "kendo");
+  }
+}
+@if (!isKendo)
+{
+
+<script type="text/javascript">
+    var lastArmId = '@lastArmId';
+    var topArmId = '@topArmId';
+  
+    //для підтримки запам"ятовування встановленого фільтра в Grid2005.js
+    var isHist = false;
+    var global_obj = { value: null };
+  
+    $(function () {
+        var intervalHideApp = null;
+        $('#applist').hover(function () { clearInterval(intervalHideApp); if (!pinAppStatus) { viewApp(); } },
+            function () { if (!pinAppStatus) { intervalHideApp = setTimeout(function () { hideApp(); }, 1000); } });
+        findCurentApp();
+    });
+    var last_select_menuBlock = null;
+    var last_select_app = null;
+    var blockArms = false;
+  
+    function findCurentApp() {
+        try {
+            var codeApp = bars.data.get('applist', 'codeapp', 'session');
+            var codeFunc = bars.data.get('applist', 'codeoper', 'session');
+            if (codeApp != null && codeFunc != null) {
+                var app = $('#' + codeApp);
+                if (app.length > 0) {
+                    var func = app.find('#oper-' + codeFunc);
+                    if (func.length > 0) {
+                        menuHover(app.parent().get(0));
+                        subMenu(codeApp, app.parent().find('.menuTitle').get(0));
+                        go(func.data('funcname'), func.get(0));
+                    }
+                }
+            } else {
+                go(bars.config.appName + '/board/index/');
+            }
+        } catch(e) {
+            go(bars.config.appName + '/board/index/');
+        }
+    }
+
+    function subMenu(id, img) {
+        var obj = document.getElementById(id);
+        img = $(img);
+        if (!img.hasClass('icon')) {
+            img = img.find('.icon');
+        }
+        var pref = id;
+        if (obj.style.display == 'none') {
+            obj.style.display = '';
+            if (topArmId == pref)
+                img.addClass('open-top');
+            else if (lastArmId == pref)
+                img.addClass('open-last');
+            else
+                img.addClass('open');
+        } else {
+            obj.style.display = 'none';
+            if (topArmId == pref)
+                img.removeClass('open-top');
+            else if (lastArmId == pref)
+                img.removeClass('open-last');
+            else
+                img.removeClass('open');
+        }
+        //функція з HEAD для розтягування менюшки
+        if (window['windowResize']) {
+            window.windowResize();
+        }
+    }
+    function go(url,elem) {
+        if (blockArms) {
+            new PNotify({
+                title: 'Попередження',
+                text: 'Дочекайтесь завантаження попердньо вибраної функції.',
+                styling: 'jqueryui',
+                delay: 1000,
+                animate_speed: "fast"
+            });
+            return;
+        }
+        if (null != last_select_app) {
+            $(last_select_app).removeClass('menuItemSelected');          
+        }
+
+        last_select_app = elem; 
+        $(last_select_app).addClass('menuItemSelected');	
+        $('#main').loader();
+        $('#mainFrame').attr('src', url);
+        var $elem = $(elem);
+        if (window.bars) {
+            bars.data.set('applist', 'codeapp',$elem.data('codeapp'),'session');
+            bars.data.set('applist', 'codeoper', $elem.data('codeoper'),'session');
+        }
+        blockArms = true;
+    
+        //для підтримки запам"ятовування встановленого фільтра в Grid2005.js
+        isHist = false;
+        global_obj.value = null;
+    }
+
+    function menuHover(elem) {
+        if (!$(elem).hasClass('menu-block-hover')) {
+            $(elem).addClass('menu-block-hover');
+            if (last_select_menuBlock != null) {
+                $(last_select_menuBlock).removeClass('menu-block-hover');
+            }
+            last_select_menuBlock = elem;
+        }
+    }
+
+    function pressOnText(e) {
+        if (e.keyCode == 13) {
+            findOpers();
+        }
+    }
+    function findOpers() {
+        var textInput = $('#findOpersText');
+        var text = textInput.val();
+        if (text != '' && text != textInput.prop('placeholder')) {
+            $('#menuApp').find('.menu-block').hide();
+            var resultSearch = $('#menuApp .menu-block:not(#menuBlockSearch) .menu-item-row')
+                .map(function () {
+                    var $this = $(this);
+                    var re = new RegExp(text.toUpperCase(), "g");
+                    if (re.test($this.find('.oper-name').text().toUpperCase())) {
+                        var armName = $this.parentsUntil('.menu-block').parent().find('.menuTitle').text();
+                        var newOper = $this.clone();
+                        newOper.find('.oper-name').html(function (ind, val) {
+                            var indexStart = val.toUpperCase().indexOf(text.toUpperCase());
+                            var newText = val.substring(0, indexStart);
+                            newText += '<span style="background-color: #fefe00;color:#000;">' + val.substring(indexStart, indexStart + text.length) + '</span>';
+                            newText += val.substring(indexStart + text.length, val.length);
+                            return newText;
+                        });
+                        var newRow = $('<div><span class="find-opers-title">' + armName + '</span></div>').append(newOper);
+                        return newRow[0];
+                    }
+                });
+            if (resultSearch.length == 0) {
+                $('#menuBlockSearch').show().find('#resultSearch').html('<div class="menu-item-row" >' +
+                    '<div class="oper-name">За вказаними параметрами незнайдено жодної функції</div>' +
+                    '</div>');
+            } else {
+                $('#menuBlockSearch').show().find('#resultSearch').html(resultSearch);
+            }
+        } else {
+            endSearch();
+        }
+    }
+
+    function endSearch() {
+        var textInput = $('#findOpersText');
+        textInput.addClass('hasPlaceholder');
+        if (!$.support.placeholder) {
+            textInput.val(textInput.prop('placeholder'));
+        } else {
+            textInput.val('');
+        }
+        $('#menuApp').find('.menu-block').show();
+        $('#menuBlockSearch').hide().find('#resultSearch').html('');
+    }
+    //сховати/показати арми
+    var pinAppStatus = true;
+    function hideApp() {
+        $('#applist').children().hide();
+        $('#applist').css({ 'width': '20px' });
+        var template = '<div style="width:15px;" id="divHideMenu" onclick="viewApp();">\
+                           <span class="ico arrow-right" style="margin: 0 2px;" onclick="viewApp();" title="Показати"></span>\
+                           <span class="vertical-text" style="color:#fff;margin-top:5px;cursor:pointer;">Меню функцій</span>\
+                        <'+'/div>';
+        var divHideMenu = $(template);
+        $('#applist').append(divHideMenu);
+        $('#main').css({'left':'25px'});
+    }
+    function viewApp() {
+        $('#divHideMenu').remove();
+        $('#applist').children().show();
+        $('#applist').animate({ 'width': '190px' }, 100);
+        $('#main').css({ 'left': '195px' });
+    }
+    function pinApp() {
+        pinAppStatus = true; $('#bt_pinApp').hide(); $('#bt_unpinApp').show();
+    }
+    function unpinApp() {
+        pinAppStatus = false; $('#bt_unpinApp').hide(); $('#bt_pinApp').show();
+    }
+</script>
+
+<div style="padding-left: 0;">
+  <div class="search" style="height: 22px;">
+    <input type="text" onkeypress="pressOnText(event);" id="findOpersText" placeholder="Пошук функцій" />
+    <span class="icon find" style="margin-top: 3px;" onclick="findOpers();"></span>
+  </div>
+</div>
+<div style="height: 16px;">
+  <span class="ico arrow-left" style="float:right;margin: 0 2px;" onclick="hideApp();" title="Сховати"></span>  
+  <span id="bt_pinApp" class="ico unpin" style="float: right; margin: 0 2px;display: none;" onclick="pinApp();" title="Закріпити"></span>  
+  <span id="bt_unpinApp" class="ico pin" style="float: right; margin: 0 2px;" onclick="unpinApp();" title="Відкріпити"></span> 
+</div>
+<div class="menu" id="menuApp" onselectstart="return false;" style="overflow: auto;">
+  <div style="height: auto;">
+      @foreach (var item in Model.GroupBy(i => i.CODEAPP).Select(i => i.FirstOrDefault()))
+      {
+        string imgMenu = item.CODEAPP.Trim().StartsWith(lastArmId) ? "-last" : item.CODEAPP.Trim().StartsWith(topArmId) ? "-top" : "";
+        <div class="menu-block" onclick="menuHover(this);">
+          <b class="rtop"><b class="r1"></b><b class="r2"></b> <b class="r3"></b> <b class="r4"></b></b>
+          <div class="menuTitle" ondblclick="subMenu('@item.CODEAPP.Trim()', this)" onselectstart="return false;" onmousedown="return false">
+            <table cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;">
+              <tr>
+                <td valign="top"><div class="icon @("arm" + imgMenu)" onclick="subMenu('@item.CODEAPP.Trim()', this)"></div></td>
+                <td style="width:98%;padding-left:3px;">@Html.Raw(item.APPNAME.Replace("(WEB)", "").Replace("(Web)", "").Replace("(web)", ""))</td>
+              </tr>
+              <tr>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+          <div id='@item.CODEAPP.Trim()' class="menuItem" style="display:none ">
+            @foreach (var row in Model.Where(i => i.CODEAPP.Trim() == item.CODEAPP.Trim()))
+            {
+              <div id="oper-@row.CODEOPER" class="menu-item-row" data-codeapp="@row.CODEAPP.Trim()" data-codeoper="@row.CODEOPER" data-funcname="@row.FUNCNAME" onclick="go('@row.FUNCNAME', this)">
+                <div class="icon func"></div>
+                <div class="oper-name">
+                  @Html.Raw(row.OPERNAME.Replace("(WEB)", "").Replace("(Web)", "").Replace("(web)", ""))
+                </div>
+              </div>
+            }
+          </div>
+          <b class="rtop"><b class="r4"></b><b class="r3"></b> <b class="r2"></b> <b class="r1"></b></b>
+        </div>
+      }
+      <div id="menuBlockSearch" style="display:none;" class="menu-block menu-block-hover">
+        <b class="rtop"><b class="r1"></b><b class="r2"></b><b class="r3"></b><b class="r4"></b></b>
+        <div class="menuTitle" ondblclick="" onselectstart="return false;" onmousedown="return false">
+          <table cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;">
+            <tr>
+              <td valign="top">
+                <div class="icon find-active"></div>
+              </td>
+              <td style="width:98%;">
+                Результати пошуку
+              </td>
+              <td>
+                <div onclick="endSearch();" class="icon clase-active"></div>
+              </td>
+            </tr>
+            <tr><td></td></tr>
+          </table>
+        </div>
+        <div id='resultSearch' class="menuItem">
+          <div class="menu-item-row">
+            <div class="oper-name">Редагування групи звітів</div>
+          </div>
+        </div>
+        <b class="rtop"><b class="r4"></b><b class="r3"></b> <b class="r2"></b> <b class="r1"></b></b>
+      </div>
+    </div>
+</div>
+
+}
+else
+{
+    <style>
+        #modulesList .k-item .k-link.k-header {
+            padding: 0.5em 1em 0.5em 0.5em;
+            line-height: 1.5em;
+        }
+        #modulesList .k-item .k-group.k-panel .k-item .k-link {
+            padding: 0.5em 0.5em 0.5em 1.5em;
+            line-height: 1.5em;
+            border-bottom: 1px dotted;
+        }
+    </style>
+
+    <script>
+        function onModulesListSelect(e) {
+            var elem = $(e.item);
+            if (elem.data('funcname')) {
+                go(elem.data('funcname'), elem.data('codeapp'), elem.data('codeoper'), elem.text());
+            }
+        }
+
+        function onModulesListCollapse(e) {
+            $(e.item).find('.pf-icon').removeClass('pf-folder_open').addClass('pf-folder').removeClass("pf-hot");
+        }
+
+        function onModulesListExpand(e) {
+            $(e.item).find('.pf-icon').removeClass('pf-folder').addClass('pf-folder_open').addClass("pf-hot");
+        }
+
+        function go(url, codeapp, codeoper, text) {
+            var mainPane = $('#main-pane');
+            if (mainPane.data('isload')) {
+                $('#popupIsload').data("kendoNotification").show("Дочекайтесь завантаження попердньо вибраної функції.", "error");
+                return;
+            }
+            kendo.ui.progress(mainPane, true);
+            mainPane.data('isload', true);
+
+            if (true) {
+                appendTab(url, text, codeoper, true);
+            } else {
+                //last_select_app = elem;
+                //$(last_select_app).addClass('menuItemSelected');
+
+                $('#mainFrame').attr('src', url);
+
+                //для підтримки запам"ятовування встановленого фільтра в Grid2005.js
+                //isHist = false;
+                //global_obj.value = null;
+            }
+
+            if (window.bars) {
+                bars.data.set('applist', 'codeapp', codeapp, 'session');
+                bars.data.set('applist', 'codeoper', codeoper, 'session');
+            }
+        }
+
+        function findCurentApp() {
+            try {
+                var codeApp = bars.data.get('applist', 'codeapp', 'session');
+                var codeFunc = bars.data.get('applist', 'codeoper', 'session');
+                if (codeApp != null && codeFunc != null) {
+                    var app = $('#' + codeApp);
+                    if (app.length > 0) {
+                        var func = app.find('#oper-' + codeFunc);
+                        if (func.length > 0) {
+                            menuHover(app.parent().get(0));
+                            subMenu(codeApp, app.parent().find('.menuTitle').get(0));
+                            go(func.data('funcname'), func.get(0));
+                        }
+                    }
+                } else {
+                    go(bars.config.urlContent( '/board/index/'));
+                }
+            } catch (e) {
+                go(bars.config.urlContent('/board/index/'));
+            }
+        }
+    </script>
+    @*<div id="modulesList1"></div>
+    
+    <script>
+        $(function() {
+            $("#modulesList1").kendoPanelBar({
+                encoded: false,
+                select: onModulesListSelect,
+                collapse: onModulesListCollapse,
+                expand: onModulesListExpand,
+                expandMode: "multiple",
+                dataSource: [
+                    {
+                        text: "<div class=\"pf-icon pf-16 pf-folder\"></div> TEST",
+                        encoded: false,
+                        attribute:{data_codeapp: 'TEST'},
+                        items: [
+                            {
+                                text: "<div class=\"pf-icon pf-16 pf-tabs-export\"></div> " + "Accounts",
+                                encoded: false,
+                                attributes: {
+                                    data_funcname: "/barsroot/acct/accounts/index/" ,
+                                    data_codeaap: "acc1",
+                                    data_codeoper: "001"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            });
+        });
+    </script>*@
+    
+    
+    @(Html.Kendo().PanelBar()
+          .Name("modulesList")
+          .Items(panelbar =>
+          {
+              foreach (var item in Model.GroupBy(i => i.CODEAPP).Select(i => i.FirstOrDefault()))
+              {
+                  string imgMenu = item.CODEAPP.Trim().StartsWith(lastArmId) ? "-execute" : item.CODEAPP.Trim().StartsWith(topArmId) ? "-favorite" : "";
+                  panelbar.Add()
+                      .Encoded(false)
+                      .Text("<div class=\"pf-icon pf-16 pf-folder" + imgMenu + "\"></div> " + item.APPNAME.Replace("(WEB)", "").Replace("(Web)", "").Replace("(web)", ""))
+                      .HtmlAttributes(new { data_codeapp = item.CODEAPP.Trim() })
+                      //.ImageUrl(Url.Content("~/Content/images/PureFlat/16/folder.png"))
+                      .Items(baseball =>
+                      {
+                          /*********************************************************/
+                          baseball.Add()
+                              .Encoded(false)
+                              .Text("<div class=\"pf-icon pf-16 pf-tabs-export\"></div> " + "Accounts")
+                              .HtmlAttributes(new {data_funcname = "/barsroot/acct/accounts/index/", data_codeaap = "acc1", data_codeoper = "001"});
+                          baseball.Add()
+                              .Encoded(false)
+                              .Text("<div class=\"pf-icon pf-16 pf-tabs-export\"></div> " + "Advertising")
+                              .HtmlAttributes(new {data_funcname = "/barsroot/doc/advertising/index/", data_codeaap = "advr1", data_codeoper = "002"});
+                          baseball.Add()
+                              .Encoded(false)
+                              .Text("<div class=\"pf-icon pf-16 pf-tabs-export\"></div> " + "Reporting")
+                              .HtmlAttributes(new {data_funcname = "/barsroot/reporting/nbu/index/", data_codeaap = "rep1", data_codeoper = "003"});
+                          baseball.Add()
+                              .Encoded(false)
+                              .Text("<div class=\"pf-icon pf-16 pf-tabs-export\"></div> " + "Cash")
+                              .HtmlAttributes(new {data_funcname = "/barsroot/cash/requests/index/", data_codeaap = "rep1", data_codeoper = "004"});
+                          baseball.Add()
+                              .Encoded(false)
+                              .Text("<div class=\"pf-icon pf-16 pf-tabs-export\"></div> " + "CashTreshold")
+                              .HtmlAttributes(new {data_funcname = "/barsroot/cash/treshold/index/", data_codeaap = "rep1", data_codeoper = "005"});
+                          baseball.Add()
+                              .Encoded(false)
+                              .Text("<div class=\"pf-icon pf-16 pf-tabs-export\"></div> " + "CashLimitDistributionAcc")
+                              .HtmlAttributes(new { data_funcname = "/barsroot/cash/limitsdistribution/Acc/", data_codeaap = "rep1", data_codeoper = "006" });
+                          baseball.Add()
+                              .Encoded(false)
+                              .Text("<div class=\"pf-icon pf-16 pf-tabs-export\"></div> " + "CashLimitDistributionAtm")
+                              .HtmlAttributes(new { data_funcname = "/barsroot/cash/limitsdistribution/Atm/", data_codeaap = "rep1", data_codeoper = "007" });                                                  
+                          baseball.Add()
+                              .Encoded(false)
+                              .Text("<div class=\"pf-icon pf-16 pf-tabs-export\"></div> " + "LCS")
+                              .HtmlAttributes(new { data_funcname = "/barsroot/LimitControl/Limit/DocumentStatus/", data_codeaap = "rep1", data_codeoper = "008" });
+
+                          baseball.Add()
+                              .Encoded(false)
+                              .Text("<div class=\"pf-icon pf-16 pf-tabs-export\"></div> " + "Schedulers")
+                              .HtmlAttributes(new { data_funcname = "/barsroot/async/schedulers/index/", data_codeaap = "rep1", data_codeoper = "009" });
+                          baseball.Add()
+                              .Encoded(false)
+                              .Text("<div class=\"pf-icon pf-16 pf-tabs-export\"></div> " + "Tasks")
+                              .HtmlAttributes(new { data_funcname = "/barsroot/async/tasks/index/", data_codeaap = "rep1", data_codeoper = "010" });                                                                              
+
+                          /*********************************************************/
+                          foreach (var row in Model.Where(i => i.CODEAPP.Trim() == item.CODEAPP.Trim()))
+                          {
+                              baseball.Add()
+                                  .Encoded(false)
+                                  .Text("<div class=\"pf-icon pf-16 pf-tabs-export\"></div> " + row.OPERNAME.Replace("(WEB)", "").Replace("(Web)", "").Replace("(web)", ""))
+                                  .HtmlAttributes(new { data_funcname = row.FUNCNAME, data_codeaap = row.CODEAPP.Trim(), data_codeoper = row.CODEOPER });
+                              //.ImageUrl(Url.Content("~/Content/shared/icons/16/star.png"));
+                          }
+                      });
+              }
+          })
+          .HtmlAttributes(new {style = "border-width: 0;"})
+          .Events(events => events
+              .Select("onModulesListSelect")
+              .Collapse("onModulesListCollapse")
+              .Expand("onModulesListExpand")
+          )
+          )
+    
+    
+      @(Html.Kendo().Notification()
+          .Name("popupIsload").Button(true).Position(position => position.Top(30)))
+}
