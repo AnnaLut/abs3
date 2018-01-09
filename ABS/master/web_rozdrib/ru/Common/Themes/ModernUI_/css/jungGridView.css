@@ -1,0 +1,381 @@
+
+
+.preTableDiv
+{
+	/*overflow: scroll;*/
+	position:relative;
+	padding: 0px 0 0px 0;
+	width:100%;
+	font-size:1em;
+	font-family: Arial;
+	color: #4C5967;
+}
+.gridView
+{
+    border-collapse:collapse; 
+    background-color:#fff;
+	width: 100%;
+    min-height:50px;
+	border:none;
+	border-left:solid 1px #bdcff7;
+	border-right:solid 1px #bdcff7;
+	border-top:dotted 1px #bdcff7;
+	border-bottom:solid 1px #bdcff7;
+}
+.gridView th
+{
+	color: #1a4784;
+	cursor:pointer;
+	padding: 3px 3px 3px 3px;
+	border: none;
+	border-right: dotted 1px #bdcff7;
+	border-bottom: dotted 1px #bdcff7;
+}
+.gridView tr
+{
+    border:none;
+    margin:0 0 0 0;
+}
+.gridView td
+{
+    margin:0 0 0 0;
+	padding: 4px 3px 4px 3px;
+	white-space:nowrap;
+	border: none;
+	border-right:solid 1px #E0E0E0;
+}
+
+table
+{
+    /*border-collapse: collapse;*/
+    border:none;
+}
+
+.barsGridView tr
+{
+
+}
+
+.barsGridView tr a
+{
+
+}
+
+.selectedRow
+{
+	background-color: #adddff; /* #0977B9 ;*/
+	/*color: #fff;*/
+}
+.headerRow
+{
+}
+
+.headerRow th
+{
+    font-size:9pt;
+    text-align: center;
+}
+
+.headerRow th a
+{
+    text-decoration: none;
+    color: #1a4784;
+}
+
+
+
+.footerRow
+{
+}
+
+.footerRow td
+{
+    padding: 0px 0px 0px 0px;
+	font-size:12px;
+	/*border:none;*/
+}
+
+ td input
+{
+	font-size:12pt;
+}
+
+.gridView tfoot td{
+    border-top: solid 1px #bdcff7;
+    padding: 0px 0px 0px 0px;
+	font-size:12px;
+}
+.gridView tfoot td img{
+    cursor:pointer;
+    margin:2px 0 -3px 0;
+}
+.footerTable
+{
+    border-top: solid 1px #bdcff7;
+}
+/*???*/
+    .footerDiv
+    {
+        border-top: solid 1px #bdcff7;
+    }
+    .footerDiv img
+    {
+        cursor:pointer;
+        margin:2px 0 -3px 0;
+
+    }
+    .footerDiv div
+    {
+        float:left;
+    }
+/*---*/
+
+.normalRow
+{
+	background-color: #F0F0F0;
+}
+
+.alternateRow
+{
+    
+    background-color:White;
+}
+.alternateRow, .normalRow, .selectedRow
+{
+    cursor:pointer;
+}
+.alternateRow:hover, .normalRow:hover
+{
+    background-color:#d7ebf9;
+}
+
+
+
+
+.newRow
+{
+	  
+}
+
+.newRow td
+{
+	padding: 0px 1px 0px 0px;
+}
+
+.editRow
+{
+}
+
+.pagerRow
+{
+    font-size:12pt;
+    padding: 0px 0px 0px 0px;
+
+}
+.pagerRow
+{
+    padding: 0px 0px 0px 0px;
+}
+
+/*€чейка пейджера*/
+.pagerRow td table tr td
+{
+   padding: 1px 1px 1px 1px;
+   border:none;
+}
+
+/*линк пейджера*/
+.pagerRow td table tr td a
+{
+    font-size:8pt;
+    padding: 0px 3px 0px 3px;
+}
+/*текуща€ страница пейджера*/
+.pagerRow td table tr td span
+{
+    font-size:10pt;
+}
+
+.filterRow input
+{
+	font-size:x-small;
+    margin-top:2px;	
+    width:100%;
+}
+
+.filterRow select
+{
+	font-size: x-small;
+}
+
+.captionHeader
+{	
+	
+	background-color: #94ABD9;
+}
+
+.captionBody
+{
+	width: 100%;
+	/*text-align:justify;*/
+    text-align:left;
+	/*background-image:url(/common/images/skin/gradient_main.png);*/
+	/*background: url(/common/images/skin/title_bg.gif) no-repeat;
+	background-repeat:repeat-x;*/
+	min-height:20px;
+	border-right:solid 1px #bdcff7;
+    border-top:solid 1px #bdcff7;
+    border-left:solid 1px #bdcff7;
+}
+.captionBody img
+{
+    cursor:pointer;
+    margin:3px 5px 0px 5px;
+}
+.captionBody div
+{
+    text-align:center;
+    margin:0px 0 3px 0px;
+}
+
+.captionBody tr td
+{
+	white-space: nowrap;
+}
+
+.captionBodySimple
+{
+	width: 100%;
+	text-align:justify;
+	padding-bottom: 3px;
+	height:20px;
+    border-left :solid 1px #bdcff7;
+	border-right:solid 1px #bdcff7;
+	border-top:solid 1px #bdcff7;
+}
+
+.captionBodySimple tr td
+{
+	white-space: nowrap;
+}
+
+.captionText
+{
+	width: 100%;
+	font-size: 10pt;
+	font-weight:bold;
+	color:White;
+	vertical-align:middle;
+	text-align: center;
+}
+
+.emptyMessage
+{
+	padding: 3px 50px 3px 50px;
+	text-align: center;
+}
+
+.tableTitle
+{
+	font-size: 11pt;
+
+	color: #1C4B75;
+	margin-bottom: 15px;
+	margin-top: 7px;
+}
+.spanIcoSortASC
+{
+    background-image:url(img/sort_asc.png);
+}
+.spanIcoSortDESC
+{
+    background-image:url(img/sort_desc.png);
+}.jungGridView {    width:100%;
+}
+.jungGridView thead tr th,
+.jungGridView thead tr td {
+  display: table-cell;
+  vertical-align: bottom;
+  padding-bottom: 5px;
+  padding-top: 10px;
+  padding-left: 5px;
+  border-bottom: 1px #bdcff7 solid;
+  border-right: 1px #bdcff7 solid;
+  border-left: 1px #bdcff7 solid;
+  border-top: 1px #bdcff7 solid;
+  font-family: 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-weight: 400;
+  font-size: 11pt;
+  letter-spacing: 0.01em;
+  line-height: 13pt;
+  font-smooth: always;
+  color: #1a4784;
+  text-align: right;
+}
+
+.jungGridView tbody tr td {
+  font-family: 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-weight: 300;
+  font-size: 11pt;
+  letter-spacing: 0.02em;
+  line-height: 14pt;
+  font-smooth: always;
+  padding: 3px 10px;
+  border-right: 1px #ddd solid;
+  border-bottom: 1px #ddd solid;
+  border-left: 1px #ddd solid;
+  border-top: 1px #ddd solid;
+  box-sizing: border-box;
+}
+
+.jungGridView tfoot tr td {
+  font-family: 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-weight: 300;
+  font-size: 11pt;
+  letter-spacing: 0.02em;
+  line-height: 14pt;
+  font-smooth: always;
+  padding: 0px 10px;
+  border-bottom: 1px #bdcff7 solid;
+  border-right: 1px #bdcff7 solid;
+  border-left: 1px #bdcff7 solid;
+  border-top: 1px #bdcff7 solid;
+  box-sizing: border-box;
+  color: #1a4784;
+}
+
+.jungGridView tfoot tr td input
+{
+	font-size:11pt;
+    margin:2px;
+    padding:2px;
+}
+/*
+.preTableDiv table.hovered {
+  border-collapse: separate !important;
+}
+.preTableDiv table.hovered thead tr th:hover,
+.preTableDiv table.hovered thead tr td:hover {
+  border: 1px #1c98cc solid;
+  background: rgba(28, 183, 236, 0.1);
+}
+.preTableDiv table.hovered tbody tr:hover {
+  background-color: rgba(28, 183, 236, 0.1);
+}
+.preTableDiv table.hovered tbody tr:hover td:first-child {
+  border-left: 1px #1c98cc solid;
+}
+.preTableDiv table.hovered tbody tr:hover td:last-child {
+  border-right: 1px #1c98cc solid;
+}
+.preTableDiv table.hovered tbody tr:hover td {
+  border-top: 1px #1c98cc solid;
+  border-bottom: 1px #1c98cc solid;
+}
+.preTableDiv table.bordered {
+  border-collapse: separate !important;
+  border: 1px #ccc solid !important;
+}
+.preTableDiv table.bordered tbody tr:last-child td {
+  border-bottom: 0;
+}*/

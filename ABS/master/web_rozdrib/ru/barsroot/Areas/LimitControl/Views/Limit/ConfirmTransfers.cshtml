@@ -1,0 +1,361 @@
+﻿@using BarsWeb.Areas.LimitControl.ViewModels
+@using Kendo.Mvc.UI
+@model TransferSearchInfo
+
+@(Html.Kendo().Window().Name("Details")
+    .Title("Неуспішно")
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .Width(600)
+)
+<h1>Підтвердження переказів</h1>
+<div class="search-section">
+ 
+    <form action="">
+        <p>
+            @Html.LabelFor(m => m.Series, new { @class = "k-label" })
+            @*Любые символы*@
+            @Html.Kendo().MaskedTextBoxFor(m => m.Series).Mask("&&&&")
+            @*Только буквы*@
+            @*@Html.Kendo().MaskedTextBoxFor(m => m.Series).Rules(rules => rules.Add('~', "/[a-zA-Zа-яА-Я]/")).Mask("~~~")*@
+            @*@Html.Kendo().TextBoxFor(m => m.Series)*@
+        </p>
+        <p>
+            @Html.LabelFor(m => m.Number, new { @class = "k-label" })
+            @*Любые символы*@
+            <input name="Number" class="k-textbox" id="Number" autocomplete="off" data-role="maskedtextbox">
+            @*@Html.Kendo().MaskedTextBoxFor(m => m.Number).Mask("&&&&&&&&&&")*@
+            @*Только цифры*@
+            @*@Html.Kendo().MaskedTextBoxFor(m => m.Number).Mask("0000000000")*@
+            @*@Html.Kendo().TextBox().Name("Number")*@
+        </p>
+    </form>
+    <p align="center">
+        <input type="submit" value="Пошук" id="search" />
+    </p>
+</div>
+
+<div class="grid-section">
+    @(Html.Kendo().Grid<Transfer>
+        ()
+        .Name("Grid")
+        .Columns(columns =>
+        {            
+            columns.Bound(p => p.Selected)
+                .Filterable(false)
+                .Sortable(false)
+                .Width(100)
+                .ClientTemplate("<input class='checkOneRow' type='checkbox' data-editable='#=Editable#' #=Selected?\"checked ='checked' \":\"\"# />")
+                .HeaderTemplate("<span><input id='checkAll' type='checkbox' title='Обрати усі' />Обрати усі</span>");
+            columns.Bound(p => p.System);
+            columns.Bound(p => p.Id)
+            .ClientTemplate("<span class='idField'>#=Id#</span>");
+            columns.Bound(p => p.Series).Width(130);
+            columns.Bound(p => p.Number);
+            columns.Bound(p => p.Name);
+            columns.Bound(p => p.BirthDate)
+                .Format("{0:dd/MM/yyyy}");
+            columns.Bound(p => p.Sum)
+                .Format("{0:##.##}")
+                .HtmlAttributes(new { @class = "sumField rightField" });
+                //.ClientTemplate("<span class='sumField'>#=Sum#</span>");
+
+        })
+        .Resizable(resize => resize.Columns(true))
+        .Reorderable(reorder => reorder.Columns(true))
+
+        .Pageable(pager => pager
+            .PageSizes(true))
+        .Sortable()
+        .AutoBind(false)
+        .Filterable()
+        .Events(builder => builder.DataBound("onDataBound"))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Read(read => read.Action("GetTransfers", "Limit")
+            .Data("getSearchInfo")
+            )
+            .Events(e => e.Error("onError"))
+        .ServerOperation(false)
+        ))
+
+    <center>
+        <span>Сума: <span id="totalSum"></span></span>
+        <button id="comfirmTransfer">Підтвердити</button>
+        <div>У списку відмітьте усі перекази Вашого клієнта та натисніть кнопку “Підтвердити”.</div>
+    </center>
+</div>
+
+<div>
+    <center>
+        <div id="message"></div>
+    </center>
+</div>
+
+<div class="modal"><!-- Place at bottom of page --></div>
+
+<script type="text/javascript">
+    function onError(e) {
+        if (e.status == "customerror") {
+            var exception = e.errors;
+            showModalWindow(exception.message);
+        }
+        else {
+            alert("Generic server error.");
+        }
+    }
+
+    function showModalWindow(content) {
+        var wnd = $("#Details").data("kendoWindow");
+        wnd.content(content);
+        wnd.center().open();
+    }
+
+    function showSpinner(par) {
+        var body = $("body");
+        if (par) {
+            body.addClass("loading");
+        } else {
+            body.removeClass("loading");
+        }
+    }
+
+    function getSearchInfo() {
+        return {
+            SearchInfo: {
+                Series: getSeries(),
+                Number: getNumber()
+            }
+        };
+    }
+
+    function getSeries() {
+        return $("#Series").val().replace(/_/g, "");
+    }
+
+    function getNumber() {
+        return $("#Number").val().replace(/_/g, "");
+    }
+
+    // вызывается каждый раз при привязке данных
+    function onDataBound() {
+        // Для всех галочек прописать класс editable, если их можно редактировать
+        $('.checkOneRow').each(function () {
+            if ($(this).data("editable") == true) {
+                $(this).addClass("editable");
+            } else {
+                $(this).attr("disabled", "disabled");
+                $(this).closest("tr").css({ "font-style": "italic", "font-weight": "bold" });
+            }
+        });
+        updateSum();
+
+        // По клику обновлям итоговую сумму
+        $('.checkOneRow.editable').click(function () {
+            $(this).attr("checked", this.checked);
+            updateSum();
+        });
+    }
+
+    // Обновить поле с суммой
+    function updateSum() {
+        $("#totalSum").text(calcSum().toFixed(2));
+    }
+
+    // Получить сумму для отмеченных строк
+    function calcSum() {
+        var totalSum = 0;
+        $(".checkOneRow[checked]").each(function () {
+            var curSum = $(this).closest("tr").find(".sumField").text();
+            totalSum += parseFloat(curSum);
+        });
+        return totalSum;
+    }
+
+    function ViewModel() {
+        var self = this;
+        self.Transfers = $.map($(".checkOneRow[checked]"), function (e) {
+            return $(e).closest("tr").find(".idField").text();
+        });
+        self.SearchInfo = { Series: getSeries(), Number: getNumber() }
+    }
+
+    $(function () {
+        //$("form").kendoValidator();
+        $("#Series").addClass("series");
+
+        $("#search").click(function (evt) {
+            if (!validateForm()) {
+                return;
+            }
+            $("#Grid").data("kendoGrid").dataSource.read();
+            $("#message").hide();
+            $(".grid-section").fadeIn();
+        });
+
+        function validateForm() {
+            // allow empty, 2, 3 characters
+            if ($("#Series").val().replace(/_/g, "").length == 1) {
+                $("#Series").focus();
+                return false;
+            }
+            if ($("#Number").val().replace(/_/g, "").length < 2) {
+                $("#Number").focus();
+                return false;
+            }
+            return true;
+        }
+
+        // Выбрать все строки
+        $('#checkAll').click(function (e) {
+            $(this).attr("checked", this.checked);
+            $(".checkOneRow.editable").prop("checked", this.checked);
+            $(".checkOneRow.editable").attr("checked", this.checked);
+            updateSum();
+            e.stopPropagation();
+        });
+
+        // Подтвердить переводы
+        $('#comfirmTransfer').click(function () {
+            var viewModel = new ViewModel();
+            if (viewModel.Transfers.length <= 0) {
+                var message = $("#message");
+                message.hide();
+                $("#message").removeClass("success-message");
+                $("#message").addClass("error-message");
+                message.text("Не обрано жодного переказу.");
+                message.fadeIn();
+                return;
+            }
+            showSpinner(true);
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("ConfirmTransfers", "Limit")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(viewModel),
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+
+            function successFunc(data, status) {
+                showSpinner(false);
+                if (data.success == true) {
+                    var message = $("#message");
+                    var response = data.response;
+                    if (response.Success == true) {
+                        message.hide();
+                        $("#message").removeClass("error-message");
+                        $("#message").addClass("success-message");
+                        message.text(response.Message);
+                        $(".grid-section").fadeOut(function () {
+                            message.fadeIn();
+                        });
+                    } else {
+                        message.hide();
+                        $("#message").removeClass("success-message");
+                        $("#message").addClass("error-message");
+                        message.text(response.Message + " " + response.ErrorMessage);
+                        message.fadeIn();
+                    }
+                } else {
+                    alert(data.errorMessage);
+                }
+            }
+
+            function errorFunc() {
+                showSpinner(false);
+                alert("error");
+            }
+        });
+
+        $('form').change(function () {
+            $(".grid-section").fadeOut();
+            $("#message").fadeOut();
+        });
+    });
+</script>
+
+<style>
+     .rightField {
+            text-align: right;
+        }
+
+    /*стили для формы поиска*/
+     .search-section {
+         width: 460px;
+         padding: 10px 30px 30px 30px;
+     }
+
+    .search-section h2 {
+        text-transform: uppercase;
+        font-size: 1.2em;
+        margin-bottom: 30px;
+    }
+
+    .search-section label {
+        display: inline-block;
+        width: 120px;
+        padding-right: 5px;
+        text-align: right;
+    }
+
+    .search-section .k-button {
+        margin: 20px 0 0 125px;
+    }
+
+    .k-readonly {
+        color: gray;
+    }
+
+    /*стили для грида*/
+    .grid-section {
+        display: none;
+    }
+
+    /*стили для сообщения*/
+    .error-message {
+        color: red;
+    }
+
+    .success-message {
+        color: green;
+    }
+
+    /* приведение к верхнему регистру серии документа*/
+    .series {
+        text-transform: uppercase !important;
+    }
+
+    /* Start by setting display:none to make this hidden.
+    Then we position it in relation to the viewport window
+    with position:fixed. Width, height, top and left speak
+    speak for themselves. Background we set to 80% white with
+    our animation centered, and no-repeating */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background: #ffffff 
+                    url('/barsroot/content/spinners/ajax-loader.gif') 50% 50% no-repeat;
+        background: rgba( 255, 255, 255, .8 ) 
+                    url('/barsroot/content/spinners/ajax-loader.gif') 50% 50% no-repeat;
+    }
+
+    /* When the body has the loading class, we turn
+    the scrollbar off with overflow:hidden */
+    body.loading {
+        overflow: hidden;
+    }
+
+    /* Anytime the body has the loading class, our
+    modal element will be visible */
+    body.loading .modal {
+        display: block;
+    }
+</style>

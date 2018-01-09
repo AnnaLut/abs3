@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="b12e3770751e47a8966cb9ace181f2fb" Name="Diagram1" ZoomLevel="72">
+        <EntityTypeShape EntityType="Areas.CRSOUR.Models.V_CDB_CHANGE_AMOUNT_CLAIM" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Areas.CRSOUR.Models.V_CDB_CLAIM_TRACK" Width="2.375" PointX="0.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Areas.CRSOUR.Models.V_CDB_CLOSE_DEAL_CLAIM" Width="1.5" PointX="6.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Areas.CRSOUR.Models.V_CDB_DEAL_INTEREST_RATE" Width="1.5" PointX="6.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Areas.CRSOUR.Models.V_CDB_NEW_DEAL_CLAIM" Width="1.5" PointX="4.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Areas.CRSOUR.Models.V_CDB_OPERATION" Width="1.5" PointX="6.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Areas.CRSOUR.Models.V_CDB_SET_EXPIRY_DATE_CLAIM" Width="1.5" PointX="8.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Areas.CRSOUR.Models.V_CDB_SET_INT_RATE_CLAIM" Width="1.5" PointX="8.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Areas.CRSOUR.Models.V_CDB_TRANSACTION_TRACK" Width="1.5" PointX="8.75" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Areas.CRSOUR.Models.V_CDB_BARS_TRANSACTION" Width="1.5" PointX="11.375" PointY="0.75" />
+        <EntityTypeShape EntityType="Areas.CRSOUR.Models.V_CDB_CLAIM_DATA_TO_ACCEPT" Width="1.5" PointX="4.75" PointY="0.875" />
+        <EntityTypeShape EntityType="Areas.CRSOUR.Models.V_CDB_CLAIM" Width="1.5" PointX="0.75" PointY="7.75" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

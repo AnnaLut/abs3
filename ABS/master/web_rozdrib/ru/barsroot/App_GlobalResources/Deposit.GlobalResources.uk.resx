@@ -1,0 +1,1044 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="al01" xml:space="preserve">
+    <value>МФО, задане для перерахування відсотків, не існує!</value>
+  </data>
+  <data name="al02" xml:space="preserve">
+    <value>МФО, задане для перерахування депозиту, не існує!</value>
+  </data>
+  <data name="al03" xml:space="preserve">
+    <value>Введені рахунки повністю співпадають з тими, що діють!\nВкажіть нові рахунки виплат</value>
+  </data>
+  <data name="al04" xml:space="preserve">
+    <value>Введений номер не може бути номером зіпсованого бланка.\nБланк з вказаним номером ще не використовувався, вже був помічений як зіпсований\nабо використовувався для друку іншого договору.</value>
+  </data>
+  <data name="al05" xml:space="preserve">
+    <value>Бланк з номером</value>
+  </data>
+  <data name="al06" xml:space="preserve">
+    <value>вже був використаний!</value>
+  </data>
+  <data name="al07" xml:space="preserve">
+    <value>Мфо, задане для перерахування відсотків, не існує!</value>
+  </data>
+  <data name="al08" xml:space="preserve">
+    <value>Мфо, задане для перерахування депозиту, не існує!</value>
+  </data>
+  <data name="al09" xml:space="preserve">
+    <value>закрито</value>
+  </data>
+  <data name="al10" xml:space="preserve">
+    <value>анулюване дод. угодою №</value>
+  </data>
+  <data name="al11" xml:space="preserve">
+    <value>активно</value>
+  </data>
+  <data name="al12" xml:space="preserve">
+    <value>Поповнення рахунку</value>
+  </data>
+  <data name="al13" xml:space="preserve">
+    <value>Документ не був сплачений!</value>
+  </data>
+  <data name="al14" xml:space="preserve">
+    <value>Вибраний вид дод. угод (дій) не підтримується!</value>
+  </data>
+  <data name="al15" xml:space="preserve">
+    <value>Даний клієнт вже існує!\nПроглянути зареєстрованих клієнтів?</value>
+  </data>
+  <data name="al16" xml:space="preserve">
+    <value>Зміни були успішно внесені!</value>
+  </data>
+  <data name="al17" xml:space="preserve">
+    <value>Оплатіть операцію!</value>
+  </data>
+  <data name="al18" xml:space="preserve">
+    <value>По сумі зняття відсотків нараховано не було!</value>
+  </data>
+  <data name="al19" xml:space="preserve">
+    <value>Не вибраний жоден шаблон!</value>
+  </data>
+  <data name="al20" xml:space="preserve">
+    <value>Первинний внесок не зроблений!</value>
+  </data>
+  <data name="al21" xml:space="preserve">
+    <value>За даним договором є необроблені запити!</value>
+  </data>
+  <data name="al22" xml:space="preserve">
+    <value>Формат документів не підтримується</value>
+  </data>
+  <data name="al23" xml:space="preserve">
+    <value>Вибраний вид дод. угод не підтримується!</value>
+  </data>
+  <data name="al24" xml:space="preserve">
+    <value>Прийом неможливий!\nВиберіть район (тип) зарахування!</value>
+  </data>
+  <data name="al25" xml:space="preserve">
+    <value>Файл був успішно прийнятий.</value>
+  </data>
+  <data name="al26" xml:space="preserve">
+    <value>Не вибраний файл!</value>
+  </data>
+  <data name="al27" xml:space="preserve">
+    <value>Оплата неможлива!\nУ файлі є некоректні записи!\nВиключіть некоректні записи і спробуйте ще раз.</value>
+  </data>
+  <data name="al28" xml:space="preserve">
+    <value>Оплата пройшла успішно!</value>
+  </data>
+  <data name="al29" xml:space="preserve">
+    <value>Формат документів не підтримується!</value>
+  </data>
+  <data name="al30" xml:space="preserve">
+    <value>Виберіть шаблон листа для формування!</value>
+  </data>
+  <data name="al31" xml:space="preserve">
+    <value>Не вибраний жоден шаблон!</value>
+  </data>
+  <data name="al32" xml:space="preserve">
+    <value>Не вибрана операція з відсотками!</value>
+  </data>
+  <data name="al33" xml:space="preserve">
+    <value>Нова відсоткова ставка дорівнює попередній!</value>
+  </data>
+  <data name="al34" xml:space="preserve">
+    <value>Некоректні дані!</value>
+  </data>
+  <data name="al35" xml:space="preserve">
+    <value>Невизначена операція!</value>
+  </data>
+  <data name="al36" xml:space="preserve">
+    <value>Тип операції не визначений!</value>
+  </data>
+  <data name="al37" xml:space="preserve">
+    <value>Не вибрана операція!</value>
+  </data>
+  <data name="al38" xml:space="preserve">
+    <value>Зміни були успішно внесені!</value>
+  </data>
+  <data name="al39" xml:space="preserve">
+    <value>Вибрані документи були успішно підписані!</value>
+  </data>
+  <data name="al40" xml:space="preserve">
+    <value>Не заданий номер депозиту!</value>
+  </data>
+  <data name="al41" xml:space="preserve">
+    <value>Дод. реквизити вкладу були успішно оновлені.</value>
+  </data>
+  <data name="al42" xml:space="preserve">
+    <value>Введений рахунок не існує або закритий!\nВведіть коректні дані.</value>
+  </data>
+  <data name="al43" xml:space="preserve">
+    <value>Оновлення пройшло успішно!</value>
+  </data>
+  <data name="btAddAgreement" xml:space="preserve">
+    <value>Дод. угода</value>
+  </data>
+  <data name="btUpdate2" xml:space="preserve">
+    <value>Оновити</value>
+  </data>
+  <data name="client_address" xml:space="preserve">
+    <value>вул.</value>
+  </data>
+  <data name="client_city" xml:space="preserve">
+    <value>м.</value>
+  </data>
+  <data name="client_district" xml:space="preserve">
+    <value>р-н</value>
+  </data>
+  <data name="client_region" xml:space="preserve">
+    <value>обл.</value>
+  </data>
+  <data name="h01" xml:space="preserve">
+    <value>Допустимі операції для виплати відсотків</value>
+  </data>
+  <data name="h02" xml:space="preserve">
+    <value>Допустимі операції для повернення депозиту</value>
+  </data>
+  <data name="hAsk" xml:space="preserve">
+    <value>Депозитний модуль: Вибір типу операції</value>
+  </data>
+  <data name="hCmd" xml:space="preserve">
+    <value>Депозитний модуль: Друк</value>
+  </data>
+  <data name="hController" xml:space="preserve">
+    <value>Депозитний модуль: Контролер - Операціоніст</value>
+  </data>
+  <data name="hDefault" xml:space="preserve">
+    <value>Депозитний модуль: Головна</value>
+  </data>
+  <data name="hDepositAccount" xml:space="preserve">
+    <value>Депозитний модуль: Рахунки виплати</value>
+  </data>
+  <data name="hDepositAddSum" xml:space="preserve">
+    <value>Депозитний модуль: Поповнення рахунку</value>
+  </data>
+  <data name="hDepositAddSumComplete" xml:space="preserve">
+    <value>Депозитний модуль: Друк додаткової угоди на зміну суми вкладу.</value>
+  </data>
+  <data name="hDepositAgreement" xml:space="preserve">
+    <value>Депозитний модуль: Формування додаткових угод</value>
+  </data>
+  <data name="hDepositAgreementBeneficiary" xml:space="preserve">
+    <value>Депозитний модуль: Вступ 3-ї особи в права</value>
+  </data>
+  <data name="hDepositAgreementPrint" xml:space="preserve">
+    <value>Депозитний модуль: Друк додаткових угод</value>
+  </data>
+  <data name="hDepositAgreementTemplate" xml:space="preserve">
+    <value>Депозптний модуль: Формування додаткових угод</value>
+  </data>
+  <data name="hDepositBFRowCorrection" xml:space="preserve">
+    <value>Депозитний модуль: Коректування банківського файлу</value>
+  </data>
+  <data name="hDepositCancelAgreement" xml:space="preserve">
+    <value>Депозитний модуль: Відміна діючої додаткової угоди</value>
+  </data>
+  <data name="hDepositCardAcc" xml:space="preserve">
+    <value>Депозитний модуль: Вибір карткового рахунку</value>
+  </data>
+  <data name="hDepositClient" xml:space="preserve">
+    <value>Депозитний модуль: Картка клієнта</value>
+  </data>
+  <data name="hDepositCloseComplete" xml:space="preserve">
+    <value>Депозитний модуль: Дострокове розторгнення</value>
+  </data>
+  <data name="hDepositClosePayIt" xml:space="preserve">
+    <value>Депозитний модуль: Дострокове розторгнення</value>
+  </data>
+  <data name="hDepositContract" xml:space="preserve">
+    <value>Депозитний модуль: Вибір типу депозитного договору</value>
+  </data>
+  <data name="hDepositContractInfo" xml:space="preserve">
+    <value>Депозитний модуль: Картка депозиту</value>
+  </data>
+  <data name="hDepositContractSelect" xml:space="preserve">
+    <value>Депозитний модуль: Друк договорів</value>
+  </data>
+  <data name="hDepositContractTemplate" xml:space="preserve">
+    <value>Депозитний модуль: Вибір шаблонів договорів</value>
+  </data>
+  <data name="hDepositDelete" xml:space="preserve">
+    <value>Депозитний модуль: Видалення депозиту</value>
+  </data>
+  <data name="hDepositEditAccount" xml:space="preserve">
+    <value>Депозитний модуль: Зміна рахунків виплати</value>
+  </data>
+  <data name="hDepositEditComplete" xml:space="preserve">
+    <value>Депозитний модуль: Зміна рахунків виплати</value>
+  </data>
+  <data name="hDepositFile" xml:space="preserve">
+    <value>Депозитний модуль: Обробка файлів зарахування</value>
+  </data>
+  <data name="hDepositFileShow" xml:space="preserve">
+    <value>Депозитний модуль: Перегляд файлів зарахування</value>
+  </data>
+  <data name="hDepositHistory" xml:space="preserve">
+    <value>Депозитний модуль: Перегляд історії</value>
+  </data>
+  <data name="hDepositLetters" xml:space="preserve">
+    <value>Депозитний модуль: Листи та повідомлення</value>
+  </data>
+  <data name="hDepositLettersPrint" xml:space="preserve">
+    <value>Депозитний модуль: Друк листів та повідомлень</value>
+  </data>
+  <data name="hDepositPercentPay" xml:space="preserve">
+    <value>Депозитний модуль: Виплата відсотків</value>
+  </data>
+  <data name="hDepositPercentPayComplete" xml:space="preserve">
+    <value>Депозитний модуль: Виплата відсотків</value>
+  </data>
+  <data name="hDepositPrint" xml:space="preserve">
+    <value>Депозитний модуль: Друк</value>
+  </data>
+  <data name="hDepositPrintContract" xml:space="preserve">
+    <value>Депозитний модуль: Друк</value>
+  </data>
+  <data name="hDepositProlongation" xml:space="preserve">
+    <value>Депозитний модуль: Пролонгація</value>
+  </data>
+  <data name="hDepositRateEdit" xml:space="preserve">
+    <value>Депозитний модуль: Зміна відсоткової ставки</value>
+  </data>
+  <data name="hDepositReturn" xml:space="preserve">
+    <value>Депозитний модуль: Виплата по завершенні</value>
+  </data>
+  <data name="hDepositReturnComplete" xml:space="preserve">
+    <value>Депозитний модуль: Виплата по завершенні</value>
+  </data>
+  <data name="hDepositSearch" xml:space="preserve">
+    <value>Депозитний модуль: Пошук депозиту</value>
+  </data>
+  <data name="hDepositSelectTrustee" xml:space="preserve">
+    <value>Депозитний модуль: Вибір довіреної особи</value>
+  </data>
+  <data name="hDepositSelectTT" xml:space="preserve">
+    <value>Депозитний модуль: Доступні операції</value>
+  </data>
+  <data name="hDepositShowClients" xml:space="preserve">
+    <value>Депозитний модуль: Перегляд існуючих клієнтів</value>
+  </data>
+  <data name="hDepositSignDialog" xml:space="preserve">
+    <value>Депозитний модуль: Вибір документів для підпису</value>
+  </data>
+  <data name="hDepositTermRateEdit" xml:space="preserve">
+    <value>Депозитний модуль: Зміна терміну</value>
+  </data>
+  <data name="hDptField" xml:space="preserve">
+    <value>Депозитний модуль: Додаткові реквізити вкладу</value>
+  </data>
+  <data name="hSearchResults" xml:space="preserve">
+    <value>Депозитний модуль: Пошук клієнта</value>
+  </data>
+  <data name="hSelectCountry" xml:space="preserve">
+    <value>Депозитний модуль: Вибір країни</value>
+  </data>
+  <data name="lbActionResult2" xml:space="preserve">
+    <value>Операція поповнення для депозиту № %s виконана</value>
+  </data>
+  <data name="lbDepositAccount2" xml:space="preserve">
+    <value>Основний рахунок</value>
+  </data>
+  <data name="lbFIO" xml:space="preserve">
+    <value>необхідно заповнити</value>
+  </data>
+  <data name="lbInfo" xml:space="preserve">
+    <value>Клієнт</value>
+  </data>
+  <data name="lbInfo16" xml:space="preserve">
+    <value>Дострокова виплата депозиту</value>
+  </data>
+  <data name="lbInfo17" xml:space="preserve">
+    <value>Зміна рахунків виплати</value>
+  </data>
+  <data name="lbInfo2" xml:space="preserve">
+    <value>Доступні операції</value>
+  </data>
+  <data name="lbSearchInfo" xml:space="preserve">
+    <value>Пошук депозитного договору</value>
+  </data>
+  <data name="Mes0" xml:space="preserve">
+    <value>Некоректне значення</value>
+  </data>
+  <data name="Mes1" xml:space="preserve">
+    <value>Очистіть поле рахунку и введіть спочатку МФО</value>
+  </data>
+  <data name="Mes10" xml:space="preserve">
+    <value>Невідповідний формат номеру паспорту! </value>
+  </data>
+  <data name="Mes11" xml:space="preserve">
+    <value>Невідповідний формат серії паспорту!</value>
+  </data>
+  <data name="Mes12" xml:space="preserve">
+    <value>Некоректне значення</value>
+  </data>
+  <data name="Mes13" xml:space="preserve">
+    <value>Заповніть поля для пошуку!</value>
+  </data>
+  <data name="Mes14" xml:space="preserve">
+    <value>Ідентифікаційний код менший ніж 10 знаків або рівний 10 нулям!</value>
+  </data>
+  <data name="Mes15" xml:space="preserve">
+    <value>Замінити нулями?</value>
+  </data>
+  <data name="Mes16" xml:space="preserve">
+    <value>Оберіть дод. угоду для укладання!</value>
+  </data>
+  <data name="Mes17" xml:space="preserve">
+    <value>Оберіть довірену особу!</value>
+  </data>
+  <data name="Mes18" xml:space="preserve">
+    <value>Оберіть дод. угоду для друку!</value>
+  </data>
+  <data name="Mes19" xml:space="preserve">
+    <value>Оберіть дод.угоду для відміни!</value>
+  </data>
+  <data name="Mes2" xml:space="preserve">
+    <value>Некоректно вказувати у цьому випадку рахунок каси</value>
+  </data>
+  <data name="Mes20" xml:space="preserve">
+    <value>Виберіть активну дод.угоду про права бенефіціара!</value>
+  </data>
+  <data name="Mes21" xml:space="preserve">
+    <value>Виберіть шаблон!</value>
+  </data>
+  <data name="Mes22" xml:space="preserve">
+    <value>Виберіть операцію!</value>
+  </data>
+  <data name="Mes23" xml:space="preserve">
+    <value>Виберіть депозит!</value>
+  </data>
+  <data name="Mes24" xml:space="preserve">
+    <value>Виберіть клієнта!</value>
+  </data>
+  <data name="Mes25" xml:space="preserve">
+    <value>Виберіть лист для формування!</value>
+  </data>
+  <data name="Mes26" xml:space="preserve">
+    <value>Ставка не змінилась!</value>
+  </data>
+  <data name="Mes27" xml:space="preserve">
+    <value>Необхідно заповнити!</value>
+  </data>
+  <data name="Mes28" xml:space="preserve">
+    <value>Виберіть тип депозитного договору!</value>
+  </data>
+  <data name="Mes29" xml:space="preserve">
+    <value>Сума менша мінімально допустимої!</value>
+  </data>
+  <data name="Mes3" xml:space="preserve">
+    <value>Змініть поле, чи залиште його порожнім</value>
+  </data>
+  <data name="Mes30" xml:space="preserve">
+    <value>Сума поповнення менша мінімально допустимої суми!</value>
+  </data>
+  <data name="Mes31" xml:space="preserve">
+    <value>Операція не вибрана!</value>
+  </data>
+  <data name="Mes32" xml:space="preserve">
+    <value>Для продовження виберіть операцію.</value>
+  </data>
+  <data name="Mes33" xml:space="preserve">
+    <value>Документ пустий!</value>
+  </data>
+  <data name="Mes34" xml:space="preserve">
+    <value>Не вибраний жоден депозит!</value>
+  </data>
+  <data name="Mes35" xml:space="preserve">
+    <value>Не вибраний жоден депозит!</value>
+  </data>
+  <data name="Mes36" xml:space="preserve">
+    <value>Клієнт не вибраний!</value>
+  </data>
+  <data name="Mes37" xml:space="preserve">
+    <value>Даний клієнт відкритий!</value>
+  </data>
+  <data name="Mes38" xml:space="preserve">
+    <value>Перереєструвати клієнта?</value>
+  </data>
+  <data name="Mes39" xml:space="preserve">
+    <value>Даний клієнт закритий!</value>
+  </data>
+  <data name="Mes4" xml:space="preserve">
+    <value>необхідно заповнити НОР!</value>
+  </data>
+  <data name="Mes40" xml:space="preserve">
+    <value>Для відкриття депозиту перереєструйте клієнта</value>
+  </data>
+  <data name="Mes41" xml:space="preserve">
+    <value>Депозит не вибран!</value>
+  </data>
+  <data name="Mes42" xml:space="preserve">
+    <value>Коментар успішно збережено</value>
+  </data>
+  <data name="Mes43" xml:space="preserve">
+    <value>Заповніть хоча б одне поле адреси крім населеного пункта!</value>
+  </data>
+  <data name="Mes44" xml:space="preserve">
+    <value>Необхідно заповнити код ЄДРПОУ!</value>
+  </data>
+  <data name="Mes45" xml:space="preserve">
+    <value>Необхідно заповнити одержувача!</value>
+  </data>
+  <data name="mes46" xml:space="preserve">
+    <value>Нарахування відсотків по договору №</value>
+  </data>
+  <data name="Mes5" xml:space="preserve">
+    <value>необхідно заповнити МФО!</value>
+  </data>
+  <data name="Mes6" xml:space="preserve">
+    <value>Неможливо виконати операцію.</value>
+  </data>
+  <data name="Mes7" xml:space="preserve">
+    <value>Нульова сума!</value>
+  </data>
+  <data name="Mes8" xml:space="preserve">
+    <value>Сума менша мінімально допустимої!</value>
+  </data>
+  <data name="Mes9" xml:space="preserve">
+    <value>Сума більша мінімально допустимої!</value>
+  </data>
+  <data name="ora01" xml:space="preserve">
+    <value>Не вибраний жоден шаблон</value>
+  </data>
+  <data name="ora02" xml:space="preserve">
+    <value>Не вибрана операція з відсотками</value>
+  </data>
+  <data name="reg" xml:space="preserve">
+    <value>Клієнт</value>
+  </data>
+  <data name="reg1" xml:space="preserve">
+    <value>Реєстрація клієнта (бенефіціара)</value>
+  </data>
+  <data name="reg2" xml:space="preserve">
+    <value>Реєстрація клієнта (спадкоємця)</value>
+  </data>
+  <data name="reg3" xml:space="preserve">
+    <value>Реєстрація клієнта (довіреної особи)</value>
+  </data>
+  <data name="reg5" xml:space="preserve">
+    <value>Реєстрація розпорядника для малолітньої особи</value>
+  </data>
+  <data name="reg6" xml:space="preserve">
+    <value>Реєстрація клієнта (малолітньої особи)</value>
+  </data>
+  <data name="sh0" xml:space="preserve">
+    <value>Пошук депозитного договору для відмови від переоформлення вкладу</value>
+  </data>
+  <data name="sh01" xml:space="preserve">
+    <value>Пошук депозитного договору для редагування рахунків виплати</value>
+  </data>
+  <data name="sh02" xml:space="preserve">
+    <value>Пошук депозитного договору для друку</value>
+  </data>
+  <data name="sh03" xml:space="preserve">
+    <value>Пошук депозитного договору для перегляду</value>
+  </data>
+  <data name="sh04" xml:space="preserve">
+    <value>Пошук депозитного договору для дострокового розторгнення</value>
+  </data>
+  <data name="sh05" xml:space="preserve">
+    <value>Пошук депозитного договору для виплати відсотків</value>
+  </data>
+  <data name="sh06" xml:space="preserve">
+    <value>Пошук депозитного договору для виплати після завершення</value>
+  </data>
+  <data name="sh07" xml:space="preserve">
+    <value>Пошук депозитного договору для видалення</value>
+  </data>
+  <data name="sh08" xml:space="preserve">
+    <value>Пошук депозитного договору для перегляду історії</value>
+  </data>
+  <data name="sh09" xml:space="preserve">
+    <value>Пошук депозитного договору для пролонгації</value>
+  </data>
+  <data name="sh10" xml:space="preserve">
+    <value>Пошук депозитного договору для оформлення дод. угоди</value>
+  </data>
+  <data name="sh11" xml:space="preserve">
+    <value>Пошук депозитного договору для зміни процентної ставки</value>
+  </data>
+  <data name="sh12" xml:space="preserve">
+    <value>Пошук депозитного договору для реєстрації свідоцтв про право на спадок</value>
+  </data>
+  <data name="tb1" xml:space="preserve">
+    <value>Вклад</value>
+  </data>
+  <data name="tb10" xml:space="preserve">
+    <value>Залишок</value>
+  </data>
+  <data name="tb100" xml:space="preserve">
+    <value>Підписаний</value>
+  </data>
+  <data name="tb101" xml:space="preserve">
+    <value>РНК</value>
+  </data>
+  <data name="tb102" xml:space="preserve">
+    <value>ДРФО</value>
+  </data>
+  <data name="tb103" xml:space="preserve">
+    <value>ПІБ</value>
+  </data>
+  <data name="tb104" xml:space="preserve">
+    <value>Дата закриття кліента</value>
+  </data>
+  <data name="tb105" xml:space="preserve">
+    <value>Вклад</value>
+  </data>
+  <data name="tb106" xml:space="preserve">
+    <value>Тип вкладу</value>
+  </data>
+  <data name="tb107" xml:space="preserve">
+    <value>Рахунок</value>
+  </data>
+  <data name="tb108" xml:space="preserve">
+    <value>Укладен</value>
+  </data>
+  <data name="tb109" xml:space="preserve">
+    <value>Завершення</value>
+  </data>
+  <data name="tb11" xml:space="preserve">
+    <value>Дата народження</value>
+  </data>
+  <data name="tb110" xml:space="preserve">
+    <value>Валюта</value>
+  </data>
+  <data name="tb111" xml:space="preserve">
+    <value>Залишок</value>
+  </data>
+  <data name="tb112" xml:space="preserve">
+    <value>Відсотки</value>
+  </data>
+  <data name="tb113" xml:space="preserve">
+    <value>Дата початку дії нової відсоткової ставки</value>
+  </data>
+  <data name="tb114" xml:space="preserve">
+    <value>Реф.</value>
+  </data>
+  <data name="tb115" xml:space="preserve">
+    <value>Рах. А</value>
+  </data>
+  <data name="tb116" xml:space="preserve">
+    <value>Вал. А</value>
+  </data>
+  <data name="tb117" xml:space="preserve">
+    <value>Сума А</value>
+  </data>
+  <data name="tb118" xml:space="preserve">
+    <value>Дата</value>
+  </data>
+  <data name="tb119" xml:space="preserve">
+    <value>Рах. Б</value>
+  </data>
+  <data name="tb12" xml:space="preserve">
+    <value>Пошук</value>
+  </data>
+  <data name="tb120" xml:space="preserve">
+    <value>Вал. Б</value>
+  </data>
+  <data name="tb121" xml:space="preserve">
+    <value>Сума Б</value>
+  </data>
+  <data name="tb122" xml:space="preserve">
+    <value>Призначення</value>
+  </data>
+  <data name="tb13" xml:space="preserve">
+    <value>Шаблон</value>
+  </data>
+  <data name="tb14" xml:space="preserve">
+    <value>Коментар</value>
+  </data>
+  <data name="tb15" xml:space="preserve">
+    <value>Дата видачі документу</value>
+  </data>
+  <data name="tb16" xml:space="preserve">
+    <value>Дата народження клієнта</value>
+  </data>
+  <data name="tb17" xml:space="preserve">
+    <value>РНК</value>
+  </data>
+  <data name="tb18" xml:space="preserve">
+    <value>ПІБ</value>
+  </data>
+  <data name="tb19" xml:space="preserve">
+    <value>ДРФО</value>
+  </data>
+  <data name="tb2" xml:space="preserve">
+    <value>Тип вкладу</value>
+  </data>
+  <data name="tb20" xml:space="preserve">
+    <value>Код операції</value>
+  </data>
+  <data name="tb21" xml:space="preserve">
+    <value>Назва операції</value>
+  </data>
+  <data name="tb22" xml:space="preserve">
+    <value>Дата народження </value>
+  </data>
+  <data name="tb23" xml:space="preserve">
+    <value>Поточна відсоткова ставка</value>
+  </data>
+  <data name="tb24" xml:space="preserve">
+    <value>Дата завершення договору</value>
+  </data>
+  <data name="tb25" xml:space="preserve">
+    <value>Мінімальна сума вкладу</value>
+  </data>
+  <data name="tb26" xml:space="preserve">
+    <value>Мінімальна сума вкладу</value>
+  </data>
+  <data name="tb27" xml:space="preserve">
+    <value>Версія</value>
+  </data>
+  <data name="tb28" xml:space="preserve">
+    <value>Назва</value>
+  </data>
+  <data name="tb29" xml:space="preserve">
+    <value>3 особа</value>
+  </data>
+  <data name="tb3" xml:space="preserve">
+    <value>Заведений</value>
+  </data>
+  <data name="tb30" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="tb31" xml:space="preserve">
+    <value>Найменування</value>
+  </data>
+  <data name="tb32" xml:space="preserve">
+    <value>Опис</value>
+  </data>
+  <data name="tb33" xml:space="preserve">
+    <value>Дата народження</value>
+  </data>
+  <data name="tb34" xml:space="preserve">
+    <value>Поточна відсоткова ставка</value>
+  </data>
+  <data name="tb35" xml:space="preserve">
+    <value>Дата початку договору</value>
+  </data>
+  <data name="tb36" xml:space="preserve">
+    <value>Сума до виплати з депозитного рахункку </value>
+  </data>
+  <data name="tb37" xml:space="preserve">
+    <value>Сума на депозитному рахунку</value>
+  </data>
+  <data name="tb38" xml:space="preserve">
+    <value>Сума на рахунку відсотків</value>
+  </data>
+  <data name="tb39" xml:space="preserve">
+    <value>Дата завершення договору</value>
+  </data>
+  <data name="tb4" xml:space="preserve">
+    <value>Завершення</value>
+  </data>
+  <data name="tb40" xml:space="preserve">
+    <value>Сума до виплати з рахунку відсотків</value>
+  </data>
+  <data name="tb41" xml:space="preserve">
+    <value>Сума на депозитному рахунку</value>
+  </data>
+  <data name="tb42" xml:space="preserve">
+    <value>Сума на рахунку відсотків</value>
+  </data>
+  <data name="tb43" xml:space="preserve">
+    <value>Номінальна відсоткова ставка</value>
+  </data>
+  <data name="tb44" xml:space="preserve">
+    <value>Штрафна відсоткова ставка</value>
+  </data>
+  <data name="tb45" xml:space="preserve">
+    <value>Загальна сума відсотків</value>
+  </data>
+  <data name="tb46" xml:space="preserve">
+    <value>Сума відсотків по вкладу з урахуванням штрафної відсоткової ставки</value>
+  </data>
+  <data name="tb47" xml:space="preserve">
+    <value>Загальна сума штрафу</value>
+  </data>
+  <data name="tb48" xml:space="preserve">
+    <value>Сума комісії за дострокове розторгенння</value>
+  </data>
+  <data name="tb49" xml:space="preserve">
+    <value>Сума до виплати</value>
+  </data>
+  <data name="tb5" xml:space="preserve">
+    <value>РНК</value>
+  </data>
+  <data name="tb50" xml:space="preserve">
+    <value>Максимально доступна сума</value>
+  </data>
+  <data name="tb51" xml:space="preserve">
+    <value>Базова відсоткова ставка</value>
+  </data>
+  <data name="tb52" xml:space="preserve">
+    <value>Мінімальна сума вкладу</value>
+  </data>
+  <data name="tb53" xml:space="preserve">
+    <value>Сума поповнення</value>
+  </data>
+  <data name="tb54" xml:space="preserve">
+    <value>Дата укладання договору</value>
+  </data>
+  <data name="tb55" xml:space="preserve">
+    <value>Дата початку договору</value>
+  </data>
+  <data name="tb56" xml:space="preserve">
+    <value>Дата завершення договору</value>
+  </data>
+  <data name="tb57" xml:space="preserve">
+    <value>Текст</value>
+  </data>
+  <data name="tb58" xml:space="preserve">
+    <value>Номер</value>
+  </data>
+  <data name="tb59" xml:space="preserve">
+    <value>Найменування</value>
+  </data>
+  <data name="tb6" xml:space="preserve">
+    <value>Ід. код</value>
+  </data>
+  <data name="tb60" xml:space="preserve">
+    <value>Версія</value>
+  </data>
+  <data name="tb61" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="tb62" xml:space="preserve">
+    <value>Рахунок</value>
+  </data>
+  <data name="tb63" xml:space="preserve">
+    <value>Валюта</value>
+  </data>
+  <data name="tb64" xml:space="preserve">
+    <value>Найменування</value>
+  </data>
+  <data name="tb65" xml:space="preserve">
+    <value>Версія</value>
+  </data>
+  <data name="tb66" xml:space="preserve">
+    <value>Назва</value>
+  </data>
+  <data name="tb67" xml:space="preserve">
+    <value>3 особа</value>
+  </data>
+  <data name="tb68" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="tb69" xml:space="preserve">
+    <value>Назва шаблону</value>
+  </data>
+  <data name="tb7" xml:space="preserve">
+    <value>ПІБ</value>
+  </data>
+  <data name="tb70" xml:space="preserve">
+    <value>Ім'я файлу</value>
+  </data>
+  <data name="tb71" xml:space="preserve">
+    <value>Дата</value>
+  </data>
+  <data name="tb72" xml:space="preserve">
+    <value>Кількість платежів</value>
+  </data>
+  <data name="tb73" xml:space="preserve">
+    <value>Сума (коп.)</value>
+  </data>
+  <data name="tb74" xml:space="preserve">
+    <value>Призначення</value>
+  </data>
+  <data name="tb75" xml:space="preserve">
+    <value>Дата початку дії договору</value>
+  </data>
+  <data name="tb76" xml:space="preserve">
+    <value>Дата укладення договору</value>
+  </data>
+  <data name="tb77" xml:space="preserve">
+    <value>Дата завершення дії договору</value>
+  </data>
+  <data name="tb78" xml:space="preserve">
+    <value>Залишок</value>
+  </data>
+  <data name="tb79" xml:space="preserve">
+    <value>Дата народження</value>
+  </data>
+  <data name="tb8" xml:space="preserve">
+    <value>Рахунок</value>
+  </data>
+  <data name="tb80" xml:space="preserve">
+    <value>Сума на депозитному рахунку</value>
+  </data>
+  <data name="tb81" xml:space="preserve">
+    <value>Сума на рахунку відсотків</value>
+  </data>
+  <data name="tb82" xml:space="preserve">
+    <value>Дата початку депозитного договору</value>
+  </data>
+  <data name="tb83" xml:space="preserve">
+    <value>Сума на рахунку відсотків</value>
+  </data>
+  <data name="tb84" xml:space="preserve">
+    <value>Дата закінчення депозитного договору</value>
+  </data>
+  <data name="tb85" xml:space="preserve">
+    <value>Нова дата початку депозитного договору</value>
+  </data>
+  <data name="tb86" xml:space="preserve">
+    <value>Нова дата закінчення депозитного договору</value>
+  </data>
+  <data name="tb87" xml:space="preserve">
+    <value>Мінімальна сума вкладу</value>
+  </data>
+  <data name="tb88" xml:space="preserve">
+    <value>Сума поповнення</value>
+  </data>
+  <data name="tb89" xml:space="preserve">
+    <value>Рахунок</value>
+  </data>
+  <data name="tb9" xml:space="preserve">
+    <value>Валюта</value>
+  </data>
+  <data name="tb90" xml:space="preserve">
+    <value>ПІБ</value>
+  </data>
+  <data name="tb91" xml:space="preserve">
+    <value>Ід.код</value>
+  </data>
+  <data name="tb92" xml:space="preserve">
+    <value>МФО</value>
+  </data>
+  <data name="tb93" xml:space="preserve">
+    <value>Зміна відсоткової ставки по вкладу</value>
+  </data>
+  <data name="tb94" xml:space="preserve">
+    <value>Зміна терміну вкладу</value>
+  </data>
+  <data name="tb95" xml:space="preserve">
+    <value>Перерахування вкладу і нарахованих відсотків на поточний рахунок</value>
+  </data>
+  <data name="tb96" xml:space="preserve">
+    <value>Перерахування вкладу і нарахованих відсотків на картковий рахунок</value>
+  </data>
+  <data name="tb97" xml:space="preserve">
+    <value>Рахунки перерахування вкладу і нарахованих відсотків</value>
+  </data>
+  <data name="tb98" xml:space="preserve">
+    <value>Шаблон</value>
+  </data>
+  <data name="tb99" xml:space="preserve">
+    <value>Версія</value>
+  </data>
+  <data name="validatorContractSum" xml:space="preserve">
+    <value>Сума вкладу менша мінімальної суми вкладу</value>
+  </data>
+  <data name="w00" xml:space="preserve">
+    <value>Дод. угода</value>
+  </data>
+  <data name="w01" xml:space="preserve">
+    <value>Дод. реквізити вкладу</value>
+  </data>
+  <data name="w02" xml:space="preserve">
+    <value>Перегляд</value>
+  </data>
+  <data name="w03" xml:space="preserve">
+    <value>Не знайдено жодного відповідного запису</value>
+  </data>
+  <data name="w04" xml:space="preserve">
+    <value>Текст відсутній</value>
+  </data>
+  <data name="Mes47" xml:space="preserve">
+    <value>Мінімальна вага злитків</value>
+  </data>
+  <data name="sh13" xml:space="preserve">
+    <value>Пошук депозитного договору для поповнення</value>
+  </data>
+  <data name="reg4" xml:space="preserve">
+    <value>Картка Клієнта</value>
+  </data>
+  <data name="Mes48" xml:space="preserve">
+    <value>Необхідно вказати хоча б один номер телефону!</value>
+  </data>
+  <data name="Mes49" xml:space="preserve">
+    <value>Невірний формат вказаного номеру телефону!</value>
+  </data>
+  <data name="w05" xml:space="preserve">
+    <value>Дод. угоди та дії</value>
+  </data>
+  <data name="w06" xml:space="preserve">
+    <value>Шаблони</value>
+  </data>
+</root>

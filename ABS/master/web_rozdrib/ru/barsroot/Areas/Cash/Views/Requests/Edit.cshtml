@@ -1,0 +1,74 @@
+﻿@model Areas.Cash.Models.V_CLIM_REQUEST
+           
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Відділення</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input type="text" class="k-textbox" data-ng-model="advertising.Name" required validationmessage="Заповніть назву" />
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Валюта</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <table style="width: 100%">
+            <tr>
+                <td style="width: 100%">
+                    <input rows="2" disabled="disabled" class="k-textbox" type="text" data-ng-model="advertising.BranchList"/>
+                </td>
+                <td style="vertical-align: top;">
+                    <a class="k-button" ng-click="showBranchHandBook()">
+                        <i class="pf-icon pf-16 pf-book"></i>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Рахунок</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <table style="width: 100%">
+            <tr>
+                <td style="width: 100%">
+                    <input rows="2" disabled="disabled" class="k-textbox" type="text" data-ng-model="advertising.BranchList" />
+                </td>
+                <td style="vertical-align: top;">
+                    <a class="k-button" ng-click="showBranchHandBook()">
+                        <i class="pf-icon pf-16 pf-book"></i>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Поточний ліміт</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input type="text" class="k-textbox" k-max="999999999999999" data-ng-model="advertising.Name" required validationmessage="Заповніть назву" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Максимальний ліміт</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input type="text" class="k-textbox" k-max="999999999999999" data-ng-model="advertising.Name" required validationmessage="Заповніть назву" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Дата заявки</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input type="text" class="k-textbox" data-ng-model="advertising.Name" required validationmessage="Заповніть назву" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Запросив</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input type="text" class="k-textbox" data-ng-model="advertising.Name" required validationmessage="Заповніть назву" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-4 col-sm-4">Статус</label>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+        <input type="text" class="k-textbox" data-ng-model="advertising.Name" required validationmessage="Заповніть назву" />
+    </div>
+</div>
+
