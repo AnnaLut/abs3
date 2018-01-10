@@ -260,6 +260,16 @@ begin
     dbms_output.put_line('В БМД не описана таблица v_cim_f503_percent_type для описания сложного поля таблицы CIM_F504.');
   end if;
 
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('V_CIM_KOD_6A_3');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'P3200');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 40, l_newtabid, l_newcolid, 'o', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица V_CIM_KOD_6A_3 для описания сложного поля таблицы CIM_F504.');
+  end if;
+
+
   -- добавляем описание процедур
   bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'cim_reports.add_f504_row(:P101,:Z,:R_AGREE_NO,:P103,:PVAL,:T,:M,:P107,:P108,:P184,:P140,:P142,:P020,:p141,:p143,:p960,:p310,:p050,:p060,:p090,:P999)');
 

@@ -108,7 +108,7 @@ is
 -- g_body_version      constant varchar2 (64) := 'version 1.00.03 04/04/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.04 08/08/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.05 20/09/2016';
-   g_body_version      constant varchar2 (64) := 'version 1.01.07 09/01/2018';
+   g_body_version      constant varchar2 (64) := 'version 1.01.08 10/01/2018';
    g_awk_body_defs     constant varchar2 (512) := '';
 
    type t_indicators_f503 is record (
@@ -934,7 +934,7 @@ end  p_f531;
         ||cur.m||'1200'||l_znyvt||to_char(cur.p1200,'DDMMYYYY')||chr(13)||chr(10)
         ||cur.m||'1300'||l_znyvt||translatewin2dos(cur.p1300)||chr(13)||chr(10)
         ||cur.m||'1400'||l_znyvt||cur.p1400||chr(13)||chr(10)
-        ||cur.m||'0100'||l_znyvt||cur.p0100||chr(13)||chr(10)
+        ||cur.m||'0100'||l_znyvt||num_code(cur.p0100)||chr(13)||chr(10)
         ||cur.m||'1500'||l_znyvt||cur.p1500||chr(13)||chr(10)
         ||cur.m||'1600'||l_znyvt||cur.p1600||chr(13)||chr(10)
         ||cur.m||'1700'||l_znyvt||cur.p1700||chr(13)||chr(10)
@@ -1097,7 +1097,7 @@ end  p_f531;
            ||cur.m||'103'||l_zn0yvt||to_char(cur.p103,'DDMMYYYY')||chr(13)||chr(10)
            ||cur.m||'107'||l_zn0yvt||translatewin2dos(cur.p107)||chr(13)||chr(10)
 
-           ||cur.m||'010'||l_zn0yvt||cur.p010||chr(13)||chr(10)
+           ||cur.m||'010'||l_zn0yvt||num_code(cur.p010)||chr(13)||chr(10)
 
            ||cur.m||'108'||l_zn0yvt||cur.p108||chr(13)||chr(10)
            ||cur.m||'140'||l_zn0yvt||cur.p140||chr(13)||chr(10)
