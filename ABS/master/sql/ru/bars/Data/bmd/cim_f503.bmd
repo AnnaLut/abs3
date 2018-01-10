@@ -342,6 +342,16 @@ begin
     dbms_output.put_line('В БМД не описана таблица v_cim_kod_34_2 для описания сложного поля таблицы CIM_F503.');
   end if;
 
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('V_CIM_KOD_6A_3');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'P3200');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 70, l_newtabid, l_newcolid, 'y', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица V_CIM_KOD_6A_3 для описания сложного поля таблицы CIM_F503.');
+  end if;
+
+
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
 

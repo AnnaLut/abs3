@@ -11,6 +11,7 @@ PROMPT *** ALTER_POLICY_INFO to CIM_CREDIT_BORROWER ***
 BEGIN 
         execute immediate  
           'begin  
+               bpa.alter_policy_info(''CIM_CREDIT_BORROWER'', ''CENTER'' , null, null, null, null);
                bpa.alter_policy_info(''CIM_CREDIT_BORROWER'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''CIM_CREDIT_BORROWER'', ''WHOLE'' , null, null, null, null);
                null;
@@ -50,7 +51,7 @@ COMMENT ON COLUMN BARS.CIM_CREDIT_BORROWER.DELETE_DATE IS 'Дата видалення';
 
 
 
-PROMPT *** Create  constraint PK_CIMCREDITBORROWER ***
+/*PROMPT *** Create  constraint PK_CIMCREDITBORROWER ***
 begin   
  execute immediate '
   ALTER TABLE BARS.CIM_CREDIT_BORROWER ADD CONSTRAINT PK_CIMCREDITBORROWER PRIMARY KEY (ID)
@@ -75,10 +76,41 @@ exception when others then
  end;
 /
 
+*/
+
+-- Drop primary, unique and foreign key constraints 
+begin   
+ execute immediate '
+    alter table CIM_CREDIT_BORROWER
+      drop constraint PK_CIMCREDITBORROWER cascade';
+exception when others then
+  if  sqlcode=-2443  then null; else raise; end if;
+ end;
+/
+
+
+begin
+    execute immediate 'alter table CIM_CREDIT_BORROWER add open_date date';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_CREDIT_BORROWER ADD CONSTRAINT PK_CIMCREDITBORROWERIO PRIMARY KEY (ID, OPEN_DATE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLD  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** Create  grants  CIM_CREDIT_BORROWER ***
-grant SELECT                                                                 on CIM_CREDIT_BORROWER to BARS_ACCESS_DEFROLE;
+grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CREDIT_BORROWER to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CIM_CREDIT_BORROWER to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CREDIT_BORROWER to CIM_ROLE;
 
 

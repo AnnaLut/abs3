@@ -161,6 +161,13 @@ end;
 / 
 COMMENT ON COLUMN bars.cim_f504.p320 IS 'Код типу реорганізації';
 
+begin
+    execute immediate 'alter table bars.cim_f504 modify p010  number(2)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
 
 begin
     execute immediate 'alter table bars.cim_f504 add (p040  number(2))';
