@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.17.012  31.12.2017
+% VERSION     :  v.18.001  10.01.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -32,6 +32,7 @@ IS
 12     VVV        R030 код валюты
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 10.01.2018 измененный алгоритм расчета S190
  29.12.2017 изменение структуры показателей с отчета за 26.12.2017
  24.11.2017 помінялась назва поля в dpu_vidd
  11.09.2017 для счетов 2701,3660 проверяется их наличие в МБДК
@@ -144,6 +145,7 @@ IS
    dp_date_        DATE                  := TO_DATE ('06062015', 'ddmmyyyy');
    dat23_          date;
 
+   kol_nd_         number;
    kol_351_        number;
    ap_             NUMBER;
    comm_           rnbu_trace.comm%TYPE;
@@ -1171,57 +1173,26 @@ BEGIN
              END IF;
           END IF;
 
-      BEGIN
-         select NVL(kol_351, 1)
-            into kol_351_
-         from nbu23_rez
-         where fdat = dat23_
-           and acc = acc_
-           and nd = nd_
-           and rownum = 1;
-      EXCEPTION WHEN NO_DATA_FOUND THEN
-         BEGIN
-            select NVL(kol_351, 1)
-               into kol_351_
-            from nbu23_rez
-            where fdat = dat23_
-              and acc = acc_
-              and rownum = 1;
-         EXCEPTION WHEN NO_DATA_FOUND THEN
-            BEGIN
-               select NVL(kol_351, 1)
-                  into kol_351_
-               from nbu23_rez
-               where fdat = dat23_
-                 and nd = nd_
-                 and nls not like '9%'
-                 and nls not like '3%'
-                 and rownum = 1;
-            EXCEPTION WHEN NO_DATA_FOUND THEN
-               BEGIN
-                  select NVL(kol_351, 1)
-                     into kol_351_
-                  from nbu23_rez
-                  where fdat = dat23_
-                    and rnk = rnk_
-                    and nls not like '9%'
-                    and nls not like '3%'
-                    and rownum = 1;
-               EXCEPTION WHEN NO_DATA_FOUND THEN
-                  BEGIN
-                     select NVL(kol_351, 1)
-                        into kol_351_
-                     from nbu23_rez
-                     where fdat = dat23_
-                       and rnk = rnk_
-                       and rownum = 1;
-                  EXCEPTION WHEN NO_DATA_FOUND THEN
-                     kol_351_ := 1;
-                  END;
-               END;
-            END;
-         END;
-      END;
+--------------------------------------- S190
+      select count(*)   into kol_nd_
+        from kol_nd_dat
+       where dat =pdat_;
+
+      if kol_nd_ =0  then
+           P_KOL_ND_OTC(pdat_);    -- заполнение табл. дней просрочки по дате
+           commit; 
+      end if;
+
+      begin
+          select nvl(kol,0)  into kol_351_
+            from kol_nd_dat
+           where dat =pdat_
+             and nd = nd_
+             and rownum = 1;
+
+      exception
+         when others  then  kol_351_ :=0;
+      end;
 
       if kol_351_ = 0
       then
@@ -3475,59 +3446,26 @@ BEGIN
 
       end if;
 
- ---------------------------------------
+--------------------------------------- S190
+      select count(*)   into kol_nd_
+        from kol_nd_dat
+       where dat =pdat_;
 
-      BEGIN
-         select NVL(kol_351, 1)
-            into kol_351_
-         from nbu23_rez
-         where fdat = dat23_
-           and acc = acc_
-           and nd = nd_
-           and rownum = 1;
-      EXCEPTION WHEN NO_DATA_FOUND THEN
-         BEGIN
-            select NVL(kol_351, 1)
-               into kol_351_
-            from nbu23_rez
-            where fdat = dat23_
-              and acc = acc_
-              and rownum = 1;
-         EXCEPTION WHEN NO_DATA_FOUND THEN
-            BEGIN
-               select NVL(kol_351, 1)
-                  into kol_351_
-               from nbu23_rez
-               where fdat = dat23_
-                 and nd = nd_
-                 and nls not like '9%'
-                 and nls not like '3%'
-                 and rownum = 1;
-            EXCEPTION WHEN NO_DATA_FOUND THEN
-               BEGIN
-                  select NVL(kol_351, 1)
-                     into kol_351_
-                  from nbu23_rez
-                  where fdat = dat23_
-                    and rnk = rnk_
-                    and nls not like '9%'
-                    and nls not like '3%'
-                    and rownum = 1;
-               EXCEPTION WHEN NO_DATA_FOUND THEN
-                  BEGIN
-                     select NVL(kol_351, 1)
-                        into kol_351_
-                     from nbu23_rez
-                     where fdat = dat23_
-                       and rnk = rnk_
-                       and rownum = 1;
-                  EXCEPTION WHEN NO_DATA_FOUND THEN
-                     kol_351_ := 1;
-                  END;
-               END;
-            END;
-         END;
-      END;
+      if kol_nd_ =0  then
+           P_KOL_ND_OTC(pdat_);    -- заполнение табл. дней просрочки по дате
+           commit; 
+      end if;
+
+      begin
+          select nvl(kol,0)  into kol_351_
+            from kol_nd_dat
+           where dat =pdat_
+             and nd = nd_
+             and rownum = 1;
+
+      exception
+         when others  then  kol_351_ :=0;
+      end;
 
       if kol_351_ = 0
       then
@@ -4248,7 +4186,7 @@ BEGIN
    begin
       for k in (select fdat, ref, acc, nls, kv, sq, nbs, acca,
                        sum(sq) over (partition by acc) sum_all
-                from (select /*+ urdered */
+                from (select /*+ ordered */
                              o.fdat, o.ref, o.acc, a.nls, a.kv,
                              decode(o.dk, 0, -1, 1) * gl.p_icurval(a.kv, o.s, dat_) sq,
                              a.nbs, z.acc acca
