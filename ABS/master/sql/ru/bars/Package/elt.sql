@@ -259,7 +259,7 @@ END ELT;
 CREATE OR REPLACE PACKAGE BODY ELT
 IS
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 45.5 â³ä 12.05.2017';
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 45.6 â³ä 10.01.2018';
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := '';    -- 45.2 â_ä 18.03.2017
 
 /****
@@ -1033,7 +1033,8 @@ begin
                     0 S,
                     nvl(n.dat_beg,DAT1_) dat_b, nvl(n.dat_end,DAT2_) dat_e,
                     e.id ID, e.npd_3570, ob22_6110, e.id_glob, e.fl1, n.nd
-             FROM e_tar_nd n, e_tarif e  WHERE n.nd=k.ND and n.id=e.id )
+             FROM e_tar_nd n, e_tarif e  WHERE n.nd=k.ND and n.id=e.id 
+                                           AND n.dat_beg is not null) 
    LOOP
 
 
