@@ -275,6 +275,7 @@ execute immediate  l_sql;
           then
      l_txt := 'Вихiдний залишок на: '||to_char(x.maxfdat,'dd/mm/yyyy')||'  '||to_char(l_ost/100, g_number_format,g_number_nlsparam)||l_ost_t||l_chr;
           else 
+     l_ostq := fostq(x.acc,x.maxfdat);
      l_txt := 'Вихiдний залишок на: '||to_char(x.maxfdat,'dd/mm/yyyy')||'  '||to_char(l_ost/100, g_number_format,g_number_nlsparam)||' (екв. '||to_char(l_ostq/100, g_number_format,g_number_nlsparam)||')'||l_ost_t||l_chr;
      end case;
      dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
