@@ -162,6 +162,15 @@ end;
 COMMENT ON COLUMN bars.cim_f504.p320 IS 'Код типу реорганізації';
 
 
+begin
+    execute immediate 'alter table bars.cim_f504 add (p040  number(2))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN bars.cim_f504.p040 IS 'Тип процентної ставки';
+
 
 PROMPT *** Create  grants  CIM_F504 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F504        to BARS_ACCESS_DEFROLE;

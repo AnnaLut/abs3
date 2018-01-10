@@ -108,7 +108,7 @@ is
 -- g_body_version      constant varchar2 (64) := 'version 1.00.03 04/04/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.04 08/08/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.05 20/09/2016';
-   g_body_version      constant varchar2 (64) := 'version 1.01.06 29/12/2017';
+   g_body_version      constant varchar2 (64) := 'version 1.01.07 09/01/2018';
    g_awk_body_defs     constant varchar2 (512) := '';
 
    type t_indicators_f503 is record (
@@ -1107,9 +1107,11 @@ end  p_f531;
            ||cur.m||'184'||l_zn0yvt||cur.p184||chr(13)||chr(10)
            ||cur.m||'020'||l_zn0yvt||cur.p020||chr(13)||chr(10)
            ||cur.m||'310'||l_zn0yvt||to_char(cur.p310,'DDMMYYYY')||chr(13)||chr(10)
+
+           ||cur.m||'320'||l_zn0yvt||cur.p320||chr(13)||chr(10)
            
-           ||cur.m||'320'||l_zn0yvt||cur.p320||chr(13)||chr(10);
-       l_n:=l_n+8+1+6+1;
+           ||cur.m||'040'||l_zn0yvt||cur.p040||chr(13)||chr(10);
+       l_n:=l_n+8+1+6+1+1;
 
       if cur.p960 is not null then
          l_txt:=l_txt||cur.m||'960'||l_zn0yvt||to_char(cur.p960,'fm99')||chr(13)||chr(10); l_n:=l_n+1;
@@ -1811,7 +1813,8 @@ end  p_f531;
                              P050, P060, P090, P960,
                              P310,
                              P999,
-                             p010
+                             p010,
+                             p040
                               )
               values (c.contr_id, l_date_to, substr(c.nmkk,1,27) /*as p101*/, lpad(substr(c.okpo,1,10),10,'0'), lpad(substr(c.r_agree_no,1,5),5,'0') /*r_agree_no*/,
                c.r_agree_date /*as p103*/, lpad(c.kv,3,'0') /*as pval*/, '0' /*as t*/, case when c.credit_type=0 then 1 when c.creditor_type=11 then 3 else 2 end /*as m*/,
@@ -1825,7 +1828,8 @@ end  p_f531;
                --nvl2(c.close_date, c.close_date-c.open_date, '') /*as p970*/, --маЇ бути р≥зниц€ м≥ж датою п≥дписанн€ ≥ зд≥йсненн€ останнього платежу
                c.close_date /*as p310*/,
                c.f504_note /*as p999*/,
-               c.borrower_id /*as p010*/)
+               c.borrower_id /*as p010*/,
+               decode(c.f503_percent_type, 1, 3, c.f503_percent_type) /*as p040*/)
                returning f504_id into l_f504_id;
 
         --розрахунок незаповнених показник≥в
@@ -2331,7 +2335,7 @@ end  p_f531;
                          substr(c.num, 1, 16) as p050_vk,                                                    f.p050 as p050_r,
                          c.open_date as p060_vk,                                                             f.p060 as p060_r,
                          c.s as p090_vk,                                                                     f.p090 as p090_r,
-                         c.borrower_id as p010_vk,                                                           f.p010 as p010_r                         
+                         c.borrower_id as p010_vk,                                                           f.p010 as p010_r
                   from v_cim_credit_contracts c, cim_f504 f where c.contr_id = f.contr_id
                    and f.kf = sys_context('bars_context','user_mfo'))
       loop
