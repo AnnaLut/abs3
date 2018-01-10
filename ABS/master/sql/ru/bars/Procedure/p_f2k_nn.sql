@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.18.001     05.01.2018
+% VERSION     : v.18.002     10.01.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -18,6 +18,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+ 10.01.2018  ограничение по отбору операций по типу оплаты SOS
  05.01.2018  добавлено формирование DDD=351
  04.01.2018  исключены операции по счетам КТ=65__
              формирование значений показателей в копейках
@@ -305,7 +306,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
        else
              segm_a := '1';
        end if;
-       segm_z := lpad(k.okpo,10,'0');
+       segm_z := lpad(trim(k.okpo),10,'0');
 
        is_dat_exist_ := 0;
        begin
@@ -332,8 +333,8 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
        for u in ( select a.acc, a.kv, a.nbs, a.nls, a.daos, a.dazs,
                          to_char(a.daos,'ddmmyyyy') c_daos,
                          decode(a.dazs,null,null,to_char(a.dazs,'ddmmyyyy') ) c_dazs,
-                         to_char( fostq(a.acc,dat_rnbo_) ) p_270,
-                         to_char( fostq(a.acc,dat_) ) p_280,
+                         to_char( round(fostq(a.acc,dat_rnbo_)) ) p_270,
+                         to_char( round(fostq(a.acc,dat_)) ) p_280,
                          nvl(a.blkd,0)+nvl(a.blkk,0) acc_blk
                     from accounts a
                    where a.rnk = k.rnk 
@@ -409,6 +410,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                                             o1.acc = u.acc 
                                        ) o
                                WHERE p.REF = o.REF
+                                 and p.sos <0
                                  AND t.tt = o.tt
                                  AND o.accd = ad.acc
                                  AND o.acck = ak.acc
