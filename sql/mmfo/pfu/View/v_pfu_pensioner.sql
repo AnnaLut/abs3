@@ -31,7 +31,8 @@ PROMPT *** Create  view V_PFU_PENSIONER ***
           pa.daos,
           p.block_date,
           p.block_type,
-          nvl(p.type_pensioner, 1) type_pensioner
+          nvl(p.type_pensioner, 1) type_pensioner,
+          nvl(p.is_okpo_well, 0) is_okpo_well
      from pfu_pensioner p left join pfu_pensacc pa
        on (p.kf = pa.kf and p.rnk = pa.rnk);
 
