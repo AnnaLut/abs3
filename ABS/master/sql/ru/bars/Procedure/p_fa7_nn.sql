@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.17.012  31.12.2017
+% VERSION     :  v.18.001  10.01.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -32,6 +32,7 @@ IS
 12     VVV        R030 код валюты
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 10.01.2018 измененный алгоритм расчета S190
  29.12.2017 изменение структуры показателей с отчета за 26.12.2017
  24.11.2017 помінялась назва поля в dpu_vidd
  11.09.2017 для счетов 2701,3660 проверяется их наличие в МБДК
@@ -144,6 +145,7 @@ IS
    dp_date_        DATE                  := TO_DATE ('06062015', 'ddmmyyyy');
    dat23_          date;
 
+   kol_nd_         number;
    kol_351_        number;
    ap_             NUMBER;
    comm_           rnbu_trace.comm%TYPE;
@@ -1129,80 +1131,47 @@ BEGIN
                 END;
              END IF;
           END IF;
----------------------------------------
+--------------------------------------- S190
+      select count(*)   into kol_nd_
+        from kol_nd_dat
+       where dat =pdat_;
 
-      BEGIN
-         select NVL(kol_351, 1)
-            into kol_351_
-         from nbu23_rez
-         where fdat = dat23_
-           and acc = acc_
-           and nd = nd_
-           and rownum = 1;
-      EXCEPTION WHEN NO_DATA_FOUND THEN
-         BEGIN
-            select NVL(kol_351, 1)
-               into kol_351_
-            from nbu23_rez
-            where fdat = dat23_
-              and acc = acc_
-              and rownum = 1;
-         EXCEPTION WHEN NO_DATA_FOUND THEN
-            BEGIN
-               select NVL(kol_351, 1)
-                  into kol_351_
-               from nbu23_rez
-               where fdat = dat23_
-                 and nd = nd_
-                 and nls not like '9%'
-                 and nls not like '3%'
-                 and rownum = 1;
-            EXCEPTION WHEN NO_DATA_FOUND THEN
-               BEGIN
-                  select NVL(kol_351, 1)
-                     into kol_351_
-                  from nbu23_rez
-                  where fdat = dat23_
-                    and rnk = rnk_
-                    and nls not like '9%'
-                    and nls not like '3%'
-                    and rownum = 1;
-               EXCEPTION WHEN NO_DATA_FOUND THEN
-                  BEGIN
-                     select NVL(kol_351, 1)
-                        into kol_351_
-                     from nbu23_rez
-                     where fdat = dat23_
-                       and rnk = rnk_
-                       and rownum = 1;
-                  EXCEPTION WHEN NO_DATA_FOUND THEN
-                     kol_351_ := 1;
-                  END;
-               END;
-            END;
-         END;
-      END;
+      if kol_nd_ =0  then
+           P_KOL_ND_OTC(pdat_);    -- заполнение табл. дней просрочки по дате
+           commit; 
+      end if;
 
-      if kol_351_ = 0
-      then
+      begin
+          select nvl(kol,0)  into kol_351_
+            from kol_nd_dat
+           where dat =pdat_
+             and nd = nd_
+             and rownum = 1;
+
+      exception
+         when others  then  kol_351_ :=0;
+      end;
+
+      if kol_351_ = 0        then
+
          s190_ := '0';
       elsif kol_351_ > 0 and kol_351_ < 8
       then
          s190_ := 'A';
-      elsif kol_351_ < 31
-      then
+      elsif kol_351_ < 31    then
+
          s190_ := 'B';
-      elsif kol_351_ < 61
-      then
+      elsif kol_351_ < 61    then
+
          s190_ := 'C';
-      elsif kol_351_ < 91
-      then
+      elsif kol_351_ < 91    then
+
          s190_ := 'D';
-      elsif kol_351_ < 181
-      then
+      elsif kol_351_ < 181   then
+
          s190_ := 'E';
-      elsif kol_351_ < 361
-      then
+      elsif kol_351_ < 361   then
+
          s190_ := 'F';
       else
          s190_ := 'G';
@@ -1939,7 +1908,8 @@ BEGIN
              IF tips_ NOT IN ('SS', 'SP', 'SL')
                    and not (tips_ = 'DEP' and nls_ like '132%')
                    AND fa7p_ = 0
-                   AND exist_sbb_acc =0 and exist_cclim_acc =0
+                   AND exist_sbb_acc =0
+                   and exist_cclim_acc =0
                    and exist_cp_acc =0
                 OR                                -- обычный режим
                        pmode_ = 1
@@ -2064,27 +2034,6 @@ BEGIN
                          x_ := '2';
                       END IF;
 
-/*                      IF     nbs_ IN
-                                ('2610', '2611', '2615', '2616', '2617', '2630',
-                                 '2635', '2636', '2637', '2651', '2652', '2653',
-                                 '2656')
-                         AND (   r013_ IS NULL
-                              OR r013_ = '0'
-                              OR r013_ NOT IN ('1', '9')
-                              OR mdate_ IS NOT NULL
-                             )
-                      THEN
-                         IF mdate_ IS NULL OR mdate_ > dat_
-                         THEN
-                            r013_ := '9';
-                         END IF;
-
-                         IF mdate_ IS NOT NULL AND mdate_ <= dat_
-                         THEN
-                            r013_ := '1';
-                         END IF;
-                      END IF;
-*/
              if s242_ !='Z'  then s190_ :='0';  end if;
              if s242_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
@@ -2363,27 +2312,6 @@ BEGIN
                       r013_ := '1';
                    END IF;
 
-/*                   IF     nbs_ IN
-                             ('2610', '2611', '2615', '2616', '2617', '2630',
-                              '2635', '2636', '2637', '2651', '2652', '2653',
-                              '2656')
-                      AND (   r013_ IS NULL
-                           OR r013_ = '0'
-                           OR r013_ NOT IN ('1', '9')
-                           OR mdate_ IS NOT NULL
-                          )
-                   THEN
-                      IF mdate_ IS NULL OR mdate_ > dat_
-                      THEN
-                         r013_ := '9';
-                      END IF;
-
-                      IF mdate_ IS NOT NULL AND mdate_ <= dat_
-                      THEN
-                         r013_ := '1';
-                      END IF;
-                   END IF;
-*/
                       pp_doda;
 
                       if datn_ < zm_date2_ then
@@ -3464,59 +3392,26 @@ insert into OTCN_FA7_REZ1
 
       end if;
 
- ---------------------------------------
+--------------------------------------- S190
+      select count(*)   into kol_nd_
+        from kol_nd_dat
+       where dat =pdat_;
 
-      BEGIN
-         select NVL(kol_351, 1)
-            into kol_351_
-         from nbu23_rez
-         where fdat = dat23_
-           and acc = acc_
-           and nd = nd_
-           and rownum = 1;
-      EXCEPTION WHEN NO_DATA_FOUND THEN
-         BEGIN
-            select NVL(kol_351, 1)
-               into kol_351_
-            from nbu23_rez
-            where fdat = dat23_
-              and acc = acc_
-              and rownum = 1;
-         EXCEPTION WHEN NO_DATA_FOUND THEN
-            BEGIN
-               select NVL(kol_351, 1)
-                  into kol_351_
-               from nbu23_rez
-               where fdat = dat23_
-                 and nd = nd_
-                 and nls not like '9%'
-                 and nls not like '3%'
-                 and rownum = 1;
-            EXCEPTION WHEN NO_DATA_FOUND THEN
-               BEGIN
-                  select NVL(kol_351, 1)
-                     into kol_351_
-                  from nbu23_rez
-                  where fdat = dat23_
-                    and rnk = rnk_
-                    and nls not like '9%'
-                    and nls not like '3%'
-                    and rownum = 1;
-               EXCEPTION WHEN NO_DATA_FOUND THEN
-                  BEGIN
-                     select NVL(kol_351, 1)
-                        into kol_351_
-                     from nbu23_rez
-                     where fdat = dat23_
-                       and rnk = rnk_
-                       and rownum = 1;
-                  EXCEPTION WHEN NO_DATA_FOUND THEN
-                     kol_351_ := 1;
-                  END;
-               END;
-            END;
-         END;
-      END;
+      if kol_nd_ =0  then
+           P_KOL_ND_OTC(pdat_);    -- заполнение табл. дней просрочки по дате
+           commit; 
+      end if;
+
+      begin
+          select nvl(kol,0)  into kol_351_
+            from kol_nd_dat
+           where dat =pdat_
+             and nd = nd_
+             and rownum = 1;
+
+      exception
+         when others  then  kol_351_ :=0;
+      end;
 
       if kol_351_ = 0
       then
@@ -4000,7 +3895,7 @@ insert into OTCN_FA7_REZ1
              kodp_ := substr(k.kodp, 1,7) ||
                 substr(k.s181_s240_a, 1,1) ||
                 (case when k.suma = '0' then 'Z' else substr(k.s181_s240_a, 2,1) end)||
-                substr(k.kodp, 10,1) ||;
+                substr(k.kodp, 10,1) ||
                 (case when k.suma = '0' then 'B' else substr(k.kodp,11,1) end)||
                 substr(k.kodp, 12,3);
           end if;
@@ -4267,6 +4162,7 @@ insert into OTCN_FA7_REZ1
                         and o.fdat = z.fdat
                         and o.stmt = z.stmt
                         and o.dk <> z.dk
+                        and o.dk = 0
                         and z.acc = x.acc
                         and x.nls not like '7%'
                         and x.nls not like '3800%'
@@ -4401,9 +4297,9 @@ insert into OTCN_FA7_REZ1
                              from otcn_saldo a, otcn_acc s, customer c
                              where  nvl(a.nbs, substr(a.nls,1,4)) in ('1410','1412','1415','1416','1417','1418',
                                            '1490','1491','1492','1493','1590','1592','1890',
-                                           '2400','2401','2890','3190','3290','3590','3599','3690',
+                                           '2400','2401','2890','3190','3290','3590','3599','3690','3692',
                                            '9010','9015','9030','9031','9036','9500',
-                                          '1419','1429','1519','1529','2039','2069','2089','2109','2119','2129',
+                                          '1419','1429','1509','1519','1529','2039','2069','2089','2109','2119','2129',
                                           '2139','2209','2239','2609','2629','2659','3119','3219')
                                 and a.acc = s.acc
                                 and a.rnk = c.rnk
@@ -4426,9 +4322,9 @@ insert into OTCN_FA7_REZ1
                          from rnbu_trace r
                          where substr(kodp, 2, 4) in ('1410','1412','1415','1416','1417','1418',
                                        '1490','1491','1492','1493','1590','1592','1890',
-                                       '2400','2401','2890','3190','3290','3590','3599','3690',
+                                       '2400','2401','2890','3190','3290','3590','3599','3690','3692',
                                        '9010','9015','9030','9031','9036','9500',
-                                      '1419','1429','1519','1529','2039','2069','2089','2109','2119','2129',
+                                      '1419','1429','1509','1519','1529','2039','2069','2089','2109','2119','2129',
                                       '2139','2209','2239','2609','2629','2659','3119','3219')
                          group by nbuc, substr(kodp, 1, 1), substr(kodp,10,1), substr(kodp, 2, 4), kv) b
                      on (a.nbuc = b.nbuc and a.rez = b.rez and a.t020 = b.t020 and a.nbs = b.nbs and a.kv = b.kv)
@@ -4527,56 +4423,6 @@ insert into OTCN_FA7_REZ1
             end if;
         end loop;
     end;
-
-   -- замена параметра S240 на значение "Z" для счетов дисконта, премии
-   -- для R012='D'
---   IF Dat_ >= zm_date3_
---   THEN
---      update bars.rnbu_trace r
---      set kodp = substr(r.kodp,1,7) || 'Z' || substr(r.kodp,9),
---          comm = substr(comm || ' заміна S240 з ' || substr(r.kodp,8,1) ||
---                        ' на ' || 'Z', 1, 200)
---      where ( instr(nbsdiscont_, substr(r.kodp,2,4)) > 0 or
---              instr(nbspremiy_,  substr(r.kodp,2,4)) > 0
---            )
---        and substr(r.kodp,10,1)='D';
---   END IF;
-
-   -- замена параметра S240 на значение "Z" для счетов резерва
-   -- для R012='B'
---   IF Dat_ >= zm_date3_
---   THEN
---      update bars.rnbu_trace r
---      set kodp = substr(r.kodp,1,7) || 'Z' || substr(r.kodp,9),
---          comm = substr(comm || ' заміна S240 з ' || substr(r.kodp,8,1) ||
---                        ' на ' || 'Z', 1, 200)
---      where substr(r.kodp,2,4) in ('1590')
---        and substr(r.kodp,6,1) in ('1','5')
---        and substr(r.kodp,10,1)='B';
---
---      update bars.rnbu_trace r
---      set kodp = substr(r.kodp,1,7) || 'Z' || substr(r.kodp,9),
---          comm = substr(comm || ' заміна S240 з ' || substr(r.kodp,8,1) ||
---                        ' на ' || 'Z', 1, 200)
---      where substr(r.kodp,2,4) in ('2400','2401')
---        and substr(r.kodp,6,1) in ('5','7')
---        and substr(r.kodp,10,1)='B';
---
---      update bars.rnbu_trace r
---      set kodp = substr(r.kodp,1,7) || 'Z' || substr(r.kodp,9),
---          comm = substr(comm || ' заміна S240 з ' || substr(r.kodp,8,1) ||
---                        ' на ' || 'Z', 1, 200)
---      where substr(r.kodp,2,4) in ('3190')
---        and substr(r.kodp,6,1) in ('B')
---        and substr(r.kodp,10,1)='B';
---
---      update bars.rnbu_trace r
---      set kodp = substr(r.kodp,1,7) || 'Z' || substr(r.kodp,9),
---          comm = substr(comm || ' заміна S240 з ' || substr(r.kodp,8,1) ||
---                        ' на ' || 'Z', 1, 200)
---      where substr(r.kodp,2,4) not in ('1590','2400','2401','3190')
---        and substr(r.kodp,10,1)='B';
---   END IF;
 
 --------------------------------------------------
    if dat_ <to_date('20171226','yyyymmdd')  then
