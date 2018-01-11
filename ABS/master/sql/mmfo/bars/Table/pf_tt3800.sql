@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  PF_TT3800 ***
+grant SELECT                                                                 on PF_TT3800       to BARSREADER_ROLE;
 grant SELECT                                                                 on PF_TT3800       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PF_TT3800       to BARS_DM;
 grant SELECT                                                                 on PF_TT3800       to START1;
+grant SELECT                                                                 on PF_TT3800       to UPLD;
 
 
 

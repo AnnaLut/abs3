@@ -46,7 +46,9 @@ COMMENT ON COLUMN BARS.KL_K044.TXT IS '';
 
 
 PROMPT *** Create  grants  KL_K044 ***
+grant SELECT                                                                 on KL_K044         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_K044         to BARS_DM;
+grant SELECT                                                                 on KL_K044         to UPLD;
 
 
 

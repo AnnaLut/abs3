@@ -63,19 +63,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_TTSAVTO_TTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TTSAVTO ADD CONSTRAINT FK_TTSAVTO_TTS FOREIGN KEY (TT)
-	  REFERENCES BARS.TTS (TT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C008001 ***
 begin   
  execute immediate '
@@ -103,9 +90,11 @@ exception when others then
 
 PROMPT *** Create  grants  TTSAVTO ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TTSAVTO         to ABS_ADMIN;
+grant SELECT                                                                 on TTSAVTO         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TTSAVTO         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TTSAVTO         to BARS_DM;
 grant SELECT                                                                 on TTSAVTO         to START1;
+grant SELECT                                                                 on TTSAVTO         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TTSAVTO         to WR_ALL_RIGHTS;
 
 

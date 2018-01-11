@@ -67,6 +67,10 @@ COMMENT ON COLUMN BARS.TMP_RM_ARM_RESOURCES.M IS '';
 
 
 
+PROMPT *** Create  grants  TMP_RM_ARM_RESOURCES ***
+grant SELECT                                                                 on TMP_RM_ARM_RESOURCES to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_RM_ARM_RESOURCES to UPLD;
+
 
 
 PROMPT ===================================================================================== 

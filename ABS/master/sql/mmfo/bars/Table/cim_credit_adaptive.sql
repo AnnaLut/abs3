@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_CREDIT_ADAPTIVE ***
+grant SELECT                                                                 on CIM_CREDIT_ADAPTIVE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CREDIT_ADAPTIVE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_CREDIT_ADAPTIVE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CREDIT_ADAPTIVE to CIM_ROLE;
+grant SELECT                                                                 on CIM_CREDIT_ADAPTIVE to UPLD;
 
 
 

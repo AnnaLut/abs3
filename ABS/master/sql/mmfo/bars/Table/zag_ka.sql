@@ -71,8 +71,10 @@ COMMENT ON COLUMN BARS.ZAG_KA.SIGN_KEY IS '';
 
 
 PROMPT *** Create  grants  ZAG_KA ***
+grant SELECT                                                                 on ZAG_KA          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAG_KA          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAG_KA          to START1;
+grant SELECT                                                                 on ZAG_KA          to UPLD;
 
 
 

@@ -65,12 +65,12 @@ COMMENT ON COLUMN BARS.MWAY_MATCH.DATE_TR IS 'Дата транзакції';
 
 
 
-PROMPT *** Create  constraint UK_MWAYMATCH ***
+PROMPT *** Create  constraint SYS_C0035373 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.MWAY_MATCH ADD CONSTRAINT UK_MWAYMATCH UNIQUE (REF_TR)
+  ALTER TABLE BARS.MWAY_MATCH ADD PRIMARY KEY (ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE NOVALIDATE';
+  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -79,12 +79,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0035373 ***
+PROMPT *** Create  constraint UK_MWAYMATCH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.MWAY_MATCH ADD PRIMARY KEY (ID)
+  ALTER TABLE BARS.MWAY_MATCH ADD CONSTRAINT UK_MWAYMATCH UNIQUE (REF_TR)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
+  TABLESPACE BRSSMLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -121,7 +121,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  MWAY_MATCH ***
+grant SELECT                                                                 on MWAY_MATCH      to BARSREADER_ROLE;
 grant SELECT                                                                 on MWAY_MATCH      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on MWAY_MATCH      to UPLD;
 
 
 

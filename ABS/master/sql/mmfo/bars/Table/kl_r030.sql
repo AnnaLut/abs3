@@ -81,8 +81,10 @@ COMMENT ON COLUMN BARS.KL_R030.D_MODE IS '';
 
 
 PROMPT *** Create  grants  KL_R030 ***
+grant SELECT                                                                 on KL_R030         to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on KL_R030         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_R030         to BARS_DM;
+grant SELECT                                                                 on KL_R030         to UPLD;
 grant FLASHBACK,SELECT                                                       on KL_R030         to WR_REFREAD;
 
 

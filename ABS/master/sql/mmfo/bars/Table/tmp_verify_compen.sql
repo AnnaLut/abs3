@@ -56,7 +56,9 @@ COMMENT ON COLUMN BARS.TMP_VERIFY_COMPEN.DIFFCA IS '';
 
 
 PROMPT *** Create  grants  TMP_VERIFY_COMPEN ***
+grant SELECT                                                                 on TMP_VERIFY_COMPEN to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_VERIFY_COMPEN to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on TMP_VERIFY_COMPEN to UPLD;
 
 
 

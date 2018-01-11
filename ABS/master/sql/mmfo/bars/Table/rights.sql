@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  RIGHTS ***
+grant SELECT                                                                 on RIGHTS          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RIGHTS          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RIGHTS          to RIGHTS;
+grant SELECT                                                                 on RIGHTS          to UPLD;
 grant FLASHBACK,SELECT                                                       on RIGHTS          to WR_REFREAD;
 
 

@@ -79,9 +79,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_PARTNER_ARC ***
+grant SELECT                                                                 on FM_PARTNER_ARC  to BARSREADER_ROLE;
 grant SELECT                                                                 on FM_PARTNER_ARC  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_PARTNER_ARC  to BARS_DM;
 grant SELECT                                                                 on FM_PARTNER_ARC  to START1;
+grant SELECT                                                                 on FM_PARTNER_ARC  to UPLD;
 
 
 

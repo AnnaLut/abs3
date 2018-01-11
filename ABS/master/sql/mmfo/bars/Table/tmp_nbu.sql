@@ -27,7 +27,7 @@ begin
    (	KODP VARCHAR2(35), 
 	DATF DATE DEFAULT SYSDATE, 
 	KODF CHAR(2), 
-	ZNAP VARCHAR2(70), 
+	ZNAP VARCHAR2(254), 
 	NBUC VARCHAR2(30) DEFAULT ''0'', 
 	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
 	ERR_MSG VARCHAR2(1000), 
@@ -65,19 +65,6 @@ PROMPT *** Create  constraint NK_TMP_NBU_DATF ***
 begin   
  execute immediate '
   ALTER TABLE BARS.TMP_NBU MODIFY (DATF CONSTRAINT NK_TMP_NBU_DATF NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_TMPNBU_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_NBU ADD CONSTRAINT FK_TMPNBU_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -164,6 +151,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_NBU ***
+grant SELECT                                                                 on TMP_NBU         to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_NBU         to BARSUPL;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on TMP_NBU         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_NBU         to BARS_DM;

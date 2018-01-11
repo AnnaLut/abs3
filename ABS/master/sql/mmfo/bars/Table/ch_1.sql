@@ -103,32 +103,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CH_1_MFOA ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CH_1 ADD CONSTRAINT FK_CH_1_MFOA FOREIGN KEY (MFOA)
-	  REFERENCES BARS.CH_1A (MFOA) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CH_1 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CH_1 ADD CONSTRAINT FK_CH_1 FOREIGN KEY (IDS)
-	  REFERENCES BARS.CH_1S (IDS) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_CH_1 ***
 begin   
  execute immediate '
@@ -143,10 +117,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  CH_1 ***
+grant SELECT                                                                 on CH_1            to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CH_1            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CH_1            to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CH_1            to RCH_1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CH_1            to START1;
+grant SELECT                                                                 on CH_1            to UPLD;
 grant FLASHBACK,SELECT                                                       on CH_1            to WR_REFREAD;
 
 

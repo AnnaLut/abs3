@@ -85,8 +85,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAG_MD ***
+grant SELECT                                                                 on ZAG_MD          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAG_MD          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAG_MD          to START1;
+grant SELECT                                                                 on ZAG_MD          to UPLD;
 
 
 

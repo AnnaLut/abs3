@@ -7,9 +7,11 @@ PROMPT =========================================================================
 
 PROMPT *** ALTER_POLICY_INFO to FM_TURN_ARC ***
 
+
 BEGIN 
         execute immediate  
           'begin  
+               bpa.alter_policy_info(''FM_TURN_ARC'', ''CENTER'' , ''C'', ''C'', ''C'', null);
                bpa.alter_policy_info(''FM_TURN_ARC'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''FM_TURN_ARC'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
@@ -28,7 +30,8 @@ begin
 	TURN_IN NUMBER, 
 	TURN_INQ NUMBER, 
 	TURN_OUT NUMBER, 
-	TURN_OUTQ NUMBER, KF VARCHAR2(6)
+	TURN_OUTQ NUMBER, 
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -38,13 +41,6 @@ exception when others then
 end; 
 /
 
-begin
-  execute immediate 'alter table bars.fm_turn_arc add kf varchar2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')';
-exception
-  when others then
-     if sqlcode = -1430 then null; else raise; end if;
-end;
-/
 
 
 
@@ -53,6 +49,7 @@ PROMPT *** ALTER_POLICIES to FM_TURN_ARC ***
 
 
 COMMENT ON TABLE BARS.FM_TURN_ARC IS 'Архив оборотов по клиентам за квартал (для ФМ)';
+COMMENT ON COLUMN BARS.FM_TURN_ARC.KF IS '';
 COMMENT ON COLUMN BARS.FM_TURN_ARC.DAT IS 'Отчетная дата (первая дата квартала)';
 COMMENT ON COLUMN BARS.FM_TURN_ARC.RNK IS 'Рег.номер клиента';
 COMMENT ON COLUMN BARS.FM_TURN_ARC.KV IS 'Код валюты';
@@ -92,9 +89,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_TURN_ARC ***
+grant SELECT                                                                 on FM_TURN_ARC     to BARSREADER_ROLE;
 grant SELECT                                                                 on FM_TURN_ARC     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_TURN_ARC     to BARS_DM;
 grant SELECT                                                                 on FM_TURN_ARC     to START1;
+grant SELECT                                                                 on FM_TURN_ARC     to UPLD;
 
 
 

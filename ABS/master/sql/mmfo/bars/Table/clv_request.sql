@@ -145,7 +145,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CLV_REQUEST ***
+grant SELECT                                                                 on CLV_REQUEST     to BARSREADER_ROLE;
 grant SELECT                                                                 on CLV_REQUEST     to BARS_DM;
+grant SELECT                                                                 on CLV_REQUEST     to UPLD;
 
 
 

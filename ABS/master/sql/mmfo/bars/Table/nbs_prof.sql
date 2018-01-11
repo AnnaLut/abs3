@@ -85,32 +85,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_NBSPROF_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBS_PROF ADD CONSTRAINT FK_NBSPROF_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_NBS_PROF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBS_PROF ADD CONSTRAINT FK_NBS_PROF FOREIGN KEY (KF, NBS, NP)
-	  REFERENCES BARS.NBS_PROFNAM (KF, NBS, NP) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_NBSPROF ***
 begin   
  execute immediate '
@@ -125,11 +99,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBS_PROF ***
+grant SELECT                                                                 on NBS_PROF        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBS_PROF        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBS_PROF        to BARS_DM;
 grant SELECT                                                                 on NBS_PROF        to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBS_PROF        to NBS_PROF;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBS_PROF        to START1;
+grant SELECT                                                                 on NBS_PROF        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBS_PROF        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on NBS_PROF        to WR_REFREAD;
 

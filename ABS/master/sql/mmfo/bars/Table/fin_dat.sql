@@ -78,7 +78,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_DAT ***
+grant SELECT                                                                 on FIN_DAT         to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on FIN_DAT         to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on FIN_DAT         to UPLD;
 
 
 

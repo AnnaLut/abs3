@@ -28,7 +28,7 @@ begin
 	ID_A VARCHAR2(14), 
 	RT CHAR(1), 
 	OT CHAR(1), 
-	ODAT DATE, 
+	ODAT DATE DEFAULT TRUNC(SYSDATE), 
 	NLS VARCHAR2(15), 
 	PRZ CHAR(1), 
 	KV NUMBER(38,0), 
@@ -95,19 +95,6 @@ COMMENT ON COLUMN BARS.REE_TMP.OT IS 'Тип операции';
 
 
 
-PROMPT *** Create  constraint FK_REETMP_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REE_TMP ADD CONSTRAINT FK_REETMP_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_REETMP_KF_NN ***
 begin   
  execute immediate '
@@ -134,10 +121,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  REE_TMP ***
+grant SELECT                                                                 on REE_TMP         to BARSREADER_ROLE;
 grant DELETE,SELECT,UPDATE                                                   on REE_TMP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REE_TMP         to BARS_DM;
 grant UPDATE                                                                 on REE_TMP         to RPBN001;
 grant DELETE,SELECT,UPDATE                                                   on REE_TMP         to RPBN002;
+grant SELECT                                                                 on REE_TMP         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REE_TMP         to WR_ALL_RIGHTS;
 
 

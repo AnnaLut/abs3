@@ -61,19 +61,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint R_PS_NI ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NI ADD CONSTRAINT R_PS_NI FOREIGN KEY (NBS)
-	  REFERENCES BARS.PS (NBS) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C009949 ***
 begin   
  execute immediate '
@@ -100,8 +87,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  NI ***
+grant SELECT                                                                 on NI              to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NI              to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NI              to START1;
+grant SELECT                                                                 on NI              to UPLD;
 
 
 

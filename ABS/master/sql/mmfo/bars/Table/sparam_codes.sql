@@ -91,10 +91,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  SPARAM_CODES ***
+grant SELECT                                                                 on SPARAM_CODES    to BARSREADER_ROLE;
 grant SELECT                                                                 on SPARAM_CODES    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SPARAM_CODES    to BARS_DM;
 grant SELECT                                                                 on SPARAM_CODES    to CUST001;
 grant SELECT                                                                 on SPARAM_CODES    to START1;
+grant SELECT                                                                 on SPARAM_CODES    to UPLD;
 
 
 

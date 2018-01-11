@@ -124,6 +124,10 @@ COMMENT ON COLUMN BARS.REZ_XLS_GT.X11 IS '';
 
 
 
+PROMPT *** Create  grants  REZ_XLS_GT ***
+grant SELECT                                                                 on REZ_XLS_GT      to BARSREADER_ROLE;
+grant SELECT                                                                 on REZ_XLS_GT      to UPLD;
+
 
 
 PROMPT ===================================================================================== 

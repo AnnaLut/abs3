@@ -69,9 +69,11 @@ COMMENT ON COLUMN BARS.SREZ_OB22_BAK.PR IS '';
 
 
 PROMPT *** Create  grants  SREZ_OB22_BAK ***
+grant SELECT                                                                 on SREZ_OB22_BAK   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SREZ_OB22_BAK   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SREZ_OB22_BAK   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SREZ_OB22_BAK   to START1;
+grant SELECT                                                                 on SREZ_OB22_BAK   to UPLD;
 
 
 

@@ -45,6 +45,10 @@ COMMENT ON COLUMN BARS.TMP_OW_SCHOOLTYPES.INFO IS '';
 
 
 
+PROMPT *** Create  grants  TMP_OW_SCHOOLTYPES ***
+grant SELECT                                                                 on TMP_OW_SCHOOLTYPES to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_OW_SCHOOLTYPES to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -214,7 +214,9 @@ COMMENT ON COLUMN BARS.TMP_NBU23_REZ_CACP.S_L IS '';
 
 
 PROMPT *** Create  grants  TMP_NBU23_REZ_CACP ***
+grant SELECT                                                                 on TMP_NBU23_REZ_CACP to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_NBU23_REZ_CACP to BARS_DM;
+grant SELECT                                                                 on TMP_NBU23_REZ_CACP to UPLD;
 
 
 

@@ -83,19 +83,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CUSTOMER_PARAMS_RNK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KL_CUSTOMER_PARAMS ADD CONSTRAINT FK_CUSTOMER_PARAMS_RNK FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_KLCUSTOMER_POSTTYPE ***
 begin   
  execute immediate '
@@ -148,9 +135,11 @@ exception when others then
 PROMPT *** Create  grants  KL_CUSTOMER_PARAMS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_CUSTOMER_PARAMS to ABS_ADMIN;
 grant SELECT                                                                 on KL_CUSTOMER_PARAMS to BARSAQ;
+grant SELECT                                                                 on KL_CUSTOMER_PARAMS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_CUSTOMER_PARAMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_CUSTOMER_PARAMS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_CUSTOMER_PARAMS to KLBX;
+grant SELECT                                                                 on KL_CUSTOMER_PARAMS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_CUSTOMER_PARAMS to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KL_CUSTOMER_PARAMS to WR_REFREAD;
 

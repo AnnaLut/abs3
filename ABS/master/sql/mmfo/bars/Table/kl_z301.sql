@@ -53,7 +53,9 @@ COMMENT ON COLUMN BARS.KL_Z301.D_CLOSE IS '';
 
 
 PROMPT *** Create  grants  KL_Z301 ***
+grant SELECT                                                                 on KL_Z301         to BARSREADER_ROLE;
 grant SELECT                                                                 on KL_Z301         to BARS_DM;
+grant SELECT                                                                 on KL_Z301         to UPLD;
 
 
 

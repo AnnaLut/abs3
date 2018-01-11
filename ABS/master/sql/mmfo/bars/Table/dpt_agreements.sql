@@ -139,10 +139,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTAGRMNTS_TEMPLATEID_NN ***
+PROMPT *** Create  constraint UK_DPTAGRMNTS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (TEMPLATE_ID CONSTRAINT CC_DPTAGRMNTS_TEMPLATEID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_AGREEMENTS ADD CONSTRAINT UK_DPTAGRMNTS UNIQUE (DPT_ID, AGRMNT_NUM)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -151,236 +153,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTAGRMNTS_BANKDATE_NN ***
+PROMPT *** Create  constraint CC_DPTAGRMNTS_STATES ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (BANKDATE CONSTRAINT CC_DPTAGRMNTS_BANKDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTAGRMNTS_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (BRANCH CONSTRAINT CC_DPTAGRMNTS_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTAGRMNTS_DPTID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (DPT_ID CONSTRAINT CC_DPTAGRMNTS_DPTID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTAGRMNTS_AGRMNTTYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (AGRMNT_TYPE CONSTRAINT CC_DPTAGRMNTS_AGRMNTTYPE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTAGRMNTS_AGRMNTNUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (AGRMNT_NUM CONSTRAINT CC_DPTAGRMNTS_AGRMNTNUM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTAGRMNTS_AGRMNTDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (AGRMNT_DATE CONSTRAINT CC_DPTAGRMNTS_AGRMNTDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTAGRMNTS_AGRMNTID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (AGRMNT_ID CONSTRAINT CC_DPTAGRMNTS_AGRMNTID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTAGRMNTS_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (KF CONSTRAINT CC_DPTAGRMNTS_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTAGRMNTS_AGRMNTSTATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (AGRMNT_STATE CONSTRAINT CC_DPTAGRMNTS_AGRMNTSTATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTAGRMNTS_DPTTRUSTEE2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS ADD CONSTRAINT FK_DPTAGRMNTS_DPTTRUSTEE2 FOREIGN KEY (KF, TRUSTEE_ID)
-	  REFERENCES BARS.DPT_TRUSTEE (KF, ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTAGRMNTS_DPTREQS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS ADD CONSTRAINT FK_DPTAGRMNTS_DPTREQS FOREIGN KEY (KF, RATE_REQID)
-	  REFERENCES BARS.DPT_REQUESTS (KF, REQ_ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTAGRMNTS_DPTREQS3 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS ADD CONSTRAINT FK_DPTAGRMNTS_DPTREQS3 FOREIGN KEY (KF, COMISS_REQID)
-	  REFERENCES BARS.DPT_REQUESTS (KF, REQ_ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTAGRMNTS_DPTDPTALL2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS ADD CONSTRAINT FK_DPTAGRMNTS_DPTDPTALL2 FOREIGN KEY (KF, DPT_ID)
-	  REFERENCES BARS.DPT_DEPOSIT_ALL (KF, DEPOSIT_ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTAGRMNTS_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS ADD CONSTRAINT FK_DPTAGRMNTS_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTAGRMNTS_BANKS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS ADD CONSTRAINT FK_DPTAGRMNTS_BANKS FOREIGN KEY (TRANSFER_BANK)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTAGRMNTS_DOCSCHEME ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS ADD CONSTRAINT FK_DPTAGRMNTS_DOCSCHEME FOREIGN KEY (TEMPLATE_ID)
-	  REFERENCES BARS.DOC_SCHEME (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTAGRMNTS_DPTVIDDFLAGS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS ADD CONSTRAINT FK_DPTAGRMNTS_DPTVIDDFLAGS FOREIGN KEY (AGRMNT_TYPE)
-	  REFERENCES BARS.DPT_VIDD_FLAGS (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTAGRMNTS_CUSTOMER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS ADD CONSTRAINT FK_DPTAGRMNTS_CUSTOMER FOREIGN KEY (CUST_ID)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTAGRMNTS_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS ADD CONSTRAINT FK_DPTAGRMNTS_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPT_AGREEMENTS ADD CONSTRAINT CC_DPTAGRMNTS_STATES CHECK (agrmnt_state IN (0,1,-1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -401,12 +177,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_DPTAGRMNTS ***
+PROMPT *** Create  constraint CC_DPTAGRMNTS_AGRMNTSTATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS ADD CONSTRAINT UK_DPTAGRMNTS UNIQUE (DPT_ID, AGRMNT_NUM)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
+  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (AGRMNT_STATE CONSTRAINT CC_DPTAGRMNTS_AGRMNTSTATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -415,10 +189,106 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTAGRMNTS_STATES ***
+PROMPT *** Create  constraint CC_DPTAGRMNTS_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_AGREEMENTS ADD CONSTRAINT CC_DPTAGRMNTS_STATES CHECK (agrmnt_state IN (0,1,-1)) ENABLE';
+  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (KF CONSTRAINT CC_DPTAGRMNTS_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTAGRMNTS_AGRMNTID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (AGRMNT_ID CONSTRAINT CC_DPTAGRMNTS_AGRMNTID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTAGRMNTS_AGRMNTDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (AGRMNT_DATE CONSTRAINT CC_DPTAGRMNTS_AGRMNTDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTAGRMNTS_AGRMNTNUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (AGRMNT_NUM CONSTRAINT CC_DPTAGRMNTS_AGRMNTNUM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTAGRMNTS_AGRMNTTYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (AGRMNT_TYPE CONSTRAINT CC_DPTAGRMNTS_AGRMNTTYPE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTAGRMNTS_DPTID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (DPT_ID CONSTRAINT CC_DPTAGRMNTS_DPTID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTAGRMNTS_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (BRANCH CONSTRAINT CC_DPTAGRMNTS_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTAGRMNTS_BANKDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (BANKDATE CONSTRAINT CC_DPTAGRMNTS_BANKDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTAGRMNTS_TEMPLATEID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_AGREEMENTS MODIFY (TEMPLATE_ID CONSTRAINT CC_DPTAGRMNTS_TEMPLATEID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -483,10 +353,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_AGREEMENTS ***
+grant SELECT                                                                 on DPT_AGREEMENTS  to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_AGREEMENTS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_AGREEMENTS  to BARS_DM;
 grant SELECT                                                                 on DPT_AGREEMENTS  to DPT_ROLE;
 grant SELECT                                                                 on DPT_AGREEMENTS  to KLBX;
+grant SELECT                                                                 on DPT_AGREEMENTS  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_AGREEMENTS  to WR_ALL_RIGHTS;
 
 

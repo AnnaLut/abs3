@@ -104,9 +104,11 @@ exception when others then
 
 PROMPT *** Create  grants  RI_MESSAGES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on RI_MESSAGES     to ABS_ADMIN;
+grant SELECT                                                                 on RI_MESSAGES     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RI_MESSAGES     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RI_MESSAGES     to BARS_DM;
 grant DELETE,INSERT,SELECT                                                   on RI_MESSAGES     to START1;
+grant SELECT                                                                 on RI_MESSAGES     to UPLD;
 grant FLASHBACK,SELECT                                                       on RI_MESSAGES     to WR_REFREAD;
 
 

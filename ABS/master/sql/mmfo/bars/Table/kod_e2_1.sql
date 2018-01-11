@@ -57,7 +57,9 @@ COMMENT ON COLUMN BARS.KOD_E2_1.DATA_M IS '';
 
 
 PROMPT *** Create  grants  KOD_E2_1 ***
+grant SELECT                                                                 on KOD_E2_1        to BARSREADER_ROLE;
 grant SELECT                                                                 on KOD_E2_1        to BARS_DM;
+grant SELECT                                                                 on KOD_E2_1        to UPLD;
 
 
 

@@ -101,7 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ERR_LANGS ***
+grant SELECT                                                                 on ERR_LANGS       to BARSREADER_ROLE;
 grant SELECT                                                                 on ERR_LANGS       to BARS_DM;
+grant SELECT                                                                 on ERR_LANGS       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ERR_LANGS       to WR_ALL_RIGHTS;
 
 

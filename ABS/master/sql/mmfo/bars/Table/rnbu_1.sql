@@ -52,10 +52,12 @@ COMMENT ON COLUMN BARS.RNBU_1.KOD IS '';
 
 PROMPT *** Create  grants  RNBU_1 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_1          to ABS_ADMIN;
+grant SELECT                                                                 on RNBU_1          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RNBU_1          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RNBU_1          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_1          to RNBU_1;
 grant SELECT                                                                 on RNBU_1          to START1;
+grant SELECT                                                                 on RNBU_1          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RNBU_1          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on RNBU_1          to WR_REFREAD;
 

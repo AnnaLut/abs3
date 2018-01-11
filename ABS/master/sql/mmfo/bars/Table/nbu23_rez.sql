@@ -380,10 +380,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_NBU23REZ_KV_NN ***
+PROMPT *** Create  constraint CC_NBU23REZ_FDAT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBU23_REZ MODIFY (KV CONSTRAINT CC_NBU23REZ_KV_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBU23_REZ MODIFY (FDAT CONSTRAINT CC_NBU23REZ_FDAT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -404,10 +404,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_NBU23REZ_FDAT_NN ***
+PROMPT *** Create  constraint CC_NBU23REZ_KV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBU23_REZ MODIFY (FDAT CONSTRAINT CC_NBU23REZ_FDAT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBU23_REZ MODIFY (KV CONSTRAINT CC_NBU23REZ_KV_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -693,6 +693,7 @@ exception when others then
 
 PROMPT *** Create  grants  NBU23_REZ ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBU23_REZ       to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on NBU23_REZ       to BARSREADER_ROLE;
 grant SELECT                                                                 on NBU23_REZ       to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBU23_REZ       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBU23_REZ       to BARS_DM;

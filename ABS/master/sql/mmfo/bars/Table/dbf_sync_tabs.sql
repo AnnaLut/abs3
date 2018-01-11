@@ -33,7 +33,8 @@ begin
 	SYNC_FLAG NUMBER(1,0), 
 	ENCODE VARCHAR2(3), 
 	FILE_NAME VARCHAR2(100), 
-	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch'')
+	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch''), 
+	SYNC_DATE DATE
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -51,6 +52,7 @@ PROMPT *** ALTER_POLICIES to DBF_SYNC_TABS ***
 
 
 COMMENT ON TABLE BARS.DBF_SYNC_TABS IS 'ТАБЛИЦЫ, СИНХРОНИЗИРУЕМЫЕ ИЗ DBF ФАЙЛОВ';
+COMMENT ON COLUMN BARS.DBF_SYNC_TABS.SYNC_DATE IS 'Дата синхронізації довідника';
 COMMENT ON COLUMN BARS.DBF_SYNC_TABS.TABID IS 'Ид. таблицы';
 COMMENT ON COLUMN BARS.DBF_SYNC_TABS.S_SELECT IS 'Выражение на выборку изменений (сравнение БД с файлом)';
 COMMENT ON COLUMN BARS.DBF_SYNC_TABS.S_INSERT IS 'Выражение на вставку недостающих записей';
@@ -61,19 +63,6 @@ COMMENT ON COLUMN BARS.DBF_SYNC_TABS.SYNC_FLAG IS '';
 COMMENT ON COLUMN BARS.DBF_SYNC_TABS.ENCODE IS 'Кодировка исходного DBF: DOS(cp866),WIN(win),UKG(укр.гост))';
 COMMENT ON COLUMN BARS.DBF_SYNC_TABS.FILE_NAME IS 'Имя DBF файла';
 COMMENT ON COLUMN BARS.DBF_SYNC_TABS.BRANCH IS '';
-
-
-
-
-PROMPT *** Create  constraint FK_DBFSYNCTABS_METATABLES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DBF_SYNC_TABS ADD CONSTRAINT FK_DBFSYNCTABS_METATABLES FOREIGN KEY (TABID)
-	  REFERENCES BARS.META_TABLES (TABID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
 
 
 
@@ -143,10 +132,12 @@ exception when others then
 
 PROMPT *** Create  grants  DBF_SYNC_TABS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DBF_SYNC_TABS   to ABS_ADMIN;
+grant SELECT                                                                 on DBF_SYNC_TABS   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DBF_SYNC_TABS   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DBF_SYNC_TABS   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DBF_SYNC_TABS   to DBF_SYNC_TABS;
 grant SELECT                                                                 on DBF_SYNC_TABS   to START1;
+grant SELECT                                                                 on DBF_SYNC_TABS   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DBF_SYNC_TABS   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DBF_SYNC_TABS   to WR_REFREAD;
 

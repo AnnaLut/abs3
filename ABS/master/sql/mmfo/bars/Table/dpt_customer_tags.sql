@@ -115,9 +115,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_CUSTOMER_TAGS ***
+grant SELECT                                                                 on DPT_CUSTOMER_TAGS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_CUSTOMER_TAGS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_CUSTOMER_TAGS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_CUSTOMER_TAGS to DPT_ADMIN;
+grant SELECT                                                                 on DPT_CUSTOMER_TAGS to UPLD;
 
 
 

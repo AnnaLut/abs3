@@ -82,8 +82,10 @@ exception when others then
 
 PROMPT *** Create  grants  XML_VALUABLES_TTS ***
 grant SELECT                                                                 on XML_VALUABLES_TTS to BARSAQ;
+grant SELECT                                                                 on XML_VALUABLES_TTS to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_VALUABLES_TTS to BARS_DM;
 grant SELECT                                                                 on XML_VALUABLES_TTS to KLBX;
+grant SELECT                                                                 on XML_VALUABLES_TTS to UPLD;
 
 
 

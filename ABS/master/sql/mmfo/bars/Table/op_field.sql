@@ -91,32 +91,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OPFIELD_SNR ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OP_FIELD ADD CONSTRAINT FK_OPFIELD_SNR FOREIGN KEY (VSPO_CHAR)
-	  REFERENCES BARS.S_NR (K_RK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_OPFIELD_METACOLTYPES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OP_FIELD ADD CONSTRAINT FK_OPFIELD_METACOLTYPES FOREIGN KEY (TYPE)
-	  REFERENCES BARS.META_COLTYPES (COLTYPE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C007419 ***
 begin   
  execute immediate '
@@ -158,6 +132,7 @@ PROMPT *** Create  grants  OP_FIELD ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OP_FIELD        to ABS_ADMIN;
 grant FLASHBACK,REFERENCES,SELECT                                            on OP_FIELD        to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on OP_FIELD        to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on OP_FIELD        to BARSREADER_ROLE;
 grant SELECT                                                                 on OP_FIELD        to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OP_FIELD        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OP_FIELD        to BARS_DM;
@@ -165,6 +140,7 @@ grant SELECT                                                                 on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on OP_FIELD        to OP_FIELD;
 grant SELECT                                                                 on OP_FIELD        to START1;
 grant SELECT                                                                 on OP_FIELD        to TECH005;
+grant SELECT                                                                 on OP_FIELD        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OP_FIELD        to WR_ALL_RIGHTS;
 grant SELECT                                                                 on OP_FIELD        to WR_DOCVIEW;
 grant SELECT                                                                 on OP_FIELD        to WR_DOC_INPUT;

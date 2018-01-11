@@ -69,6 +69,10 @@ COMMENT ON COLUMN BARS.ADR_HOUSES_ERRLOG.LONGITUDE IS '';
 
 
 
+PROMPT *** Create  grants  ADR_HOUSES_ERRLOG ***
+grant SELECT                                                                 on ADR_HOUSES_ERRLOG to BARSREADER_ROLE;
+grant SELECT                                                                 on ADR_HOUSES_ERRLOG to UPLD;
+
 
 
 PROMPT ===================================================================================== 

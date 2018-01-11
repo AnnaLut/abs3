@@ -49,9 +49,11 @@ COMMENT ON COLUMN BARS.N_GR.NAME IS '';
 
 
 PROMPT *** Create  grants  N_GR ***
+grant SELECT                                                                 on N_GR            to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on N_GR            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on N_GR            to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on N_GR            to N_GR;
+grant SELECT                                                                 on N_GR            to UPLD;
 grant FLASHBACK,SELECT                                                       on N_GR            to WR_REFREAD;
 
 

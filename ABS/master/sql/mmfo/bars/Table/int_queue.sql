@@ -123,10 +123,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_INTQUEUE_ACCOPEN_NN ***
+PROMPT *** Create  constraint CC_INTQUEUE_ACCID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_QUEUE MODIFY (ACC_OPEN CONSTRAINT CC_INTQUEUE_ACCOPEN_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.INT_QUEUE MODIFY (ACC_ID CONSTRAINT CC_INTQUEUE_ACCID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -171,10 +171,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_INTQUEUE_ACCID_NN ***
+PROMPT *** Create  constraint CC_INTQUEUE_ACCOPEN_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_QUEUE MODIFY (ACC_ID CONSTRAINT CC_INTQUEUE_ACCID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.INT_QUEUE MODIFY (ACC_OPEN CONSTRAINT CC_INTQUEUE_ACCOPEN_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -195,8 +195,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  INT_QUEUE ***
+grant SELECT                                                                 on INT_QUEUE       to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on INT_QUEUE       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_QUEUE       to BARS_DM;
+grant SELECT                                                                 on INT_QUEUE       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_QUEUE       to WR_ALL_RIGHTS;
 
 

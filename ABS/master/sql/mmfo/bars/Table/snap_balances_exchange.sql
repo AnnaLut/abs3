@@ -113,10 +113,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0033022 ***
+PROMPT *** Create  constraint SYS_C0033017 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SNAP_BALANCES_EXCHANGE MODIFY (KOSQ NOT NULL ENABLE)';
+  ALTER TABLE BARS.SNAP_BALANCES_EXCHANGE MODIFY (OST NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -173,10 +173,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0033017 ***
+PROMPT *** Create  constraint SYS_C0033022 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SNAP_BALANCES_EXCHANGE MODIFY (OST NOT NULL ENABLE)';
+  ALTER TABLE BARS.SNAP_BALANCES_EXCHANGE MODIFY (KOSQ NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -189,7 +189,7 @@ PROMPT *** Create  index UK_SNAP_BALANCES_EXCHANGE ***
 begin   
  execute immediate '
   CREATE UNIQUE INDEX BARS.UK_SNAP_BALANCES_EXCHANGE ON BARS.SNAP_BALANCES_EXCHANGE (FDAT, KF, ACC) 
-  PCTFREE 0 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS COMPRESS 2 
+  PCTFREE 0 INITRANS 2 MAXTRANS 255 COMPRESS 2 
   TABLESPACE BRSACCM ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
@@ -199,7 +199,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SNAP_BALANCES_EXCHANGE ***
+grant SELECT                                                                 on SNAP_BALANCES_EXCHANGE to BARSREADER_ROLE;
 grant ALTER,SELECT                                                           on SNAP_BALANCES_EXCHANGE to DM;
+grant SELECT                                                                 on SNAP_BALANCES_EXCHANGE to UPLD;
 
 
 

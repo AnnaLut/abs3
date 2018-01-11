@@ -53,10 +53,12 @@ COMMENT ON COLUMN BARS.STRU3.TXT IS '';
 
 
 PROMPT *** Create  grants  STRU3 ***
+grant SELECT                                                                 on STRU3           to BARSREADER_ROLE;
 grant SELECT                                                                 on STRU3           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STRU3           to BARS_DM;
 grant SELECT                                                                 on STRU3           to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STRU3           to STRU3;
+grant SELECT                                                                 on STRU3           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STRU3           to WR_ALL_RIGHTS;
 
 

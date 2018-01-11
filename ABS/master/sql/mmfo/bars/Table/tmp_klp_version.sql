@@ -61,6 +61,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  TMP_KLP_VERSION ***
+grant SELECT                                                                 on TMP_KLP_VERSION to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_KLP_VERSION to UPLD;
+
 
 
 PROMPT ===================================================================================== 

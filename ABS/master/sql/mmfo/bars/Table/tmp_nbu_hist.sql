@@ -106,8 +106,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_NBU_HIST ***
+grant SELECT                                                                 on TMP_NBU_HIST    to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on TMP_NBU_HIST    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_NBU_HIST    to BARS_DM;
+grant SELECT                                                                 on TMP_NBU_HIST    to UPLD;
 grant FLASHBACK,SELECT                                                       on TMP_NBU_HIST    to WR_REFREAD;
 
 

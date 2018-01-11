@@ -70,8 +70,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SYNC_ERRORS ***
+grant SELECT                                                                 on SYNC_ERRORS     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SYNC_ERRORS     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SYNC_ERRORS     to CIM_ROLE;
+grant SELECT                                                                 on SYNC_ERRORS     to UPLD;
 
 
 

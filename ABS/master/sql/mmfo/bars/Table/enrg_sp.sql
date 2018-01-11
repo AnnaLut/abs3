@@ -87,9 +87,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ENRG_SP ***
+grant SELECT                                                                 on ENRG_SP         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ENRG_SP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ENRG_SP         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ENRG_SP         to START1;
+grant SELECT                                                                 on ENRG_SP         to UPLD;
 
 
 

@@ -107,19 +107,6 @@ COMMENT ON COLUMN BARS.TMP_REZ_ZALOG23.PR_IMP IS '% затрат на реализацию';
 
 
 
-PROMPT *** Create  constraint FK_TMPREZZALOG23_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_REZ_ZALOG23 ADD CONSTRAINT FK_TMPREZZALOG23_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_TMPREZZALOG23_KF_NN ***
 begin   
  execute immediate '
@@ -160,6 +147,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_REZ_ZALOG23 ***
+grant SELECT                                                                 on TMP_REZ_ZALOG23 to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_REZ_ZALOG23 to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_REZ_ZALOG23 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_REZ_ZALOG23 to BARS_DM;

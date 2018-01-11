@@ -79,6 +79,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_PARAMETERS ***
+grant SELECT                                                                 on BPK_PARAMETERS  to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_PARAMETERS  to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_PARAMETERS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_PARAMETERS  to BARS_DM;

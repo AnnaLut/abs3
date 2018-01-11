@@ -93,96 +93,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005804 ***
+PROMPT *** Create  constraint PK_CURRATES$BASE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUR_RATES$BASE MODIFY (OTM NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CURRATES$BASE_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUR_RATES$BASE MODIFY (BRANCH CONSTRAINT CC_CURRATES$BASE_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CURRATES$BASE_RATEO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUR_RATES$BASE MODIFY (RATE_O CONSTRAINT CC_CURRATES$BASE_RATEO_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CURRATES$BASE_BSUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUR_RATES$BASE MODIFY (BSUM CONSTRAINT CC_CURRATES$BASE_BSUM_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CURRATES$BASE_VDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUR_RATES$BASE MODIFY (VDATE CONSTRAINT CC_CURRATES$BASE_VDATE_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CURRATES$BASE_KV_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUR_RATES$BASE MODIFY (KV CONSTRAINT CC_CURRATES$BASE_KV_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CURRATES$BASE_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUR_RATES$BASE ADD CONSTRAINT FK_CURRATES$BASE_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CURRATES$BASE_TABVAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUR_RATES$BASE ADD CONSTRAINT FK_CURRATES$BASE_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) DISABLE';
+  ALTER TABLE BARS.CUR_RATES$BASE ADD CONSTRAINT PK_CURRATES$BASE PRIMARY KEY (BRANCH, VDATE, KV)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -203,12 +119,70 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_CURRATES$BASE ***
+PROMPT *** Create  constraint CC_CURRATES$BASE_KV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUR_RATES$BASE ADD CONSTRAINT PK_CURRATES$BASE PRIMARY KEY (BRANCH, VDATE, KV)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CUR_RATES$BASE MODIFY (KV CONSTRAINT CC_CURRATES$BASE_KV_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CURRATES$BASE_VDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUR_RATES$BASE MODIFY (VDATE CONSTRAINT CC_CURRATES$BASE_VDATE_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CURRATES$BASE_BSUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUR_RATES$BASE MODIFY (BSUM CONSTRAINT CC_CURRATES$BASE_BSUM_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CURRATES$BASE_RATEO_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUR_RATES$BASE MODIFY (RATE_O CONSTRAINT CC_CURRATES$BASE_RATEO_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CURRATES$BASE_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUR_RATES$BASE MODIFY (BRANCH CONSTRAINT CC_CURRATES$BASE_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005804 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CUR_RATES$BASE MODIFY (OTM NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -230,9 +204,9 @@ exception when others then
 
 
 
-
 PROMPT *** Create  grants  CUR_RATES$BASE ***
 grant SELECT                                                                 on CUR_RATES$BASE  to BARSAQ with grant option;
+grant SELECT                                                                 on CUR_RATES$BASE  to BARSREADER_ROLE;
 grant SELECT                                                                 on CUR_RATES$BASE  to BARSUPL;
 grant INSERT,SELECT,UPDATE                                                   on CUR_RATES$BASE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUR_RATES$BASE  to BARS_DM;
@@ -240,6 +214,7 @@ grant SELECT                                                                 on 
 grant INSERT,SELECT,UPDATE                                                   on CUR_RATES$BASE  to PYOD001;
 grant SELECT                                                                 on CUR_RATES$BASE  to REFSYNC_USR;
 grant INSERT,SELECT,UPDATE                                                   on CUR_RATES$BASE  to TECH005;
+grant SELECT                                                                 on CUR_RATES$BASE  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUR_RATES$BASE  to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CUR_RATES$BASE  to WR_RATES;
 

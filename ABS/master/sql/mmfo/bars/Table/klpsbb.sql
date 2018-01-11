@@ -63,19 +63,6 @@ COMMENT ON COLUMN BARS.KLPSBB.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_KLPSBB_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLPSBB ADD CONSTRAINT FK_KLPSBB_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C009230 ***
 begin   
  execute immediate '
@@ -156,8 +143,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  KLPSBB ***
+grant SELECT                                                                 on KLPSBB          to BARSREADER_ROLE;
 grant SELECT                                                                 on KLPSBB          to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on KLPSBB          to OPERKKK;
+grant SELECT                                                                 on KLPSBB          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLPSBB          to WR_ALL_RIGHTS;
 
 

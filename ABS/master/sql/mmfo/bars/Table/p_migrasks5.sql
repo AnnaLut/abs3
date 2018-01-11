@@ -53,7 +53,9 @@ COMMENT ON COLUMN BARS.P_MIGRASKS5.ORDNUNG IS 'Порядок сортировки';
 
 
 PROMPT *** Create  grants  P_MIGRASKS5 ***
+grant SELECT                                                                 on P_MIGRASKS5     to BARSREADER_ROLE;
 grant SELECT                                                                 on P_MIGRASKS5     to BARS_DM;
+grant SELECT                                                                 on P_MIGRASKS5     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on P_MIGRASKS5     to WR_ALL_RIGHTS;
 
 

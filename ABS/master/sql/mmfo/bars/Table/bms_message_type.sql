@@ -173,7 +173,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BMS_MESSAGE_TYPE ***
+grant SELECT                                                                 on BMS_MESSAGE_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on BMS_MESSAGE_TYPE to BARS_DM;
+grant SELECT                                                                 on BMS_MESSAGE_TYPE to UPLD;
 
 
 

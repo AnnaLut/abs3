@@ -155,9 +155,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_LIMIT_QUERY ***
+grant SELECT                                                                 on DPT_LIMIT_QUERY to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_LIMIT_QUERY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_LIMIT_QUERY to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_LIMIT_QUERY to START1;
+grant SELECT                                                                 on DPT_LIMIT_QUERY to UPLD;
 
 
 

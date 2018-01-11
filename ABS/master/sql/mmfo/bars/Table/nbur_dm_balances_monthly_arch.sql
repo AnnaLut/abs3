@@ -156,10 +156,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMBALSMONTHARCH_ADJBALUAH ***
+PROMPT *** Create  constraint CC_DMBALSMONTHARCH_ACCID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_BALANCES_MONTHLY_ARCH MODIFY (ADJ_BAL_UAH CONSTRAINT CC_DMBALSMONTHARCH_ADJBALUAH NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_BALANCES_MONTHLY_ARCH MODIFY (ACC_ID CONSTRAINT CC_DMBALSMONTHARCH_ACCID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -192,10 +192,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMBALSMONTHARCH_ACCID_NN ***
+PROMPT *** Create  constraint CC_DMBALSMONTHARCH_ADJBALUAH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_BALANCES_MONTHLY_ARCH MODIFY (ACC_ID CONSTRAINT CC_DMBALSMONTHARCH_ACCID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_BALANCES_MONTHLY_ARCH MODIFY (ADJ_BAL_UAH CONSTRAINT CC_DMBALSMONTHARCH_ADJBALUAH NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -273,9 +273,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_DM_BALANCES_MONTHLY_ARCH ***
+grant SELECT                                                                 on NBUR_DM_BALANCES_MONTHLY_ARCH to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_DM_BALANCES_MONTHLY_ARCH to BARSUPL;
 grant SELECT                                                                 on NBUR_DM_BALANCES_MONTHLY_ARCH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_DM_BALANCES_MONTHLY_ARCH to BARS_DM;
+grant SELECT                                                                 on NBUR_DM_BALANCES_MONTHLY_ARCH to UPLD;
 
 
 

@@ -111,7 +111,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_WEB_EXPORT_DOCS ***
+grant SELECT                                                                 on TMP_WEB_EXPORT_DOCS to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_WEB_EXPORT_DOCS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on TMP_WEB_EXPORT_DOCS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_WEB_EXPORT_DOCS to WR_ALL_RIGHTS;
 grant SELECT                                                                 on TMP_WEB_EXPORT_DOCS to WR_IMPEXP;
 

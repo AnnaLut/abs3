@@ -119,9 +119,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_DOG_SYNC_PARAMS ***
+grant SELECT                                                                 on CIG_DOG_SYNC_PARAMS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIG_DOG_SYNC_PARAMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_DOG_SYNC_PARAMS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIG_DOG_SYNC_PARAMS to CIG_ROLE;
+grant SELECT                                                                 on CIG_DOG_SYNC_PARAMS to UPLD;
 
 
 

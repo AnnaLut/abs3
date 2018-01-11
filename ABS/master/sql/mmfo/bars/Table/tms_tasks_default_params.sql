@@ -54,21 +54,10 @@ COMMENT ON COLUMN BARS.TMS_TASKS_DEFAULT_PARAMS.PARAM_INITIALIZATION IS '';
 
 
 
-
-PROMPT *** Create  constraint FK_TASK_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMS_TASKS_DEFAULT_PARAMS ADD CONSTRAINT FK_TASK_ID FOREIGN KEY (TASK_ID)
-	  REFERENCES BARS.TMS_LIST_TASKS (TASK_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
 PROMPT *** Create  grants  TMS_TASKS_DEFAULT_PARAMS ***
+grant SELECT                                                                 on TMS_TASKS_DEFAULT_PARAMS to BARSREADER_ROLE;
 grant SELECT                                                                 on TMS_TASKS_DEFAULT_PARAMS to BARS_DM;
+grant SELECT                                                                 on TMS_TASKS_DEFAULT_PARAMS to UPLD;
 
 
 

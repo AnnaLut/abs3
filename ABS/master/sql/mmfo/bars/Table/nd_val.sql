@@ -32,7 +32,8 @@ begin
 	TIP_FIN NUMBER(*,0), 
 	ISTVAL NUMBER(*,0), 
 	S080 VARCHAR2(1), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
+	S180 VARCHAR2(1)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -50,6 +51,7 @@ PROMPT *** ALTER_POLICIES to ND_VAL ***
 
 
 COMMENT ON TABLE BARS.ND_VAL IS 'Параметри по договору';
+COMMENT ON COLUMN BARS.ND_VAL.S180 IS 'Параметр s180';
 COMMENT ON COLUMN BARS.ND_VAL.FDAT IS 'Звітна дата';
 COMMENT ON COLUMN BARS.ND_VAL.ND IS 'Реф. договору';
 COMMENT ON COLUMN BARS.ND_VAL.TIPA IS 'Тип активу ';
@@ -67,22 +69,9 @@ COMMENT ON COLUMN BARS.ND_VAL.KF IS '';
 PROMPT *** Create  constraint PK_ND_VAL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ND_VAL ADD CONSTRAINT PK_ND_VAL PRIMARY KEY (FDAT, RNK, ND)
+  ALTER TABLE BARS.ND_VAL ADD CONSTRAINT PK_ND_VAL PRIMARY KEY (FDAT, RNK, ND, TIPA)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_NDVAL_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ND_VAL ADD CONSTRAINT FK_NDVAL_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -106,9 +95,9 @@ exception when others then
 PROMPT *** Create  index PK_ND_VAL ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_ND_VAL ON BARS.ND_VAL (FDAT, RNK, ND) 
+  CREATE UNIQUE INDEX BARS.PK_ND_VAL ON BARS.ND_VAL (FDAT, RNK, ND, TIPA) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND ';
+  TABLESPACE BRSMDLI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
@@ -117,9 +106,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ND_VAL ***
+grant SELECT                                                                 on ND_VAL          to BARSREADER_ROLE;
 grant SELECT                                                                 on ND_VAL          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ND_VAL          to RCC_DEAL;
 grant SELECT                                                                 on ND_VAL          to START1;
+grant SELECT                                                                 on ND_VAL          to UPLD;
 
 
 

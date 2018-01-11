@@ -49,8 +49,10 @@ COMMENT ON COLUMN BARS.USSR_3301.SUM_BLK IS '';
 
 
 PROMPT *** Create  grants  USSR_3301 ***
+grant SELECT                                                                 on USSR_3301       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on USSR_3301       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on USSR_3301       to START1;
+grant SELECT                                                                 on USSR_3301       to UPLD;
 
 
 

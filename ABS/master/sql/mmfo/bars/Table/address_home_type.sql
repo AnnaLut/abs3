@@ -79,9 +79,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ADDRESS_HOME_TYPE ***
+grant SELECT                                                                 on ADDRESS_HOME_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on ADDRESS_HOME_TYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ADDRESS_HOME_TYPE to BARS_DM;
 grant SELECT                                                                 on ADDRESS_HOME_TYPE to CUST001;
+grant SELECT                                                                 on ADDRESS_HOME_TYPE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ADDRESS_HOME_TYPE to WR_ALL_RIGHTS;
 grant SELECT                                                                 on ADDRESS_HOME_TYPE to WR_CUSTREG;
 

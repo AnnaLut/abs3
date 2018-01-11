@@ -105,9 +105,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACC_30 ***
+grant SELECT                                                                 on ACC_30          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_30          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_30          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_30          to START1;
+grant SELECT                                                                 on ACC_30          to UPLD;
 
 
 

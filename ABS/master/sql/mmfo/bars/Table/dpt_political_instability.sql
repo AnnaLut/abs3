@@ -191,8 +191,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_POLITICAL_INSTABILITY ***
+grant SELECT                                                                 on DPT_POLITICAL_INSTABILITY to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_POLITICAL_INSTABILITY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_POLITICAL_INSTABILITY to BARS_DM;
+grant SELECT                                                                 on DPT_POLITICAL_INSTABILITY to UPLD;
 
 
 

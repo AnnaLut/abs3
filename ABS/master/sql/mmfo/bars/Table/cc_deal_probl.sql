@@ -96,8 +96,10 @@ COMMENT ON COLUMN BARS.CC_DEAL_PROBL.POG_SN_EQV IS '';
 
 
 PROMPT *** Create  grants  CC_DEAL_PROBL ***
+grant SELECT                                                                 on CC_DEAL_PROBL   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_DEAL_PROBL   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_DEAL_PROBL   to RCC_DEAL;
+grant SELECT                                                                 on CC_DEAL_PROBL   to UPLD;
 
 
 

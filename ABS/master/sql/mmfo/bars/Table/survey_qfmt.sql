@@ -89,9 +89,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SURVEY_QFMT ***
+grant SELECT                                                                 on SURVEY_QFMT     to BARSREADER_ROLE;
 grant SELECT                                                                 on SURVEY_QFMT     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SURVEY_QFMT     to BARS_DM;
 grant SELECT                                                                 on SURVEY_QFMT     to DPT_ADMIN;
+grant SELECT                                                                 on SURVEY_QFMT     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SURVEY_QFMT     to WR_ALL_RIGHTS;
 
 

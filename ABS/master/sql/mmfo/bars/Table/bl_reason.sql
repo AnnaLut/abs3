@@ -81,58 +81,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint BL_REASON_BASE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_REASON ADD CONSTRAINT BL_REASON_BASE FOREIGN KEY (BASE_ID)
-	  REFERENCES BARS.BL_BASE_DICT (BASE_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint BL_REASON_PERSON_FK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_REASON ADD CONSTRAINT BL_REASON_PERSON_FK FOREIGN KEY (BASE_ID, PERSON_ID)
-	  REFERENCES BARS.BL_PERSON (BASE_ID, PERSON_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint BL_REASON_REASON_FK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_REASON ADD CONSTRAINT BL_REASON_REASON_FK FOREIGN KEY (REASON_GROUP)
-	  REFERENCES BARS.BL_REASON_DICT (REASON_GROUP) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint BL_REASON_USER_FK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_REASON ADD CONSTRAINT BL_REASON_USER_FK FOREIGN KEY (USER_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NN_BL_REASON_REASON_ID ***
 begin   
  execute immediate '
@@ -157,10 +105,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NN_BL_REASON_BASE_ID ***
+PROMPT *** Create  constraint NN_BL_REASON_USER ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BL_REASON MODIFY (BASE_ID CONSTRAINT NN_BL_REASON_BASE_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.BL_REASON MODIFY (USER_ID CONSTRAINT NN_BL_REASON_USER NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -169,10 +117,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NN_BL_REASON_USER ***
+PROMPT *** Create  constraint NN_BL_REASON_BASE_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BL_REASON MODIFY (USER_ID CONSTRAINT NN_BL_REASON_USER NOT NULL ENABLE)';
+  ALTER TABLE BARS.BL_REASON MODIFY (BASE_ID CONSTRAINT NN_BL_REASON_BASE_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -209,8 +157,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  BL_REASON ***
+grant SELECT                                                                 on BL_REASON       to BARSREADER_ROLE;
 grant SELECT                                                                 on BL_REASON       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BL_REASON       to RBL;
+grant SELECT                                                                 on BL_REASON       to UPLD;
 
 
 

@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CASH_LIMIT_VID ***
+grant SELECT                                                                 on CASH_LIMIT_VID  to BARSREADER_ROLE;
 grant SELECT                                                                 on CASH_LIMIT_VID  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CASH_LIMIT_VID  to BARS_DM;
 grant SELECT                                                                 on CASH_LIMIT_VID  to RPBN001;
+grant SELECT                                                                 on CASH_LIMIT_VID  to UPLD;
 
 
 

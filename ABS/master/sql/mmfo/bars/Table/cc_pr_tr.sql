@@ -62,9 +62,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_PR_TR ***
+grant SELECT                                                                 on CC_PR_TR        to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_PR_TR        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_PR_TR        to BARS_DM;
 grant SELECT                                                                 on CC_PR_TR        to RCC_DEAL;
+grant SELECT                                                                 on CC_PR_TR        to UPLD;
 
 
 

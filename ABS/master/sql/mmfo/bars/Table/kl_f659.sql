@@ -53,8 +53,10 @@ COMMENT ON COLUMN BARS.KL_F659.IDF IS '';
 
 
 PROMPT *** Create  grants  KL_F659 ***
+grant SELECT                                                                 on KL_F659         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F659         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F659         to RPBN002;
+grant SELECT                                                                 on KL_F659         to UPLD;
 
 
 

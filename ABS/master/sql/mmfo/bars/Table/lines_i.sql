@@ -55,19 +55,6 @@ COMMENT ON COLUMN BARS.LINES_I.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_LINESI_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.LINES_I ADD CONSTRAINT FK_LINESI_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_LINESI_KF_NN ***
 begin   
  execute immediate '
@@ -108,9 +95,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  LINES_I ***
+grant SELECT                                                                 on LINES_I         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LINES_I         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LINES_I         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LINES_I         to RPBN002;
+grant SELECT                                                                 on LINES_I         to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on LINES_I         to WR_ALL_RIGHTS;
 
 

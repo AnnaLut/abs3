@@ -107,8 +107,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRICE ***
+grant SELECT                                                                 on PRICE           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PRICE           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PRICE           to START1;
+grant SELECT                                                                 on PRICE           to UPLD;
 
 
 

@@ -41,7 +41,9 @@ COMMENT ON COLUMN BARS.TMP_WAY4_LIST.FILENAME IS '';
 
 
 PROMPT *** Create  grants  TMP_WAY4_LIST ***
+grant SELECT                                                                 on TMP_WAY4_LIST   to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_WAY4_LIST   to BARS_DM;
+grant SELECT                                                                 on TMP_WAY4_LIST   to UPLD;
 
 
 

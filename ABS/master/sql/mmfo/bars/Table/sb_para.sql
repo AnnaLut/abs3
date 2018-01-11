@@ -107,9 +107,11 @@ COMMENT ON COLUMN BARS.SB_PARA.R020_FA IS '';
 
 
 PROMPT *** Create  grants  SB_PARA ***
+grant SELECT                                                                 on SB_PARA         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_PARA         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SB_PARA         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_PARA         to START1;
+grant SELECT                                                                 on SB_PARA         to UPLD;
 
 
 

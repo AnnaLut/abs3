@@ -89,9 +89,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_STAFF_TIP ***
+grant SELECT                                                                 on SKRYNKA_STAFF_TIP to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SKRYNKA_STAFF_TIP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SKRYNKA_STAFF_TIP to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SKRYNKA_STAFF_TIP to DEP_SKRN;
+grant SELECT                                                                 on SKRYNKA_STAFF_TIP to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_STAFF_TIP to WR_ALL_RIGHTS;
 
 

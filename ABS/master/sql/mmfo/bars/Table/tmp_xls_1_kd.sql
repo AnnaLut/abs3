@@ -76,7 +76,9 @@ COMMENT ON COLUMN BARS.TMP_XLS_1_KD.CC_ID_STI_K IS '';
 
 
 PROMPT *** Create  grants  TMP_XLS_1_KD ***
+grant SELECT                                                                 on TMP_XLS_1_KD    to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_XLS_1_KD    to BARS_DM;
+grant SELECT                                                                 on TMP_XLS_1_KD    to UPLD;
 
 
 

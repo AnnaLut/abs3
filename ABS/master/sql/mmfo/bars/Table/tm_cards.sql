@@ -85,19 +85,6 @@ COMMENT ON COLUMN BARS.TM_CARDS.BRANCH IS 'Идентификатор подразделения';
 
 
 
-PROMPT *** Create  constraint FK_TMCARDS_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TM_CARDS ADD CONSTRAINT FK_TMCARDS_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_TMCARDS_NLS_NN ***
 begin   
  execute immediate '
@@ -164,11 +151,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  TM_CARDS ***
+grant SELECT                                                                 on TM_CARDS        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TM_CARDS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TM_CARDS        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TM_CARDS        to DPT_ADMIN;
 grant SELECT                                                                 on TM_CARDS        to DPT_ROLE;
 grant SELECT                                                                 on TM_CARDS        to START1;
+grant SELECT                                                                 on TM_CARDS        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TM_CARDS        to WR_ALL_RIGHTS;
 
 

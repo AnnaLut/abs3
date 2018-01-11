@@ -102,10 +102,12 @@ exception when others then
 
 PROMPT *** Create  grants  ZAPROS_FMT ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAPROS_FMT      to ABS_ADMIN;
+grant SELECT                                                                 on ZAPROS_FMT      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAPROS_FMT      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAPROS_FMT      to BARS_DM;
 grant SELECT                                                                 on ZAPROS_FMT      to DPT_ADMIN;
 grant SELECT                                                                 on ZAPROS_FMT      to START1;
+grant SELECT                                                                 on ZAPROS_FMT      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAPROS_FMT      to WR_ALL_RIGHTS;
 
 

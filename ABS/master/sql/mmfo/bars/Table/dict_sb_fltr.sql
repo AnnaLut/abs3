@@ -53,9 +53,11 @@ COMMENT ON COLUMN BARS.DICT_SB_FLTR.FILTER IS '';
 
 
 PROMPT *** Create  grants  DICT_SB_FLTR ***
+grant SELECT                                                                 on DICT_SB_FLTR    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DICT_SB_FLTR    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DICT_SB_FLTR    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DICT_SB_FLTR    to START1;
+grant SELECT                                                                 on DICT_SB_FLTR    to UPLD;
 grant FLASHBACK,SELECT                                                       on DICT_SB_FLTR    to WR_REFREAD;
 
 

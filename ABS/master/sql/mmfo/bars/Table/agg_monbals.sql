@@ -115,10 +115,10 @@ COMMENT ON COLUMN BARS.AGG_MONBALS.DOSQ IS 'Сума дебетових оборотів (еквівалент)
 
 
 
-PROMPT *** Create  constraint CC_AGG_MONBALS_KF_NN ***
+PROMPT *** Create  constraint CC_AGG_MONBALS_OST_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.AGG_MONBALS MODIFY (KF CONSTRAINT CC_AGG_MONBALS_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.AGG_MONBALS MODIFY (OST CONSTRAINT CC_AGG_MONBALS_OST_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -139,10 +139,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_AGG_MONBALS_OST_NN ***
+PROMPT *** Create  constraint CC_AGG_MONBALS_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.AGG_MONBALS MODIFY (OST CONSTRAINT CC_AGG_MONBALS_OST_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.AGG_MONBALS MODIFY (KF CONSTRAINT CC_AGG_MONBALS_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -163,10 +163,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_AGG_MONBALS_KOSQ_NN ***
+PROMPT *** Create  constraint CC_AGG_MONBALS_RNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.AGG_MONBALS MODIFY (KOSQ CONSTRAINT CC_AGG_MONBALS_KOSQ_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.AGG_MONBALS MODIFY (RNK CONSTRAINT CC_AGG_MONBALS_RNK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -223,10 +223,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_AGG_MONBALS_RNK_NN ***
+PROMPT *** Create  constraint CC_AGG_MONBALS_KOSQ_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.AGG_MONBALS MODIFY (RNK CONSTRAINT CC_AGG_MONBALS_RNK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.AGG_MONBALS MODIFY (KOSQ CONSTRAINT CC_AGG_MONBALS_KOSQ_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -304,10 +304,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  AGG_MONBALS ***
+grant SELECT                                                                 on AGG_MONBALS     to BARSREADER_ROLE;
 grant SELECT                                                                 on AGG_MONBALS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AGG_MONBALS     to BARS_DM;
 grant ALTER,SELECT                                                           on AGG_MONBALS     to DM;
 grant SELECT                                                                 on AGG_MONBALS     to START1;
+grant SELECT                                                                 on AGG_MONBALS     to UPLD;
 
 
 

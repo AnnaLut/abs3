@@ -91,8 +91,10 @@ COMMENT ON COLUMN BARS.TMP_CC_DEAL_PROBL.POG_SN_EQV IS 'Сума погашення процентів
 
 
 PROMPT *** Create  grants  TMP_CC_DEAL_PROBL ***
+grant SELECT                                                                 on TMP_CC_DEAL_PROBL to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CC_DEAL_PROBL to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CC_DEAL_PROBL to RCC_DEAL;
+grant SELECT                                                                 on TMP_CC_DEAL_PROBL to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_CC_DEAL_PROBL to WR_ALL_RIGHTS;
 
 

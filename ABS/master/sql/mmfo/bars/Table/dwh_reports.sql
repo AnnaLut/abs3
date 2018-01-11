@@ -88,19 +88,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DWHREPORTS_DWHREPORTSTYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DWH_REPORTS ADD CONSTRAINT FK_DWHREPORTS_DWHREPORTSTYPE FOREIGN KEY (TYPEID)
-	  REFERENCES BARS.DWH_REPORT_TYPE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_DWHREPORTS_ID ***
 begin   
  execute immediate '
@@ -129,7 +116,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DWH_REPORTS ***
+grant SELECT                                                                 on DWH_REPORTS     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DWH_REPORTS     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on DWH_REPORTS     to UPLD;
 
 
 

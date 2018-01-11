@@ -51,8 +51,10 @@ COMMENT ON COLUMN BARS.TMP_SSP_TRANS.RECV_FLAG IS '';
 
 
 PROMPT *** Create  grants  TMP_SSP_TRANS ***
+grant SELECT                                                                 on TMP_SSP_TRANS   to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on TMP_SSP_TRANS   to BARS_ACCESS_DEFROLE;
 grant INSERT,SELECT                                                          on TMP_SSP_TRANS   to TOSS;
+grant SELECT                                                                 on TMP_SSP_TRANS   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_SSP_TRANS   to WR_ALL_RIGHTS;
 
 

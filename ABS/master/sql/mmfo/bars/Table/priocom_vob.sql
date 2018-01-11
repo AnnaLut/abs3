@@ -65,19 +65,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_PRIOCOM_VOB_VOB ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PRIOCOM_VOB ADD CONSTRAINT FK_PRIOCOM_VOB_VOB FOREIGN KEY (BARS_VOB_CODE)
-	  REFERENCES BARS.VOB (VOB) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_PRIOCOM_VOB_NAME ***
 begin   
  execute immediate '
@@ -116,9 +103,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRIOCOM_VOB ***
+grant SELECT                                                                 on PRIOCOM_VOB     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PRIOCOM_VOB     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRIOCOM_VOB     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PRIOCOM_VOB     to PRIOCOM_VOB;
+grant SELECT                                                                 on PRIOCOM_VOB     to UPLD;
 grant FLASHBACK,SELECT                                                       on PRIOCOM_VOB     to WR_REFREAD;
 
 

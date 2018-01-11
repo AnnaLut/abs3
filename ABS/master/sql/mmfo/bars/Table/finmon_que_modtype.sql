@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FINMON_QUE_MODTYPE ***
+grant SELECT                                                                 on FINMON_QUE_MODTYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on FINMON_QUE_MODTYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FINMON_QUE_MODTYPE to BARS_DM;
 grant SELECT                                                                 on FINMON_QUE_MODTYPE to FINMON01;
+grant SELECT                                                                 on FINMON_QUE_MODTYPE to UPLD;
 
 
 

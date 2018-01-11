@@ -47,9 +47,11 @@ COMMENT ON COLUMN BARS.NBS_KRD_POGP.NBS IS '';
 
 
 PROMPT *** Create  grants  NBS_KRD_POGP ***
+grant SELECT                                                                 on NBS_KRD_POGP    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBS_KRD_POGP    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBS_KRD_POGP    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBS_KRD_POGP    to SALGL;
+grant SELECT                                                                 on NBS_KRD_POGP    to UPLD;
 grant FLASHBACK,SELECT                                                       on NBS_KRD_POGP    to WR_REFREAD;
 
 

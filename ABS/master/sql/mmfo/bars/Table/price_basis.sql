@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRICE_BASIS ***
+grant SELECT                                                                 on PRICE_BASIS     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PRICE_BASIS     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PRICE_BASIS     to PRICE_BAS;
+grant SELECT                                                                 on PRICE_BASIS     to UPLD;
 grant FLASHBACK,SELECT                                                       on PRICE_BASIS     to WR_REFREAD;
 
 

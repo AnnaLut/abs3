@@ -71,19 +71,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CP_DT_RNK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CP_DT ADD CONSTRAINT FK_CP_DT_RNK FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C009667 ***
 begin   
  execute immediate '
@@ -122,9 +109,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_DT ***
+grant SELECT                                                                 on CP_DT           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_DT           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_DT           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_DT           to START1;
+grant SELECT                                                                 on CP_DT           to UPLD;
 
 
 

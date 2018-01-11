@@ -13,7 +13,7 @@ BEGIN
           'begin  
                bpa.alter_policy_info(''FIN_OBU_SCORING'', ''CENTER'' , null, ''E'', ''E'', ''E'');
                bpa.alter_policy_info(''FIN_OBU_SCORING'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''FIN_OBU_SCORING'', ''WHOLE''  , null, null, null, null);
+               bpa.alter_policy_info(''FIN_OBU_SCORING'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
           '; 
@@ -59,48 +59,6 @@ COMMENT ON COLUMN BARS.FIN_OBU_SCORING.MAX_VAL IS 'Макс. значение отрезка';
 COMMENT ON COLUMN BARS.FIN_OBU_SCORING.MAX_SIGN IS 'Знак макс. значения отрезка';
 COMMENT ON COLUMN BARS.FIN_OBU_SCORING.SCORE IS 'Баллы';
 COMMENT ON COLUMN BARS.FIN_OBU_SCORING.KF IS '';
-
-
-
-
-PROMPT *** Create  constraint PK_FINOBUSCORING ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FIN_OBU_SCORING ADD CONSTRAINT PK_FINOBUSCORING PRIMARY KEY (ID, KOD, ORD)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-begin 
-  execute immediate 
-    ' ALTER TABLE BARS.FIN_OBU_SCORING DROP CONSTRAINT PK_FINOBUSCORING';
-exception when others then 
-  if sqlcode=-2443 then null; else raise; end if;
-end;
-/
-
-begin 
-  execute immediate 
-    'DROP INDEX BARS.PK_FINOBUSCORING';
-exception when others then 
-  if sqlcode=-1418 then null; else raise; end if;
-end;
-/
-
-
-PROMPT *** Create  constraint FK_FINOBUSCORING_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FIN_OBU_SCORING ADD CONSTRAINT FK_FINOBUSCORING_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
 
 
 
@@ -191,8 +149,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_OBU_SCORING ***
+grant SELECT                                                                 on FIN_OBU_SCORING to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_OBU_SCORING to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_OBU_SCORING to BARS_DM;
+grant SELECT                                                                 on FIN_OBU_SCORING to UPLD;
 
 
 

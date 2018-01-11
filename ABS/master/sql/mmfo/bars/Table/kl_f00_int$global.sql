@@ -126,8 +126,10 @@ exception when others then
 
 PROMPT *** Create  grants  KL_F00_INT$GLOBAL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F00_INT$GLOBAL to ABS_ADMIN;
+grant SELECT                                                                 on KL_F00_INT$GLOBAL to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F00_INT$GLOBAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_F00_INT$GLOBAL to BARS_DM;
+grant SELECT                                                                 on KL_F00_INT$GLOBAL to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F00_INT$GLOBAL to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KL_F00_INT$GLOBAL to WR_REFREAD;
 

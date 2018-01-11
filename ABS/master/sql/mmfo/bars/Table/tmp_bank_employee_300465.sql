@@ -63,6 +63,10 @@ COMMENT ON COLUMN BARS.TMP_BANK_EMPLOYEE_300465.PENSIONER IS '';
 
 
 
+PROMPT *** Create  grants  TMP_BANK_EMPLOYEE_300465 ***
+grant SELECT                                                                 on TMP_BANK_EMPLOYEE_300465 to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_BANK_EMPLOYEE_300465 to UPLD;
+
 
 
 PROMPT ===================================================================================== 

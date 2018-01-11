@@ -65,9 +65,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CONTRTYPE ***
+grant SELECT                                                                 on CONTRTYPE       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CONTRTYPE       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CONTRTYPE       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CONTRTYPE       to CONTRTYPE;
+grant SELECT                                                                 on CONTRTYPE       to UPLD;
 grant FLASHBACK,SELECT                                                       on CONTRTYPE       to WR_REFREAD;
 
 

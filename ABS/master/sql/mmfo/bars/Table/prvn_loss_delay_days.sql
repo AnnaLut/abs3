@@ -101,7 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  PRVN_LOSS_DELAY_DAYS ***
+grant SELECT                                                                 on PRVN_LOSS_DELAY_DAYS to BARSREADER_ROLE;
 grant SELECT                                                                 on PRVN_LOSS_DELAY_DAYS to BARS_DM;
+grant SELECT                                                                 on PRVN_LOSS_DELAY_DAYS to UPLD;
 
 
 

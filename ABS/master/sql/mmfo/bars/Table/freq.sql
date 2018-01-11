@@ -119,6 +119,7 @@ exception when others then
 PROMPT *** Create  grants  FREQ ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on FREQ            to ABS_ADMIN;
 grant SELECT                                                                 on FREQ            to BARS010;
+grant SELECT                                                                 on FREQ            to BARSREADER_ROLE;
 grant SELECT                                                                 on FREQ            to BARSUPL;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on FREQ            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FREQ            to BARS_DM;
@@ -126,6 +127,7 @@ grant SELECT                                                                 on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on FREQ            to FREQ;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on FREQ            to RCC_DEAL;
 grant SELECT                                                                 on FREQ            to START1;
+grant SELECT                                                                 on FREQ            to UPLD;
 grant SELECT                                                                 on FREQ            to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FREQ            to WR_ALL_RIGHTS;
 grant SELECT                                                                 on FREQ            to WR_CREDIT;

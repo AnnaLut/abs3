@@ -146,10 +146,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TSEL015_DIG ***
+PROMPT *** Create  constraint CC_TSEL015_TT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TSEL015 MODIFY (DIG CONSTRAINT CC_TSEL015_DIG NOT NULL ENABLE)';
+  ALTER TABLE BARS.TSEL015 MODIFY (TT CONSTRAINT CC_TSEL015_TT NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -206,10 +206,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TSEL015_TT ***
+PROMPT *** Create  constraint CC_TSEL015_DIG ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TSEL015 MODIFY (TT CONSTRAINT CC_TSEL015_TT NOT NULL ENABLE)';
+  ALTER TABLE BARS.TSEL015 MODIFY (DIG CONSTRAINT CC_TSEL015_DIG NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -218,8 +218,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TSEL015 ***
+grant SELECT                                                                 on TSEL015         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TSEL015         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TSEL015         to START1;
+grant SELECT                                                                 on TSEL015         to UPLD;
 
 
 

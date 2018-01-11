@@ -129,12 +129,14 @@ exception when others then
 PROMPT *** Create  grants  GROUPS_ACC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on GROUPS_ACC      to ABS_ADMIN;
 grant SELECT                                                                 on GROUPS_ACC      to BARSAQ;
+grant SELECT                                                                 on GROUPS_ACC      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on GROUPS_ACC      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GROUPS_ACC      to BARS_DM;
 grant SELECT                                                                 on GROUPS_ACC      to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GROUPS_ACC      to DOSTUP;
 grant SELECT                                                                 on GROUPS_ACC      to KLBX;
 grant SELECT                                                                 on GROUPS_ACC      to START1;
+grant SELECT                                                                 on GROUPS_ACC      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on GROUPS_ACC      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on GROUPS_ACC      to WR_REFREAD;
 grant SELECT                                                                 on GROUPS_ACC      to WR_VIEWACC;

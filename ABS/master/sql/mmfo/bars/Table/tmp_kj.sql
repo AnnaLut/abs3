@@ -63,9 +63,11 @@ COMMENT ON COLUMN BARS.TMP_KJ.TT IS '';
 
 
 PROMPT *** Create  grants  TMP_KJ ***
+grant SELECT                                                                 on TMP_KJ          to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_KJ          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_KJ          to BARS_DM;
 grant SELECT                                                                 on TMP_KJ          to RPBN001;
+grant SELECT                                                                 on TMP_KJ          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_KJ          to WR_ALL_RIGHTS;
 
 

@@ -90,9 +90,11 @@ exception when others then
 
 PROMPT *** Create  grants  XML2_BM ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on XML2_BM         to ABS_ADMIN;
+grant SELECT                                                                 on XML2_BM         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML2_BM         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on XML2_BM         to BARS_DM;
 grant DELETE,SELECT,UPDATE                                                   on XML2_BM         to PYOD001;
+grant SELECT                                                                 on XML2_BM         to UPLD;
 grant FLASHBACK,SELECT                                                       on XML2_BM         to WR_REFREAD;
 
 

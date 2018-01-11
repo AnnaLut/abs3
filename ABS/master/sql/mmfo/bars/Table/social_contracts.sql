@@ -95,62 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SOCIALCONTR_BRANCH ***
+PROMPT *** Create  constraint CC_SOCIALCONTR_TYPEID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SOCIAL_CONTRACTS ADD CONSTRAINT FK_SOCIALCONTR_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SOCIALCONTR_CUSTOMER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_CONTRACTS ADD CONSTRAINT FK_SOCIALCONTR_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SOCIALCONTR_SOCIALDPTTYPES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_CONTRACTS ADD CONSTRAINT FK_SOCIALCONTR_SOCIALDPTTYPES FOREIGN KEY (TYPE_ID)
-	  REFERENCES BARS.SOCIAL_DPT_TYPES (TYPE_ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SOCIALCONTR_SOCIALAGENCY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_CONTRACTS ADD CONSTRAINT FK_SOCIALCONTR_SOCIALAGENCY FOREIGN KEY (AGENCY_ID)
-	  REFERENCES BARS.SOCIAL_AGENCY (AGENCY_ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SOCIALCONTR_CONTRDAT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_CONTRACTS MODIFY (CONTRACT_DATE CONSTRAINT CC_SOCIALCONTR_CONTRDAT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SOCIAL_CONTRACTS MODIFY (TYPE_ID CONSTRAINT CC_SOCIALCONTR_TYPEID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -219,10 +167,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SOCIALCONTR_TYPEID_NN ***
+PROMPT *** Create  constraint CC_SOCIALCONTR_CONTRDAT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SOCIAL_CONTRACTS MODIFY (TYPE_ID CONSTRAINT CC_SOCIALCONTR_TYPEID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SOCIAL_CONTRACTS MODIFY (CONTRACT_DATE CONSTRAINT CC_SOCIALCONTR_CONTRDAT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -315,11 +263,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  SOCIAL_CONTRACTS ***
+grant SELECT                                                                 on SOCIAL_CONTRACTS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SOCIAL_CONTRACTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SOCIAL_CONTRACTS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SOCIAL_CONTRACTS to DPT_ROLE;
 grant SELECT                                                                 on SOCIAL_CONTRACTS to KLBX;
 grant SELECT                                                                 on SOCIAL_CONTRACTS to START1;
+grant SELECT                                                                 on SOCIAL_CONTRACTS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SOCIAL_CONTRACTS to WR_ALL_RIGHTS;
 
 

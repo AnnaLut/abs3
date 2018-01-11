@@ -75,6 +75,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  ND_ACC_OLD ***
+grant SELECT                                                                 on ND_ACC_OLD      to BARSREADER_ROLE;
+grant SELECT                                                                 on ND_ACC_OLD      to UPLD;
+
 
 
 PROMPT ===================================================================================== 

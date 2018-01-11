@@ -101,7 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  NOTARY_TRANSACTION_TYPES ***
+grant SELECT                                                                 on NOTARY_TRANSACTION_TYPES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NOTARY_TRANSACTION_TYPES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on NOTARY_TRANSACTION_TYPES to UPLD;
 
 
 

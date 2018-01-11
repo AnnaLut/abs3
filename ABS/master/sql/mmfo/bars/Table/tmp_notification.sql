@@ -75,6 +75,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  TMP_NOTIFICATION ***
+grant SELECT                                                                 on TMP_NOTIFICATION to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_NOTIFICATION to UPLD;
+
 
 
 PROMPT ===================================================================================== 

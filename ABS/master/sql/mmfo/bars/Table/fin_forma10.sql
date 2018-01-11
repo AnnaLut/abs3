@@ -81,10 +81,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_FORMA10 ***
+grant SELECT                                                                 on FIN_FORMA10     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_FORMA10     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_FORMA10     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_FORMA10     to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_FORMA10     to R_FIN2;
+grant SELECT                                                                 on FIN_FORMA10     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_FORMA10     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on FIN_FORMA10     to WR_REFREAD;
 

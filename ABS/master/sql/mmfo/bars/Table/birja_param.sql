@@ -62,10 +62,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BIRJA_COMM_NOT_NULL ***
+PROMPT *** Create  constraint CC_BIRJA_PAR_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BIRJA_PARAM MODIFY (COMM CONSTRAINT CC_BIRJA_COMM_NOT_NULL NOT NULL ENABLE)';
+  ALTER TABLE BARS.BIRJA_PARAM MODIFY (PAR CONSTRAINT CC_BIRJA_PAR_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -74,10 +74,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BIRJA_PAR_NN ***
+PROMPT *** Create  constraint CC_BIRJA_COMM_NOT_NULL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BIRJA_PARAM MODIFY (PAR CONSTRAINT CC_BIRJA_PAR_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BIRJA_PARAM MODIFY (COMM CONSTRAINT CC_BIRJA_COMM_NOT_NULL NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -101,9 +101,11 @@ exception when others then
 
 PROMPT *** Create  grants  BIRJA_PARAM ***
 grant FLASHBACK,REFERENCES,SELECT                                            on BIRJA_PARAM     to BARSAQ with grant option;
+grant SELECT                                                                 on BIRJA_PARAM     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BIRJA_PARAM     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BIRJA_PARAM     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BIRJA_PARAM     to F_500;
+grant SELECT                                                                 on BIRJA_PARAM     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BIRJA_PARAM     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BIRJA_PARAM     to WR_REFREAD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BIRJA_PARAM     to ZAY;

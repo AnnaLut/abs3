@@ -83,32 +83,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ALTBPK_USERID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ALT_BPK ADD CONSTRAINT FK_ALTBPK_USERID FOREIGN KEY (USERID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ALTBPK_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ALT_BPK ADD CONSTRAINT FK_ALTBPK_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_ALTBPK_KF_NN ***
 begin   
  execute immediate '
@@ -125,19 +99,6 @@ PROMPT *** Create  constraint CC_ALTBPK_ID_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.ALT_BPK MODIFY (ID CONSTRAINT CC_ALTBPK_ID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ALTBPK_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ALT_BPK ADD CONSTRAINT FK_ALTBPK_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -174,9 +135,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ALT_BPK ***
+grant SELECT                                                                 on ALT_BPK         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ALT_BPK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ALT_BPK         to BARS_DM;
 grant SELECT                                                                 on ALT_BPK         to START1;
+grant SELECT                                                                 on ALT_BPK         to UPLD;
 
 
 

@@ -51,19 +51,6 @@ COMMENT ON COLUMN BARS.XAR.PAP IS '¿/œ/¿œ';
 
 
 
-PROMPT *** Create  constraint FK_XAR_PAP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XAR ADD CONSTRAINT FK_XAR_PAP FOREIGN KEY (PAP)
-	  REFERENCES BARS.PAP (PAP) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_XAR_XAR_NN ***
 begin   
  execute immediate '
@@ -129,10 +116,12 @@ exception when others then
 
 PROMPT *** Create  grants  XAR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on XAR             to ABS_ADMIN;
+grant SELECT                                                                 on XAR             to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XAR             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on XAR             to BARS_DM;
 grant SELECT                                                                 on XAR             to CUST001;
 grant SELECT                                                                 on XAR             to START1;
+grant SELECT                                                                 on XAR             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XAR             to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on XAR             to WR_REFREAD;
 grant SELECT                                                                 on XAR             to WR_VIEWACC;

@@ -158,12 +158,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint XPK_TMP_AN_KL ***
+PROMPT *** Create  constraint SYS_C0048957 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_AN_KL ADD CONSTRAINT XPK_TMP_AN_KL PRIMARY KEY (KF, RNK, NLS)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.TMP_AN_KL MODIFY (NLS NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -172,10 +170,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0048957 ***
+PROMPT *** Create  constraint XPK_TMP_AN_KL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_AN_KL MODIFY (NLS NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_AN_KL ADD CONSTRAINT XPK_TMP_AN_KL PRIMARY KEY (KF, RNK, NLS)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -199,7 +199,9 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_AN_KL ***
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TMP_AN_KL       to AN_KL;
+grant SELECT                                                                 on TMP_AN_KL       to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on TMP_AN_KL       to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on TMP_AN_KL       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_AN_KL       to WR_ALL_RIGHTS;
 
 

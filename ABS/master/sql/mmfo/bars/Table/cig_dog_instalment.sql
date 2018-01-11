@@ -79,34 +79,12 @@ COMMENT ON COLUMN BARS.CIG_DOG_INSTALMENT.OVERDUE_DAY_CNT IS '';
 
 
 
-PROMPT *** Create  constraint CC_CIGDOGINST_BODYCURR_NN ***
+PROMPT *** Create  constraint PK_CIGDOGINSTLMNT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_INSTALMENT MODIFY (BODY_CURR_ID CONSTRAINT CC_CIGDOGINST_BODYCURR_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CIGDOGINST_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIG_DOG_INSTALMENT MODIFY (BRANCH CONSTRAINT CC_CIGDOGINST_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CIGDOGINST_DOGID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIG_DOG_INSTALMENT MODIFY (DOG_ID CONSTRAINT CC_CIGDOGINST_DOGID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CIG_DOG_INSTALMENT ADD CONSTRAINT PK_CIGDOGINSTLMNT PRIMARY KEY (ID, BRANCH)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -127,11 +105,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CIGDOGINST_CIGDOGGENERAL ***
+PROMPT *** Create  constraint CC_CIGDOGINST_DOGID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_INSTALMENT ADD CONSTRAINT FK_CIGDOGINST_CIGDOGGENERAL FOREIGN KEY (DOG_ID, BRANCH)
-	  REFERENCES BARS.CIG_DOG_GENERAL (ID, BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CIG_DOG_INSTALMENT MODIFY (DOG_ID CONSTRAINT CC_CIGDOGINST_DOGID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -140,12 +117,22 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_CIGDOGINSTLMNT ***
+PROMPT *** Create  constraint CC_CIGDOGINST_BODYSUM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_INSTALMENT ADD CONSTRAINT PK_CIGDOGINSTLMNT PRIMARY KEY (ID, BRANCH)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.CIG_DOG_INSTALMENT MODIFY (BODY_SUM CONSTRAINT CC_CIGDOGINST_BODYSUM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CIGDOGINST_BODYCURR_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIG_DOG_INSTALMENT MODIFY (BODY_CURR_ID CONSTRAINT CC_CIGDOGINST_BODYCURR_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -274,10 +261,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIGDOGINST_BODYSUM_NN ***
+PROMPT *** Create  constraint CC_CIGDOGINST_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_DOG_INSTALMENT MODIFY (BODY_SUM CONSTRAINT CC_CIGDOGINST_BODYSUM_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CIG_DOG_INSTALMENT MODIFY (BRANCH CONSTRAINT CC_CIGDOGINST_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -328,9 +315,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_DOG_INSTALMENT ***
+grant SELECT                                                                 on CIG_DOG_INSTALMENT to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on CIG_DOG_INSTALMENT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_DOG_INSTALMENT to BARS_DM;
 grant SELECT,UPDATE                                                          on CIG_DOG_INSTALMENT to CIG_ROLE;
+grant SELECT                                                                 on CIG_DOG_INSTALMENT to UPLD;
 
 
 

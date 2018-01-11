@@ -69,7 +69,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_SGI ***
+grant SELECT                                                                 on TMP_SGI         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SGI         to START1;
+grant SELECT                                                                 on TMP_SGI         to UPLD;
 
 
 

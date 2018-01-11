@@ -102,10 +102,12 @@ exception when others then
 
 PROMPT *** Create  grants  VIDS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on VIDS            to ABS_ADMIN;
+grant SELECT                                                                 on VIDS            to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VIDS            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VIDS            to BARS_DM;
 grant SELECT                                                                 on VIDS            to CUST001;
 grant SELECT                                                                 on VIDS            to START1;
+grant SELECT                                                                 on VIDS            to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VIDS            to VIDS;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VIDS            to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on VIDS            to WR_REFREAD;

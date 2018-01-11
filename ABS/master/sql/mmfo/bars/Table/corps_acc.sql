@@ -91,35 +91,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CORPSACC_TABVAL ***
+PROMPT *** Create  constraint CC_CORPSACC_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CORPS_ACC ADD CONSTRAINT FK_CORPSACC_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CORPSACC_NLS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CORPS_ACC MODIFY (NLS CONSTRAINT CC_CORPSACC_NLS_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CORPSACC_MFO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CORPS_ACC MODIFY (MFO CONSTRAINT CC_CORPSACC_MFO_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CORPS_ACC MODIFY (ID CONSTRAINT CC_CORPSACC_ID_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -140,10 +115,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CORPSACC_ID_NN ***
+PROMPT *** Create  constraint CC_CORPSACC_MFO_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CORPS_ACC MODIFY (ID CONSTRAINT CC_CORPSACC_ID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CORPS_ACC MODIFY (MFO CONSTRAINT CC_CORPSACC_MFO_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -152,24 +127,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CORPSACC_CORPS ***
+PROMPT *** Create  constraint CC_CORPSACC_NLS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CORPS_ACC ADD CONSTRAINT FK_CORPSACC_CORPS FOREIGN KEY (RNK)
-	  REFERENCES BARS.CORPS (RNK) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CORPSACC_BANKS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CORPS_ACC ADD CONSTRAINT FK_CORPSACC_BANKS2 FOREIGN KEY (MFO)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CORPS_ACC MODIFY (NLS CONSTRAINT CC_CORPSACC_NLS_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -192,9 +153,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CORPS_ACC ***
+grant SELECT                                                                 on CORPS_ACC       to BARSREADER_ROLE;
 grant DELETE,SELECT,UPDATE                                                   on CORPS_ACC       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CORPS_ACC       to BARS_DM;
 grant DELETE,SELECT,UPDATE                                                   on CORPS_ACC       to CUST001;
+grant SELECT                                                                 on CORPS_ACC       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CORPS_ACC       to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CORPS_ACC       to WR_CUSTREG;
 grant SELECT                                                                 on CORPS_ACC       to WR_DEPOSIT_U;

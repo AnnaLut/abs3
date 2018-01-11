@@ -87,6 +87,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  INS_DEAL_STATUSES ***
+grant SELECT                                                                 on INS_DEAL_STATUSES to BARSREADER_ROLE;
+grant SELECT                                                                 on INS_DEAL_STATUSES to UPLD;
+
 
 
 PROMPT ===================================================================================== 

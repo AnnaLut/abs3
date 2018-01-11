@@ -76,19 +76,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_EWADOCTYPE_DOCTYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_EWA_DOCUMENT_TYPES ADD CONSTRAINT FK_EWADOCTYPE_DOCTYPE FOREIGN KEY (EXT_ID)
-	  REFERENCES BARS.PASSP (PASSP) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index SYS_C0033463 ***
 begin   
  execute immediate '
@@ -103,7 +90,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  INS_EWA_DOCUMENT_TYPES ***
+grant SELECT                                                                 on INS_EWA_DOCUMENT_TYPES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INS_EWA_DOCUMENT_TYPES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on INS_EWA_DOCUMENT_TYPES to UPLD;
 
 
 

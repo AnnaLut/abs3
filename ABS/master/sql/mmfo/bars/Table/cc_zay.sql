@@ -93,58 +93,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CC_ZAY_KLA ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ZAY ADD CONSTRAINT FK_CC_ZAY_KLA FOREIGN KEY (KLA)
-	  REFERENCES BARS.CC_KLA (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CC_ZAY_KV ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ZAY ADD CONSTRAINT FK_CC_ZAY_KV FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CC_ZAY_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ZAY ADD CONSTRAINT FK_CC_ZAY_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CCZAY_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ZAY ADD CONSTRAINT FK_CCZAY_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_CC_ZAY_ID ***
 begin   
  execute immediate '
@@ -169,10 +117,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CCZAY_KF_NN ***
+PROMPT *** Create  constraint CC_CC_ZAY_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_ZAY MODIFY (KF CONSTRAINT CC_CCZAY_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_ZAY MODIFY (BRANCH CONSTRAINT CC_CC_ZAY_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -181,10 +129,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CC_ZAY_BRANCH_NN ***
+PROMPT *** Create  constraint CC_CCZAY_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_ZAY MODIFY (BRANCH CONSTRAINT CC_CC_ZAY_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_ZAY MODIFY (KF CONSTRAINT CC_CCZAY_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -207,9 +155,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_ZAY ***
+grant SELECT                                                                 on CC_ZAY          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_ZAY          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_ZAY          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_ZAY          to RCC_DEAL;
+grant SELECT                                                                 on CC_ZAY          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_ZAY          to WR_ALL_RIGHTS;
 
 

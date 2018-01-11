@@ -110,12 +110,14 @@ COMMENT ON COLUMN BARS.TMP_ACCOUNTS_UPDATE_O.SEND_SMS IS 'Признак відправки СМС 
 
 
 PROMPT *** Create  grants  TMP_ACCOUNTS_UPDATE_O ***
+grant SELECT                                                                 on TMP_ACCOUNTS_UPDATE_O to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_ACCOUNTS_UPDATE_O to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_ACCOUNTS_UPDATE_O to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_ACCOUNTS_UPDATE_O to BARS_DM;
 grant DELETE,INSERT,UPDATE                                                   on TMP_ACCOUNTS_UPDATE_O to CUST001;
 grant SELECT                                                                 on TMP_ACCOUNTS_UPDATE_O to KLBX;
 grant SELECT                                                                 on TMP_ACCOUNTS_UPDATE_O to START1;
+grant SELECT                                                                 on TMP_ACCOUNTS_UPDATE_O to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_ACCOUNTS_UPDATE_O to WR_ALL_RIGHTS;
 
 

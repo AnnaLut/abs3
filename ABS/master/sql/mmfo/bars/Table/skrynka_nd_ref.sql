@@ -83,45 +83,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SKRYNKANDREF_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ND_REF ADD CONSTRAINT FK_SKRYNKANDREF_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SKRYNKANDREF_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ND_REF ADD CONSTRAINT FK_SKRYNKANDREF_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SKRYNKANDREF_SKRYNKAND ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_ND_REF ADD CONSTRAINT FK_SKRYNKANDREF_SKRYNKAND FOREIGN KEY (KF, ND)
-	  REFERENCES BARS.SKRYNKA_ND (KF, ND) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SKRYNKANDREF_BRANCH_NN ***
 begin   
  execute immediate '
@@ -160,9 +121,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_ND_REF ***
+grant SELECT                                                                 on SKRYNKA_ND_REF  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SKRYNKA_ND_REF  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SKRYNKA_ND_REF  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SKRYNKA_ND_REF  to DEP_SKRN;
+grant SELECT                                                                 on SKRYNKA_ND_REF  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_ND_REF  to WR_ALL_RIGHTS;
 
 

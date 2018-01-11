@@ -76,10 +76,12 @@ COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.REF IS 'Референс повідомлення в центрі ві
 
 
 
-PROMPT *** Create  constraint CC_MSGSUBMIT_STATUS_CC ***
+PROMPT *** Create  constraint PK_MSGSUBMIT1 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.MSG_SUBMIT_DATA ADD CONSTRAINT CC_MSGSUBMIT_STATUS_CC CHECK (status in (''NEW'',''SUBMITTED'',''REJECTED'',''EXPIRED'',''ERROR'', ''INVREQ'', ''ACCEPT'', ''INVSRC'', ''INVDST'', ''INVMSG'', ''DELIVERED'', ''EXPIRED'', ''UNDELIV'')) ENABLE';
+  ALTER TABLE BARS.MSG_SUBMIT_DATA ADD CONSTRAINT PK_MSGSUBMIT1 PRIMARY KEY (MSG_ID, KF)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -88,12 +90,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_MSGSUBMIT1 ***
+PROMPT *** Create  constraint CC_MSGSUBMIT_STATUS_CC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.MSG_SUBMIT_DATA ADD CONSTRAINT PK_MSGSUBMIT1 PRIMARY KEY (MSG_ID, KF)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.MSG_SUBMIT_DATA ADD CONSTRAINT CC_MSGSUBMIT_STATUS_CC CHECK (status in (''NEW'',''SUBMITTED'',''REJECTED'',''EXPIRED'',''ERROR'', ''INVREQ'', ''ACCEPT'', ''INVSRC'', ''INVDST'', ''INVMSG'', ''DELIVERED'', ''EXPIRED'', ''UNDELIV'')) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -126,10 +126,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_MSGSUBMIT_STATUSTIME_NN ***
+PROMPT *** Create  constraint CC_MSGSUBMIT_EXPTIME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.MSG_SUBMIT_DATA MODIFY (STATUS_TIME CONSTRAINT CC_MSGSUBMIT_STATUSTIME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.MSG_SUBMIT_DATA MODIFY (EXPIRATION_TIME CONSTRAINT CC_MSGSUBMIT_EXPTIME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -186,10 +186,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_MSGSUBMIT_EXPTIME_NN ***
+PROMPT *** Create  constraint CC_MSGSUBMIT_STATUSTIME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.MSG_SUBMIT_DATA MODIFY (EXPIRATION_TIME CONSTRAINT CC_MSGSUBMIT_EXPTIME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.MSG_SUBMIT_DATA MODIFY (STATUS_TIME CONSTRAINT CC_MSGSUBMIT_STATUSTIME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -268,8 +268,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  MSG_SUBMIT_DATA ***
+grant SELECT                                                                 on MSG_SUBMIT_DATA to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MSG_SUBMIT_DATA to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MSG_SUBMIT_DATA to START1;
+grant SELECT                                                                 on MSG_SUBMIT_DATA to UPLD;
 
 
 

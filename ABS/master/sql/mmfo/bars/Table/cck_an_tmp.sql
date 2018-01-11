@@ -109,11 +109,13 @@ COMMENT ON COLUMN BARS.CCK_AN_TMP.AIM IS '';
 
 PROMPT *** Create  grants  CCK_AN_TMP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_AN_TMP      to AN_KL;
+grant SELECT                                                                 on CCK_AN_TMP      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_AN_TMP      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_AN_TMP      to BARS_DM;
 grant DELETE,INSERT                                                          on CCK_AN_TMP      to PYOD001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_AN_TMP      to RCC_DEAL;
 grant SELECT                                                                 on CCK_AN_TMP      to SALGL;
+grant SELECT                                                                 on CCK_AN_TMP      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_AN_TMP      to WR_ALL_RIGHTS;
 
 

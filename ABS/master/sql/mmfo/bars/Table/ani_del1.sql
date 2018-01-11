@@ -69,9 +69,11 @@ COMMENT ON COLUMN BARS.ANI_DEL1.NAZN IS '';
 
 
 PROMPT *** Create  grants  ANI_DEL1 ***
+grant SELECT                                                                 on ANI_DEL1        to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on ANI_DEL1        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANI_DEL1        to BARS_DM;
 grant SELECT,UPDATE                                                          on ANI_DEL1        to START1;
+grant SELECT                                                                 on ANI_DEL1        to UPLD;
 
 
 

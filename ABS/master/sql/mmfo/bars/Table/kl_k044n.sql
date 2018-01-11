@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  KL_K044N ***
+grant SELECT                                                                 on KL_K044N        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_K044N        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_K044N        to RPBN002;
 grant SELECT                                                                 on KL_K044N        to START1;
+grant SELECT                                                                 on KL_K044N        to UPLD;
 
 
 

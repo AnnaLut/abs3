@@ -51,8 +51,10 @@ COMMENT ON COLUMN BARS.PATCHES.APPLY_DATE IS '';
 
 
 PROMPT *** Create  grants  PATCHES ***
+grant SELECT                                                                 on PATCHES         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PATCHES         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PATCHES         to START1;
+grant SELECT                                                                 on PATCHES         to UPLD;
 
 
 

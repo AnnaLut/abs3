@@ -103,9 +103,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_HIERARCHY_HIST ***
+grant SELECT                                                                 on CP_HIERARCHY_HIST to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_HIERARCHY_HIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_HIERARCHY_HIST to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_HIERARCHY_HIST to CP_ROLE;
+grant SELECT                                                                 on CP_HIERARCHY_HIST to UPLD;
 grant FLASHBACK,SELECT                                                       on CP_HIERARCHY_HIST to WR_REFREAD;
 
 

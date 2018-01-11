@@ -80,10 +80,12 @@ exception when others then
 
 PROMPT *** Create  grants  SPR_B040 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPR_B040        to ABS_ADMIN;
+grant SELECT                                                                 on SPR_B040        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPR_B040        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SPR_B040        to BARS_DM;
 grant SELECT                                                                 on SPR_B040        to RPBN002;
 grant SELECT                                                                 on SPR_B040        to START1;
+grant SELECT                                                                 on SPR_B040        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPR_B040        to WR_ALL_RIGHTS;
 
 

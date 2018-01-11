@@ -97,9 +97,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SP_K050 ***
+grant SELECT                                                                 on SP_K050         to BARSREADER_ROLE;
 grant SELECT                                                                 on SP_K050         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SP_K050         to BARS_DM;
 grant SELECT                                                                 on SP_K050         to CUST001;
+grant SELECT                                                                 on SP_K050         to UPLD;
 grant SELECT                                                                 on SP_K050         to WR_CUSTREG;
 
 

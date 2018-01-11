@@ -89,7 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SYNC_STATUSES ***
+grant SELECT                                                                 on WCS_SYNC_STATUSES to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_SYNC_STATUSES to BARS_DM;
+grant SELECT                                                                 on WCS_SYNC_STATUSES to UPLD;
 
 
 

@@ -79,19 +79,6 @@ COMMENT ON COLUMN BARS.OTCN_TRACE_39.TOBO IS '';
 
 
 
-PROMPT *** Create  constraint FK_OTCNTRACE39_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OTCN_TRACE_39 ADD CONSTRAINT FK_OTCNTRACE39_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_OTCNTRACE39_KF_NN ***
 begin   
  execute immediate '
@@ -103,10 +90,26 @@ exception when others then
 
 
 
+
+PROMPT *** Create  index I1_OTCN_TRACE_39 ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I1_OTCN_TRACE_39 ON BARS.OTCN_TRACE_39 (KF, DATF) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  OTCN_TRACE_39 ***
+grant SELECT                                                                 on OTCN_TRACE_39   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_TRACE_39   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_TRACE_39   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_TRACE_39   to RPBN002;
+grant SELECT                                                                 on OTCN_TRACE_39   to UPLD;
 
 
 

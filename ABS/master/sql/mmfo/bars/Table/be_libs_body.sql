@@ -52,19 +52,6 @@ COMMENT ON COLUMN BARS.BE_LIBS_BODY.FILE_BODY IS 'рекн ахакхнрейх (яндепфхлне тю
 
 
 
-PROMPT *** Create  constraint FK_BELIBSBODY_BELIBS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BE_LIBS_BODY ADD CONSTRAINT FK_BELIBSBODY_BELIBS FOREIGN KEY (PATH_NAME)
-	  REFERENCES BARS.BE_LIBS (PATH_NAME) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_BELIBSBODY ***
 begin   
  execute immediate '
@@ -105,7 +92,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BE_LIBS_BODY ***
+grant SELECT                                                                 on BE_LIBS_BODY    to BARSREADER_ROLE;
 grant SELECT                                                                 on BE_LIBS_BODY    to BARS_DM;
+grant SELECT                                                                 on BE_LIBS_BODY    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BE_LIBS_BODY    to WR_ALL_RIGHTS;
 
 

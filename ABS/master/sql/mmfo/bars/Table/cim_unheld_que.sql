@@ -53,9 +53,11 @@ COMMENT ON COLUMN BARS.CIM_UNHELD_QUE.VDAT IS 'Планова дата валютування';
 
 
 PROMPT *** Create  grants  CIM_UNHELD_QUE ***
+grant SELECT                                                                 on CIM_UNHELD_QUE  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_UNHELD_QUE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_UNHELD_QUE  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_UNHELD_QUE  to CIM_ROLE;
+grant SELECT                                                                 on CIM_UNHELD_QUE  to UPLD;
 
 
 

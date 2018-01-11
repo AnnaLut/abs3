@@ -12,8 +12,8 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''ORGANDOK'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''ORGANDOK'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''ORGANDOK'', ''WHOLE'' , null, null, null, null);
+               bpa.alter_policy_info(''ORGANDOK'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''ORGANDOK'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
           '; 
@@ -25,7 +25,8 @@ begin
   execute immediate '
   CREATE TABLE BARS.ORGANDOK 
    (	ID NUMBER(38,0), 
-	NAME VARCHAR2(70)
+	NAME VARCHAR2(70), 
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -43,6 +44,7 @@ PROMPT *** ALTER_POLICIES to ORGANDOK ***
 
 
 COMMENT ON TABLE BARS.ORGANDOK IS 'Органы выдачи документов';
+COMMENT ON COLUMN BARS.ORGANDOK.KF IS '';
 COMMENT ON COLUMN BARS.ORGANDOK.ID IS 'Код';
 COMMENT ON COLUMN BARS.ORGANDOK.NAME IS 'Наименование органа';
 
@@ -102,10 +104,12 @@ exception when others then
 
 PROMPT *** Create  grants  ORGANDOK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ORGANDOK        to ABS_ADMIN;
+grant SELECT                                                                 on ORGANDOK        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ORGANDOK        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ORGANDOK        to BARS_DM;
 grant SELECT                                                                 on ORGANDOK        to CUST001;
 grant SELECT                                                                 on ORGANDOK        to START1;
+grant SELECT                                                                 on ORGANDOK        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ORGANDOK        to WR_ALL_RIGHTS;
 grant SELECT                                                                 on ORGANDOK        to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on ORGANDOK        to WR_REFREAD;

@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''DYN_FILTER'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''DYN_FILTER'', ''FILIAL'' , ''r'', ''E'', ''E'', ''E'');
+               bpa.alter_policy_info(''DYN_FILTER'', ''FILIAL'' , ''P'', ''B'', ''B'', ''B'');
                bpa.alter_policy_info(''DYN_FILTER'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -80,47 +80,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DYNFILTER_METATABLES ***
+PROMPT *** Create  constraint CC_DYNFILTER_WHERECLAUSE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DYN_FILTER ADD CONSTRAINT FK_DYNFILTER_METATABLES FOREIGN KEY (TABID)
-	  REFERENCES BARS.META_TABLES (TABID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DYNFILTER_SEMANTIC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DYN_FILTER MODIFY (SEMANTIC CONSTRAINT CC_DYNFILTER_SEMANTIC_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DYNFILTER_TABID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DYN_FILTER MODIFY (TABID CONSTRAINT CC_DYNFILTER_TABID_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DYNFILTER_FILTERID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DYN_FILTER MODIFY (FILTER_ID CONSTRAINT CC_DYNFILTER_FILTERID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.DYN_FILTER MODIFY (WHERE_CLAUSE CONSTRAINT CC_DYNFILTER_WHERECLAUSE_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -141,10 +104,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DYNFILTER_WHERECLAUSE_NN ***
+PROMPT *** Create  constraint CC_DYNFILTER_FILTERID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DYN_FILTER MODIFY (WHERE_CLAUSE CONSTRAINT CC_DYNFILTER_WHERECLAUSE_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.DYN_FILTER MODIFY (FILTER_ID CONSTRAINT CC_DYNFILTER_FILTERID_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -153,11 +116,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DYNFILTER_BRANCH ***
+PROMPT *** Create  constraint CC_DYNFILTER_TABID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DYN_FILTER ADD CONSTRAINT FK_DYNFILTER_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DYN_FILTER MODIFY (TABID CONSTRAINT CC_DYNFILTER_TABID_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -166,11 +128,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DYNFILTER_STAFF ***
+PROMPT *** Create  constraint CC_DYNFILTER_SEMANTIC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DYN_FILTER ADD CONSTRAINT FK_DYNFILTER_STAFF FOREIGN KEY (USERID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DYN_FILTER MODIFY (SEMANTIC CONSTRAINT CC_DYNFILTER_SEMANTIC_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -208,9 +169,11 @@ exception when others then
 
 PROMPT *** Create  grants  DYN_FILTER ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DYN_FILTER      to ABS_ADMIN;
+grant SELECT                                                                 on DYN_FILTER      to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on DYN_FILTER      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DYN_FILTER      to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on DYN_FILTER      to START1;
+grant SELECT                                                                 on DYN_FILTER      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DYN_FILTER      to WR_ALL_RIGHTS;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DYN_FILTER      to WR_FILTER;
 grant SELECT                                                                 on DYN_FILTER      to WR_TOBO_ACCOUNTS_LIST;

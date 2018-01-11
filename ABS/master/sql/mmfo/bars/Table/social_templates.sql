@@ -65,45 +65,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SOCTEMPLATES_DOCSCHEME ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_TEMPLATES ADD CONSTRAINT FK_SOCTEMPLATES_DOCSCHEME FOREIGN KEY (TEMPLATE_ID)
-	  REFERENCES BARS.DOC_SCHEME (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SOCTEMPLATES_SOCIALDPTTYPES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_TEMPLATES ADD CONSTRAINT FK_SOCTEMPLATES_SOCIALDPTTYPES FOREIGN KEY (TYPE_ID)
-	  REFERENCES BARS.SOCIAL_DPT_TYPES (TYPE_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SOCTEMPLATES_DPTVIDDFLAGS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOCIAL_TEMPLATES ADD CONSTRAINT FK_SOCTEMPLATES_DPTVIDDFLAGS FOREIGN KEY (FLAG_ID)
-	  REFERENCES BARS.DPT_VIDD_FLAGS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SOCTEMPLATES_TYPEID_NN ***
 begin   
  execute immediate '
@@ -116,10 +77,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SOCTEMPLATES_FLAGID_NN ***
+PROMPT *** Create  constraint CC_SOCTEMPLATES_TEMPLATEID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SOCIAL_TEMPLATES MODIFY (FLAG_ID CONSTRAINT CC_SOCTEMPLATES_FLAGID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SOCIAL_TEMPLATES MODIFY (TEMPLATE_ID CONSTRAINT CC_SOCTEMPLATES_TEMPLATEID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -128,10 +89,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SOCTEMPLATES_TEMPLATEID_NN ***
+PROMPT *** Create  constraint CC_SOCTEMPLATES_FLAGID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SOCIAL_TEMPLATES MODIFY (TEMPLATE_ID CONSTRAINT CC_SOCTEMPLATES_TEMPLATEID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SOCIAL_TEMPLATES MODIFY (FLAG_ID CONSTRAINT CC_SOCTEMPLATES_FLAGID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -154,10 +115,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  SOCIAL_TEMPLATES ***
+grant SELECT                                                                 on SOCIAL_TEMPLATES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SOCIAL_TEMPLATES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SOCIAL_TEMPLATES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SOCIAL_TEMPLATES to DPT_ADMIN;
 grant SELECT                                                                 on SOCIAL_TEMPLATES to DPT_ROLE;
+grant SELECT                                                                 on SOCIAL_TEMPLATES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SOCIAL_TEMPLATES to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SOCIAL_TEMPLATES to WR_REFREAD;
 

@@ -61,11 +61,12 @@ COMMENT ON COLUMN BARS.FIN_ND.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_FINND_KF ***
+PROMPT *** Create  constraint XPK_FIN_ND ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FIN_ND ADD CONSTRAINT FK_FINND_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.FIN_ND ADD CONSTRAINT XPK_FIN_ND PRIMARY KEY (RNK, ND, IDF, KOD, KF)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -78,20 +79,6 @@ PROMPT *** Create  constraint CC_FINND_KF_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.FIN_ND MODIFY (KF CONSTRAINT CC_FINND_KF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint XPK_FIN_ND ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FIN_ND ADD CONSTRAINT XPK_FIN_ND PRIMARY KEY (RNK, ND, IDF, KOD, KF)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -114,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_ND ***
+grant SELECT                                                                 on FIN_ND          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_ND          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_ND          to BARS_DM;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_ND          to START1;
+grant SELECT                                                                 on FIN_ND          to UPLD;
 
 
 

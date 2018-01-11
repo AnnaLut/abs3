@@ -57,8 +57,10 @@ COMMENT ON COLUMN BARS.CC_ACCP_ARC.KF IS '';
 
 
 PROMPT *** Create  grants  CC_ACCP_ARC ***
+grant SELECT                                                                 on CC_ACCP_ARC     to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CC_ACCP_ARC     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_ACCP_ARC     to BARS_DM;
+grant SELECT                                                                 on CC_ACCP_ARC     to UPLD;
 
 
 

@@ -106,8 +106,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_EBK_REQ_UPDATECARD ***
+grant SELECT                                                                 on TMP_EBK_REQ_UPDATECARD to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_EBK_REQ_UPDATECARD to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_EBK_REQ_UPDATECARD to BARS_DM;
+grant SELECT                                                                 on TMP_EBK_REQ_UPDATECARD to UPLD;
 
 
 

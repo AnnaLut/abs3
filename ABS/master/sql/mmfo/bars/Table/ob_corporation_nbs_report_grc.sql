@@ -67,12 +67,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_OBCORPREPORTNBSGRC ***
+PROMPT *** Create  constraint SYS_C00110728 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OB_CORPORATION_NBS_REPORT_GRC ADD CONSTRAINT PK_OBCORPREPORTNBSGRC PRIMARY KEY (EXTERNAL_ID, NBS)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.OB_CORPORATION_NBS_REPORT_GRC MODIFY (NBS NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -81,10 +79,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00110728 ***
+PROMPT *** Create  constraint PK_OBCORPREPORTNBSGRC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OB_CORPORATION_NBS_REPORT_GRC MODIFY (NBS NOT NULL ENABLE)';
+  ALTER TABLE BARS.OB_CORPORATION_NBS_REPORT_GRC ADD CONSTRAINT PK_OBCORPREPORTNBSGRC PRIMARY KEY (EXTERNAL_ID, NBS)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -135,7 +135,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OB_CORPORATION_NBS_REPORT_GRC ***
+grant SELECT                                                                 on OB_CORPORATION_NBS_REPORT_GRC to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on OB_CORPORATION_NBS_REPORT_GRC to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on OB_CORPORATION_NBS_REPORT_GRC to UPLD;
 
 
 

@@ -119,6 +119,7 @@ exception when others then
 PROMPT *** Create  grants  ACCOUNTS_FIELD ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCOUNTS_FIELD  to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCOUNTS_FIELD  to ACCOUNTS_FIELD;
+grant SELECT                                                                 on ACCOUNTS_FIELD  to BARSREADER_ROLE;
 grant SELECT                                                                 on ACCOUNTS_FIELD  to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACCOUNTS_FIELD  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCOUNTS_FIELD  to BARS_DM;

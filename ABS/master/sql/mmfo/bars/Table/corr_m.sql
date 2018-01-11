@@ -55,9 +55,11 @@ COMMENT ON COLUMN BARS.CORR_M.BKTRUS33 IS '';
 
 
 PROMPT *** Create  grants  CORR_M ***
+grant SELECT                                                                 on CORR_M          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CORR_M          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CORR_M          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CORR_M          to START1;
+grant SELECT                                                                 on CORR_M          to UPLD;
 
 
 

@@ -95,8 +95,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  ALIEN_SW ***
+grant SELECT                                                                 on ALIEN_SW        to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on ALIEN_SW        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ALIEN_SW        to BARS_DM;
+grant SELECT                                                                 on ALIEN_SW        to UPLD;
 grant FLASHBACK,SELECT                                                       on ALIEN_SW        to WR_REFREAD;
 
 

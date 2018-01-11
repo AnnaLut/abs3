@@ -32,7 +32,7 @@ begin
 	REG_BODY_COUNT NUMBER, 
 	ERR_TEXT VARCHAR2(4000), 
 	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
-   ) SEGMENT CREATION DEFERRED 
+   ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSDYND 
@@ -105,7 +105,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ESCR_REG_XML_FILES ***
+grant SELECT                                                                 on ESCR_REG_XML_FILES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ESCR_REG_XML_FILES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on ESCR_REG_XML_FILES to UPLD;
 
 
 

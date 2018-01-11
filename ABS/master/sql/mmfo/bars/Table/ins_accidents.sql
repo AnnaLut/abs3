@@ -64,19 +64,6 @@ COMMENT ON COLUMN BARS.INS_ACCIDENTS.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_INSACCIDENTS_DID_DEALS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_ACCIDENTS ADD CONSTRAINT FK_INSACCIDENTS_DID_DEALS FOREIGN KEY (DEAL_ID, KF)
-	  REFERENCES BARS.INS_DEALS (ID, KF) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C0033447 ***
 begin   
  execute immediate '
@@ -125,11 +112,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_INSACCIDENTS_STFID_STAFF ***
+PROMPT *** Create  constraint CC_INSACCIDENTS_CRTD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INS_ACCIDENTS ADD CONSTRAINT FK_INSACCIDENTS_STFID_STAFF FOREIGN KEY (STAFF_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.INS_ACCIDENTS MODIFY (CRT_DATE CONSTRAINT CC_INSACCIDENTS_CRTD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -176,31 +162,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_INSACCIDENTS_BRANCH_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_ACCIDENTS ADD CONSTRAINT FK_INSACCIDENTS_BRANCH_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_INSACCIDENTS_CRTD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INS_ACCIDENTS MODIFY (CRT_DATE CONSTRAINT CC_INSACCIDENTS_CRTD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_INSACCIDENTS ***
 begin   
  execute immediate '
@@ -227,6 +188,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  INS_ACCIDENTS ***
+grant SELECT                                                                 on INS_ACCIDENTS   to BARSREADER_ROLE;
+grant SELECT                                                                 on INS_ACCIDENTS   to UPLD;
 
 
 

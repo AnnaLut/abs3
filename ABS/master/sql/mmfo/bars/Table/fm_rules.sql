@@ -51,12 +51,10 @@ COMMENT ON COLUMN BARS.FM_RULES.V_NAME IS 'Представление';
 
 
 
-PROMPT *** Create  constraint PK_FMRULES ***
+PROMPT *** Create  constraint CC_FMRULES_NAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FM_RULES ADD CONSTRAINT PK_FMRULES PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD  ENABLE';
+  ALTER TABLE BARS.FM_RULES ADD CONSTRAINT CC_FMRULES_NAME_NN CHECK (name is not null) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -65,10 +63,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_FMRULES_NAME_NN ***
+PROMPT *** Create  constraint PK_FMRULES ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FM_RULES ADD CONSTRAINT CC_FMRULES_NAME_NN CHECK (name is not null) ENABLE';
+  ALTER TABLE BARS.FM_RULES ADD CONSTRAINT PK_FMRULES PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -91,10 +91,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_RULES ***
+grant SELECT                                                                 on FM_RULES        to BARSREADER_ROLE;
 grant SELECT                                                                 on FM_RULES        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_RULES        to BARS_DM;
 grant SELECT                                                                 on FM_RULES        to FINMON01;
 grant SELECT                                                                 on FM_RULES        to START1;
+grant SELECT                                                                 on FM_RULES        to UPLD;
 
 
 

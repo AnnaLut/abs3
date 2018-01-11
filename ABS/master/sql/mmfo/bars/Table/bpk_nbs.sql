@@ -79,45 +79,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BPKNBS_PS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_NBS ADD CONSTRAINT FK_BPKNBS_PS FOREIGN KEY (NBS)
-	  REFERENCES BARS.PS (NBS) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_BPKNBS_SBOB22 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_NBS ADD CONSTRAINT FK_BPKNBS_SBOB22 FOREIGN KEY (NBS, OB22)
-	  REFERENCES BARS.SB_OB22 (R020, OB22) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_BPKNBS_TIPS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_NBS ADD CONSTRAINT FK_BPKNBS_TIPS FOREIGN KEY (TIP)
-	  REFERENCES BARS.TIPS (TIP) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_BPKNBS_NBS_NN ***
 begin   
  execute immediate '
@@ -142,10 +103,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKNBS_TIP_NN ***
+PROMPT *** Create  constraint CC_BPKNBS_CUSTTYPE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_NBS MODIFY (TIP CONSTRAINT CC_BPKNBS_TIP_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BPK_NBS MODIFY (CUSTTYPE CONSTRAINT CC_BPKNBS_CUSTTYPE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -154,10 +115,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKNBS_CUSTTYPE_NN ***
+PROMPT *** Create  constraint CC_BPKNBS_TIP_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_NBS MODIFY (CUSTTYPE CONSTRAINT CC_BPKNBS_CUSTTYPE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BPK_NBS MODIFY (TIP CONSTRAINT CC_BPKNBS_TIP_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -180,9 +141,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_NBS ***
+grant SELECT                                                                 on BPK_NBS         to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_NBS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_NBS         to BARS_DM;
 grant SELECT                                                                 on BPK_NBS         to OBPC;
+grant SELECT                                                                 on BPK_NBS         to UPLD;
 
 
 

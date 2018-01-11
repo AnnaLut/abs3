@@ -53,8 +53,10 @@ COMMENT ON COLUMN BARS.SALDOH.KOS IS '';
 
 
 PROMPT *** Create  grants  SALDOH ***
+grant SELECT                                                                 on SALDOH          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDOH          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDOH          to START1;
+grant SELECT                                                                 on SALDOH          to UPLD;
 
 
 

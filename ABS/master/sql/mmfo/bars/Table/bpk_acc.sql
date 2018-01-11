@@ -91,37 +91,12 @@ COMMENT ON COLUMN BARS.BPK_ACC.GRP IS 'група активу портфельного методу';
 
 
 
-PROMPT *** Create  constraint FK_BPKACC_STANOBS23 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_ACC ADD CONSTRAINT FK_BPKACC_STANOBS23 FOREIGN KEY (OBS23)
-	  REFERENCES BARS.STAN_OBS23 (OBS) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_BPKACC ***
 begin   
  execute immediate '
   ALTER TABLE BARS.BPK_ACC ADD CONSTRAINT PK_BPKACC PRIMARY KEY (KF, ND)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKACC_ACC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_ACC MODIFY (ACC_PK CONSTRAINT CC_BPKACC_ACC_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -256,50 +231,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BPKACC_W4ACC ***
+PROMPT *** Create  constraint CC_BPKACC_ACC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_ACC ADD CONSTRAINT FK_BPKACC_W4ACC FOREIGN KEY (ACC_W4)
-	  REFERENCES BARS.W4_ACC (ACC_PK) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_BPKACC_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_ACC ADD CONSTRAINT FK_BPKACC_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_BPKACC_STANFIN23 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_ACC ADD CONSTRAINT FK_BPKACC_STANFIN23 FOREIGN KEY (FIN23)
-	  REFERENCES BARS.STAN_FIN23 (FIN) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_BPKACC_STANKAT23 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_ACC ADD CONSTRAINT FK_BPKACC_STANKAT23 FOREIGN KEY (KAT23)
-	  REFERENCES BARS.STAN_KAT23 (KAT) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.BPK_ACC MODIFY (ACC_PK CONSTRAINT CC_BPKACC_ACC_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -449,11 +384,13 @@ exception when others then
 
 PROMPT *** Create  grants  BPK_ACC ***
 grant SELECT                                                                 on BPK_ACC         to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on BPK_ACC         to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_ACC         to BARSUPL;
 grant INSERT,SELECT,UPDATE                                                   on BPK_ACC         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_ACC         to BARS_DM;
 grant INSERT,SELECT,UPDATE                                                   on BPK_ACC         to OBPC;
 grant SELECT                                                                 on BPK_ACC         to RPBN001;
+grant SELECT                                                                 on BPK_ACC         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BPK_ACC         to WR_ALL_RIGHTS;
 
 

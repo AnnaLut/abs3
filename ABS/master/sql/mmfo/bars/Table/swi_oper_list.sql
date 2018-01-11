@@ -133,9 +133,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SWI_OPER_LIST ***
+grant SELECT                                                                 on SWI_OPER_LIST   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SWI_OPER_LIST   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SWI_OPER_LIST   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SWI_OPER_LIST   to START1;
+grant SELECT                                                                 on SWI_OPER_LIST   to UPLD;
 
 
 

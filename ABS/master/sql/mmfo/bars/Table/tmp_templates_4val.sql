@@ -91,8 +91,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_TEMPLATES_4VAL ***
+grant SELECT                                                                 on TMP_TEMPLATES_4VAL to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_TEMPLATES_4VAL to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_TEMPLATES_4VAL to START1;
+grant SELECT                                                                 on TMP_TEMPLATES_4VAL to UPLD;
 
 
 

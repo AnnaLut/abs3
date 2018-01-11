@@ -53,19 +53,6 @@ COMMENT ON COLUMN BARS.DPT_AGRW.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_DPTAGRW_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_AGRW ADD CONSTRAINT FK_DPTAGRW_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C007521 ***
 begin   
  execute immediate '
@@ -102,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_AGRW ***
+grant SELECT                                                                 on DPT_AGRW        to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DPT_AGRW        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_AGRW        to BARS_DM;
+grant SELECT                                                                 on DPT_AGRW        to UPLD;
 
 
 

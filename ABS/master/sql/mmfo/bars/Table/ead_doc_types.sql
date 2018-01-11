@@ -101,8 +101,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  EAD_DOC_TYPES ***
+grant SELECT                                                                 on EAD_DOC_TYPES   to BARSREADER_ROLE;
 grant SELECT                                                                 on EAD_DOC_TYPES   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EAD_DOC_TYPES   to BARS_DM;
+grant SELECT                                                                 on EAD_DOC_TYPES   to UPLD;
 
 
 

@@ -198,10 +198,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMPRFTLOSS_LOSSAMNTUAH_NN ***
+PROMPT *** Create  constraint CC_DMPRFTLOSS_PRFTAMNT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_PROFIT_AND_LOSS MODIFY (LOSS_AMNT_UAH CONSTRAINT CC_DMPRFTLOSS_LOSSAMNTUAH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_PROFIT_AND_LOSS MODIFY (PRFT_AMNT CONSTRAINT CC_DMPRFTLOSS_PRFTAMNT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -234,10 +234,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMPRFTLOSS_PRFTAMNT_NN ***
+PROMPT *** Create  constraint CC_DMPRFTLOSS_LOSSAMNTUAH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_PROFIT_AND_LOSS MODIFY (PRFT_AMNT CONSTRAINT CC_DMPRFTLOSS_PRFTAMNT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_PROFIT_AND_LOSS MODIFY (LOSS_AMNT_UAH CONSTRAINT CC_DMPRFTLOSS_LOSSAMNTUAH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -338,7 +338,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_DM_PROFIT_AND_LOSS ***
+grant SELECT                                                                 on NBUR_DM_PROFIT_AND_LOSS to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_DM_PROFIT_AND_LOSS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on NBUR_DM_PROFIT_AND_LOSS to UPLD;
 
 
 

@@ -78,7 +78,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ASYNC_WEBUI ***
+grant SELECT                                                                 on ASYNC_WEBUI     to BARSREADER_ROLE;
 grant SELECT                                                                 on ASYNC_WEBUI     to BARS_DM;
+grant SELECT                                                                 on ASYNC_WEBUI     to UPLD;
 
 
 

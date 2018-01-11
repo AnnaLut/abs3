@@ -1,213 +1,153 @@
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED 
-SET ECHO OFF 
-SET LINES 500 
-SET PAGES 500 
-SET FEEDBACK OFF 
-begin 
-  BPA.ALTER_POLICY_INFO( 'IBX_FILES', 'WHOLE' , null, null, null, null );
-  BPA.ALTER_POLICY_INFO( 'IBX_FILES', 'FILIAL', null, null, null, null ); 
-end;
-/
-begin 
-   execute immediate('create table IBX_FILES( test_column number ) 
-    tablespace BRSDYND pctfree 10 initrans 1 maxtrans 255');
-exception when others then 
-if sqlcode = -955 then null;
-else
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: create table IBX_FILES'); 
-end if;
-end;
-/
-begin 
-   execute immediate('alter table IBX_FILES add "TYPE_ID" VARCHAR2(256 BYTE  ) ');
-exception when others then 
-if sqlcode = -1430 then null;
-else
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: add column TYPE_ID'); 
-end if;
-end;
-/
-begin 
-   execute immediate('alter table IBX_FILES add "FILE_NAME" VARCHAR2(256 BYTE  ) ');
-exception when others then 
-if sqlcode = -1430 then null;
-else
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: add column FILE_NAME'); 
-end if;
-end;
-/
-begin 
-   execute immediate('alter table IBX_FILES add "FILE_DATE" DATE ');
-exception when others then 
-if sqlcode = -1430 then null;
-else
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: add column FILE_DATE'); 
-end if;
-end;
-/
-begin 
-   execute immediate('alter table IBX_FILES add "TOTAL_COUNT" NUMBER ');
-exception when others then 
-if sqlcode = -1430 then null;
-else
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: add column TOTAL_COUNT'); 
-end if;
-end;
-/
-begin 
-   execute immediate('alter table IBX_FILES add "TOTAL_SUM" NUMBER ');
-exception when others then 
-if sqlcode = -1430 then null;
-else
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: add column TOTAL_SUM'); 
-end if;
-end;
-/
-begin 
-   execute immediate('alter table IBX_FILES add "LOADED" DATE ');
-exception when others then 
-if sqlcode = -1430 then null;
-else
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: add column LOADED'); 
-end if;
-end;
-/
-begin 
-   execute immediate('alter table IBX_FILES drop column test_column');
-exception when others then 
-if sqlcode = -904 then null;
-else
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: removing dummy-column'); 
-end if;
-end;
-/
-begin 
-   execute immediate('create UNIQUE index PK_IBXFILES on IBX_FILES(TYPE_ID,FILE_NAME) 
-    tablespace BRSDYND pctfree 10 initrans 2 maxtrans 255');
-exception when others then 
-if sqlcode = -955 then null;
-else
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: create index PK_IBXFILES'); 
-end if;
-end;
-/
-begin  
- for cc_con in (select c.TABLE_NAME, c.CONSTRAINT_NAME, c.SEARCH_CONDITION, cc.COLUMN_NAME 
-   from user_constraints c join user_cons_columns cc 
-   on c.constraint_name = cc.constraint_name and c.owner = cc.owner 
-   where c.table_name = 'IBX_FILES' and c.constraint_type = 'C' and cc.COLUMN_NAME not in 
-    (select cc1.COLUMN_NAME from user_constraints c1 join user_cons_columns cc1 
-    on c1.constraint_name = cc1.constraint_name and c1.owner = cc1.owner 
-    where c1.table_name = 'IBX_FILES' and c1.constraint_type = 'P')) 
- loop 
-   execute immediate('alter table IBX_FILES drop constraint ' || cc_con.CONSTRAINT_NAME); 
- end loop; 
-end;
-/
-begin 
-   execute immediate('alter table IBX_FILES add constraint PK_IBXFILES PRIMARY KEY (TYPE_ID,FILE_NAME)');
-exception when others then
-if sqlcode = -2260 then null;
-else 
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: create constraint PK_IBXFILES'); 
-end if;
-end;
-/
-begin 
-   execute immediate('alter table IBX_FILES add constraint FK_IBXFILES_ID_IBXTYPES FOREIGN KEY (TYPE_ID) references BARS.IBX_TYPES(ID)');
-exception when others then 
-if sqlcode = -2275 then null;
-else 
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: create constraint FK_IBXFILES_ID_IBXTYPES'); 
-end if;
-end;
-/
-begin 
-   execute immediate('alter table IBX_FILES add constraint CC_IBXFILES_TSUM_NN check ("TOTAL_SUM" IS NOT NULL)');
-exception when others then 
-if sqlcode = -2264 then null;
-else 
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: create constraint CC_IBXFILES_TSUM_NN'); 
-end if;
-end;
-/
-begin 
-   execute immediate('alter table IBX_FILES add constraint CC_IBXFILES_IBOXTYPE_NN check ("TYPE_ID" IS NOT NULL)');
-exception when others then 
-if sqlcode = -2264 then null;
-else 
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: create constraint CC_IBXFILES_IBOXTYPE_NN'); 
-end if;
-end;
-/
-begin 
-   execute immediate('alter table IBX_FILES add constraint CC_IBXFILES_FILENAME_NN check ("FILE_NAME" IS NOT NULL)');
-exception when others then 
-if sqlcode = -2264 then null;
-else 
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: create constraint CC_IBXFILES_FILENAME_NN'); 
-end if;
-end;
-/
-begin 
-   execute immediate('alter table IBX_FILES add constraint CC_IBXFILES_FDATE_NN check ("FILE_DATE" IS NOT NULL)');
-exception when others then 
-if sqlcode = -2264 then null;
-else 
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: create constraint CC_IBXFILES_FDATE_NN'); 
-end if;
-end;
-/
-begin 
-   execute immediate('alter table IBX_FILES add constraint CC_IBXFILES_TCOUNT_NN check ("TOTAL_COUNT" IS NOT NULL)');
-exception when others then 
-if sqlcode = -2264 then null;
-else 
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''oper: create constraint CC_IBXFILES_TCOUNT_NN'); 
-end if;
-end;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/IBX_FILES.sql =========*** Run *** ===
+PROMPT ===================================================================================== 
+
+
+PROMPT *** ALTER_POLICY_INFO to IBX_FILES ***
+
+
+BEGIN 
+        execute immediate  
+          'begin  
+               bpa.alter_policy_info(''IBX_FILES'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''IBX_FILES'', ''WHOLE'' , null, null, null, null);
+               null;
+           end; 
+          '; 
+END; 
 /
 
+PROMPT *** Create  table IBX_FILES ***
 begin 
-   execute immediate('comment on table IBX_FILES is ''Таблица импортированных IBOX-файлов''');
-exception when others then 
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''commenting column IBX_FILES'); 
-end;
+  execute immediate '
+  CREATE TABLE BARS.IBX_FILES 
+   (	TYPE_ID VARCHAR2(256), 
+	FILE_NAME VARCHAR2(256), 
+	FILE_DATE DATE, 
+	TOTAL_COUNT NUMBER, 
+	TOTAL_SUM NUMBER, 
+	LOADED DATE
+   ) SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  TABLESPACE BRSDYND ';
+exception when others then       
+  if sqlcode=-955 then null; else raise; end if; 
+end; 
 /
-begin 
-   execute immediate('comment on column IBX_FILES.TYPE_ID is ''Тип интерфейса''');
-exception when others then 
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''commenting column TYPE_ID'); 
-end;
+
+
+
+
+PROMPT *** ALTER_POLICIES to IBX_FILES ***
+ exec bpa.alter_policies('IBX_FILES');
+
+
+COMMENT ON TABLE BARS.IBX_FILES IS 'Таблица импортированных IBOX-файлов';
+COMMENT ON COLUMN BARS.IBX_FILES.TYPE_ID IS 'Тип интерфейса';
+COMMENT ON COLUMN BARS.IBX_FILES.FILE_NAME IS 'Имя файла';
+COMMENT ON COLUMN BARS.IBX_FILES.FILE_DATE IS 'Дата файла';
+COMMENT ON COLUMN BARS.IBX_FILES.TOTAL_COUNT IS 'Всего записей';
+COMMENT ON COLUMN BARS.IBX_FILES.TOTAL_SUM IS 'Всего сумма';
+COMMENT ON COLUMN BARS.IBX_FILES.LOADED IS 'Дата/время принятия';
+
+
+
+
+PROMPT *** Create  constraint PK_IBXFILES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.IBX_FILES ADD CONSTRAINT PK_IBXFILES PRIMARY KEY (TYPE_ID, FILE_NAME)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
 /
-begin 
-   execute immediate('comment on column IBX_FILES.FILE_NAME is ''Имя файла''');
-exception when others then 
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''commenting column FILE_NAME'); 
-end;
+
+
+
+
+PROMPT *** Create  constraint CC_IBXFILES_TSUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.IBX_FILES ADD CONSTRAINT CC_IBXFILES_TSUM_NN CHECK (TOTAL_SUM IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
 /
-begin 
-   execute immediate('comment on column IBX_FILES.FILE_DATE is ''Дата файла''');
-exception when others then 
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''commenting column FILE_DATE'); 
-end;
+
+
+
+
+PROMPT *** Create  constraint CC_IBXFILES_IBOXTYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.IBX_FILES ADD CONSTRAINT CC_IBXFILES_IBOXTYPE_NN CHECK (TYPE_ID IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
 /
-begin 
-   execute immediate('comment on column IBX_FILES.TOTAL_COUNT is ''Всего записей''');
-exception when others then 
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''commenting column TOTAL_COUNT'); 
-end;
+
+
+
+
+PROMPT *** Create  constraint CC_IBXFILES_FILENAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.IBX_FILES ADD CONSTRAINT CC_IBXFILES_FILENAME_NN CHECK (FILE_NAME IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
 /
-begin 
-   execute immediate('comment on column IBX_FILES.TOTAL_SUM is ''Всего сумма''');
-exception when others then 
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''commenting column TOTAL_SUM'); 
-end;
+
+
+
+
+PROMPT *** Create  constraint CC_IBXFILES_FDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.IBX_FILES ADD CONSTRAINT CC_IBXFILES_FDATE_NN CHECK (FILE_DATE IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
 /
-begin 
-   execute immediate('comment on column IBX_FILES.LOADED is ''Дата/время принятия''');
-exception when others then 
-   dbms_output.put_line('INFO: code: '||sqlcode||', '||sqlerrm(sqlcode)||' with msg: ''commenting column LOADED'); 
-end;
+
+
+
+
+PROMPT *** Create  constraint CC_IBXFILES_TCOUNT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.IBX_FILES ADD CONSTRAINT CC_IBXFILES_TCOUNT_NN CHECK (TOTAL_COUNT IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
 /
-SET FEEDBACK     ON 
+
+
+
+
+PROMPT *** Create  index PK_IBXFILES ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.PK_IBXFILES ON BARS.IBX_FILES (TYPE_ID, FILE_NAME) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
+PROMPT *** Create  grants  IBX_FILES ***
+grant SELECT                                                                 on IBX_FILES       to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Table/IBX_FILES.sql =========*** End *** ===
+PROMPT ===================================================================================== 

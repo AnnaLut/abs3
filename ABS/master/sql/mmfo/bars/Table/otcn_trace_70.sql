@@ -94,10 +94,26 @@ exception when others then
 
 
 
+
+PROMPT *** Create  index I1_OTCN_TRACE_70 ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I1_OTCN_TRACE_70 ON BARS.OTCN_TRACE_70 (KF, DATF) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  OTCN_TRACE_70 ***
+grant SELECT                                                                 on OTCN_TRACE_70   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_TRACE_70   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_TRACE_70   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_TRACE_70   to RPBN002;
+grant SELECT                                                                 on OTCN_TRACE_70   to UPLD;
 
 
 

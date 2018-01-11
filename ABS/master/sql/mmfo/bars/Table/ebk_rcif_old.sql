@@ -74,6 +74,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBK_RCIF_OLD ***
+grant SELECT                                                                 on EBK_RCIF_OLD    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBK_RCIF_OLD    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBK_RCIF_OLD    to BARS_DM;
 

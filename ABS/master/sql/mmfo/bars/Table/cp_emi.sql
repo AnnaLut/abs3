@@ -89,6 +89,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_EMI ***
+grant SELECT                                                                 on CP_EMI          to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_EMI          to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_EMI          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_EMI          to BARS_DM;

@@ -103,124 +103,10 @@ COMMENT ON COLUMN BARS.CC_DEAL.GRP IS 'група активу портфельного методу';
 
 
 
-PROMPT *** Create  constraint FK_CCDEAL_STANKAT23 ***
+PROMPT *** Create  constraint CC_CCDEAL_VIDD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_DEAL ADD CONSTRAINT FK_CCDEAL_STANKAT23 FOREIGN KEY (KAT23)
-	  REFERENCES BARS.STAN_KAT23 (KAT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CCDEAL_STANOBS23 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_DEAL ADD CONSTRAINT FK_CCDEAL_STANOBS23 FOREIGN KEY (OBS23)
-	  REFERENCES BARS.STAN_OBS23 (OBS) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CCDEAL_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_DEAL MODIFY (KF CONSTRAINT CC_CCDEAL_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CC_DEAL_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_DEAL MODIFY (BRANCH CONSTRAINT CC_CC_DEAL_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CCDEAL_STAFF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_DEAL MODIFY (USER_ID CONSTRAINT CC_CCDEAL_STAFF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CCDEAL_RNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_DEAL MODIFY (RNK CONSTRAINT CC_CCDEAL_RNK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CCDEAL_SOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_DEAL MODIFY (SOS CONSTRAINT CC_CCDEAL_SOS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_CC_DEAL_ND ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_DEAL MODIFY (ND CONSTRAINT NK_CC_DEAL_ND NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint UK_CC_DEAL_ND_RNK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_DEAL ADD CONSTRAINT UK_CC_DEAL_ND_RNK UNIQUE (ND, RNK, KF)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint UK_CCDEAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_DEAL ADD CONSTRAINT UK_CCDEAL UNIQUE (KF, ND)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.CC_DEAL MODIFY (VIDD CONSTRAINT CC_CCDEAL_VIDD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -243,10 +129,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CCDEAL_VIDD_NN ***
+PROMPT *** Create  constraint UK_CCDEAL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_DEAL MODIFY (VIDD CONSTRAINT CC_CCDEAL_VIDD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_DEAL ADD CONSTRAINT UK_CCDEAL UNIQUE (KF, ND)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -255,11 +143,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint R_CCSOS_CCDEAL ***
+PROMPT *** Create  constraint UK_CC_DEAL_ND_RNK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_DEAL ADD CONSTRAINT R_CCSOS_CCDEAL FOREIGN KEY (SOS)
-	  REFERENCES BARS.CC_SOS (SOS) ENABLE';
+  ALTER TABLE BARS.CC_DEAL ADD CONSTRAINT UK_CC_DEAL_ND_RNK UNIQUE (ND, RNK, KF)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -268,11 +157,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CCDEAL_STANFIN23 ***
+PROMPT *** Create  constraint NK_CC_DEAL_ND ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_DEAL ADD CONSTRAINT FK_CCDEAL_STANFIN23 FOREIGN KEY (FIN23)
-	  REFERENCES BARS.STAN_FIN23 (FIN) ENABLE';
+  ALTER TABLE BARS.CC_DEAL MODIFY (ND CONSTRAINT NK_CC_DEAL_ND NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -281,11 +169,58 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint R_CCVIDD_CCDEAL ***
+PROMPT *** Create  constraint CC_CCDEAL_SOS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_DEAL ADD CONSTRAINT R_CCVIDD_CCDEAL FOREIGN KEY (VIDD)
-	  REFERENCES BARS.CC_VIDD (VIDD) ENABLE';
+  ALTER TABLE BARS.CC_DEAL MODIFY (SOS CONSTRAINT CC_CCDEAL_SOS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CCDEAL_RNK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_DEAL MODIFY (RNK CONSTRAINT CC_CCDEAL_RNK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CCDEAL_STAFF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_DEAL MODIFY (USER_ID CONSTRAINT CC_CCDEAL_STAFF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CC_DEAL_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_DEAL MODIFY (BRANCH CONSTRAINT CC_CC_DEAL_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_CCDEAL_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_DEAL MODIFY (KF CONSTRAINT CC_CCDEAL_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -365,11 +300,13 @@ exception when others then
 
 PROMPT *** Create  grants  CC_DEAL ***
 grant SELECT                                                                 on CC_DEAL         to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on CC_DEAL         to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_DEAL         to BARSUPL;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on CC_DEAL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_DEAL         to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CC_DEAL         to FOREX;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CC_DEAL         to RCC_DEAL;
+grant SELECT                                                                 on CC_DEAL         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_DEAL         to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CC_DEAL         to WR_CREDIT;
 grant FLASHBACK,SELECT                                                       on CC_DEAL         to WR_REFREAD;

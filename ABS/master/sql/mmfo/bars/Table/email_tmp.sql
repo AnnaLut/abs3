@@ -51,9 +51,11 @@ COMMENT ON COLUMN BARS.EMAIL_TMP.ID IS '';
 
 
 PROMPT *** Create  grants  EMAIL_TMP ***
+grant SELECT                                                                 on EMAIL_TMP       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on EMAIL_TMP       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EMAIL_TMP       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EMAIL_TMP       to START1;
+grant SELECT                                                                 on EMAIL_TMP       to UPLD;
 grant FLASHBACK,SELECT                                                       on EMAIL_TMP       to WR_REFREAD;
 
 

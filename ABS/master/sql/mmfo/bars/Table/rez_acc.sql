@@ -78,10 +78,10 @@ COMMENT ON COLUMN BARS.REZ_ACC.KV_D IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C0010259 ***
+PROMPT *** Create  constraint PK_REZ_ACC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.REZ_ACC MODIFY (ACC NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.REZ_ACC ADD CONSTRAINT PK_REZ_ACC PRIMARY KEY (ACC) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -90,10 +90,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_REZ_ACC ***
+PROMPT *** Create  constraint SYS_C0010259 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.REZ_ACC ADD CONSTRAINT PK_REZ_ACC PRIMARY KEY (ACC) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.REZ_ACC MODIFY (ACC NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -126,8 +126,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_ACC ***
+grant SELECT                                                                 on REZ_ACC         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZ_ACC         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZ_ACC         to START1;
+grant SELECT                                                                 on REZ_ACC         to UPLD;
 
 
 

@@ -101,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  KOATUU_REGION_CODE ***
+grant SELECT                                                                 on KOATUU_REGION_CODE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOATUU_REGION_CODE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOATUU_REGION_CODE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOATUU_REGION_CODE to CUST001;
+grant SELECT                                                                 on KOATUU_REGION_CODE to UPLD;
 
 
 

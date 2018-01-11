@@ -118,9 +118,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_OB_BANKS ***
+grant SELECT                                                                 on REZ_OB_BANKS    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REZ_OB_BANKS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ_OB_BANKS    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZ_OB_BANKS    to START1;
+grant SELECT                                                                 on REZ_OB_BANKS    to UPLD;
 grant FLASHBACK,SELECT                                                       on REZ_OB_BANKS    to WR_REFREAD;
 
 

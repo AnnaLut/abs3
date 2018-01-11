@@ -68,12 +68,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint XPK_MONEXUO ***
+PROMPT *** Create  constraint CC_MONEXUO_NAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.MONEX_UO ADD CONSTRAINT XPK_MONEXUO PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.MONEX_UO MODIFY (NAME CONSTRAINT CC_MONEXUO_NAME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -82,10 +80,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_MONEXUO_NAME_NN ***
+PROMPT *** Create  constraint XPK_MONEXUO ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.MONEX_UO MODIFY (NAME CONSTRAINT CC_MONEXUO_NAME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.MONEX_UO ADD CONSTRAINT XPK_MONEXUO PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -108,8 +108,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  MONEX_UO ***
+grant SELECT                                                                 on MONEX_UO        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MONEX_UO        to BARS_ACCESS_DEFROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MONEX_UO        to START1;
+grant SELECT                                                                 on MONEX_UO        to UPLD;
 
 
 

@@ -92,10 +92,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119208 ***
+PROMPT *** Create  constraint SYS_C00119205 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_W4_PRODUCT_MASK MODIFY (TIP NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_W4_PRODUCT_MASK MODIFY (KV NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -128,16 +128,20 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119205 ***
+PROMPT *** Create  constraint SYS_C00119208 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_W4_PRODUCT_MASK MODIFY (KV NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_W4_PRODUCT_MASK MODIFY (TIP NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
+
+PROMPT *** Create  grants  TMP_W4_PRODUCT_MASK ***
+grant SELECT                                                                 on TMP_W4_PRODUCT_MASK to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_W4_PRODUCT_MASK to UPLD;
 
 
 

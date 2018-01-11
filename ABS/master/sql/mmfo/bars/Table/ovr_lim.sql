@@ -56,32 +56,6 @@ COMMENT ON COLUMN BARS.OVR_LIM.OK IS 'Признак 1=Авторизован, иначе - нет';
 
 
 
-PROMPT *** Create  constraint FK_OVRLIM_ND ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OVR_LIM ADD CONSTRAINT FK_OVRLIM_ND FOREIGN KEY (ND)
-	  REFERENCES BARS.CC_DEAL (ND) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_OVRLIM_ACC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OVR_LIM ADD CONSTRAINT FK_OVRLIM_ACC FOREIGN KEY (ACC)
-	  REFERENCES BARS.ACCOUNTS (ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XPK_OVRLIM ***
 begin   
  execute immediate '
@@ -110,8 +84,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OVR_LIM ***
+grant SELECT                                                                 on OVR_LIM         to BARSREADER_ROLE;
 grant SELECT                                                                 on OVR_LIM         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OVR_LIM         to START1;
+grant SELECT                                                                 on OVR_LIM         to UPLD;
 
 
 

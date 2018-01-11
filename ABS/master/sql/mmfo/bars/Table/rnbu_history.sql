@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''RNBU_HISTORY'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''RNBU_HISTORY'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''RNBU_HISTORY'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''RNBU_HISTORY'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -85,19 +85,6 @@ COMMENT ON COLUMN BARS.RNBU_HISTORY.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_RNBUHISTORY_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.RNBU_HISTORY ADD CONSTRAINT FK_RNBUHISTORY_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_RNBUHISTORY_KF_NN ***
 begin   
  execute immediate '
@@ -121,10 +108,13 @@ exception when others then
  end;
 /
 
+
+
+
 PROMPT *** Create  index I1_RNBU_HISTORY ***
 begin   
  execute immediate '
-  CREATE INDEX BARS.I1_RNBU_HISTORY ON BARS.RNBU_HISTORY (KF, ODATE, ACC)
+  CREATE INDEX BARS.I1_RNBU_HISTORY ON BARS.RNBU_HISTORY (KF, ODATE, ACC) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYNI ';
 exception when others then
@@ -133,12 +123,15 @@ exception when others then
 /
 
 
+
 PROMPT *** Create  grants  RNBU_HISTORY ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_HISTORY    to ABS_ADMIN;
+grant SELECT                                                                 on RNBU_HISTORY    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RNBU_HISTORY    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RNBU_HISTORY    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_HISTORY    to RNBU_HIST;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_HISTORY    to START1;
+grant SELECT                                                                 on RNBU_HISTORY    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RNBU_HISTORY    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on RNBU_HISTORY    to WR_REFREAD;
 

@@ -49,9 +49,11 @@ COMMENT ON COLUMN BARS.NOTA_TR.TYPR IS '“ËÔ';
 
 
 PROMPT *** Create  grants  NOTA_TR ***
+grant SELECT                                                                 on NOTA_TR         to BARSREADER_ROLE;
 grant SELECT                                                                 on NOTA_TR         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NOTA_TR         to BARS_DM;
 grant SELECT                                                                 on NOTA_TR         to START1;
+grant SELECT                                                                 on NOTA_TR         to UPLD;
 
 
 

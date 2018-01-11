@@ -52,38 +52,12 @@ COMMENT ON COLUMN BARS.OVR_LIM_DOG.LIM IS 'Значение нового лимита';
 
 
 
-PROMPT *** Create  constraint FK_OVRLIMDOG_ACC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OVR_LIM_DOG ADD CONSTRAINT FK_OVRLIMDOG_ACC FOREIGN KEY (ACC)
-	  REFERENCES BARS.ACCOUNTS (ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XPK_OVRLIMDOG ***
 begin   
  execute immediate '
   ALTER TABLE BARS.OVR_LIM_DOG ADD CONSTRAINT XPK_OVRLIMDOG PRIMARY KEY (ND, ACC, FDAT)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_OVRLIMDOG_ND ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OVR_LIM_DOG ADD CONSTRAINT FK_OVRLIMDOG_ND FOREIGN KEY (ND)
-	  REFERENCES BARS.CC_DEAL (ND) DEFERRABLE ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -104,6 +78,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  OVR_LIM_DOG ***
+grant SELECT                                                                 on OVR_LIM_DOG     to BARSREADER_ROLE;
+grant SELECT                                                                 on OVR_LIM_DOG     to UPLD;
 
 
 

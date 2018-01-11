@@ -57,9 +57,11 @@ COMMENT ON COLUMN BARS.VO_PRC.PERCN IS '';
 
 
 PROMPT *** Create  grants  VO_PRC ***
+grant SELECT                                                                 on VO_PRC          to BARSREADER_ROLE;
 grant SELECT                                                                 on VO_PRC          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VO_PRC          to BARS_DM;
 grant SELECT                                                                 on VO_PRC          to START1;
+grant SELECT                                                                 on VO_PRC          to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VO_PRC          to VO_PRC;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VO_PRC          to WR_ALL_RIGHTS;
 

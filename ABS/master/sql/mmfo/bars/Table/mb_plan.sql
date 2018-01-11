@@ -59,9 +59,11 @@ COMMENT ON COLUMN BARS.MB_PLAN.COMM IS 'Комментарий';
 
 
 PROMPT *** Create  grants  MB_PLAN ***
+grant SELECT                                                                 on MB_PLAN         to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on MB_PLAN         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MB_PLAN         to BARS_DM;
 grant SELECT                                                                 on MB_PLAN         to SALGL;
+grant SELECT                                                                 on MB_PLAN         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MB_PLAN         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on MB_PLAN         to WR_REFREAD;
 

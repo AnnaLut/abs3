@@ -91,19 +91,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_T902_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.T902 ADD CONSTRAINT FK_T902_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C007336 ***
 begin   
  execute immediate '
@@ -157,10 +144,12 @@ exception when others then
 
 PROMPT *** Create  grants  T902 ***
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on T902            to BARS014;
+grant SELECT                                                                 on T902            to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on T902            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on T902            to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on T902            to PYOD001;
 grant SELECT                                                                 on T902            to START1;
+grant SELECT                                                                 on T902            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on T902            to WR_ALL_RIGHTS;
 
 

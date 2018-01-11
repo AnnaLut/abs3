@@ -108,11 +108,6 @@ COMMENT ON COLUMN BARS.SB_R020.D_CLOSE IS '';
 
 
 
-PROMPT *** Create  grants  SB_R020 ***
-grant DELETE,INSERT,SELECT,UPDATE                                            on SB_R020         to ABS_ADMIN;
-grant DELETE,INSERT,SELECT,UPDATE                                            on SB_R020         to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on SB_R020         to BARS_DM;
-
 
 
 PROMPT ===================================================================================== 

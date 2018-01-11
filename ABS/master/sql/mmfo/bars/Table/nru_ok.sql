@@ -77,6 +77,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  NRU_OK ***
+grant SELECT                                                                 on NRU_OK          to BARSREADER_ROLE;
+grant SELECT                                                                 on NRU_OK          to UPLD;
+
 
 
 PROMPT ===================================================================================== 

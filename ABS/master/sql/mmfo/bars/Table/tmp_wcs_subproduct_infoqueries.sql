@@ -53,6 +53,10 @@ COMMENT ON COLUMN BARS.TMP_WCS_SUBPRODUCT_INFOQUERIES.ORD IS '';
 
 
 
+PROMPT *** Create  grants  TMP_WCS_SUBPRODUCT_INFOQUERIES ***
+grant SELECT                                                                 on TMP_WCS_SUBPRODUCT_INFOQUERIES to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_WCS_SUBPRODUCT_INFOQUERIES to UPLD;
+
 
 
 PROMPT ===================================================================================== 

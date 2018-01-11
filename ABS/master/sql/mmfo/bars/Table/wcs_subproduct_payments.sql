@@ -63,32 +63,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SBPPAYMENTS_SBPID_SBPS_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SUBPRODUCT_PAYMENTS ADD CONSTRAINT FK_SBPPAYMENTS_SBPID_SBPS_ID FOREIGN KEY (SUBPRODUCT_ID)
-	  REFERENCES BARS.WCS_SUBPRODUCTS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SBPPAYMENTS_PID_PARTS_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SUBPRODUCT_PAYMENTS ADD CONSTRAINT FK_SBPPAYMENTS_PID_PARTS_ID FOREIGN KEY (PAYMENT_ID)
-	  REFERENCES BARS.WCS_PAYMENT_TYPES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_SBPPAYMENTS ***
 begin   
  execute immediate '
@@ -103,8 +77,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SUBPRODUCT_PAYMENTS ***
+grant SELECT                                                                 on WCS_SUBPRODUCT_PAYMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_SUBPRODUCT_PAYMENTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_SUBPRODUCT_PAYMENTS to BARS_DM;
+grant SELECT                                                                 on WCS_SUBPRODUCT_PAYMENTS to UPLD;
 
 
 

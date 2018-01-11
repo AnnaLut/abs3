@@ -101,12 +101,14 @@ exception when others then
 
 
 PROMPT *** Create  grants  DEMAND_KK ***
+grant SELECT                                                                 on DEMAND_KK       to BARSREADER_ROLE;
 grant SELECT                                                                 on DEMAND_KK       to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEMAND_KK       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEMAND_KK       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEMAND_KK       to DEMAND;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEMAND_KK       to OBPC;
 grant SELECT                                                                 on DEMAND_KK       to START1;
+grant SELECT                                                                 on DEMAND_KK       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEMAND_KK       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DEMAND_KK       to WR_REFREAD;
 

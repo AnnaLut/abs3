@@ -51,19 +51,6 @@ COMMENT ON COLUMN BARS.KLI_TTS.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_KLI_TTS_TTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLI_TTS ADD CONSTRAINT FK_KLI_TTS_TTS FOREIGN KEY (TTS)
-	  REFERENCES BARS.TTS (TT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_KLI_TTS_KF_NN ***
 begin   
  execute immediate '
@@ -77,8 +64,10 @@ exception when others then
 
 PROMPT *** Create  grants  KLI_TTS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLI_TTS         to ABS_ADMIN;
+grant SELECT                                                                 on KLI_TTS         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLI_TTS         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLI_TTS         to TECH_MOM1;
+grant SELECT                                                                 on KLI_TTS         to UPLD;
 grant FLASHBACK,SELECT                                                       on KLI_TTS         to WR_REFREAD;
 
 

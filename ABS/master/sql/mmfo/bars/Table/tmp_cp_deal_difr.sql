@@ -87,6 +87,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  TMP_CP_DEAL_DIFR ***
+grant SELECT                                                                 on TMP_CP_DEAL_DIFR to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_CP_DEAL_DIFR to UPLD;
+
 
 
 PROMPT ===================================================================================== 

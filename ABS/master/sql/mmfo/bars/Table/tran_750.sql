@@ -85,8 +85,10 @@ COMMENT ON COLUMN BARS.TRAN_750.TERMINAL IS '';
 
 
 PROMPT *** Create  grants  TRAN_750 ***
+grant SELECT                                                                 on TRAN_750        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TRAN_750        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TRAN_750        to START1;
+grant SELECT                                                                 on TRAN_750        to UPLD;
 
 
 

@@ -91,9 +91,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  EK4_DK ***
+grant SELECT                                                                 on EK4_DK          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EK4_DK          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EK4_DK          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EK4_DK          to START1;
+grant SELECT                                                                 on EK4_DK          to UPLD;
 
 
 

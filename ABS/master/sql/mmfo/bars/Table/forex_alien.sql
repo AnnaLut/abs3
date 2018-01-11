@@ -95,6 +95,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  FOREX_ALIEN ***
+grant SELECT                                                                 on FOREX_ALIEN     to BARSREADER_ROLE;
 grant SELECT                                                                 on FOREX_ALIEN     to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FOREX_ALIEN     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FOREX_ALIEN     to BARS_DM;

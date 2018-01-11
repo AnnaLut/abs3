@@ -67,32 +67,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_MACS_APLEV_SRVHRCH_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_MACS ADD CONSTRAINT FK_MACS_APLEV_SRVHRCH_ID FOREIGN KEY (APPLY_LEVEL)
-	  REFERENCES BARS.WCS_SRV_HIERARCHY (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_MACS_TID_MACTYPES_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_MACS ADD CONSTRAINT FK_MACS_TID_MACTYPES_ID FOREIGN KEY (TYPE_ID)
-	  REFERENCES BARS.WCS_MAC_TYPES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_WCSMACS_NAME_NN ***
 begin   
  execute immediate '
@@ -119,9 +93,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_MACS ***
+grant SELECT                                                                 on WCS_MACS        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_MACS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_MACS        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_MACS        to START1;
+grant SELECT                                                                 on WCS_MACS        to UPLD;
 
 
 

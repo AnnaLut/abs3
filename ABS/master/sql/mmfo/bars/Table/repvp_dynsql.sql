@@ -82,9 +82,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  REPVP_DYNSQL ***
+grant SELECT                                                                 on REPVP_DYNSQL    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPVP_DYNSQL    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REPVP_DYNSQL    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPVP_DYNSQL    to RPBN001;
+grant SELECT                                                                 on REPVP_DYNSQL    to UPLD;
 
 
 

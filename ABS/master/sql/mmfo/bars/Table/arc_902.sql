@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ARC_902 ***
+grant SELECT                                                                 on ARC_902         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ARC_902         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ARC_902         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ARC_902         to START1;
+grant SELECT                                                                 on ARC_902         to UPLD;
 
 
 

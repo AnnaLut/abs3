@@ -79,32 +79,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_PSSPARAM_PS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PS_SPARAM ADD CONSTRAINT FK_PSSPARAM_PS FOREIGN KEY (NBS)
-	  REFERENCES BARS.PS (NBS) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_PSSPARAM_SPARAMLIST ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PS_SPARAM ADD CONSTRAINT FK_PSSPARAM_SPARAMLIST FOREIGN KEY (SPID)
-	  REFERENCES BARS.SPARAM_LIST (SPID) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_PSSPARAM_NBS_NN ***
 begin   
  execute immediate '
@@ -144,10 +118,12 @@ exception when others then
 
 PROMPT *** Create  grants  PS_SPARAM ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PS_SPARAM       to ABS_ADMIN;
+grant SELECT                                                                 on PS_SPARAM       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PS_SPARAM       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PS_SPARAM       to BARS_DM;
 grant SELECT                                                                 on PS_SPARAM       to CUST001;
 grant SELECT                                                                 on PS_SPARAM       to START1;
+grant SELECT                                                                 on PS_SPARAM       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PS_SPARAM       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on PS_SPARAM       to WR_REFREAD;
 grant SELECT                                                                 on PS_SPARAM       to WR_VIEWACC;

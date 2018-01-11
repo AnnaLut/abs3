@@ -49,9 +49,11 @@ COMMENT ON COLUMN BARS.CCK_WORKER_BANK_AIM.DESCR_AIM IS 'Îïèñ ö³ë³';
 
 
 PROMPT *** Create  grants  CCK_WORKER_BANK_AIM ***
+grant SELECT                                                                 on CCK_WORKER_BANK_AIM to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_WORKER_BANK_AIM to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_WORKER_BANK_AIM to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_WORKER_BANK_AIM to RCC_DEAL;
+grant SELECT                                                                 on CCK_WORKER_BANK_AIM to UPLD;
 
 
 

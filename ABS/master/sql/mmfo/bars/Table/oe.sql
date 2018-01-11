@@ -104,12 +104,14 @@ exception when others then
 
 PROMPT *** Create  grants  OE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OE              to ABS_ADMIN;
+grant SELECT                                                                 on OE              to BARSREADER_ROLE;
 grant SELECT                                                                 on OE              to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OE              to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OE              to BARS_DM;
 grant SELECT                                                                 on OE              to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OE              to OE;
 grant SELECT                                                                 on OE              to START1;
+grant SELECT                                                                 on OE              to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OE              to WR_ALL_RIGHTS;
 grant SELECT                                                                 on OE              to WR_CUSTREG;
 grant FLASHBACK,SELECT                                                       on OE              to WR_REFREAD;

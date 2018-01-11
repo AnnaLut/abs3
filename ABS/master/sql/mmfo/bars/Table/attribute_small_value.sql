@@ -79,10 +79,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025692 ***
+PROMPT *** Create  constraint SYS_C0025691 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_SMALL_VALUE MODIFY (OBJECT_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.ATTRIBUTE_SMALL_VALUE MODIFY (ATTRIBUTE_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -91,10 +91,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025691 ***
+PROMPT *** Create  constraint SYS_C0025692 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_SMALL_VALUE MODIFY (ATTRIBUTE_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.ATTRIBUTE_SMALL_VALUE MODIFY (OBJECT_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -117,7 +117,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ATTRIBUTE_SMALL_VALUE ***
+grant SELECT                                                                 on ATTRIBUTE_SMALL_VALUE to BARSREADER_ROLE;
 grant SELECT                                                                 on ATTRIBUTE_SMALL_VALUE to BARS_DM;
+grant SELECT                                                                 on ATTRIBUTE_SMALL_VALUE to UPLD;
 
 
 

@@ -76,10 +76,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025776 ***
+PROMPT *** Create  constraint SYS_C0025774 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STAFF_KLF00_BAK MODIFY (GRANTOR NOT NULL ENABLE)';
+  ALTER TABLE BARS.STAFF_KLF00_BAK MODIFY (KODF NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -100,16 +100,20 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025774 ***
+PROMPT *** Create  constraint SYS_C0025776 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STAFF_KLF00_BAK MODIFY (KODF NOT NULL ENABLE)';
+  ALTER TABLE BARS.STAFF_KLF00_BAK MODIFY (GRANTOR NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
+
+PROMPT *** Create  grants  STAFF_KLF00_BAK ***
+grant SELECT                                                                 on STAFF_KLF00_BAK to BARSREADER_ROLE;
+grant SELECT                                                                 on STAFF_KLF00_BAK to UPLD;
 
 
 

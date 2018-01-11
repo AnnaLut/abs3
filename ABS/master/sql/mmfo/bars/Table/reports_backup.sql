@@ -97,8 +97,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  REPORTS_BACKUP ***
+grant SELECT                                                                 on REPORTS_BACKUP  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPORTS_BACKUP  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPORTS_BACKUP  to START1;
+grant SELECT                                                                 on REPORTS_BACKUP  to UPLD;
 
 
 

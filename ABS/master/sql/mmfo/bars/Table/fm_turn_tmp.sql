@@ -50,9 +50,11 @@ COMMENT ON COLUMN BARS.FM_TURN_TMP.SQ IS '';
 
 
 PROMPT *** Create  grants  FM_TURN_TMP ***
+grant SELECT                                                                 on FM_TURN_TMP     to BARSREADER_ROLE;
 grant SELECT                                                                 on FM_TURN_TMP     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_TURN_TMP     to BARS_DM;
 grant SELECT                                                                 on FM_TURN_TMP     to START1;
+grant SELECT                                                                 on FM_TURN_TMP     to UPLD;
 
 
 

@@ -58,6 +58,12 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  TMP_KWT_2924 ***
+grant SELECT                                                                 on TMP_KWT_2924    to BARSREADER_ROLE;
+grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_KWT_2924    to BARS_ACCESS_DEFROLE;
+grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_KWT_2924    to START1;
+grant SELECT                                                                 on TMP_KWT_2924    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

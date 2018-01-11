@@ -85,71 +85,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SECJOURNAL_BRANCH ***
+PROMPT *** Create  constraint CC_SECJOURNAL_WHOGRANT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_JOURNAL ADD CONSTRAINT FK_SECJOURNAL_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SECJOURNAL_RECID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEC_JOURNAL MODIFY (REC_ID CONSTRAINT CC_SECJOURNAL_RECID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SECJOURNAL_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEC_JOURNAL MODIFY (BRANCH CONSTRAINT CC_SECJOURNAL_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SECJOURNAL_ACTION_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEC_JOURNAL MODIFY (ACTION CONSTRAINT CC_SECJOURNAL_ACTION_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SECJOURNAL_GRDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEC_JOURNAL MODIFY (GR_DATE CONSTRAINT CC_SECJOURNAL_GRDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SECJOURNAL_SOURCETYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEC_JOURNAL MODIFY (SOURCE_TYPE CONSTRAINT CC_SECJOURNAL_SOURCETYPE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEC_JOURNAL MODIFY (WHO_GRANT CONSTRAINT CC_SECJOURNAL_WHOGRANT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -170,11 +109,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SECJOURNAL_SECRESOURCES ***
+PROMPT *** Create  constraint CC_SECJOURNAL_SOURCETYPE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_JOURNAL ADD CONSTRAINT FK_SECJOURNAL_SECRESOURCES FOREIGN KEY (RESOURCE_TYPE)
-	  REFERENCES BARS.SEC_RESOURCES (RES_ID) ENABLE';
+  ALTER TABLE BARS.SEC_JOURNAL MODIFY (SOURCE_TYPE CONSTRAINT CC_SECJOURNAL_SOURCETYPE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -183,11 +121,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SECJOURNAL_SECRESOURCES2 ***
+PROMPT *** Create  constraint CC_SECJOURNAL_GRDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_JOURNAL ADD CONSTRAINT FK_SECJOURNAL_SECRESOURCES2 FOREIGN KEY (SOURCE_TYPE)
-	  REFERENCES BARS.SEC_RESOURCES (RES_ID) ENABLE';
+  ALTER TABLE BARS.SEC_JOURNAL MODIFY (GR_DATE CONSTRAINT CC_SECJOURNAL_GRDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -196,11 +133,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SECJOURNAL_SECACTION ***
+PROMPT *** Create  constraint CC_SECJOURNAL_ACTION_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_JOURNAL ADD CONSTRAINT FK_SECJOURNAL_SECACTION FOREIGN KEY (ACTION)
-	  REFERENCES BARS.SEC_ACTION (ID) ENABLE';
+  ALTER TABLE BARS.SEC_JOURNAL MODIFY (ACTION CONSTRAINT CC_SECJOURNAL_ACTION_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -209,11 +145,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SECJOURNAL_STAFF ***
+PROMPT *** Create  constraint CC_SECJOURNAL_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_JOURNAL ADD CONSTRAINT FK_SECJOURNAL_STAFF FOREIGN KEY (WHO_GRANT)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+  ALTER TABLE BARS.SEC_JOURNAL MODIFY (BRANCH CONSTRAINT CC_SECJOURNAL_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -222,10 +157,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SECJOURNAL_WHOGRANT_NN ***
+PROMPT *** Create  constraint CC_SECJOURNAL_RECID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_JOURNAL MODIFY (WHO_GRANT CONSTRAINT CC_SECJOURNAL_WHOGRANT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEC_JOURNAL MODIFY (REC_ID CONSTRAINT CC_SECJOURNAL_RECID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -249,9 +184,11 @@ exception when others then
 
 PROMPT *** Create  grants  SEC_JOURNAL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEC_JOURNAL     to ABS_ADMIN;
+grant SELECT                                                                 on SEC_JOURNAL     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEC_JOURNAL     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEC_JOURNAL     to BARS_DM;
 grant SELECT                                                                 on SEC_JOURNAL     to START1;
+grant SELECT                                                                 on SEC_JOURNAL     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SEC_JOURNAL     to WR_ALL_RIGHTS;
 
 

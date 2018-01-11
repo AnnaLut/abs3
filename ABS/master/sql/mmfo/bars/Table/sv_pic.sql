@@ -92,9 +92,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SV_PIC ***
+grant SELECT                                                                 on SV_PIC          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_PIC          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SV_PIC          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_PIC          to RPBN002;
+grant SELECT                                                                 on SV_PIC          to UPLD;
 
 
 

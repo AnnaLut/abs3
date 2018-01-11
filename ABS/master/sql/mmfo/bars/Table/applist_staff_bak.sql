@@ -60,18 +60,6 @@ COMMENT ON COLUMN BARS.APPLIST_STAFF_BAK.GRANTOR IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C0025761 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.APPLIST_STAFF_BAK MODIFY (CODEAPP NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C0025760 ***
 begin   
  execute immediate '
@@ -83,8 +71,22 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint SYS_C0025761 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.APPLIST_STAFF_BAK MODIFY (CODEAPP NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  APPLIST_STAFF_BAK ***
+grant SELECT                                                                 on APPLIST_STAFF_BAK to BARSREADER_ROLE;
 grant SELECT                                                                 on APPLIST_STAFF_BAK to BARS_DM;
+grant SELECT                                                                 on APPLIST_STAFF_BAK to UPLD;
 
 
 

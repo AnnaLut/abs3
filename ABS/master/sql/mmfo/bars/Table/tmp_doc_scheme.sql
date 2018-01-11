@@ -85,6 +85,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  TMP_DOC_SCHEME ***
+grant SELECT                                                                 on TMP_DOC_SCHEME  to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_DOC_SCHEME  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -94,82 +94,11 @@ exception when others then
 
 
 
-/*
-PROMPT *** Create  constraint CC_SKRYNKASTAFF_USERID_NN ***
+
+PROMPT *** Create  constraint CC_SKRYNKASTAFF_TIP_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_STAFF MODIFY (USERID CONSTRAINT CC_SKRYNKASTAFF_USERID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-*/
-
-PROMPT *** Create  constraint CC_SKRYNKASTAFF_USERID_NN ***
-begin   
- execute immediate 'ALTER TABLE BARS.SKRYNKA_STAFF MODIFY  USERID NULL';
-exception when others then
-  if  sqlcode=-1451 then null; else raise; end if;
- end;
-/
-
-
-PROMPT *** Create  constraint FK_SKRYNKA_STAFF_USERID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_STAFF ADD CONSTRAINT FK_SKRYNKA_STAFF_USERID FOREIGN KEY (USERID)
-	  REFERENCES BARS.STAFF$BASE (ID) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SKRYNKA_STAFF_TIP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_STAFF ADD CONSTRAINT FK_SKRYNKA_STAFF_TIP FOREIGN KEY (TIP)
-	  REFERENCES BARS.SKRYNKA_STAFF_TIP (TIP) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SKRYNKASTAFF_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_STAFF ADD CONSTRAINT FK_SKRYNKASTAFF_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SKRYNKASTAFF_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_STAFF ADD CONSTRAINT FK_SKRYNKASTAFF_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SKRYNKASTAFF_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_STAFF MODIFY (KF CONSTRAINT CC_SKRYNKASTAFF_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SKRYNKA_STAFF MODIFY (TIP CONSTRAINT CC_SKRYNKASTAFF_TIP_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -190,10 +119,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SKRYNKASTAFF_TIP_NN ***
+PROMPT *** Create  constraint CC_SKRYNKASTAFF_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_STAFF MODIFY (TIP CONSTRAINT CC_SKRYNKASTAFF_TIP_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SKRYNKA_STAFF MODIFY (KF CONSTRAINT CC_SKRYNKASTAFF_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -221,6 +150,7 @@ grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT
 grant SELECT                                                                 on SKRYNKA_STAFF   to BARS_DM;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_STAFF   to DEP_SKRN;
 grant SELECT                                                                 on SKRYNKA_STAFF   to START1;
+grant SELECT                                                                 on SKRYNKA_STAFF   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_STAFF   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SKRYNKA_STAFF   to WR_REFREAD;
 

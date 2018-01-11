@@ -75,6 +75,10 @@ COMMENT ON COLUMN BARS.NBUR_TMP_F42.OKPO IS '';
 
 
 
+PROMPT *** Create  grants  NBUR_TMP_F42 ***
+grant SELECT                                                                 on NBUR_TMP_F42    to BARSREADER_ROLE;
+grant SELECT                                                                 on NBUR_TMP_F42    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

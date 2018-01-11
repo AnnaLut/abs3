@@ -79,9 +79,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_CONCLUSION_ORG ***
+grant SELECT                                                                 on CIM_CONCLUSION_ORG to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONCLUSION_ORG to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_CONCLUSION_ORG to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CONCLUSION_ORG to CIM_ROLE;
+grant SELECT                                                                 on CIM_CONCLUSION_ORG to UPLD;
 
 
 

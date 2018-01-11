@@ -46,6 +46,18 @@ COMMENT ON COLUMN BARS.TMP_OPERLIST_DEPS.ID_CHILD IS '';
 
 
 
+PROMPT *** Create  constraint SYS_C0025578 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_OPERLIST_DEPS MODIFY (ID_PARENT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C0025579 ***
 begin   
  execute immediate '
@@ -57,17 +69,9 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint SYS_C0025578 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_OPERLIST_DEPS MODIFY (ID_PARENT NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
+PROMPT *** Create  grants  TMP_OPERLIST_DEPS ***
+grant SELECT                                                                 on TMP_OPERLIST_DEPS to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_OPERLIST_DEPS to UPLD;
 
 
 

@@ -89,9 +89,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  EK_POK ***
+grant SELECT                                                                 on EK_POK          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on EK_POK          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EK_POK          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EK_POK          to EK_POK;
+grant SELECT                                                                 on EK_POK          to UPLD;
 grant FLASHBACK,SELECT                                                       on EK_POK          to WR_REFREAD;
 
 

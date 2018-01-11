@@ -108,8 +108,10 @@ exception when others then
 
 PROMPT *** Create  grants  RAZ_KOM ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on RAZ_KOM         to ABS_ADMIN;
+grant SELECT                                                                 on RAZ_KOM         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RAZ_KOM         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RAZ_KOM         to BARS_DM;
+grant SELECT                                                                 on RAZ_KOM         to UPLD;
 grant FLASHBACK,SELECT                                                       on RAZ_KOM         to WR_REFREAD;
 
 

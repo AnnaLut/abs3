@@ -71,19 +71,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_T902ACC_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.T902_ACC ADD CONSTRAINT FK_T902ACC_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_T902ACC_KF_NN ***
 begin   
  execute immediate '
@@ -125,7 +112,9 @@ exception when others then
 
 PROMPT *** Create  grants  T902_ACC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on T902_ACC        to BARS014;
+grant SELECT                                                                 on T902_ACC        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on T902_ACC        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on T902_ACC        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on T902_ACC        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on T902_ACC        to WR_REFREAD;
 

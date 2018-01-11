@@ -69,35 +69,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint XFK_DPT_DEPOSITW_DPT_ID ***
+PROMPT *** Create  constraint CC_DPTDEPOSITW_DPTID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSITW ADD CONSTRAINT XFK_DPT_DEPOSITW_DPT_ID FOREIGN KEY (DPT_ID)
-	  REFERENCES BARS.DPT_DEPOSIT (DEPOSIT_ID) ON DELETE CASCADE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTDEPOSITW_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSITW MODIFY (BRANCH CONSTRAINT CC_DPTDEPOSITW_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTDEPOSITW_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSITW MODIFY (KF CONSTRAINT CC_DPTDEPOSITW_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_DEPOSITW MODIFY (DPT_ID CONSTRAINT CC_DPTDEPOSITW_DPTID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -118,10 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTDEPOSITW_DPTID_NN ***
+PROMPT *** Create  constraint CC_DPTDEPOSITW_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSITW MODIFY (DPT_ID CONSTRAINT CC_DPTDEPOSITW_DPTID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_DEPOSITW MODIFY (KF CONSTRAINT CC_DPTDEPOSITW_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -130,50 +105,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTDEPOSITW_DPTDPTALL2 ***
+PROMPT *** Create  constraint CC_DPTDEPOSITW_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSITW ADD CONSTRAINT FK_DPTDEPOSITW_DPTDPTALL2 FOREIGN KEY (KF, DPT_ID)
-	  REFERENCES BARS.DPT_DEPOSIT_ALL (KF, DEPOSIT_ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTDEPOSITW_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSITW ADD CONSTRAINT FK_DPTDEPOSITW_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTDEPOSITW_DPTFIELD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSITW ADD CONSTRAINT FK_DPTDEPOSITW_DPTFIELD FOREIGN KEY (TAG)
-	  REFERENCES BARS.DPT_FIELD (TAG) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTDEPOSITW_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_DEPOSITW ADD CONSTRAINT FK_DPTDEPOSITW_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPT_DEPOSITW MODIFY (BRANCH CONSTRAINT CC_DPTDEPOSITW_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -196,9 +131,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_DEPOSITW ***
+grant SELECT                                                                 on DPT_DEPOSITW    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_DEPOSITW    to BARS_ACCESS_DEFROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on DPT_DEPOSITW    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_DEPOSITW    to DPT_ROLE;
+grant SELECT                                                                 on DPT_DEPOSITW    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_DEPOSITW    to WR_ALL_RIGHTS;
 
 

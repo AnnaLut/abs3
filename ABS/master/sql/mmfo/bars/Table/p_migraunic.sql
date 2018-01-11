@@ -53,7 +53,9 @@ COMMENT ON COLUMN BARS.P_MIGRAUNIC.ORDNUNG IS 'Порядок сортировки';
 
 
 PROMPT *** Create  grants  P_MIGRAUNIC ***
+grant SELECT                                                                 on P_MIGRAUNIC     to BARSREADER_ROLE;
 grant SELECT                                                                 on P_MIGRAUNIC     to BARS_DM;
+grant SELECT                                                                 on P_MIGRAUNIC     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on P_MIGRAUNIC     to WR_ALL_RIGHTS;
 
 

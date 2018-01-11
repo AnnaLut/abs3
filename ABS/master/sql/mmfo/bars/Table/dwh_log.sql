@@ -23,33 +23,39 @@ END;
 PROMPT *** Create  table DWH_LOG ***
 begin 
   execute immediate '
-		create table BARS.DWH_LOG
-		(
-			package_id     NUMBER(38),
-			package_data   CLOB,
-			recieved_date  DATE default sysdate,
-			package_status VARCHAR2(10),
-			package_error  VARCHAR2(2000),
-			package_type   NUMBER(2),
-			bank_date      VARCHAR2(20),
-			kf             VARCHAR2(6)
-		)
-		tablespace BRSDYND';
+  CREATE TABLE BARS.DWH_LOG 
+   (	PACKAGE_ID NUMBER(38,0), 
+	PACKAGE_DATA CLOB, 
+	RECIEVED_DATE DATE DEFAULT sysdate, 
+	PACKAGE_STATUS VARCHAR2(10), 
+	PACKAGE_ERROR VARCHAR2(2000), 
+	PACKAGE_TYPE NUMBER(2,0), 
+	BANK_DATE VARCHAR2(20), 
+	KF VARCHAR2(6), 
+	PARSE_BEGIN DATE, 
+	PARSE_END DATE
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  TABLESPACE BRSDYNI 
+ LOB (PACKAGE_DATA) STORE AS BASICFILE (
+  TABLESPACE BRSDYNI ENABLE STORAGE IN ROW CHUNK 8192 RETENTION 
+  NOCACHE LOGGING ) ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
 
-alter table bars.dwh_log modify package_id number(38);
+
 
 
 PROMPT *** ALTER_POLICIES to DWH_LOG ***
  exec bpa.alter_policies('DWH_LOG');
 
 
--- Add comments to the table 
 COMMENT ON TABLE BARS.DWH_LOG IS 'протокол отримання інформації і обробки від DWH';
--- Add comments to the columns 
+COMMENT ON COLUMN BARS.DWH_LOG.PARSE_BEGIN IS 'Время начала обработки';
+COMMENT ON COLUMN BARS.DWH_LOG.PARSE_END IS 'Время окончания обработки';
 COMMENT ON COLUMN BARS.DWH_LOG.PACKAGE_ID IS 'номер пакету';
 COMMENT ON COLUMN BARS.DWH_LOG.PACKAGE_DATA IS 'дані пакету';
 COMMENT ON COLUMN BARS.DWH_LOG.RECIEVED_DATE IS 'дата надходження пакету';
@@ -114,8 +120,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  DWH_LOG ***
+grant SELECT                                                                 on DWH_LOG         to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DWH_LOG         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DWH_LOG         to BARS_DM;
+grant SELECT                                                                 on DWH_LOG         to UPLD;
 
 
 

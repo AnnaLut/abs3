@@ -68,19 +68,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_REZSPN_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REZ_SPN ADD CONSTRAINT FK_REZSPN_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_REZSPN_KF_NN ***
 begin   
  execute immediate '
@@ -107,9 +94,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_SPN ***
+grant SELECT                                                                 on REZ_SPN         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REZ_SPN         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REZ_SPN         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZ_SPN         to START1;
+grant SELECT                                                                 on REZ_SPN         to UPLD;
 grant FLASHBACK,SELECT                                                       on REZ_SPN         to WR_REFREAD;
 
 

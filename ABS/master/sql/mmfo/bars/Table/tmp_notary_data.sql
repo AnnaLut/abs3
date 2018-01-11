@@ -77,6 +77,10 @@ COMMENT ON COLUMN BARS.TMP_NOTARY_DATA.NOTARY_CERTIFICATE_NUMBER IS '';
 
 
 
+PROMPT *** Create  grants  TMP_NOTARY_DATA ***
+grant SELECT                                                                 on TMP_NOTARY_DATA to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_NOTARY_DATA to UPLD;
+
 
 
 PROMPT ===================================================================================== 

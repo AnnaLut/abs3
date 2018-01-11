@@ -106,11 +106,13 @@ exception when others then
 
 PROMPT *** Create  grants  KLP_INFO ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_INFO        to ABS_ADMIN;
+grant SELECT                                                                 on KLP_INFO        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLP_INFO        to BARS_ACCESS_DEFROLE;
 grant UPDATE                                                                 on KLP_INFO        to BARS_CONNECT;
 grant SELECT                                                                 on KLP_INFO        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_INFO        to START1;
 grant DELETE,INSERT,UPDATE                                                   on KLP_INFO        to TECH_MOM1;
+grant SELECT                                                                 on KLP_INFO        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLP_INFO        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KLP_INFO        to WR_REFREAD;
 

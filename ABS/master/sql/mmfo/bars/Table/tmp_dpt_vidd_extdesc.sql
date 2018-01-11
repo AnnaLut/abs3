@@ -70,10 +70,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119356 ***
+PROMPT *** Create  constraint SYS_C00119354 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_DPT_VIDD_EXTDESC MODIFY (TERM_DAYS NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_DPT_VIDD_EXTDESC MODIFY (EXT_NUM NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -94,16 +94,20 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119354 ***
+PROMPT *** Create  constraint SYS_C00119356 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_DPT_VIDD_EXTDESC MODIFY (EXT_NUM NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_DPT_VIDD_EXTDESC MODIFY (TERM_DAYS NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
+
+PROMPT *** Create  grants  TMP_DPT_VIDD_EXTDESC ***
+grant SELECT                                                                 on TMP_DPT_VIDD_EXTDESC to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_DPT_VIDD_EXTDESC to UPLD;
 
 
 

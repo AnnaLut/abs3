@@ -101,6 +101,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  STAN_OBS23 ***
+grant SELECT                                                                 on STAN_OBS23      to BARSREADER_ROLE;
 grant SELECT                                                                 on STAN_OBS23      to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAN_OBS23      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAN_OBS23      to BARS_DM;

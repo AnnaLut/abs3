@@ -55,19 +55,6 @@ COMMENT ON COLUMN BARS.DPU_AGREEMENT_TYPES.CONFIRM IS 'ќзнака необх≥дност≥ погод
 
 
 
-PROMPT *** Create  constraint FK_DPUAGRMNTTYPES_TEMPLATE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_AGREEMENT_TYPES ADD CONSTRAINT FK_DPUAGRMNTTYPES_TEMPLATE FOREIGN KEY (TEMPLATE)
-	  REFERENCES BARS.DOC_SCHEME (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_DPUAGRMNTTYPES ***
 begin   
  execute immediate '
@@ -156,11 +143,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPU_AGREEMENT_TYPES ***
+grant SELECT                                                                 on DPU_AGREEMENT_TYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on DPU_AGREEMENT_TYPES to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPU_AGREEMENT_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_AGREEMENT_TYPES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_AGREEMENT_TYPES to DPT_ADMIN;
 grant SELECT                                                                 on DPU_AGREEMENT_TYPES to START1;
+grant SELECT                                                                 on DPU_AGREEMENT_TYPES to UPLD;
 grant FLASHBACK,SELECT                                                       on DPU_AGREEMENT_TYPES to WR_REFREAD;
 
 

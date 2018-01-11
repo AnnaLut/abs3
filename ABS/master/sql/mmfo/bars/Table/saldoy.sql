@@ -338,9 +338,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SALDOY ***
+grant SELECT                                                                 on SALDOY          to BARSREADER_ROLE;
 grant SELECT                                                                 on SALDOY          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALDOY          to BARS_DM;
 grant SELECT                                                                 on SALDOY          to START1;
+grant SELECT                                                                 on SALDOY          to UPLD;
 
 
 

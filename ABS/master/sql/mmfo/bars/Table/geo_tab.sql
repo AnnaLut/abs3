@@ -46,8 +46,10 @@ COMMENT ON COLUMN BARS.GEO_TAB.NLS IS '';
 
 
 PROMPT *** Create  grants  GEO_TAB ***
+grant SELECT                                                                 on GEO_TAB         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GEO_TAB         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GEO_TAB         to BARS_DM;
+grant SELECT                                                                 on GEO_TAB         to UPLD;
 
 
 

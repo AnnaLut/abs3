@@ -75,47 +75,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SCORQSDAT_SCORQUESTS ***
+PROMPT *** Create  constraint CC_SCORQSDAT_MINVAL_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_DATE ADD CONSTRAINT FK_SCORQSDAT_SCORQUESTS FOREIGN KEY (SCORING_ID, QUESTION_ID)
-	  REFERENCES BARS.WCS_SCORING_QUESTIONS (SCORING_ID, QUESTION_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SCORQSDAT_SCORE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_DATE MODIFY (SCORE CONSTRAINT CC_SCORQSDAT_SCORE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SCORQSDAT_MAXSIGN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_DATE MODIFY (MAX_SIGN CONSTRAINT CC_SCORQSDAT_MAXSIGN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SCORQSDAT_MAXVAL_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_DATE MODIFY (MAX_VAL CONSTRAINT CC_SCORQSDAT_MAXVAL_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_SCORING_QS_DATE MODIFY (MIN_VAL CONSTRAINT CC_SCORQSDAT_MINVAL_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -136,10 +99,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SCORQSDAT_MINVAL_NN ***
+PROMPT *** Create  constraint CC_SCORQSDAT_MAXVAL_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_DATE MODIFY (MIN_VAL CONSTRAINT CC_SCORQSDAT_MINVAL_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_SCORING_QS_DATE MODIFY (MAX_VAL CONSTRAINT CC_SCORQSDAT_MAXVAL_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -148,11 +111,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SCORQSDAT_MINS_STYPES_ID ***
+PROMPT *** Create  constraint CC_SCORQSDAT_MAXSIGN_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_DATE ADD CONSTRAINT FK_SCORQSDAT_MINS_STYPES_ID FOREIGN KEY (MIN_SIGN)
-	  REFERENCES BARS.WCS_SIGN_TYPES (ID) ENABLE';
+  ALTER TABLE BARS.WCS_SCORING_QS_DATE MODIFY (MAX_SIGN CONSTRAINT CC_SCORQSDAT_MAXSIGN_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -161,11 +123,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SCORQSDAT_MAXS_STYPES_ID ***
+PROMPT *** Create  constraint CC_SCORQSDAT_SCORE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_SCORING_QS_DATE ADD CONSTRAINT FK_SCORQSDAT_MAXS_STYPES_ID FOREIGN KEY (MAX_SIGN)
-	  REFERENCES BARS.WCS_SIGN_TYPES (ID) ENABLE';
+  ALTER TABLE BARS.WCS_SCORING_QS_DATE MODIFY (SCORE CONSTRAINT CC_SCORQSDAT_SCORE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -188,8 +149,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_SCORING_QS_DATE ***
+grant SELECT                                                                 on WCS_SCORING_QS_DATE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SCORING_QS_DATE to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_SCORING_QS_DATE to START1;
+grant SELECT                                                                 on WCS_SCORING_QS_DATE to UPLD;
 
 
 

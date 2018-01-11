@@ -73,19 +73,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CCPENYSTART_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_PENY_START ADD CONSTRAINT FK_CCPENYSTART_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_CCPENYSTART_BRANCH_NN ***
 begin   
  execute immediate '
@@ -112,7 +99,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_PENY_START ***
+grant SELECT                                                                 on CC_PENY_START   to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_PENY_START   to BARS_DM;
+grant SELECT                                                                 on CC_PENY_START   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_PENY_START   to WR_ALL_RIGHTS;
 
 

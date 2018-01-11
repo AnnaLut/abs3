@@ -55,8 +55,10 @@ COMMENT ON COLUMN BARS.KL_Z300.A010 IS '';
 
 
 PROMPT *** Create  grants  KL_Z300 ***
+grant SELECT                                                                 on KL_Z300         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_Z300         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_Z300         to START1;
+grant SELECT                                                                 on KL_Z300         to UPLD;
 
 
 

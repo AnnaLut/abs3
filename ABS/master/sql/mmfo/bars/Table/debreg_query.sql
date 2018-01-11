@@ -97,19 +97,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DEBREGQUERY_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEBREG_QUERY ADD CONSTRAINT FK_DEBREGQUERY_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_DEBREG_QUERY_PHASEID ***
 begin   
  execute immediate '
@@ -172,9 +159,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DEBREG_QUERY ***
+grant SELECT                                                                 on DEBREG_QUERY    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEBREG_QUERY    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEBREG_QUERY    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEBREG_QUERY    to DEB_REG;
+grant SELECT                                                                 on DEBREG_QUERY    to UPLD;
 
 
 

@@ -53,9 +53,11 @@ COMMENT ON COLUMN BARS.EK19_RA.PROC IS '';
 
 
 PROMPT *** Create  grants  EK19_RA ***
+grant SELECT                                                                 on EK19_RA         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on EK19_RA         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EK19_RA         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EK19_RA         to EK19_RA;
+grant SELECT                                                                 on EK19_RA         to UPLD;
 grant FLASHBACK,SELECT                                                       on EK19_RA         to WR_REFREAD;
 
 

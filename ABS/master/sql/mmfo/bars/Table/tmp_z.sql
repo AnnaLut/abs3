@@ -51,8 +51,10 @@ COMMENT ON COLUMN BARS.TMP_Z.ERRK IS '';
 
 
 PROMPT *** Create  grants  TMP_Z ***
+grant SELECT                                                                 on TMP_Z           to BARSREADER_ROLE;
 grant INSERT                                                                 on TMP_Z           to BARS_ACCESS_DEFROLE;
 grant INSERT                                                                 on TMP_Z           to TOSS;
+grant SELECT                                                                 on TMP_Z           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_Z           to WR_ALL_RIGHTS;
 
 

@@ -88,7 +88,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CHKLIST_GOU ***
+grant SELECT                                                                 on CHKLIST_GOU     to BARSREADER_ROLE;
 grant SELECT                                                                 on CHKLIST_GOU     to BARS_DM;
+grant SELECT                                                                 on CHKLIST_GOU     to UPLD;
 
 
 

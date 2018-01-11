@@ -128,10 +128,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMBALSDAILYARCH_CUSTID ***
+PROMPT *** Create  constraint CC_DMBALSDAILYARCH_VERSION_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_BALANCES_DAILY_ARCH MODIFY (CUST_ID CONSTRAINT CC_DMBALSDAILYARCH_CUSTID NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_BALANCES_DAILY_ARCH MODIFY (VERSION_ID CONSTRAINT CC_DMBALSDAILYARCH_VERSION_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -152,10 +152,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMBALSDAILYARCH_VERSION_NN ***
+PROMPT *** Create  constraint CC_DMBALSDAILYARCH_CUSTID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_BALANCES_DAILY_ARCH MODIFY (VERSION_ID CONSTRAINT CC_DMBALSDAILYARCH_VERSION_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_BALANCES_DAILY_ARCH MODIFY (CUST_ID CONSTRAINT CC_DMBALSDAILYARCH_CUSTID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -233,9 +233,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_DM_BALANCES_DAILY_ARCH ***
+grant SELECT                                                                 on NBUR_DM_BALANCES_DAILY_ARCH to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_DM_BALANCES_DAILY_ARCH to BARSUPL;
 grant SELECT                                                                 on NBUR_DM_BALANCES_DAILY_ARCH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_DM_BALANCES_DAILY_ARCH to BARS_DM;
+grant SELECT                                                                 on NBUR_DM_BALANCES_DAILY_ARCH to UPLD;
 
 
 

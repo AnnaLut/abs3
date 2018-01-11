@@ -49,8 +49,10 @@ COMMENT ON COLUMN BARS.IN_CHET.NAME_CNT IS '';
 
 
 PROMPT *** Create  grants  IN_CHET ***
+grant SELECT                                                                 on IN_CHET         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on IN_CHET         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on IN_CHET         to START1;
+grant SELECT                                                                 on IN_CHET         to UPLD;
 
 
 

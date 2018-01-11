@@ -167,8 +167,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  USSR_ERR_DEBIT ***
+grant SELECT                                                                 on USSR_ERR_DEBIT  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on USSR_ERR_DEBIT  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on USSR_ERR_DEBIT  to START1;
+grant SELECT                                                                 on USSR_ERR_DEBIT  to UPLD;
 
 
 

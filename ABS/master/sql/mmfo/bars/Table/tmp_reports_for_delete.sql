@@ -146,9 +146,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_REPORTS_FOR_DELETE ***
+grant SELECT                                                                 on TMP_REPORTS_FOR_DELETE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_REPORTS_FOR_DELETE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_REPORTS_FOR_DELETE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_REPORTS_FOR_DELETE to START1;
+grant SELECT                                                                 on TMP_REPORTS_FOR_DELETE to UPLD;
 
 
 

@@ -67,10 +67,12 @@ COMMENT ON COLUMN BARS.VER_DOC_MAKET.KF IS '';
 
 
 PROMPT *** Create  grants  VER_DOC_MAKET ***
+grant SELECT                                                                 on VER_DOC_MAKET   to BARSREADER_ROLE;
 grant SELECT                                                                 on VER_DOC_MAKET   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VER_DOC_MAKET   to BARS_DM;
 grant SELECT                                                                 on VER_DOC_MAKET   to RCC_DEAL;
 grant SELECT                                                                 on VER_DOC_MAKET   to START1;
+grant SELECT                                                                 on VER_DOC_MAKET   to UPLD;
 
 
 

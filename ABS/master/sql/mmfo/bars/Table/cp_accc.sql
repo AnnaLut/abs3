@@ -71,8 +71,8 @@ begin
 	NLS_1819 VARCHAR2(15), 
 	NLS_1919 VARCHAR2(15), 
 	UNREC VARCHAR2(15), 
-	NLSFD VARCHAR2(15),
-        D_Close date
+	NLSFD VARCHAR2(15), 
+	D_CLOSE DATE
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -82,12 +82,6 @@ exception when others then
 end; 
 /
 
-begin EXECUTE IMMEDIATE 'alter table bars.CP_ACCC add ( D_Close date) ';
-exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
-end;
-/
-
-
 
 
 
@@ -96,6 +90,7 @@ PROMPT *** ALTER_POLICIES to CP_ACCC ***
 
 
 COMMENT ON TABLE BARS.CP_ACCC IS 'Справочник консолид.сч. ФУ пр ЦБ';
+COMMENT ON COLUMN BARS.CP_ACCC.D_CLOSE IS 'Дата закр Суб.Портф';
 COMMENT ON COLUMN BARS.CP_ACCC.VIDD IS 'Вид учета (БС)';
 COMMENT ON COLUMN BARS.CP_ACCC.RYN IS 'СубПортфель';
 COMMENT ON COLUMN BARS.CP_ACCC.NLSA IS 'Cчет номинала';
@@ -144,7 +139,7 @@ COMMENT ON COLUMN BARS.CP_ACCC.NLS_1819 IS 'Рах-к Деб. заборгованост_';
 COMMENT ON COLUMN BARS.CP_ACCC.NLS_1919 IS 'Рах-к Кред. заборгованост_';
 COMMENT ON COLUMN BARS.CP_ACCC.UNREC IS 'Сч невизнаних доходів';
 COMMENT ON COLUMN BARS.CP_ACCC.NLSFD IS 'Сч ФинДебеторки для портфеля ФД(-3)';
-COMMENT ON COLUMN BARS.CP_ACCC.D_Close IS 'Дата закр Суб.Портф';
+
 
 
 
@@ -154,19 +149,6 @@ begin
   ALTER TABLE BARS.CP_ACCC ADD CONSTRAINT XPK_CP_ACCC PRIMARY KEY (VIDD, EMI, PF, RYN)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CP_ACCC_BYR ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CP_ACCC ADD CONSTRAINT FK_CP_ACCC_BYR FOREIGN KEY (IDB)
-	  REFERENCES BARS.CP_BYR (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -237,6 +219,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_ACCC ***
+grant SELECT                                                                 on CP_ACCC         to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_ACCC         to BARSUPL;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CP_ACCC         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_ACCC         to BARS_DM;

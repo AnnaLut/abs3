@@ -94,10 +94,12 @@ exception when others then
 
 PROMPT *** Create  grants  BRANCH_TIP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BRANCH_TIP      to ABS_ADMIN;
+grant SELECT                                                                 on BRANCH_TIP      to BARSREADER_ROLE;
 grant SELECT                                                                 on BRANCH_TIP      to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRANCH_TIP      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH_TIP      to BARS_DM;
 grant SELECT                                                                 on BRANCH_TIP      to CUST001;
+grant SELECT                                                                 on BRANCH_TIP      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRANCH_TIP      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BRANCH_TIP      to WR_REFREAD;
 

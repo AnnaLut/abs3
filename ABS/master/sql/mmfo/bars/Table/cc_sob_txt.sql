@@ -103,10 +103,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_SOB_TXT ***
+grant SELECT                                                                 on CC_SOB_TXT      to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_SOB_TXT      to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_SOB_TXT      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_SOB_TXT      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_SOB_TXT      to RCC_DEAL;
+grant SELECT                                                                 on CC_SOB_TXT      to UPLD;
 
 
 

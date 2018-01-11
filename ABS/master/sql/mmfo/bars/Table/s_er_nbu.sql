@@ -49,8 +49,10 @@ COMMENT ON COLUMN BARS.S_ER_NBU.N_ER IS '';
 
 
 PROMPT *** Create  grants  S_ER_NBU ***
+grant SELECT                                                                 on S_ER_NBU        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on S_ER_NBU        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S_ER_NBU        to S_ER_NBU;
+grant SELECT                                                                 on S_ER_NBU        to UPLD;
 grant FLASHBACK,SELECT                                                       on S_ER_NBU        to WR_REFREAD;
 
 

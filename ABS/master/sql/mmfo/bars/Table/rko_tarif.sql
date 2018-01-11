@@ -119,8 +119,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  RKO_TARIF ***
+grant SELECT                                                                 on RKO_TARIF       to BARSREADER_ROLE;
 grant SELECT                                                                 on RKO_TARIF       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RKO_TARIF       to CUST001;
+grant SELECT                                                                 on RKO_TARIF       to UPLD;
 
 
 

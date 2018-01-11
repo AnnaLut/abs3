@@ -77,11 +77,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  BLK_CODES ***
+grant SELECT                                                                 on BLK_CODES       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BLK_CODES       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BLK_CODES       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BLK_CODES       to BLK_CODES;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BLK_CODES       to SEP_ROLE;
 grant SELECT                                                                 on BLK_CODES       to START1;
+grant SELECT                                                                 on BLK_CODES       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BLK_CODES       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BLK_CODES       to WR_REFREAD;
 

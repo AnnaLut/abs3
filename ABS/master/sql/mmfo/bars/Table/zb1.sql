@@ -132,7 +132,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZB1 ***
+grant SELECT                                                                 on ZB1             to BARSREADER_ROLE;
 grant SELECT                                                                 on ZB1             to BARS_DM;
+grant SELECT                                                                 on ZB1             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZB1             to WR_ALL_RIGHTS;
 
 

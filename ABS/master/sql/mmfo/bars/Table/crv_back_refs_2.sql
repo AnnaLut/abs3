@@ -63,9 +63,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CRV_BACK_REFS_2 ***
+grant SELECT                                                                 on CRV_BACK_REFS_2 to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CRV_BACK_REFS_2 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CRV_BACK_REFS_2 to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CRV_BACK_REFS_2 to START1;
+grant SELECT                                                                 on CRV_BACK_REFS_2 to UPLD;
 
 
 

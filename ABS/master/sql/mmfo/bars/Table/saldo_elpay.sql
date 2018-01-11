@@ -103,8 +103,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SALDO_ELPAY ***
+grant SELECT                                                                 on SALDO_ELPAY     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDO_ELPAY     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SALDO_ELPAY     to START1;
+grant SELECT                                                                 on SALDO_ELPAY     to UPLD;
 
 
 

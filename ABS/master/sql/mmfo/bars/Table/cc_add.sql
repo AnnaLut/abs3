@@ -61,7 +61,9 @@ begin
 	NAMKRED VARCHAR2(38), 
 	NAZNKRED VARCHAR2(160), 
 	NLS_1819 VARCHAR2(14), 
-	FIELD_58D VARCHAR2(250)
+	FIELD_58D VARCHAR2(250), 
+	N_NBU VARCHAR2(300), 
+	D_NBU DATE
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -79,6 +81,8 @@ PROMPT *** ALTER_POLICIES to CC_ADD ***
 
 
 COMMENT ON TABLE BARS.CC_ADD IS 'Доп.соглашения';
+COMMENT ON COLUMN BARS.CC_ADD.N_NBU IS 'Номер свідоцтва НБУ';
+COMMENT ON COLUMN BARS.CC_ADD.D_NBU IS 'Дата реєстрації в НБУ';
 COMMENT ON COLUMN BARS.CC_ADD.ND IS 'Номер договора (референц)';
 COMMENT ON COLUMN BARS.CC_ADD.ADDS IS 'N доп. соглащения';
 COMMENT ON COLUMN BARS.CC_ADD.AIM IS 'Целевое назначение договора';
@@ -135,23 +139,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CCADD_ACCOUNTS ***
+PROMPT *** Create  constraint NK_CC_ADD_ND ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_ADD ADD CONSTRAINT FK_CCADD_ACCOUNTS FOREIGN KEY (KF, ACCS)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CCADD_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ADD MODIFY (KF CONSTRAINT CC_CCADD_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CC_ADD MODIFY (ND CONSTRAINT NK_CC_ADD_ND NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -172,140 +163,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_CC_ADD_ND ***
+PROMPT *** Create  constraint CC_CCADD_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_ADD MODIFY (ND CONSTRAINT NK_CC_ADD_ND NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CCADD_SWJOURNAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ADD ADD CONSTRAINT FK_CCADD_SWJOURNAL FOREIGN KEY (SWI_REF)
-	  REFERENCES BARS.SW_JOURNAL (SWREF) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CCADD_SWJOURNAL2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ADD ADD CONSTRAINT FK_CCADD_SWJOURNAL2 FOREIGN KEY (SWO_REF)
-	  REFERENCES BARS.SW_JOURNAL (SWREF) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_CCSOURCE_CCADD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ADD ADD CONSTRAINT R_CCSOURCE_CCADD FOREIGN KEY (SOUR)
-	  REFERENCES BARS.CC_SOURCE (SOUR) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_TABVAL_CCADD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ADD ADD CONSTRAINT R_TABVAL_CCADD FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint XFK_FREQ ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ADD ADD CONSTRAINT XFK_FREQ FOREIGN KEY (FREQ)
-	  REFERENCES BARS.FREQ (FREQ) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_CCAIM_CCADD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ADD ADD CONSTRAINT R_CCAIM_CCADD FOREIGN KEY (AIM)
-	  REFERENCES BARS.CC_AIM (AIM) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CCADD_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ADD ADD CONSTRAINT FK_CCADD_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CCADD_SWBANKS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ADD ADD CONSTRAINT FK_CCADD_SWBANKS2 FOREIGN KEY (SWO_BIC)
-	  REFERENCES BARS.SW_BANKS (BIC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CCADD_SWBANKS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ADD ADD CONSTRAINT FK_CCADD_SWBANKS FOREIGN KEY (SWI_BIC)
-	  REFERENCES BARS.SW_BANKS (BIC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_CCDEAL_CCADD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_ADD ADD CONSTRAINT R_CCDEAL_CCADD FOREIGN KEY (ND)
-	  REFERENCES BARS.CC_DEAL (ND) DEFERRABLE ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CC_ADD MODIFY (KF CONSTRAINT CC_CCADD_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -325,6 +186,9 @@ exception when others then
  end;
 /
 
+
+
+
 PROMPT *** Create  index IDX_CCADD_KFACC ***
 begin   
  execute immediate '
@@ -337,27 +201,10 @@ exception when others then
 /
 
 
-begin
- execute immediate   'alter table CC_add add (N_NBU varchar2(50)) ';
-exception when others then
-  -- ORA-01430: column being added already exists in table
-  if SQLCODE = - 01430 then null;   else raise; end if; 
-end;
-/
-COMMENT ON COLUMN cc_add.n_NBU IS 'Номер свідоцтва НБУ';
-
-begin
- execute immediate   'alter table CC_add add (D_NBU date) ';
-exception when others then
-  -- ORA-01430: column being added already exists in table
-  if SQLCODE = - 01430 then null;   else raise; end if; 
-end;
-/
-COMMENT ON COLUMN cc_add.D_NBU IS 'Дата реєстрації в НБУ';
-
 
 PROMPT *** Create  grants  CC_ADD ***
 grant SELECT                                                                 on CC_ADD          to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on CC_ADD          to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_ADD          to BARSUPL;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on CC_ADD          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_ADD          to BARS_DM;

@@ -160,7 +160,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_CIM_VMD_BOUND ***
+grant SELECT                                                                 on TMP_CIM_VMD_BOUND to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_CIM_VMD_BOUND to BARS_DM;
+grant SELECT                                                                 on TMP_CIM_VMD_BOUND to UPLD;
 
 
 

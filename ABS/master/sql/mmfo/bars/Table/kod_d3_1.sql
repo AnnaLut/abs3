@@ -63,8 +63,10 @@ COMMENT ON COLUMN BARS.KOD_D3_1.TXT_OLD IS '';
 
 
 PROMPT *** Create  grants  KOD_D3_1 ***
+grant SELECT                                                                 on KOD_D3_1        to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on KOD_D3_1        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_D3_1        to BARS_DM;
+grant SELECT                                                                 on KOD_D3_1        to UPLD;
 grant FLASHBACK,SELECT                                                       on KOD_D3_1        to WR_REFREAD;
 
 

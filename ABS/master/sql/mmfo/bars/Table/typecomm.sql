@@ -91,8 +91,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TYPECOMM ***
+grant SELECT                                                                 on TYPECOMM        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TYPECOMM        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TYPECOMM        to START1;
+grant SELECT                                                                 on TYPECOMM        to UPLD;
 
 
 

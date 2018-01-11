@@ -49,18 +49,6 @@ COMMENT ON COLUMN BARS.SV_OWNER_OZN.NAME IS 'Тип істотної участі';
 
 
 
-PROMPT *** Create  constraint CC_SVOWNEROZN_NAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_OWNER_OZN ADD CONSTRAINT CC_SVOWNEROZN_NAME_NN CHECK (NAME IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SVOWNEROZN_ID_NN ***
 begin   
  execute immediate '
@@ -72,9 +60,23 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint CC_SVOWNEROZN_NAME_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SV_OWNER_OZN ADD CONSTRAINT CC_SVOWNEROZN_NAME_NN CHECK (NAME IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  SV_OWNER_OZN ***
+grant SELECT                                                                 on SV_OWNER_OZN    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_OWNER_OZN    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_OWNER_OZN    to RPBN002;
+grant SELECT                                                                 on SV_OWNER_OZN    to UPLD;
 
 
 

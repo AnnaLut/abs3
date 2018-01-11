@@ -102,11 +102,13 @@ exception when others then
 
 PROMPT *** Create  grants  BASEM ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BASEM           to ABS_ADMIN;
+grant SELECT                                                                 on BASEM           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BASEM           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BASEM           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BASEM           to BASEM;
 grant SELECT                                                                 on BASEM           to CUST001;
 grant SELECT                                                                 on BASEM           to START1;
+grant SELECT                                                                 on BASEM           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BASEM           to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BASEM           to WR_REFREAD;
 

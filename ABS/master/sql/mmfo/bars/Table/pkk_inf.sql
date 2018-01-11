@@ -59,19 +59,6 @@ COMMENT ON COLUMN BARS.PKK_INF.DATP IS '';
 
 
 
-PROMPT *** Create  constraint FK_PKKINF_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PKK_INF ADD CONSTRAINT FK_PKKINF_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_PKKINF_REC_NN ***
 begin   
  execute immediate '
@@ -150,10 +137,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  PKK_INF ***
+grant SELECT                                                                 on PKK_INF         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PKK_INF         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PKK_INF         to OBPC;
 grant DELETE                                                                 on PKK_INF         to PYOD001;
 grant SELECT                                                                 on PKK_INF         to TECH004;
+grant SELECT                                                                 on PKK_INF         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PKK_INF         to WR_ALL_RIGHTS;
 
 

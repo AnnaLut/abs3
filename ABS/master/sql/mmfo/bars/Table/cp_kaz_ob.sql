@@ -101,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_KAZ_OB ***
+grant SELECT                                                                 on CP_KAZ_OB       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_KAZ_OB       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_KAZ_OB       to BARS_DM;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_KAZ_OB       to START1;
+grant SELECT                                                                 on CP_KAZ_OB       to UPLD;
 grant FLASHBACK,SELECT                                                       on CP_KAZ_OB       to WR_REFREAD;
 
 

@@ -79,32 +79,6 @@ COMMENT ON COLUMN BARS.TABVAL$GLOBAL.FX_BASE IS '';
 
 
 
-PROMPT *** Create  constraint FK_TABVAL_COUNTRY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TABVAL$GLOBAL ADD CONSTRAINT FK_TABVAL_COUNTRY FOREIGN KEY (COUNTRY)
-	  REFERENCES BARS.COUNTRY (COUNTRY) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_TABVAL_BASEY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TABVAL$GLOBAL ADD CONSTRAINT FK_TABVAL_BASEY FOREIGN KEY (BASEY)
-	  REFERENCES BARS.BASEY (BASEY) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_TABVAL ***
 begin   
  execute immediate '
@@ -157,10 +131,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TABVAL_PRV_NN ***
+PROMPT *** Create  constraint CC_TABVAL_KV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TABVAL$GLOBAL MODIFY (PRV CONSTRAINT CC_TABVAL_PRV_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TABVAL$GLOBAL MODIFY (KV CONSTRAINT CC_TABVAL_KV_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -229,10 +203,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_TABVAL_KV_NN ***
+PROMPT *** Create  constraint CC_TABVAL_PRV_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TABVAL$GLOBAL MODIFY (KV CONSTRAINT CC_TABVAL_KV_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TABVAL$GLOBAL MODIFY (PRV CONSTRAINT CC_TABVAL_PRV_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -273,6 +247,7 @@ grant DELETE,INSERT,SELECT,UPDATE                                            on 
 grant SELECT                                                                 on TABVAL$GLOBAL   to BARS010;
 grant FLASHBACK,REFERENCES,SELECT                                            on TABVAL$GLOBAL   to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on TABVAL$GLOBAL   to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on TABVAL$GLOBAL   to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on TABVAL$GLOBAL   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TABVAL$GLOBAL   to BARS_DM;
 grant SELECT                                                                 on TABVAL$GLOBAL   to CC_DOC;
@@ -286,6 +261,7 @@ grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on 
 grant SELECT                                                                 on TABVAL$GLOBAL   to RPBN001;
 grant SELECT                                                                 on TABVAL$GLOBAL   to START1;
 grant SELECT                                                                 on TABVAL$GLOBAL   to TOSS;
+grant SELECT                                                                 on TABVAL$GLOBAL   to UPLD;
 grant SELECT                                                                 on TABVAL$GLOBAL   to WEB_BALANS;
 grant SELECT                                                                 on TABVAL$GLOBAL   to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TABVAL$GLOBAL   to WR_ALL_RIGHTS;

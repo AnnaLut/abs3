@@ -223,6 +223,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_ADD_UPDATE ***
+grant SELECT                                                                 on CC_ADD_UPDATE   to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_ADD_UPDATE   to BARSUPL;
 grant SELECT                                                                 on CC_ADD_UPDATE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_ADD_UPDATE   to BARS_DM;

@@ -101,10 +101,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  REF_BACK ***
+grant SELECT                                                                 on REF_BACK        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REF_BACK        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REF_BACK        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REF_BACK        to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REF_BACK        to RPBN002;
+grant SELECT                                                                 on REF_BACK        to UPLD;
 grant FLASHBACK,SELECT                                                       on REF_BACK        to WR_REFREAD;
 
 

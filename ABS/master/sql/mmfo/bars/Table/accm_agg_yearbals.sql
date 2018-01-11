@@ -83,95 +83,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ACCMAGGYBALS_ACCMSTATECAL ***
+PROMPT *** Create  constraint CC_ACCMAGGYBALS_CALDT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCM_AGG_YEARBALS ADD CONSTRAINT FK_ACCMAGGYBALS_ACCMSTATECAL FOREIGN KEY (CALDT_ID)
-	  REFERENCES BARS.ACCM_CALENDAR (CALDT_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMAGGYBALS_WCKOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (WCKOS CONSTRAINT CC_ACCMAGGYBALS_WCKOS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMAGGYBALS_WCDOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (WCDOS CONSTRAINT CC_ACCMAGGYBALS_WCDOS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMAGGYBALS_WSKOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (WSKOS CONSTRAINT CC_ACCMAGGYBALS_WSKOS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMAGGYBALS_WSDOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (WSDOS CONSTRAINT CC_ACCMAGGYBALS_WSDOS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMAGGYBALS_OSTQ_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (OSTQ CONSTRAINT CC_ACCMAGGYBALS_OSTQ_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMAGGYBALS_OST_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (OST CONSTRAINT CC_ACCMAGGYBALS_OST_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCMAGGYBALS_RNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (RNK CONSTRAINT CC_ACCMAGGYBALS_RNK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (CALDT_ID CONSTRAINT CC_ACCMAGGYBALS_CALDT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -192,10 +107,82 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ACCMAGGYBALS_CALDT_NN ***
+PROMPT *** Create  constraint CC_ACCMAGGYBALS_RNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (CALDT_ID CONSTRAINT CC_ACCMAGGYBALS_CALDT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (RNK CONSTRAINT CC_ACCMAGGYBALS_RNK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMAGGYBALS_OST_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (OST CONSTRAINT CC_ACCMAGGYBALS_OST_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMAGGYBALS_OSTQ_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (OSTQ CONSTRAINT CC_ACCMAGGYBALS_OSTQ_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMAGGYBALS_WSDOS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (WSDOS CONSTRAINT CC_ACCMAGGYBALS_WSDOS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMAGGYBALS_WSKOS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (WSKOS CONSTRAINT CC_ACCMAGGYBALS_WSKOS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMAGGYBALS_WCDOS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (WCDOS CONSTRAINT CC_ACCMAGGYBALS_WCDOS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ACCMAGGYBALS_WCKOS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ACCM_AGG_YEARBALS MODIFY (WCKOS CONSTRAINT CC_ACCMAGGYBALS_WCKOS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -221,9 +208,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACCM_AGG_YEARBALS ***
+grant SELECT                                                                 on ACCM_AGG_YEARBALS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_AGG_YEARBALS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCM_AGG_YEARBALS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCM_AGG_YEARBALS to START1;
+grant SELECT                                                                 on ACCM_AGG_YEARBALS to UPLD;
 
 
 

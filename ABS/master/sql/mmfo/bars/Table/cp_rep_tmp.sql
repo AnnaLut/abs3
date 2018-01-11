@@ -135,9 +135,11 @@ COMMENT ON COLUMN BARS.CP_REP_TMP.PF_NEW IS '';
 
 
 PROMPT *** Create  grants  CP_REP_TMP ***
+grant SELECT                                                                 on CP_REP_TMP      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_REP_TMP      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_REP_TMP      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_REP_TMP      to START1;
+grant SELECT                                                                 on CP_REP_TMP      to UPLD;
 
 
 

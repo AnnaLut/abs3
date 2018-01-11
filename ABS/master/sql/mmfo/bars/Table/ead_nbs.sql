@@ -86,7 +86,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  EAD_NBS ***
+grant SELECT                                                                 on EAD_NBS         to BARSREADER_ROLE;
 grant SELECT                                                                 on EAD_NBS         to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on EAD_NBS         to UPLD;
 
 
 

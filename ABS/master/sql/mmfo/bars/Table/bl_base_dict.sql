@@ -101,8 +101,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  BL_BASE_DICT ***
+grant SELECT                                                                 on BL_BASE_DICT    to BARSREADER_ROLE;
 grant SELECT                                                                 on BL_BASE_DICT    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BL_BASE_DICT    to RBL;
+grant SELECT                                                                 on BL_BASE_DICT    to UPLD;
 
 
 

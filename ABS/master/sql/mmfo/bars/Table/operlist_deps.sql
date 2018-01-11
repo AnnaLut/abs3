@@ -49,32 +49,6 @@ COMMENT ON COLUMN BARS.OPERLIST_DEPS.ID_CHILD IS 'Код дочерней функции';
 
 
 
-PROMPT *** Create  constraint FK_OPERLISTDEPS_OPERLIST ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPERLIST_DEPS ADD CONSTRAINT FK_OPERLISTDEPS_OPERLIST FOREIGN KEY (ID_PARENT)
-	  REFERENCES BARS.OPERLIST (CODEOPER) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_OPERLISTDEPS_OPERLIST2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPERLIST_DEPS ADD CONSTRAINT FK_OPERLISTDEPS_OPERLIST2 FOREIGN KEY (ID_CHILD)
-	  REFERENCES BARS.OPERLIST (CODEOPER) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_OPERLISTDEPS_IDCHILD_NN ***
 begin   
  execute immediate '
@@ -99,8 +73,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OPERLIST_DEPS ***
+grant SELECT                                                                 on OPERLIST_DEPS   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPERLIST_DEPS   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPERLIST_DEPS   to START1;
+grant SELECT                                                                 on OPERLIST_DEPS   to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OPERLIST_DEPS   to WR_ALL_RIGHTS;
 grant SELECT                                                                 on OPERLIST_DEPS   to WR_DIAGNOSTICS;
 

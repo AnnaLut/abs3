@@ -57,11 +57,12 @@ COMMENT ON COLUMN BARS.PEREK6_7.TOBO IS '';
 
 
 
-PROMPT *** Create  constraint FK_PEREK67_KF ***
+PROMPT *** Create  constraint XPK_PEREK6_7 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PEREK6_7 ADD CONSTRAINT FK_PEREK67_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+  ALTER TABLE BARS.PEREK6_7 ADD CONSTRAINT XPK_PEREK6_7 PRIMARY KEY (NLSA, NLSB, KF)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -106,26 +107,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint XPK_PEREK6_7 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PEREK6_7 ADD CONSTRAINT XPK_PEREK6_7 PRIMARY KEY (NLSA, NLSB)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index XPK_PEREK6_7 ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.XPK_PEREK6_7 ON BARS.PEREK6_7 (NLSA, NLSB) 
+  CREATE UNIQUE INDEX BARS.XPK_PEREK6_7 ON BARS.PEREK6_7 (NLSA, NLSB, KF) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI ';
+  TABLESPACE BRSDYND ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
@@ -134,8 +121,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  PEREK6_7 ***
+grant SELECT                                                                 on PEREK6_7        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PEREK6_7        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PEREK6_7        to PEREK6_7;
+grant SELECT                                                                 on PEREK6_7        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PEREK6_7        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on PEREK6_7        to WR_REFREAD;
 

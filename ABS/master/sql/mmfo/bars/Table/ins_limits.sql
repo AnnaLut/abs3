@@ -93,6 +93,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  INS_LIMITS ***
+grant SELECT                                                                 on INS_LIMITS      to BARSREADER_ROLE;
+grant SELECT                                                                 on INS_LIMITS      to UPLD;
+
 
 
 PROMPT ===================================================================================== 

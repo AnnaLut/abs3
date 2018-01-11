@@ -67,32 +67,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_NP_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NP ADD CONSTRAINT FK_NP_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_NP_STAFF$BASE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NP ADD CONSTRAINT FK_NP_STAFF$BASE FOREIGN KEY (ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_NP_ID_NN ***
 begin   
  execute immediate '
@@ -143,12 +117,14 @@ exception when others then
 
 
 PROMPT *** Create  grants  NP ***
+grant SELECT                                                                 on NP              to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NP              to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NP              to BARS_DM;
 grant DELETE,INSERT                                                          on NP              to FOREX;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NP              to NP;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NP              to PYOD001;
 grant INSERT                                                                 on NP              to RCC_DEAL;
+grant SELECT                                                                 on NP              to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NP              to WR_ALL_RIGHTS;
 grant INSERT,SELECT                                                          on NP              to WR_DOC_INPUT;
 grant FLASHBACK,SELECT                                                       on NP              to WR_REFREAD;

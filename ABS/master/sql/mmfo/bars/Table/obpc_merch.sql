@@ -129,9 +129,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_MERCH ***
+grant SELECT                                                                 on OBPC_MERCH      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_MERCH      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_MERCH      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_MERCH      to OBPC;
+grant SELECT                                                                 on OBPC_MERCH      to UPLD;
 
 
 

@@ -120,31 +120,6 @@ COMMENT ON COLUMN BARS.ACCOUNTS_UPDATE.GLOBALBD IS 'Глобальна банківська дата';
 
 
 
-PROMPT *** Create  constraint FK_ACCOUNTSUPD_ACCOUNTS3 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_UPDATE ADD CONSTRAINT FK_ACCOUNTSUPD_ACCOUNTS3 FOREIGN KEY (KF, ACCC)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ACCOUNTSUPD_GLOBALBD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_UPDATE MODIFY (GLOBALBD CONSTRAINT CC_ACCOUNTSUPD_GLOBALBD_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_ACCOUNTSUPD_CHGACTION ***
 begin   
  execute immediate '
@@ -303,11 +278,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ACCOUNTSUPD_ACCOUNTS2 ***
+PROMPT *** Create  constraint CC_ACCOUNTSUPD_GLOBALBD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ACCOUNTS_UPDATE ADD CONSTRAINT FK_ACCOUNTSUPD_ACCOUNTS2 FOREIGN KEY (KF, ACC)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.ACCOUNTS_UPDATE MODIFY (GLOBALBD CONSTRAINT CC_ACCOUNTSUPD_GLOBALBD_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -438,12 +412,14 @@ exception when others then
 
 PROMPT *** Create  grants  ACCOUNTS_UPDATE ***
 grant REFERENCES,SELECT                                                      on ACCOUNTS_UPDATE to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on ACCOUNTS_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ACCOUNTS_UPDATE to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACCOUNTS_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCOUNTS_UPDATE to BARS_DM;
 grant DELETE,INSERT,UPDATE                                                   on ACCOUNTS_UPDATE to CUST001;
 grant SELECT                                                                 on ACCOUNTS_UPDATE to KLBX;
 grant SELECT                                                                 on ACCOUNTS_UPDATE to START1;
+grant SELECT                                                                 on ACCOUNTS_UPDATE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACCOUNTS_UPDATE to WR_ALL_RIGHTS;
 
 

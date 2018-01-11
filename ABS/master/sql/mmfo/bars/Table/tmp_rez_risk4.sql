@@ -91,9 +91,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_REZ_RISK4 ***
+grant SELECT                                                                 on TMP_REZ_RISK4   to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_REZ_RISK4   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_REZ_RISK4   to BARS_DM;
 grant SELECT                                                                 on TMP_REZ_RISK4   to RCC_DEAL;
+grant SELECT                                                                 on TMP_REZ_RISK4   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_REZ_RISK4   to WR_ALL_RIGHTS;
 
 

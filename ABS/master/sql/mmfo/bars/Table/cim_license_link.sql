@@ -135,9 +135,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_LICENSE_LINK ***
+grant SELECT                                                                 on CIM_LICENSE_LINK to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_LICENSE_LINK to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_LICENSE_LINK to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_LICENSE_LINK to CIM_ROLE;
+grant SELECT                                                                 on CIM_LICENSE_LINK to UPLD;
 
 
 

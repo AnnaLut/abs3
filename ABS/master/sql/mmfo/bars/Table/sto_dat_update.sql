@@ -111,9 +111,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  STO_DAT_UPDATE ***
+grant SELECT                                                                 on STO_DAT_UPDATE  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_DAT_UPDATE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STO_DAT_UPDATE  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_DAT_UPDATE  to STO;
+grant SELECT                                                                 on STO_DAT_UPDATE  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STO_DAT_UPDATE  to WR_ALL_RIGHTS;
 grant SELECT                                                                 on STO_DAT_UPDATE  to WR_CHCKINNR_ALL;
 grant SELECT                                                                 on STO_DAT_UPDATE  to WR_CHCKINNR_SELF;

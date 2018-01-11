@@ -59,8 +59,10 @@ COMMENT ON COLUMN BARS.SPEC_INT.R020_FA IS '';
 
 
 PROMPT *** Create  grants  SPEC_INT ***
+grant SELECT                                                                 on SPEC_INT        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPEC_INT        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPEC_INT        to START1;
+grant SELECT                                                                 on SPEC_INT        to UPLD;
 
 
 

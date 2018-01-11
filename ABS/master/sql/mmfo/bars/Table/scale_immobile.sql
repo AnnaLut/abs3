@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SCALE_IMMOBILE ***
+grant SELECT                                                                 on SCALE_IMMOBILE  to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on SCALE_IMMOBILE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SCALE_IMMOBILE  to BARS_DM;
 grant INSERT,SELECT,UPDATE                                                   on SCALE_IMMOBILE  to START1;
+grant SELECT                                                                 on SCALE_IMMOBILE  to UPLD;
 
 
 

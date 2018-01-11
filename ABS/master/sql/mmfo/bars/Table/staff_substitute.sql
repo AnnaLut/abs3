@@ -79,24 +79,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_STAFFSUBS_STAFF2 ***
+PROMPT *** Create  constraint CC_STAFFSUBS_IDWHO_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STAFF_SUBSTITUTE ADD CONSTRAINT FK_STAFFSUBS_STAFF2 FOREIGN KEY (ID_WHOM)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_STAFFSUBS_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_SUBSTITUTE ADD CONSTRAINT FK_STAFFSUBS_STAFF FOREIGN KEY (ID_WHO)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.STAFF_SUBSTITUTE MODIFY (ID_WHO CONSTRAINT CC_STAFFSUBS_IDWHO_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -109,18 +95,6 @@ PROMPT *** Create  constraint CC_STAFFSUBS_IDWHOM_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.STAFF_SUBSTITUTE MODIFY (ID_WHOM CONSTRAINT CC_STAFFSUBS_IDWHOM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_STAFFSUBS_IDWHO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_SUBSTITUTE MODIFY (ID_WHO CONSTRAINT CC_STAFFSUBS_IDWHO_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -146,9 +120,11 @@ PROMPT *** Create  grants  STAFF_SUBSTITUTE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_SUBSTITUTE to ABS_ADMIN;
 grant REFERENCES,SELECT                                                      on STAFF_SUBSTITUTE to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on STAFF_SUBSTITUTE to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on STAFF_SUBSTITUTE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_SUBSTITUTE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF_SUBSTITUTE to BARS_DM;
 grant SELECT                                                                 on STAFF_SUBSTITUTE to START1;
+grant SELECT                                                                 on STAFF_SUBSTITUTE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF_SUBSTITUTE to WR_ALL_RIGHTS;
 grant SELECT                                                                 on STAFF_SUBSTITUTE to WR_DOC_INPUT;
 

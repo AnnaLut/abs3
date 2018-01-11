@@ -77,32 +77,6 @@ COMMENT ON COLUMN BARS.ZAG_B.K_ER IS 'Код ошибки по файлу';
 
 
 
-PROMPT *** Create  constraint FK_ZAGB_TABVAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAG_B ADD CONSTRAINT FK_ZAGB_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAGB_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAG_B ADD CONSTRAINT FK_ZAGB_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_ZAGB_FN_NN ***
 begin   
  execute immediate '
@@ -127,12 +101,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_ZAGB ***
+PROMPT *** Create  constraint CC_ZAGB_SDE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAG_B ADD CONSTRAINT PK_ZAGB PRIMARY KEY (KF, DAT, FN)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.ZAG_B MODIFY (SDE CONSTRAINT CC_ZAGB_SDE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -177,10 +149,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ZAGB_SDE_NN ***
+PROMPT *** Create  constraint PK_ZAGB ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAG_B MODIFY (SDE CONSTRAINT CC_ZAGB_SDE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.ZAG_B ADD CONSTRAINT PK_ZAGB PRIMARY KEY (KF, DAT, FN)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -218,10 +192,12 @@ exception when others then
 
 PROMPT *** Create  grants  ZAG_B ***
 grant UPDATE                                                                 on ZAG_B           to BARS014;
+grant SELECT                                                                 on ZAG_B           to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on ZAG_B           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAG_B           to BARS_DM;
 grant SELECT                                                                 on ZAG_B           to START1;
 grant SELECT,UPDATE                                                          on ZAG_B           to TOSS;
+grant SELECT                                                                 on ZAG_B           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAG_B           to WR_ALL_RIGHTS;
 grant SELECT                                                                 on ZAG_B           to WR_DOCVIEW;
 

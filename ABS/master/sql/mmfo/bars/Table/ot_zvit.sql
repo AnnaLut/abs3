@@ -89,10 +89,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OTZVIT_IDSORT_NN ***
+PROMPT *** Create  constraint CC_OTZVIT_IDREC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OT_ZVIT MODIFY (ID_SORT CONSTRAINT CC_OTZVIT_IDSORT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.OT_ZVIT MODIFY (ID_REC CONSTRAINT CC_OTZVIT_IDREC_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -113,10 +113,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OTZVIT_IDREC_NN ***
+PROMPT *** Create  constraint CC_OTZVIT_IDSORT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OT_ZVIT MODIFY (ID_REC CONSTRAINT CC_OTZVIT_IDREC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.OT_ZVIT MODIFY (ID_SORT CONSTRAINT CC_OTZVIT_IDSORT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -137,8 +137,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OT_ZVIT ***
+grant SELECT                                                                 on OT_ZVIT         to BARSREADER_ROLE;
 grant SELECT                                                                 on OT_ZVIT         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OT_ZVIT         to RPBN001;
+grant SELECT                                                                 on OT_ZVIT         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OT_ZVIT         to WR_ALL_RIGHTS;
 
 

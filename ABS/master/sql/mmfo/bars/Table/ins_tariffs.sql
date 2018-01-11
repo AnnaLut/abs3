@@ -99,6 +99,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  INS_TARIFFS ***
+grant SELECT                                                                 on INS_TARIFFS     to BARSREADER_ROLE;
+grant SELECT                                                                 on INS_TARIFFS     to UPLD;
+
 
 
 PROMPT ===================================================================================== 

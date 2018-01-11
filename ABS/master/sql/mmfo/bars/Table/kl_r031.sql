@@ -49,9 +49,11 @@ COMMENT ON COLUMN BARS.KL_R031.TXT IS '';
 
 
 PROMPT *** Create  grants  KL_R031 ***
+grant SELECT                                                                 on KL_R031         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_R031         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_R031         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_R031         to KL_R031;
+grant SELECT                                                                 on KL_R031         to UPLD;
 grant FLASHBACK,SELECT                                                       on KL_R031         to WR_REFREAD;
 
 

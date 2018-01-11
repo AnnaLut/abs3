@@ -87,9 +87,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBS_PRINT_BANK ***
+grant SELECT                                                                 on NBS_PRINT_BANK  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBS_PRINT_BANK  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBS_PRINT_BANK  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBS_PRINT_BANK  to START1;
+grant SELECT                                                                 on NBS_PRINT_BANK  to UPLD;
 grant FLASHBACK,SELECT                                                       on NBS_PRINT_BANK  to WR_REFREAD;
 
 

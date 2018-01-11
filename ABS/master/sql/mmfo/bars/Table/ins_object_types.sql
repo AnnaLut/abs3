@@ -87,6 +87,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  INS_OBJECT_TYPES ***
+grant SELECT                                                                 on INS_OBJECT_TYPES to BARSREADER_ROLE;
+grant SELECT                                                                 on INS_OBJECT_TYPES to UPLD;
+
 
 
 PROMPT ===================================================================================== 

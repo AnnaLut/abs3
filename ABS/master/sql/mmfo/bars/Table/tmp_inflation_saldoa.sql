@@ -128,6 +128,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  TMP_INFLATION_SALDOA ***
+grant SELECT                                                                 on TMP_INFLATION_SALDOA to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_INFLATION_SALDOA to UPLD;
+
 
 
 PROMPT ===================================================================================== 

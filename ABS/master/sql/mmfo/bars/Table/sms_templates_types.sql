@@ -100,6 +100,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  SMS_TEMPLATES_TYPES ***
+grant SELECT                                                                 on SMS_TEMPLATES_TYPES to BARSREADER_ROLE;
+grant SELECT                                                                 on SMS_TEMPLATES_TYPES to UPLD;
+
 
 
 PROMPT ===================================================================================== 

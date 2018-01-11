@@ -80,7 +80,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DBO_TT_OPERATIONKIND ***
+grant SELECT                                                                 on DBO_TT_OPERATIONKIND to BARSREADER_ROLE;
 grant SELECT                                                                 on DBO_TT_OPERATIONKIND to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on DBO_TT_OPERATIONKIND to UPLD;
 
 
 

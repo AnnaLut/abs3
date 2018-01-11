@@ -101,7 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ATTRIBUTE_HISTORY_COMMENT ***
+grant SELECT                                                                 on ATTRIBUTE_HISTORY_COMMENT to BARSREADER_ROLE;
 grant SELECT                                                                 on ATTRIBUTE_HISTORY_COMMENT to BARS_DM;
+grant SELECT                                                                 on ATTRIBUTE_HISTORY_COMMENT to UPLD;
 
 
 

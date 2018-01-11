@@ -91,9 +91,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUSTOMER_FIELD_CODES ***
+grant SELECT                                                                 on CUSTOMER_FIELD_CODES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTOMER_FIELD_CODES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_FIELD_CODES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_FIELD_CODES to CUST001;
+grant SELECT                                                                 on CUSTOMER_FIELD_CODES to UPLD;
 grant FLASHBACK,SELECT                                                       on CUSTOMER_FIELD_CODES to WR_REFREAD;
 
 

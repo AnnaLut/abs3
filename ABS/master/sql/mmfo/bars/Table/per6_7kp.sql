@@ -65,19 +65,6 @@ COMMENT ON COLUMN BARS.PER6_7KP.TOBO IS '';
 
 
 
-PROMPT *** Create  constraint FK_PER67KP_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PER6_7KP ADD CONSTRAINT FK_PER67KP_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C006157 ***
 begin   
  execute immediate '
@@ -143,11 +130,13 @@ exception when others then
 
 PROMPT *** Create  grants  PER6_7KP ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PER6_7KP        to ABS_ADMIN;
+grant SELECT                                                                 on PER6_7KP        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PER6_7KP        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PER6_7KP        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PER6_7KP        to PER6_7KP;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PER6_7KP        to SALGL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PER6_7KP        to START1;
+grant SELECT                                                                 on PER6_7KP        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PER6_7KP        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on PER6_7KP        to WR_REFREAD;
 

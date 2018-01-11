@@ -142,11 +142,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_NBURLSTFILES_STAFF ***
+PROMPT *** Create  constraint CC_NBURLSTFILES_STARTTM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_LST_FILES ADD CONSTRAINT FK_NBURLSTFILES_STAFF FOREIGN KEY (USER_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+  ALTER TABLE BARS.NBUR_LST_FILES MODIFY (START_TIME CONSTRAINT CC_NBURLSTFILES_STARTTM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -205,44 +204,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_NBURLSTFILES_LSTFILES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBUR_LST_FILES ADD CONSTRAINT FK_NBURLSTFILES_LSTFILES FOREIGN KEY (REPORT_DATE, KF, VERSION_ID)
-	  REFERENCES BARS.NBUR_LST_VERSIONS (REPORT_DATE, KF, VERSION_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_NBURLSTFILES_REFFILES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBUR_LST_FILES ADD CONSTRAINT FK_NBURLSTFILES_REFFILES FOREIGN KEY (FILE_ID)
-	  REFERENCES BARS.NBUR_REF_FILES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_NBURLSTFILES_STARTTM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBUR_LST_FILES MODIFY (START_TIME CONSTRAINT CC_NBURLSTFILES_STARTTM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index UK_NBURLSTFILES ***
 begin   
  execute immediate '
@@ -257,9 +218,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_LST_FILES ***
+grant SELECT                                                                 on NBUR_LST_FILES  to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_LST_FILES  to BARSUPL;
 grant SELECT                                                                 on NBUR_LST_FILES  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_LST_FILES  to BARS_DM;
+grant SELECT                                                                 on NBUR_LST_FILES  to UPLD;
 
 
 

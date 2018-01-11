@@ -102,10 +102,12 @@ exception when others then
 
 PROMPT *** Create  grants  SW_SEQ ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_SEQ          to BARS013;
+grant SELECT                                                                 on SW_SEQ          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_SEQ          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_SEQ          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_SEQ          to SWIFT001;
 grant SELECT                                                                 on SW_SEQ          to SWTOSS;
+grant SELECT                                                                 on SW_SEQ          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_SEQ          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SW_SEQ          to WR_REFREAD;
 

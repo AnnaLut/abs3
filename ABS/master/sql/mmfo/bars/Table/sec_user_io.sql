@@ -81,32 +81,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SECUSERIO_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEC_USER_IO ADD CONSTRAINT FK_SECUSERIO_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SECUSERIO_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SEC_USER_IO ADD CONSTRAINT FK_SECUSERIO_STAFF FOREIGN KEY (ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SECUSERIO_ID_NN ***
 begin   
  execute immediate '
@@ -143,10 +117,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SECUSERIO_RECID_NN ***
+PROMPT *** Create  constraint CC_SECUSERIO_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_USER_IO MODIFY (REC_ID CONSTRAINT CC_SECUSERIO_RECID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEC_USER_IO MODIFY (BRANCH CONSTRAINT CC_SECUSERIO_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -155,10 +129,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SECUSERIO_BRANCH_NN ***
+PROMPT *** Create  constraint CC_SECUSERIO_RECID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEC_USER_IO MODIFY (BRANCH CONSTRAINT CC_SECUSERIO_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEC_USER_IO MODIFY (REC_ID CONSTRAINT CC_SECUSERIO_RECID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -182,9 +156,11 @@ exception when others then
 
 PROMPT *** Create  grants  SEC_USER_IO ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEC_USER_IO     to ABS_ADMIN;
+grant SELECT                                                                 on SEC_USER_IO     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEC_USER_IO     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEC_USER_IO     to BARS_DM;
 grant SELECT                                                                 on SEC_USER_IO     to START1;
+grant SELECT                                                                 on SEC_USER_IO     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SEC_USER_IO     to WR_ALL_RIGHTS;
 
 

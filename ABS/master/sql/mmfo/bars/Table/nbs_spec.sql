@@ -73,58 +73,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_NBSSPEC_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBS_SPEC ADD CONSTRAINT FK_NBSSPEC_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_NBSSPEC_PEREKRG ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBS_SPEC ADD CONSTRAINT FK_NBSSPEC_PEREKRG FOREIGN KEY (KF, IDG)
-	  REFERENCES BARS.PEREKR_G (KF, IDG) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_NBSSPEC_PEREKRS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBS_SPEC ADD CONSTRAINT FK_NBSSPEC_PEREKRS FOREIGN KEY (KF, IDS)
-	  REFERENCES BARS.PEREKR_S (KF, IDS) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_NBSSPEC_PS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBS_SPEC ADD CONSTRAINT FK_NBSSPEC_PS FOREIGN KEY (NBS)
-	  REFERENCES BARS.PS (NBS) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_NBSSPEC_KF_NN ***
 begin   
  execute immediate '
@@ -137,10 +85,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_NBSSPEC_KTK_NN ***
+PROMPT *** Create  constraint SYS_C006437 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBS_SPEC MODIFY (KTK CONSTRAINT CC_NBSSPEC_KTK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBS_SPEC MODIFY (NBS NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -161,10 +109,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C006437 ***
+PROMPT *** Create  constraint CC_NBSSPEC_KTK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBS_SPEC MODIFY (NBS NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBS_SPEC MODIFY (KTK CONSTRAINT CC_NBSSPEC_KTK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -188,9 +136,11 @@ exception when others then
 
 PROMPT *** Create  grants  NBS_SPEC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBS_SPEC        to ABS_ADMIN;
+grant SELECT                                                                 on NBS_SPEC        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBS_SPEC        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBS_SPEC        to BARS_DM;
 grant SELECT                                                                 on NBS_SPEC        to START1;
+grant SELECT                                                                 on NBS_SPEC        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBS_SPEC        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on NBS_SPEC        to WR_REFREAD;
 

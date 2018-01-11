@@ -65,32 +65,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_WEB_PROFILE_PARAMS_PROFILE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WEB_PROFILE_PARAMS ADD CONSTRAINT FK_WEB_PROFILE_PARAMS_PROFILE FOREIGN KEY (PROFILE_ID)
-	  REFERENCES BARS.WEB_PROFILES (PROFILE_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_WEB_PROFILE_PARAMS_TAG ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WEB_PROFILE_PARAMS ADD CONSTRAINT FK_WEB_PROFILE_PARAMS_TAG FOREIGN KEY (TAG)
-	  REFERENCES BARS.WEB_PROFILE_TAGS (TAG) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index XPK_WEB_PROFILE_PARAMS ***
 begin   
  execute immediate '
@@ -105,8 +79,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WEB_PROFILE_PARAMS ***
+grant SELECT                                                                 on WEB_PROFILE_PARAMS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_PROFILE_PARAMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WEB_PROFILE_PARAMS to BARS_DM;
+grant SELECT                                                                 on WEB_PROFILE_PARAMS to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WEB_PROFILE_PARAMS to WEB_PROFILE_PARAMS;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_PROFILE_PARAMS to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on WEB_PROFILE_PARAMS to WR_REFREAD;

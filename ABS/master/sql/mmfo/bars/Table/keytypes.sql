@@ -129,6 +129,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  KEYTYPES ***
+grant SELECT                                                                 on KEYTYPES        to BARSREADER_ROLE;
+grant SELECT                                                                 on KEYTYPES        to UPLD;
+
 
 
 PROMPT ===================================================================================== 

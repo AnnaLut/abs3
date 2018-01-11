@@ -158,9 +158,11 @@ exception when others then
 
 PROMPT *** Create  grants  SUMPR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SUMPR           to ABS_ADMIN;
+grant SELECT                                                                 on SUMPR           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SUMPR           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SUMPR           to BARS_DM;
 grant SELECT                                                                 on SUMPR           to START1;
+grant SELECT                                                                 on SUMPR           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SUMPR           to WR_ALL_RIGHTS;
 
 

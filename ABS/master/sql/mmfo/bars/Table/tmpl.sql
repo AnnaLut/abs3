@@ -47,8 +47,10 @@ COMMENT ON COLUMN BARS.TMPL.ACC IS '';
 
 
 PROMPT *** Create  grants  TMPL ***
+grant SELECT                                                                 on TMPL            to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMPL            to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMPL            to START1;
+grant SELECT                                                                 on TMPL            to UPLD;
 
 
 

@@ -64,19 +64,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_EBKCGROUPS_CUSTTYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.EBKC_GROUPS ADD CONSTRAINT FK_EBKCGROUPS_CUSTTYPE FOREIGN KEY (CUST_TYPE)
-	  REFERENCES BARS.EBKC_CUST_TYPES (CUST_TYPE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_EBKC_GROUPS ***
 begin   
  execute immediate '
@@ -91,6 +78,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBKC_GROUPS ***
+grant SELECT                                                                 on EBKC_GROUPS     to BARSREADER_ROLE;
 grant SELECT                                                                 on EBKC_GROUPS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBKC_GROUPS     to BARS_DM;
 

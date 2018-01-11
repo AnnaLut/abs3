@@ -64,6 +64,18 @@ COMMENT ON COLUMN BARS.OPERAPP_BAK.GRANTOR IS '';
 
 
 
+PROMPT *** Create  constraint SYS_C0025764 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OPERAPP_BAK MODIFY (CODEAPP NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C0025765 ***
 begin   
  execute immediate '
@@ -75,17 +87,9 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint SYS_C0025764 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OPERAPP_BAK MODIFY (CODEAPP NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
+PROMPT *** Create  grants  OPERAPP_BAK ***
+grant SELECT                                                                 on OPERAPP_BAK     to BARSREADER_ROLE;
+grant SELECT                                                                 on OPERAPP_BAK     to UPLD;
 
 
 

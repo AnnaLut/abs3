@@ -82,8 +82,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_SERVLIST ***
+grant SELECT                                                                 on XML_SERVLIST    to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_SERVLIST    to BARS_DM;
 grant SELECT                                                                 on XML_SERVLIST    to KLBX;
+grant SELECT                                                                 on XML_SERVLIST    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_SERVLIST    to WR_ALL_RIGHTS;
 
 

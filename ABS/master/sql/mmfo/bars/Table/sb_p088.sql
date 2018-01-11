@@ -56,7 +56,9 @@ COMMENT ON COLUMN BARS.SB_P088.COD_ACT IS '';
 
 
 PROMPT *** Create  grants  SB_P088 ***
+grant SELECT                                                                 on SB_P088         to BARSREADER_ROLE;
 grant SELECT                                                                 on SB_P088         to BARS_DM;
+grant SELECT                                                                 on SB_P088         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SB_P088         to WR_ALL_RIGHTS;
 
 

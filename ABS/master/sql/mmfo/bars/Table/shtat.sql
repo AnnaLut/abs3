@@ -63,8 +63,10 @@ COMMENT ON COLUMN BARS.SHTAT.KARTA_T IS '';
 
 
 PROMPT *** Create  grants  SHTAT ***
+grant SELECT                                                                 on SHTAT           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SHTAT           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SHTAT           to START1;
+grant SELECT                                                                 on SHTAT           to UPLD;
 
 
 

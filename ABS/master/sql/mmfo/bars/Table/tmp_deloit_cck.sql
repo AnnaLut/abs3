@@ -116,9 +116,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_DELOIT_CCK ***
+grant SELECT                                                                 on TMP_DELOIT_CCK  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DELOIT_CCK  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_DELOIT_CCK  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DELOIT_CCK  to RCC_DEAL;
+grant SELECT                                                                 on TMP_DELOIT_CCK  to UPLD;
 
 
 

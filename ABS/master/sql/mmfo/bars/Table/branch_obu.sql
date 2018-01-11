@@ -85,7 +85,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BRANCH_OBU ***
+grant SELECT                                                                 on BRANCH_OBU      to BARSREADER_ROLE;
 grant SELECT                                                                 on BRANCH_OBU      to BARS_DM;
+grant SELECT                                                                 on BRANCH_OBU      to UPLD;
 
 
 

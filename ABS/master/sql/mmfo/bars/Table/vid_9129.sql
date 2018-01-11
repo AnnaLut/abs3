@@ -89,9 +89,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  VID_9129 ***
+grant SELECT                                                                 on VID_9129        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VID_9129        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VID_9129        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on VID_9129        to RCC_DEAL;
+grant SELECT                                                                 on VID_9129        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on VID_9129        to WR_ALL_RIGHTS;
 
 

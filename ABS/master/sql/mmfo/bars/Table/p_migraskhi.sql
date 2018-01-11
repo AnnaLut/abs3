@@ -53,7 +53,9 @@ COMMENT ON COLUMN BARS.P_MIGRASKHI.ORDNUNG IS 'Порядок сортировки';
 
 
 PROMPT *** Create  grants  P_MIGRASKHI ***
+grant SELECT                                                                 on P_MIGRASKHI     to BARSREADER_ROLE;
 grant SELECT                                                                 on P_MIGRASKHI     to BARS_DM;
+grant SELECT                                                                 on P_MIGRASKHI     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on P_MIGRASKHI     to WR_ALL_RIGHTS;
 
 

@@ -55,7 +55,9 @@ COMMENT ON COLUMN BARS.P_MIGRAMEGA.PROV_SQL IS 'Имя вюшки - Проверочный SQL';
 
 
 PROMPT *** Create  grants  P_MIGRAMEGA ***
+grant SELECT                                                                 on P_MIGRAMEGA     to BARSREADER_ROLE;
 grant SELECT                                                                 on P_MIGRAMEGA     to BARS_DM;
+grant SELECT                                                                 on P_MIGRAMEGA     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on P_MIGRAMEGA     to WR_ALL_RIGHTS;
 
 

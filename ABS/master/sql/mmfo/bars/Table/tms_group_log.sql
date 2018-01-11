@@ -69,19 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_GROUPLOG_ID_GROUP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMS_GROUP_LOG ADD CONSTRAINT FK_GROUPLOG_ID_GROUP FOREIGN KEY (ID_GROUP)
-	  REFERENCES BARS.TMS_TASK_GROUPS (ID_GROUP) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_ID_GROUP_LOG ***
 begin   
  execute immediate '
@@ -96,7 +83,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMS_GROUP_LOG ***
+grant SELECT                                                                 on TMS_GROUP_LOG   to BARSREADER_ROLE;
 grant SELECT                                                                 on TMS_GROUP_LOG   to BARS_DM;
+grant SELECT                                                                 on TMS_GROUP_LOG   to UPLD;
 
 
 

@@ -77,8 +77,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TTS_KOMP ***
+grant SELECT                                                                 on TTS_KOMP        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TTS_KOMP        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TTS_KOMP        to REF0000;
+grant SELECT                                                                 on TTS_KOMP        to UPLD;
 grant FLASHBACK,SELECT                                                       on TTS_KOMP        to WR_REFREAD;
 
 

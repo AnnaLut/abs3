@@ -77,7 +77,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CA_DEPT ***
+grant SELECT                                                                 on CA_DEPT         to BARSREADER_ROLE;
 grant SELECT                                                                 on CA_DEPT         to BARS_DM;
+grant SELECT                                                                 on CA_DEPT         to UPLD;
 
 
 

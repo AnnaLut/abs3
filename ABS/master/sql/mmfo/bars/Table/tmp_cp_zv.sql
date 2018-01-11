@@ -508,9 +508,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_CP_ZV ***
+grant SELECT                                                                 on TMP_CP_ZV       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CP_ZV       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_CP_ZV       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CP_ZV       to START1;
+grant SELECT                                                                 on TMP_CP_ZV       to UPLD;
 
 
 

@@ -45,10 +45,10 @@ COMMENT ON COLUMN BARS.TMP_PUL.COM IS 'Комментарий';
 
 
 
-PROMPT *** Create  constraint SYS_C0010229 ***
+PROMPT *** Create  constraint PK_TMPPUL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_PUL MODIFY (TAG NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_PUL ADD CONSTRAINT PK_TMPPUL PRIMARY KEY (TAG) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -57,10 +57,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_TMPPUL ***
+PROMPT *** Create  constraint SYS_C0010229 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_PUL ADD CONSTRAINT PK_TMPPUL PRIMARY KEY (TAG) ENABLE';
+  ALTER TABLE BARS.TMP_PUL MODIFY (TAG NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -82,8 +82,10 @@ exception when others then
 
 PROMPT *** Create  grants  TMP_PUL ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_PUL         to ABS_ADMIN;
+grant SELECT                                                                 on TMP_PUL         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_PUL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_PUL         to START1;
+grant SELECT                                                                 on TMP_PUL         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_PUL         to WR_ALL_RIGHTS;
 
 

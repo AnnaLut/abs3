@@ -218,7 +218,9 @@ COMMENT ON COLUMN BARS.TMP_NBU23_1505.ZALQ IS '';
 
 
 PROMPT *** Create  grants  TMP_NBU23_1505 ***
+grant SELECT                                                                 on TMP_NBU23_1505  to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_NBU23_1505  to BARS_DM;
+grant SELECT                                                                 on TMP_NBU23_1505  to UPLD;
 
 
 

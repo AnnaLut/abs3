@@ -67,19 +67,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_TAMOZHDOCREESTR_CONTRACTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TAMOZHDOC_REESTR ADD CONSTRAINT FK_TAMOZHDOCREESTR_CONTRACTS FOREIGN KEY (PID)
-	  REFERENCES BARS.TOP_CONTRACTS (PID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_TAMOZHDOCREESTR_IDR_NN ***
 begin   
  execute immediate '
@@ -118,8 +105,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TAMOZHDOC_REESTR ***
+grant SELECT                                                                 on TAMOZHDOC_REESTR to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TAMOZHDOC_REESTR to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TAMOZHDOC_REESTR to START1;
+grant SELECT                                                                 on TAMOZHDOC_REESTR to UPLD;
 
 
 

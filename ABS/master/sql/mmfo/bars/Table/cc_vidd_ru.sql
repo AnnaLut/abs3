@@ -100,7 +100,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_VIDD_RU ***
+grant SELECT                                                                 on CC_VIDD_RU      to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_VIDD_RU      to BARS_DM;
+grant SELECT                                                                 on CC_VIDD_RU      to UPLD;
 
 
 

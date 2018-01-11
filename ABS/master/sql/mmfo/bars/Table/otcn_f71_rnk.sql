@@ -93,8 +93,10 @@ exception when others then
 
 PROMPT *** Create  grants  OTCN_F71_RNK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F71_RNK    to ABS_ADMIN;
+grant SELECT                                                                 on OTCN_F71_RNK    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F71_RNK    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F71_RNK    to RPBN002;
+grant SELECT                                                                 on OTCN_F71_RNK    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_F71_RNK    to WR_ALL_RIGHTS;
 
 

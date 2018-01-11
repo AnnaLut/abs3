@@ -89,9 +89,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_PR_KIAKR ***
+grant SELECT                                                                 on CP_PR_KIAKR     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_PR_KIAKR     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_PR_KIAKR     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_PR_KIAKR     to START1;
+grant SELECT                                                                 on CP_PR_KIAKR     to UPLD;
 
 
 

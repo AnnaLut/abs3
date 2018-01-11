@@ -101,11 +101,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  NOSEP ***
+grant SELECT                                                                 on NOSEP           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NOSEP           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NOSEP           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NOSEP           to NOSEP;
 grant SELECT                                                                 on NOSEP           to OPER000;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NOSEP           to SEP_ROLE;
+grant SELECT                                                                 on NOSEP           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NOSEP           to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on NOSEP           to WR_REFREAD;
 

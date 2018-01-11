@@ -91,49 +91,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPUJOBSJRNL_BRANCH ***
+PROMPT *** Create  constraint CC_DPUJOBSJRNL_JOBID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_JRNL ADD CONSTRAINT FK_DPUJOBSJRNL_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPUJOBSJRNL_DPTJOBSLIST ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_JRNL ADD CONSTRAINT FK_DPUJOBSJRNL_DPTJOBSLIST FOREIGN KEY (JOB_ID)
-	  REFERENCES BARS.DPT_JOBS_LIST (JOB_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPUJOBSJRNL_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_JRNL ADD CONSTRAINT FK_DPUJOBSJRNL_STAFF FOREIGN KEY (USER_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPUJOBSJRNL_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_JRNL MODIFY (KF CONSTRAINT CC_DPUJOBSJRNL_KF_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.DPU_JOBS_JRNL MODIFY (JOB_ID CONSTRAINT CC_DPUJOBSJRNL_JOBID_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -190,10 +151,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPUJOBSJRNL_JOBID_NN ***
+PROMPT *** Create  constraint CC_DPUJOBSJRNL_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPU_JOBS_JRNL MODIFY (JOB_ID CONSTRAINT CC_DPUJOBSJRNL_JOBID_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.DPU_JOBS_JRNL MODIFY (KF CONSTRAINT CC_DPUJOBSJRNL_KF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -216,10 +177,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPU_JOBS_JRNL ***
+grant SELECT                                                                 on DPU_JOBS_JRNL   to BARSREADER_ROLE;
 grant SELECT                                                                 on DPU_JOBS_JRNL   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_JOBS_JRNL   to BARS_DM;
 grant SELECT                                                                 on DPU_JOBS_JRNL   to DPT_ADMIN;
 grant SELECT                                                                 on DPU_JOBS_JRNL   to RPBN001;
+grant SELECT                                                                 on DPU_JOBS_JRNL   to UPLD;
 
 
 

@@ -143,8 +143,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  META_COL_INTL_FILTERS ***
+grant SELECT                                                                 on META_COL_INTL_FILTERS to BARSREADER_ROLE;
 grant SELECT                                                                 on META_COL_INTL_FILTERS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on META_COL_INTL_FILTERS to START1;
+grant SELECT                                                                 on META_COL_INTL_FILTERS to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on META_COL_INTL_FILTERS to WR_ALL_RIGHTS;
 
 

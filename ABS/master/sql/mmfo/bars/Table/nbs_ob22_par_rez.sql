@@ -94,9 +94,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBS_OB22_PAR_REZ ***
+grant SELECT                                                                 on NBS_OB22_PAR_REZ to BARSREADER_ROLE;
 grant SELECT                                                                 on NBS_OB22_PAR_REZ to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBS_OB22_PAR_REZ to RCC_DEAL;
 grant SELECT                                                                 on NBS_OB22_PAR_REZ to START1;
+grant SELECT                                                                 on NBS_OB22_PAR_REZ to UPLD;
 
 
 

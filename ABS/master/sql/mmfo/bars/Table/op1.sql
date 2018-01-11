@@ -92,82 +92,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C008075 ***
+PROMPT *** Create  constraint SYS_C008067 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OP1 MODIFY (KF NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008074 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OP1 MODIFY (ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008073 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OP1 MODIFY (SOS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008072 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OP1 MODIFY (STMT NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008071 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OP1 MODIFY (SQ NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008070 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OP1 MODIFY (S NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008069 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OP1 MODIFY (FDAT NOT NULL ENABLE)';
+  ALTER TABLE BARS.OP1 MODIFY (DK NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -188,10 +116,82 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C008067 ***
+PROMPT *** Create  constraint SYS_C008069 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OP1 MODIFY (DK NOT NULL ENABLE)';
+  ALTER TABLE BARS.OP1 MODIFY (FDAT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008070 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OP1 MODIFY (S NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008071 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OP1 MODIFY (SQ NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008072 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OP1 MODIFY (STMT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008073 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OP1 MODIFY (SOS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008074 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OP1 MODIFY (ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008075 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OP1 MODIFY (KF NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -200,7 +200,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OP1 ***
+grant SELECT                                                                 on OP1             to BARSREADER_ROLE;
 grant SELECT                                                                 on OP1             to BARS_DM;
+grant SELECT                                                                 on OP1             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OP1             to WR_ALL_RIGHTS;
 
 

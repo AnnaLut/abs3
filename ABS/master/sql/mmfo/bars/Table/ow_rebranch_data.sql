@@ -32,7 +32,7 @@ begin
 	STATE NUMBER(*,0), 
 	MSG VARCHAR2(4000), 
 	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
-   ) SEGMENT CREATION DEFERRED 
+   ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSDYND ';
@@ -86,60 +86,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint OW_REBRANCH_DATA ***
+PROMPT *** Create  constraint SYS_C0085183 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OW_REBRANCH_DATA ADD CONSTRAINT OW_REBRANCH_DATA PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0085188 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_REBRANCH_DATA MODIFY (KF NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0085187 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_REBRANCH_DATA MODIFY (STATE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0085186 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_REBRANCH_DATA MODIFY (BRANCH NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0085185 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_REBRANCH_DATA MODIFY (NLS NOT NULL ENABLE)';
+  ALTER TABLE BARS.OW_REBRANCH_DATA MODIFY (IDN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -160,10 +110,60 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0085183 ***
+PROMPT *** Create  constraint SYS_C0085185 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OW_REBRANCH_DATA MODIFY (IDN NOT NULL ENABLE)';
+  ALTER TABLE BARS.OW_REBRANCH_DATA MODIFY (NLS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C0085186 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_REBRANCH_DATA MODIFY (BRANCH NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C0085187 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_REBRANCH_DATA MODIFY (STATE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C0085188 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_REBRANCH_DATA MODIFY (KF NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint OW_REBRANCH_DATA ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OW_REBRANCH_DATA ADD CONSTRAINT OW_REBRANCH_DATA PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -214,7 +214,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_REBRANCH_DATA ***
+grant SELECT                                                                 on OW_REBRANCH_DATA to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on OW_REBRANCH_DATA to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on OW_REBRANCH_DATA to UPLD;
 
 
 

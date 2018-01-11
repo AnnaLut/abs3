@@ -53,32 +53,6 @@ COMMENT ON COLUMN BARS.KLP_VERSION.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_KLPVERSION_CUSTOMER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP_VERSION ADD CONSTRAINT FK_KLPVERSION_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_KLPVERSION_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.KLP_VERSION ADD CONSTRAINT FK_KLPVERSION_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_KLPVERSION_KF_NN ***
 begin   
  execute immediate '
@@ -134,11 +108,13 @@ exception when others then
 
 PROMPT *** Create  grants  KLP_VERSION ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_VERSION     to ABS_ADMIN;
+grant SELECT                                                                 on KLP_VERSION     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLP_VERSION     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KLP_VERSION     to BARS_DM;
 grant SELECT                                                                 on KLP_VERSION     to OPERKKK;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_VERSION     to REF0000;
 grant SELECT                                                                 on KLP_VERSION     to TECH_MOM1;
+grant SELECT                                                                 on KLP_VERSION     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLP_VERSION     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on KLP_VERSION     to WR_REFREAD;
 

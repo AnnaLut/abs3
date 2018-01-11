@@ -55,6 +55,10 @@ COMMENT ON COLUMN BARS.TMP_TZAPROS_BAK.KF IS '';
 
 
 
+PROMPT *** Create  grants  TMP_TZAPROS_BAK ***
+grant SELECT                                                                 on TMP_TZAPROS_BAK to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_TZAPROS_BAK to UPLD;
+
 
 
 PROMPT ===================================================================================== 

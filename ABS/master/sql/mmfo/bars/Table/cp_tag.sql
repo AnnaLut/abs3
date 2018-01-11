@@ -1,3 +1,5 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/CP_TAG.sql =========*** Run *** ======
 PROMPT ===================================================================================== 
@@ -24,7 +26,8 @@ begin
   CREATE TABLE BARS.CP_TAG 
    (	ID NUMBER(*,0), 
 	TAG VARCHAR2(7), 
-	NAME VARCHAR2(50)
+	NAME VARCHAR2(50), 
+	DICT_NAME VARCHAR2(30)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -42,17 +45,12 @@ PROMPT *** ALTER_POLICIES to CP_TAG ***
 
 
 COMMENT ON TABLE BARS.CP_TAG IS 'Коды доп.реквизитов ЦБ';
+COMMENT ON COLUMN BARS.CP_TAG.DICT_NAME IS 'Найменування довідника (таблиця чи представлення)';
 COMMENT ON COLUMN BARS.CP_TAG.ID IS 'К чему от относится доп.реквизит: 1- Эмитент, 2- ЦБ, 3-сделка';
 COMMENT ON COLUMN BARS.CP_TAG.TAG IS 'ТЭГ -мнем.код доп.реквизита';
 COMMENT ON COLUMN BARS.CP_TAG.NAME IS 'Семантика доп.реквизита';
 
 
-
-PROMPT *** MODIFY COLUMN  TAG***
-begin   
- execute immediate 'ALTER TABLE BARS.CP_TAG MODIFY TAG VARCHAR2(7)';
- end;
-/
 
 
 PROMPT *** Create  constraint XPK_CPTAG ***
@@ -81,18 +79,9 @@ exception when others then
 /
 
 
-begin   
- execute immediate 'alter table CP_TAG add dict_name VARCHAR2(30)';
-exception when others then
-  if  sqlcode=-1430  then null; else raise; end if;
- end;
-/
-comment on column CP_TAG.dict_name  is 'Найменування довідника (таблиця чи представлення)';
-
-
-
 
 PROMPT *** Create  grants  CP_TAG ***
+grant SELECT                                                                 on CP_TAG          to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_TAG          to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_TAG          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_TAG          to BARS_DM;

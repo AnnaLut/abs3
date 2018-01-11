@@ -55,32 +55,6 @@ COMMENT ON COLUMN BARS.SALDOA_TURN_QUEUE.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_SALTURNQUE_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SALDOA_TURN_QUEUE ADD CONSTRAINT FK_SALTURNQUE_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SALTURNQUE_ACCOUNTS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SALDOA_TURN_QUEUE ADD CONSTRAINT FK_SALTURNQUE_ACCOUNTS2 FOREIGN KEY (KF, ACC)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SALTURNQUE_ACC_NN ***
 begin   
  execute immediate '
@@ -169,7 +143,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SALDOA_TURN_QUEUE ***
+grant SELECT                                                                 on SALDOA_TURN_QUEUE to BARSREADER_ROLE;
 grant SELECT                                                                 on SALDOA_TURN_QUEUE to BARS_DM;
+grant SELECT                                                                 on SALDOA_TURN_QUEUE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SALDOA_TURN_QUEUE to WR_ALL_RIGHTS;
 
 

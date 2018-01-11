@@ -71,8 +71,10 @@ COMMENT ON COLUMN BARS.SSP.ACC IS '';
 
 
 PROMPT *** Create  grants  SSP ***
+grant SELECT                                                                 on SSP             to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SSP             to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SSP             to START1;
+grant SELECT                                                                 on SSP             to UPLD;
 
 
 

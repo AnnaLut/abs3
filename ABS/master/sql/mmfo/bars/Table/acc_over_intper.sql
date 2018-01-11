@@ -55,10 +55,12 @@ COMMENT ON COLUMN BARS.ACC_OVER_INTPER.RATE IS '';
 PROMPT *** Create  grants  ACC_OVER_INTPER ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_INTPER to ABS_ADMIN;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on ACC_OVER_INTPER to BARS009;
+grant SELECT                                                                 on ACC_OVER_INTPER to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_INTPER to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_OVER_INTPER to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_INTPER to TECH005;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_INTPER to TECH006;
+grant SELECT                                                                 on ACC_OVER_INTPER to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_OVER_INTPER to WR_ALL_RIGHTS;
 
 

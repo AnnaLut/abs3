@@ -133,7 +133,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OT_PIDM ***
+grant SELECT                                                                 on OT_PIDM         to BARSREADER_ROLE;
 grant SELECT                                                                 on OT_PIDM         to BARS_DM;
+grant SELECT                                                                 on OT_PIDM         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OT_PIDM         to WR_ALL_RIGHTS;
 
 

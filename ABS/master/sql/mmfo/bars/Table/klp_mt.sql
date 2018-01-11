@@ -89,9 +89,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  KLP_MT ***
+grant SELECT                                                                 on KLP_MT          to BARSREADER_ROLE;
 grant INSERT,SELECT                                                          on KLP_MT          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KLP_MT          to BARS_DM;
 grant INSERT,SELECT                                                          on KLP_MT          to TECH_MOM1;
+grant SELECT                                                                 on KLP_MT          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KLP_MT          to WR_ALL_RIGHTS;
 
 

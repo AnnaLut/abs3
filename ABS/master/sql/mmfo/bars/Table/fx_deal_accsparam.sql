@@ -115,9 +115,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FX_DEAL_ACCSPARAM ***
+grant SELECT                                                                 on FX_DEAL_ACCSPARAM to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FX_DEAL_ACCSPARAM to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FX_DEAL_ACCSPARAM to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FX_DEAL_ACCSPARAM to FOREX;
+grant SELECT                                                                 on FX_DEAL_ACCSPARAM to UPLD;
 grant FLASHBACK,SELECT                                                       on FX_DEAL_ACCSPARAM to WR_REFREAD;
 
 
