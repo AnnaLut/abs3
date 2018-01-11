@@ -49,7 +49,7 @@ BEGIN
      from accounts
     where nbs ='3800'
       and dazs is null
-      and ob22 = (select substr(s3800, length(s3800)-4,2) from tts where tt = op.tt)
+      and ob22 = '22' --(select substr(s3800, length(s3800)-4,2) from tts where tt = op.tt) 
       and branch like '/'|| sys_context('bars_context','user_mfo') ||'/%';
    exception when no_data_found then bars_error.raise_nerror('CAC','Рахунку 3800 не існує');
    end;
@@ -275,7 +275,7 @@ BEGIN
               S_  := op.S;
               SQ_ := op.s2;-- сумма документа по предыдущему курсу для портфеля на продаж pf = 1
 
-              IF   (k.k22 > 0)                
+              IF   (k.k22 > 0)
                 THEN  op.dk := 1;
                 ELSE  op.dk := 0;
               END IF;

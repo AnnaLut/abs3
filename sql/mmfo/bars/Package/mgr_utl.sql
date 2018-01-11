@@ -12,7 +12,7 @@
   -- Purpose    : Вспомагательные функции для миграции
 
   -- global consts
-  G_HEADER_VERSION constant varchar2(64)  := 'version 1.2.0 08/04/2017';
+  G_HEADER_VERSION constant varchar2(64)  := 'version 2.1.7 16/06/2017';
 
   ----
   -- header_version - возвращает версию заголовка пакета
@@ -636,7 +636,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
 
 
   -- global consts
-  G_BODY_VERSION constant varchar2(64)  := 'version 1.2.0 08/04/2017';
+  G_BODY_VERSION constant varchar2(64)  := 'version 2.1.7 16/06/2017';
 
   G_PKG constant varchar2(30) := 'mgr_utl';
 
@@ -1403,7 +1403,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
                  and r.status = 'DISABLED'
                   and r.constraint_name = p.constraint_name
                  and (p.table_name like case when p_table is null then '%' else upper(p_table) end
-                 or substr(r.r_constraint_name,-length(p_table), length(p_table) ) = p.table_name)
+                 --не понимаю смысла следующей строчки, закомментил
+                 /*or substr(r.r_constraint_name,-length(p_table), length(p_table) ) = p.table_name*/)
               )
     loop
         l_stmt := 'alter table '||c.owner||'.'||rpad(c.table_name,30)||' modify constraint '||rpad(c.constraint_name,30)||' enable novalidate';
@@ -1440,7 +1441,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
                  and r.validated <> 'VALIDATED'
                   and r.constraint_name = p.constraint_name
                  and (p.table_name like case when p_table is null then '%' else upper(p_table) end
-                 or substr(r.r_constraint_name,-length(p_table), length(p_table) ) = p.table_name)
+                 --не понимаю смысла следующей строчки, закомментил
+                 /*or substr(r.r_constraint_name,-length(p_table), length(p_table) ) = p.table_name*/)
               )
     loop
         begin
@@ -1855,7 +1857,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
             case when p_exclude is not null then ''''||p_exclude||'''' else 'null' end
         );
         -- выключаем все триггера
-        begin
+        /*begin
             l_stmt := 'alter table '||p_table||' disable all triggers';
             logger.trace(l_stmt);
             execute immediate l_stmt;
@@ -1863,7 +1865,26 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
             when others then
                 l_errors := true;
                 logger.error(get_errmsg());
+        end;*/
+        begin
+                for rec in 
+                    (select t.trigger_name from all_triggers t
+                      where t.owner = 'BARS'
+                        and t.table_name = p_table
+                        and t.status = 'ENABLED')  
+            loop
+            begin  
+                l_stmt := 'alter trigger '||rec.trigger_name||' disable';
+                logger.trace(l_stmt);
+                execute immediate l_stmt;
+            exception
+                when others then
+                    l_errors := true;
+                    logger.error(get_errmsg());
+            end;
+            end loop;
         end;
+        
         -- включаем триггера по списку p_exclude
         for c in (select upper(trim(token)) as trigger_name
                     from ( select regexp_substr(p_exclude,'[^,]+', 1, level) token
@@ -1903,7 +1924,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
         --
         logger.trace('enable_table_triggers(''%s'')', p_table);
         --
-        begin
+        /*begin
             l_stmt := 'alter table '||p_table||' enable all triggers';
             logger.trace(l_stmt);
             execute immediate l_stmt;
@@ -1911,9 +1932,28 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
             when others then
                 l_errors := true;
                 logger.error(get_errmsg());
+        end;*/
+        begin
+                for rec in 
+                    (select t.trigger_name from all_triggers t
+                      where t.owner = 'BARS'
+                        and t.table_name = p_table
+                        and t.status = 'DISABLED')  
+            loop
+            begin  
+                l_stmt := 'alter trigger '||rec.trigger_name||' enable';
+                logger.trace(l_stmt);
+                execute immediate l_stmt;
+            exception
+                when others then
+                    l_errors := true;
+                    logger.error(get_errmsg());
+            end;
+            end loop;
         end;
+
         -- выключаем триггера по списку из mgr_oschad.check_disable_trigger
-        for c in (
+        /*for c in (
                    select dus.object_name 
                       from ddl_utils_store dus 
                     where dus.object_type = 'TRIGGER_DISABLED'
@@ -1929,7 +1969,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
                     l_errors := true;
                     logger.error(get_errmsg());
             end;
-        end loop;
+        end loop;*/
         if l_errors
         then
             raise_application_error(-20000, 'При включении триггеров на таблице '||p_table||' возникли ошибки. См. журнал.');
@@ -4298,7 +4338,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
   begin
     for cur in
       (
-       select u.trigger_name
+       select '"'||u.trigger_name||'"' trigger_name
        from user_triggers u
        where u.table_name = upper(stable)
          and u.status = 'ENABLED'
@@ -4316,7 +4356,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
   begin
     for cur in
       (
-       select u.trigger_name
+       select '"'||u.trigger_name||'"' trigger_name
        from user_triggers u
        where u.table_name = upper(stable)
          and u.status = 'DISABLED'
@@ -4325,18 +4365,20 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
       p_trigger_enable(cur.trigger_name);
     end loop;
   -- выключаем триггера по списку из mgr_oschad.check_disable_trigger
-  for c in (
+  /*for c in (
              select dus.object_name 
                 from ddl_utils_store dus 
               where dus.object_type = 'TRIGGER_DISABLED'
                 and dus.table_name = stable
-                and dus.table_name not in ('OPLDOK', 'ARC_RRP')
+                --and dus.table_name not in ('OPLDOK', 'ARC_RRP')
            )
   loop
       begin
        p_trigger_disable(c.object_name);
+       exception
+       when others then null; 
       end;
-  end loop;
+  end loop;*/
   end p_triggers_enable;
 
   procedure p_indexes_nonuq_drop
@@ -4435,7 +4477,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
 
     for cur in
        (
-        select u.constraint_name
+        select '"'||u.constraint_name||'"' constraint_name
         from user_constraints u
         where u.constraint_type = 'R'
           and u.table_name = upper(stable)
@@ -4455,7 +4497,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
 
     for cur in
        (
-        select u.constraint_name
+        select '"'||u.constraint_name||'"' constraint_name
         from user_constraints u
         where u.constraint_type = 'C'
           and u.table_name = upper(stable)
@@ -4475,7 +4517,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
 
     for cur in
        (
-        select u.constraint_name
+        select '"'||u.constraint_name||'"' constraint_name
         from user_constraints u
         where u.constraint_type = 'C'
           and u.table_name = upper(stable)
@@ -4495,7 +4537,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
 
     for cur in
        (
-        select u.constraint_name
+        select '"'||u.constraint_name||'"' constraint_name
         from user_constraints u
         where u.constraint_type = 'C'
           and u.table_name = upper(stable)
@@ -4515,7 +4557,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
 
     for cur in
        (
-        select u.constraint_name
+        select '"'||u.constraint_name||'"' constraint_name
         from user_constraints u
         where u.constraint_type in ('P','U')
           and u.table_name = upper(stable)
@@ -4536,7 +4578,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
 
     for cur in
        (
-        select u.constraint_name
+        select '"'||u.constraint_name||'"' constraint_name
         from user_constraints u
         where u.constraint_type in ('P','U')
           and u.table_name = upper(stable)
@@ -4556,7 +4598,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
 
     for cur in
        (
-        select u.constraint_name
+        select '"'||u.constraint_name||'"' constraint_name
           from user_constraints u
          where u.constraint_type in ('P','U')
            and u.table_name = upper(stable)
@@ -4598,7 +4640,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
   as
   begin
     for cur in
-       ( select  table_name, constraint_name
+       ( select  table_name, '"'||constraint_name||'"' constraint_name
             from user_constraints
             where r_constraint_name
                in (select constraint_name
@@ -4620,7 +4662,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
   as
   begin
     for cur in
-       ( select  table_name, constraint_name
+       ( select  table_name, '"'||constraint_name||'"' constraint_name
             from user_constraints
             where r_constraint_name
                in (select constraint_name
@@ -4642,7 +4684,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
   as
   begin
     for cur in
-       ( select  table_name, constraint_name
+       ( select  table_name, '"'||constraint_name||'"' constraint_name
             from user_constraints
             where r_constraint_name
                in (select constraint_name
@@ -4668,7 +4710,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
 
     for cur in
        (
-        select  table_name, constraint_name
+        select  table_name, '"'||constraint_name||'"' constraint_name
             from user_constraints
            where r_constraint_name
               in (select constraint_name
@@ -4694,7 +4736,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
 
     for cur in
        (
-        select u.constraint_name
+        select '"'||u.constraint_name||'"' constraint_name
         from user_constraints u
         where u.constraint_type = 'R'
           and u.table_name = upper(stable)
@@ -4715,7 +4757,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
 
     for cur in
        (
-        select u.constraint_name
+        select '"'||u.constraint_name||'"' constraint_name
         from user_constraints u
         where u.constraint_type = 'R'
           and u.table_name = upper(stable)
@@ -4736,7 +4778,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
 
     for cur in
        (
-        select u.constraint_name
+        select '"'||u.constraint_name||'"' constraint_name
         from user_constraints u
         where u.constraint_type = 'R'
           and u.table_name = upper(stable)
@@ -4757,7 +4799,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
 
     for cur in
        (
-        select u.constraint_name
+        select '"'||u.constraint_name||'"' constraint_name
         from user_constraints u
         where u.constraint_type in ('P','U')
           and u.table_name = upper(stable)
@@ -4781,7 +4823,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MGR_UTL is
 
     for cur in
        (
-        select u.constraint_name
+        select '"'||u.constraint_name||'"' constraint_name
         from user_constraints u
         where u.constraint_type in ('P','U')
           and u.table_name = upper(stable)
@@ -5527,7 +5569,10 @@ end  f_tbl_col_com_get_metadata ;
                         )
       )
    loop
-     p_job_restore(cur.object_name, cur.object_type);
+     begin
+       p_job_restore(cur.object_name, cur.object_type);
+       exception when others then null;
+     end;
    end loop;
   end p_run_scheduler_job;
   
@@ -5568,7 +5613,7 @@ end  f_tbl_col_com_get_metadata ;
   for cur in 
   (
   select dsj.owner||'.'||dsj.job_name as job  from dba_scheduler_jobs dsj
-   where dsj.owner in ('BARS', 'BARSAQ', 'CDB', 'BARS_DM', 'BARSUPL')
+   where dsj.owner in ('BARS', 'BARSAQ', 'CDB', 'BARS_DM', 'BARSUPL','PFU', 'SBON')
      and dsj.enabled = 'TRUE'
   )
   loop
@@ -7008,7 +7053,11 @@ end  f_tbl_col_com_get_metadata ;
           
         select count(*)
         into l_job_cnt
-        from dba_scheduler_running_jobs;
+        from dba_scheduler_running_jobs
+          where JOB_NAME like 'B%'
+            and length (JOB_NAME) < 7
+            and substr(JOB_NAME, 2, 5) >= p_row_from 
+            and substr(JOB_NAME, 2, 5) <= p_row_to;
         
         if l_job_cnt < p_streems_count
           then
@@ -7040,7 +7089,11 @@ end  f_tbl_col_com_get_metadata ;
             
           select count(*)
           into l_job_cnt
-          from dba_scheduler_running_jobs;
+          from dba_scheduler_running_jobs
+          where JOB_NAME like 'B%'
+            and length (JOB_NAME) < 7
+            and substr(JOB_NAME, 2, 5) >= p_row_from 
+            and substr(JOB_NAME, 2, 5) <= p_row_to;
           
           if l_job_cnt > 0
             then dbms_lock.sleep(10);
@@ -7051,7 +7104,7 @@ end  f_tbl_col_com_get_metadata ;
      end if;
   end p_migration_jobs;
   
-  procedure merge_table_auto(
+/*  procedure merge_table_auto(
                           p_table varchar2,
                           p_matched boolean default true,
                           p_not_matched boolean default true,
@@ -7326,7 +7379,320 @@ end  f_tbl_col_com_get_metadata ;
       
       mgr_utl.sync_table(p_table => l_table, p_stmt => l_stmt, p_delete => false);
       
-  end merge_table_auto;  
+  end merge_table_auto;  */
+  
+    procedure merge_table_auto(
+                          p_table varchar2,
+                          p_matched boolean default true,
+                          p_not_matched boolean default true,
+                          p_column_match varchar2 default null,    
+                          p_column_replace varchar2 default null
+                        ) 
+    is
+    
+    l_table    varchar2(30) := upper(p_table);
+      
+      rc_c sys_refcursor;
+      type t_rec_c is record
+          ( 
+            rn           integer,
+            column_name    sys.all_tab_cols.column_name%type 
+          );
+      rec_c t_rec_c;
+
+      cursor c_cc is  
+        (
+        select rownum rn
+             , cc.column_name
+          from dba_constraints c
+          join dba_cons_columns cc
+            on c.constraint_name = cc.constraint_name
+           and c.owner = cc.owner
+         where c.TABLE_NAME = l_table
+           and c.owner = upper('BARS')
+           and c.CONSTRAINT_TYPE = 'P'
+        );
+       
+      rc_inc sys_refcursor;
+      type t_rec_inc is record
+          ( 
+            column_id    sys.all_tab_cols.column_id%type,
+            cn           sys.all_tab_cols.column_name%type,
+            cnk          sys.all_tab_cols.column_name%type
+          );
+      rec_inc t_rec_inc;
+
+    l_stmt     varchar2(4000);
+    l_ins_cols varchar2(4000);
+    l_sel_cols varchar2(4000);
+    l_col      varchar2(256);
+    l_kf       varchar2(6);
+    l_include       boolean;
+    l_tab_exists    number;
+    l_tab_length    BINARY_INTEGER;    
+    l_array         DBMS_UTILITY.lname_array;
+    type t_colrep is table of varchar2(4000) index by varchar2(30);
+    l_colrep        t_colrep;
+    l_index         pls_integer;
+    l_column        varchar2(30);
+    l_replace       varchar2(4000);
+    l_nullable      varchar2(1);
+    l_datadefault   varchar2(1024); 
+ 
+----------------------------------------------------------------------------------------------        
+    begin  
+
+        -- посмотрим существует ли исходная таблица
+        l_kf := mgr_utl.get_kf();
+        begin
+          execute immediate '
+            select 1
+              from '||regexp_replace(mgr_utl.pkf('all_tables'), 'BARS.', '')||'
+             where owner=''BARS''
+               and table_name='''||l_table||''''
+          into l_tab_exists;
+          exception
+            when no_data_found then
+                l_tab_exists := 0;
+        end;
+        --
+        if l_tab_exists=0
+        then
+            raise_application_error(-20000, 'Таблица '||l_table||' не существует на источнике. Импорт не выполняем.');
+        end if;
+        --
+        -- обрабатываем p_column_replace
+        --
+        if p_column_replace is not null
+        then
+            dbms_utility.comma_to_table(
+                list    => p_column_replace,
+                tablen  => l_tab_length,
+                tab     => l_array
+            );
+            l_index := 1;
+            while l_index < l_tab_length
+            loop
+                l_column := upper(trim(l_array(l_index)));
+                l_replace := trim(l_array(l_index+1));
+                if l_replace like '"%"'
+                then
+                    l_replace := substr(l_replace, 2, length(l_replace)-2);
+                end if;
+                l_colrep(l_column) := l_replace;
+                mgr_utl.trace('Колонка %s будет заменена на выражение %s', l_column, l_replace);
+
+                l_index := l_index + 2;
+            end loop;
+        end if;
+      
+      --START FORMING MERGE STATEMENT
+      l_stmt := '';
+      
+      l_stmt := concat(l_stmt, 'merge into '||l_table||' t using '||chr(13));   
+      l_stmt := concat(l_stmt, '(select '||chr(13));   
+           
+      --for rec in c_c      
+      --loop
+      
+      open rc_c for ' select t.COLUMN_ID rn
+                           , cast(t.COLUMN_NAME as varchar2(255)) as COLUMN_NAME
+                        from '||regexp_replace(mgr_utl.pkf('all_tab_cols'), 'BARS.', '')||' t
+                       where t.TABLE_NAME = '''||l_table||'''
+                         and t.owner = ''BARS''
+                       order by 1';
+      while true
+      loop
+            fetch rc_c into rec_c;
+            exit when rc_c%notfound;
+            l_index := 1;
+            while l_index < l_tab_length
+            loop
+               if upper(l_array(l_index)) = rec_c.column_name
+                 then rec_c.column_name := upper(substr(l_array(l_index+1), 2, length(l_array(l_index+1))-2))||' as '||rec_c.column_name;
+               end if;
+               l_index := l_index + 2;
+            
+            end loop;
+        if rec_c.rn = 1 
+          then l_stmt := concat(l_stmt, rec_c.column_name||chr(13));   
+        else   l_stmt := concat(l_stmt, ','||rec_c.column_name||chr(13));   
+        end if;
+      end loop;
+      
+      close rc_c;
+
+      l_stmt := concat(l_stmt, 'from '||mgr_utl.pkf(l_table)||' ) tt '||chr(13));   
+      --ON
+        --
+        -- обрабатываем p_column_match
+        --
+      if p_column_match is not null
+      then
+          dbms_utility.comma_to_table(
+              list    => p_column_match,
+              tablen  => l_tab_length,
+              tab     => l_array
+          );
+          l_index := 1;
+          while l_index < l_tab_length + 1
+          loop
+              l_column := upper(trim(l_array(l_index)));
+              if l_index = 1 
+                then l_stmt := concat(l_stmt, 'ON( t.'||l_array(l_index)||' = tt.'||l_array(l_index)||chr(13));   
+              elsif l_index > 1 
+                then l_stmt := concat(l_stmt, 'AND t.'||l_array(l_index)||' = tt.'||l_array(l_index)||chr(13));   
+              --else l_stmt := concat(l_stmt, 'ON( 1 = 0'||chr(13));
+              end if;
+              l_index := l_index + 1;
+          end loop;
+
+      else
+
+          for rec in c_cc                 
+          loop
+            
+            if rec.rn = 1 
+              then l_stmt := concat(l_stmt, 'ON( t.'||rec.column_name||' = tt.'||rec.column_name||chr(13));   
+            elsif rec.rn > 1 
+              then l_stmt := concat(l_stmt, 'AND t.'||rec.column_name||' = tt.'||rec.column_name||chr(13));   
+            else l_stmt := concat(l_stmt, 'ON( 1 = 0'||chr(13));
+            end if;
+          end loop;
+
+      end if;
+
+      l_stmt := concat(l_stmt, ')');   
+
+      --WHEN MATCHED PART
+      if p_matched = true then    
+          l_stmt := concat(l_stmt, 'when matched then update set '||chr(13));   
+          l_index := 1;
+          
+          if p_column_match is not null
+          then
+              open rc_inc for ' select t.column_id 
+                                     , ''t.''||t.COLUMN_NAME cn
+                                     , case when t.COLUMN_NAME = ''KF'' and tt.COLUMN_NAME is null then '''||g_kf||''' 
+                                            when tt.COLUMN_NAME is null then ''null'' 
+                                       else ''  tt.''||tt.COLUMN_NAME end cnk
+                                  from all_tab_cols t
+                                  left join '||regexp_replace(mgr_utl.pkf('all_tab_cols'), 'BARS.', '')||' tt
+                                    on t.TABLE_NAME = tt.TABLE_NAME
+                                   and t.COLUMN_NAME = tt.COLUMN_NAME
+                                   and tt.owner = ''BARS''
+                                 where t.TABLE_NAME = '''||l_table||'''
+                                   and t.owner = ''BARS''
+                                 order by 1'
+                                   ;
+                
+              while true
+              loop
+                  fetch rc_inc into rec_inc;
+                  exit when rc_inc%notfound;
+                  
+                    l_index := 1;
+                    l_include := false;
+                    while l_index < l_tab_length + 1
+                    loop
+                       if upper('t.'||l_array(l_index)) = upper(rec_inc.cn)
+                         then l_include := true;
+                       end if;
+                       l_index := l_index + 1;
+                    end loop;
+                    if l_include = false 
+                      then
+                        l_stmt := concat(l_stmt, rec_inc.cn||' = '||rec_inc.cnk||', '||chr(13));   
+                    end if;
+              end loop;
+              
+              close rc_inc;
+              
+              l_stmt := rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(l_stmt, ', '||chr(13))
+                        , chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13));
+          else
+
+              --for rec in c_inc 
+              --loop
+              open rc_inc for ' select --row_number() over( order by t.column_id ) rn ,
+                                       t.column_id 
+                                     , ''t.''||t.COLUMN_NAME cn
+                                     , case when t.COLUMN_NAME = ''KF'' and tt.COLUMN_NAME is null then '''||g_kf||''' 
+                                            when tt.COLUMN_NAME is null then ''null'' 
+                                       else ''tt.''||tt.COLUMN_NAME end cnk
+                                  from all_tab_cols t
+                                  left join '||regexp_replace(mgr_utl.pkf('all_tab_cols'), 'BARS.', '')||' tt
+                                    on t.TABLE_NAME = tt.TABLE_NAME
+                                   and t.COLUMN_NAME = tt.COLUMN_NAME
+                                   and tt.owner = upper(''BARS'')
+                                  left join (select cc.column_name
+                                               from all_constraints c
+                                               join all_cons_columns cc
+                                                 on c.constraint_name = cc.constraint_name
+                                                and c.owner = cc.owner
+                                              where c.TABLE_NAME = '''||l_table||'''
+                                                and c.owner = upper(''BARS'')
+                                                and c.CONSTRAINT_TYPE = ''P'') ttt
+                                    on t.column_name = ttt.column_name
+                                 where t.TABLE_NAME = '''||l_table||'''
+                                   and t.owner = ''BARS''
+                                   and ttt.column_name is null
+                                 order by 1';
+              while true
+              loop
+                
+                fetch rc_inc into rec_inc;
+                exit when rc_inc%notfound;
+              
+                if l_index = 1  
+                  then l_stmt := concat(l_stmt, rec_inc.cn||' = '||rec_inc.cnk||chr(13));   
+                  else l_stmt := concat(l_stmt, ', '||rec_inc.cn||' = '||rec_inc.cnk||chr(13));   
+                end if;
+                l_index := l_index + 1;
+              end loop;
+          
+        end if;
+      end if;
+              l_stmt := l_stmt||chr(13);       
+      --WHEN NOT MATCHED PART
+      if p_not_matched = true then    
+          l_stmt := concat(l_stmt, 'when not matched then insert values ('||chr(13));   
+
+              open rc_inc for ' select t.column_id 
+                                     , ''t.''||t.COLUMN_NAME cn
+                                     , case when t.COLUMN_NAME = ''KF'' and tt.COLUMN_NAME is null then '''||g_kf||''' 
+                                            when tt.COLUMN_NAME is null then ''null'' 
+                                       else ''  tt.''||tt.COLUMN_NAME end cnk
+                                  from all_tab_cols t
+                                  left join '||regexp_replace(mgr_utl.pkf('all_tab_cols'), 'BARS.', '')||' tt
+                                    on t.TABLE_NAME = tt.TABLE_NAME
+                                   and t.COLUMN_NAME = tt.COLUMN_NAME
+                                   and tt.owner = ''BARS''
+                                 where t.TABLE_NAME = '''||l_table||'''
+                                   and t.owner = ''BARS''
+                                 order by 1';
+                
+              while true
+              loop
+                  fetch rc_inc into rec_inc;
+                  exit when rc_inc%notfound;
+
+                  l_stmt := concat(l_stmt, rec_inc.cnk||', '||chr(13));   
+              end loop;
+              close rc_inc;
+
+          l_stmt := rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(rtrim(l_stmt, ', '||chr(13))
+                    , chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13)), chr(13));
+          l_stmt := l_stmt||chr(13);  
+          l_stmt := concat(l_stmt, ')');  
+
+      end if;
+      
+      --dbms_output.put_line(l_stmt);
+      
+      mgr_utl.sync_table(p_table => l_table, p_stmt => l_stmt, p_delete => false);
+      
+  end merge_table_auto;
   
 end mgr_utl;
 /

@@ -1,4 +1,13 @@
-CREATE OR REPLACE PROCEDURE BARS.int15_N (p_dat DATE)
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/INT15_N.sql =========*** Run *** =
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure INT15_N ***
+
+  CREATE OR REPLACE PROCEDURE BARS.INT15_N (p_dat DATE)
 IS
 -- ver 25/02-17 KDI
    l_tax_nls          VARCHAR2 (14);
@@ -25,7 +34,11 @@ BEGIN
                     a.acc,
                     ap.nls nlsp,                    
                     ap.ostc,
-                    substr(op.nazn,17,instr(substr(op.nazn,17,15),' ')-1) nls,      
+                     case   when substr (op.nazn, 16,1)= '.'   
+                            then substr (op.nazn,17,instr(substr(op.nazn,17,15),' ')-1)
+                            when substr (op.nazn, 12,4)= ' рах'
+                            then substr(op.nazn,17,instr(substr(op.nazn,17,15),' ')-1)
+                     end as nls,      
                     a.branch                            -- выборка необходимых
                FROM (SELECT *
                        FROM opldok o 
@@ -33,12 +46,16 @@ BEGIN
                       oper op,
                       accounts a,
                       accounts ap                                        
-              WHERE     a.nls = substr(op.nazn,17,instr(substr(op.nazn,17,15),' ')-1)
+              WHERE a.nls = (case   when substr (op.nazn, 16,1)= '.'   
+                                    then substr (op.nazn,17,instr(substr(op.nazn,17,15),' ')-1)
+                                    when substr (op.nazn, 12,4)= ' рах'
+                                    then substr(op.nazn,17,instr(substr(op.nazn,17,15),' ')-1)
+                            end)
                     and (substr(a.nbs,1,2)= '26' or substr(ap.nbs,1,2)= '26')
                     and a.kv = op.kv
                     and o.acc = ap.acc                    
-                    AND op.ref = o.ref  AND op.NLSB not like '6%'  --- Отсекаем проводки начисл. %%1  Дт2607-Кт6020
-                    AND NOT EXISTS                                 --- по Овердрафтам на 2600 СПД                  
+                    AND op.ref = o.ref
+                    AND NOT EXISTS
                                (SELECT 1
                                   FROM opldok
                                  WHERE     tt in ('%15','MIL')
@@ -193,3 +210,14 @@ BEGIN
    END IF;
 END int15_N;
 /
+show err;
+
+PROMPT *** Create  grants  INT15_N ***
+grant EXECUTE                                                                on INT15_N         to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on INT15_N         to START1;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/INT15_N.sql =========*** End *** =
+PROMPT ===================================================================================== 

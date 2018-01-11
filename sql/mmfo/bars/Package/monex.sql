@@ -1,4 +1,10 @@
-create or replace package monex is
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/monex.sql =========*** Run *** =====
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.MONEX is
 
   -- 19.09.2017  Sta + Artem Юрченко Очистка пользовательского контекста
   -- 11.01.2017  Добавлена работа с БРАГАМИ
@@ -35,8 +41,7 @@ PROCEDURE monex_KL (  p_UL number) ; --- p_dat1 date, p_dat2 date) ---- Выполнит
 --------------------------------------------------
 end monex;
 /
-
-create or replace package body monex is
+CREATE OR REPLACE PACKAGE BODY BARS.MONEX is
 
 /*
   24/10/2017 LitvinSO При формировании Свифтов обрабатываем отрицательную суму если клиент нам должен
@@ -123,7 +128,7 @@ begin l_nls := vkrzn(substr(p_branch,2,5),  p_nbs||'00'|| MONEX.ob3(p_ob22) || '
 end NLSM;
 
 
-function show_monex_ctx( tag  varchar2)  return varchar2 IS 
+function show_monex_ctx( tag  varchar2)  return varchar2 IS
     sess_   varchar2(64) :=bars_login.get_session_clientid;
     sid_    varchar2(64);
 
@@ -132,7 +137,7 @@ function show_monex_ctx( tag  varchar2)  return varchar2 IS
    sid_:=SYS_CONTEXT('BARS_CLEARING',tag);
    SYS.DBMS_SESSION.SET_IDENTIFIER(sess_);
 
-return sid_; 
+return sid_;
 
 end;
 
@@ -158,7 +163,7 @@ begin
   oo.mfoa := gl.aMfo ;
   for kk in (select * from monex_UO where id > 0 and id=decode(p_ul,0, id, p_UL) and mfo is not null and nls is not null and okpo is not null)
   loop
-      --oo.id_a :=trim(kk.okpo);  
+      --oo.id_a :=trim(kk.okpo);
       oo.id_b := trim(kk.okpo);
       oo.mfob := kk.Mfo ;  oo.nlsb := trim(kk.nls) ;  oo.nam_b:= substr(kk.name,1,38);
 
@@ -176,9 +181,9 @@ begin
                   INTO oo.id_a
                   FROM customer c
                  WHERE c.rnk = ss.rnk;
-           EXCEPTION WHEN NO_DATA_FOUND THEN oo.id_a := trim(kk.okpo); 
+           EXCEPTION WHEN NO_DATA_FOUND THEN oo.id_a := trim(kk.okpo);
            end;
-           
+
            If ss.ostc > 0          then oo.dk  := 1 ; oo.nazn := 'Перерахування кредитового' ;  oo.vob := 1;
            elsIf oo.MFOb = oo.Mfoa then oo.dk  := 0 ; oo.nazn := 'Списання дебетового';    oo.vob := 2 ;
            else                         oo.dk  := 2 ; oo.nazn := 'Вимога на відшкодування дебетового';  oo.vob := 2 ;
@@ -293,7 +298,7 @@ end monex_KL;
 
       If l_FL = 0 then
          -- попутно проверка на дубль даты + код системы (дубль файла)
-     
+
 
          begin
            select distinct 1 into nTmp_ from  MONEXR where FDAT = l_FDAT and kod_nbu = l_nbu;
@@ -306,16 +311,16 @@ end monex_KL;
       end if;
 
       l_Branch := trim(substr   (MONEX.getChildNodeValue(l_child, 'BarsPointCode'), 1, 22));
-      
-      begin 
+
+      begin
       select 1  into nTmp_ from banks$base where mfo= (case when substr(l_Branch,2,6) in (select distinct substr(branch,2,6) from BRANCH_UO)  then mfo else substr(l_Branch,2,6) end) and rownum=1;
       EXCEPTION WHEN NO_DATA_FOUND THEN
        raise_application_error(-20100,
              'Увага: Відділення ' ||l_Branch||' не дійсне.' );
       end;
-      
 
-      
+
+
       l_KV     := to_number(MONEX.getChildNodeValue(l_child, 'CurrencyCode'));
       l_S_2909 := to_number(MONEX.getChildNodeValue(l_child, 'SentAmount'),    g_numb_mask,  g_nls_mask) * 100;
       l_K_2909 := to_number(MONEX.getChildNodeValue(l_child, 'SentFee'),       g_numb_mask,  g_nls_mask) * 100;
@@ -334,7 +339,7 @@ end monex_KL;
             l_receivesafee := to_number(MONEX.getChildNodeValue(l_child, 'ReceiveSafee') , g_numb_mask,  g_nls_mask) * 100;
             l_returnsafee  := to_number(MONEX.getChildNodeValue(l_child, 'ReturnSafee')  , g_numb_mask,  g_nls_mask) * 100;
 
-      begin 
+      begin
       if ((l_S_2909<0) or (l_K_2909<0) or ( l_S_2809<0) or ( l_k_2809<0) or ( l_s_0000<0) or ( l_K_0000<0))
       then raise_application_error(-20100,
              'Увага: у файлі є від*ємне значення! Файл не буде завантажено' );
@@ -388,7 +393,8 @@ end monex_KL;
                   mfoa_    => gl.aMfo, -- VARCHAR2,  -- Sender's MFOs
                   nlsa_    => oo.nlsa, -- VARCHAR2,  -- Sender's account number
                   mfob_    => oo.mfob, -- VARCHAR2,  -- Destination MFO
-                  nlsb_    => oo.nlsb, -- VARCHAR2,  -- Target account number
+                  nlsb_    => oo.nlsb, -- VARCHAR2,  -- Target account number
+
                   dk_      => oo.dk, -- SMALLINT, -- Debet/Credit code
                   s_       => oo.s, -- DECIMAL,  -- Amount
                   vob_     => oo.vob, -- SMALLINT, -- Document type
@@ -595,25 +601,25 @@ sid_:=show_monex_ctx('CLEARING');
 if system_='%'
 then
 for s in (select distinct KOD_NBU from monexr where fdat >= p_dat1 and fdat <= p_dat2)
-  
+
   loop
 
     monexD(p_dat1, p_dat2, s.KOD_NBU);
-    
-  end loop ; 
+
+  end loop ;
 else
-for s in (select distinct KOD_NBU from monexr where fdat >= p_dat1 and fdat <= p_dat2 and 
-                                    (KOD_NBU IN 
+for s in (select distinct KOD_NBU from monexr where fdat >= p_dat1 and fdat <= p_dat2 and
+                                    (KOD_NBU IN
                                     (select distinct KS from (select  substr(s, level,2 ) KS, rownum as ID from
-                                    (select replace(system_,',','') as s from dual 
+                                    (select replace(system_,',','') as s from dual
                                     )
                                     connect by level <= length(s)) where mod(ID,2)<>0 )))
- 
+
   loop
 
     monexD(p_dat1, p_dat2, s.KOD_NBU);
-    
-  end loop ; 
+
+  end loop ;
 end if;
 
 
@@ -627,7 +633,7 @@ end;
 
 PROCEDURE monexD (p_dat1 date, p_dat2 date, system_ varchar2 )  is
 begin
- 
+
      -- 1) клиринг с РУ идет по каждой системе и дате отдельно
      for k in (select distinct fdat from monexr where fdat >= p_dat1 and fdat <= p_dat2 and KOD_NBU = system_ ) loop
      bars_audit.info('CLEARING, monex.monexp: p_kod_NBU =>'||system_||', p_dat => '||k.fdat);
@@ -715,7 +721,8 @@ begin
 
         oo.nlsa := x0.nlsT;
         oo.kv   := k.kv;
-        oo.kv2  := k.kv;
+        oo.kv2  := k.kv;
+
         oo.vob  := 2 ;
         oo.S    := k.S_2909;
         oo.S2   := oo.S;
@@ -802,7 +809,7 @@ begin
            gl.payv(0, MR.rk_2809, gl.bdate, 'D06', 1, k.kv, X0.nlst, k.k_2809, 980 , X0.nlst, oo.s      );
            If nvl(GetGlobalOption('PEDAL_PROFIX'),0)=1 then  gl.pay (2, MR.rk_2809, gl.bDATE);    end if;
         end if;
-        
+
      end if;
 ---------------------------------------------------------------------------------------------------------------
      -- 5) кредитовый платеж - на 2809 - тело (анул)
@@ -834,19 +841,19 @@ begin
          If p_kod_nbu = '03' then
             oo.kv   := gl.baseval ;
             oo.kv2  := gl.baseval ;
-         else 
+         else
             oo.kv   := k.kv ;
             oo.kv2  := oo.kv ;
-             
+
          end if;
-        
+
         oo.s    := k.K_0000;
         oo.S2   := oo.S ;
         oo.nlsb := monex.NLSM_ext (  UU.UO, UU.OB22_2809, trim(k.branch));
         oo.nazn := substr(to_char(p_dat, 'dd.mm.yyyy')  || ';Перерахування комiсiї за анульованi перекази. Вал='||k.kv||',Сума='||to_char(k.k_0000/100),  1, 160 );
         oo.dk   := 1 ;
         monex.opl1(oo);  MR.rK_0000 :=  oo.ref ;
-       
+
      end if;
      --------------------
 
@@ -936,8 +943,15 @@ end DEL_FIle ;
 
 end monex;
 /
-show err;
+ show err;
  
 PROMPT *** Create  grants  MONEX ***
 grant EXECUTE                                                                on MONEX           to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on MONEX           to START1;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/monex.sql =========*** End *** =====
+ PROMPT ===================================================================================== 
+ 

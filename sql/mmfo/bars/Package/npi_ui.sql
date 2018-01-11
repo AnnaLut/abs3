@@ -1,4 +1,10 @@
-create or replace package npi_ui is
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/npi_ui.sql =========*** Run *** ====
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.NPI_UI is
 
     -- Author  : VITALII.KHOMIDA
     -- Created : 15.03.2017 19:41:12
@@ -48,7 +54,7 @@ create or replace package npi_ui is
     procedure edit_selected_reckoning(p_id in integer, p_interest_amount in number, p_purpose in varchar2);
 end;
 /
-create or replace package body npi_ui is
+CREATE OR REPLACE PACKAGE BODY BARS.NPI_UI is
 
     procedure prepare_portfolio_interest(
         p_nbs         in varchar2, --NBS
@@ -452,11 +458,7 @@ create or replace package body npi_ui is
 
         l_reckoning_row := interest_utl.read_reckoning_row(p_reckoning_id, p_lock => true, p_raise_ndf => false);
 
-        if (l_reckoning_row.state_id = interest_utl.RECKONING_STATE_RECKONING_FAIL) then
-            interest_utl.clear_reckonings(l_reckoning_row);
-        else
-            interest_utl.clear_reckonings(l_reckoning_row.account_id, l_reckoning_row.interest_kind_id, l_reckoning_row.date_from);
-        end if;
+        interest_utl.clear_reckonings(l_reckoning_row.account_id, l_reckoning_row.interest_kind_id, l_reckoning_row.date_from);
     end;
 
     procedure pay_accrued_interest
@@ -517,3 +519,14 @@ create or replace package body npi_ui is
 
 end npi_ui;
 /
+ show err;
+ 
+PROMPT *** Create  grants  NPI_UI ***
+grant EXECUTE                                                                on NPI_UI          to BARS_ACCESS_DEFROLE;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/npi_ui.sql =========*** End *** ====
+ PROMPT ===================================================================================== 
+ 

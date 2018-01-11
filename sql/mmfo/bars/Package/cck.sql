@@ -1,4 +1,10 @@
-CREATE OR REPLACE PACKAGE cck IS
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cck.sql =========*** Run *** =======
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.CCK IS
   g_header_version CONSTANT VARCHAR2(64) := 'ver.3.24  10/11/2017 ';
 
   /*
@@ -1165,7 +1171,7 @@ CREATE OR REPLACE PACKAGE cck IS
 
 END cck;
 /
-CREATE OR REPLACE PACKAGE BODY cck IS
+CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
   -------------------------------------------------------------------
   g_body_version CONSTANT VARCHAR2(64) := 'ver.4.2.7  16/12/2017 ';
   ------------------------------------------------------------------
@@ -16009,3 +16015,18 @@ BEGIN
 
 END cck;
 /
+ show err;
+ 
+PROMPT *** Create  grants  CCK ***
+grant EXECUTE                                                                on CCK             to BARS009;
+grant EXECUTE                                                                on CCK             to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on CCK             to RCC_DEAL;
+grant EXECUTE                                                                on CCK             to WR_ALL_RIGHTS;
+grant EXECUTE                                                                on CCK             to WR_CREDIT;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/cck.sql =========*** End *** =======
+ PROMPT ===================================================================================== 
+ 

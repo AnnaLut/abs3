@@ -1,4 +1,5 @@
 
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/DPT_EXECUTE_JOB.sql =========*** R
 PROMPT ===================================================================================== 
@@ -6,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure DPT_EXECUTE_JOB ***
 
-CREATE OR REPLACE PROCEDURE DPT_EXECUTE_JOB(P_JOBCODE IN DPT_JOBS_LIST.JOB_CODE%TYPE,
+  CREATE OR REPLACE PROCEDURE BARS.DPT_EXECUTE_JOB (P_JOBCODE IN DPT_JOBS_LIST.JOB_CODE%TYPE,
                                             P_JOBMODE IN NUMBER DEFAULT NULL) IS
   -- HO - с обслуживанием вкладов в выходные и праздничные дни
   G_MODCODE    VARCHAR2(3) := 'DPT';
@@ -108,20 +109,20 @@ BEGIN
 
   -- дл€ нарахуванн€ в≥дсотк≥в ќўјƒЅјЌ у
   IF (GETGLOBALOPTION('BANKTYPE') = 'SBER') AND (P_JOBCODE = 'JOB_MINT') THEN
-  
+
     L_PLSQLBLOCK := 'begin dpt_web.auto_make_int_monthly_opt(:dptid, :runid, :branch, :date, :mode); end;';
-  
+
     BARS_AUDIT.INFO(TITLE || L_PLSQLBLOCK);
     BARS_AUDIT.TRACE('%s branch = /all_branch/, bdate = %s',
                      TITLE,
                      TO_CHAR(L_BDATE, 'dd.mm.yyyy'));
     BARS_AUDIT.INFO(TITLE || ' branch = /all_branch/, bdate = ' ||
                     TO_CHAR(L_BDATE, 'dd.mm.yyyy'));
-  
+
     L_BDATE := GL.BDATE; -- glb_bankdate;
-  
+
     L_CURSOR := DBMS_SQL.OPEN_CURSOR;
-  
+
     BEGIN
       DBMS_SQL.PARSE(L_CURSOR, L_PLSQLBLOCK, DBMS_SQL.NATIVE);
       DBMS_SQL.BIND_VARIABLE(L_CURSOR, 'dptid', 0);
@@ -138,18 +139,18 @@ BEGIN
         DBMS_SQL.CLOSE_CURSOR(L_CURSOR);
         RAISE;
     END;
-  
+
   ELSE
-  
+
     -- цикл по подразделени€м банка
     <<BRANCH_LOOP>>
     FOR I IN 1 .. L_BRANCHLIST.COUNT LOOP
-    
+
       BARS_AUDIT.TRACE('%s branch = %s', TITLE, L_BRANCHLIST(I));
       BARS_AUDIT.INFO(TITLE || ' branch = ' || L_BRANCHLIST(I));
-    
+
       BEGIN
-      
+
         L_KF := BARS_CONTEXT.EXTRACT_MFO(L_BRANCHLIST(I));
         -- поиск банк.даты дл€ 1-го подразделени€ очередного филиала
         IF (L_CURKF IS NULL OR L_CURKF <> L_KF) THEN
@@ -163,8 +164,6 @@ BEGIN
                           TO_CHAR(L_BDATE, 'dd.mm.yyyy'));
         END IF;
         BARS_CONTEXT.SUBST_BRANCH(L_BRANCHLIST(I));
-
-        BARS_AUDIT.INFO(TITLE || ' L_BRANCHLIST(I) := ' ||L_BRANCHLIST(I)||' L_BDATE := '||L_BDATE);
 
         L_CURSOR := DBMS_SQL.OPEN_CURSOR;
         BEGIN
@@ -183,14 +182,14 @@ BEGIN
             DBMS_SQL.CLOSE_CURSOR(L_CURSOR);
             RAISE;
         END;
-      
+
       EXCEPTION
         WHEN EXPTNOBD THEN
           BARS_AUDIT.ERROR(TITLE || ' не найдена банк.дата дл€ ћ‘ќ ' || L_KF);
       END;
-    
+
     END LOOP BRANCH_LOOP;
-  
+
   END IF;
 
   BARS_CONTEXT.SET_CONTEXT;
@@ -238,5 +237,3 @@ grant EXECUTE                                                                on 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/DPT_EXECUTE_JOB.sql =========*** E
 PROMPT ===================================================================================== 
-
-

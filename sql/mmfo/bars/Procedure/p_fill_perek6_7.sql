@@ -1,4 +1,13 @@
-CREATE OR REPLACE PROCEDURE p_fill_perek6_7 (p_nls5    VARCHAR2,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FILL_PEREK6_7.sql =========*** R
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_FILL_PEREK6_7 ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_FILL_PEREK6_7 (p_nls5    VARCHAR2,
                                              p_nazn    VARCHAR2)
 IS
 -- Наповнення довідника перекриття 6,7 класів на 5040(5041)
@@ -11,15 +20,15 @@ BEGIN
    THEN
       raise_application_error (l_errn, l_err_txt1);
    END IF;
-   
-   IF l_kf is null or LENGTH (l_kf) < 6 
+
+   IF l_kf is null or LENGTH (l_kf) < 6
    THEN
       raise_application_error (l_errn, l_err_txt2);
    END IF;
-   
+
    delete from perek6_7 where kf = l_kf;
-   
-   
+
+
    INSERT INTO perek6_7 (nlsa,
                          nlsb,
                          nazn,
@@ -40,5 +49,13 @@ BEGIN
       ORDER BY SUBSTR (a.nls, 1, 4), SUBSTR (a.nls, 6, 9);
 END;
 /
+show err;
 
-grant execute on p_fill_perek6_7 to bars_access_defrole;
+PROMPT *** Create  grants  P_FILL_PEREK6_7 ***
+grant EXECUTE                                                                on P_FILL_PEREK6_7 to BARS_ACCESS_DEFROLE;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FILL_PEREK6_7.sql =========*** E
+PROMPT ===================================================================================== 

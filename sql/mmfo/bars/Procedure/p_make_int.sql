@@ -1,4 +1,13 @@
-CREATE OR REPLACE PROCEDURE BARS.P_MAKE_INT
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_MAKE_INT.sql =========*** Run **
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_MAKE_INT ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_MAKE_INT 
 ( acc_cur SYS_REFCURSOR,            -- подмножество счетов
   p_dat2  IN  DATE,                 -- дата, по которую начисляются %%
   p_mod   IN  NUMBER  DEFAULT 0,    -- 0 - прогноз, 1 - начисление+проводки
@@ -422,20 +431,20 @@ BEGIN
             l_taxrow_mil.bdate          := l_bdate;
             l_taxrow_mil.tax_s := 0;
             l_taxrow_mil.tax_sq := 0;
-            
+
             l_tax_s := 0;
             l_tax_sq := 0;
             l_tax_mil_s := 0;
             l_tax_mil_sq := 0;
 
-            l_tax_base_soc := 0; 
+            l_tax_base_soc := 0;
             l_tax_base_soc_sq := 0;
-            
+
             l_tmp_s_soc := 0;
             l_tmp_sq_soc := 0;
             l_tmp_mil_s_soc := 0;
             l_tmp_mil_sq_soc := 0;
-            
+
             l_tax_s_soc := 0;
             l_tax_sq_soc := 0;
             l_tax_mil_s_soc := 0;
@@ -1015,9 +1024,15 @@ BEGIN
 
 END P_MAKE_INT;
 /
-
 show err;
 
-grant EXECUTE on P_MAKE_INT to BARS_ACCESS_DEFROLE;
-grant EXECUTE on P_MAKE_INT to DPT_ROLE;
-grant EXECUTE on P_MAKE_INT to WR_ALL_RIGHTS;
+PROMPT *** Create  grants  P_MAKE_INT ***
+grant EXECUTE                                                                on P_MAKE_INT      to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on P_MAKE_INT      to DPT_ROLE;
+grant EXECUTE                                                                on P_MAKE_INT      to WR_ALL_RIGHTS;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_MAKE_INT.sql =========*** End **
+PROMPT ===================================================================================== 

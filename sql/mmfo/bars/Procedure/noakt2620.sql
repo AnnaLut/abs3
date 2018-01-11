@@ -1,4 +1,13 @@
-CREATE OR REPLACE PROCEDURE BARS.NoAkt2620(p_dat date) is
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/NOAKT2620.sql =========*** Run ***
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure NOAKT2620 ***
+
+  CREATE OR REPLACE PROCEDURE BARS.NOAKT2620 (p_dat date) is
 
 --15.11.2017 Трансфер-2017  6110.F1 => 6510.F1
 
@@ -313,3 +322,14 @@ BEGIN
 
 END NoAkt2620;
 /
+show err;
+
+PROMPT *** Create  grants  NOAKT2620 ***
+grant EXECUTE                                                                on NOAKT2620       to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on NOAKT2620       to START1;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/NOAKT2620.sql =========*** End ***
+PROMPT ===================================================================================== 

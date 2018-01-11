@@ -1,4 +1,10 @@
-create or replace package BARS.EBK_DUP_WFORM_UTL
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ebk_dup_wform_utl.sql =========*** R
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.EBK_DUP_WFORM_UTL 
 is
 
   --
@@ -34,7 +40,7 @@ is
 
   procedure change_master_card
   ( p_m_rnk       in     number
-  , p_new_m_rnk   in     number 
+  , p_new_m_rnk   in     number
   );
 
   procedure ignore_card
@@ -55,19 +61,14 @@ is
 
 end EBK_DUP_WFORM_UTL;
 /
-
-show err
-
-----------------------------------------------------------------------------------------------------
-
-CREATE OR REPLACE package body BARS.ebk_dup_wform_utl
+CREATE OR REPLACE PACKAGE BODY BARS.EBK_DUP_WFORM_UTL 
 is
 
   --
   -- constants
   --
   g_body_version  constant varchar2(64)  := 'version 1.03  2016.09.21';
-  
+
   G_TRACE         constant varchar2(20)  := 'ebk_dup_wform_utl';
 
 function get_db_value(p_rnk in number,p_attr_name in varchar2, p_attr_type in varchar2)  return varchar2
@@ -86,27 +87,27 @@ function get_db_value(p_rnk in number,p_attr_name in varchar2, p_attr_type in va
 
 function get_group_id(p_rnk in number,
                       p_kf in varchar2) return number is
- -- p_kf is dummy parameter                     
+ -- p_kf is dummy parameter
  l_group_id number;
  l_tmp      number;
 begin
-  
+
   select
-    case when exists (select 1 from w4_acc w, accounts a  where w.acc_pk = a.acc and a.dazs is null  and a.rnk = p_rnk) then 1 
-        else 
-            case when exists (select 1 from cc_deal cc where cc.rnk = p_rnk  and cc.sos not in (0,2,14,15))             then 2 
-            else 
-                case when exists (select 1 from dpt_deposit dd where dd.rnk = p_rnk)                                    then 3 
-                else 
-                    case when exists (select 1 from accounts ac where ac.rnk = p_rnk and ac.dazs is null and nbs='2620') then 4 
-                     else 5 
-                    end                   
-                end  
-            end 
+    case when exists (select 1 from w4_acc w, accounts a  where w.acc_pk = a.acc and a.dazs is null  and a.rnk = p_rnk) then 1
+        else
+            case when exists (select 1 from cc_deal cc where cc.rnk = p_rnk  and cc.sos not in (0,2,14,15))             then 2
+            else
+                case when exists (select 1 from dpt_deposit dd where dd.rnk = p_rnk)                                    then 3
+                else
+                    case when exists (select 1 from accounts ac where ac.rnk = p_rnk and ac.dazs is null and nbs='2620') then 4
+                     else 5
+                    end
+                end
+            end
         end as group_id
     into l_group_id
     from dual;
-    
+
  return l_group_id;
 end get_group_id;
 
@@ -131,7 +132,7 @@ end get_last_modifc_date;
 /*процедура по созданию групп дубликатов включена в график работ БД*/
 procedure create_group_duplicate
 is
-  l_trace  varchar2(500) := G_TRACE || '.create_group_duplicate: '; 
+  l_trace  varchar2(500) := G_TRACE || '.create_group_duplicate: ';
   l_kf     varchar2(6);
   l_cycle  integer;
   l_lock   VARCHAR2(30);
@@ -145,36 +146,36 @@ is
     -- выбор по правилу наивыcшего - продукт,дата последней модификации, качество картки клиента
     for r in ( select distinct rnk
                  from tmp_ebk_dup_client
-                where kf = l_kf 
+                where kf = l_kf
                    or kf = dup_kf
                 order by rnk)
     loop
-      
+
       dbms_application_info.set_client_info(l_trace|| ' set MC for rnk=' || r.rnk);
-      
+
       for x in ( select rnk, dup_rnk,  product_id, last_modifc_date, quality
                       , row_number() over (partition by rnk order by product_id asc, last_modifc_date desc nulls last ,quality desc)  as master_queue
                    from ( select d.rnk, d.dup_rnk
                                     , get_group_id(d.dup_rnk, l_kf)  as product_id
                                     , get_last_modifc_date(d.dup_rnk) as  last_modifc_date
                                     , nvl((select max(quality) from ebk_qualityattr_gourps where kf = l_kf and  rnk = d.dup_rnk  and name  = 'card' ),0 )as quality
-                             from ( select distinct kf, rnk, dup_rnk 
-                                      from tmp_ebk_dup_client 
+                             from ( select distinct kf, rnk, dup_rnk
+                                      from tmp_ebk_dup_client
                                      where rnk = r.rnk
                                        and kf = l_kf
                                      union
                                     select distinct kf, rnk, rnk as dup_rnk
                                       from tmp_ebk_dup_client
                                      where rnk = r.rnk
-                                       and kf = l_kf 
+                                       and kf = l_kf
                                   ) d
                            )
                   )
         loop
- 
-          bars_audit.trace(l_trace||'set master card for rnk = %s, dup_rnk = %s, last_modifc_date=%s, quality=%s, master_card=%s', 
-                             to_char(x.rnk), to_char(x.dup_rnk), to_char(x.last_modifc_date), to_char(x.quality), to_char(x.master_queue));  
-          if x.master_queue = 1 
+
+          bars_audit.trace(l_trace||'set master card for rnk = %s, dup_rnk = %s, last_modifc_date=%s, quality=%s, master_card=%s',
+                             to_char(x.rnk), to_char(x.dup_rnk), to_char(x.last_modifc_date), to_char(x.quality), to_char(x.master_queue));
+          if x.master_queue = 1
           then -- это наша основная карточка
              update tmp_ebk_dup_client
                 set rnk = x.dup_rnk
@@ -185,30 +186,30 @@ is
               where rnk = x.dup_rnk and dup_rnk = x.dup_rnk;
           end if;
         end loop;
-    end loop;    
-        
+    end loop;
+
     bars_audit.info(l_trace||' Exit.');
-    
+
   end create_group_duplicate_kf;
   ---
 begin
-  
+
   bars_audit.info(l_trace||' Start');
-  
+
   l_kf := sys_context('bars_context','user_mfo');
-  
+
   -- только один процесс может быть запущен
   dbms_lock.allocate_unique('DuplicateGroups', l_lock);
   l_status := dbms_lock.request(l_lock, dbms_lock.x_mode,180,true);
-  
-  bars_audit.trace('dbms_lock status for DuplicateGroups = %s', to_char(l_status)); 
-   
-  if l_status = 0 
+
+  bars_audit.trace('dbms_lock status for DuplicateGroups = %s', to_char(l_status));
+
+  if l_status = 0
   THEN
     -- блокируем таблицу с загруженными дубликатами на время создания групп
     -- после создания групп очищаем от данных участвующие в создании групп и освобождаем таблицу
     lock table tmp_ebk_dup_client in exclusive mode;
-    
+
     if ( l_kf Is Null )
     then
       for i in ( select KF
@@ -220,26 +221,26 @@ begin
     else
       create_group_duplicate_kf;
     end if;
-    
+
     -- заполняем группами дедубликаций
     insert
       into EBK_DUPLICATE_GROUPS
          ( M_RNK, D_RNK, KF )
     select distinct RNK, DUP_RNK, KF
       from TMP_EBK_DUP_CLIENT
-     where rnk <> dup_rnk 
-       and not exists ( select null 
-                          from EBK_DUPLICATE_GROUPS 
-                         where m_rnk = rnk 
+     where rnk <> dup_rnk
+       and not exists ( select null
+                          from EBK_DUPLICATE_GROUPS
+                         where m_rnk = rnk
                            and d_rnk = dup_rnk );
-    
+
     --очищаем от обработанных
     delete from tmp_ebk_dup_client;
-    
+
     --очищаем от закрытых дочерних
     delete from ebk_duplicate_groups e
      where exists ( select null from customer where rnk = e.d_rnk and date_off is not null);
-     
+
    commit; --фиксация, освобождение  tmp_ebk_dup_client от блокировки
  end if;
  l_status := dbms_lock.release(l_lock);
@@ -254,26 +255,26 @@ end create_group_duplicate;
 procedure change_master_card(p_m_rnk in number,
                              p_new_m_rnk in number
                             ) is
- l_trace  varchar2(500) := G_TRACE || '.change_master_card: ';                             
+ l_trace  varchar2(500) := G_TRACE || '.change_master_card: ';
 begin
  if  get_group_id(p_m_rnk,gl.kf ) = 1 then
    raise_application_error(-20000, 'Картка '||p_m_rnk||' має продукт БПК, відображається як основна без можливості зміни!');
  end if;
- 
- bars_audit.info(l_trace||' change master-cars' || to_char(p_m_rnk) || ' to ' || to_char(p_new_m_rnk)); 
+
+ bars_audit.info(l_trace||' change master-cars' || to_char(p_m_rnk) || ' to ' || to_char(p_new_m_rnk));
  -- меняем основную картку дубликатов
  -- міняємо місцями стару і нову мастер-карти
  update ebk_duplicate_groups
-    set m_rnk = p_new_m_rnk, 
+    set m_rnk = p_new_m_rnk,
         d_rnk = m_rnk
-  where m_rnk = p_m_rnk 
+  where m_rnk = p_m_rnk
     and d_rnk = p_new_m_rnk ;
-    
+
  -- в інших карт проводимо заміну мастер-карти
  update ebk_duplicate_groups
    set m_rnk = p_new_m_rnk
  where m_rnk = p_m_rnk;
- 
+
  --commit;
  end change_master_card;
 
@@ -292,13 +293,13 @@ procedure merge_2rnk
 , p_rnkto       in     number
 ) is
 begin
-  
+
   bars_audit.trace( '%s.merge_2rnk: Entry with ( p_rnkfrom=%s, p_rnkto=%s ).'
                   , g_trace, to_char(p_rnkfrom), to_char(p_rnkto) );
-  
+
   -- передача данных одного клиента другому на основании стандартной процедуры
   BARS.RNK2RNK( p_rnkfrom, p_rnkto );
-  
+
   -- устанавливаем rcif для основной карточки
   begin
     insert
@@ -310,14 +311,14 @@ begin
     when DUP_VAL_ON_INDEX then
       null;
   end;
-  
+
   -- разрываем связь дочерней с основной
   delete BARS.EBK_DUPLICATE_GROUPS
    where m_rnk = p_rnkto
      and d_rnk = p_rnkfrom;
-  
+
   bars_audit.trace( '%s.merge_2rnk: Exit.', g_trace );
-  
+
 exception
   when OTHERS then
     rollback;
@@ -376,7 +377,14 @@ procedure change_cust_attr (p_rnk in number,
 
 end ebk_dup_wform_utl;
 /
+ show err;
+ 
+PROMPT *** Create  grants  EBK_DUP_WFORM_UTL ***
+grant EXECUTE                                                                on EBK_DUP_WFORM_UTL to BARS_ACCESS_DEFROLE;
 
-show err
-
-grant execute on BARS.EBK_DUP_WFORM_UTL to BARS_ACCESS_DEFROLE;
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/ebk_dup_wform_utl.sql =========*** E
+ PROMPT ===================================================================================== 
+ 

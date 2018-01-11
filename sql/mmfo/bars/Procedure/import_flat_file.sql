@@ -13,7 +13,7 @@ PROMPT *** Create  procedure IMPORT_FLAT_FILE ***
 show err;
 
 PROMPT *** Create  grants  IMPORT_FLAT_FILE ***
-grant EXECUTE                                                        on IMPORT_FLAT_FILE to BARS_ACCESS_DEFROLE;
+grant EXECUTE,EXECUTE                                                        on IMPORT_FLAT_FILE to BARS_ACCESS_DEFROLE;
 
 
 

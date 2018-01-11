@@ -1,13 +1,16 @@
+
+
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ======= Scripts /Sql/BARS/Procedure/PAY_23_OB22_NBS.sql ========*** Run *
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/PAY_23_OB22_NBS.sql =========*** R
 PROMPT ===================================================================================== 
+
 
 PROMPT *** Create  procedure PAY_23_OB22_NBS ***
 
   CREATE OR REPLACE PROCEDURE BARS.PAY_23_OB22_NBS (dat01_ DATE, mode_ NUMBER DEFAULT 0, p_user number default null,
                                                     nal_ varchar2, nn number)  IS
 
-/* РУ+ГОУ          Версия 3.1 13-06-2017  17-03-2017 23-11-2016  29-07-2016 27-07-2016  18-05-2016  
+/* РУ+ГОУ          Версия 3.1 13-06-2017  17-03-2017 23-11-2016  29-07-2016 27-07-2016  18-05-2016
 
 10) 23-06-2017  -   Оплата через процедуру gl.payv вместо paytt
  9) 17-03-2017  -   R013 по  1590,1592,2400,2401,3590 не зависит от категории риска
@@ -16,7 +19,7 @@ PROMPT *** Create  procedure PAY_23_OB22_NBS ***
  6) 29-07-2016 LUDA Dat_last --> Dat_last_work
  5) 27-07-2016 LUDA При открытии 7 кл. было РНК=1 --> RNK_b
  4) 27-07-2016 LUDA Убрала БРАНЧ при открытии клиента (ЗАЧЕМ? сама не помню)
- 3) 18-05-2016 LUDA Клиент+счета по странам риска (для отчетности)   
+ 3) 18-05-2016 LUDA Клиент+счета по странам риска (для отчетности)
  2) 13-05-2016 LUDA Номер счета по маске
  1) 24-02-2016 LUDA Формирование проводок по ФАКТУ (параметр REZ_PAY)
 ------------------ 13-01-2016
@@ -59,7 +62,7 @@ PROMPT *** Create  procedure PAY_23_OB22_NBS ***
         = 7 - Цінні папери      (для нарах.% не погаш. >30 днів)
         = 8 - Портфельний метод (Врах.   в податковий облік)
         = 9 - Портфельний метод (Не врах.в податковий облік)
-        = A - Не врах.в податковий облік {портфельный}(для нарах.% не погаш. < 30 днів) 
+        = A - Не врах.в податковий облік {портфельный}(для нарах.% не погаш. < 30 днів)
         = B - Врах.   в податковий облік {портфельный}(для нарах.% не погаш. < 30 днів)
         = C - Врах.   в податковий облік {портфельный}(для нарах.% не погаш. > 30 днів)
         = D - Не врах.в податковий облік {портфельный}(для нарах.% не погаш. > 30 днів)
@@ -78,7 +81,7 @@ PROMPT *** Create  procedure PAY_23_OB22_NBS ***
   dat31_     date;
   vv_        int;
   p4_        int;
-  l_MMFO     int;  
+  l_MMFO     int;
   l_day_year NUMBER;
   r7702_acc  number;
   mon_       NUMBER;
@@ -97,7 +100,7 @@ PROMPT *** Create  procedure PAY_23_OB22_NBS ***
   REZPROV_   NUMBER         DEFAULT 0;
   nn_        number;
   l_rez_pay  number;
-  l_pay      number;  
+  l_pay      number;
   r7702_     varchar2(20);
   nazn_      varchar2(500);
   tt_        varchar2(3);
@@ -129,10 +132,10 @@ PROMPT *** Create  procedure PAY_23_OB22_NBS ***
   l_code     regions.code%type;
   name_mon_  META_MONTH.name_plain%type;
   rz_        nbu23_rez.rz%type;
-  l_nd       oper.nd%type; 
+  l_nd       oper.nd%type;
   e_nofound_7form    exception;
   e_nofound_7rasform exception;
-  l_branch   accounts.branch%type := '/' || gl.amfo || '/'; 
+  l_branch   accounts.branch%type := '/' || gl.amfo || '/';
 
   TYPE CurTyp IS REF CURSOR;
   c0 CurTyp;
@@ -162,7 +165,7 @@ PROMPT *** Create  procedure PAY_23_OB22_NBS ***
   ---------------------------------------
   procedure pap_77 (p_acc  NUMBER,p_pap NUMBER) is
      l_fl NUMBER;
-     begin 
+     begin
         select 1 into l_fl from accounts  where acc= p_acc and pap<>p_pap;
         update accounts set pap = p_pap where acc= p_acc;
      EXCEPTION WHEN NO_DATA_FOUND THEN  NULL;
@@ -173,9 +176,9 @@ PROMPT *** Create  procedure PAY_23_OB22_NBS ***
 BEGIN
 
    l_rez_pay   := nvl(F_Get_Params('REZ_PAY', 0) ,0); -- Формирование  резерва по факту (1 - ФАКТ)
-   select id into l_absadm from staff$base where logname = 'ABSADM';   
+   select id into l_absadm from staff$base where logname = 'ABSADM';
    logger.info('PAY1 : l_rez_pay= ' || l_rez_pay) ;
-   if l_rez_pay = 1 THEN 
+   if l_rez_pay = 1 THEN
          l_pay := 1;
    else  l_pay := 0;
    end if;
@@ -240,20 +243,20 @@ BEGIN
    END;
 
    -- Определяем схема MMFO ?
-   begin 
+   begin
       select count(*) into l_MMFO from mv_kf;
       if l_MMFO > 1 THEN             l_MMFO := 1; -- схема    MMFO
-      ELSE                           l_MMFO := 0; -- схема не MMFO 
+      ELSE                           l_MMFO := 0; -- схема не MMFO
       end if;
    EXCEPTION WHEN NO_DATA_FOUND THEN l_MMFO := 0; -- схема не MMFO
    end ;
    if l_MMFO = 1 THEN
       begin
-         select code into l_code from regions where kf = sys_context('bars_context','user_mfo'); 
+         select code into l_code from regions where kf = sys_context('bars_context','user_mfo');
       EXCEPTION WHEN NO_DATA_FOUND THEN l_code := '';
       end;
-   end if; 
-   if nn <>0  THEN 
+   end if;
+   if nn <>0  THEN
    --выборка данных для проводок
    DECLARE
       TYPE r0Typ IS RECORD (
@@ -288,7 +291,7 @@ BEGIN
 
    begin
 
-   
+
       if nal_ in ('1','5','7','B','C','D') THEN
 
          OPEN c0 FOR
@@ -296,7 +299,7 @@ BEGIN
                 t.szn    , t.sz_30  , t.s080    , t.pr    , t.r_s080 , t.r013  , t.nd     , t.cc_id, t.nd_cp ,
                 ConcatStr(ar.acc) r_acc         , ConcatStr(ar.nls) r_nls      , ConcatStr(a7_f.acc) f7_acc  ,
                 ConcatStr(a7_f.nls) f7_nls      , ConcatStr(a7_r.acc) r7_acc   , ConcatStr(a7_r.nls) r7_nls  , count(*) cnt
-         from ( select c.country, o.NBS_REZ , o.OB22_REZ, o.NBS_7f  , o.OB22_7f, o.NBS_7r, o.OB22_7r, o.pr , o.r013 , nvl(r.rz,1) rz, r.KV, 
+         from ( select c.country, o.NBS_REZ , o.OB22_REZ, o.NBS_7f  , o.OB22_7f, o.NBS_7r, o.OB22_7r, o.pr , o.r013 , nvl(r.rz,1) rz, r.KV,
                        null nd  , null cc_id, null nd_cp, rtrim(substr(r.branch||'/',1,instr(r.branch||'/','/',1,3)-1),'/')||'/' branch,
                        sum(nvl(r.rez   *100,0)) sz      , sum(nvl(r.rezn*100,0)) szn  ,
                        sum(nvl(r.rez_30*100,0)) sz_30   , decode(r.kat,1,1,9,9,2) s080, r.kat r_s080
@@ -314,13 +317,13 @@ BEGIN
                          rtrim(substr(r.branch||'/',1,instr(r.branch||'/','/',1,3)-1),'/')||'/',decode(r.kat,1,1,9,9,2),r.kat
               ) t
          --счет резерва
-         left join v_gls080 ar on ( t.NBS_REZ = ar.nbs    and t.OB22_REZ = ar.ob22  and ar.rz    = t.rz    and t.KV = ar.kv  and  
+         left join v_gls080 ar on ( t.NBS_REZ = ar.nbs    and t.OB22_REZ = ar.ob22  and ar.rz    = t.rz    and t.KV = ar.kv  and
                                     t.branch  = ar.BRANCH and ar.dazs is null       and t.r_s080 = ar.s080 and t.country = ar.country)
          --счет 7 класса формирования
-         left join accounts a7_f   on (t.NBS_7f = a7_f.nbs    and t.OB22_7f = a7_f.ob22 and t.kv = a7_f.kv and 
+         left join accounts a7_f   on (t.NBS_7f = a7_f.nbs    and t.OB22_7f = a7_f.ob22 and t.kv = a7_f.kv and
                                        a7_f.nls like '3739_9999903' and l_branch = a7_f.BRANCH and a7_f.dazs is null)
          --счет 7 класса уменьшения
-         left join accounts a7_r   on (t.NBS_7r = a7_r.nbs    and t.OB22_7r = a7_r.ob22 and t.kv = a7_r.kv and 
+         left join accounts a7_r   on (t.NBS_7r = a7_r.nbs    and t.OB22_7r = a7_r.ob22 and t.kv = a7_r.kv and
                                        a7_r.nls like '3739_9999903'and  l_branch = a7_r.BRANCH and  a7_r.dazs is null)
          group by t.country, t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv, t.rz, t.branch, t.sz, t.szn, t.sz_30,
                   t.s080   , t.pr     , t.nd      , t.cc_id , t.nd_cp  , t.r_s080, t.r013   ;
@@ -328,9 +331,9 @@ BEGIN
       elsif nal_ in ('3','7') THEN
 
          OPEN c0 FOR
-         select t.country, t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz   , t.branch, t.sz, 
-                t.szn    , t.sz_30  , t.s080    , t.pr    , t.r_s080 , t.r013  , t.nd     , t.cc_id, t.nd_cp, 
-                ConcatStr(ar.acc) r_acc         , ConcatStr(ar.nls) r_nls      , ConcatStr(a7_f.acc) f7_acc , 
+         select t.country, t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz   , t.branch, t.sz,
+                t.szn    , t.sz_30  , t.s080    , t.pr    , t.r_s080 , t.r013  , t.nd     , t.cc_id, t.nd_cp,
+                ConcatStr(ar.acc) r_acc         , ConcatStr(ar.nls) r_nls      , ConcatStr(a7_f.acc) f7_acc ,
                 ConcatStr(a7_f.nls) f7_nls      , ConcatStr(a7_r.acc) r7_acc   , ConcatStr(a7_r.nls) r7_nls, count(*) cnt
          from ( select c.country, o.NBS_REZ, o.OB22_REZ, o.NBS_7f, o.OB22_7f, o.NBS_7r, o.OB22_7r, o.pr, o.r013,nvl(r.rz,1) rz, r.KV,
                        '1' cc_id,0 nd,r.nd_cp,rtrim(substr(r.branch||'/',1,instr(r.branch||'/','/',1,3)-1),'/')||'/' branch,
@@ -351,22 +354,22 @@ BEGIN
                          decode(r.kat,1,1,9,9,2),r.kat ) t
          --счет резерва
          left join v_gls080 ar on (t.NBS_REZ = ar.nbs      and t.OB22_REZ = ar.ob22   and ar.rz =t.rz        and t.KV = ar.kv   and
-                                   t.branch  = ar.BRANCH   and ar.dazs is null        and t.r_s080 = ar.s080 and t.nd_cp=ar.nkd and 
+                                   t.branch  = ar.BRANCH   and ar.dazs is null        and t.r_s080 = ar.s080 and t.nd_cp=ar.nkd and
                                    t.country = ar.country)
          --счет 7 класса формирования
-         left join accounts a7_f   on (t.NBS_7f  = a7_f.nbs    and t.OB22_7f  = a7_f.ob22 and t.kv = a7_f.kv 
+         left join accounts a7_f   on (t.NBS_7f  = a7_f.nbs    and t.OB22_7f  = a7_f.ob22 and t.kv = a7_f.kv
                                    and a7_f.nls like '3739_9999903' and l_branch  = a7_f.BRANCH and a7_f.dazs is null)
          --счет 7 класса уменьшения
-         left join accounts a7_r   on (t.NBS_7r  = a7_r.nbs    and t.OB22_7r  = a7_r.ob22 and t.kv = a7_r.kv 
+         left join accounts a7_r   on (t.NBS_7r  = a7_r.nbs    and t.OB22_7r  = a7_r.ob22 and t.kv = a7_r.kv
                                    and a7_r.nls like '3739_9999903' and l_branch  = a7_r.BRANCH and a7_r.dazs is null)
          group by t.country, t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv, t.nd, t.rz, t.branch, t.sz, t.szn,
                   t.sz_30  , t.s080   , t.pr      , t.cc_id , t.nd_cp  , t.r_s080, t.r013;
       else
 
          OPEN c0 FOR
-         select t.country, t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz   , t.branch, t.sz, 
-                t.szn    , t.sz_30  , t.s080    , t.pr    , t.r_s080 , t.r013  , t.nd     , t.cc_id, t.nd_cp, 
-                ConcatStr(ar.acc) r_acc         , ConcatStr(ar.nls) r_nls      , ConcatStr(a7_f.acc) f7_acc, 
+         select t.country, t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz   , t.branch, t.sz,
+                t.szn    , t.sz_30  , t.s080    , t.pr    , t.r_s080 , t.r013  , t.nd     , t.cc_id, t.nd_cp,
+                ConcatStr(ar.acc) r_acc         , ConcatStr(ar.nls) r_nls      , ConcatStr(a7_f.acc) f7_acc,
                 ConcatStr(a7_f.nls) f7_nls      , ConcatStr(a7_r.acc) r7_acc   , ConcatStr(a7_r.nls) r7_nls, count(*) cnt
          from ( select c.country, o.NBS_REZ, o.OB22_REZ, o.NBS_7f, o.OB22_7f, o.NBS_7r, o.OB22_7r, o.pr, o.r013, nvl(r.rz,1) rz, r.KV,
                        r.nd     , r.cc_id  , r.nd_cp   , rtrim(substr(r.branch||'/',1,instr(r.branch||'/','/',1,3)-1),'/')||'/' branch,
@@ -386,13 +389,13 @@ BEGIN
                          decode(r.kat,1,1,9,9,2),r.kat ) t
          --счет резерва
          left join v_gls080 ar on (t.NBS_REZ = ar.nbs      and t.OB22_REZ = ar.ob22   and ar.rz    = t.rz    and t.KV    = ar.kv  and
-                                   t.branch  = ar.BRANCH   and ar.dazs is null        and t.r_s080 = ar.s080 and t.nd_cp = ar.nkd and 
+                                   t.branch  = ar.BRANCH   and ar.dazs is null        and t.r_s080 = ar.s080 and t.nd_cp = ar.nkd and
                                    t.country = ar.country)
          --счет 7 класса формирования
-         left join accounts a7_f   on (t.NBS_7f  = a7_f.nbs    and t.OB22_7f  = a7_f.ob22 and t.kv = a7_f.kv 
+         left join accounts a7_f   on (t.NBS_7f  = a7_f.nbs    and t.OB22_7f  = a7_f.ob22 and t.kv = a7_f.kv
                                        and a7_f.nls like '3739_9999903' and l_branch  = a7_f.BRANCH and a7_f.dazs is null)
          --счет 7 класса уменьшения
-         left join accounts a7_r   on (t.NBS_7r  = a7_r.nbs    and t.OB22_7r  = a7_r.ob22 and t.kv = a7_r.kv 
+         left join accounts a7_r   on (t.NBS_7r  = a7_r.nbs    and t.OB22_7r  = a7_r.ob22 and t.kv = a7_r.kv
                                        and a7_r.nls like '3739_9999903' and l_branch = a7_r.BRANCH  and a7_r.dazs is null)
          group by t.country,t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv, t.rz, t.branch, t.sz, t.szn,
                   t.sz_30  , t.s080  , t.pr      , t.nd    , t.cc_id  , t.nd_cp , t.r_s080 , t.r013;
@@ -439,7 +442,7 @@ BEGIN
          -- Определение параметров клиента и счета
          begin
             select * into par from NBS_OB22_PAR_REZ_NEW  where nbs_rez = k.nbs_rez and ob22_rez in (k.ob22_rez,'0') and rz=k.rz;
-         EXCEPTION  WHEN NO_DATA_FOUND THEN 
+         EXCEPTION  WHEN NO_DATA_FOUND THEN
             par.par_rnk   := 'REZ_RNK_UL';
             par.nmk       := 'ЮО (неизвестен)';
             par.cu        := 2;
@@ -474,8 +477,8 @@ BEGIN
                   END;
 
                   -- регистрация
-                  rnk_   := bars_sqnc.get_nextval('s_customer'); 
-                  nmkl_  := substr(trim(NMK_),1,70);    
+                  rnk_   := bars_sqnc.get_nextval('s_customer');
+                  nmkl_  := substr(trim(NMK_),1,70);
                   nmklk_ := substr(nmkl_,1,38);
 
                   kl.open_client (Rnk_,           -- Customer number
@@ -568,7 +571,7 @@ BEGIN
                   insert into specparam_int(acc,ob22) values(acc_, k.OB22_REZ);
                end if;
                update accounts set ob22 = k.OB22_REZ where acc= acc_ and (ob22 <> k.OB22_REZ or ob22 is null) ;
-             
+
                if k.kv=980 THEN
                   s090_:='1';
                ELSE
@@ -590,7 +593,7 @@ BEGIN
                s080_:=k.r_s080;
             end if;
          end if;
-         update accounts set tip='REZ'         where acc= k.r_acc and tip<>'REZ'; 
+         update accounts set tip='REZ'         where acc= k.r_acc and tip<>'REZ';
          -- Для отчетности заполнение R013 для 2400
          --logger.info('PAY6 : acc_= ' || acc_) ;
          --logger.info('PAY7 : k.nbs_rez= ' || k.nbs_rez) ;
@@ -710,12 +713,12 @@ BEGIN
             --формирование проводок
             if fl = 0 then
                tt_    := '015';
-               vob_   := 6;        
-               s_old_ := 0;      
+               vob_   := 6;
+               s_old_ := 0;
 /*
                if l_user is not null THEN
                   vob_    := 6;
-                  s_old_  := 0;  -- Предыдущий резерв 
+                  s_old_  := 0;  -- Предыдущий резерв
                else
                   -- Определяем необходимый вид VOB
                   if b_date - dat31_ > l_day_year and dat01_=to_date('01-01-2016','dd-mm-yyyy')  THEN
@@ -777,7 +780,7 @@ BEGIN
                      l_nd := substr(to_char(ref_),-10);
                   end if;
 
---             
+--
                   -- узнать название нужных счетов для вставки в OPER
                   SELECT SUBSTR (a.nms, 1, 38), SUBSTR (b.nms, 1, 38) INTO nam_a_, nam_b_
                   FROM accounts a, accounts b WHERE a.acc = k.r_acc and b.acc = r7702_acc;
@@ -795,27 +798,27 @@ BEGIN
 
                      IF mode_ = 0 THEN
                         --gl.REF (ref_);
---                        if length(ref_) < 10 THEN l_x := 1                ; l_y := length(ref_);  
+--                        if length(ref_) < 10 THEN l_x := 1                ; l_y := length(ref_);
 --                        else                      l_x := length(ref_)+1-10; l_y := 10;
 --                        end if;
---                        l_nd := substr(ref_,l_x,l_y); 
-                        INSERT INTO oper (REF   , tt    , vob   , nd     , dk    , pdat   , vdat  , datd  , datp  , nam_a , nlsa   ,   mfoa, 
+--                        l_nd := substr(ref_,l_x,l_y);
+                        INSERT INTO oper (REF   , tt    , vob   , nd     , dk    , pdat   , vdat  , datd  , datp  , nam_a , nlsa   ,   mfoa,
                                           id_a  , nam_b , nlsb  , mfob   , id_b  , kv     , s     , kv2   , s2    , nazn  , userid)
-                                  VALUES (ref_  , tt_   , vob_  , l_nd   , 0     , SYSDATE, dat31_, b_date, b_date, nam_a_, k.r_nls,gl.amfo, 
-                                          okpoa_, nam_b_, r7702_, gl.amfo, okpoa_, k.kv   , diff_ , k.kv  , diff_ , 
+                                  VALUES (ref_  , tt_   , vob_  , l_nd   , 0     , SYSDATE, dat31_, b_date, b_date, nam_a_, k.r_nls,gl.amfo,
+                                          okpoa_, nam_b_, r7702_, gl.amfo, okpoa_, k.kv   , diff_ , k.kv  , diff_ ,
                                           nazn_ , otvisp_) ;
 
                         error_str := error_str||'8';
 
                         gl.payv (l_pay, ref_, dat31_, tt_, 0, k.kv, k.r_nls, diff_, k.kv, r7702_, diff_ );
-                     
+
                         error_str := error_str||'9';
                      end if;
                      -- logger.info('KORR99-12+: vob_= ' || vob_||'diff_='||diff_||':s_new-'||s_new_||'-'||k.r_nls) ;
-                     INSERT INTO rez_doc_maket (tt    , vob    , pdat   , vdat     , datd  , datp  , nam_a , nlsa   , mfoa  , id_a   , nam_b, nlsb      , 
+                     INSERT INTO rez_doc_maket (tt    , vob    , pdat   , vdat     , datd  , datp  , nam_a , nlsa   , mfoa  , id_a   , nam_b, nlsb      ,
                                                 mfob  , id_b   , kv     , s        , kv2   , s2    , nazn  , userid , dk    , branch_a, ref  )
-                                        VALUES (tt_   , k.s080 , SYSDATE, dat31_   , b_date, b_date, nam_a_, k.r_nls, k.nbs_rez||'/'||k.ob22_rez        , 
-                                                okpoa_, nam_b_ , r7702_ , r7702_bal, okpoa_, k.kv  , diff_ , k.kv   , diff_ , 
+                                        VALUES (tt_   , k.s080 , SYSDATE, dat31_   , b_date, b_date, nam_a_, k.r_nls, k.nbs_rez||'/'||k.ob22_rez        ,
+                                                okpoa_, nam_b_ , r7702_ , r7702_bal, okpoa_, k.kv  , diff_ , k.kv   , diff_ ,
                                                 nazn_ , userid_, 1      , k.branch , ref_ );
 
                      error_str := error_str||' 10';
@@ -831,10 +834,10 @@ BEGIN
 
                      error_str := error_str||' 12';
                      IF mode_ = 0 THEN
-                        INSERT INTO oper (REF   , tt    , vob   , nd     , dk    , pdat   , vdat  , datd  , datp  , nam_a , nlsa   , mfoa   , 
+                        INSERT INTO oper (REF   , tt    , vob   , nd     , dk    , pdat   , vdat  , datd  , datp  , nam_a , nlsa   , mfoa   ,
                                           id_a  , nam_b , nlsb  , mfob   , id_b  , kv     , s     , kv2   , s2    , nazn  , userid )
-                                  VALUES (ref_  , tt_   , vob_  , l_nd   , 1     , SYSDATE, dat31_, b_date, b_date, nam_a_, k.r_nls, gl.amfo, 
-                                          okpoa_, nam_b_, r7702_, gl.amfo, okpoa_, k.kv   , diff_ , k.kv  , diff_ , 
+                                  VALUES (ref_  , tt_   , vob_  , l_nd   , 1     , SYSDATE, dat31_, b_date, b_date, nam_a_, k.r_nls, gl.amfo,
+                                          okpoa_, nam_b_, r7702_, gl.amfo, okpoa_, k.kv   , diff_ , k.kv  , diff_ ,
                                           nazn_ , otvisp_ );
 
                         error_str := error_str||' 13';
@@ -842,10 +845,10 @@ BEGIN
                         error_str := error_str||' 14';
                      end if;
                      -- logger.info('KORR99-13-: vob_= ' || vob_||'diff_='||diff_||':s_new-'||s_new_||'-'||k.r_nls) ;
-                     INSERT INTO rez_doc_maket (tt    , vob    , pdat   , vdat     , datd  , datp  , nam_a , nlsa   , mfoa, id_a    , nam_b , nlsb       , 
+                     INSERT INTO rez_doc_maket (tt    , vob    , pdat   , vdat     , datd  , datp  , nam_a , nlsa   , mfoa, id_a    , nam_b , nlsb       ,
                                                 mfob  , id_b   , kv     , s        , kv2   , s2    , nazn  , userid , dk  , branch_a, ref   )
-                                       VALUES  (tt_   , k.s080 , SYSDATE, dat31_   , b_date, b_date, nam_a_, k.r_nls, k.nbs_rez||'/'||k.ob22_rez         , 
-                                                okpoa_, nam_b_ , r7702_ , r7702_bal, okpoa_, k.kv  , diff_ , k.kv   , diff_ , 
+                                       VALUES  (tt_   , k.s080 , SYSDATE, dat31_   , b_date, b_date, nam_a_, k.r_nls, k.nbs_rez||'/'||k.ob22_rez         ,
+                                                okpoa_, nam_b_ , r7702_ , r7702_bal, okpoa_, k.kv  , diff_ , k.kv   , diff_ ,
                                                 nazn_ , userid_, 0      , k.branch , ref_  );
 
                      error_str := error_str||' 15';
@@ -855,9 +858,9 @@ BEGIN
                   -- чтобы впоследствии при полном расформировании не учитывать этот счет
                else
                   -- logger.info('KORR99-14-0: vob_= ' || vob_||'diff_='||diff_||':s_new-'||s_new_||'-'||k.r_nls) ;
-                  INSERT INTO rez_doc_maket (tt     , vob   , pdat     , vdat  , datd  , datp  , nam_a , nlsa   , mfoa    , id_a    , nam_b , nlsb  , 
+                  INSERT INTO rez_doc_maket (tt     , vob   , pdat     , vdat  , datd  , datp  , nam_a , nlsa   , mfoa    , id_a    , nam_b , nlsb  ,
                                              mfob   , id_b  , kv       , s     ,kv2    , s2    , nazn  , userid , dk      , branch_a, ref   )
-                                     VALUES (tt_    , k.s080, SYSDATE  , dat31_, b_date, b_date, null  , k.r_nls, k.nbs_rez||'/'||k.ob22_rez, okpoa_, 
+                                     VALUES (tt_    , k.s080, SYSDATE  , dat31_, b_date, b_date, null  , k.r_nls, k.nbs_rez||'/'||k.ob22_rez, okpoa_,
                                              null   , null  , r7702_bal, okpoa_, k.kv  , diff_ , k.kv  , diff_  , null  ,
                                              userid_, -1    , k.branch ,ref_   );
 
@@ -903,7 +906,7 @@ BEGIN
                    a.nls r_nls, a.kv, a.ostc sz, o.NBS_7R, o.OB22_7R, ConcatStr(a7.acc) r7_acc, ConcatStr(a7.nls) r7_nls,o.pr
             from accounts a
             left join srezerv_ob22_r o on a.nbs = o.nbs_rez and a.ob22 = o.ob22_rez
-            left join accounts a7 on (o.NBS_7R = a7.nbs and o.OB22_7R = a7.ob22 and a.kv = a7.kv and a7.nls like '3739_9999903' and 
+            left join accounts a7 on (o.NBS_7R = a7.nbs and o.OB22_7R = a7.ob22 and a.kv = a7.kv and a7.nls like '3739_9999903' and
                                   l_branch = a7.BRANCH and a7.dazs is null )
             where a.nbs in ('1590','1592',               -- Операцiї на мiжбанкiвському ринку
                             '1890','2890','3590','3599', -- Дебiторська заборгованнiсть
@@ -923,7 +926,7 @@ BEGIN
                    a.nls r_nls, a.kv, a.ostc sz, o.NBS_7R, o.OB22_7R, ConcatStr(a7.acc) r7_acc, ConcatStr(a7.nls) r7_nls,o.pr
             from accounts a
             left join srezerv_ob22_r o on a.nbs = o.nbs_rez and a.ob22 = o.ob22_rez
-            left join accounts a7 on (o.NBS_7R = a7.nbs     and o.OB22_7R = a7.ob22 and a.kv = a7.kv and a7.nls like '3739_9999903' and 
+            left join accounts a7 on (o.NBS_7R = a7.nbs     and o.OB22_7R = a7.ob22 and a.kv = a7.kv and a7.nls like '3739_9999903' and
                                       l_branch = a7.BRANCH  and a7.dazs is null )
             where a.nbs in ('1490','1492','3190','3191', -- ЦП в портфелi на продаж
                             '1491','1493','3290','3291'  -- ЦП в портфелi до погашення
@@ -936,28 +939,28 @@ BEGIN
                                   r.branch = rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' )
             group by a.acc, a.ob22, a.nbs, rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' ,
                      a.nls, a.kv, o.NBS_7R, o.OB22_7R,o.pr,a.ostc;
-   
+
          end if;
 
          loop
             FETCH c0 INTO k;
             EXIT WHEN c0%NOTFOUND;
 
-            logger.info('PAY1 : nbs_rez/ob22= ' || k.nbs_rez||'/'||k.ob22_rez|| ' NLS='||k.r_nls) ;   
-            logger.info('PAY2 : nbs_7R/OB22_7R= ' || k.nbs_7R||'/'||k.ob22_7r|| ' NLS='||k.r7_nls) ;   
+            logger.info('PAY1 : nbs_rez/ob22= ' || k.nbs_rez||'/'||k.ob22_rez|| ' NLS='||k.r_nls) ;
+            logger.info('PAY2 : nbs_7R/OB22_7R= ' || k.nbs_7R||'/'||k.ob22_7r|| ' NLS='||k.r7_nls) ;
             fl := 0;
-   
+
             if k.NBS_7R is null then
                p_error( 8, k.NBS_rez||'/'|| k.OB22_rez,null, null, k.kv, k.branch,k.NBS_REZ||'/'||k.OB22_REZ,
                         k.kv, null, k.sz,k.r7_nls,  'Рахунок резерву - '||k.r_nls);
                fl := 5;
-            logger.info('PAY3 : nbs_7R/OB22_7R=null ') ;      
+            logger.info('PAY3 : nbs_7R/OB22_7R=null ') ;
             -- для одного счета 7 класса (для уменьшения) найдено несколько лицевых счетов
             elsif instr(k.r7_nls,',') > 0 then
                p_error( 7, k.NBS_7r||'/'|| k.OB22_7r,null, null, 980, k.branch,  k.NBS_REZ||'/'||k.OB22_REZ,
                          k.kv, null, k.sz,k.r7_nls,  'Рахунок резерву - '||k.r_nls);
                fl := 5;
-             logger.info('PAY4 : nbs_7R/OB22_7R= ' || k.nbs_7R||'/'||k.ob22_7r|| ' NLS='||k.r7_nls) ;   
+             logger.info('PAY4 : nbs_7R/OB22_7R= ' || k.nbs_7R||'/'||k.ob22_7r|| ' NLS='||k.r7_nls) ;
             --счета не найдены
             elsif k.r7_acc is null then
                begin
@@ -985,14 +988,14 @@ BEGIN
                      --update accounts set tobo = k.branch,daos=dat31_ where acc= acc_;
                      update accounts set                 daos=dat31_ where acc= acc_ and daos > dat31_ ;
                      update accounts set tobo = l_branch             where acc= acc_ and tobo <> l_branch ;
-   
+
                      --update specparam_int set ob22=k.OB22_7R where acc=acc_;
                      --if sql%rowcount=0 then
                      --   insert into specparam_int(acc,ob22) values(acc_, k.OB22_7R);
                      --end if;
                      update accounts set ob22 = k.OB22_7R where acc=acc_ and (ob22 <> k.OB22_7R or ob22 is null);
                   end;
-   
+
                   --p_error( 8, k.NBS_7r||'/'|| k.OB22_7r,null, null, 980, k.branch, k.NBS_REZ||'/'||k.OB22_REZ,
                   --         k.kv, null,  k.sz, k.NBS_7r||'/'|| k.OB22_7r, 'Рахунок резерву - '||k.r_nls);
                   --fl := 5;
@@ -1002,80 +1005,80 @@ BEGIN
             begin
                savepoint sp;
                -- Определение параметров клиента и счета
-   
+
                error_str :=null;
                --формирование проводок
-               logger.info('PAY5 : nbs_rez/ob22= ' || k.nbs_rez ||'/'||k.ob22_rez|| ' FL='||FL) ;   
+               logger.info('PAY5 : nbs_rez/ob22= ' || k.nbs_rez ||'/'||k.ob22_rez|| ' FL='||FL) ;
                if fl = 0 then
                   begin
                      select * into par from NBS_OB22_PAR_REZ_OLD where nbs_rez = k.nbs_rez and ob22_rez in (k.ob22_rez,'0') and rz=1;
-                  EXCEPTION  WHEN NO_DATA_FOUND THEN 
+                  EXCEPTION  WHEN NO_DATA_FOUND THEN
                      par.nazn      := '(?)';
                   END;
                   nazn_ := par.nazn;
-   
+
                   --тип операции
                   tt_ := '015';
                   -- Определяем необходимый вид VOB
                   vob_ := 6;  -- обычные
                   -- узнать предыдущие остатки
                   s_old_ := k.sz;
-            logger.info('PAY6 : nbs_rez/ob22= ' || k.nbs_rez ||'/'||k.ob22_rez|| ' s_old_='||s_old_) ;   
+            logger.info('PAY6 : nbs_rez/ob22= ' || k.nbs_rez ||'/'||k.ob22_rez|| ' s_old_='||s_old_) ;
                   -- logger.info('KORR99-3: vob_= ' || vob_||'ostc='||s_old_||'-'||k.r_acc||'-'||k.r_nls) ;
                   --новая сумма резерва
                   s_new_ := 0;
-   
+
                   error_str := error_str||'1';
                   r7702_acc := k.r7_acc;
                   r7702_ := k.r7_nls;
-   
+
                   -- узнать название нужных счетов для вставки в OPER
                   SELECT SUBSTR (a.nms, 1, 38), SUBSTR (b.nms, 1, 38) INTO nam_a_, nam_b_ FROM accounts a, accounts b
                   WHERE a.acc = k.r_acc and b.acc = r7702_acc;
-   
+
                   error_str := error_str||'2';
                   -- проводка по расформированию резерва
                   IF mode_ = 0  THEN
                      gl.REF (ref_);
                      l_nd := substr(to_char(ref_),-10);
                   END IF;
-   
+
                   error_str := error_str||'4';
-   
+
                   --уменьшение резерва
                   diff_ := (s_old_ - s_new_);
-logger.info('PAY7 : nbs_rez/ob22= ' || k.nbs_rez ||'/'||k.ob22_rez|| ' diff_ ='||diff_) ;   
+logger.info('PAY7 : nbs_rez/ob22= ' || k.nbs_rez ||'/'||k.ob22_rez|| ' diff_ ='||diff_) ;
                   -- logger.info('KORR99-5: vob_= ' || vob_||'old ='||s_old_||':new-'||s_new_||'-'||k.r_nls) ;
                   error_str := error_str||'5';
-   
+
                   IF    vob_ = 99 THEN nazn_ := rasform_nazn_korr_year || nazn_;
                   ElsIf vob_ = 96 THEN nazn_ := rasform_nazn_korr      || nazn_;
-                  Else                 nazn_ := rasform_nazn           || nazn_; 
+                  Else                 nazn_ := rasform_nazn           || nazn_;
                   END IF;
-   
+
                   error_str := error_str||'6';
                   if diff_ <> 0 THEN
                      IF mode_ = 0 then
-   
-                        INSERT INTO oper (REF   , tt    , vob    , nd    , dk  , pdat   , vdat  , datd  , datp  , nam_a , nlsa      , mfoa   , id_a   ,  
+
+                        INSERT INTO oper (REF   , tt    , vob    , nd    , dk  , pdat   , vdat  , datd  , datp  , nam_a , nlsa      , mfoa   , id_a   ,
                                           nam_b , nlsb  , mfob   , id_b  , kv  , s      , kv2   , s2    , nazn  , userid)
-                                  VALUES (ref_  , tt_   , vob_   , l_nd  , 1   , SYSDATE, dat31_, b_date, b_date, nam_a_, k.r_nls   , gl.amfo, okpoa_ , 
+                                  VALUES (ref_  , tt_   , vob_   , l_nd  , 1   , SYSDATE, dat31_, b_date, b_date, nam_a_, k.r_nls   , gl.amfo, okpoa_ ,
                                           nam_b_, r7702_, gl.amfo, okpoa_, k.kv, diff_  , k.kv  , diff_ , nazn_  , otvisp_);
                         error_str := error_str||'7';
                         gl.payv (l_pay, ref_, dat31_, tt_, 1, k.kv, k.r_nls, diff_, k.kv, r7702_, diff_ );
                         error_str := error_str||'8';
-           
+
                      end if;
-   
-                     INSERT INTO rez_doc_maket (tt   , vob , pdat , vdat   , datd  , datp      , nam_a , nlsa   , mfoa, id_a      , nam_b , nlsb, 
+
+                     INSERT INTO rez_doc_maket (tt   , vob , pdat , vdat   , datd  , datp      , nam_a , nlsa   , mfoa, id_a      , nam_b , nlsb,
                                                 mfob , id_b, kv   , s      , kv2   , s2        , nazn  , userid , dk  , branch_a  , ref   )
                                         VALUES (tt_  , nvl(k.pr,0), SYSDATE, dat31_, b_date    , b_date, nam_a_ , k.r_nls,
-                                                k.nbs_rez||'/'||k.ob22_rez , okpoa_, nam_b_    , r7702_, k.NBS_7R||'/'||k.OB22_7R , okpoa_, k.kv, 
+                                                k.nbs_rez||'/'||k.ob22_rez , okpoa_, nam_b_    , r7702_, k.NBS_7R||'/'||k.OB22_7R , okpoa_, k.kv,
                                                 diff_, k.kv , diff_, nazn_ , userid_, 2   , k.branch  , ref_  );
                      error_str := error_str||'9';
                   end if;
                end if;
-   
+
                exception when others then rollback to sp;
                p_error( 9, null,null, null, k.kv, k.branch,k.NBS_REZ||'/'||k.OB22_REZ, k.kv, null, k.sz,
                         k.NBS_REZ||'/'||k.OB22_REZ||','||k.NBS_7r||'/'|| k.OB22_7r|| substr(sqlerrm,instr(sqlerrm,':')+1),error_str );
@@ -1098,10 +1101,13 @@ END PAY_23_OB22_nbs  ;
 /
 show err;
 
-grant EXECUTE                                                                on PAY_23_OB22_NBS     to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on PAY_23_OB22_NBS     to RCC_DEAL;
-grant EXECUTE                                                                on PAY_23_OB22_NBS     to START1;
+PROMPT *** Create  grants  PAY_23_OB22_NBS ***
+grant EXECUTE                                                                on PAY_23_OB22_NBS to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on PAY_23_OB22_NBS to RCC_DEAL;
+grant EXECUTE                                                                on PAY_23_OB22_NBS to START1;
+
+
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ======== Scripts /Sql/BARS/Procedure/PAY_23_OB22_NBS.sql =======*** End *
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/PAY_23_OB22_NBS.sql =========*** E
 PROMPT ===================================================================================== 

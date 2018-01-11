@@ -1,4 +1,10 @@
-create or replace package BARS_UTL_SNAPSHOT
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_utl_snapshot.sql =========*** R
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.BARS_UTL_SNAPSHOT 
 is
   -- Author  : OLEG.MUZYKA
   -- Created : 07.07.2015 13:05:13
@@ -7,24 +13,24 @@ is
   -- Public constant declarations
   VERSION_HEAD         constant varchar2(64) := 'version 1.3  19.06.2017';
   PKG_NAME             constant varchar2(64) := 'BARS_UTL_SNAPSHOT';
-  
+
   -- алгоритмы наполнения accm_snap_balances
   ALGORITHM_OLD        constant varchar2(30) := 'OLD';
   ALGORITHM_SALNQC     constant varchar2(30) := 'SALNQC';
   ALGORITHM_MIK        constant varchar2(30) := 'ALGORITMIK';
-  
+
   -- таблица оборотов в номинале по банковским датам
   TAB_SALDOA           constant varchar2(30) := 'SALDOA';
-  
+
   -- таблица оборотов в эквиваленте по банковским датам
   TAB_SALDOB           constant varchar2(30) := 'SALDOB';
-  
+
   -- таблица записей(ключей), удаленных из SALDOA
   TAB_SALDOA_DEL_ROWS  constant varchar2(30) := 'SALDOA_DEL_ROWS';
-  
+
   -- таблица корегуючих оборотов в номинале по звітним датам
   TAB_SALDOZ           constant varchar2(30) := 'SALDOZ';
-  
+
   -- таблиця щоденнх знімків балансу
   TAB_SNAP_BALANCES    constant varchar2(30) := 'SNAP_BALANCES';
 
@@ -34,27 +40,27 @@ is
   --
   --
   function header_version return varchar2;
-  
+
   ------------------------------------------------------------------
   -- BODY_VERSION
   --
   --
   --
   function body_version return varchar2;
-  
+
   --------------------------------------------------------------------------------
   --
   -- Функція яка повертає признак чи запущено накопичення
   --
   function get_snp_running return number;
-  
+
   --
   -- Перевірка наявності активного процесу формування знімку
   --
   function CHECK_SNP_RUNNING
   ( p_action  in   v$session.action%type default null
   ) return varchar2;
-  
+
   --
   --
   --
@@ -62,60 +68,60 @@ is
   ( p_action  in   v$session.action%type
   , p_kf      in   v$globalcontext.value%type
   ) return varchar2;
-  
+
   --
   -- Встановлення відмітки про активність процесу формування знімку
   --
   procedure set_running_flag
   ( p_action  in   v$session.action%type default null );
-  
+
   --
   -- Видадення відмітки про активність процесу формування знімку
   --
   procedure purge_running_flag;
-  
+
   -------------------------------------------------------------------
   --
   -- Процедура яка встановлює відмітку про старт запуску формування знімку
   --
   --
   procedure start_running;
-  
+
   -------------------------------------------------------------------
   --
   -- Процедура яка встановлює відмітку про завершення формування знімку
   --
   --
   procedure stop_running;
-  
+
   -- ==================================================================================================
   -- Процедура Синхронизация снимков объекта
   -- ==================================================================================================
   Procedure sync_snap (p_fdat date);
-  
-  
+
+
   -- ==================================================================================================
   -- Процедура Синхронизация снимков объекта sync_month
   -- ==================================================================================================
   Procedure sync_month (p_mdat date);
-  
-  
+
+
   -- ==================================================================================================
   -- Процедура Синхронизация снимков объекта за період
   -- ==================================================================================================
   Procedure sync_snap_period (p_fdat1 date, p_fdat2 date);
-  
+
   -- ==================================================================================================
   -- set_snap_scn - устанавливает scn последней генерации снимка баланса по партиции указанной таблицы
   -- =================================================================================================
   procedure set_snap_scn(p_date in date);
-  
-  
+
+
   -- ==================================================================================================
   -- set_table_scn - устанавливает scn последней генерации снимка баланса по партиции указанной таблицы
   -- ==================================================================================================
   procedure SET_TABLE_SCN( p_table in varchar2, p_date in date, p_scn in number );
-  
+
   --
   --
   --
@@ -125,13 +131,13 @@ is
   , p_kf    in     varchar2
   , p_scn   in     number
   );
-  
+
   -- ======================================================
   -- Modifying Subpartition Template
   -- ======================================================
   procedure SET_SUBPARTITION_TEMPLATES
   ( p_force        in     signtype default 0 );
-  
+
   -- ==================================================================================================
   -- Переіменовує системно згенеровані імена секцій таблиці відповідно до значень ключів секціонування
   -- ==================================================================================================
@@ -142,36 +148,31 @@ is
 
 end BARS_UTL_SNAPSHOT;
 /
-
-show errors
-
-----------------------------------------------------------------------------------------------------
-
-create or replace package body BARS_UTL_SNAPSHOT
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_UTL_SNAPSHOT 
 is
   --
   -- constants
   --
   VERSION_BODY    constant varchar2(64)  := 'version 1.2.9  07.09.2017';
   MODULE_CODE     constant varchar2(8)   := 'SNAPSHOT';
-    
+
   -- Префикс для трассировки
   PKG_CODE        constant varchar2(100) := 'UTL_SNAPSHOT';
-  
+
   -- Формат даты
   FMT_DATE        constant varchar2(10)  := 'dd.mm.yyyy';
-  
+
   -- Формат дата+время
   FMT_DATETIME    constant varchar2(24)  := 'dd.mm.yyyy hh24:mi:ss';
-  
+
   --
   -- variables
   --
-  
+
   -- Флаг активності процесу формування знімку
   G_SNP_RUNNING            number;
   G_ALGORITHM              varchar2(30);
-  
+
   ------------------------------------------------------------------
   -- HEADER_VERSION
   --
@@ -194,16 +195,16 @@ is
   function GET_SNP_RUNNING return number
   is
   begin
-    
+
     select nvl(max(p.val),0)
-      into G_SNP_RUNNING 
-      from params$base p 
+      into G_SNP_RUNNING
+      from params$base p
      where p.par='SNP_RUN';
-    
+
     return G_SNP_RUNNING;
-    
-  end  get_snp_running; 
-  
+
+  end  get_snp_running;
+
   --------------------------------------------------------------------------------
   -- Перевірка наявності активного процесу формування знімку
   --
@@ -214,9 +215,9 @@ is
     l_errmsg  varchar2(500);
     l_action  v$session.action%type;
   begin
-    
+
     l_action := nvl(p_action,'MONBALS');
-    
+
     begin
       select s.USERNAME || ' (' || s.MACHINE || '/' || s.OSUSER || ')'
         into l_errmsg
@@ -229,11 +230,11 @@ is
       when NO_DATA_FOUND then
         l_errmsg := null;
     end;
-    
+
     return l_errmsg;
-    
+
   end CHECK_SNP_RUNNING;
-  
+
   --
   --
   --
@@ -245,22 +246,22 @@ is
     l_errmsg  varchar2(500);
     l_kf      varchar2(5);
   begin
-    
-    case 
+
+    case
     when ( p_action Is Null )
     then raise_application_error( -20666, 'Parameter [p_action] must be specified!' );
     when ( p_kf     Is Null )
     then l_kf := sys_context('BARS_CONTEXT','USER_MFO');
     else null;
     end case;
-    
+
     if ( l_kf Is Null )
     then
-      
+
       l_errmsg := CHECK_SNP_RUNNING( p_action );
-      
+
     else
-    
+
       begin
         select s.USERNAME || ' (' || s.MACHINE || '/' || s.OSUSER || ')'
           into l_errmsg
@@ -279,13 +280,13 @@ is
         when NO_DATA_FOUND then
           l_errmsg := null;
       end;
-      
+
     end if;
-    
+
     return l_errmsg;
-    
+
   end check_snp_running;
-  
+
   --------------------------------------------------------------------------------
   --
   -- Встановлення відмітки про активність процесу формування знімку
@@ -295,14 +296,14 @@ is
   ) is
     l_action  v$session.action%type;
   begin
-    
+
     l_action := nvl(p_action,'MONBALS');
-    
+
 --  dbms_application_info.set_module( MODULE_CODE, l_action );
     dbms_application_info.set_action( l_action );
-    
+
   end set_running_flag;
-  
+
   --------------------------------------------------------------------------------
   --
   -- Видадення відмітки про активність процесу формування знімку
@@ -314,7 +315,7 @@ is
     dbms_application_info.set_action(Null);
     dbms_application_info.set_client_info(Null);
   end purge_running_flag;
-  
+
   ------------------------------------------------------------------
   --
   -- Процедура яка встановлює відмітку про старт запуску формування знімку
@@ -324,23 +325,23 @@ is
   is
     PRAGMA AUTONOMOUS_TRANSACTION;
   begin
-    
+
     update params$base p
        set p.val='1'
      where p.par='SNP_RUN';
-    
+
     if ( sql%rowcount = 0 )
-    then 
-      insert into params$base(par, val, comm) 
+    then
+      insert into params$base(par, val, comm)
       values('SNP_RUN', '1', 'Відмітка про стан запуску формування знімку');
     end if;
-    
+
     commit;
-    
+
     set_running_flag;
-    
-  end start_running;   
-  
+
+  end start_running;
+
   -------------------------------------------------------------------
   --
   -- Процедура яка встановлює відмітку про старт запуску формування знімку
@@ -353,10 +354,10 @@ is
     update params$base p
        set p.val='0'
      where p.par='SNP_RUN';
-    commit; 
+    commit;
     purge_running_flag;
-  end stop_running; 
-  
+  end stop_running;
+
   -- ==================================================================================================
   -- get_snap_scn - возвращает scn последней генерации снимка баланса по партиции указанной таблицы
   -- ==================================================================================================
@@ -396,8 +397,8 @@ is
     return l_snap_scn;
     --
   end get_snap_scn;
-    
-    
+
+
   -- ==================================================================================================
   -- get_mod_scn - возвращает scn последней модификации партиции указанной таблицы
   -- ==================================================================================================
@@ -408,16 +409,16 @@ is
   ) return number
   is
   begin
-    
+
     return DM_UTL.GET_LAST_SCN
            ( p_table_nm  => p_table
            , p_table_own => 'BARS'
            , p_date      => p_date
            , p_kf        => nvl(p_kf,sys_context('bars_context','user_mfo'))
            );
-    
+
   end get_mod_scn;
-  
+
   -- ==================================================================================================
   -- set_table_scn - устанавливает scn последней генерации снимка баланса по партиции указанной таблицы
   -- ==================================================================================================
@@ -430,7 +431,7 @@ is
       --
       if logger.trace_enabled()
       then
-          logger.trace('%s: entry point p_table=>%s, p_date=>%s, p_scn=>%s', 
+          logger.trace('%s: entry point p_table=>%s, p_date=>%s, p_scn=>%s',
                         p, p_table, to_char(p_date, FMT_DATE), to_char(p_scn));
       end if;
       --
@@ -443,12 +444,12 @@ is
        where fdat = l_date
          and table_name = l_table;
       --
-      if sql%rowcount=0 
+      if sql%rowcount=0
       then
           insert
             into accm_snap_scn(fdat, table_name, snap_scn, snap_date)
           values (l_date, l_table, p_scn, scn_to_timestamp(p_scn));
-      end if;         
+      end if;
       --
       if logger.trace_enabled()
       then
@@ -456,7 +457,7 @@ is
       end if;
       commit;
   end SET_TABLE_SCN;
-    
+
   --
   --
   --
@@ -471,32 +472,32 @@ is
     l_date                date;
     l_kf                  varchar2(6);
   begin
-      
+
     bars_audit.trace( '%s: entry with ( p_table=>%s, p_date=>%s, p_kf=>%s, p_scn=>%s ).'
                       , title, p_table, to_char(p_date, FMT_DATE), p_kf, to_char(p_scn) );
-    
+
     l_table := upper( p_table );
     l_date  := trunc( p_date );
     l_kf    := nvl( p_kf, SYS_CONTEXT('BARS_CONTEXT','USER_MFO') );
-    
+
     update ACCM_SNAP_SCN
        set SNAP_SCN   = p_scn
          , SNAP_DATE  = scn_to_timestamp(p_scn)
      where FDAT       = l_date
        and TABLE_NAME = l_table
        and KF         = l_kf;
-    
+
     if ( sql%rowcount = 0 )
     then
         insert
           into ACCM_SNAP_SCN ( KF, FDAT, TABLE_NAME, SNAP_SCN, SNAP_DATE )
         values ( l_kf, l_date, l_table, p_scn, scn_to_timestamp(p_scn) );
-    end if;         
-    
+    end if;
+
     bars_audit.trace( '%s: Exit.', title );
-    
+
     commit;
-    
+
   end SET_TABLE_SCN;
 
   --==================================================================================================
@@ -511,25 +512,25 @@ is
     l_tabl_scn_h       number;
     l_mod              number(1);
   begin
-    
+
     bars_audit.trace( '%s.IS_PARTITION_MODIFIED: Entry with ( p_table = %s, p_date = %s ).'
                     , $$PLSQL_UNIT, p_table, to_char(p_date,FMT_DATE) );
-    
+
     l_tabl_scn   := get_mod_scn( p_table, p_date); -- max(ora_rowscn)
     l_tabl_scn_h := get_snap_scn(p_table, p_date); -- bars.accm_snap_scn
-    
+
     bars_audit.trace( '%s.IS_PARTITION_MODIFIED: ( l_tabl_scn = %s, l_tabl_scn_h = %s ).'
                     , $$PLSQL_UNIT, to_char(l_tabl_scn), to_char(l_tabl_scn_h) );
-                    
+
     if ( l_tabl_scn > l_tabl_scn_h )
     then l_mod := 1;
     else l_mod := 0;
     end if;
-    
+
     bars_audit.trace( '%s.IS_PARTITION_MODIFIED: Exit with ( %s ).'
                     , $$PLSQL_UNIT, to_char(l_mod) );
     return l_mod;
-    
+
   end IS_PARTITION_MODIFIED;
 
 
@@ -544,43 +545,43 @@ is
     l_saldoa_snap_scn  number;
     l_delrow_snap_scn  number;
     l_saldob_snap_scn  number;
-    
+
   Begin
-    
+
     bars_audit.trace(PKG_CODE||'IS_BDAY_MODIFIED: Start scn '|| 'fdat '||to_char(p_fdat, FMT_DATE));
-    
+
     -- снимок уже создавался раньше, необходимо его перенакопить
     -- для этого:
     -- получим scn последних снимков балансов по партиции saldoa, saldob
     l_saldoa_snap_scn := is_partition_modified(TAB_SALDOA,           p_fdat);
     l_delrow_snap_scn := is_partition_modified(TAB_SALDOA_DEL_ROWS,  p_fdat);
-    
+
     bars_audit.trace(PKG_CODE||' saldoa_snap_scn='||l_saldoa_snap_scn||', fdat='||to_char(p_fdat, FMT_DATE));
     bars_audit.trace(PKG_CODE||' delrow_snap_scn='||l_delrow_snap_scn||', fdat='||to_char(p_fdat, FMT_DATE));
-    
+
     if ( g_algorithm = ALGORITHM_MIK )
     then
       l_saldob_snap_scn := 0;
     else
       l_saldob_snap_scn := is_partition_modified( TAB_SALDOB, p_fdat );
     end if;
-    
+
     -- и проверим модифицировались ли партиции за указанную дату с этого момента
     if ( l_saldoa_snap_scn = 1 or
          l_saldob_snap_scn = 1 or
          l_delrow_snap_scn = 1 )
     then
-      
+
       bars_audit.trace( PKG_CODE||' l_create_snap = true, fdat = '||to_char(p_fdat, FMT_DATE) );
-      
+
       l_create_snap := true;
-      
-    end if; 
-    
+
+    end if;
+
     return l_create_snap;
-    
+
   end is_bday_modified;
-  
+
   -- ==================================================================================================
   -- is_month_modified - перевіряєм чи були зміни за звітну дату коригуючі проводки
   -- ==================================================================================================
@@ -593,39 +594,39 @@ is
     l_snap_scn        number;  --
     l_last_bdt        date;    -- останній робочий день міс.
   Begin
-    
+
     bars_audit.trace( '%s: Start with p_fdat=%s.', PKG_CODE, to_char(p_fdat,FMT_DATE) );
-    
+
     -- снимок уже создавался раньше, необходимо его перенакопить, для этого:
-    
-    -- получим scn последних снимков короборотів 
+
+    -- получим scn последних снимков короборотів
     l_saldoz_snap_scn := is_partition_modified( TAB_SALDOZ, p_fdat );
-    
+
     -- и проверим модифицировались ли партиции за указанную дату с этого момента
     if ( l_saldoz_snap_scn = 1 )
     then
       l_create_snap := true;
     else -- перевірка на модифікацію даних в партиції табл.SNAP_BALANCES за останній робочий день міс.
-      
+
       l_last_bdt := DAT_NEXT_U(add_months(p_fdat,1),-1);
       l_tabl_scn := get_mod_scn( TAB_SNAP_BALANCES, l_last_bdt);
       l_snap_scn := get_snap_scn(TAB_SALDOZ, p_fdat);
-      
+
       if ( l_snap_scn < l_tabl_scn )
       then
         l_create_snap := true;
       else
         l_create_snap := false;
       end if;
-      
-    end if; 
-    
+
+    end if;
+
     bars_audit.trace( '%s: Exit with %s.', PKG_CODE, case l_create_snap when true then 'TRUER' else 'FALSE' end );
-    
+
     return l_create_snap;
-    
+
   end;
-  
+
   -- ==================================================================================================
   -- set_snap_scn - устанавливает scn последней генерации снимка баланса по партиции указанной таблицы
   -- ==================================================================================================
@@ -634,16 +635,16 @@ is
     l_now_scn   number;
   Begin
     l_now_scn := dbms_flashback.get_system_change_number();
-    logger.trace(PKG_CODE||' set_snap_scn >'||l_now_scn); 
+    logger.trace(PKG_CODE||' set_snap_scn >'||l_now_scn);
     -- сохраняем scn'ы
     set_table_scn(TAB_SALDOA,          p_date, l_now_scn);
 --  set_table_scn(TAB_SALDOB,          p_date, l_now_scn);
     set_table_scn(TAB_SALDOA_DEL_ROWS, p_date, l_now_scn);
     commit;
   End;
-  
+
   -- ==================================================================================================
-  -- load_algorithm - вичитуєм алгоритм наполнения accm_snap_balances 
+  -- load_algorithm - вичитуєм алгоритм наполнения accm_snap_balances
   -- ==================================================================================================
   procedure load_algorithm
   is
@@ -663,9 +664,9 @@ is
         ||ALGORITHM_OLD||' или '||ALGORITHM_SALNQC||' или '||ALGORITHM_MIK);
      end if;
   end load_algorithm;
-  
+
   -- ==================================================================================================
-  -- Возвращает алгоритм наполнения accm_snap_balances 
+  -- Возвращает алгоритм наполнения accm_snap_balances
   -- ==================================================================================================
   function get_algorithm
     return varchar2
@@ -673,149 +674,149 @@ is
   begin
     return g_algorithm;
   end get_algorithm;
-  
+
   -- ==================================================================================================
   -- Процедура Синхронизация снимков объекта
   -- ==================================================================================================
   Procedure sync_snap (p_fdat date)
   is
     l_create_snap      boolean := false;
-    l_saldoa_snap_scn  number;    
+    l_saldoa_snap_scn  number;
     l_delrow_snap_scn  number;
     l_saldob_snap_scn  number;
     l_bankday          varchar2(1);
     l_snap_balance     varchar2(1);
     dats_              date;
-    
+
     sess_   varchar2(64) := bars_login.get_session_clientid;
     sid_    varchar2(64);
-    
-    l_previous_day        date; 
+
+    l_previous_day        date;
     l_previous_day_modif  number;
     l_snap_balance_previous varchar2(1);
-    
+
   Begin
-    
+
     logger.trace( PKG_CODE||'.SYNC_SNAP Entry with p_fdat = '||to_char(p_fdat,FMT_DATE) );
-    
+
     -- Якщо формується снімок то немає і даних для звіту.
-    if g_algorithm = ALGORITHM_MIK 
-    then 
-      
+    if g_algorithm = ALGORITHM_MIK
+    then
+
       begin
-        
+
         SYS.DBMS_SESSION.CLEAR_IDENTIFIER;
         sid_:=SYS_CONTEXT('BARS_GLPARAM','SNPBAL');
         SYS.DBMS_SESSION.SET_IDENTIFIER(sess_);
-                                      
-        select sid into sid_ 
+
+        select sid into sid_
           from v$session
          where sid=sid_
            and sid<>SYS_CONTEXT ('USERENV', 'SID');
-        
+
         raise_application_error(-20000,'Повторіть формуваня звіту через 10хв.'||CHR(10)||'Формується знімок балансу  SID='|| sid_);
-        
+
       exception
         when no_data_found THEN NULL;
       end;
-      
+
     end if;
-    
+
     -- Визначимо дату снимка чи банківський день.
     begin
       Select 'Y'
         Into l_bankday
         From BARS.FDAT
-       Where FDAT = p_fdat; 
+       Where FDAT = p_fdat;
     exception
       when no_data_found then
         l_bankday := 'N';
     end;
-    
+
     logger.trace(PKG_CODE||' l_bankday='||l_bankday);
-    
+
     begin
       Select 'Y'
         Into l_snap_balance
         From BARS.SNAP_BALANCES
        Where fdat = p_fdat
-         and rownum=1; 
+         and rownum=1;
     exception
-      when no_data_found then 
+      when no_data_found then
         l_snap_balance := 'N';
     end;
-    
+
     logger.trace(PKG_CODE||' l_snap_balance='||l_snap_balance);
-    
-    -- для драпсів неможна формувати снимки раніше вказаної дати    
+
+    -- для драпсів неможна формувати снимки раніше вказаної дати
     begin
       SELECT TO_DATE(val,'DDMMYYYY') INTO dats_ FROM params WHERE par='DATRAPS';
-      IF dats_>p_fdat 
+      IF dats_>p_fdat
       THEN
         l_bankday := 'N';
       END IF;
     exception
       when NO_DATA_FOUND then NULL;
     end;
-    
+
     -- Якщо не банківський день то знімки не формуємо
     If ( l_bankday = 'N' )
     then
       l_create_snap := false;
     else
-      
+
       if ( l_snap_balance = 'Y' )
       then -- перевіряєм чи були зміни за дату формування снимка
         l_create_snap := is_bday_modified(p_fdat);
       else
         l_create_snap := true;
       end if;
-      
+
     end if;
-    
+
     -- Формуємо знімок
     if l_create_snap
     then
-      
-      if g_algorithm = ALGORITHM_MIK 
+
+      if g_algorithm = ALGORITHM_MIK
       then
-        
+
         l_previous_day := DAT_NEXT_U(p_fdat, -1); -- попередня банківська даня
-        
+
         begin
           Select 'Y'
             Into l_snap_balance_previous
             From snap_balances
            Where fdat = l_previous_day
-             and rownum=1; 
+             and rownum=1;
         exception
-          when no_data_found then 
+          when no_data_found then
             l_snap_balance_previous := 'N';
         end;
-         
+
         if ( is_bday_modified(l_previous_day) and l_snap_balance_previous='N' )
         then -- повне формування
           l_previous_day_modif := 0;
         else -- спрощене формування
           l_previous_day_modif := 1;
         end if;
-        
-        logger.trace(PKG_CODE||'.sync_snap: Попередній банківськй день '||' dat '||to_char(l_previous_day, FMT_DATE)||' l_previous_day_modif='||l_previous_day_modif); 
-               
-        logger.trace(PKG_CODE||'.sync_snap: start := ddraps; '||' fdat '||to_char(p_fdat, FMT_DATE)); 
-        
+
+        logger.trace(PKG_CODE||'.sync_snap: Попередній банківськй день '||' dat '||to_char(l_previous_day, FMT_DATE)||' l_previous_day_modif='||l_previous_day_modif);
+
+        logger.trace(PKG_CODE||'.sync_snap: start := ddraps; '||' fdat '||to_char(p_fdat, FMT_DATE));
+
         BARS.DDRAPS( p_fdat, l_previous_day_modif );
-        
+
       else
         bars_audit.info( PKG_CODE||': ALGORITHM <> '||ALGORITHM_MIK );
       end if;
-      
+
     else
       bars_audit.info( PKG_CODE||'.sync_snap: create_snap = false.' );
     End if;
-    
+
     bars_audit.trace( '%s: Exit.', PKG_CODE||'.sync_snap' );
-    
+
   End sync_snap;
 
   -- ==================================================================================================
@@ -826,7 +827,7 @@ is
 --  , p_mode  in number default 0  -- режим формування знімку: 1 - безумовне переформування / 0 - при необхідності
   ) is
     l_create_snap      boolean := false;
-    l_snap_balance     varchar2(1);  
+    l_snap_balance     varchar2(1);
     l_fdat             date;
     l_errmsg           varchar2(500);
     sess_              varchar2(64) := bars_login.get_session_clientid;
@@ -841,65 +842,65 @@ is
     --     from BARS.ACCM_SNAP_SCN
     --    where TABLE_NAME = 'SALDOZ'
     --      and FDAT between dat1_ and dat2_;
-    -- 
+    --
     -- end if;
     ----------------------------------------------------------
     */
   Begin
-    
+
     l_fdat := trunc(p_mdat,'MM');
-    
-    bars_audit.trace( PKG_CODE ||' start := sync_month '||' fdat '||to_char(l_fdat,FMT_DATE) ); 
-    
+
+    bars_audit.trace( PKG_CODE ||' start := sync_month '||' fdat '||to_char(l_fdat,FMT_DATE) );
+
     -- Перевірка наявності активного процесу формування знімку
     l_errmsg := BARS_UTL_SNAPSHOT.CHECK_SNP_RUNNING('MONBALS');
-    
+
     if (l_errmsg is Not Null)
     then
       raise_application_error( -20666, 'формування місячного знімку балансу вже запущено користувачем ' || l_errmsg );
-    else 
-    
+    else
+
       if ( g_algorithm = ALGORITHM_MIK )
       then -- Якщо формується то немає і даних для звіту
         begin
-          
+
           SYS.DBMS_SESSION.CLEAR_IDENTIFIER;
           sid_:=SYS_CONTEXT('BARS_GLPARAM','MONBAL');
           SYS.DBMS_SESSION.SET_IDENTIFIER(sess_);
-          
-          select USERNAME || ' (' || MACHINE || '/' || OSUSER || ')' -- sid 
+
+          select USERNAME || ' (' || MACHINE || '/' || OSUSER || ')' -- sid
             into l_errmsg
             from V$SESSION
            where sid = sid_
              and sid <> SYS_CONTEXT ('USERENV','SID');
-          
+
           raise_application_error( -20000, 'Повторіть формуваня звіту через 10 хв.' || CHR(10) ||
                                            'формування місячного знімку балансу вже запущено користувачем ' || l_errmsg );
-          
+
         exception
-           when no_data_found THEN 
+           when no_data_found THEN
              NULL;
         end;
       end if;
-      
+
     end if;
-    
+
 --  if ( p_mode = 0 )
 --  then
-      
+
       begin
         Select 'Y'
           Into l_snap_balance
           From AGG_MONBALS
          Where fdat = l_fdat
-           and rownum = 1; 
+           and rownum = 1;
       exception
-        when NO_DATA_FOUND then 
+        when NO_DATA_FOUND then
           l_snap_balance := 'N';
       end;
-      
+
       bars_audit.trace( PKG_CODE ||' l_snap_balance='|| l_snap_balance );
-      
+
       if ( l_snap_balance <> 'Y' )
       then
         l_create_snap := true;
@@ -907,17 +908,17 @@ is
         -- перевіряєм чи були зміни за дату формування снимка
         l_create_snap := is_month_modified(l_fdat);
       end if;
-      
+
 --  else
 --    l_create_snap := true;
 --  end if;
-    
-    if l_create_snap 
+
+    if l_create_snap
     then -- Формуємо знімок
-      
+
       if ( g_algorithm = ALGORITHM_MIK )
       then
-        
+
         if ( get_snp_running = 1 )
         then
           raise_application_error( -20000, 'Формування снімку балансу не можливо. Проводиться нарахування резервів.' );
@@ -925,11 +926,11 @@ is
           bars_audit.trace( '%s run MDRAPS( fdat => %s);', PKG_CODE, to_char(l_fdat,FMT_DATE) );
           MDRAPS( l_fdat );
         end if;
-        
+
       end if;
-      
+
     End if;
-    
+
   End sync_month;
 
   -- ==================================================================================================
@@ -941,17 +942,17 @@ is
   ) is
   begin
     bars_audit.trace( PKG_CODE ||'.sync_snap_period: start with ( p_fdat1=%s, p_fdat2=%s ).'
-                    , to_char(p_fdat1,FMT_DATE), to_char(p_fdat2,FMT_DATE) ); 
+                    , to_char(p_fdat1,FMT_DATE), to_char(p_fdat2,FMT_DATE) );
     for x in
-    ( select FDAT from FDAT 
-       where FDAT between p_fdat1 
+    ( select FDAT from FDAT
+       where FDAT between p_fdat1
                       and p_fdat2
        order by FDAT )
     loop
       sync_snap( x.FDAT );
     end loop;
   end sync_snap_period;
-  
+
   -- ======================================================
   -- Modifying Subpartition Template
   -- ======================================================
@@ -963,20 +964,20 @@ is
     l_spt_stmt         varchar(2000);
     l_qty              number(3);
   begin
-    
-    bars_audit.trace( '%s: start with ( p_force=%s ).', title, to_char(p_force) ); 
-    
+
+    bars_audit.trace( '%s: start with ( p_force=%s ).', title, to_char(p_force) );
+
     l_spt_stmt :=  q'[SUBPARTITION SP_%kf VALUES ('%kf')]';
-    
+
     select listagg( replace( l_spt_stmt, '%kf', KF ), CHR(10)||', ' ) WITHIN GROUP ( order by KF )
          , count(1)
       into l_spt_stmt, l_qty
       from BARS.MV_KF;
-    
+
     l_ddl_stmt := 'ALTER TABLE BARS.%tab SET SUBPARTITION TEMPLATE' || chr(10) || '( ' || l_spt_stmt || chr(10) || ')';
-    
-    bars_audit.trace( '%s: ddl_stmt=%s.', title, l_ddl_stmt ); 
-    
+
+    bars_audit.trace( '%s: ddl_stmt=%s.', title, l_ddl_stmt );
+
     for tab in
     ( select TABLE_NAME, SUBPARTITION_COUNT
         from ALL_TAB_PARTITIONS
@@ -986,17 +987,17 @@ is
                                               , TABLE_NAME
                                               , max(PARTITION_POSITION)
                                            from ALL_TAB_PARTITIONS
-                                          where TABLE_OWNER = 'BARS' 
+                                          where TABLE_OWNER = 'BARS'
                                             and TABLE_NAME  in ( 'SNAP_BALANCES', 'AGG_MONBALS', 'AGG_YEARBALS' )
                                           group by TABLE_OWNER, TABLE_NAME )
     )
     loop
-      
+
       if ( l_qty > tab.SUBPARTITION_COUNT OR p_force = 1 )
       then
-        
+
         l_ddl_stmt := replace( l_ddl_stmt, '%tab', tab.TABLE_NAME );
-        
+
         begin
           execute immediate l_ddl_stmt;
         exception
@@ -1005,17 +1006,17 @@ is
                                     chr(10) || dbms_utility.format_error_backtrace() );
             raise;
         end;
-        
+
       else
-        
-        bars_audit.info( title ||': subpartition quantity equal to existing KF quantity.' ); 
-        
+
+        bars_audit.info( title ||': subpartition quantity equal to existing KF quantity.' );
+
       end if;
-      
+
     end loop;
-    
+
   end SET_SUBPARTITION_TEMPLATES;
-  
+
   -- ======================================================
   -- Renaming PARTITION (and SUBPARTITION)
   -- Переіменування системно згенерованих секцій (та підсекцій) таблиці
@@ -1033,34 +1034,34 @@ is
     l_query               varchar(1000);
     l_ddl_stmt            varchar(1000);
   begin
-    
+
     l_tab_nm := upper(p_table_name);
-    
+
     l_query := q'[select to_char(f.FDAT,'yyyymmdd') as FDAT
   from ( select unique FDAT
            from BARS.%tab
        ) f
-  left 
+  left
   join ( select PARTITION_NAME
            from ALL_TAB_PARTITIONS
-          where TABLE_OWNER = 'BARS' 
+          where TABLE_OWNER = 'BARS'
             and TABLE_NAME  = '%tab'
             and PARTITION_NAME <> 'P_MINVALUE'
        ) p
     on ( p.PARTITION_NAME = 'P_' || to_char(FDAT,'YYYYMMDD') )
  where p.PARTITION_NAME Is Null]';
-    
+
     l_query := replace( l_query, '%tab', l_tab_nm );
-    
+
     OPEN cur_p FOR l_query;
-    
+
     LOOP
-      
+
       FETCH cur_p INTO l_fdat;
       EXIT WHEN cur_p%NOTFOUND;
-      
+
       l_ddl_stmt := 'ALTER TABLE BARS.' || l_tab_nm || ' RENAME ' || replace( q'[PARTITION FOR (to_date('%p','YYYYMMDD')) TO P_%p]', '%p', l_fdat );
-      
+
       -- rename partition
       begin
         execute immediate l_ddl_stmt;
@@ -1068,29 +1069,29 @@ is
         when OTHERS then
           if ( sqlcode = -14081 )
           then null; -- new partition name must differ from the old partition name
-          else bars_audit.error( title   || ': ddl_stmt ="' || l_ddl_stmt || '"' || 
+          else bars_audit.error( title   || ': ddl_stmt ="' || l_ddl_stmt || '"' ||
                                  chr(10) || dbms_utility.format_error_stack()    ||
                                  chr(10) || dbms_utility.format_error_backtrace() );
           end if;
       end;
-      
+
       if ( p_rename_sub = 1 )
       then -- rename subpartition
-        
+
         l_query := replace( q'[select unique KF from BARS.%tab PARTITION FOR (to_date('%p','YYYYMMDD'))]', '%p', l_fdat );
         l_query := replace( l_query, '%tab', l_tab_nm );
-        
+
         l_ddl_stmt := 'ALTER TABLE BARS.' || l_tab_nm || ' RENAME '  || replace( q'[SUBPARTITION FOR (to_date('%p','YYYYMMDD'),'%sp') TO P_%p_SP_%sp]', '%p',l_fdat );
-        
+
         OPEN cur_s FOR l_query;
-        
+
         LOOP
-            
+
           FETCH cur_s INTO l_kf;
           EXIT WHEN cur_s%NOTFOUND;
-          
+
           l_ddl_stmt := replace( l_ddl_stmt, '%sp', l_kf );
-          
+
           begin
             execute immediate l_ddl_stmt;
           exception
@@ -1100,19 +1101,19 @@ is
               else raise;
               end if;
           end;
-          
+
         END LOOP;
-        
+
         CLOSE cur_s;
-        
+
       end if;
-      
+
     END LOOP;
-    
+
     CLOSE cur_p;
-    
+
   end RENAME_PARTITION;
-  
+
   --
   --
   --
@@ -1129,60 +1130,60 @@ is
     l_name               varchar2(30);
     l_level              number(1);
   begin
-    
+
     if ( p_key Is Not Null )
     then -- збір статистики для PARTITION
-      
+
       l_pkey := upper(p_key);
       l_name := 'P_'||l_pkey;
-      
+
       if ( p_subkey Is Not Null )
       then -- збір статистики для SUBPARTITION
-        
+
         l_skey := upper(p_subkey);
         l_name := l_name||'_SP_'||l_skey;
-        
+
         -- ищем SUBPARTITION с именем l_name
         begin
-          
+
           select 2
             into l_level
             from ALL_TAB_SUBPARTITIONS
            where TABLE_OWNER = l_owner
              and TABLE_NAME  = l_table
              and subpartition_name = l_name;
-          
+
         exception
           when NO_DATA_FOUND
           then -- если нет субпартиции (предполагаем что она носит системное имя)
             -- переименуем ее
             execute immediate 'alter table '||l_owner||'.'||l_table||' rename SUBPARTITION for ('||l_pkey||','||l_skey||') to '||l_name;
         end;
-        
+
       else -- збір статистики для PARTITION
-        
+
         -- ищем PARTITION с именем l_name
         begin
-          
+
           select 1
             into l_level
             from ALL_TAB_PARTITIONS
            where TABLE_OWNER    = l_owner
              and TABLE_NAME     = l_table
              and PARTITION_NAME = l_name;
-          
+
         exception
-          when NO_DATA_FOUND 
+          when NO_DATA_FOUND
           then -- если нет партиции (предполагаем что она носит системное имя)
             -- переименуем ее
             execute immediate 'alter table '||l_owner||'.'||l_table||' rename PARTITION for ('||l_pkey||') to '||l_name;
         end;
       end if;
-      
+
     else -- збір статистики для TABLE
       l_level := 0;
     end if;
-    
+
     -- после переименования субпартиция должна существовать
     DBMS_STATS.gather_table_stats
     ( ownname          => l_owner
@@ -1191,7 +1192,7 @@ is
     , degree           => DBMS_STATS.AUTO_DEGREE
     , estimate_percent => DBMS_STATS.AUTO_SAMPLE_SIZE
     , cascade          => TRUE );
-    
+
   end gather_stats;
 
 
@@ -1200,10 +1201,16 @@ begin
   load_algorithm();
 end bars_utl_snapshot;
 /
+ show err;
+ 
+PROMPT *** Create  grants  BARS_UTL_SNAPSHOT ***
+grant EXECUTE                                                                on BARS_UTL_SNAPSHOT to BARSUPL;
+grant EXECUTE                                                                on BARS_UTL_SNAPSHOT to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on BARS_UTL_SNAPSHOT to UPLD;
 
-show errors
-
-grant EXECUTE on BARS_UTL_SNAPSHOT to BARSUPL;
-grant EXECUTE on BARS_UTL_SNAPSHOT to BARS_ACCESS_DEFROLE;
-grant EXECUTE on BARS_UTL_SNAPSHOT to UPLD;
-
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_utl_snapshot.sql =========*** E
+ PROMPT ===================================================================================== 
+ 

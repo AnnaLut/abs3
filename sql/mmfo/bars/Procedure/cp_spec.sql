@@ -7,13 +7,11 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure CP_SPEC ***
 
-
-CREATE OR REPLACE PROCEDURE 
-BARS.cp_spec (p_dat date default null, p_days int default 5)
+  CREATE OR REPLACE PROCEDURE BARS.CP_SPEC      (p_dat date default null, p_days int default 5)
 is
 
 -- Дозаповнення спецпараметрів для нових рах-в портфеля ЦП
---  ***    v.3.5 від 25/04-17   -- prv v.3.3a 
+--  ***    v.3.5 від 25/04-17   -- prv v.3.3a
 
 --  25/04    включаю аналіз CP_ARCH
 --  21/04    якщо спецпар-р НЕ пустий - НЕ міняємо
@@ -41,34 +39,34 @@ for k0 in (select c.id,c.ref,ar.dat_ug from cp_deal c, oper o, cp_arch ar
 loop
 for k in (
 SELECT c.ACC,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a
-       WHERE ref=k0.ref and c.acc is not NULL and a.acc=c.acc and a.dazs is null   
-UNION ALL    
-SELECT c.ACCD,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a 
-       WHERE ref=k0.ref and c.accd is not NULL and a.acc=c.accd(+) and a.dazs is null  
-UNION ALL    
-SELECT c.ACCP,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a 
+       WHERE ref=k0.ref and c.acc is not NULL and a.acc=c.acc and a.dazs is null
+UNION ALL
+SELECT c.ACCD,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a
+       WHERE ref=k0.ref and c.accd is not NULL and a.acc=c.accd(+) and a.dazs is null
+UNION ALL
+SELECT c.ACCP,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a
        WHERE ref=k0.ref and c.accp is not NULL and a.acc=c.accp(+) and a.dazs is null
-UNION ALL    
-SELECT c.ACCr,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a 
+UNION ALL
+SELECT c.ACCr,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a
        WHERE ref=k0.ref and c.accr is not NULL and a.acc=c.accr(+) and a.dazs is null
-UNION ALL    
-SELECT c.ACCR2,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a 
+UNION ALL
+SELECT c.ACCR2,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a
        WHERE ref=k0.ref and c.accr2 is not NULL and a.acc=c.accr2(+) and a.dazs is null
-UNION ALL    
-SELECT c.ACCS,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a 
-       WHERE ref=k0.ref and c.accs is not NULL and a.acc=c.accs(+) and a.dazs is null   
-UNION ALL    
-SELECT c.ACCR3,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a 
+UNION ALL
+SELECT c.ACCS,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a
+       WHERE ref=k0.ref and c.accs is not NULL and a.acc=c.accs(+) and a.dazs is null
+UNION ALL
+SELECT c.ACCR3,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a
        WHERE ref=k0.ref and c.accr3 is not NULL and a.acc=c.accr3(+) and a.dazs is null
-UNION ALL    
-SELECT c.ACCEXPN,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a 
-       WHERE ref=k0.ref and c.accexpn is not NULL and a.acc=c.accexpn(+) and a.dazs is null  
-UNION ALL    
-SELECT c.ACCEXPR,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a 
-       WHERE ref=k0.ref and c.accexpr is not NULL and a.acc=c.accexpr(+) and a.dazs is null  
-UNION ALL    
-SELECT c.ACCUNREC,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a 
-       WHERE ref=k0.ref and c.accunrec is not NULL and a.acc=c.accunrec(+) and a.dazs is null  
+UNION ALL
+SELECT c.ACCEXPN,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a
+       WHERE ref=k0.ref and c.accexpn is not NULL and a.acc=c.accexpn(+) and a.dazs is null
+UNION ALL
+SELECT c.ACCEXPR,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a
+       WHERE ref=k0.ref and c.accexpr is not NULL and a.acc=c.accexpr(+) and a.dazs is null
+UNION ALL
+SELECT c.ACCUNREC,c.ref,a.nls,a.kv,a.accc FROM CP_DEAL c, accounts a
+       WHERE ref=k0.ref and c.accunrec is not NULL and a.acc=c.accunrec(+) and a.dazs is null
          order by ref,1)
 loop
 
@@ -86,12 +84,12 @@ end;
 
 begin
 fl:=0;
-select r011, r012, r013, r016, s080, s180, s580, s130 
+select r011, r012, r013, r016, s080, s180, s580, s130
 into l_r011, l_r012, l_r013, l_r016, l_s080, l_s180, l_s580, l_s130
 from specparam where acc=k.accc;
 fl:=1;
 exception when NO_DATA_FOUND then null;
-l_r011:=null; l_r012:=null; l_r013:=null; l_r016:=null; 
+l_r011:=null; l_r012:=null; l_r013:=null; l_r016:=null;
 l_s080:=null; l_s180:=null; l_s580:=null;
 l_s130:=null;
 end;
@@ -108,7 +106,7 @@ if fl=1 then  fl1:=0;
    if l_r011 is not null  and r_spec.r011 is null then
       Accreg.setAccountSParam( k.acc, 'R011', l_r011);  fl1:=1;
    end if;
-  
+
    if l_r012 is not null  and r_spec.r012 is null then
       Accreg.setAccountSParam( k.acc, 'R012', l_r012);  fl1:=1;
    end if;
@@ -150,10 +148,12 @@ end loop; -- k0
 logger.info('CP_SPEC: finish');
 end; -- cp_spec
 /
+show err;
 
---grant execute on cp_spec to start1;
+PROMPT *** Create  grants  CP_SPEC ***
+grant EXECUTE                                                                on CP_SPEC         to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on CP_SPEC         to START1;
 
-GRANT EXECUTE ON cp_spec TO bars_access_defrole;
 
 
 PROMPT ===================================================================================== 

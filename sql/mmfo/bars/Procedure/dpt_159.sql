@@ -250,7 +250,6 @@ exception
     bars_audit.error('Ошибка переноса вклада № '|| to_char(p_dptid)||' на вклад до востребования: '||sqlerrm);
     raise_application_error(-20013, 'Ошибка переноса вклада № '||to_char(p_dptid)||': '||sqlerrm, true);
 end dpt_159;
- 
 /
 show err;
 

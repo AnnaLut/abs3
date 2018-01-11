@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_F27 ***
 
-CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F27 (p_kod_filii        varchar2,
+  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F27 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -23,15 +23,15 @@ is
   ver_          char(30)  := 'v.16.004  14/16/2017';
 /*
    Структура показника  D BBBB 00 VVV
-   
-   D    -    може приймати значення: 
+
+   D    -    може приймати значення:
         5 - списано коштів
         6 - зараховано коштів
         7 – у тому числі списано для обов’язкового продажу іноземної валюти
-             (з 22.11.2012) 
+             (з 22.11.2012)
    BBBB    -    балансовий рахунок;
    00    -    частина сегменту, заповнена нулями (до 01.03.2006 відповідала
-              значенням поля D020 довідника KL_D020)    
+              значенням поля D020 довідника KL_D020)
    VVV    -    код валюти;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -41,7 +41,7 @@ is
     l_file_code     varchar2(2) := substr(p_file_code, 2, 2);
 BEGIN
     logger.info ('NBUR_P_F27 begin for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
- 
+
     -- определение начальных параметров (код области или МФО или подразделение)
     nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 0, l_file_code, l_nbuc, l_type);
 
@@ -148,16 +148,16 @@ BEGIN
                     r.report_date(+) = p_report_date and
                     r.kf(+) = p_kod_filii and
                     t.ref = r.ref(+) and
-                    t.ref = o.ref and 
+                    t.ref = o.ref and
                     t.kv not in (980, 959, 961, 962, 964) and
                     t.acc_num_db like '2603%' and
                     t.acc_num_cr not like '25%' and
                     t.acc_num_cr not like '26%' and
-                    (t.acc_num_cr like '2900%' and t.ob22_cr = '04' or 
+                    (t.acc_num_cr like '2900%' and t.ob22_cr = '04' or
                      r.d020 = '01' or
                      LOWER(o.nazn) like '%обов%прод%' or
-                     LOWER(o.nazn) like '%об%зател%продаж%'  or  
-                     LOWER(o.nazn) like '%внутр_шн_й переказ%'   
+                     LOWER(o.nazn) like '%об%зател%продаж%'  or
+                     LOWER(o.nazn) like '%внутр_шн_й переказ%'
                      )
                 union all
               select t.report_date, t.kf, t.cust_id_db cust_id,

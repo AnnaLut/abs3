@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_FF1_NN ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_FF1_NN ( dat_     DATE,
+  CREATE OR REPLACE PROCEDURE BARS.P_FF1_NN (dat_     DATE,
                                            sheme_   VARCHAR2 DEFAULT 'G') IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #F1 для КБ

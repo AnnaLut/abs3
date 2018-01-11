@@ -1,4 +1,10 @@
-create or replace package DPT_WEB
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpt_web.sql =========*** Run *** ===
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.DPT_WEB 
 is
   --
   -- основной пакет процедур для работы модуля "Вклады населения-WEB"
@@ -882,7 +888,7 @@ is
   function get_bonus_rate(p_dptid dpt_deposit.deposit_id%type) return number;
 
   /*
-  
+
   --
   -- повертає гріфічну інформацію клієнта
   --
@@ -890,7 +896,7 @@ is
   ( p_rnk   in   CUSTOMER_IMAGES.rnk%type,
     p_typ   in   CUSTOMER_IMAGES.type_img%type
   ) return       CUSTOMER_IMAGES.image%type;
-  
+
   --
   -- Збереження гріфічної інформації клієнта (Фото/підпис)
   --
@@ -898,21 +904,21 @@ is
   ( p_rnk   in   CUSTOMER_IMAGES.rnk%type,
     p_typ   in   CUSTOMER_IMAGES.type_img%type,
     p_img   in   CUSTOMER_IMAGES.image%type );
-  
+
   ---
   --
   ---
   function GET_VERIFIED_STATE
   ( p_rnk   in   dpt_customer_changes.rnk%type
   ) return number;
-  
+
   ---
   --
   ---
   procedure SET_VERIFIED_STATE
   ( p_rnk    in   person_valid_document.rnk%type,
     p_state  in   person_valid_document.doc_state%type );
-  
+
   --
   -- попередне тимчасове збереження змінених реквізитів клієнта
   --
@@ -920,20 +926,20 @@ is
   ( p_rnk   in   dpt_customer_changes.rnk%type,
     p_tag   in   dpt_customer_changes.tag%type,
     p_val   in   dpt_customer_changes.val%type );
-  
+
   --
   -- Остаточне збереження змін реквізитів клієнта
   --
   procedure SAVE_CHANGES_CUSTOMER_PARAMS
   ( p_rnk   in   dpt_customer_changes.rnk%type );
-  
+
   ---
   -- Збереження ідентифікатора депозитного договору отриманого від ЕАД
   ---
   procedure SET_ARCHIVE_DOCID
   ( p_dptid  in   dpt_deposit.deposit_id%type,
     p_docid  in   dpt_deposit.archdoc_id%type );
-  
+
   --
   -- Пошук шаблону для друку
   --
@@ -942,15 +948,15 @@ is
     p_code   in   dpt_vidd_flags.id%type,
     p_fr     in   doc_scheme.fr%type  default 0
   ) return        dpt_vidd_scheme.id%type;
-  
+
   ---
   -- Перевірка карткового рахунка на "ВІРТУАЛЬНІСТЬ"
   ---
   function CHECK_VIRTUAL_BPK
   ( p_acc     in accounts.acc%type
   ) return       number;
-  
-  
+
+
   */
 
   ---
@@ -1037,10 +1043,7 @@ is
 
 end dpt_web;
 /
-
-show errors;
-
-create or replace package body DPT_WEB
+CREATE OR REPLACE PACKAGE BODY BARS.DPT_WEB 
 is
 
   g_body_version  constant varchar2(32)  := 'version 48.06  25.10.2017';
@@ -1172,12 +1175,12 @@ is
     l_subquery varchar2(4000);
     l_clause   varchar2(4000);
   begin
-  
+
     bars_audit.trace('%s entry, p_method=>%s, p_dptid=>%s',
                      title,
                      to_char(p_method),
                      to_char(p_dptid));
-  
+
     l_subquery := '(select deposit_id, nd, datz, rnk, acc, vidd, branch ' ||
                   nlchr || '   from dpt_deposit ' || nlchr || case
                     when p_method = 10 then
@@ -1203,14 +1206,14 @@ is
                         '    and deposit_id = :p_dptid ' || nlchr
                      end
                   end || ')' || nlchr;
-  
+
     l_clause := case
                   when p_method = 9 then
                    '   and d.branch = :p_branch ' || nlchr
                   else
                    ' '
                 end;
-  
+
     p_statement := 'insert into int_queue ' || nlchr ||
                    '   (kf, branch, deal_id, deal_num, deal_dat, cust_id, int_id, ' ||
                    nlchr ||
@@ -1272,9 +1275,9 @@ is
                    '   and d.vidd      = v.vidd ' || nlchr ||
                    '   and ((m.acr_dat is null) or (m.acr_dat < :p_acrdat and m.acr_dat < m.stp_dat)) ' ||
                    nlchr || l_clause;
-  
+
     bars_audit.trace('%s exit with %s', title, p_statement);
-  
+
   end igen_intstatement;
   -- ======================================================================================
   --                        Служебные функции
@@ -1305,7 +1308,7 @@ is
     l_subquery varchar2(4000);
     l_clause   varchar2(4000) := '';
   begin
-  
+
     bars_audit.trace('%s ид.код = %s, ФИО = %s, ДР = %s, серия и № паспорта = %s %s',
                      l_title,
                      p_okpo,
@@ -1313,7 +1316,7 @@ is
                      to_char(p_bday, 'DD/MM/YYYY'),
                      p_ser,
                      p_numdoc);
-  
+
     -- проверка достаточности входных параметров для поиска вкладчика
     l_enough := enough_search_params(p_dptid     => null,
                                      p_dptnum    => null,
@@ -1324,11 +1327,11 @@ is
                                      p_birthdate => p_bday,
                                      p_docserial => p_ser,
                                      p_docnum    => p_numdoc);
-  
+
     if (p_nmk is not null) then
       l_nmk := upper(p_nmk) || l_nmk;
     end if;
-  
+
     if p_okpo is not null and p_okpo != '0000000000' then
       l_subquery := 'SELECT /*+ FIRST_ROWS(10) */
            c.rnk, c.nmk, c.okpo, c.adr,
@@ -1355,13 +1358,13 @@ is
       if l_nmk is not null then
         l_clause := ' AND UPPER(c.nmk) LIKE :l_nmk ' || nlchr;
       end if;
-    
+
       if p_okpo is not null then
         l_clause := l_clause || ' AND c.okpo = :p_okpo ' || nlchr;
       else
         l_clause := l_clause || ' and :p_okpo is null ' || nlchr;
       end if;
-    
+
       if p_bday is not null then
         l_clause := l_clause || ' AND NVL(p.bday, to_date(''' ||
                     to_char(g_nulldate, 'dd/mm/yyyy') ||
@@ -1369,13 +1372,13 @@ is
       else
         l_clause := l_clause || ' and :p_bday is null ' || nlchr;
       end if;
-    
+
       if p_ser is not null then
         l_clause := l_clause || ' AND NVL(p.ser,'' '') = :p_ser ' || nlchr;
       else
         l_clause := l_clause || ' and :p_ser is null  ' || nlchr;
       end if;
-    
+
       if p_numdoc is not null then
         l_clause := l_clause || ' AND NVL(p.numdoc, '' '') = :p_numdoc ' ||
                     nlchr;
@@ -1384,7 +1387,7 @@ is
       end if;
       l_clause   := l_clause || ' ) where canilookclient(rnk) = 1';
       l_subquery := l_subquery || l_clause;
-    
+
       if l_nmk is not null then
         open t_cust for l_subquery
           using l_nmk, p_okpo, p_bday, p_ser, p_numdoc;
@@ -1394,10 +1397,10 @@ is
       end if;
     end if;
     bars_audit.info(l_subquery);
-  
+
     p_cust := t_cust;
     bars_audit.trace('%s выход', l_title);
-  
+
   end p_search_customer;
   -- ======================================================================================
   procedure p_close_cursor(p_cust in out t_cursor) is
@@ -1441,7 +1444,7 @@ is
       return case when(l_serial is not null and l_number is not null) then 1 else 0 end;
     end valid_docparams;
   begin
-  
+
     bars_audit.trace('%s договор № %s (%s), счет %s',
                      l_title,
                      p_dptnum,
@@ -1457,7 +1460,7 @@ is
                      p_docserial,
                      p_docnum,
                      to_char(p_birthdate, 'DD/MM/YY'));
-  
+
     if p_extended is null then
       -- спрощена система перевірок достатньості параметрів для пошуку клиєнта/договору
       if coalesce(to_char(p_dptid),
@@ -1507,7 +1510,7 @@ is
     l_branch   branch.branch%type := sys_context('bars_context',
                                                  'user_branch');
   begin
-  
+
     if p_type = 1 then
       -- поиск клиента по регистрационному номеру
       select *
@@ -1558,9 +1561,9 @@ is
     else
       null;
     end if;
-  
+
     return l_custrow;
-  
+
   end get_custdata;
   -- ======================================================================================
   -- расширенный поиск клиента
@@ -1577,7 +1580,7 @@ is
     l_custrow  customer%rowtype;
     l_complete boolean := false;
   begin
-  
+
     bars_audit.trace('%s entry, (%s, %s, %s, %s, %s, %s)',
                      title,
                      to_char(p_custid),
@@ -1586,7 +1589,7 @@ is
                      to_char(p_bdate, 'dd.mm.yyyy'),
                      p_docserial,
                      p_docnumber);
-  
+
     -- попытка № 1: поиск клиента по РНК
     begin
       l_custrow  := get_custdata(p_type => 1, p_custid => p_custid);
@@ -1597,7 +1600,7 @@ is
         l_custrow  := null;
         l_complete := false;
     end;
-  
+
     -- попытка № 2: поиск клиента по идентиф.коду (не 0...000) и ФИО (90%-ное совпадение)
     if not l_complete and p_custcode != l_nullcode then
       begin
@@ -1618,7 +1621,7 @@ is
           l_complete := false;
       end;
     end if;
-  
+
     -- попытка № 3: расширенный поиск клиента по ид.коду, ФИО и пасп.данным
     if not l_complete then
       begin
@@ -1665,9 +1668,9 @@ is
                      title,
                      to_char(l_custrow.rnk),
                      l_custrow.nmk);
-  
+
     return l_custrow;
-  
+
   end get_custdata_ex;
   -- ======================================================================================
   --
@@ -1741,7 +1744,7 @@ is
     l_cust          number(38);
     l_custadrtype   number(38);
   begin
-  
+
     bars_audit.trace('%s запуск, ФИО=>%s, РНК=>%s, ид.код=>%s, паспорт=>%s, дата рождения=>%s',
                      l_title,
                      p_clientname,
@@ -1749,21 +1752,21 @@ is
                      p_clientcode,
                      p_docserial || '/' || p_docnumber,
                      to_char(p_clientbdate, 'DD/MM/YY'));
-  
+
     bars_audit.trace('%s PhotoDate = %s',
                      l_title,
                      to_char(p_photodate, 'DD/MM/YYYY'));
-  
+
     bars_audit.trace('%s SelfEmployer => %s, c_reg => %s, c_dst => %s',
                      l_title,
                      to_char(p_selfemployer),
                      to_char(p_taxagencycode),
                      to_char(p_regagencycode));
-  
+
     bars_audit.trace('%s режим выполнения - %s',
                      l_title,
                      p_usagemode);
-  
+
     -- код нашей страны
     begin
       select to_number(val)
@@ -1774,10 +1777,10 @@ is
       when no_data_found then
         bars_error.raise_nerror(g_modcode, 'COUNTRY_NOT_FOUND');
     end;
-  
+
     -- заполнение альтернативного адреса (p_resid_*) в фактический дарес
     l_custadrtype := 2;
-  
+
     -- эконом.показатели
     l_residcode := case
                      when p_resid_code = 1 then
@@ -1787,7 +1790,7 @@ is
                    end;
     l_custtype  := 3;
     l_prinsider := 99;
-  
+
     l_ise := case
                when p_resid_code = 1 then
                 '14410'
@@ -1799,7 +1802,7 @@ is
     l_ved  := '00000';
     l_sed  := '00';
     l_k050 := '000';
-  
+
     -- краткое наименование клиента
     l_custnameshurt := substr(p_client_surname, 1, 38);
     if trim(p_client_name) is not null then
@@ -1814,14 +1817,14 @@ is
                                   38);
       end if;
     end if;
-  
+
     bars_audit.trace('%s краткое наименование = %s',
                      l_title,
                      l_custnameshurt);
-  
+
     l_custrow := null;
     l_persrow := null;
-  
+
     -- поиск клиента по рег.номеру, ид.коду, ФИО и пасп.данным
     l_custrow := get_custdata_ex(p_custid    => p_clientid, -- рег.номер
                                  p_custcode  => p_clientcode, -- идентиф.код
@@ -1830,15 +1833,15 @@ is
                                  p_docserial => p_docserial, -- серия паспорта
                                  p_docnumber => p_docnumber, -- номер паспорта
                                  p_mode      => p_usagemode); -- режим для поиска 'MI ' только по коду ОКПО
-  
+
     if (l_custrow.rnk is null) then
-    
+
       -- режим с регистрацией нового клиента (IO / IU)
       if (p_usagemode = 'IO' or p_usagemode = 'IU' or p_usagemode = 'MI') then
         bars_audit.trace('%s клиент не найден, режим %s => регистрируем нового клиента',
                          l_title,
                          p_usagemode);
-      
+
         -- заполнение карточки клиента
         kl.setcustomerattr(rnk_       => l_cust,
                            custtype_  => l_custtype,
@@ -1896,7 +1899,7 @@ is
                                          end,
                            tobo_      => substr(tobopack.gettobo, 1, 30),
                            isp_       => null);
-      
+
         -- заполнение карточки клиента-физ.лица
         kl.setpersonattrex(rnk_    => l_cust,
                            sex_    => p_clientsex,
@@ -1911,7 +1914,7 @@ is
                            teld_   => substr(p_clienthomeph, 1, 20),
                            telw_   => substr(p_clientworkph, 1, 20),
                            telm_   => p_clientcellphone);
-      
+
         -- заполнение доп.реквизитов клиента
         kl.setcustomerelement(l_cust,
                               'SN_FN',
@@ -1930,15 +1933,15 @@ is
                               substr(p_clientname_gc, 1, 500),
                               0);
         kl.setcustomerelement(l_cust, 'K013', '5', 0);
-      
+
         if (branch_usr.get_branch_param2('DPT_WORKSCHEME', 1) = 'EBP') then
           -- код модуля реєстрації клієнта для ЕБП
           kl.setcustomerelement(l_cust, 'CRSRC', 'DPT', 0);
         end if;
-      
+
         kl.setcustomerelement(l_cust, 'SAMZ', to_char(p_selfemployer), 0); -- Ознака самозайнятої особи
         kl.setcustomerelement(l_cust, 'SPMRK', to_char(p_special_marks), 0); -- "Особлива Вiдмiтка" нестандартного клієнта
-      
+
         -- заповнення юридичної адреси
         kl.setcustomeraddressbyterritory(rnk_         => l_cust,
                                          typeid_      => 1,
@@ -1958,7 +1961,7 @@ is
                                                                 1,
                                                                 100),
                                          territoryid_ => p_territory);
-      
+
         -- заповнення фактичної адреси
         if (coalesce(p_resid_index,
                      p_resid_obl,
@@ -1995,31 +1998,31 @@ is
                          p_k090 => l_oe,
                          p_k050 => l_k050,
                          p_k051 => l_sed);
-      
+
         bars_audit.trace('%s выполена регистрация клиента, РНК = %s',
                          l_title,
                          to_char(l_cust));
         p_clientid := l_cust;
-      
+
       else
-      
+
         -- режим без регистрации нового клиента (SO / UO)
         bars_audit.trace('%s клиент не найден, режим %s => без регистрации',
                          l_title,
                          p_usagemode);
         p_clientid := null;
-      
+
       end if; -- p_usagemode
-    
+
     else
-    
+
       -- режим с обновлением карточки найденного клиента (UO / IU)
       if (p_usagemode = 'UO' or p_usagemode = 'IU') then
-      
+
         bars_audit.trace('%s клиент найден, режим %s => обновляем карточку клиента',
                          l_title,
                          p_usagemode);
-      
+
         -- проверка на необходимость обновления параметров клиента
         if not (nvl(l_custrow.nmk, '_') = nvl(p_clientname, '_') and
             nvl(l_custrow.nmkk, '_') = nvl(l_custnameshurt, '_') and
@@ -2089,7 +2092,7 @@ is
                            k050
                         end)
            where rnk = l_custrow.rnk;
-        
+
           -- обновление доп.реквизитов клиента
           kl.setcustomerelement(l_custrow.rnk,
                                 'SN_FN',
@@ -2103,7 +2106,7 @@ is
                                 'SN_MN',
                                 substr(p_client_patr, 1, 500),
                                 0);
-        
+
           -- заповнення юридичної адреси
           begin
             select *
@@ -2115,7 +2118,7 @@ is
             when no_data_found then
               l_addrrow := null;
           end;
-        
+
           if ((l_addrrow.zip = p_index) and (l_addrrow.domain = p_obl) and
              (l_addrrow.region = p_district) and
              (l_addrrow.locality = p_settlement) and
@@ -2123,7 +2126,7 @@ is
              (l_addrrow.territory_id = p_territory)) then
             null;
           else
-          
+
             kl.setcustomeraddressbyterritory(rnk_         => l_custrow.rnk,
                                              typeid_      => 1,
                                              country_     => nvl(p_country,
@@ -2146,9 +2149,9 @@ is
                                              territoryid_ => nvl(p_territory,
                                                                  l_addrrow.territory_id) -- якщо код території не вказаний лишаємо старе значення
                                              );
-          
+
           end if;
-        
+
           kl.setcustomerelement(l_custrow.rnk,
                                 'FGIDX',
                                 substr(p_index, 1, 500),
@@ -2169,31 +2172,31 @@ is
                                 'FGADR',
                                 substr(p_adress, 1, 500),
                                 0);
-        
+
           bars_audit.trace('%s обновлены параметры клиента',
                            l_title);
-        
+
         end if;
-      
+
         -- ФИО клиента в родит.падеже может измениться независимо от ФИО в именит.падеже
         kl.setcustomerelement(l_custrow.rnk,
                               'SN_GC',
                               substr(p_clientname_gc, 1, 500),
                               0);
         kl.setcustomerelement(l_custrow.rnk, 'K013', '5', 0);
-      
+
         -- Ознака самозайнятої особи
         kl.setcustomerelement(l_custrow.rnk,
                               'SAMZ',
                               to_char(p_selfemployer),
                               0);
-      
+
         -- "Особлива Вiдмiтка" нестандартного клієнта
         kl.setcustomerelement(l_custrow.rnk,
                               'SPMRK',
                               to_char(p_special_marks),
                               0);
-      
+
         -- заполнение фактического адреса
         if (coalesce(p_resid_index,
                      p_resid_obl,
@@ -2210,7 +2213,7 @@ is
             when no_data_found then
               l_addrrow := null;
           end;
-        
+
           if ((l_addrrow.zip = p_resid_index) and
              (l_addrrow.domain = p_resid_obl) and
              (l_addrrow.region = p_resid_district) and
@@ -2219,7 +2222,7 @@ is
              (l_addrrow.territory_id = p_resid_territory)) then
             null;
           else
-          
+
             kl.setcustomeraddressbyterritory(rnk_         => l_custrow.rnk,
                                              typeid_      => l_custadrtype,
                                              country_     => nvl(p_country,
@@ -2242,19 +2245,19 @@ is
                                              territoryid_ => nvl(p_resid_territory,
                                                                  l_addrrow.territory_id) -- якщо код території не вказаний лишаємо старе значення
                                              );
-          
+
           end if;
-        
+
           bars_audit.trace('%s заполнен факт.адрес',
                            l_title);
-        
+
         end if;
-      
+
         -- параметры физ.лица
         begin
-        
+
           select * into l_persrow from person where rnk = l_custrow.rnk;
-        
+
           -- проверка на необходимость обновления параметров клиента-физ.лица
           if not
               (nvl(l_persrow.sex, '0') = nvl(p_clientsex, '0') and
@@ -2290,10 +2293,10 @@ is
                                teld_   => substr(p_clienthomeph, 1, 20),
                                telw_   => substr(p_clientworkph, 1, 20),
                                telm_   => p_clientcellphone);
-          
+
             bars_audit.trace('%s обновлены параметры клиента-физ.лица',
                              l_title);
-          
+
             -- Якщо змінився номер мобільного телефону
             if (l_persrow.cellphone = p_clientcellphone) then
               null;
@@ -2310,9 +2313,9 @@ is
                 end loop;
               end;
             end if;
-          
+
           end if;
-        
+
         exception
           when no_data_found then
             -- клиент зарегистрирован БЕЗ параметров физ.лица
@@ -2332,28 +2335,28 @@ is
             bars_audit.trace('%s заполнены параметры клиента-физ.лица',
                              l_title);
         end;
-      
+
         bars_audit.trace('%s выполено обновление карточки клиента, РНК = %s',
                          l_title,
                          to_char(l_custrow.rnk));
         p_clientid := l_custrow.rnk;
-      
+
       else
-      
+
         -- режим без обновления карточки найденного клиента (SO / IO)
         bars_audit.trace('%s клиент найден, режим %s => без обновления',
                          l_title,
                          p_usagemode);
         p_clientid := l_custrow.rnk;
-      
+
       end if;
-    
+
     end if; -- регистрация / обновление
-  
+
     bars_audit.trace('%s выход с РНК = %s',
                      l_title,
                      to_char(p_clientid));
-  
+
   end p_open_vklad_rnk;
 
   -- ======================================================================================
@@ -2409,14 +2412,14 @@ is
     bars_audit.info('Дебаг помилки COBUMMFO-5060. Початок процедури створення депозиту - '||l_title ||chr(10)||
                             'Вхідні дані: vidd = ' ||to_char(p_vidd) || ' rnk = ' || to_char(p_rnk)||
                           ' wb = ' || to_char(p_wb));
-                          
+
     l_valid_mobphone := bars.verify_cellphone_byrnk(p_rnk);
     if (p_datbegin is null) then
       l_datbegin := gl.bdate;
     else
       l_datbegin := p_datbegin;
     end if;
-  
+
     -- Перевірка "НА МІГРАЦІЮ" (локальна банківська дата != глобальній)
     if instr(p_comment, 'Imported from') > 0 then
       l_migr := 1;
@@ -2445,15 +2448,15 @@ is
                               'ERR:  В картці клієнта не заповнено або невірно заповнено мобільний телефон! Заповніть корректний моб.телефон в картці клієнта і спробуйте знову.',
                               true);
     else
-    
+
       bars_audit.trace('%s РНК = %s, вид вклада = %s, сумма = %s',
                        l_title,
                        to_char(p_rnk),
                        to_char(p_vidd),
                        to_char(p_sum));
-    
+
       -- группа доступа
-    
+
       begin
         select g.id
           into l_grp
@@ -2467,7 +2470,7 @@ is
       bars_audit.trace('%s группа доступа = %s',
                        l_title,
                        to_char(l_grp));
-    
+
       begin
         select nvl(duration, 0),
                nvl(duration_days, 0),
@@ -2491,7 +2494,7 @@ is
                                   g_viddnotfound,
                                   to_char(p_vidd));
       end;
-    
+
       bars_audit.trace('%s тип = %s, min.термін = (%s міс, %s дн), max.термін = (%s міс, %s дн)',
                        l_title,
                        to_char(l_termtype),
@@ -2499,12 +2502,12 @@ is
                        to_char(l_termd),
                        to_char(l_termm_max),
                        to_char(l_termd_max));
-    
+
       bars_audit.trace('%s индив.срок = (%s мес, %s дн)',
                        l_title,
                        to_char(p_duration),
                        to_char(p_duration_days));
-    
+
       begin
         select val
           into l_ea_pens
@@ -2515,7 +2518,7 @@ is
         when no_data_found then
           l_ea_pens := 0;
       end;
-    
+
       begin
         select count(*)
           into l_pens_count
@@ -2546,12 +2549,12 @@ is
           bars_error.raise_nerror(g_modcode, 'CORRTERM_INVALIDATES');
         end if;
       end if;
-    
+
       if (l_termtype != 1) then
         l_termm := nvl(p_duration, l_termm);
         l_termd := nvl(p_duration_days, l_termd);
       end if;
-    
+
       bars_audit.trace('%s => срок договора = (%s мес, %s дн)',
                        l_title,
                        to_char(l_termm),
@@ -2559,7 +2562,7 @@ is
       bars_audit.info('Дебаг помилки COBUMMFO-5060. Передача даних до dpt.p_open_vklad_ex: '||chr(10)||
                             ' vidd = ' ||to_char(p_vidd) || ' rnk = ' || to_char(p_rnk)||
                           ' wb = ' || to_char(p_wb));
-                          
+
       dpt.p_open_vklad_ex(p_vidd        => p_vidd,
                           p_rnk         => p_rnk,
                           p_nd          => p_nd,
@@ -2591,22 +2594,22 @@ is
                           p_nlsamr      => l_nlsa,
                           p_errmsg      => l_errmsg,
                           p_wb          => p_wb);
-    
+
       p_dpt_id := l_dpt;
       bars_audit.trace('%s открыт вклад № %s',
                        l_title,
                        to_char(l_dpt));
-    
+
       bars_audit.trace('%s запуск процедуры расчета льгот',
                        l_title);
-    
+
       dpt_bonus.set_bonus(l_dpt);
-    
+
       bars_audit.trace('%s льготы рассчитаны', l_title);
-    
+
       bars_audit.trace('%s поиск бонусной процентной ставки, не требующей подтверждения',
                        l_title);
-    
+
       select count(1)
         into l_bonus_cnt
         from dpt_bonus_requests t1, dpt_bonuses t2, dpt_requests t3
@@ -2617,30 +2620,30 @@ is
          and t3.reqtype_id = 1 -- запит на бонусну ставку
          and t2.bonus_confirm = 'N' -- не потребує додаткового підтвердження
          and t1.request_state = 'ALLOW'; -- запит погоджено автоматично;
-    
+
       bars_audit.trace('%s по вкладу найдено %s бонусных ставок, переход к подтверждению',
                        l_title,
                        to_char(l_bonus_cnt));
-    
+
       if (l_bonus_cnt > 0) then
         dpt_bonus.set_bonus_rate(l_dpt, p_datz, l_bonusval);
         bars_audit.trace('%s встановлена бонусна ставка = %s',
                          l_title,
                          to_char(l_bonusval));
       end if;
-    
+
       -- для строкових вкладів що відкриваються по ЕБП (Ощадбанк)
       if ((branch_usr.get_branch_param2('DPT_WORKSCHEME', 1) = 'EBP') and
-         ((substr(l_nlsd, 1, 4) in ('2630', '2635') and newnbs.g_state = 0) or (substr(l_nlsd, 1, 4) = '2630' and newnbs.g_state = 1)) 
+         ((substr(l_nlsd, 1, 4) in ('2630', '2635') and newnbs.g_state = 0) or (substr(l_nlsd, 1, 4) = '2630' and newnbs.g_state = 1))
          and (l_migr is null)) then
-      
+
         ebp.set_archive_docid(l_dpt, 0);
-      
+
         -- для відправки SMS повідомленнь про рух коштів по рахунках депозитного договору
         for k in (select accid from dpt_accounts where dptid = l_dpt) loop
-        
+
           update accounts set send_sms = 'Y' where acc = k.accid;
-        
+
           begin
             insert into acc_sms_phones
               (acc, phone, "ENCODE")
@@ -2652,9 +2655,9 @@ is
             when dup_val_on_index then
               bars_error.raise_nerror('DP', 'ERROR_MPNO');
           end;
-        
+
         end loop;
-      
+
       end if;
       --inga 31/03/2015 COBUSUPABS-3311 Если параметр в карточке вида вклада EA_PENS = '1', отправляем документ 143 (Пенсионное удостоверение в ЕА)
       if l_ea_pens = '1' and l_pens_count = 0 and is_pensioner(p_rnk) = 0 then
@@ -2696,15 +2699,15 @@ is
   procedure sign_deposit(p_dptid in dpt_deposit.deposit_id%type) is
     l_title varchar2(60) := 'dpt_web.sign_deposit: ';
   begin
-  
+
     bars_audit.trace(l_title || 'вклад № %s', to_char(p_dptid));
-  
+
     update dpt_deposit set status = 0 where deposit_id = p_dptid;
-  
+
     if (sql%rowcount = 0) then
       bars_error.raise_nerror(g_modcode, g_dptnotfound, to_char(p_dptid));
     end if;
-  
+
   end sign_deposit;
   -- ======================================================================================
   procedure create_text(p_id   in cc_docs.id%type,
@@ -2714,12 +2717,12 @@ is
     l_title varchar2(60) := 'dpt_web.create_text: ';
     l_id    cc_docs.id%type;
   begin
-  
+
     bars_audit.trace(l_title || 'договор № %s, ДС № %s, шаблон %s',
                      to_char(p_nd),
                      to_char(p_adds),
                      p_id);
-  
+
     -- есть запись с пустым текстом
     update cc_docs
        set text = p_text, version = sysdate
@@ -2727,9 +2730,9 @@ is
        and nd = p_nd
        and adds = p_adds
        and text is null;
-  
+
     if sql%rowcount = 0 then
-    
+
       begin
         -- проверим, возможно есть запись с непустым текстом
         select id
@@ -2753,13 +2756,13 @@ is
             (p_id, p_nd, p_adds, p_text, sysdate, 1);
           bars_audit.trace(l_title || 'добавили запись');
       end;
-    
+
     else
-    
+
       bars_audit.trace(l_title || 'заполнен текст пустого договора / ДС');
-    
+
     end if;
-  
+
   end create_text;
   -- ======================================================================================
   procedure prolongation_create_text(p_id   in cc_docs.id%type,
@@ -2768,33 +2771,33 @@ is
     l_title varchar2(60) := 'dpt_web.prolongation_create_text: ';
     l_id    cc_docs.id%type;
   begin
-  
+
     bars_audit.trace(l_title || 'договор № %s, ДС № 0, шаблон %s',
                      to_char(p_nd),
                      p_id);
-  
+
     -- есть запись с пустым текстом
     update cc_docs
        set text = p_text, version = sysdate
      where id = p_id
        and nd = p_nd
        and adds = 0;
-  
+
     if sql%rowcount = 0 then
-    
+
       -- запись остутствует -> добавим
       insert into cc_docs
         (id, nd, adds, text, version, state)
       values
         (p_id, p_nd, 0, p_text, sysdate, 1);
       bars_audit.trace(l_title || 'добавили запись');
-    
+
     else
-    
+
       bars_audit.trace(l_title || 'заполнен текст договора / ДС');
-    
+
     end if;
-  
+
   end prolongation_create_text;
   -- ======================================================================================
   function acc_closing_permitted(p_acc in accounts.acc%type,
@@ -2809,19 +2812,19 @@ is
     l_bdate date := gl.bdate;
     l_dapp  date;
   begin
-  
+
     bars_audit.trace('%s entry, acc=>%s, sos=>%s, gl.bdate=>%s',
                      title,
                      to_char(p_acc),
                      to_char(p_sos),
                      to_char(l_bdate, 'dd.mm.yyyy'));
-  
+
     select max(fdat)
       into l_dapp
       from saldoa
      where dos + kos > 0
        and acc = p_acc;
-  
+
     begin
       select 1
         into l_flag
@@ -2838,10 +2841,10 @@ is
       when no_data_found then
         l_flag := 0;
     end;
-  
+
     bars_audit.trace('%s exit with %s', title, to_char(l_flag));
     return l_flag;
-  
+
   end acc_closing_permitted;
 
   function dpt_closing_permitted(p_dpt in dpt_deposit.deposit_id%type)
@@ -2864,7 +2867,7 @@ is
       when no_data_found then
         l_flag := 1;
     end;
-  
+
     if l_flag = 0 then
       bars_audit.trace('%s Вклад %s на малолітню особу - не закриваємо',
                        title,
@@ -2880,12 +2883,12 @@ is
     title  varchar2(60) := 'dptweb.clospermit:';
     l_flag number(1) := 0;
   begin
-  
+
     bars_audit.trace('%s entry, dptid=>%s, sos=>%s',
                      title,
                      to_char(p_dptid),
                      to_char(p_sos));
-  
+
     begin
       select 1
         into l_flag
@@ -2904,10 +2907,10 @@ is
       when no_data_found then
         l_flag := 0;
     end;
-  
+
     bars_audit.trace('%s exit with %s', title, to_char(l_flag));
     return l_flag;
-  
+
   end closing_permitted;
 
   -- ======================================================================================
@@ -2917,9 +2920,9 @@ is
     title  varchar2(60) := 'dptweb.check_belongs_credit: ';
     l_flag number(1);
   begin
-  
+
     bars_audit.trace('%s entry, acc=>%s', title, to_char(p_acc));
-  
+
     begin
       select 1
         into l_flag
@@ -2931,11 +2934,11 @@ is
       when no_data_found then
         l_flag := 0;
     end;
-  
+
     bars_audit.trace('%s exit with %s', title, to_char(l_flag));
-  
+
     return l_flag;
-  
+
   end check_belongs_credit;
 
   -- ======================================================================================
@@ -2946,12 +2949,12 @@ is
                            p_delbonus in number default 0) is
     l_title varchar(60) := 'dpt_web.close_requests: ';
   begin
-  
+
     bars_audit.trace('%s договор № %s, тип  запроса %s',
                      l_title,
                      to_char(p_dptid),
                      p_typecode);
-  
+
     -- запросы на изменение ставки согл.ДС, на удаление, на отмену комиссий
     <<req_loop>>
     for req in (select r.req_id, t.reqtype_code type_code, r.branch
@@ -2962,12 +2965,12 @@ is
                    and (p_typecode is null or t.reqtype_code = p_typecode)
                    and t.reqtype_code != 'BONUS'
                  order by 2, 1 desc) loop
-    
+
       bars_audit.trace('%s запрос № %s, тип  запроса %s',
                        l_title,
                        to_char(req.req_id),
                        req.type_code);
-    
+
       if req.type_code = 'DELETE_DEAL' then
         -- найден необработанный запрос (№ %s) на удаление договора №
         bars_error.raise_nerror(g_modcode,
@@ -2982,16 +2985,16 @@ is
         bars_audit.trace('%s неопознанный тип запроса',
                          l_title);
       end if;
-    
+
     end loop request_loop;
     bars_audit.trace('%s выполнено удаление необработанных запросов по договору № %s',
                      l_title,
                      to_char(p_dptid));
-  
+
     bars_audit.trace('%s признак удаления запросов на получение льгот - %s',
                      l_title,
                      to_char(p_delbonus));
-  
+
     <<bonus_loop>>
     for bonus in (select r.dpt_id, r.bonus_id, q.req_id, r.request_state
                     from dpt_bonus_requests r,
@@ -3003,11 +3006,11 @@ is
                    where r.dpt_id = q.dpt_id(+)
                      and r.dpt_id = p_dptid
                    order by 1) loop
-    
+
       bars_audit.trace('%s запрос на получение льготы № %s',
                        l_title,
                        to_char(bonus.bonus_id));
-    
+
       if p_delbonus = 1 then
         bars_audit.trace('%s физическое удаление запроса',
                          l_title);
@@ -3030,13 +3033,13 @@ is
                            to_char(bonus.bonus_id));
         end if;
       end if;
-    
+
     end loop bonus_loop;
-  
+
     bars_audit.trace('%s выполнено удаление запросов по договору № %s',
                      l_title,
                      to_char(p_dptid));
-  
+
   end close_requests;
 
   -- ======================================================================================
@@ -3053,9 +3056,9 @@ is
                      p_type,
                      to_char(p_dptid),
                      to_char(p_accid));
-  
+
     if p_type = 'DPT' then
-    
+
       bars_audit.trace('%s закрытие всех доп.соглашений',
                        l_title);
       update dpt_agreements
@@ -3072,33 +3075,33 @@ is
       close_requests(p_dptid    => p_dptid,
                      p_typecode => null,
                      p_delbonus => 0);
-    
+
       -- закрытие договора
       delete from dpt_deposit where deposit_id = p_dptid;
-    
+
       if sql%rowcount = 0 then
         bars_error.raise_nerror(g_modcode,
                                 'DPT_CLOSE_ERR',
                                 to_char(p_dptid));
       else
-      
+
         bars_audit.trace('%s закрыт договор № %s',
                          l_title,
                          to_char(p_dptid));
         close_sto_argmnt(p_dptid    => p_dptid,
                          p_accid    => null,
                          p_argmntid => null);
-      
+
       end if;
-    
+
     elsif p_type = 'ACC' then
-    
+
       -- закрытие счета
       update bars.accounts
          set dazs = decode(daos, p_dat, dat_next_u(p_dat, 1), p_dat)
        where acc = p_accid
          and dazs is null;
-    
+
       -- счет м.д. закрыт (последствия миграции)
       -- IF SQL%ROWCOUNT = 0 THEN
       --   bars_error.raise_nerror(g_modcode, 'ACC_CLOSE_ERR', to_char(p_accid));
@@ -3107,13 +3110,13 @@ is
                        l_title,
                        to_char(p_accid));
       -- END IF;
-    
+
     else
-    
+
       null;
-    
+
     end if;
-  
+
   end close_to_archive;
   -- ======================================================================================
   function dpt_del_enabled(p_dptid in dpt_deposit.deposit_id%type,
@@ -3122,11 +3125,11 @@ is
     l_title  varchar2(60) := 'dpt_web.dpt_del_enabled: ';
     l_enable number(1); /* 0 - нельзя удалить, 1 - удаление разрешено */
   begin
-  
+
     bars_audit.trace(l_title || 'договор № %s', to_char(p_dptid));
-  
+
     l_enable := 0;
-  
+
     -- Проверки:
     -- 1. дата заключения договора - текущая банковская дата (или p_dat)
     -- 2. по договору отсутствуют завизированные документы
@@ -3140,7 +3143,7 @@ is
                      to_char(p_dptid),
                      to_char(l_enable));
     return l_enable;
-  
+
   exception
     when no_data_found then
       bars_audit.trace(l_title || 'закрытие договора № %s недопустимо',
@@ -3160,15 +3163,15 @@ is
     l_strpar  varchar2(50);
     l_errmsg  g_errmsg%type;
   begin
-  
+
     bars_audit.trace(l_title || 'договор № %s', to_char(p_dptid));
-  
+
     /* Удаление депозитов запрещено. */
-  
+
     bars_error.raise_nerror(g_modcode,
                             g_proc_deprecated,
                             'dpt_web.dpt_delete');
-  
+
     /*
       -- допустимо ли удаление
       IF dpt_del_enabled (p_dptid, p_dat) != 1 THEN
@@ -3176,7 +3179,7 @@ is
          bars_error.raise_nerror(g_modcode, 'DPT_CLOSE_VETO', to_char(p_dptid), l_errmsg);
       END IF;
       bars_audit.trace(l_title||'удаление допустимо');
-    
+
       -- счета по договору
       BEGIN
         SELECT d.acc, i.acra, decode(v.bsa, NULL, NULL, i.acrb), d.dpt_d
@@ -3192,7 +3195,7 @@ is
       END;
       bars_audit.trace(l_title||' счета по договору (%s, %s, %s)',
                        to_char(l_accd), to_char(l_accp), to_char(l_acca));
-    
+
       -- сторно всех незавизированных документов
       kill_dpt_payments (p_dptid     => p_dptid,
                          p_ref       => 0,
@@ -3201,7 +3204,7 @@ is
                          p_levelid   => 3,
                          p_fullback  => 1,
                          p_novisa    => 0);
-    
+
       -- закрытие вклада
       BEGIN
         close_to_archive (p_type   => 'DPT',
@@ -3217,12 +3220,12 @@ is
            RAISE;
          END IF;
       END;
-    
+
       -- удалим техн.вклад, если он есть
       IF l_techdpt IS NOT NULL THEN
          dpt_delete (l_techdpt, p_dat);
       END IF;
-    
+
       -- закрытие депозитного счета
       BEGIN
         close_to_archive (p_type   => 'ACC',
@@ -3238,7 +3241,7 @@ is
            RAISE;
          END IF;
       END;
-    
+
       -- закрытие счета начисленных %%
       BEGIN
         close_to_archive (p_type   => 'ACC',
@@ -3254,7 +3257,7 @@ is
            RAISE;
          END IF;
       END;
-    
+
       IF l_acca IS NOT NULL THEN
          -- закрытие счета амортизации начисленных %%
          BEGIN
@@ -3289,29 +3292,29 @@ is
       l_title varchar(60) := 'dpt_web.change_deposit_type.reverse_all_agreements: ';
       l_cnt   number(38);
     begin
-    
+
       bars_audit.trace('%s договор № %s',
                        l_title,
                        to_char(l_dptid));
-    
+
       <<agreement_loop>>
       for agr in (select agrmnt_id, agrmnt_num, agrmnt_date, agrmnt_type
                     from dpt_agreements
                    where dpt_id = l_dptid
                      and agrmnt_state = 1
                    order by 1 desc) loop
-      
+
         bars_audit.trace('%s ДС № %s от %s (%s), тип %s',
                          l_title,
                          to_char(agr.agrmnt_num),
                          to_char(agr.agrmnt_date, 'dd.mm.yyyy'),
                          to_char(agr.agrmnt_id),
                          to_char(agr.agrmnt_type));
-      
+
         p_reverse_agrement(agr.agrmnt_id);
-      
+
       end loop agreement_loop;
-    
+
       -- это волшебное слово - рекурсия!
       select count(*)
         into l_cnt
@@ -3321,11 +3324,11 @@ is
       if l_cnt > 0 then
         reverse_all_agreements(p_dptid);
       end if;
-    
+
     end reverse_all_agreements;
     -------------------
   begin
-  
+
     bars_audit.trace('%s договор № %s, вид договора %s, сумма договора %s',
                      l_title,
                      to_char(p_dptid),
@@ -3342,7 +3345,7 @@ is
                      to_char(l_dptrow.status),
                      to_char(l_dptrow.datz, 'dd.mm.yyyy'),
                      to_char(l_dptrow.dat_begin, 'dd.mm.yyyy'));
-  
+
     if (l_dptrow.dat_begin != l_bankdate) or
        (l_dptrow.datz != trunc(sysdate) or (l_dptrow.status is not null) or
        closing_permitted(p_dptid, 1) != 1) then
@@ -3351,7 +3354,7 @@ is
                               'CHG_DPTYPE_DENIED',
                               to_char(p_dptid));
     end if;
-  
+
     bars_audit.trace('%s удаление всех активных доп.соглашений по договору',
                      l_title);
     reverse_all_agreements(p_dptid);
@@ -3369,13 +3372,13 @@ is
                       p_levelid   => 3,
                       p_fullback  => 1,
                       p_novisa    => 1);
-  
+
     bars_audit.trace('%s удаление текса договора',
                      l_title);
     delete from cc_docs
      where nd = p_dptid
        and nvl(adds, 0) = 0;
-  
+
     bars_audit.trace('%s изменение вида договора',
                      l_title);
     dpt.update_dpt_type(p_dptid        => p_dptid,
@@ -3393,14 +3396,14 @@ is
                         p_dptrcpname   => null,
                         p_comment      => p_comment);
     bars_audit.trace('%s вид договора изменен', l_title);
-  
+
     bars_audit.trace('%s запуск процедуры расчета льгот',
                      l_title);
-  
+
     dpt_bonus.set_bonus(p_dptid);
-  
+
     bars_audit.trace('%s льготы рассчитаны', l_title);
-  
+
   end change_deposit_type;
   -- ======================================================================================
   procedure ivalidate_deposit_accounts(p_rcpacc in dpt_deposit.nls_d%type, -- счет получателя
@@ -3408,7 +3411,7 @@ is
    is
     l_iscardacc number(1);
   begin
-  
+
     if (p_rcpacc is not null and p_rcpmfo is null) or
        (p_rcpacc is null and p_rcpmfo is not null) then
       -- некорректно заданы параметры перечисления депозита/процентов (МФО, счет)
@@ -3417,9 +3420,9 @@ is
                               p_rcpmfo,
                               p_rcpacc);
     end if;
-  
+
     l_iscardacc := 0;
-  
+
     -- проверка контр.разряда для (не)карточных счетов
     if (p_rcpacc is not null and l_iscardacc = 0) then
       if p_rcpacc != vkrzn(substr(p_rcpmfo, 1, 5), p_rcpacc) then
@@ -3430,7 +3433,7 @@ is
                                 p_rcpmfo);
       end if;
     end if;
-  
+
   end ivalidate_deposit_accounts;
   -- ======================================================================================
   --  Изменение параметров выплаты процентов и возврата вклада
@@ -3459,7 +3462,7 @@ is
     l_intrcpname    dpt_deposit.name_p%type;
     l_intrcpidcode  dpt_deposit.okpo_p%type;
   begin
-  
+
     bars_audit.trace(title ||
                      ' entry, dptid=>%s, intrcp=>(%s,%s,%s,%s), deprcp=>(%s,%s,%s,%s)',
                      to_char(p_dptid),
@@ -3471,7 +3474,7 @@ is
                      p_intrcpacc,
                      p_intrcpname,
                      p_intrcpidcode);
-  
+
     -- поиск вклада
     begin
       select * into l_dptrow from dpt_deposit where deposit_id = p_dptid;
@@ -3479,7 +3482,7 @@ is
       when no_data_found then
         bars_error.raise_nerror(g_modcode, g_dptnotfound, to_char(p_dptid));
     end;
-  
+
     -- поиск клиента
     begin
       select substr(nmk, 1, 38), okpo
@@ -3496,7 +3499,7 @@ is
                      title,
                      l_custname,
                      l_custcode);
-  
+
     -- признак капитализации начисленных процентов на депозитный счет
     begin
       select nvl(comproc, 0), nvl(disable_add, 0)
@@ -3512,7 +3515,7 @@ is
     bars_audit.trace('%s comproc - %s disable_add - %s',
                      title,
                      to_char(l_comproc));
-  
+
     -- перевірка рах.випл.% для вкладів які не можна поповнювати
     if (l_disabadd = 1 and p_intrcpmfo = l_mfo) then
       begin
@@ -3521,7 +3524,7 @@ is
           from accounts
          where kv = l_dptrow.kv
            and nls = l_intrcpacc;
-      
+
         -- якщо асс рах. виплати %% = асс депозитного рахунка
         if l_accid = l_dptrow.acc then
           bars_error.raise_nerror(g_modcode,
@@ -3533,7 +3536,7 @@ is
           null;
       end;
     end if;
-  
+
     -- для вклада с капитализацией процентов параметры выплаты %% не меняются
     if (l_comproc = 1 and l_dptrow.nls_p is not null) then
       l_intrcpacc    := substr(l_dptrow.nls_p, 1, 14);
@@ -3546,7 +3549,7 @@ is
       l_intrcpname   := substr(p_intrcpname, 1, 38);
       l_intrcpidcode := substr(p_intrcpidcode, 1, 14);
     end if;
-  
+
     -- проверяем, изменились ли счета перечисления депозита / процентов
     if (nvl(l_dptrow.name_p, '.') != nvl(p_intrcpname, '.') or
        nvl(l_dptrow.okpo_p, '.') != nvl(p_intrcpidcode, '.') or
@@ -3556,17 +3559,17 @@ is
        nvl(l_dptrow.okpo_d, '.') != nvl(p_restrcpidcode, '.') or
        nvl(l_dptrow.nls_d, '.') != nvl(p_restrcpacc, '.') or
        nvl(l_dptrow.mfo_d, '.') != nvl(p_restrcpmfo, '.')) then
-    
+
       bars_audit.trace('%s int/dep-receipt params has changed', title);
-    
+
       -- валидация параметров перечисление депозита
       ivalidate_deposit_accounts(p_restrcpacc, p_restrcpmfo);
       bars_audit.trace('%s deposit receipt params succ.checked', title);
-    
+
       -- валидация параметров выплаты процентов
       ivalidate_deposit_accounts(l_intrcpacc, l_intrcpmfo);
       bars_audit.trace('%s interest receipt params succ.checked', title);
-    
+
       -- поиск счета для перечисления депозита
       if (p_restrcpacc is not null and p_restrcpmfo = l_mfo) then
         begin
@@ -3584,17 +3587,17 @@ is
                          title,
                          to_char(l_accid));
       end if;
-    
+
       if (p_restrcpacc is not null) then
         l_restrcpname   := substr(nvl(p_restrcpname, l_custname), 1, 38);
         l_restrcpidcode := substr(nvl(p_restrcpidcode, l_custcode), 1, 14);
       end if;
-    
+
       if (l_intrcpacc is not null) then
         l_intrcpname   := substr(nvl(l_intrcpname, l_custname), 1, 38);
         l_intrcpidcode := substr(nvl(l_intrcpidcode, l_custcode), 1, 14);
       end if;
-    
+
       update dpt_deposit
          set mfo_d  = substr(p_restrcpmfo, 1, 12),
              nls_d  = substr(p_restrcpacc, 1, 14),
@@ -3607,7 +3610,7 @@ is
              name_p = substr(l_intrcpname, 1, 38),
              okpo_p = substr(l_intrcpidcode, 1, 14)
        where deposit_id = p_dptid;
-    
+
       if sql%rowcount = 0 then
         bars_error.raise_nerror(g_modcode,
                                 'UPD_DEPPAYOFFPARAMS_FAILED',
@@ -3619,14 +3622,14 @@ is
                        title,
                        p_restrcpmfo,
                        p_restrcpacc);
-    
+
       update int_accn
          set namb = substr(l_intrcpname, 1, 38),
              nlsb = substr(l_intrcpacc, 1, 14),
              mfob = substr(l_intrcpmfo, 1, 12)
        where acc = l_dptrow.acc
          and id = 1;
-    
+
       if sql%rowcount = 0 then
         bars_error.raise_nerror(g_modcode,
                                 'UPD_INTPAYOFFPARAMS_FAILED',
@@ -3638,15 +3641,15 @@ is
                        title,
                        l_intrcpmfo,
                        l_intrcpacc);
-    
+
     else
-    
+
       bars_audit.trace('%s int/dep-receipt params hasn''t changed', title);
-    
+
     end if;
-  
+
     bars_audit.trace('%s exit', title);
-  
+
   end change_deposit_accounts;
 
   -- =============================================================================
@@ -3679,7 +3682,7 @@ is
                    p_dptrest     => l_dptrest, -- сумма депозита к выплате
                    p_intrest     => l_intrest, -- сумма процентов к выплате
                    p_int2pay_ing => l_int2pay_ing); -- shtraf ); -- сумма процентов к выплате
-  
+
     p_acrsum := l_intrest;
   end p_write_down;
 
@@ -3690,7 +3693,7 @@ is
     title      varchar2(60) := 'dpt_web.get_tax_rate: ';
     l_tax_rate number;
   begin
-  
+
     begin
       l_tax_rate := to_number(getglobaloption('TAX_INT'), '99.9999');
     exception
@@ -3705,9 +3708,9 @@ is
           raise;
         end if;
     end;
-  
+
     return l_tax_rate;
-  
+
   end get_tax_rate;
 
   -- ======================================================================================
@@ -3767,15 +3770,15 @@ is
     l_errmsg   g_errmsg%type;
     l_errflag  boolean;
   begin
-  
+
     bars_audit.trace('%s договор № %s, сумма штрафа = %s',
                      l_title,
                      to_char(p_dptid),
                      to_char(p_penalty));
-  
+
     bars_audit.trace('%s вызов процедуры dpt_web.global_penalty',
                      l_title);
-  
+
     global_penalty(p_dptid       => p_dptid, -- идентификатор договора
                    p_date        => l_bdate, -- дата снятия (текущая)
                    p_fullpay     => 1, -- 1-расторжение, 0-част.снятие
@@ -3787,14 +3790,14 @@ is
                    p_dptrest     => p_dptrest, -- сумма депозита к выплате
                    p_intrest     => p_intrest, -- сумма процентов к выплате
                    p_int2pay_ing => p_int2pay_ing);
-  
+
     bars_audit.trace('%s сумма депозита к выплате = %s',
                      l_title,
                      to_char(p_dptrest));
     bars_audit.trace('%s сумма процентов к выплате = %s',
                      l_title,
                      to_char(p_intrest));
-  
+
   end penalty_payment;
   -- ======================================================================================
   procedure change_deposit_owner(p_dptid  in dpt_deposit.deposit_id%type,
@@ -3813,13 +3816,13 @@ is
                        l_title,
                        to_char(p_accid),
                        to_char(p_custid));
-    
+
       -- перерегистрация счетов
       update accounts
          set rnk = p_custid
        where acc = p_accid
          and dazs is null;
-    
+
       if sql%rowcount = 0 then
         -- ошибка при перерегистрации счета (acc=%s) на клиента № %s
         bars_error.raise_error(g_modcode,
@@ -3827,18 +3830,18 @@ is
                                to_char(p_accid),
                                to_char(p_custid));
       end if;
-    
+
       bars_audit.trace('%s счет acc=%s перерегистрирован на клиента № %s',
                        l_title,
                        to_char(p_accid),
                        to_char(p_custid));
-    
+
     end change_account_owner;
-  
+
   begin
-  
+
     bars_audit.trace('%s договор № %s', l_title, to_char(p_dptid));
-  
+
     -- счета, обслуживающие данный депозитный договор
     begin
       select i.acc,
@@ -3864,7 +3867,7 @@ is
                      to_char(l_accp),
                      to_char(l_acca),
                      to_char(l_acct));
-  
+
     begin
       select acc
         into l_acct
@@ -3880,24 +3883,24 @@ is
     bars_audit.trace('%s есть технический счет acc=%s',
                      l_title,
                      to_char(l_acct));
-  
+
     -- перерегистрация счетов
     change_account_owner(l_accd, p_custid);
-  
+
     change_account_owner(l_accp, p_custid);
-  
+
     if l_acca is not null then
       change_account_owner(l_acca, p_custid);
     end if;
-  
+
     if l_acct is not null then
       change_account_owner(l_acct, p_custid);
     end if;
-  
+
     bars_audit.trace('%s выполнена перерегистрация счетов по договору № %s',
                      l_title,
                      to_char(p_dptid));
-  
+
     -- перерегистрация депозита
     -- та оновлення ОКПО рах.для капіт.% в зв'язку із зміною РНК
     update dpt_deposit
@@ -3907,7 +3910,7 @@ is
                            (select okpo from customer where rnk = p_custid),
                            okpo_p)
      where deposit_id = p_dptid;
-  
+
     if sql%rowcount = 0 then
       -- ошибка при перерегистрации вклада № %s на клиента № %s
       bars_error.raise_error(g_modcode,
@@ -3915,11 +3918,11 @@ is
                              to_char(p_dptid),
                              to_char(p_custid));
     end if;
-  
+
     bars_audit.trace('%s выполнена перерегистрация договора № %s',
                      l_title,
                      to_char(p_dptid));
-  
+
   end change_deposit_owner;
   -- ======================================================================================
   procedure create_trustee(p_dptid      in dpt_deposit.deposit_id%type,
@@ -3936,22 +3939,22 @@ is
     l_undoid   dpt_trustee.id%type;
     l_active   number(1);
   begin
-  
+
     bars_audit.trace(l_title ||
                      '№ вклада = %s, тип ДС = %s, ДС № %s от %s',
                      to_char(p_dptid),
                      to_char(p_agrmnttype),
                      p_agrmntnum,
                      to_char(p_agrmntdat, 'DD/MM/YYYY'));
-  
+
     if p_agrmnttype not in (5, 6, 8, 9, 12, 13, 26, 27) then
       -- Тип указанного ДС (= %s) не является ДС о 3-их лицах
       bars_error.raise_error(g_modcode, 226, to_char(p_agrmnttype));
     end if;
-  
+
     -- проверка входных параметров не выполняется, так как процедура вызывается из
     -- процедуры create_agreement, в которой все передаваемые параметры проверены.
-  
+
     -- тип третьего лица
     l_symbtype := case
                     when p_agrmnttype in (5, 6) then
@@ -3965,17 +3968,17 @@ is
                     else
                      'T' -- доверенное лицо
                   end;
-  
+
     bars_audit.trace(l_title ||
                      'владелец вклада № %s, рег.№ и тип 3-го лица = %s / %s',
                      to_char(p_owner),
                      to_char(p_trustee),
                      l_symbtype);
-  
+
     -- идентификатор доп.соглашения о 3-их лицах
     select bars_sqnc.get_nextval('S_DPT_TRUSTEE') into l_id from dual;
     bars_audit.trace(l_title || 'идентификатор ДС = ' || to_char(l_id));
-  
+
     -- делегирование/аннулирование ДС
     if p_agrmnttype in (5, 8, 12, 26, 27) then
       l_active := 1;
@@ -4002,7 +4005,7 @@ is
                                  to_char(p_dptid));
       end;
     end if;
-  
+
     begin
       insert into dpt_trustee
         (id,
@@ -4029,12 +4032,12 @@ is
         -- Ошибка при записи данных о 3-ем лице: %s
         bars_error.raise_error(g_modcode, 228, substr(sqlerrm, 1, 254));
     end;
-  
+
     p_trustid := l_id;
-  
+
     bars_audit.trace(l_title || 'выход из процедуры с параметром = %s',
                      to_char(p_trustid));
-  
+
   end create_trustee;
 
   -- ======================================================================================
@@ -4122,46 +4125,46 @@ is
       l_str   varchar2(254);
       l_value varchar2(254);
     begin
-    
+
       l_str := '/doc/' || trim(p_param) || '/text()';
-    
+
       if (p_dataxml.extract(l_str) is not null) then
         l_value := p_dataxml.extract(l_str).getstringval();
       else
         l_value := null;
       end if;
-    
+
       return l_value;
-    
+
     end get_data_from_xml;
     ----------------------
-  
+
   begin
-  
+
     bars_audit.trace('%s № вклада = %s, тип ДС = %s, реф.комиссии = %s',
                      l_title,
                      to_char(p_dptid),
                      to_char(p_agrmnttype),
                      to_char(p_comissref));
-  
+
     bars_audit.trace('%s инициатор ДС = %s, 3-е лицо ДС = %s, № ДС о 3-их лицах = %s',
                      l_title,
                      to_char(p_initcustid),
                      to_char(p_trustcustid),
                      to_char(p_trustid));
-  
+
     -- Вычисление глобальных параметров ДС
     -- и проверка корректности входных параметров для ДС всех типов
-  
+
     l_sysdate  := sysdate;
     l_bankdate := bankdate;
     l_branch   := sys_context('bars_context', 'user_branch');
-  
+
     -- идентификатор доп.соглашения
     select bars_sqnc.get_nextval('S_DPT_AGREEMENTS')
       into l_agrmntid
       from dual;
-  
+
     -- вид вклада и рег.№ клиента-владельца вклада
     begin
       select rnk, vidd, kv, limit, acc, datz, dat_begin
@@ -4182,7 +4185,7 @@ is
                      l_title,
                      to_char(l_dptowner),
                      to_char(l_vidd));
-  
+
     if p_initcustid != l_dptowner then
       bars_audit.trace('%s ДС заключается довер.лицом № %s',
                        l_title,
@@ -4192,7 +4195,7 @@ is
                        l_title,
                        to_char(p_initcustid));
     end if;
-  
+
     -- название типа ДС
     begin
       select name, trim(mod_proc)
@@ -4211,15 +4214,15 @@ is
         end if;
     end;
     bars_audit.trace('%s название ДС = %s', l_title, l_typename);
-  
+
     -- номер доп.соглашения
     select to_char(nvl(max(agrmnt_num), 0) + 1)
       into l_agrmntnum
       from dpt_agreements
      where dpt_id = p_dptid;
-  
+
     bars_audit.trace('%s номер ДС = %s', l_title, l_agrmntnum);
-  
+
     -- шаблон ДС
     if p_templateid is null then
       begin
@@ -4245,15 +4248,15 @@ is
     else
       l_templateid := p_templateid;
     end if;
-  
+
     bars_audit.trace('%s шаблон ДС = %s', l_title, l_templateid);
-  
+
     -- Обработка ДС всех типов
-  
+
     if p_agrmnttype in (5, 6, 8, 9, 12, 13, 26, 27) then
-    
+
       bars_audit.trace('%s ДС о 3-их лицах', l_title);
-    
+
       -- ФИО 3-го лица
       begin
         select nmk
@@ -4268,7 +4271,7 @@ is
       bars_audit.trace('%s ФИО 3-го лица = %s',
                        l_title,
                        l_trustname);
-    
+
       -- запись инф-ции о 3-ем лице и соответствующем ДС
       create_trustee(p_dptid      => p_dptid,
                      p_agrmnttype => p_agrmnttype,
@@ -4278,18 +4281,18 @@ is
                      p_agrmntdat  => l_bankdate,
                      p_initrustid => p_trustid,
                      p_trustid    => l_trustid);
-    
+
       bars_audit.trace('%s идентификатор ДС о 3-их лицах = %s',
                        l_title,
                        to_char(l_trustid));
-    
+
       if (p_agrmnttype = 12) then
-      
+
         -- Перелік дозволеннх операцій для ДУ про довіреність
         l_denompenya := p_denomcount;
-      
+
         if (l_denompenya is not null) then
-        
+
           begin
             for i in 1 .. length(to_char(l_denompenya)) loop
               if (substr(to_char(l_denompenya), -i, 1) = '1') then
@@ -4302,18 +4305,18 @@ is
               end if;
             end loop;
           end;
-        
+
         end if;
       end if;
     elsif p_agrmnttype = 2 then
-    
+
       bars_audit.trace('%s ДС на изменение суммы вклада: сумма (НАЛ) = %s, сумма (БЕЗНАЛ) = %s',
                        l_title,
                        to_char(p_amountcash),
                        to_char(p_amountcashless));
-    
+
       l_amount := nvl(p_amountcash, 0) + nvl(p_amountcashless, 0);
-    
+
       if (p_amountcash * p_amountcashless < 0) or (l_amount = 0) then
         -- Неверно указаны суммы НАЛ = %s и БЕЗНАЛ = %s
         bars_error.raise_error(g_modcode,
@@ -4321,7 +4324,7 @@ is
                                to_char(p_amountcash),
                                to_char(p_amountcashless));
       end if;
-    
+
       if l_amount > 0 then
         bars_audit.trace('%s сумма пополнения = %s',
                          l_title,
@@ -4340,21 +4343,21 @@ is
                          to_char(l_acrd_int));
         -- передаю Володе значение l_acrd_int - для выплаты процентов при част.снятии
       end if;
-    
+
       -- <<<  3. Додаткова угода про зміну відсоткової ставки по договору >>>
     elsif p_agrmnttype = 3 then
-    
+
       l_op := null;
-    
+
       bars_audit.trace('%s Дод.угода на зміну ставки (пакет Ексклюзивний), ставка %s вступає в дію з %s',
                        l_title,
                        to_char(p_ratevalue),
                        to_char(p_ratedate, 'dd/MM/yyyy'));
       -- розрахунок бонусної ставки
       l_ratevalue := dpt_web.get_bonus_rate(p_dptid);
-    
+
       if (l_ratevalue > 0) then
-      
+
         begin
           select *
             into l_ratn_row
@@ -4379,39 +4382,39 @@ is
                                         to_char(p_ratereqid));
             end;
         end;
-      
+
         -- якщо фіксована ставка
         if (l_ratn_row.ir is not null) and (l_ratn_row.br is null) then
           l_ratebr := null;
           l_op     := null;
-        
+
         elsif (l_ratn_row.ir is not null) and (l_ratn_row.br = 0) then
           -- фіксована ставка (збочення ГОУ)
           l_ratebr := null;
           l_op     := null;
-        
+
           -- якщо базова ставка
         elsif (l_ratn_row.br is not null) and (l_ratn_row.ir is null) then
           l_ratevalue := l_ratevalue - l_ratn_row.ir;
           l_ratebr    := l_ratn_row.br;
           l_op        := 1;
-        
+
         else
           -- всі інші варіанти
           bars_error.raise_nerror(g_modcode,
                                   'RATE_REVIEW_FAILED',
                                   to_char(p_ratereqid));
-        
+
         end if;
-      
+
         -- %% по новій ставці мають нараховуватися з наступного дня, після дня укладення додаткової угоди з клієнтом,
         -- незалежно від того коли було збільшено залишок по вкладу.
         l_ratedate := (l_bankdate + 1);
-      
+
         bars_audit.trace('%s внутр.№ деп.рах. = %s',
                          l_title,
                          to_char(l_accd));
-      
+
         begin
           insert into int_ratn
             (acc, id, bdat, ir, br, op)
@@ -4447,17 +4450,17 @@ is
         end;
         bars_audit.trace('%s ставка збережена в БД',
                          l_title);
-      
+
       end if;
-    
+
     elsif (p_agrmnttype = 4) then
       -- <<< 4. Додаткова угода про зміну строку договору >>>
-    
+
       bars_audit.trace('%s ДС на изменение периода действия договора: %s - %s',
                        l_title,
                        to_char(p_datbegin, 'dd/MM/yy'),
                        to_char(p_datend, 'dd/MM/yy'));
-    
+
       if (p_datbegin is null or p_datend is null or p_datbegin >= p_datend) then
         -- Неверно задан периода действия договора: %s - %s
         bars_error.raise_error(g_modcode,
@@ -4465,7 +4468,7 @@ is
                                to_char(p_datbegin, 'dd/MM/yyyy'),
                                to_char(p_datend, 'dd/MM/yyyy'));
       end if;
-    
+
       begin
         insert into dpt_extconsent
           (dpt_id, dat_begin, dat_end)
@@ -4475,17 +4478,17 @@ is
         when dup_val_on_index then
           bars_error.raise_error(g_modcode, 241, to_char(p_dptid));
       end;
-    
+
       -- відсоткова ставка на банківську дату зключення ДУ
       l_ratevalue := dpt.f_calc_rate(l_vidd,
                                      0,
                                      0,
                                      fost(l_accd, l_bankdate),
                                      l_bankdate);
-    
+
       -- l_ratevalue := getbrat( l_bankdate, ext.base_rate, l_currency, l_dptamount);
       -- l_ratedate  := p_datbegin;
-    
+
       /*  -- счета, обслуживающие данный депозитный договор
           BEGIN
             SELECT i.acc, i.acra, decode(v.bsa, a.nbs, i.acrb, NULL)
@@ -4503,7 +4506,7 @@ is
           END;
           bars_audit.trace('%s счета по вкладу № %s = (%s, %s, %s)', l_title, to_char(p_dptid),
                            to_char(l_accd), to_char(l_acci), to_char(l_acca));
-      
+
           -- изменение срока действия вклада
           UPDATE dpt_deposit
              SET dat_begin = p_datbegin,
@@ -4514,30 +4517,30 @@ is
              bars_error.raise_error(g_modcode, 241, to_char(p_dptid));
           END IF;
           bars_audit.trace('%s изменен срок действия вклада № %s', l_title, to_char(p_dptid));
-      
+
           -- изменение дат погашения и стоп-дат по начислению процентов по счетам договора
           UPDATE accounts SET mdate = p_datend WHERE acc = l_accd;
           IF SQL%ROWCOUNT = 0 THEN
              -- Ошибка при изменении даты погашения для счета (acc=%s) по вкладу № %s
             bars_error.raise_error(g_modcode, 242, to_char(l_accd), to_char(p_dptid));
-      
+
           END IF;
           bars_audit.trace('%s изменена дата погашения по счету № %s',l_title, to_char(l_accd));
-      
+
           UPDATE accounts SET mdate = p_datend WHERE acc = l_acci;
           IF SQL%ROWCOUNT = 0 THEN
              -- Ошибка при изменении даты погашения для счета (acc=%s) по вкладу № %s
              bars_error.raise_error(g_modcode, 242, to_char(l_acci), to_char(p_dptid));
           END IF;
           bars_audit.trace('%s изменена дата погашения по счету № %s', l_title, to_char(l_acci));
-      
+
           UPDATE int_accn SET stp_dat = p_datend - 1 WHERE id = 1 AND acc = l_accd;
           IF SQL%ROWCOUNT = 0 THEN
              -- Ошибка при изменении стоп-даты по начислению для вклада № %s
              bars_error.raise_error(g_modcode, 243,  to_char(p_dptid));
           END IF;
           bars_audit.trace('%s изменена стоп-дата по начислению процентов для счета № %s', l_title, to_char(l_accd));
-      
+
           IF l_acca IS NOT NULL THEN
              UPDATE accounts SET mdate = p_datend WHERE acc = l_acca;
              IF SQL%ROWCOUNT = 0 THEN
@@ -4545,7 +4548,7 @@ is
                 bars_error.raise_error(g_modcode, 242, to_char(l_acca), to_char(p_dptid));
              END IF;
              bars_audit.trace('%s изменена дата погашения по счету № %s', l_title, to_char(l_acca));
-      
+
              UPDATE int_accn SET acr_dat = p_datbegin, stp_dat = p_datend WHERE id = 0 AND acc = l_acca;
              IF SQL%ROWCOUNT = 0 THEN
                 -- Ошибка при изменении стоп-даты по начислению для вклада № %s
@@ -4554,17 +4557,17 @@ is
              bars_audit.trace('%s изменены даты в процентной карточке счета № %s', l_title, to_char(l_acca));
           END IF;
       */
-    
+
     elsif p_agrmnttype = 7 then
-    
+
       bars_audit.trace('%s ДС о вступлении 3-го лица в права вкладчика',
                        l_title);
-    
+
       l_trustid := p_trustid;
       bars_audit.trace('%s код ДС о 3-их лицах, согласно которому данное дов.лицо вступает в права № %s',
                        l_title,
                        to_char(l_trustid));
-    
+
       -- параметры ДС, согласно которому 3-е лицо вступает в права
       begin
         select * into l_trust from dpt_trustee where id = l_trustid;
@@ -4573,7 +4576,7 @@ is
           -- Не найдено ДС о 3-их лицах № %s
           bars_error.raise_error(g_modcode, 244, to_char(l_trustid));
       end;
-    
+
       -- ФИО 3-го лица
       begin
         select nmk
@@ -4588,7 +4591,7 @@ is
       bars_audit.trace('%s ФИО 3-го лица = %s',
                        l_title,
                        l_trustname);
-    
+
       l_msg := case
                  when l_trust.dpt_id != p_dptid then
                   '(dpt)'
@@ -4603,18 +4606,18 @@ is
         -- Не корректно задан идентификатор ДС о 3-их лицах № %s: %s
         bars_error.raise_error(g_modcode, 245, to_char(l_trustid), l_msg);
       end if;
-    
+
       -- перерегистрация договора и счетов, обслуживающих данный договор
       change_deposit_owner(p_dptid => p_dptid, p_custid => p_trustcustid);
-    
+
       bars_audit.trace('%s выполнена перерегистрация договора № %s на клиента № %s',
                        l_title,
                        to_char(p_dptid),
                        to_char(p_trustcustid));
-    
+
     elsif (p_agrmnttype = 10 or p_agrmnttype = 11 or p_agrmnttype = 20 or
           p_agrmnttype = 34) then
-    
+
       if p_agrmnttype = 10 then
         bars_audit.trace('%s ДС о перечислении вклада и %% на текущий счет',
                          l_title);
@@ -4628,7 +4631,7 @@ is
         bars_audit.trace('%s ДС о відмові від перерахування вкладу и %% на карткові/поточні рахунки',
                          l_title);
       end if;
-    
+
       if (p_agrmnttype != 34) then
         -- реквизиты для перечисления суммы депозита
         l_dataxml           := xmltype(p_transferdpt);
@@ -4638,14 +4641,14 @@ is
         l_transferdptname   := substr(get_data_from_xml(l_dataxml, 'nmk'),
                                       0,
                                       38); --довжина поля виходила за рамки 38 символів.
-      
+
         bars_audit.trace('%s реквизиты для виплати вкладу (Mfo=%s, Nls=%s, Nms=%s, IdCode=%s)',
                          l_title,
                          l_transferdptmfo,
                          l_transferdptacc,
                          l_transferdptname,
                          l_transferdptidcode);
-      
+
         -- реквизиты для выплаты процентов
         l_dataxml           := xmltype(p_transferint);
         l_transferintacc    := get_data_from_xml(l_dataxml, 'nls');
@@ -4663,14 +4666,14 @@ is
         l_transferintidcode := null;
         l_transferintname   := null;
       end if;
-    
+
       bars_audit.trace('%s реквизиты для виплати відсотків (Mfo=%s, Nls=%s, Nms=%s, IdCode=%s)',
                        l_title,
                        l_transferintmfo,
                        l_transferintacc,
                        l_transferintname,
                        l_transferintidcode);
-    
+
       change_deposit_accounts(p_dptid         => p_dptid,
                               p_intrcpname    => l_transferintname,
                               p_intrcpidcode  => l_transferintidcode,
@@ -4682,12 +4685,12 @@ is
                               p_restrcpmfo    => l_transferdptmfo);
       --встановлення ознаки Депозит застава по кредиту
       if p_agrmnttype = 20 then
-      
+
         update dpt_depositw d
            set d.value = to_char(l_transferintacc)
          where dpt_id = p_dptid
            and tag = 'CPAWN';
-      
+
         if sql%rowcount = 0 then
           insert into dpt_depositw
             (dpt_id, tag, value)
@@ -4699,18 +4702,18 @@ is
            set t1.blkd = nvl(trim(getglobaloption('ACC_PAWN')), 90) -- 90 - код блокування ЗАСТАВА
          where acc =
                (select acc from dpt_deposit where deposit_id = p_dptid);
-      
+
       end if;
-    
+
       bars_audit.trace('%s изменены реквизиты для  перечисления депозита / выплаты процентов',
                        l_title);
-    
+
     elsif (p_agrmnttype = 28) then
       bars_audit.trace('%s ДУ про переоформлення депозиту на малолітню особу',
                        l_title);
-    
+
       bars_audit.info('ДУ про переоформлення депозиту на малолітню особу');
-    
+
       -- реквизиты для перечисления суммы депозита
       l_dataxml           := xmltype(p_transferdpt);
       l_transferdptacc    := get_data_from_xml(l_dataxml, 'nls');
@@ -4719,28 +4722,28 @@ is
       l_transferdptname   := substr(get_data_from_xml(l_dataxml, 'nmk'),
                                     0,
                                     38); --довжина поля виходила за рамки 38 символів.
-    
+
       bars_audit.trace('%s реквизиты для виплати вкладу (Mfo=%s, Nls=%s, Nms=%s, IdCode=%s)',
                        l_title,
                        l_transferdptmfo,
                        l_transferdptacc,
                        l_transferdptname,
                        l_transferdptidcode);
-    
+
       -- реквизиты для выплаты процентов
       l_dataxml           := xmltype(p_transferint);
       l_transferintacc    := get_data_from_xml(l_dataxml, 'nls');
       l_transferintmfo    := get_data_from_xml(l_dataxml, 'mfo');
       l_transferintidcode := get_data_from_xml(l_dataxml, 'okpo');
       l_transferintname   := get_data_from_xml(l_dataxml, 'nmk');
-    
+
       bars_audit.trace('%s реквизиты для виплати відсотків (Mfo=%s, Nls=%s, Nms=%s, IdCode=%s)',
                        l_title,
                        l_transferintmfo,
                        l_transferintacc,
                        l_transferintname,
                        l_transferintidcode);
-    
+
       change_deposit_accounts(p_dptid         => p_dptid,
                               p_intrcpname    => l_transferintname,
                               p_intrcpidcode  => l_transferintidcode,
@@ -4750,7 +4753,7 @@ is
                               p_restrcpidcode => l_transferdptidcode,
                               p_restrcpacc    => l_transferdptacc,
                               p_restrcpmfo    => l_transferdptmfo);
-    
+
       -- перерегистрация депозита
       -- та оновлення ОКПО рах.для капіт.% в зв'язку із зміною РНК
       update dpt_deposit
@@ -4758,7 +4761,7 @@ is
              okpo_p =
              (select okpo from customer where rnk = p_initcustid)
        where deposit_id = p_dptid;
-    
+
       if sql%rowcount = 0 then
         -- ошибка при перерегистрации вклада № %s на клиента № %s
         bars_error.raise_error(g_modcode,
@@ -4766,16 +4769,16 @@ is
                                to_char(p_dptid),
                                to_char(p_initcustid));
       end if;
-    
+
       -- перерегистрация депозита
       update dpt_trustee
          set fl_act = 0
        where dpt_id = p_dptid
          and typ_tr in ('C', 'M');
-    
+
       bars_audit.trace('%s Власника депозиту змінено на малолітню особу',
                        l_title);
-    
+
       --оформлення довіреності на розпорядника
       begin
         select rnk_tr
@@ -4783,11 +4786,11 @@ is
           from dpt_trustee
          where dpt_id = p_dptid
            and typ_tr = 'M';
-      
+
         --створення референсу на відміну комісії
-      
+
         l_commis_req := dpt_web.create_commis_request(p_dptid, 12);
-      
+
         dpt_web.create_agreement(p_dptid          => p_dptid,
                                  p_agrmnttype     => 12,
                                  p_initcustid     => p_initcustid,
@@ -4812,22 +4815,22 @@ is
                                  p_templateid     => null,
                                  p_freq           => null,
                                  p_access_others  => null);
-      
+
         l_agrmntnum := l_agrmntnum + 1; --необхідно для запису одразу двох ДУ в одній транзакції
       end;
-    
+
     elsif (p_agrmnttype = 14) then
-    
+
       bars_audit.trace('%s ДС о приеме на вклад ветхих купюр, сумма = %s / %s',
                        l_title,
                        to_char(p_denomamount),
                        to_char(l_currency));
-    
+
       if l_dptamount < p_denomamount then
         -- сумма ветхих купюр превышает сумму договора
         bars_error.raise_nerror(g_modcode, 'INVALID_DENOM_AMOUNT');
       end if;
-    
+
       bars_audit.trace('%s процедура расчета суммы комиссии = %s',
                        l_title,
                        l_procname);
@@ -4836,7 +4839,7 @@ is
       bars_audit.trace('%s процедура расчета суммы комиссии после подстановки = %s',
                        l_title,
                        l_procname);
-    
+
       if l_procname is null then
         l_denompenya := 0;
       else
@@ -4846,41 +4849,41 @@ is
       bars_audit.trace('%s сумма комиссии = %s',
                        l_title,
                        to_char(l_denompenya));
-    
+
       -- зміна істотних умов договору
     elsif (p_agrmnttype = 16) then
       null;
-    
+
       -- відмова від автопролонгації договору
     elsif (p_agrmnttype = 17) then
-    
+
       bars_audit.trace('%s відмова від автопролонгації договору # %s',
                        l_title,
                        to_char(p_dptid));
-    
+
       fix_extcancel(p_dptid, 1);
-    
+
     elsif (p_agrmnttype = 18) then
       -- заява про дострокове повернення депозиту
-    
+
       bars_audit.trace('%s заява про дострокове повернення депозиту # %s',
                        l_title,
                        to_char(p_dptid));
-    
+
     elsif (p_agrmnttype = 19) then
       -- ДУ про зміну періодичності виплати відсотків
-    
+
       bars_audit.trace('%s ДУ про зміну періодичності виплати відсотків депозиту # %s (new freq = %s).',
                        l_title,
                        to_char(p_dptid),
                        to_char(p_freq));
-    
+
       if (p_freq is null) then
-      
+
         bars_error.raise_nerror(g_modcode,
                                 'GENERAL_ERROR_CODE',
                                 'Для ДУ №19 не вказано періодичність випалати відсотків.');
-      
+
       else
         begin
           update dpt_deposit d
@@ -4907,7 +4910,7 @@ is
               raise;
             end if;
         end;
-      
+
         if (l_vidd is null) then
           bars_error.raise_nerror(g_modcode,
                                   'GENERAL_ERROR_CODE',
@@ -4916,18 +4919,18 @@ is
           bars_audit.info(l_title || ' змінено вид депозиту по договору #' ||
                           to_char(p_dptid) || ' на vidd=' || l_vidd || '.');
         end if;
-      
+
       end if;
-    
+
     else
-    
+
       null;
-    
+
     end if;
-  
+
     -- Если передан запрос на отмену комиссии
     if (p_comissreqid is not null) then
-    
+
       if (p_comissreqid = -13) then
         -- открытие ДС во время миграции с АРМа Депозит
         -- не проверяем наличие комисии за оформление ДС или запроса на ее отмену
@@ -4941,9 +4944,9 @@ is
         -- Удаляем активный запрос c договора
         delete_commis_request(p_comissreqid);
       end if;
-    
+
     else
-    
+
       -- проверка на обязательность документа комиссии
       if (p_comissref is null) then
         select count(*)
@@ -4951,22 +4954,22 @@ is
           from dpt_vidd_flags
          where id = p_agrmnttype
            and main_tt is not null;
-      
+
         if (l_cnt > 0) then
           bars_error.raise_nerror(g_modcode, commission_doc_required);
         end if;
       end if;
-    
+
     end if;
-  
+
     -- 3. Запись ДС в журнал
-  
+
     bars_audit.trace('%s идентификатор ДС = %s',
                      l_title,
                      to_char(l_agrmntid));
-  
+
     l_agrmntstate := 1;
-  
+
     insert into dpt_agreements
       (agrmnt_id,
        agrmnt_date,
@@ -5027,33 +5030,33 @@ is
        p_transferdpt,
        p_transferint,
        p_docref);
-  
+
     bars_audit.info(l_title || 'создано доп.соглашение № ' ||
                     to_char(l_agrmntnum) || ' к договору № ' ||
                     to_char(p_dptid));
-  
+
     -- запись в доп.реквизит вклада (временно для Володи)
     update dpt_depositw d
        set d.value = to_char(l_agrmntid)
      where dpt_id = p_dptid
        and tag = 'LSTAG';
-  
+
     if sql%rowcount = 0 then
       insert into dpt_depositw
         (dpt_id, tag, value)
       values
         (p_dptid, 'LSTAG', to_char(l_agrmntid));
     end if;
-  
+
     -- 4. Аннулирование предыдущих ДС (при необходимости)
     agreement_termination(p_dptid, p_agrmnttype, l_agrmntid, l_trustid);
-  
+
     p_agrmntid := l_agrmntid;
-  
+
     bars_audit.trace('%s выход из процедуры с параметром = %s',
                      l_title,
                      to_char(p_agrmntid));
-  
+
   end create_agreement;
 
   -- ======================================================================================
@@ -5067,17 +5070,17 @@ is
     l_title varchar2(60) := 'dpt_web.close_agreement: ';
     l_state dpt_agreements.agrmnt_state%type := 0;
   begin
-  
+
     bars_audit.trace('%s инициатор закрытия ДС № %s, закрываемое ДС № %s / %s',
                      l_title,
                      to_char(v_new_agrmntid),
                      to_char(v_agrid),
                      to_char(v_trustid));
-  
+
     if v_trustid is not null then
-    
+
       update dpt_trustee set fl_act = l_state where id = v_trustid;
-    
+
       if sql%rowcount = 0 then
         -- ошибка при закрытии ДС о 3-их лицах № %s к депозитному договору № %s
         bars_error.raise_error(g_modcode,
@@ -5088,13 +5091,13 @@ is
       bars_audit.trace('%s закрыто ДС о 3-их лицах № %s',
                        l_title,
                        to_char(v_trustid));
-    
+
     end if;
-  
+
     update dpt_agreements
        set agrmnt_state = l_state, undo_id = v_new_agrmntid
      where agrmnt_id = v_agrid;
-  
+
     if sql%rowcount = 0 then
       -- ошибка при закрытии ДС № %s к депозитному договору № %s
       bars_error.raise_error(g_modcode,
@@ -5124,19 +5127,19 @@ is
     l_idupd        dpt_techaccounts.dpt_idupd%type;
     l_errmsg       g_errmsg%type;
   begin
-  
+
     bars_audit.trace('%s договор № %s, тип ДС = %s, № ДС = %s, № ДС о 3-их лицах = %s',
                      l_title,
                      to_char(p_dptid),
                      to_char(p_agrmnttype),
                      to_char(p_agrmntid),
                      to_char(p_trustid));
-  
+
     if p_agrmnttype = 7 then
-    
+
       bars_audit.trace('%s ДС о вступлении в права',
                        l_title);
-    
+
       -- аннулирование всех действующих ДС о 3-их лицах
       for prev7 in (select agrmnt_id, agrmnt_num, trustee_id
                       from dpt_agreements
@@ -5145,12 +5148,12 @@ is
                        and agrmnt_state = 1
                        and trustee_id is not null
                      order by 1) loop
-      
+
         bars_audit.trace('%s ДС № %s / %s',
                          l_title,
                          to_char(prev7.agrmnt_id),
                          to_char(prev7.trustee_id));
-      
+
         begin
           close_agreement(p_dptid,
                           prev7.agrmnt_id,
@@ -5173,12 +5176,12 @@ is
               raise;
             end if;
         end;
-      
+
       end loop; -- prev7
-    
+
       -- если есть технический счет, то он перемещается в dpt_techaccounts
       -- SELECT * INTO l_dptrow FROM dpt_deposit WHERE deposit_id = p_dptid;
-    
+
       -- очистка параметров выплаты процентов и возврата депозита
       change_deposit_accounts(p_dptid         => p_dptid,
                               p_intrcpname    => null,
@@ -5191,11 +5194,11 @@ is
                               p_restrcpmfo    => null);
       bars_audit.trace('%s обнулены параметров выплаты процентов и возврата депозита',
                        l_title);
-    
+
     elsif p_trustid is not null then
-    
+
       bars_audit.trace('%s ДС о 3-их лицах', l_title);
-    
+
       -- закрытие того ДС, которое было аннулировано данным  ДС
       begin
         select t.undo_id, p.agrmnt_id, p.agrmnt_num
@@ -5204,12 +5207,12 @@ is
          where a.agrmnt_id = p_agrmntid
            and t.id = p_trustid
            and t.undo_id = p.trustee_id;
-      
+
         bars_audit.trace('%s ДС № %s / %s',
                          l_title,
                          to_char(l_prevagrmtid),
                          to_char(l_prevtrustid));
-      
+
         begin
           close_agreement(p_dptid,
                           l_prevagrmtid,
@@ -5232,18 +5235,18 @@ is
               raise;
             end if;
         end;
-      
+
       exception
         when no_data_found then
           -- данное ДС делегирует права 3-им лицам -> ничего не закрываем
           null;
       end;
-    
+
     else
-    
+
       bars_audit.trace('%s ДС об изменении параметров договора',
                        l_title);
-    
+
       for prev in (select agrmnt_id, agrmnt_num
                      from dpt_agreements
                     where dpt_id = p_dptid
@@ -5260,9 +5263,9 @@ is
                       and p_agrmnttype in (10, 11)
                       and agrmnt_type in (10, 11)
                     order by 1) loop
-      
+
         bars_audit.trace('%s ДС № %s', l_title, to_char(prev.agrmnt_id));
-      
+
         begin
           close_agreement(p_dptid,
                           prev.agrmnt_id,
@@ -5282,11 +5285,11 @@ is
               raise;
             end if;
         end;
-      
+
       end loop; -- prev
-    
+
     end if;
-  
+
   end agreement_termination;
   -- ======================================================================================
   function f_tarif_agreement(p_dptid    dpt_deposit.deposit_id%type,
@@ -5301,12 +5304,12 @@ is
     l_tarif  tarif.kod%type;
     l_amount number(38);
   begin
-  
+
     bars_audit.trace(l_title || 'договор № %s, тариф № %s (№ %s)',
                      to_char(p_dptid),
                      to_char(p_tarifid),
                      to_char(p_tarifid2));
-  
+
     -- параметры вклада
     begin
       select a.nls, a.kv, decode(a.ostc, 0, a.ostb, a.ostc)
@@ -5318,11 +5321,11 @@ is
       when no_data_found then
         bars_error.raise_error(g_modcode, g_dptnotfound, to_char(p_dptid));
     end;
-  
+
     bars_audit.trace(l_title || 'текущий остаток на счете %s = %s',
                      l_nls || '/' || to_char(l_kv),
                      to_char(l_saldo));
-  
+
     -- по какому тарифу работаем
     l_tarif := case
                  when (l_kv = 980 and l_saldo > 2000000) then
@@ -5335,7 +5338,7 @@ is
                   p_tarifid
                end;
     bars_audit.trace(l_title || 'тариф = %s', to_char(l_tarif));
-  
+
     begin
       l_amount := f_tarif(l_tarif, 980, l_nls, l_saldo);
     exception
@@ -5348,9 +5351,9 @@ is
     end;
     bars_audit.trace(l_title || 'сумма комиссии = %s',
                      to_char(l_amount));
-  
+
     return l_amount;
-  
+
   end f_tarif_agreement;
 
   -- ======================================================================================
@@ -5399,38 +5402,38 @@ is
       l_allow   char(1);
       l_reason  varchar2(100);
     begin
-    
+
       l_allow := 'Y';
-    
+
       select * into l_agrec from dpt_agreements where agrmnt_id = p_agrid;
-    
+
       l_amount := nvl(l_agrec.amount_cash, 0) +
                   nvl(l_agrec.amount_cashless, 0);
-    
+
       case
         when (l_agrec.agrmnt_state != 1) then
           -- ДС закрыто
           l_allow  := 'N';
           l_reason := 'ДУ не активна/закрита';
-        
+
         when (l_agrec.bankdate != gl.bdate and
              l_agrec.agrmnt_type not in (17, 25)) then
           -- "несвежее" ДС
           l_allow  := 'N';
           l_reason := 'сторнування дозволено лише в день заключення ДУ';
-        
+
         when (l_agrec.agrmnt_type = 3) then
           -- изменение процентной ставки
           l_allow  := 'N';
           l_reason := 'заборонено сторнуваня ДУ про зміну відсоткової ставки';
-        
+
         when (l_agrec.agrmnt_type = 2 and l_amount <= 0) then
           -- частичное снятие
           l_allow  := 'N';
           l_reason := 'заборонено сторнуваня ДУ про зміну суми депозиту';
-        
+
         else
-        
+
           select count(*)
             into l_cntdocs
             from oper
@@ -5444,15 +5447,15 @@ is
                            from dpt_agreements
                           where agrmnt_id = p_agrid
                             and doc_ref is not null);
-        
+
           if (l_cntdocs > 0) then
             l_allow  := 'N';
             l_reason := 'знайдено ' || to_char(l_cntdocs) ||
                         ' оплачених документів';
           end if;
-        
+
       end case;
-    
+
       if (l_allow = 'N') then
         -- Неможливо сторнувати додаткову угоду № ... від ... до договору № ... (...)
         bars_error.raise_nerror(g_modcode,
@@ -5462,7 +5465,7 @@ is
                                 to_char(l_agrec.dpt_id),
                                 l_reason);
       end if;
-    
+
     end reverse_allowed;
     --------------------------
     function get_data_from_xml(p_dataxml xmltype, p_param varchar2)
@@ -5470,17 +5473,17 @@ is
       l_str   varchar2(254);
       l_value varchar2(254);
     begin
-    
+
       l_str := '/doc/' || trim(p_param) || '/text()';
-    
+
       if (p_dataxml.extract(l_str) is not null) then
         l_value := p_dataxml.extract(l_str).getstringval();
       else
         l_value := null;
       end if;
-    
+
       return l_value;
-    
+
     end get_data_from_xml;
     ----------------------------
     procedure activate_agreement(p_dptid  in dpt_agreements.dpt_id%type,
@@ -5489,9 +5492,9 @@ is
                                  p_agrid  in dpt_agreements.agrmnt_id%type,
                                  p_trsid  in dpt_trustee.id%type) is
     begin
-    
+
       if p_trsid is not null then
-      
+
         update dpt_trustee
            set fl_act = 1, undo_id = null
          where id = p_trsid;
@@ -5503,13 +5506,13 @@ is
         bars_audit.trace('%s восстановлено доп.соглашение о 3-их лицах № %s',
                          l_title,
                          to_char(p_trsid));
-      
+
       end if;
-    
+
       update dpt_agreements
          set agrmnt_state = 1, undo_id = null
        where agrmnt_id = p_agrid;
-    
+
       if sql%rowcount = 0 then
         bars_error.raise_nerror(g_modcode,
                                 'AGREEMENT_NOT_FOUND',
@@ -5522,7 +5525,7 @@ is
                        and da.agrmnt_id = a.agr_id
                        and a.idd = sd.idd
                        and nvl(sd.status_id, 1) = -1)
-        
+
          loop
           sto_all.claim_idd(p_idd        => rec.idd,
                             p_statusid   => 0,
@@ -5532,20 +5535,20 @@ is
       bars_audit.trace('%s восстановлено доп.соглашение № %s',
                        l_title,
                        to_char(p_agrid));
-    
+
       bars_audit.info(l_title || ' восстановлено доп.соглашение № ' ||
                       to_char(p_agrnum) || ' от ' ||
                       to_char(p_agrdat, 'DD/MM/YYYY') ||
                       ' к депозитному договору № ' || to_char(p_dptid));
-    
+
     end activate_agreement;
     ---------------------------
   begin
-  
+
     bars_audit.trace('%s сторнирование доп.соглашения № %s',
                      l_title,
                      to_char(p_agr_id));
-  
+
     -- параметры доп.соглашения
     begin
       select agrmnt_type, dpt_id, trustee_id
@@ -5558,22 +5561,22 @@ is
                                 'AGREEMENT_NOT_FOUND',
                                 to_char(p_agr_id));
     end;
-  
+
     bars_audit.trace('%s тип ДС %s, договор № %s',
                      l_title,
                      to_char(l_agr_type),
                      to_char(l_dpt_id));
-  
+
     -- проверка допустимости торнирования ДС
     reverse_allowed(p_agr_id);
-  
+
     -- ШАГ 1 - предварительные действия
-  
+
     if (l_agr_type = 2) then
-    
+
       bars_audit.trace('%s доп.соглашение про пополнение',
                        l_title);
-    
+
       -- возобновляем все доп.соглашения, отмененные сторнируемым
       for prev_agr in (select agrmnt_id, agrmnt_num, agrmnt_date
                          from dpt_agreements
@@ -5586,10 +5589,10 @@ is
                            p_trsid  => null);
       end loop;
     elsif (l_agr_type = 4) then
-    
+
       bars_audit.trace('%s дод.угода про пролонгацію вкладу',
                        l_title);
-    
+
       -- видаляємо відмітку на пролонгацію догоовору
       delete from bars.dpt_extconsent
        where (dpt_id, dat_begin) in
@@ -5598,7 +5601,7 @@ is
                where deposit_id = l_dpt_id
                  and dat_next_u(dat_end, -5) > glb_bankdate -- ще більше ніж 5 банк.днів до завершення договору
               );
-    
+
       if (sql%rowcount = 0) then
         -- Дана ДУ вже всупила в дію або сплив термін її стрнування
         bars_error.raise_error(g_modcode, 241, to_char(l_dpt_id));
@@ -5607,21 +5610,21 @@ is
                          l_title,
                          to_char(l_dpt_id));
       end if;
-    
+
     elsif (l_agr_type in (5, 8, 12)) then
-    
+
       bars_audit.trace('%s доп.соглашение о правах 3-их лиц',
                        l_title);
-    
+
       bars_audit.trace('%s доп.соглашение № %s не требует доп.действий',
                        l_title,
                        to_char(p_agr_id));
-    
+
     elsif (l_agr_type in (6, 9, 13)) then
-    
+
       bars_audit.trace('%s доп.соглашение об анулировании прав 3-их лиц',
                        l_title);
-    
+
       -- активируем ДС о правах 3-их лиц, которое было отменено данным доп.соглашением
       begin
         select agrmnt_id, trustee_id, agrmnt_num, agrmnt_date
@@ -5638,18 +5641,18 @@ is
       bars_audit.trace('%s первичное доп.соглашение о правах 3-их лиц № %s',
                        l_title,
                        to_char(r_agr_id));
-    
+
       activate_agreement(p_dptid  => l_dpt_id,
                          p_agrnum => r_agr_num,
                          p_agrdat => r_agr_date,
                          p_agrid  => r_agr_id,
                          p_trsid  => r_trustee_id);
-    
+
     elsif (l_agr_type = 7) then
-    
+
       bars_audit.trace('%s доп.соглашение о вступление в права',
                        l_title);
-    
+
       -- текущий владелец договора
       select rnk
         into l_dptowner
@@ -5658,7 +5661,7 @@ is
       bars_audit.trace('%s текущий владелец договора - %s',
                        l_title,
                        to_char(l_dptowner));
-    
+
       -- поиск предыдущего владельца договора
       begin
         select t.rnk_tr
@@ -5679,16 +5682,16 @@ is
       bars_audit.trace('%s предыдущий владелец договора - %s',
                        l_title,
                        to_char(l_rnk));
-    
+
       -- перерегистрация договора и счетов, обслуживающих данный договор
       change_deposit_owner(p_dptid => l_dpt_id, p_custid => l_rnk);
-    
+
       bars_audit.trace('%s выполнена перерегистрация договора № %s с клиента № %s на клиента № %s',
                        l_title,
                        to_char(l_dpt_id),
                        to_char(l_dptowner),
                        to_char(l_rnk));
-    
+
       -- восстановление всех ДС о 3-их лицах, которые были закрыты данным соглашением
       for prev7 in (select agrmnt_id, trustee_id, agrmnt_num, agrmnt_date
                       from dpt_agreements
@@ -5704,26 +5707,26 @@ is
                            p_agrid  => prev7.agrmnt_id,
                            p_trsid  => prev7.trustee_id);
       end loop;
-    
+
     elsif (l_agr_type = 20) then
       --якщо сторнується ДУ про внесення депозиту в заставу по кредиту - знімаємо ознаку та блокування рахунку
-    
+
       update dpt_depositw t1
          set t1.value = null
        where t1.dpt_id = l_dpt_id
          and t1.tag = 'CPAWN';
-    
+
       --зняття блокування основного рахунку по дебету
       update accounts t1
          set t1.blkd = 0
        where t1.acc =
              (select acc from dpt_deposit where deposit_id = l_dpt_id);
-    
+
     elsif (l_agr_type in (10, 11)) then
-    
+
       bars_audit.trace('%s доп.соглашение о перечислении на текущий / карт.счет',
                        l_title);
-    
+
       -- поиск предыдущего доп.соглашения,которое было отменено днным доп.соглашением
       begin
         select agrmnt_id, agrmnt_num, agrmnt_date, transfdpt, transfint
@@ -5732,20 +5735,20 @@ is
          where undo_id = p_agr_id
            and agrmnt_type in (10, 11)
            and agrmnt_state = 0;
-      
+
         activate_agreement(p_dptid  => l_dpt_id,
                            p_agrnum => r_agr_num,
                            p_agrdat => r_agr_date,
                            p_agrid  => r_agr_id,
                            p_trsid  => null);
-      
+
         -- реквизиты для перечисления суммы депозита
         l_dataxml           := xmltype(r_transfdpt);
         l_transferdptacc    := get_data_from_xml(l_dataxml, 'nls');
         l_transferdptmfo    := get_data_from_xml(l_dataxml, 'mfo');
         l_transferdptidcode := get_data_from_xml(l_dataxml, 'okpo');
         l_transferdptname   := get_data_from_xml(l_dataxml, 'nmk');
-      
+
         bars_audit.trace('%s реквизиты для перечисления суммы депозита ' ||
                          '(МФО, счет, наименование, код ОКПО) = (%s,%s,%s,%s)',
                          l_title,
@@ -5753,14 +5756,14 @@ is
                          l_transferdptacc,
                          l_transferdptname,
                          l_transferdptidcode);
-      
+
         -- реквизиты для выплаты процентов
         l_dataxml           := xmltype(r_transfint);
         l_transferintacc    := get_data_from_xml(l_dataxml, 'nls');
         l_transferintmfo    := get_data_from_xml(l_dataxml, 'mfo');
         l_transferintidcode := get_data_from_xml(l_dataxml, 'okpo');
         l_transferintname   := get_data_from_xml(l_dataxml, 'nmk');
-      
+
         bars_audit.trace('%s реквизиты для выплаты процентов ' ||
                          '(МФО, счет, наименование, код ОКПО) = (%s,%s,%s,%s)',
                          l_title,
@@ -5768,7 +5771,7 @@ is
                          l_transferintacc,
                          l_transferintname,
                          l_transferintidcode);
-      
+
       exception
         when no_data_found then
           bars_audit.trace('%s данное ДС-первое, реквизиты берем из карточки договора',
@@ -5786,7 +5789,7 @@ is
            where deposit_id = l_dpt_id
              and action_id = 0;
       end;
-    
+
       change_deposit_accounts(p_dptid         => l_dpt_id,
                               p_intrcpname    => l_transferintname,
                               p_intrcpidcode  => l_transferintidcode,
@@ -5796,22 +5799,22 @@ is
                               p_restrcpidcode => l_transferdptidcode,
                               p_restrcpacc    => l_transferdptacc,
                               p_restrcpmfo    => l_transferdptmfo);
-    
+
       bars_audit.trace('%s изменены реквизиты для перечисления депозита / выплаты процентов',
                        l_title);
-    
+
     elsif l_agr_type = 17 then
       bars_audit.trace('%s доп.соглашение об отказе от автопролонгации',
                        l_title);
-    
+
       verify_extcancel(p_dptid  => l_dpt_id, -- идентификатор вклада
                        p_state  => -1, -- статус (1=виза, -1=сторно)
                        p_reason => 'сторнирование ДУ 17');
-    
+
     end if;
-  
+
     -- ШАГ 2 - сторнирование документов
-  
+
     for doc in (select o.ref ref, o.sos, o.nextvisagrp grp
                   from dpt_agreements d, oper o
                  where d.agrmnt_id = p_agr_id
@@ -5823,12 +5826,12 @@ is
                  where d.agrmnt_id = p_agr_id
                    and d.doc_ref = o.ref
                    and o.sos > 0) loop
-    
+
       bars_audit.trace('%s документ № %s, статус - %s',
                        l_title,
                        to_char(doc.ref),
                        to_char(doc.sos));
-    
+
       kill_dpt_payments(p_dptid     => l_dpt_id,
                         p_ref       => doc.ref,
                         p_docstatus => 3, --  плановые + форвардные
@@ -5839,34 +5842,34 @@ is
       bars_audit.trace('%s сторнирован документ № %s',
                        l_title,
                        to_char(doc.ref));
-    
+
     end loop;
-  
+
     -- ШАГ 3 - сторнирование доп.соглашения
-  
+
     if ((l_trustee_id is not null) and (l_agr_type != 7)) then
-    
+
       update dpt_trustee
          set fl_act = -1, undo_id = null
        where id = l_trustee_id;
-    
+
       if (sql%rowcount = 0) then
         bars_error.raise_nerror(g_modcode,
                                 'INCORRECT_CANCEL_AGREEMENT',
                                 to_char(p_agr_id));
       end if;
-    
+
     end if;
-  
+
     update dpt_agreements set agrmnt_state = -1 where agrmnt_id = p_agr_id;
-  
+
     if sql%rowcount = 0 then
       bars_error.raise_nerror(g_modcode,
                               'AGREEMENT_NOT_FOUND',
                               to_char(p_agr_id));
-    
+
     else
-    
+
       -- ШАГ 4 - сторнирование РП (COBUMMFO-4543)
       for rec in (select sd.idd
                     from dpt_agreements da, sto_det_agr a, sto_det sd
@@ -5874,19 +5877,19 @@ is
                      and da.agrmnt_id = a.agr_id
                      and a.idd = sd.idd
                      and nvl(sd.status_id, 1) <> -1)
-      
+
        loop
         sto_all.claim_idd(p_idd        => rec.idd,
                           p_statusid   => -1,
                           p_disclaimid => 2);
       end loop;
-    
+
     end if;
-  
+
     bars_audit.trace('%s выполнена процедура сторнирования доп.соглашения № %s',
                      l_title,
                      to_char(p_agr_id));
-  
+
   end p_reverse_agrement;
 
   -- ======================================================================================
@@ -5906,27 +5909,27 @@ is
     l_accn2  int_accn.acra%type;
     l_error exception;
   begin
-  
+
     bars_audit.trace('%s branch=>%s, bdate=>%s, runid=>%s, dptid=>%s',
                      title,
                      p_branch,
                      to_char(p_bdate, 'dd.mm.yy'),
                      to_char(p_runid),
                      to_char(p_dptid));
-  
+
     if (nvl(p_runid, 0) = 0 and p_dptid = 0) then
       bars_error.raise_nerror(g_modcode, g_jobrunidnotfound);
     end if;
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOCLOSBLANK_ENTRY',
                                        p_branch));
     end if;
-  
+
     -- кількість днів протягом яких не закривається вклад відкритий безготівково
     l_days := f_get_params('DPT_DELAY_CLOSE', 1);
-  
+
     -- отсекаем все вклады, по деп.счетам которых не было ни одного движения
     for d in (select /* весь депозитный портфель*/
                d.deposit_id,
@@ -5986,16 +5989,16 @@ is
                  and dpt_closing_permitted(d.deposit_id) = 1
                order by 1) loop
       bars_audit.trace('%s deposit № %s', title, to_char(d.deposit_id));
-    
+
       l_allow := 0; -- = 0 - закрытие НЕ допустимо, = 1 - закрытие допустимо
-    
+
       l_dat1 := d.dat_begin;
-    
+
       if d.ncash = 0 then
         -- наличные вклады д.б. пополнены в день открытия
         l_dat2 := d.dat_begin;
       else
-      
+
         -- безнал.вклады д.б.пополнены не позже след.рабочего дня
         begin
           l_dat2 := dat_next_u(d.dat_begin, l_days);
@@ -6008,10 +6011,10 @@ is
                              dbms_utility.format_error_stack() || chr(10) ||
                              dbms_utility.format_error_backtrace());
         end;
-      
+
         -- вид депозиту "Майбутнє дітям"
         if (d.vidd in (53, 14)) then
-        
+
           begin
             select add_months(bday, 12)
               into l_dat2
@@ -6023,22 +6026,22 @@ is
               -- якщо невказана дата народження клієнта - закриваєм через рік після відкриття
               l_dat2 := add_months(d.dat_begin, 12);
           end;
-        
+
         end if;
-      
+
       end if;
-    
+
       bars_audit.trace('%s l_dat1 = %s, l_dat2 = %s.',
                        title,
                        to_char(l_dat1, 'dd.mm.yyyy'),
                        to_char(l_dat2, 'dd.mm.yyyy'));
-    
+
       -- Можно закрывать:
       -- НАЛ: если в дату открытия не был пополнен деп.счет  (dat1 = dat2 < p_dat)
       -- БЕЗНАЛ: якщо за [l_days] банківських дні не було поповнено деп.счет (dat1 < dat2 < p_dat)
-    
+
       if l_dat2 < p_bdate then
-      
+
         -- сумма всех поступлений за период
         select nvl(sum(kos), 0)
           into l_amount
@@ -6048,15 +6051,15 @@ is
         bars_audit.trace('%s total credit amount = %s',
                          title,
                          to_char(l_amount));
-      
+
         -- больше ничего не проверяем
         -- если не было поступлений, то не было и начисления/амортизации %%.
         if l_amount = 0 then
           l_allow := 1;
         end if;
-      
+
       end if;
-    
+
       -- рах. 2620 не закривається, якщо він є рах.погашення заборгованості в КД
       if ((l_allow = 1) and (substr(d.nls, 1, 4) = '2620') and
          (check_belongs_credit(d.accd) = 1)) then
@@ -6065,23 +6068,23 @@ is
                          title,
                          d.nls);
       end if;
-    
+
       if l_allow = 0 then
-      
+
         bars_audit.trace('%s close is not allowed for deposit № %s',
                          title,
                          to_char(d.deposit_id));
-      
+
       else
-      
+
         bars_audit.trace('%s close is allowed for deposit № %s',
                          title,
                          to_char(d.deposit_id));
-      
+
         savepoint del_ok;
-      
+
         begin
-        
+
           -- перенос вклада в архив
           close_to_archive(p_type  => 'DPT',
                            p_dat   => p_bdate,
@@ -6090,7 +6093,7 @@ is
           bars_audit.trace('%s перенесли в архив вклад № %s',
                            title,
                            to_char(d.deposit_id));
-        
+
           -- закрытие основного счета
           close_to_archive(p_type  => 'ACC',
                            p_dat   => p_bdate,
@@ -6100,7 +6103,7 @@ is
                            title,
                            to_char(d.accd),
                            to_char(d.deposit_id));
-        
+
           -- закрытие счета начисленных процентов
           close_to_archive(p_type  => 'ACC',
                            p_dat   => p_bdate,
@@ -6110,7 +6113,7 @@ is
                            title,
                            to_char(d.accn),
                            to_char(d.deposit_id));
-        
+
           -- закрытие счета амортизации процентов (если есть)
           if d.acca is not null then
             close_to_archive(p_type  => 'ACC',
@@ -6122,25 +6125,25 @@ is
                              to_char(d.acca),
                              to_char(d.deposit_id));
           end if;
-        
+
           -- удаление технического вклада (при наличии оного)
           if d.dpt_d is not null then
             bars_audit.trace('%s есть техн.вклад № %s',
                              title,
                              to_char(d.dpt_d));
-          
+
             select i.acc, i.acra
               into l_accd2, l_accn2
               from dpt_deposit d1, int_accn i
              where d1.acc = i.acc
                and i.id = 1
                and d1.deposit_id = d.dpt_d;
-          
+
             bars_audit.trace('%s счета по техн.вкладу (%s, %s)',
                              title,
                              to_char(l_accd2),
                              to_char(l_accn2));
-          
+
             close_to_archive(p_type  => 'DPT',
                              p_dat   => p_bdate,
                              p_dptid => d.dpt_d,
@@ -6148,7 +6151,7 @@ is
             bars_audit.trace('%s перенесли в архив техн.вклад № %s',
                              title,
                              to_char(d.dpt_d));
-          
+
             -- закрытие основного счета
             close_to_archive(p_type  => 'ACC',
                              p_dat   => p_bdate,
@@ -6158,7 +6161,7 @@ is
                              title,
                              to_char(l_accd2),
                              to_char(d.dpt_d));
-          
+
             -- закрытие счета начисленных процентов
             close_to_archive(p_type  => 'ACC',
                              p_dat   => p_bdate,
@@ -6168,15 +6171,15 @@ is
                              title,
                              to_char(l_accn2),
                              to_char(d.dpt_d));
-          
+
             bars_audit.trace('%s закрыт техн.вклад № %s',
                              title,
                              to_char(d.dpt_d));
-          
+
           end if;
-        
+
           bars_audit.financial('Закрыт вклад № ' || to_char(d.deposit_id));
-        
+
           -- запись в журнал
           dpt_jobs_audit.p_save2log(p_runid      => p_runid,
                                     p_dptid      => d.deposit_id,
@@ -6214,18 +6217,18 @@ is
                                       p_contractid => null);
             rollback to del_ok;
         end;
-      
+
       end if; -- l_allow
-    
+
     end loop; -- d
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOCLOSBLANK_DONE',
                                        p_branch));
       commit;
     end if;
-  
+
   end auto_close_blank_deposit;
   --
   -- начисление процентов по вчерашний день или по ACRDAT_X
@@ -6243,24 +6246,24 @@ is
     l_cursor integer;
     l_tmpnum integer;
   begin
-  
+
     bars_audit.trace('%s branch=>%s, bdate=>%s, runid=>%s, dptid=>%s',
                      title,
                      p_branch,
                      to_char(p_bdate, 'dd.mm.yy'),
                      to_char(p_runid),
                      to_char(p_dptid));
-  
+
     if (nvl(p_runid, 0) = 0 and p_dptid = 0) then
       bars_error.raise_nerror(g_modcode, g_jobrunidnotfound);
     end if;
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOMAKEINT_ENTRY',
                                        p_branch));
     end if;
-  
+
     -- м.б. задана дата начисления в конфиг.параметре
     begin
       select to_date(val, 'yyyymmdd')
@@ -6271,11 +6274,11 @@ is
       when others then
         l_acrdat := p_bdate - 1;
     end;
-  
+
     if l_acrdat is null then
       l_acrdat := p_bdate - 1;
     end if;
-  
+
     l_method := 0;
     l_cursor := dbms_sql.open_cursor;
     begin
@@ -6293,20 +6296,20 @@ is
         dbms_sql.close_cursor(l_cursor);
         raise;
     end;
-  
+
     make_int(p_dat2      => l_acrdat,
              p_runmode   => 1,
              p_runid     => p_runid,
              p_intamount => l_tmp,
              p_errflg    => l_error);
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOMAKEINT_DONE',
                                        p_branch));
       commit;
     end if;
-  
+
   end auto_make_int;
 
   --
@@ -6326,7 +6329,7 @@ is
     l_cursor  integer;
     l_tmpnum  integer;
   begin
-  
+
     bars_audit.trace('%s branch=>%s, bdate=>%s, runid=>%s, dptid=>%s, mode=>%s',
                      title,
                      p_branch,
@@ -6334,32 +6337,32 @@ is
                      to_char(p_runid),
                      to_char(p_dptid),
                      to_char(p_mode));
-  
+
     if (nvl(p_runid, 0) = 0 and p_dptid = 0) then
       bars_error.raise_nerror(g_modcode, g_jobrunidnotfound);
     end if;
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOMAKEINTMNTH_ENTRY',
                                        p_branch));
     end if;
-  
+
     -- I. начисление по срочным вкладам
-  
+
     -- расчет даты выполняения и граничной даты начисления процентов в конце месяца
     get_mnthintdates(p_bnkdate => p_bdate, -- текущая банк.дата
                      p_isfixed => 'Y', -- признак срочного вклада (Y-срочный, N-до востреб.)
                      p_valdate => l_valdate, -- дата выполнения начисления
                      p_acrdate => l_acrdate, -- граничная дата начисления
                      p_mode    => p_mode); -- режим запуска функции
-  
+
     if p_bdate != l_valdate then
       -- нарушен регламент начисления процентов в конце месяца
       bars_audit.info(bars_msg.get_msg(g_modcode, 'AUTOMAKEINTMNTH_DENIED'));
       return;
     end if;
-  
+
     l_method := 1;
     l_cursor := dbms_sql.open_cursor;
     begin
@@ -6377,28 +6380,28 @@ is
         dbms_sql.close_cursor(l_cursor);
         raise;
     end;
-  
+
     make_int(p_dat2      => l_acrdate,
              p_runmode   => 1,
              p_runid     => p_runid,
              p_intamount => l_tmp,
              p_errflg    => l_error);
-  
+
     -- II. начисление по вкладам до востребования
-  
+
     -- расчет даты выполняения и граничной даты начисления процентов в конце месяца
     get_mnthintdates(p_bnkdate => p_bdate, -- текущая банк.дата
                      p_isfixed => 'N', -- признак срочного вклада (Y-срочный, N-до востреб.)
                      p_valdate => l_valdate, -- дата выполнения начисления
                      p_acrdate => l_acrdate, -- граничная дата начисления
                      p_mode    => p_mode); -- режим запуска функции
-  
+
     if p_bdate != l_valdate then
       -- нарушен регламент начисления процентов в конце месяца
       bars_audit.info(bars_msg.get_msg(g_modcode, 'AUTOMAKEINTMNTH_DENIED'));
       return;
     end if;
-  
+
     l_method := 2;
     l_cursor := dbms_sql.open_cursor;
     begin
@@ -6416,20 +6419,20 @@ is
         dbms_sql.close_cursor(l_cursor);
         raise;
     end;
-  
+
     make_int(p_dat2      => l_acrdate,
              p_runmode   => 1,
              p_runid     => p_runid,
              p_intamount => l_tmp,
              p_errflg    => l_error);
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOMAKEINTMNTH_DONE',
                                        p_branch));
       commit;
     end if;
-  
+
   end auto_make_int_monthly;
 
   --
@@ -6450,9 +6453,9 @@ is
     l_cursor  integer;
     l_tmpnum  integer;
   begin
-  
+
     -- Процедура auto_make_int_monthly_opt пока заточена только под Ощадбанк
-  
+
     bars_audit.trace('%s branch=>%s, bdate=>%s, runid=>%s, dptid=>%s, mode=>%s',
                      title,
                      p_branch,
@@ -6460,11 +6463,11 @@ is
                      to_char(p_runid),
                      to_char(p_dptid),
                      to_char(p_mode));
-  
+
     if (nvl(p_runid, 0) = 0 and p_dptid = 0) then
       bars_error.raise_nerror(g_modcode, g_jobrunidnotfound);
     end if;
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOMAKEINTMNTH_ENTRY',
@@ -6474,24 +6477,24 @@ is
       raise_application_error(-20000,
                               'Процедура auto_make_int_monthly_opt поддерживает только групповое начисление %%');
     end if;
-  
+
     -- для Ощадбанка(SBER) граничной датой начисления %% является последняя календарная дата месяца
     -- вне зависимости срочный это вклад или до востребования
     -- поэтому начисление выполняем за один проход
-  
+
     -- расчет даты выполняения и граничной даты начисления процентов в конце месяца
     get_mnthintdates(p_bnkdate => p_bdate, -- текущая банк.дата
                      p_isfixed => 'Y', -- признак срочного вклада (Y-срочный, N-до востреб.)
                      p_valdate => l_valdate, -- дата выполнения начисления
                      p_acrdate => l_acrdate, -- граничная дата начисления
                      p_mode    => p_mode); -- режим запуска функции
-  
+
     if p_bdate != l_valdate then
       -- нарушен регламент начисления процентов в конце месяца
       bars_audit.info(bars_msg.get_msg(g_modcode, 'AUTOMAKEINTMNTH_DENIED'));
       return;
     end if;
-  
+
     l_method := 10; -- специальный метод начисления %% по всему массиву депозитов
     --
     igen_intstatement(l_method, p_dptid, int_statement);
@@ -6524,12 +6527,12 @@ is
              p_runid     => p_runid,
              p_intamount => l_tmp,
              p_errflg    => l_error);
-  
+
     bars_audit.info(bars_msg.get_msg(g_modcode,
                                      'AUTOMAKEINTMNTH_DONE',
                                      p_branch));
     commit;
-  
+
   end auto_make_int_monthly_opt;
 
   --
@@ -6548,33 +6551,33 @@ is
     l_cursor  integer;
     l_tmpnum  integer;
   begin
-  
+
     bars_audit.trace('%s branch=>%s, bdate=>%s, runid=>%s, dptid=>%s',
                      title,
                      p_branch,
                      to_char(p_bdate, 'dd.mm.yy'),
                      to_char(p_runid),
                      to_char(p_dptid));
-  
+
     if (nvl(p_runid, 0) = 0 and p_dptid = 0) then
       bars_error.raise_nerror(g_modcode, g_jobrunidnotfound);
     end if;
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOMAKEINTFINAL_ENTRY',
                                        p_branch));
     end if;
-  
+
     -- окончательное урегулирование начисленных и выплаченных авансом процентов
     -- по авансовым вкладам, срок действия которых истек
     auto_advance_balsettlement(p_branch, p_bdate, p_dptid);
-  
+
     l_acrdat := p_bdate - 1;
-  
+
     -- день, следующий за предыдущим банковским днем
     l_prevdat := dat_next_u(p_bdate, -1) + 1;
-  
+
     l_method := 9;
     l_cursor := dbms_sql.open_cursor;
     begin
@@ -6594,20 +6597,20 @@ is
         dbms_sql.close_cursor(l_cursor);
         raise;
     end;
-  
+
     make_int(p_dat2      => l_acrdat,
              p_runmode   => 1,
              p_runid     => p_runid,
              p_intamount => l_tmp,
              p_errflg    => l_error);
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOMAKEINTFINAL_DONE',
                                        p_branch));
       commit;
     end if;
-  
+
   end auto_make_int_finally;
 
   -- ======================================================================================
@@ -6647,18 +6650,18 @@ is
   begin
     -- дата валютування = глобальна банківська дата
     l_vdat := glb_bankdate;
-  
+
     bars_audit.trace('%s branch=>%s, bdate=>%s, runid=>%s, dptid=>%s',
                      title,
                      p_branch,
                      to_char(p_bdate, 'dd.mm.yy'),
                      to_char(p_runid),
                      to_char(p_dptid));
-  
+
     if (nvl(p_runid, 0) = 0 and p_dptid = 0) then
       bars_error.raise_nerror(g_modcode, g_jobrunidnotfound);
     end if;
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOPAYOUTINT_ENTRY',
@@ -6671,7 +6674,7 @@ is
                         p_valdate  => l_valdate,  -- дата выполнения начисления
                         p_acrdate  => l_acrdate,  -- граничная дата начисления
                         p_mode     => p_mode);    -- режим запуска функции
-    
+
       if p_bdate != l_valdate then
          -- нарушен регламент начисления процентов в конце месяца
          bars_audit.info(bars_msg.get_msg (g_modcode, 'AUTOMAKEINTMNTH_DENIED'));
@@ -6679,7 +6682,7 @@ is
       end if;
     */
     bars_audit.trace('%s № запуска: %s', title, to_char(p_runid));
-  
+
     if (p_dptid = 0) then
       -- депозитный портфель
       select d.deposit_id
@@ -6717,17 +6720,17 @@ is
                          decode(v.amr_metr, 0, 0, 1),
                          decode(nvl(d.cnt_dubl, 0), 0, 0, 1)) = 1;
     end if;
-  
+
     for i in 1 .. l_dptlist.count loop
-    
+
       bars_audit.trace('%s вклад № %s', title, to_char(l_dptlist(i)));
-    
+
       l_errflg := false;
       l_errmsg := null;
       l_ref    := null;
-    
+
       savepoint sp_payout;
-    
+
       begin
         select d.deposit_id,
                d.nd,
@@ -6755,7 +6758,7 @@ is
            and p.ostc > 0
            and p.dazs is null
            and d.deposit_id = l_dptlist(i);
-      
+
         begin
           select apl_dat
             into l_apldat
@@ -6773,7 +6776,7 @@ is
                                g_errmsg_dim);
             rollback to sp_payout;
         end;
-      
+
         paydoc(p_dptid    => l_payrec.dptid,
                p_vdat     => l_vdat,
                p_brancha  => p_branch,
@@ -6801,9 +6804,9 @@ is
                p_ref      => l_ref,
                p_err_flag => l_errflg,
                p_err_msg  => l_errmsg);
-      
+
         bars_audit.trace('%s референс = %s', title, to_char(l_ref));
-      
+
         -- протоколирование
         if p_runid > 0 then
           dpt_jobs_audit.p_save2log(p_runid      => p_runid,
@@ -6825,7 +6828,7 @@ is
                                     p_errmsg     => l_errmsg,
                                     p_contractid => null);
         end if;
-      
+
         if l_errflg then
           if p_runid > 0 then
             bars_audit.error(title || 'ошибка оплаты: ' || l_errmsg);
@@ -6855,16 +6858,16 @@ is
                            title,
                            to_char(l_dptlist(i)));
       end;
-    
+
     end loop; -- l_dptlist
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOPAYOUTINT_DONE',
                                        p_branch));
       commit;
     end if;
-  
+
   end auto_payout_int;
 
   -- =======================================================================================
@@ -6924,7 +6927,7 @@ is
       l_nls accounts.nls%type;
     begin
       select nls into l_nls from accounts where acc = p_acc;
-    
+
       if (p_nls = l_nls) then
         return true;
       else
@@ -6948,7 +6951,7 @@ is
         when no_data_found then
           l_adds := -1;
       end;
-    
+
       if (l_adds = 1) then
         return true;
       else
@@ -6956,40 +6959,40 @@ is
       end if;
     end;
   begin
-  
+
     bars_audit.trace('%s entry with {%s, %s, %s, %s)',
                      c_title,
                      to_char(p_dptid),
                      to_char(p_runid),
                      p_branch,
                      to_char(p_bdate, 'dd.mm.yyyy'));
-  
+
     if (nvl(p_runid, 0) = 0 and p_dptid = 0) then
       bars_error.raise_nerror(g_modcode, g_jobrunidnotfound);
     end if;
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOPAYOUTINTPL_ENTRY',
                                        p_branch));
     end if;
-  
+
     l_initdate := dat_next_u(p_bdate, -1) + 1;
     bars_audit.trace('%s plandate''s range: %s - %s',
                      c_title,
                      to_char(l_initdate, 'dd.mm.yyyy'),
                      to_char(p_bdate, 'dd.mm.yyyy'));
-  
+
     l_plandate := l_initdate;
-  
+
     while l_plandate <= p_bdate loop
-    
+
       bars_audit.trace('%s processing plandate %s...',
                        c_title,
                        to_char(l_plandate, 'dd.mm.yyyy'));
-    
+
       l_acrdat := l_plandate - 1;
-    
+
       -- начисление %% по план.дату минус 1 день
       insert into int_queue
         (kf,
@@ -7047,7 +7050,7 @@ is
                                   decode(v.amr_metr, 0, 0, 1),
                                   decode(nvl(d.cnt_dubl, 0), 0, 0, 1),
                                   1) = l_plandate;
-    
+
       /*insert into dpt_int_queue
       select bars_sqnc.get_nextval('S_DPTINT'),
              kf,
@@ -7070,21 +7073,21 @@ is
              mod_code,
              sysdate
         from int_queue;*/
-    
+
       bars_audit.trace('%s make_int for %s...', c_title, p_branch);
-    
+
       make_int(p_dat2      => l_acrdat,
                p_runmode   => 1,
                p_runid     => 0,
                p_intamount => l_tmpnum,
                p_errflg    => l_errflg);
-    
+
       bars_audit.trace('%s make_int for %s completed.', c_title, p_branch);
-    
+
       l_plandate := l_plandate + 1;
-    
+
     end loop;
-  
+
     -- отбор всех вкладов, для которых наступил день плановой выплаты процентов
     select deposit_id, plandate, comproc, limit
       bulk collect
@@ -7137,22 +7140,22 @@ is
                                       decode(v.amr_metr, 0, 0, 1),
                                       decode(nvl(d.cnt_dubl, 0), 0, 0, 1),
                                       1) between l_initdate and p_bdate);
-  
+
     bars_audit.trace('%s amount of intpay-deposits = %s',
                      c_title,
                      to_char(l_dptlist.count));
-  
+
     -- безначичная выплата процентов (+ oper_ext)
     l_tmpnum := 0;
-  
+
     for i in 1 .. l_dptlist.count loop
-    
+
       l_errflg := false;
       l_errmsg := null;
       l_ref    := null;
-    
+
       savepoint sp_payout;
-    
+
       begin
         select d.deposit_id,
                d.nd,
@@ -7180,14 +7183,14 @@ is
            and d.rnk = c.rnk
            and p.ostc > 0
            and d.deposit_id = l_dptlist(i).dptid;
-      
+
         bars_audit.trace('%s processing deposit № %s...',
                          c_title,
                          to_char(l_dptlist(i).dptid));
-      
+
         -- міняєм призначення платежу якщо виплата %% - це капіталізація
         if (l_dptlist(i).comproc = 1) then
-        
+
           -- перевіряємо чи не було змінено рах. виплати %%
           if (check_nls4pay(l_payrec.nlsb, l_payrec.dptacc)) then
             l_payrec.nazn := substr('Капіталізація нарахованих відсотків по договору № ' ||
@@ -7198,10 +7201,10 @@ is
         else
           -- якщо мін. сума поповнення більша нуля то вклад з поповненням  і це виплата на депозитний рахунок, а НЕ КАПІТАЛІЗАЦІЯ
           if (l_dptlist(i).min_add > 0) then
-          
+
             -- якщо сума %% менша за мін. суму поповнення
             if (l_payrec.amntfact < l_dptlist(i).min_add) then
-            
+
               l_errflg := true;
               -- сума поповнення %s менша за мінімально допустиму %s для вкладу № %s
               l_errmsg := substr(bars_msg.get_msg(g_modcode,
@@ -7212,9 +7215,9 @@ is
                                                   l_payrec.dptnum),
                                  1,
                                  g_errmsg_dim);
-            
+
               l_payrec.amntfact := 0;
-            
+
               rollback to sp_payout;
               begin
                 select d.vidd
@@ -7227,7 +7230,7 @@ is
                 when no_data_found then
                   l_vidd := -1;
               end;
-            
+
               -- якщо депозит без поповнення та рах.виплати %% = рах.вкладу - капіталіз. згідно пакету "ЕКСКЛЮЗИВ"
               if l_vidd > 0 and (l_payrec.amntfact >= l_dptlist(i).min_add) and
                  check_joinpay(l_payrec.dptid, l_payrec.nlsb) then
@@ -7237,7 +7240,7 @@ is
                                         160);
               end if;
             end if;
-          
+
           else
             -- якщо мін. сума поповнення нуль или пусто
             if (check_nls4pay(l_payrec.nlsb, l_payrec.dptacc)) then
@@ -7252,7 +7255,7 @@ is
                 when no_data_found then
                   l_vidd := -1;
               end;
-            
+
               -- якщо депозит без поповнення та рах.виплати %% = рах.вкладу - капіталіз. згідно пакету "ЕКСКЛЮЗИВ"
               if l_vidd > 0 and
                  check_joinpay(l_payrec.dptid, l_payrec.nlsb) then
@@ -7264,13 +7267,13 @@ is
             end if;
           end if;
         end if;
-      
+
         if not l_errflg then
-        
+
           if (l_payrec.amntfact != l_payrec.amntplan) then
-          
+
             l_errflg := true;
-          
+
             -- наличие незавизир.документов на счете %s/%s для вклада № %s
             l_errmsg := substr(bars_msg.get_msg(g_modcode,
                                                 'AUTOPAYOUTINTPL_INVALID_SALDO',
@@ -7279,11 +7282,11 @@ is
                                                 l_payrec.dptnum),
                                1,
                                g_errmsg_dim);
-          
+
             rollback to sp_payout;
-          
+
           else
-          
+
             begin
               select apl_dat
                 into l_apldat
@@ -7303,7 +7306,7 @@ is
                                    g_errmsg_dim);
                 rollback to sp_payout;
             end;
-          
+
             paydoc(p_dptid    => l_payrec.dptid,
                    p_vdat     => p_bdate,
                    p_brancha  => p_branch,
@@ -7331,7 +7334,7 @@ is
                    p_nazn     => l_payrec.nazn,
                    p_err_flag => l_errflg,
                    p_err_msg  => l_errmsg);
-          
+
             bars_audit.trace('%s docref (%s->%s %s) = %s',
                              c_title,
                              l_payrec.nlsa,
@@ -7340,7 +7343,7 @@ is
                              to_char(l_payrec.curcode),
                              to_char(l_ref));
             if (l_ref is not null) and (l_dptlist(i).plandate != p_bdate) then
-            
+
               begin
                 insert into oper_ext
                   (ref, kf, pay_bankdate, pay_caldate)
@@ -7350,7 +7353,7 @@ is
                 when dup_val_on_index then
                   null;
               end;
-            
+
               bars_audit.trace('%s pay(bnk/sys)dat = %s/%s for ref %s',
                                c_title,
                                to_char(p_bdate, 'dd.mm.yyyy'),
@@ -7359,7 +7362,7 @@ is
             end if;
           end if;
         end if;
-      
+
         -- протоколирование
         if p_runid > 0 then
           dpt_jobs_audit.p_save2log(p_runid      => p_runid,
@@ -7381,9 +7384,9 @@ is
                                     p_errmsg     => l_errmsg,
                                     p_contractid => null);
         end if;
-      
+
         if l_errflg then
-        
+
           if (p_runid > 0) then
             -- ошибка выплаты процентов по вкладу № %s: %s
             bars_audit.error(bars_msg.get_msg(g_modcode,
@@ -7395,17 +7398,17 @@ is
                                     'PAYOUT_ERR',
                                     c_title || l_errmsg);
           end if;
-        
+
           rollback to sp_payout;
-        
+
         else
           update int_accn
              set apl_dat = p_bdate
            where acc = l_payrec.dptacc
              and id = 1;
-        
+
           l_tmpnum := l_tmpnum + 1;
-        
+
           if (p_runid > 0 and l_tmpnum >= autocommit) then
             bars_audit.trace('%s intermediate commit (%s dep. processed)',
                              c_title,
@@ -7413,7 +7416,7 @@ is
             commit;
             l_tmpnum := 0;
           end if;
-        
+
           if (ebp.get_archive_docid(l_payrec.dptid) > 0) then
             -- відправка SMS повідомлення про виплату відсотків
             /* send_sms( l_payrec.custid, 'Po depozytu N'|| to_char(l_payrec.dptid) ||' vyplacheno protsenty u sumi '||
@@ -7421,25 +7424,25 @@ is
             */ -- прибрана відправка. Відправка СМС через відповідний шаблон
             null;
           end if;
-        
+
         end if;
-      
+
       exception
         when no_data_found then
           bars_audit.trace('%s nothing to pay for deposit № %s',
                            c_title,
                            to_char(l_dptlist(i).dptid));
       end;
-    
+
     end loop; -- l_dptlist
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOPAYOUTINTPL_DONE',
                                        p_branch));
       commit;
     end if;
-  
+
   end auto_payout_int_plan;
 
   -- =======================================================================================
@@ -7459,30 +7462,30 @@ is
     l_vdat       oper.vdat%type;
     l_bdate      fdat.fdat%type;
   begin
-  
+
     bars_audit.trace('%s entry, branch=>%s, bdate=>%s, runid=>%s, dptid=>%s',
                      title,
                      p_branch,
                      to_char(p_bdate),
                      to_char(p_runid),
                      to_char(p_dptid));
-  
+
     if (nvl(p_runid, 0) = 0 and p_dptid = 0) then
       bars_error.raise_nerror(g_modcode, g_jobrunidnotfound);
     end if;
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOMATPAYOFF_ENTRY',
                                        p_branch));
     end if;
-  
+
     -- дата валютування = глобальна банківська дата
     l_vdat := glb_bankdate;
-  
+
     -- Ощадбанк виплачує депозити на наступний день після завершення
     l_bdate := (p_bdate - 1);
-  
+
     for d in (select -- выборка данных для одного вклада № p_dptid
                d.deposit_id dptid,
                d.nd dptnum,
@@ -7600,12 +7603,12 @@ is
            and acc = d.depaccid;
       end;
       begin
-      
+
         bars_audit.trace('%s deposit № %s (%s)',
                          title,
                          d.dptnum,
                          to_char(d.dptid));
-      
+
         savepoint sp_maturity;
         -- перевірка депозиту на "пролонгацію"
         if (check_for_extension(d.dptid) = 1) then
@@ -7622,7 +7625,7 @@ is
         l_ref_int    := null;
         l_amount_dpt := null;
         l_amount_int := null;
-      
+
         -- начисление процентов по вчерашний день
         insert into int_queue
           (mod_code,
@@ -7658,13 +7661,13 @@ is
            d.custid,
            d.intid,
            d.inttt);
-      
+
         make_int(p_dat2      => l_bdate - 1,
                  p_runmode   => 1,
                  p_runid     => 0,
                  p_intamount => l_amount_int,
                  p_errflg    => l_errflg);
-      
+
         if l_errflg then
           l_errmsg := substr('ошибка начисления %% по договору №' ||
                              d.dptnum || ' (' || to_char(d.dptid) || ') ' ||
@@ -7678,7 +7681,7 @@ is
                            title,
                            to_char(l_amount_int));
         end if;
-      
+
         if (d.intmfob is not null and d.intnlsb is not null) then
           -- уточняем остаток на счете начисленных процентов (с учетом возможного начисления %%)
           begin
@@ -7701,7 +7704,7 @@ is
                                  g_errmsg_dim);
               goto nextrec;
           end;
-        
+
           -- выплата процентов
           if (l_amount_int > 0) then
             paydoc(p_dptid    => d.dptid,
@@ -7731,7 +7734,7 @@ is
                    p_ref      => l_ref_int,
                    p_err_flag => l_errflg,
                    p_err_msg  => l_errmsg);
-          
+
             if l_errflg then
               l_errmsg := substr('Помилка виплати %% по дог.№' || d.dptnum || ' (' ||
                                  to_char(d.dptid) || ') ' || l_errmsg,
@@ -7742,7 +7745,7 @@ is
               bars_audit.financial('Сформирован документ по выплате процентов. ref ' ||
                                    to_char(l_ref_int));
             end if;
-          
+
           end if;
         end if;
         if (d.depmfob is not null and d.depnlsb is not null) then
@@ -7768,7 +7771,7 @@ is
                                  g_errmsg_dim);
               goto nextrec;
           end;
-        
+
           -- перечисление суммы депозита
           if (l_amount_dpt > 0) then
             paydoc(p_dptid    => d.dptid,
@@ -7798,7 +7801,7 @@ is
                    p_ref      => l_ref_dpt,
                    p_err_flag => l_errflg,
                    p_err_msg  => l_errmsg);
-          
+
             if l_errflg then
               l_errmsg := substr('Помилка виплати коштів по дог.№' ||
                                  d.dptnum || ' (' || to_char(d.dptid) || ') ' ||
@@ -7807,10 +7810,10 @@ is
                                  g_errmsg_dim);
               goto nextrec;
             else
-            
+
               bars_audit.financial('Сформирован документ по перечислению суммы депозита. ref ' ||
                                    to_char(l_ref_dpt));
-            
+
               if (ebp.get_archive_docid(d.dptid) > 0) then
                 -- відправка SMS повідомлення про виплату депозиту
                 /*  send_sms( d.custid, 'Depozyt N'|| to_char(d.dptid) ||' zakryto, koshty u sumi '||
@@ -7818,12 +7821,12 @@ is
                 */
                 null;
               end if;
-            
+
             end if;
-          
+
           end if;
         end if;
-      
+
         <<nextrec>>
         if p_runid > 0 then
           -- протоколирование
@@ -7846,22 +7849,22 @@ is
                                     p_errmsg     => l_errmsg,
                                     p_contractid => null);
         end if;
-      
+
         if l_errflg then
-        
+
           if (p_runid > 0) then
             bars_audit.error(title || l_errmsg);
-          
+
             rollback to sp_maturity;
-          
+
           else
             bars_error.raise_nerror(g_modcode,
                                     'PAYOUT_ERR',
                                     title || l_errmsg);
           end if;
-        
+
         end if;
-      
+
       exception
         when others then
           -- для автом.завдань
@@ -7883,18 +7886,18 @@ is
           else
             raise;
           end if;
-        
+
       end;
-    
+
     end loop;
-  
+
     if (p_dptid = 0) then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOMATPAYOFF_DONE',
                                        p_branch));
       commit; -- ????
     end if;
-  
+
   end auto_maturity_payoff;
 
   --=======================================================================================
@@ -7923,24 +7926,24 @@ is
     l_dpt t_dptacclist;
     l_cnt number := 0;
   begin
-  
+
     bars_audit.trace('%s entry, branch=>%s, runid=>%s, dptid=>%s, bdate=>%s',
                      title,
                      p_branch,
                      to_char(p_runid),
                      to_char(p_dptid),
                      to_char(p_bdate, 'dd.mm.yy'));
-  
+
     if (nvl(p_runid, 0) = 0 and p_dptid = 0) then
       bars_error.raise_nerror(g_modcode, g_jobrunidnotfound);
     end if;
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOCLOS_ENTRY',
                                        p_branch));
     end if;
-  
+
     select deposit_id, nd, vidd, rnk, acc, null, null, null, null, null
       bulk collect
       into l_dpt
@@ -7976,15 +7979,15 @@ is
                and fkos(d.acc, d.datz, p_bdate) = 0
                and add_months(p.bday, 12) between dat_next_u(p_bdate, -1) and
                    p_bdate);
-  
+
     for i in 1 .. l_dpt.count loop
-    
+
       bars_audit.trace('%s deposit № %s',
                        title,
                        to_char(l_dpt(i).dptid) || '...');
-    
+
       begin
-      
+
         select a.nls,
                a.kv,
                i.acra,
@@ -8009,11 +8012,11 @@ is
            and acc_closing_permitted(i.acra, 0) = 1
            and (v.amr_metr = 0 or
                v.amr_metr > 0 and acc_closing_permitted(i.acrb, 0) = 1);
-      
+
         savepoint del_ok;
-      
+
         begin
-        
+
           -- рах. 2620 не закривається, якщо він є рах.погашення заборгованості в КД
           if ((substr(l_dpt(i).accnum, 1, 4) = '2620') and
              (check_belongs_credit(l_dpt(i).depacc) = 1)) then
@@ -8022,14 +8025,14 @@ is
                                     '(dpt_id=' || to_char(l_dpt(i).dptid) ||
                                     ') використовується в КД!');
           end if;
-        
+
           if (l_dpt(i).blkd > 0) then
             raise_application_error(-20666,
                                     'Рахунок ' || l_dpt(i).accnum ||
                                     '(dpt_id=' || to_char(l_dpt(i).dptid) ||
                                     ') арештовано !');
           end if;
-        
+
           -- перенос вклада в архив
           close_to_archive(p_type  => 'DPT',
                            p_dat   => p_bdate,
@@ -8055,7 +8058,7 @@ is
           bars_audit.trace('%s deposit № %s',
                            title,
                            to_char(l_dpt(i).dptid) || ' succ.closed.');
-        
+
           -- запись в журнал
           dpt_jobs_audit.p_save2log(p_runid      => p_runid,
                                     p_dptid      => l_dpt(i).dptid,
@@ -8110,14 +8113,14 @@ is
         l_cnt := 0;
       end if;
     end loop;
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOCLOS_DONE',
                                        p_branch));
       commit;
     end if;
-  
+
   end auto_move2archive;
   --=======================================================================================
   procedure auto_rate_down(p_dptid  in dpt_deposit.deposit_id%type,
@@ -8127,24 +8130,24 @@ is
     title constant varchar2(60) := 'dptweb.autoratedown:';
     l_rate number(38) := 0;
   begin
-  
+
     bars_audit.trace('%s branch=>%s, bdate=>%s, runid=>%s, dptid=>%s',
                      title,
                      p_branch,
                      to_char(p_bdate, 'dd.mm.yy'),
                      to_char(p_runid),
                      to_char(p_dptid));
-  
+
     if (nvl(p_runid, 0) = 0 and p_dptid = 0) then
       bars_error.raise_nerror(g_modcode, g_jobrunidnotfound);
     end if;
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOAUTORATEDOWN_ENTRY',
                                        p_branch));
     end if;
-  
+
     for d in (select /* весь депозитный портфель*/
                d.deposit_id dpt,
                d.nd         nd,
@@ -8181,9 +8184,9 @@ is
                  and p_dptid != 0
                order by 1) loop
       bars_audit.trace('%s вклад № %s', title, to_char(d.dpt));
-    
+
       savepoint upd_ok;
-    
+
       begin
         insert into int_ratn
           (acc, id, bdat, ir)
@@ -8192,7 +8195,7 @@ is
         -- запись в журнал
         bars_audit.financial('Изменена проц.ставка на 0% для вклада № ' ||
                              to_char(d.dpt));
-      
+
         -- запись в журнал
         dpt_jobs_audit.p_save2log(p_runid      => p_runid,
                                   p_dptid      => d.dpt,
@@ -8232,16 +8235,16 @@ is
                                     p_contractid => null);
           rollback to upd_ok;
       end;
-    
+
     end loop; --d
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOAUTORATEDOWN_DONE',
                                        p_branch));
       commit;
     end if;
-  
+
   end auto_rate_down;
   -- =======================================================================================
   --
@@ -8254,32 +8257,32 @@ is
     l_cursor integer;
     l_tmpnum integer;
   begin
-  
+
     bars_audit.trace('%s entry', title);
-  
+
     l_query := null;
-  
+
     for i in 1 .. p_dptlist.count loop
-    
+
       bars_audit.trace('%s processing dpt № %s (%s)...',
                        title,
                        to_char(p_dptlist(i).dptid),
                        to_char(p_dptlist(i).extflag));
-    
+
       if (p_dptlist(i).extflag is null and p_dptlist(i).extcond is not null) then
-      
+
         if (l_query != p_dptlist(i).extcond) then
           dbms_sql.close_cursor(l_cursor);
           bars_audit.trace('%s cursor closed', title);
         end if;
-      
+
         if (l_query is null or l_query != p_dptlist(i).extcond) then
           l_cursor := dbms_sql.open_cursor;
           bars_audit.trace('%s cursor opened', title);
           dbms_sql.parse(l_cursor, p_dptlist(i).extcond, dbms_sql.native);
           bars_audit.trace('%s cursor parsed', title);
         end if;
-      
+
         begin
           dbms_sql.bind_variable(l_cursor, 'DPTID', p_dptlist(i).dptid);
           dbms_sql.define_column(l_cursor, 1, l_permit);
@@ -8291,26 +8294,26 @@ is
             raise;
         end;
         bars_audit.trace('%s l_permit = %s', title, to_char(l_permit));
-      
+
         p_dptlist(i).extflag := l_permit;
-      
+
         l_query := p_dptlist(i).extcond;
-      
+
       end if;
-    
+
       bars_audit.trace('%s flag for dpt № %s - %s',
                        title,
                        to_char(p_dptlist(i).dptid),
                        to_char(p_dptlist(i).extflag));
     end loop;
-  
+
     if l_query is not null then
       dbms_sql.close_cursor(l_cursor);
       bars_audit.trace('%s cursor closed', title);
     end if;
-  
+
     bars_audit.trace('%s exit', title);
-  
+
   end intl_autoext_permit;
   -- =======================================================================================
   --
@@ -8323,11 +8326,11 @@ is
     l_amount number(38);
     l_errflg boolean := false;
   begin
-  
+
     bars_audit.trace('%s entry, dptid => %s',
                      title,
                      to_char(p_dptdata.dptid));
-  
+
     insert into int_queue
       (kf,
        branch,
@@ -8368,13 +8371,13 @@ is
         from accounts a, tabval t
        where a.kv = t.kv
          and a.acc = p_dptdata.dptacc;
-  
+
     make_int(p_dat2      => p_dptdata.datend,
              p_runmode   => 1,
              p_runid     => 0,
              p_intamount => l_amount,
              p_errflg    => l_errflg);
-  
+
     if l_errflg then
       p_errmsg := substr(bars_msg.get_msg(g_modcode,
                                           'AUTOEXT_INTFAILED',
@@ -8414,18 +8417,18 @@ is
     l_nazn   oper.nazn%type;
     l_errflg boolean := false;
   begin
-  
+
     bars_audit.trace('%s entry, dptid => %s',
                      title,
                      to_char(p_dptdata.dptid));
-  
+
     l_lang := nvl(substr(getglobaloption('ERRLNG'), 1, 1), 'U');
-  
+
     l_nazn := substr(bars_msg.get_msg(g_modcode, 'AUTOEXT_CAPDETAILS') || ' ' ||
                      f_nazn(l_lang, p_dptdata.dptid),
                      1,
                      160);
-  
+
     paydoc(p_dptid    => p_dptdata.dptid,
            p_vdat     => p_bdate,
            p_brancha  => p_branch,
@@ -8453,12 +8456,12 @@ is
            p_ref      => p_docref,
            p_err_flag => l_errflg,
            p_err_msg  => p_errmsg);
-  
+
     bars_audit.trace('%s exit with %s, %s',
                      title,
                      to_char(p_docref),
                      p_errmsg);
-  
+
   exception
     when others then
       p_docref := null;
@@ -8503,7 +8506,7 @@ is
     l_bonusval  number;
     l_arest11   number := 0;
     l_type_cod  dpt_vidd.type_cod%type;
-  
+
     function get_bonusval(p_deposit_id in dpt_deposit.deposit_id%type)
       return number is
       l_bonus_val_actual dpt_depositw.value%type;
@@ -8532,13 +8535,13 @@ is
       end;
       return l_bonus_val;
     end;
-  
+
   begin
-  
+
     bars_audit.trace('%s entry, dptid => %s',
                      title,
                      to_char(p_dptdata.dptid));
-  
+
     select duration,
            duration_days,
            basem,
@@ -8566,7 +8569,7 @@ is
     bars_audit.trace('%s l_min_summ(dpt_vidd)=> %s',
                      title,
                      to_char(l_min_summ));
-  
+
     begin
       select sum(nvl(blkd, 0))
         into l_arest11
@@ -8583,7 +8586,7 @@ is
         l_arest11 := 0;
     end;
     --COBUSUPABS-3722
-  
+
     begin
       select i.ir, i.br, i.bdat
         into l_prev_ir, l_prev_br, l_prev_bdat
@@ -8600,7 +8603,7 @@ is
                                 'EXTENSION_RATE_NOT_FOUND',
                                 to_char(p_dptdata.dptid));
     end;
-  
+
     bars_audit.info('(l_prev_ir,l_prev_br,l_prev_bdat)=(' || l_prev_ir || ',' ||
                     l_prev_br || ',' || l_prev_bdat || ')');
     --/COBUSUPABS-3722
@@ -8609,7 +8612,7 @@ is
       if l_termtype = 1 then
         -- дата начала действия договора
         p_dptdata.datbeg := p_dptdata.datend;
-      
+
         -- дата окончания действия договора
         p_dptdata.datend := dpt.get_datend_uni(p_datbeg  => p_dptdata.datbeg,
                                                p_mnthcnt => l_mnthcnt,
@@ -8619,11 +8622,11 @@ is
         -- дата закінчення договору ( + к-ть днів дії вкладу )
         l_reviewdat := p_dptdata.datend +
                        (p_dptdata.datend - p_dptdata.datbeg);
-      
+
         p_dptdata.datbeg := p_dptdata.datend;
         p_dptdata.datend := l_reviewdat;
       end if;
-    
+
       -- изменение №, срока и суммы договора
       update dpt_deposit
          set nd        = p_dptdata.dptnum,
@@ -8638,7 +8641,7 @@ is
                        to_char(p_dptdata.dptsum),
                        to_char(p_dptdata.datbeg, 'dd.mm.yyyy'),
                        to_char(p_dptdata.datend, 'dd.mm.yyyy'));
-    
+
       -- изменение дат погашения и стоп-дат по начислению процентов
       update accounts
          set mdate = p_dptdata.datend
@@ -8650,7 +8653,7 @@ is
          set stp_dat = p_dptdata.datend - 1
        where acc = p_dptdata.dptacc
          and id = 1;
-    
+
       --#ifdef SBER
       bars_audit.trace('%s ratereview_extype № %s',
                        title,
@@ -8715,9 +8718,9 @@ is
         l_indrate := null;
         l_basrate := null;
         l_opid    := null;
-      
+
         if (ext.base_rate is not null) then
-        
+
           case
             when ext.method_id = 0 then
               -- значение базовой ставки на дату оформления первичного вклада
@@ -8725,23 +8728,23 @@ is
                                    ext.base_rate,
                                    p_dptdata.dptcur,
                                    p_dptdata.dptsum);
-            
+
             when ext.method_id = 1 then
               -- значение базовой ставки на дату пролонгации вклада
               l_indrate := getbrat(ext.intdat,
                                    ext.base_rate,
                                    p_dptdata.dptcur,
                                    p_dptdata.dptsum);
-            
+
             when ext.method_id = 2 then
               -- базовая ставка
               l_basrate := ext.base_rate;
-            
+
             when ext.method_id = 3 then
               -- ставка яка діяла в момент заключення ДУ на пролонгацію
-            
+
               begin
-              
+
                 select da.rate_value, -- ставка яка діяла в момент заключення ДУ на пролонгацію
                        da.bankdate -- банківська дата заключення ДУ на пролонгацію
                   into l_indrate, l_reviewdat
@@ -8750,14 +8753,14 @@ is
                    and da.agrmnt_type = 4
                    and da.agrmnt_state = 1
                    and da.bankdate < p_dptdata.datbeg; -- ДУ яка заключена до дати початку дії нового терміну
-              
+
                 if (l_indrate is null) then
                   l_indrate := getbrat(l_reviewdat,
                                        ext.base_rate,
                                        p_dptdata.dptcur,
                                        p_dptdata.dptsum);
                 end if;
-              
+
               exception
                 when no_data_found then
                   -- Для обчислення %% ставки при автопереоформленні депозиту вказано невідомий метод
@@ -8770,7 +8773,7 @@ is
                                    chr(10) ||
                                    dbms_utility.format_error_backtrace());
               end;
-            
+
             when ext.method_id = 4 then
               -- базовая ставка по депозиту + збереження бонусної ставки та операції обчислення + бонус за пролонгацію
               begin
@@ -8819,19 +8822,19 @@ is
                   bars_audit.info(title || sqlerrm);
               end;
               ----4822
-          
+
             when ext.method_id = 5 then
               -- код базовой ставки на дату оформления первичного вклада+ додаток з опису
               l_basrate := ext.base_rate; -- из настроек в виде вклада, на датуоткрітия договора
               l_indrate := get_bonusval(p_dptdata.dptid);
               l_opid    := ext.oper_id;
-            
+
             when ext.method_id = 6 then
               -- значение базовой ставки на дату пролонгации вклада
               l_basrate := l_prev_br;
               l_indrate := get_bonusval(p_dptdata.dptid);
               l_opid    := ext.oper_id;
-            
+
             when ext.method_id = 7 then
               -- базовая ставка по депозиту без збереження бонусної ставки та операції обчислення + бонус за пролонгацію
               l_indrate := get_bonusval(p_dptdata.dptid);
@@ -8865,14 +8868,14 @@ is
               bars_error.raise_nerror(g_modcode,
                                       'INVALID_EXTENSION_METHOD',
                                       to_char(ext.method_id));
-            
+
           end case;
-        
+
           if (ext.oper_id is not null) then
-          
+
             if (l_basrate is not null and l_indrate is not null) --якщо зберігаємо попередне значення базової % та індив.%
              then
-            
+
               l_indrate := case
                              when ext.oper_id = 1 then
                               l_indrate + ext.indv_rate
@@ -8883,14 +8886,14 @@ is
                              when ext.oper_id = 4 then
                               l_indrate / ext.indv_rate
                            end;
-            
+
             elsif (l_basrate is not null) then
-            
+
               l_indrate := ext.indv_rate;
               l_opid    := ext.oper_id;
-            
+
             else
-            
+
               l_indrate := case
                              when ext.oper_id = 1 then
                               l_indrate + ext.indv_rate
@@ -8901,17 +8904,17 @@ is
                              when ext.oper_id = 4 then
                               l_indrate / ext.indv_rate
                            end;
-            
+
             end if;
-          
+
           end if;
-        
+
         else
-        
+
           l_indrate := ext.indv_rate;
-        
+
         end if;
-      
+
         bars_audit.info('get_bonusval (p_dptdata.dptid)=' ||
                         to_char(get_bonusval(p_dptdata.dptid)));
         bars_audit.info('dpt_bonus.set_bonus starts');
@@ -8919,7 +8922,7 @@ is
         bars_audit.info('dpt_bonus.set_bonus ends');
         bars_audit.info('get_bonusval (p_dptdata.dptid)=' ||
                         to_char(get_bonusval(p_dptdata.dptid)));
-      
+
         /*Если метод переоформления для вклада не (8,9,10) - убираем Эксклюзивный  (bonus_id = 4) 2017 года для вкладов с пролонгацией до 8,9,10 метода, так как его действие начинается в будущем (или не начинается)*/
         if (ext.method_id not in (8, 9, 10)) then
           update dpt_bonus_requests
@@ -8928,7 +8931,7 @@ is
              and request_bdate = gl.bd
              and bonus_id = 4; --Эксклюзивный 2017
         end if;
-      
+
         select count(1)
           into l_bonus_cnt
           from dpt_bonus_requests t1, dpt_bonuses t2, dpt_requests t3
@@ -8988,20 +8991,20 @@ is
                                     p_dptdata.dptcur,
                                     p_dptdata.dptsum) + nvl(l_indrate, 0);
         end if;
-      
+
         bars_audit.trace('%s new rate values on %s = (%s, %s, %s)',
                          title,
                          to_char(ext.intdat, 'dd.mm.yyyy'),
                          to_char(l_indrate),
                          to_char(l_opid),
                          to_char(l_basrate));
-      
+
       end loop; -- ext
       bars_audit.trace('%s exit', title);
     else
       -- если сумма остатка депозита меньше минимальной суммы вида вклада, то пролонгации не будет
       --p_errmsg := 'Сума остатка на депозитному рахунку меньша за мінімальну суму виду вкладу';
-      
+
       -- COBUMMFO-5162
       begin
       bars_audit.trace('%s встановлення ознаки дозволу на закриття вкладу до запитання dpt_id = %s',
@@ -9010,15 +9013,15 @@ is
                          p_tag => '2CLOS',
                          p_val => 'Y');
       bars_audit.trace('%s Возврат депозита и начисленных процентов по окончанию депозитных договоров dpt_id = %s',
-                     title, to_char(p_dptdata.dptid));         
-                               
-      auto_maturity_payoff(p_dptdata.dptid, 0, sys_context('bars_context','user_branch'), p_bdate);            
-                         
+                     title, to_char(p_dptdata.dptid));
+
+      auto_maturity_payoff(p_dptdata.dptid, 0, sys_context('bars_context','user_branch'), p_bdate);
+
       exception when others then
         p_errmsg := 'Не вдалося встановити ознаку дозволу на закриття вкладу та зробити возврат депозита та нарахування відсотків';
       end;
     end if;
-  
+
   exception
     when others then
       p_errmsg := substr(bars_msg.get_msg(g_modcode,
@@ -9057,27 +9060,27 @@ is
                                            or vidd IN (SELECT vidd FROM DPT_DICT_VIDD_DEBTRANS))), 0) FROM DUAL';
     autext_expt exception;
   begin
-  
+
     bars_audit.trace('%s branch=>%s, bdate=>%s, runid=>%s, dptid=>%s',
                      title,
                      p_branch,
                      to_char(p_bdate, 'dd.mm.yy'),
                      to_char(p_runid),
                      to_char(p_dptid));
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOEXT_STARTED',
                                        p_branch));
     end if;
-  
+
     if (p_runid = 0 and p_dptid = 0) then
       bars_error.raise_nerror(g_modcode, g_jobrunidnotfound);
     end if;
-  
+
     -- I. установка бонуса для пролонгированных вкладов
     auto_extension_bonus(p_dptid, p_runid, p_branch, p_bdate);
-  
+
     -- определение диапазона дат закрытия вкладов-претендентов на переоформление
     l_mindatend := dat_next_u(p_bdate, -1); -- предыдущий банковский день
     if l_mindatend = trunc(sysdate) then
@@ -9086,20 +9089,20 @@ is
     else
       l_maxdatend := trunc(sysdate) - 1; -- предыдущий календарный день
     end if;
-  
+
     bars_audit.trace('%s datend range - (%s,%s)',
                      title,
                      to_char(l_mindatend, 'dd.mm.yyyy'),
                      to_char(l_maxdatend, 'dd.mm.yyyy'));
-  
+
     -- II. отбор активных вкладов, для которых предусмотрено переоформление, дата
     -- окончания - сегодня или ближайшие выходные, без отказа от продления (т.е.
     -- не отбираем те вклады, от переоформления которых клиенты успели отказаться
     -- до граничной даты включительно)
     -- а також договора по яких заключили дод.угоду на автопролонгацію
-  
+
     if (p_dptid = 0) then
-    
+
       begin
         select d.deposit_id,
                d.nd,
@@ -9145,7 +9148,7 @@ is
                    and dat_begin <= l_maxdatend)
          order by 5, 6; --(ext_flag, ext_condition)
       end;
-    
+
     else
       -- p_dptid != 0
       begin
@@ -9197,18 +9200,18 @@ is
     bars_audit.info(l_dptlist.count);
     -- проверка допустимости переоформления
     intl_autoext_permit(l_dptlist);
-  
+
     for i in 1 .. l_dptlist.count loop
-    
+
       bars_audit.trace('%s dpt № %s', title, to_char(l_dptlist(i).dptid));
-    
+
       begin
-      
+
         savepoint sp_extend;
-      
+
         l_docref := null;
         l_errmsg := null;
-      
+
         begin
           select d.deposit_id,
                  d.nd,
@@ -9269,7 +9272,7 @@ is
                                          to_char(l_dptlist(i).dptid));
             raise autext_expt;
         end;
-      
+
         -- проверка наличия остатка и отсутствия незавизир.документов на деп.счете
         if l_dptdata.errcode = -1 then
           -- незавизир.документы на депозитном счете %s/%s
@@ -9279,7 +9282,7 @@ is
                                        to_char(l_dptdata.dptcur));
           raise autext_expt;
         end if;
-      
+
         if l_dptdata.errcode = -2 then
           -- нулевой остаток на депозитном счете %s/%s
           l_errmsg := bars_msg.get_msg(g_modcode,
@@ -9288,7 +9291,7 @@ is
                                        to_char(l_dptdata.dptcur));
           raise autext_expt;
         end if;
-      
+
         if nvl(l_dptlist(i).extflag, 0) != 1 then
           -- нарушение условий переоформления договора №%s
           l_errmsg := bars_msg.get_msg(g_modcode,
@@ -9296,26 +9299,26 @@ is
                                        to_char(l_dptlist(i).dptid));
           raise autext_expt;
         end if;
-      
+
         -- допускается наличие незавизир.документов на счете нач.%% (м.б. бонус)
         select ostb
           into l_dptdata.intsum
           from accounts
          where acc = l_dptdata.intacc
            for update of ostb nowait;
-      
+
         -- III. начисление процентов по дату окончания минус 1 день (включительно)
         intl_autoext_interest(p_dptdata => l_dptdata, p_errmsg => l_errmsg);
         if l_errmsg is not null then
           raise autext_expt;
         end if;
-      
+
         -- учет суммы доначисления в кач-ве суммы для перечисления на деп.счет
         select ostb
           into l_dptdata.intsum
           from accounts
          where acc = l_dptdata.intacc;
-      
+
         -- V. перерегистрация вклада (изменение №, срока, ставки и суммы договора)
         intl_autoext_rewrite(p_bdate   => p_bdate,
                              p_dptdata => l_dptdata,
@@ -9333,14 +9336,14 @@ is
         --      insert into dpt_irrqueue (dpt_id, branch)
         --      values (l_dptlist(i).dptid, p_branch);
         --#endif
-      
+
         -- промежуточная фиксация
         l_cnt := l_cnt + 1;
         if p_runid > 0 and l_cnt >= autocommit then
           commit;
           l_cnt := 0;
         end if;
-      
+
       exception
         when autext_expt then
           if l_errmsg is not null and p_runid = 0 then
@@ -9352,7 +9355,7 @@ is
           end if;
           rollback to sp_extend;
       end;
-    
+
       -- VII. протоколирование
       if p_runid > 0 then
         dpt_jobs_audit.p_save2log(p_runid      => p_runid,
@@ -9375,18 +9378,18 @@ is
                                   p_contractid => null,
                                   p_rateval    => l_dptdata.rate);
       end if;
-    
+
     end loop;
-  
+
     if p_dptid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOEXT_FINISHED',
                                        p_branch));
       commit;
     end if;
-  
+
     bars_audit.trace('%s exit', title);
-  
+
   end auto_extension;
 
   --
@@ -9396,25 +9399,25 @@ is
     l_title constant varchar2(60) := 'dptweb.automove2dmnd: ';
     l_branch branch.branch%type;
   begin
-  
+
     l_branch := sys_context('bars_context', 'user_branch');
-  
+
     if ((p_bdate is null) or (l_branch = '/')) then
       raise_application_error(-20001,
                               'ERR: Заборонено виконання вибраної функції під поточним користувачом !',
                               true);
     end if;
-  
+
     for d in (select dptid, branch
                 from v_dpt_move2dmnd
                where datend < dat_next_u(bankdate, -2)) loop
       savepoint sp_move2dmnd;
-    
+
       if l_branch != d.branch then
         l_branch := d.branch;
         bars_context.subst_branch(l_branch);
       end if;
-    
+
       begin
         dpt.move2dmnd(p_dptid => d.dptid, -- № вклада
                       p_tt    => 'DPX', -- код операции
@@ -9429,11 +9432,11 @@ is
                            dbms_utility.format_error_backtrace());
           rollback to sp_move2dmnd;
       end;
-    
+
     end loop;
-  
+
     bc.set_context();
-  
+
   end auto_move2dmnd;
 
   -- =======================================================================================
@@ -9515,9 +9518,9 @@ is
       l_ob22   accounts.ob22%type;
       l_branch accounts.branch%type;
     begin
-    
+
       if (p_ob22 is null) then
-      
+
         begin
           select ob22
             into l_ob22
@@ -9532,14 +9535,14 @@ is
                         else null
                       end;
         end;
-      
+
       else
         l_ob22 := p_ob22;
       end if;
-    
+
       -- котлові рах. тільки на 2-му рівні
       l_branch := substr(p_branch,1,15);
-    
+
       begin
         select a.nls
           into l_nls
@@ -9553,23 +9556,23 @@ is
       exception
         when no_data_found then
           begin
-          
+
             bars_error.raise_nerror( g_modcode, 'CONSACC_NOT_FOUND', p_nbs || '/' || p_kv || '|' || l_ob22 );
-          
+
             -- -- 1) Установить код вал
             -- pul.Set_Mas_Ini('OP_BSOB_KV', to_char(p_kv) , 'Код вал для открытия счета');
-          
+
             -- -- 2) проверить и открыть нужный счет (если не найден)
             -- OP_BS_OB1( p_branch, p_nbs||l_ob22 );
-          
+
             -- -- 3) знайти відкритий рахунок
             -- l_nls := get_nls_immobile( p_nbs, p_kv, p_branch, l_ob22 );
-          
+
           end;
       end;
-    
+
       return l_nls;
-    
+
     end get_nls_immobile;
     ---
     -- перевірка наявності руху коштів протягом трьох останніх років
@@ -9579,7 +9582,7 @@ is
     is
       l_checked number;
     begin
-    
+
       select case
                when exists (select 1
                        from saldoa s
@@ -9594,49 +9597,49 @@ is
              end
         into l_checked
         from dual;
-    
+
       return l_checked;
-    
+
     end check_conditions;
     ---
   begin
-  
+
     bars_audit.trace('%s start with: p_dptid.count = %s, p_runid = %s, p_bdate = %s.',
                      title,
                      to_char(p_dptid.count),
                      to_char(p_runid),
                      to_char(p_bdate, 'dd/mm/yyyy'));
-  
+
     l_outmsg := null;
     l_mfo    := gl.amfo;
     l_branch := sys_context('bars_context', 'user_branch');
-  
+
     if (p_bdate is null)
     then
       l_bdate := gl.bdate;
     else
       l_bdate := p_bdate;
     end if;
-  
+
     for i in p_dptid.first .. p_dptid.last loop
-    
+
       bars_audit.trace('%s dpt_id = %s.', title, to_char(p_dptid(i)));
-    
+
       savepoint sp_immobile;
-    
+
       begin
-      
+
         -- перевірка на відповідність умовам для перенесення в нерухомі (відсутній рух коштів протягом останніх 3-х років)
         if (check_conditions(p_dptid(i)) = 0) then
-        
+
           l_errmsg := 'Не відповідає умовам відбору для перенесення в нерухомі';
-        
+
           raise errors;
-        
+
         else
-        
+
           begin
-          
+
             select d.deposit_id as dpt_id,
                    d.acc,
                    d.rnk,
@@ -9700,29 +9703,29 @@ is
                 on (sp.acc = ad.acc)
              where d.deposit_id = p_dptid(i);
             -- for update of ad.ostb nowait;
-          
+
             -- сума списання (тіло + відсотки)
             l_sum := (r_immobile.ost_dep + r_immobile.ost_int);
-          
-            if (l_sum > 0) 
+
+            if (l_sum > 0)
             then
-            
+
               if (l_branch != r_immobile.branch)
               then
                 l_branch := r_immobile.branch;
                 bars_context.subst_branch(l_branch);
               end if;
-            
+
               -- пошук котлового рахунка (нерухомі вклади для РНВ із залишками більше 10 одиниць)
               l_nls := get_nls_immobile(r_immobile.nbs_term,  --r_immobile.nbs_dep,
                                         r_immobile.kv,
                                         r_immobile.branch,
                                         null);
-            
+
               l_ref := null;
-            
+
               gl.ref(l_ref);
-            
+
               gl.in_doc3(ref_   => l_ref,
                          tt_    => l_tt,
                          dk_    => l_dk,
@@ -9752,7 +9755,7 @@ is
                          sos_   => null,
                          prty_  => 0,
                          uid_   => null);
-            
+
               -- 1) Капіталізація нарахованих відсотків
               if (r_immobile.ost_int > 0)
               then
@@ -9770,7 +9773,7 @@ is
                      , r_immobile.nls_dep
                      , r_immobile.ost_int );
               end if;
-            
+
               -- 2) Списання в нерухомі
               paytt(null,
                     l_ref,
@@ -9783,7 +9786,7 @@ is
                     r_immobile.kv,
                     l_nls,
                     l_sum);
-            
+
               -- 3) передача інформації в реєстр нерухомих
               migraas.dpt2immobile(p_source   => 'BARS', -- Источник вклада
                                    p_dptid    => r_immobile.dpt_id, -- id договора
@@ -9823,9 +9826,9 @@ is
                                    p_ref      => l_ref, -- реф. док. списання на нерухомі
                                    p_err      => l_errmsg -- возвращаемый текст (Ok - хорошо, иначе текст ошибки)
                                    );
-            
+
               if (l_errmsg = 'Ok') then
-              
+
                 insert into bars.dpt_immobile
                   (dpt_id,
                    transfer_ref,
@@ -9834,72 +9837,72 @@ is
                    bank_date)
                 values
                   (r_immobile.dpt_id, l_ref, sysdate, user_id, l_bdate);
-              
+
               else
-              
+
                 raise errors;
-              
+
               end if;
-            
+
             else
-            
+
               -- якщо сума рівна нулю ...
               null;
-            
+
             end if;
-          
+
             -- Для вкладів "До запитання" проставляємо відмітку про закриття
             if (r_immobile.dat_end is null)
             then
-            
+
               DPT.FILL_DPTPARAMS(p_dptid(i), '2CLOS', 'Y');
-            
+
             end if;
-          
+
           end;
-        
+
         end if;
-      
+
       exception
         when others then
-        
+
           bars_audit.info( title || ' депозит #' ||  to_char(r_immobile.dpt_id) || ' error: ' ||
                           nvl( l_errmsg, sqlerrm || chr(10) || dbms_utility.format_error_backtrace() ) );
-        
+
           if (p_runid > 0)
           then --  для автооперації записати помилку в журнал виконання автоматичних завдань
 
             null;
 
           else
-          
+
             l_outmsg := ( l_outmsg || '<BR> депозит # ' || to_char(r_immobile.dpt_id) || '(' || nvl(l_errmsg, sqlerrm) || ');' );
-          
+
           end if;
-        
+
           rollback to sp_immobile;
-        
+
       end;
-    
+
     end loop;
-  
+
     -- виклик процедури з WEB
     if ( web_utl.is_web_user = 1 )
     then
-    
+
       if (l_outmsg is not null)
       then
-      
+
         l_outmsg := 'Перенесення депозитів у картотеку нерухомих виконано з помилками:' || l_outmsg;
-      
+
       end if;
-    
+
       barsweb_session.set_varchar2('ERRORS', l_outmsg);
-    
+
     end if;
-  
+
     bc.set_context();
-  
+
   end auto_move2immobile;
 
   -- =======================================================================================
@@ -9916,24 +9919,24 @@ is
     err_num  number;
     err_par  varchar2(80);
   begin
-  
+
     bars_audit.trace('%s branch=>%s, bdate=>%s, runid=>%s, accid=>%s',
                      title,
                      p_branch,
                      to_char(p_bdate, 'dd.mm.yy'),
                      to_char(p_runid),
                      to_char(p_accid));
-  
+
     if (nvl(p_runid, 0) = 0 and p_accid = 0) then
       bars_error.raise_nerror(g_modcode, g_jobrunidnotfound);
     end if;
-  
+
     if p_accid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOCLOSTECHACC_ENTRY',
                                        p_branch));
     end if;
-  
+
     -- перечень всех техн.счетов данного подразделения, уже закрытых ПЛАНОВО
     for t in (select dpt_id,
                      dpt_num,
@@ -9953,16 +9956,16 @@ is
                        title,
                        t.nls,
                        t.kvcode);
-    
+
       select * into l_techacc from accounts where acc = t.acc;
-    
+
       if (f_techacc_allow2close(t.acc) = 1) and (l_techacc.ostc = 0) and
          (l_techacc.ostb = 0) and (l_techacc.ostf = 0) and
          (l_techacc.dapp is null or l_techacc.dapp < p_bdate) then
-      
+
         -- закрытие техн.счета
         update accounts set dazs = p_bdate where acc = t.acc;
-      
+
         if sql%rowcount = 0 then
           l_errmsg := 'неможливо заповнити дату закриття';
           bars_audit.error('TECHACC_CLOSE(5): ' || l_errmsg);
@@ -9983,11 +9986,11 @@ is
                                                            g_errmsg_dim),
                                     p_contractid => null);
         else
-        
+
           if t.dpt_active = 0 then
             -- основной вклад - в архиве
             delete from dpt_techaccounts where tech_acc = t.acc;
-          
+
             if sql%rowcount = 0 then
               l_errmsg := 'помилка при розірванні звязку між' ||
                           ' техн.рах. та закритим вкладом';
@@ -10029,7 +10032,7 @@ is
                                         p_contractid => null);
             end if;
           else
-          
+
             -- основной вклад - активный
             update dpt_deposit
                set dpt_d       = null,
@@ -10041,7 +10044,7 @@ is
                    dat_end_alt = null
              where acc_d = t.acc
                and deposit_id = t.dpt_id;
-          
+
             if sql%rowcount = 0 then
               l_errmsg := 'помилка при видаленні інформації' ||
                           ' про техн.рах.з картки активного вкладу';
@@ -10079,21 +10082,21 @@ is
                                         p_status     => 1,
                                         p_errmsg     => null,
                                         p_contractid => null);
-            
+
             end if;
-          
+
           end if; --основной вклад (не)акт.
-        
+
         end if; -- закрытие счета
-      
+
       else
-      
+
         -- не выполнена хотя бы одна проверка допустимости закрытия техн.счета
-      
+
         l_errmsg := 'закриття техн.рахунку недопустимо';
-      
+
         bars_audit.error('TECHACC_CLOSE(5): ' || l_errmsg);
-      
+
         dpt_jobs_audit.p_save2log(p_runid      => p_runid,
                                   p_dptid      => t.dpt_id,
                                   p_dealnum    => t.dpt_num,
@@ -10109,17 +10112,17 @@ is
                                                          1,
                                                          g_errmsg_dim),
                                   p_contractid => null);
-      
+
       end if;
-    
+
     end loop; -- t
-  
+
     if p_accid = 0 then
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'AUTOCLOSTECHACC_DONE',
                                        p_branch));
     end if;
-  
+
   end auto_close_techacc;
 
   --========================================================================================
@@ -10132,9 +10135,9 @@ is
   begin
     bars_audit.trace('TECHACC_ALLOW2CLOSE: техн.счет acc=(' ||
                      to_char(p_accid) || ')');
-  
+
     l_enable := 0;
-  
+
     -- остатки на техн.счете
     begin
       select ostb, ostc, ostf, dapp
@@ -10147,17 +10150,17 @@ is
                          to_char(p_accid) || ')');
         return l_enable;
     end;
-  
+
     -- закрытие (и выплата) техн.счета допустимы при отсутствии план.документов
     if l_ostb = l_ostc and l_ostf = 0 then
       l_enable := 1;
     end if;
-  
+
     bars_audit.trace('TECHACC_ALLOW2CLOSE: закрытие техн.счета ' || case when
                      l_enable = 1 then 'допустимо' else 'недопустимо' end);
-  
+
     return l_enable;
-  
+
   end f_techacc_allow2close;
   -- ======================================================================================
   procedure p_techacc_close(p_type   in number, -- тип закрытия: 1-план
@@ -10169,72 +10172,72 @@ is
     l_dptact  v_dpt_tech_accounts.dpt_active%type;
     l_techacc accounts%rowtype;
   begin
-  
+
     bars_audit.trace('TECHACC_CLOSE: подразделение: ' || p_branch ||
                      ', банк.дата: ' || to_char(p_dat, 'DD/MM/YYYY') ||
                      ', № запуска: ' || to_char(p_runid) ||
                      ', тип закрытия: ' || to_char(p_type));
-  
+
     if p_type != 1 then
       -- Указан несуществующий тип закрытия
       bars_error.raise_error(g_modcode, 291, to_char(p_type));
     end if;
-  
+
     bars_audit.trace('TECHACC_CLOSE(1): плановое закрытие');
-  
+
     if f_techacc_allow2close(p_accid) != 1 then
       -- закрытие техн.счета недопустимо
       bars_error.raise_error(g_modcode, 292, to_char(p_accid));
     end if;
-  
+
     -- № основного вклада и признак его активности для техн.счета
     select dpt_id, dpt_active
       into l_dptid, l_dptact
       from v_dpt_tech_accounts
      where tech_accid = p_accid;
-  
+
     -- заполнение даты планового закрытия
-  
+
     if l_dptact = 0 then
       -- основной вклад - в архиве
-    
+
       update dpt_techaccounts
          set tech_datend = p_dat
        where tech_acc = p_accid;
-    
+
       if sql%rowcount = 0 then
         -- не удалось заполнить дату планового закрытия техн.счета
         bars_error.raise_error(g_modcode, 293, to_char(p_accid));
       else
         bars_audit.trace('TECHACC_CLOSE(1): заполнена дата план.закрытия (вклад - в архиве)');
       end if;
-    
+
     else
       -- основной вклад - активный
-    
+
       update dpt_deposit set dat_end_alt = p_dat where acc_d = p_accid;
-    
+
       if sql%rowcount = 0 then
         -- не удалось заполнить дату планового закрытия техн.счета
         bars_error.raise_error(g_modcode, 293, to_char(p_accid));
       else
         bars_audit.trace('TECHACC_CLOSE(1): заполнена дата план.закрытия (вклад - активный)');
       end if;
-    
+
     end if;
-  
+
   end p_techacc_close;
   -- ======================================================================================
   procedure p_tech_oper_update(p_ref  in oper.ref%type,
                                p_refl in oper.refl%type) is
   begin
-  
+
     bars_audit.trace('p_tech_oper_update: ref зачисления = ' ||
                      to_char(p_ref) || ', ref комиссии   = ' ||
                      to_char(p_refl));
-  
+
     update oper set refl = p_refl where ref = p_ref;
-  
+
     if sql%rowcount = 0 then
       -- невозможно связать платеж-пополнение техн.счета с платежом-комиссией
       bars_error.raise_error(g_modcode,
@@ -10244,7 +10247,7 @@ is
     else
       bars_audit.trace('p_tech_oper_update: привязка выполнена!');
     end if;
-  
+
   end p_tech_oper_update;
   -- ======================================================================================
   procedure p_techacc_nocash_comiss(p_ref0 in oper.ref%type,
@@ -10259,11 +10262,11 @@ is
     l_ref     oper.ref%type;
     l_amountc oper.s%type;
   begin
-  
+
     bars_audit.trace('%s реф.безнал.пополнения = %s',
                      l_title,
                      to_char(p_ref0));
-  
+
     -- реквизиты первичного документа
     begin
       select * into l_doc from oper where ref = p_ref0;
@@ -10277,7 +10280,7 @@ is
                      l_doc.nlsb,
                      to_char(l_doc.kv2),
                      to_char(l_doc.s));
-  
+
     -- поиск операции по взысканию комиссии за безнал.пополнение счета
     begin
       select tt_comiss
@@ -10308,13 +10311,13 @@ is
     bars_audit.trace('%s операция по взысканию комиссии = %s',
                      l_title,
                      l_tt);
-  
+
     l_accrec.acc_num     := l_doc.nlsb;
     l_accrec.acc_cur     := l_doc.kv2;
     l_accrec.acc_name    := l_doc.nam_b;
     l_accrec.cust_name   := l_doc.nam_b;
     l_accrec.cust_idcode := l_doc.id_b;
-  
+
     paydoc_nocash_commission(p_tt          => l_tt,
                              p_dptid       => null,
                              p_main_amount => l_doc.s,
@@ -10325,21 +10328,21 @@ is
                              p_userid      => l_userid,
                              p_ref         => l_ref,
                              p_amount      => l_amountc);
-  
+
     bars_audit.trace('%s референс платежа - комиссии = %s, сумма комиссии = %s',
                      l_title,
                      to_char(l_ref),
                      to_char(l_amountc));
-  
+
     dpt_web.p_tech_oper_update(p_ref0, l_ref);
-  
+
     bars_audit.trace('%s выполнена привязка комиссии к платежу пополнения (%s <-> %s)',
                      l_title,
                      to_char(p_ref0),
                      to_char(l_ref));
-  
+
     p_ref := l_ref;
-  
+
   end p_techacc_nocash_comiss;
 
   -- ======================================================================================
@@ -10355,7 +10358,7 @@ is
                      l_title,
                      to_char(p_dptid),
                      to_char(p_typeop));
-  
+
     select tt_comiss
       into l_tt
       from v_techacc_operations
@@ -10363,7 +10366,7 @@ is
     bars_audit.trace('%s код операции по взысканию комиссии - %s',
                      l_title,
                      l_tt);
-  
+
     select decode(count(*), 0, 'N', 'Y')
       into l_taken
       from dpt_payments d, oper o
@@ -10374,9 +10377,9 @@ is
     bars_audit.trace('%s комиссия была взыскана? - %s',
                      l_title,
                      l_taken);
-  
+
     return l_taken;
-  
+
   exception
     when no_data_found then
       bars_audit.trace('%s взыскание комиссии не предусмотрено',
@@ -10392,7 +10395,7 @@ is
     l_datbegin dpt_deposit.dat_begin%type;
     l_nazn     oper.nazn%type;
   begin
-  
+
     begin
       select nvl(nd, to_char(deposit_id)), datz, dat_begin
         into l_dealnum, l_dealdat, l_datbegin
@@ -10412,16 +10415,16 @@ is
             return null;
         end;
     end;
-  
+
     l_nazn := l_dealnum || case
                 when p_type = 'R' then
                  ' от '
                 else
                  ' від '
               end || f_dat_lit(l_dealdat, p_type);
-  
+
     return l_nazn;
-  
+
   end f_nazn;
   -- ======================================================================================
   function get_tt(p_type     dpt_op.id%type, -- тип депозитной операции
@@ -10435,21 +10438,21 @@ is
     l_tt    tts.tt%type;
     p_tagname constant op_rules.tag%type := 'DPTOP';
   begin
-  
+
     bars_audit.trace('%s тип операции = %s, МБ / КАРТ / ВАЛ = (%s, %s, %s)',
                      l_title,
                      to_char(p_type),
                      to_char(p_interpay),
                      to_char(p_cardpay),
                      to_char(p_currency));
-  
+
     -- в Сбербанке для выплаты депозита /процентов исп.единая операция PKR
     if p_cardpay = 1 then
       l_tt := cardpay_tt;
       bars_audit.trace('%s код операции = %s', l_title, l_tt);
       return l_tt;
     end if;
-  
+
     l_type := case
                 when (p_type = 2 and p_cardpay = 1) then
                  23 -- возврат депозита на карточку
@@ -10518,9 +10521,9 @@ is
         end;
     end;
     bars_audit.trace('%s код операции = %s', l_title, l_tt);
-  
+
     return l_tt;
-  
+
   end get_tt;
   -- ======================================================================================
   function get_nazn(p_tt     tts.tt%type,
@@ -10536,14 +10539,14 @@ is
     l_func   varchar2(250);
     l_result varchar2(250);
   begin
-  
+
     bars_audit.trace('%s: договор № %s, код операции %s',
                      l_title,
                      to_char(p_dptid),
                      p_tt);
-  
+
     select trim(nazn) into l_nazn from tts where tt = p_tt;
-  
+
     if p_tt = '%%1' then
       -- нарахування відсотків по договору № %s від %s
       l_tail := bars_msg.get_msg(g_modcode,
@@ -10562,28 +10565,28 @@ is
       -- не описано назначение платежа для операции
       bars_error.raise_error(g_modcode, 300, p_tt);
     else
-    
+
       l_length := length(l_nazn);
       l_tail   := l_nazn;
       l_tail   := substr(replace(l_tail, '#(ND)', to_char(p_dptid)), 1, 160);
       l_posb   := instr(l_tail, '#{', 1);
       l_pose   := instr(l_tail, '}', 1);
-    
+
       while l_posb > 0 loop
-      
+
         bars_audit.trace('%s: l_tail = %s, l_posB = %s, l_posE = %s',
                          l_title,
                          l_tail,
                          to_char(l_posb),
                          to_char(l_pose));
-      
+
         l_func := substr(l_tail, l_posb + 1, l_pose - l_posb);
         l_func := replace(l_func, '{', '');
         l_func := replace(l_func, '}', '');
         l_func := 'SELECT ' || l_func || ' FROM dual';
-      
+
         bars_audit.trace('%s: l_func = %s', l_title, l_func);
-      
+
         begin
           execute immediate l_func
             into l_result;
@@ -10592,25 +10595,25 @@ is
             -- невозможно рассчитать назначение платежа по формуле из карточки операции
             bars_error.raise_error(g_modcode, 301, p_tt, l_nazn);
         end;
-      
+
         bars_audit.trace('%s: l_result = %s', l_title, l_result);
-      
+
         l_tail := substr(l_tail, 1, l_posb - 1) || l_result ||
                   substr(l_tail, l_pose + 1);
         l_posb := instr(l_tail, '#{', 1);
         l_pose := instr(l_tail, '}', 1);
-      
+
       end loop;
-    
+
     end if;
-  
+
     l_nazn := substr(l_tail, 1, 160);
     bars_audit.trace('%s: назначение платежа = %s',
                      l_title,
                      l_nazn);
-  
+
     return l_nazn;
-  
+
   end get_nazn;
   -- ======================================================================================
   function get_vob(p_kva  tabval.kv%type,
@@ -10620,14 +10623,14 @@ is
     l_title varchar2(60) := 'dpt_web.get_vob: ';
     l_vob   vob.vob%type;
   begin
-  
+
     bars_audit.trace('%s валА = %s, валБ = %s, код/тип операции = %s/%s',
                      l_title,
                      to_char(p_kva),
                      to_char(p_kvb),
                      p_tt,
                      to_char(p_type));
-  
+
     if p_tt is not null then
       begin
         select vob into l_vob from tts_vob where tt = p_tt;
@@ -10640,7 +10643,7 @@ is
           l_vob := null;
       end;
     end if;
-  
+
     if l_vob is null then
       if (p_kva <> p_kvb) then
         l_vob := 16;
@@ -10655,13 +10658,13 @@ is
                        to_char(p_kvb),
                        to_char(l_vob));
     end if;
-  
+
     bars_audit.trace('%s вид обработки = %s',
                      l_title,
                      to_char(l_vob));
-  
+
     return l_vob;
-  
+
   end get_vob;
   -- ======================================================================================
   function get_amount(p_tt        tts.tt%type,
@@ -10683,15 +10686,15 @@ is
     l_result  varchar2(3000);
     l_amount  number;
   begin
-  
+
     bars_audit.trace('%s операция %s, формула = %s',
                      l_title,
                      p_tt,
                      p_formula);
-  
+
     if p_formula is not null then
       l_formula := p_formula;
-    
+
       l_formula := replace(l_formula, '#(ND)', to_char(p_ref));
       l_formula := replace(l_formula, '#(REF)', to_char(p_dealnum));
       l_formula := replace(l_formula, '#(S)', to_char(p_suma));
@@ -10708,11 +10711,11 @@ is
       l_formula := replace(l_formula,
                            '#(MFOB)',
                            '''' || p_bankcodeb || '''');
-    
+
       bars_audit.trace('%s формула с подстановками =  %s',
                        l_title,
                        l_formula);
-    
+
       begin
         execute immediate 'SELECT ' || l_formula || ' FROM dual'
           into l_result;
@@ -10724,7 +10727,7 @@ is
       bars_audit.trace('%s значение формулы =  %s',
                        l_title,
                        l_result);
-    
+
       begin
         l_amount := to_number(l_result);
       exception
@@ -10732,15 +10735,15 @@ is
           -- ошибка преобразования в число суммы комиссии
           bars_error.raise_error(g_modcode, 304, l_result);
       end;
-    
+
     else
       l_amount := 0;
     end if;
-  
+
     bars_audit.trace('%s сумма = %s', l_title, to_char(l_amount));
-  
+
     return l_amount;
-  
+
   end get_amount;
 
   -- ======================================================================================
@@ -10755,13 +10758,13 @@ is
     l_bdate      date;
   begin
     l_bdate := gl.bdate;
-  
+
     bars_audit.trace('F_GET_NOCASH_COMMIS: start with: dpt_id = %s, acc = %s, kv = %s, bdate = %s.',
                      to_char(p_dptid),
                      to_char(p_acc),
                      to_char(p_kv),
                      to_char(l_bdate, 'dd/mm/yyyy'));
-  
+
     -- BRSMAIN-2411 (пошук суми безготівкових зарахувань по міжбанку або від іншого клієнта, що надійшли після 27.02.2014 р.)
     -- BRSMAIN-3082 (пошук суми безготівкових зарахувань по міжбанку: 1) від іншого клієнта; 2) надійшли після 27.02.2014 р.; 3) надійшли не з Ощадбанку)
     -- COBUSUPABS-3240 (пошук суми безготівкового зарахування коштів клієнтів з рахунків 2625 на рах. 2620/30/35 потрапляють через рах. 2924)
@@ -10788,7 +10791,7 @@ is
        and (a.okpo <> o.id_a or
            o.mfoa not in (select mfo from banks where mfou = '300465') or
            a.fdat <= to_date('27/02/2014', 'dd/mm/yyyy'));
-  
+
     -- розрахунок комісії за видачу готівки
     if (nvl(l_sum_nocash, 0) > 0) then
       begin
@@ -10813,9 +10816,9 @@ is
     else
       l_sum_nocash := 0;
     end if;
-  
+
     return l_sum_nocash;
-  
+
   end f_get_nocash_commis;
 
   -- ======================================================================================
@@ -10830,7 +10833,7 @@ is
                        p_extend in number default 0) -- признак переооформленного вклада
    return number is
   begin
-  
+
     return dpt.payoff_enable(p_intacc,
                              p_freq,
                              p_avans,
@@ -10838,7 +10841,7 @@ is
                              p_enddat,
                              p_curdat,
                              p_extend);
-  
+
   end f_allow2pay;
   --=======================================================================================
   function f_interbank(p_mfo banks.mfo%type) return number is
@@ -10863,9 +10866,9 @@ is
     title constant varchar2(60) := 'dptweb.acciscard:';
     l_iscard number(1);
   begin
-  
+
     bars_audit.trace('%s entry with {%s, %s}', title, p_bankcode, p_accnum);
-  
+
     select (case
              when count(*) > 0 then
               1
@@ -10878,7 +10881,7 @@ is
        and a.nls = p_accnum
        and a.dazs is null
        and a.acc = b.acc_pk;
-  
+
     --
     -- якщо рахунок 2625% але його немає в BPK_ALL_ACCOUNTS (тимчасово щоб знайти причину)
     --
@@ -10893,7 +10896,7 @@ is
     l_iscard := nvl(l_iscard, 0);
     bars_audit.trace('%s exit with {%s}', title, to_char(l_iscard));
     return l_iscard;
-  
+
   end account_is_card;
 
   --=======================================================================================
@@ -10902,15 +10905,15 @@ is
   function search_acc_params(p_accid in accounts.acc%type) return acc_rec is
     l_accrec acc_rec;
   begin
-  
+
     select a.nls, a.kv, substr(a.nms, 1, 38), substr(c.nmk, 1, 38), c.okpo
       into l_accrec
       from accounts a, customer c
      where a.rnk = c.rnk
        and a.acc = p_accid;
-  
+
     return l_accrec;
-  
+
   exception
     when no_data_found then
       bars_error.raise_nerror(g_modcode, g_accnotfound, to_char(p_accid));
@@ -10928,7 +10931,7 @@ is
     bars_audit.trace('dpt_web.fill_dpt_payments: договор № %s, реф %s',
                      to_char(p_dptid),
                      to_char(p_ref));
-  
+
     begin
       insert into dpt_payments
         (dpt_id, ref, branch, rnk)
@@ -10947,7 +10950,7 @@ is
                                to_char(p_dptid),
                                substr(sqlerrm, 1, 250));
     end;
-  
+
   end fill_dpt_payments;
   -- ======================================================================================
   procedure kill_dpt_payments(p_dptid     in dpt_payments.dpt_id%type,
@@ -10971,13 +10974,13 @@ is
       l_staff  staff%rowtype;
       l_chkgrp chklist%rowtype;
     begin
-    
+
       select * into l_staff from staff where id = p_userid;
       bars_audit.trace(l_title || 'пользователь № %s, %s / %s',
                        to_char(l_staff.id),
                        l_staff.fio,
                        l_staff.tabn);
-    
+
       -- код группы контроля "Сторно"
       select *
         into l_chkgrp
@@ -10986,7 +10989,7 @@ is
       bars_audit.trace(l_title || 'группа № %s %s',
                        to_char(l_chkgrp.idchk),
                        l_chkgrp.name);
-    
+
       insert into oper_visa
         (ref,
          sqnc,
@@ -11007,24 +11010,24 @@ is
          l_staff.tabn,
          l_chkgrp.idchk,
          l_chkgrp.name);
-    
+
       bars_audit.trace(l_title ||
                        'занесена запись в историю виз на док-те № %s',
                        to_char(p_ref));
-    
+
     end fill_oper_visa;
     ---------
   begin
-  
+
     bars_audit.trace(l_title ||
                      'договор № %s, документ № %s, статус док-тов = %s, запрет на положит.визы =%s',
                      to_char(p_dptid),
                      to_char(p_ref),
                      to_char(p_docstatus),
                      to_char(p_novisa));
-  
+
     select reason into l_reason from bp_reason where id = p_reasonid;
-  
+
     for dpt_docs in (select o.*,
                             (select count(*)
                                from oper_visa
@@ -11040,7 +11043,7 @@ is
       bars_audit.trace(l_title || ' документ № %s, статус - %s',
                        to_char(dpt_docs.ref),
                        to_char(dpt_docs.sos));
-    
+
       if (dpt_docs.sos > p_docstatus) or
          (p_novisa = 1 and dpt_docs.visa > 0) then
         bars_error.raise_nerror(g_modcode,
@@ -11048,7 +11051,7 @@ is
                                 to_char(dpt_docs.ref),
                                 to_char(p_dptid));
       end if;
-    
+
       begin
         p_back_dok(ref_      => dpt_docs.ref,
                    lev_      => p_levelid,
@@ -11072,7 +11075,7 @@ is
                                   sqlerrm);
       end;
     end loop; -- dpt_docs
-  
+
   end kill_dpt_payments;
   -- ======================================================================================
   procedure paydoc(p_dptid    in dpt_deposit.deposit_id%type,
@@ -11127,11 +11130,11 @@ is
     l_child_s  oper.s%type;
     l_child_s2 oper.s2%type;
   begin
-  
+
     p_ref      := null;
     p_err_flag := false;
     p_err_msg  := null;
-  
+
     bars_audit.trace('%s договор № %s, ФИО - %s, дата - %s, назначение - %s, ' ||
                      'тип/код операции - %s, вид/ДК/исп/СК - %s',
                      l_title,
@@ -11160,13 +11163,13 @@ is
                      p_idb,
                      to_char(p_kvb),
                      to_char(p_sb));
-  
+
     if nvl(p_sa, 0) = 0 then
       return;
     end if;
-  
+
     l_userid := nvl(p_userid, gl.auid);
-  
+
     -- процедура НЕ должна запускаться от имени супер-пользователя
     if (l_curbranch = '/') then
       p_err_msg := 'Заборонено виконання процедури оплати документа від імені підрозділу ' ||
@@ -11180,7 +11183,7 @@ is
     bars_audit.trace('%s представились подразделением %s',
                      l_title,
                      p_brancha);
-  
+
     -- проверка "Счет для списания не заблокирован"
     select nvl(blkd, 0)
       into l_blkd
@@ -11188,7 +11191,7 @@ is
      where nls = p_nlsa
        and kv = p_kva
        and kf = p_mfoa;
-  
+
     if l_blkd != 0 then
       p_err_msg := bars_error.get_nerror_text(g_modcode,
                                               g_accountdebitdenied,
@@ -11196,7 +11199,7 @@ is
                                               to_char(p_kva));
       raise l_error;
     end if;
-  
+
     -- признак "чистого" межбанка
     if p_mfoa = p_mfob then
       l_interbank := 0;
@@ -11206,16 +11209,16 @@ is
     bars_audit.trace('%s признак "чистого" межбанка = %s',
                      l_title,
                      to_char(l_interbank));
-  
+
     -- признак платежа на карточку
     l_card := account_is_card(p_mfob, p_nlsb);
     bars_audit.trace('%s признак платежа на карточку = %s',
                      l_title,
                      to_char(l_card));
-  
+
     -- p_branchb = null - допустимо отсутствие счета-Б в балансе подразделения,
     --                    которое инициировало платеж (p_branchb != null - НЕдопустимо)
-  
+
     -- определения счета Б для оплаты
     if (l_card = 1) then
       -- платеж на карточку
@@ -11252,14 +11255,14 @@ is
           -- коррсчет банку (для нацвалюти)
           l_nlsb := get_proc_nls('T00', gl.baseval);
       end;
-    
+
       l_branchb := p_brancha;
-    
+
     end if;
     bars_audit.trace('%s счет-Б для оплаты = %s',
                      l_title,
                      l_nlsb);
-  
+
     -- код операции
     if p_tt is not null then
       l_tt := p_tt;
@@ -11270,7 +11273,7 @@ is
                      p_currency => p_kva);
     end if;
     bars_audit.trace('%s код операции = %s', l_title, l_tt);
-  
+
     -- вид обработки
     if p_vob is not null then
       l_vob := p_vob;
@@ -11280,21 +11283,21 @@ is
     bars_audit.trace('%s вид обработки = %s',
                      l_title,
                      to_char(l_vob));
-  
+
     -- назначение платежа
     if p_nazn is not null then
       l_nazn := p_nazn;
     else
       l_nazn := get_nazn(l_tt, p_dptid, null, null);
     end if;
-  
+
     -- IF l_card = 1 THEN
     --   l_nazn := substr(l_nazn||' на картковий рахунок', 1, 160);
     -- END IF;
     bars_audit.trace('%s назначение платежа = %s',
                      l_title,
                      l_nazn);
-  
+
     -- наименование отправителя
     if p_mfoa <> p_mfob and l_interbank = 1 then
       l_nama := nvl(p_nmk, p_nama);
@@ -11302,7 +11305,7 @@ is
       l_nama := p_nama;
     end if;
     bars_audit.trace('%s отправитель = %s', l_title, l_nama);
-  
+
     begin
       gl.ref(p_ref);
       gl.in_doc3(p_ref,
@@ -11334,7 +11337,7 @@ is
                  1,
                  null,
                  null);
-    
+
       paytt(null,
             p_ref,
             p_vdat,
@@ -11349,7 +11352,7 @@ is
       bars_audit.trace('%s референс документа =  %s',
                        l_title,
                        to_char(p_ref));
-    
+
       -- доплата дочерней операции для выплаты на карточку (PKR)
       if l_card = 1 then
         for c in (select t.tt, a.dk invers, t.s formula, t.s2 formula2
@@ -11363,7 +11366,7 @@ is
                           else
                            p_dk
                         end;
-        
+
           -- сумма-а дочерней операции
           if c.formula is not null then
             l_child_s := dpt_web.get_amount(p_tt        => l_tt,
@@ -11423,7 +11426,7 @@ is
                            c.tt);
         end loop;
       end if;
-    
+
     exception
       when others then
         bars_error.get_error_info(sqlerrm,
@@ -11436,7 +11439,7 @@ is
                                   p_errmsg);
         raise l_error;
     end;
-  
+
     -- запись документа в хранилище док-тов по депозитному договору ФО
     if (p_dptid is not null) and (p_mcode = 'DPT') then
       fill_dpt_payments(p_dptid, p_ref);
@@ -11445,7 +11448,7 @@ is
                        to_char(p_ref),
                        to_char(p_dptid));
     end if;
-  
+
   exception
     when l_error then
       p_err_flag := true;
@@ -11461,13 +11464,13 @@ is
     l_accnum accounts.nls%type;
     l_result varchar2(3000);
   begin
-  
+
     bars_audit.trace('%s формула для расчета счета = %s',
                      l_title,
                      p_formula);
-  
+
     if (substr(p_formula, 1, 2) = '#(') then
-    
+
       begin
         execute immediate 'SELECT ' ||
                           substr(p_formula, 3, length(p_formula) - 3) ||
@@ -11481,19 +11484,19 @@ is
       bars_audit.trace('%s результат вычислений = %s',
                        l_title,
                        l_result);
-    
+
       l_accnum := substr(l_result, 1, 14);
-    
+
     else
-    
+
       l_accnum := substr(p_formula, 1, 14);
-    
+
     end if;
-  
+
     bars_audit.trace('%s счет = %s', l_title, l_accnum);
-  
+
     return l_accnum;
-  
+
   end get_accnum;
 
   -- ======================================================================================
@@ -11529,17 +11532,17 @@ is
     l_errmsg  g_errmsg%type;
     l_brancha branch.branch%type;
     l_branchb branch.branch%type;
-  
+
   begin
-  
+
     bars_audit.trace('%s операция %s', l_title, p_tt);
-  
+
     -- параметры операции
     select * into l_ttrow from tts where tt = p_tt;
     bars_audit.trace('%s название операции = %s',
                      l_title,
                      l_ttrow.name);
-  
+
     -- сторона А
     l_mfoa    := sys_context('bars_context', 'user_mfo');
     l_brancha := sys_context('bars_context', 'user_branch');
@@ -11551,7 +11554,7 @@ is
                      l_title,
                      l_nlsa,
                      to_char(l_kva));
-  
+
     -- сторона Б
     l_mfob    := l_mfoa;
     l_branchb := l_brancha;
@@ -11574,7 +11577,7 @@ is
                      l_title,
                      l_nlsb,
                      to_char(l_kvb));
-  
+
     -- назначение платежа
     l_nazn := dpt_web.get_nazn(p_tt     => p_tt,
                                p_dptid  => p_dptid,
@@ -11583,7 +11586,7 @@ is
     bars_audit.trace('%s назначение платежа = %s',
                      l_title,
                      l_nazn);
-  
+
     -- сумма платежа - A
     if p_amount > 0 then
       l_amounta := p_amount;
@@ -11606,7 +11609,7 @@ is
     bars_audit.trace('%s сумма комиссии = %s',
                      l_title,
                      to_char(l_amounta));
-  
+
     -- сумма платежа - Б
     if l_ttrow.s2 is null then
       l_amountb := gl.p_icurval(l_kva, l_amounta, p_vdate);
@@ -11629,7 +11632,7 @@ is
     bars_audit.trace('%s сумма-2 комиссии = %s',
                      l_title,
                      to_char(l_amountb));
-  
+
     -- оплата
     paydoc(p_dptid    => p_dptid,
            p_vdat     => p_vdate,
@@ -11658,19 +11661,19 @@ is
            p_ref      => l_ref,
            p_err_flag => l_errflg,
            p_err_msg  => l_errmsg);
-  
+
     bars_audit.trace('%s референс комиссии = %s',
                      l_title,
                      to_char(l_ref));
-  
+
     if l_errflg then
       -- ошибка оплаты документа по взысканию комиссии за безнал.пополнение
       bars_error.raise_error(g_modcode, 305, substr(l_errmsg, 1, 254));
     end if;
-  
+
     p_ref    := l_ref;
     p_amount := l_amounta;
-  
+
   end paydoc_nocash_commission;
 
   -- ======================================================================================
@@ -11682,12 +11685,12 @@ is
     l_reqid     dpt_requests.req_id%type; /* ид. созданного запроса */
     l_branch    branch.branch%type; /*          код отделения */
   begin
-  
+
     bars_audit.trace('%s: entry with: reqtype=%s, dptid=%s.',
                      pn,
                      to_char(p_reqtype),
                      to_char(p_dptid));
-  
+
     begin
       select reqtype_id
         into l_reqtypeid
@@ -11699,14 +11702,14 @@ is
                                 request_type_not_found,
                                 p_reqtype);
     end;
-  
+
     bars_audit.trace('%s: reqtype id=%s', pn, to_char(l_reqtypeid));
-  
+
     -- бранч користувача
     l_branch := sys_context('bars_context', 'user_branch');
-  
+
     bars_audit.trace('%s: dpt branch is %s', pn, l_branch);
-  
+
     -- Создаем запрос
     insert into dpt_requests
       (req_id,
@@ -11725,12 +11728,12 @@ is
        p_dptid,
        l_branch)
     returning req_id into l_reqid;
-  
+
     bars_audit.trace('%s: req created id=%s', pn, to_char(l_reqid));
     bars_audit.trace('%s: succ end', pn);
-  
+
     return l_reqid;
-  
+
   end create_request;
 
   -- ======================================================================================
@@ -11739,24 +11742,24 @@ is
     pn constant varchar2(100) := 'dpt.prcreq';
     l_reqfunc dpt_req_types.reqtype_func%type; /*  функция обработки запроса */
   begin
-  
+
     bars_audit.trace('%s: entry point par[0]=>%s', pn, to_char(p_reqid));
-  
+
     select reqtype_func
       into l_reqfunc
       from dpt_requests r, dpt_req_types t
      where r.req_id = p_reqid
        and r.reqtype_id = t.reqtype_id;
-  
+
     bars_audit.trace('%s: req func is %s', pn, l_reqfunc);
-  
+
     -- Запускаем
     execute immediate 'begin ' || l_reqfunc || '(:reqid); end;'
       using p_reqid;
-  
+
     bars_audit.trace('%s: reqfunc completed.', pn);
     bars_audit.trace('%s: succ end', pn);
-  
+
   end process_request;
 
   -- ======================================================================================
@@ -11767,12 +11770,12 @@ is
     l_reqfunc dpt_req_types.reqtype_func%type; /*  функция обработки запроса */
     l_cnt     number; /*    признак наличия запроса */
   begin
-  
+
     bars_audit.trace('%s: entry point par[0]=>%s par[1]=>%s',
                      pn,
                      to_char(p_reqid),
                      to_char(p_reqstate));
-  
+
     -- Устанавливаем состояние (только для необработ.)
     update dpt_requests
        set req_prcdate   = sysdate,
@@ -11780,12 +11783,12 @@ is
            req_state     = p_reqstate
      where req_id = p_reqid
        and req_state is null;
-  
+
     if (sql%rowcount = 0) then
-    
+
       -- Проверяем существование
       select count(*) into l_cnt from dpt_requests where req_id = p_reqid;
-    
+
       -- Если запрос есть, то значит он был уже обработан
       if (l_cnt = 0) then
         bars_error.raise_nerror(g_modcode,
@@ -11796,11 +11799,11 @@ is
                                 request_processed,
                                 to_char(p_reqid));
       end if;
-    
+
     end if;
-  
+
     bars_audit.trace('%s: succ end', pn);
-  
+
   end set_request_state;
 
   -- ======================================================================================
@@ -11810,14 +11813,14 @@ is
     pn constant varchar2(100) := 'dpt.getreqst';
     l_reqstate dpt_requests.req_state%type; /* состояние */
   begin
-  
+
     select req_state
       into l_reqstate
       from dpt_requests
      where req_id = p_reqid;
-  
+
     return l_reqstate;
-  
+
   exception
     when no_data_found then
       bars_error.raise_nerror(g_modcode,
@@ -11835,30 +11838,30 @@ is
     l_bankdt fdat.fdat%type; /*            Банк. дата польз. */
     l_isdel  number; /*       признак возм. удаления */
   begin
-  
+
     bars_audit.trace('%s: enry point par[0]=>%s', pn, to_char(p_dptid));
-  
+
     /* Удаление депозитов запрещено. */
-  
+
     bars_error.raise_nerror(g_modcode,
                             g_proc_deprecated,
                             'dpt_web.dpt_delete');
-  
+
     /*
       -- TODO: добавить функцию проверки на возможность закрытия
       l_isdel := dpt_web.dpt_del_enabled(p_dptid);
       bars_audit.trace('%s: deleting flag is %s', pn, to_char(l_isdel));
-    
+
       if (l_isdel != 1) then
           bars_error.raise_nerror(g_modcode, DELETE_DEAL_DISALLOWED, to_char(p_dptid));
       end if;
-    
+
       l_bankdt := bankdate;
-    
+
       -- Создаем заголовок запроса
       l_reqid := create_request('DELETE_DEAL', p_dptid);
        bars_audit.trace('%s: req header created, id=%s', pn, to_char(l_reqid));
-    
+
       -- Определяем пользователя, который создал договор
       begin
         select branch, actiion_author
@@ -11871,7 +11874,7 @@ is
           bars_error.raise_nerror(g_modcode, DPTCREATOR_NOT_EXISTS, to_char(p_dptid));
       end;
       bars_audit.trace('%s: dpt creator is user %s', pn, to_char(l_userid));
-    
+
       -- Определяем нужно ли добавлять
       if (l_userid != user_id) then
           insert into dpt_req_deldeals(req_id, user_id, user_bdate, branch)
@@ -11880,7 +11883,7 @@ is
       else
           bars_audit.trace('%s: request user is dpt creator, skipping', pn);
       end if;
-    
+
       -- Проходим по документам
       insert into dpt_req_deldeals(req_id, user_id, user_bdate, branch)
       select l_reqid, dc.userid, l_bankdt, l_branch
@@ -11889,20 +11892,20 @@ is
          and dp.dpt_id  = p_dptid
          and dc.status in (1, 2)   -- только подтверждение
        group by dc.userid;
-    
+
       bars_audit.trace('%s: added %s check-in user(s)', to_char(sql%rowcount));
-    
+
       process_request(l_reqid);
-    
+
       if (get_request_state(l_reqid) = REQUEST_ALLOWED) then
           g_dptdelcode := DEAL_DELETED;
       else
           g_dptdelcode := DEAL_DELREQ;
       end if;
-    
+
       bars_audit.trace('%s: succ end', pn);
     */
-  
+
   end delete_deposit;
   -- ======================================================================================
   procedure get_deldeposit_msg(p_delcode out number, p_delmsg out varchar2) is
@@ -11912,15 +11915,15 @@ is
     --     на удаления (ожидает подтверждения). Текст соответствует
     --     коду сообщения
   begin
-  
+
     p_delcode := g_dptdelcode;
-  
+
     if (p_delcode = deal_deleted) then
       p_delmsg := bars_msg.get_msg(g_modcode, 'DEAL_DELETED');
     else
       p_delmsg := bars_msg.get_msg(g_modcode, 'DEAL_DELREQ');
     end if;
-  
+
   end get_deldeposit_msg;
 
   -- ======================================================================================
@@ -11932,27 +11935,27 @@ is
     l_cnt   number;
     l_dptid dpt_requests.dpt_id%type; /* ид. деп. договора */
   begin
-  
+
     bars_audit.trace('%s: entry point par[0]=>%s', to_char(p_reqid));
     /* Удаление депозитов запрещено. */
     bars_error.raise_nerror(g_modcode,
                             g_proc_deprecated,
                             'dpt_web.dpt_delete');
-  
+
     /*  -- Смотрим были ли отказы
       select count(*) into l_cnt
         from dpt_req_deldeals
        where req_id     = p_reqid
          and user_state = -1;
-    
+
       bars_audit.trace('%s: req %s refused record(s) found.', pn, to_char(l_cnt));
-    
+
       -- Если отказы были, то закрываем запрос
       if (l_cnt > 0) then
           set_request_state(p_reqid, REQUEST_DISALLOWED);
           return;
       end if;
-    
+
       -- Проверяем все ли подтверждения получены
       select count(*) into l_cnt
         from dpt_req_deldeals
@@ -11960,20 +11963,20 @@ is
          and (user_state is null or
               user_state != 1       );
       bars_audit.trace('%s: req has %s not approved recors.', pn, to_char(l_cnt));
-    
+
       -- Если неподтвержденных нет, то удаляем
       if (l_cnt = 0) then
-    
+
           set_request_state(p_reqid, REQUEST_ALLOWED);
-    
+
           select dpt_id into l_dptid
             from dpt_requests
            where req_id = p_reqid;
-    
+
           dpt_web.dpt_delete(l_dptid);
-    
+
       end if;
-    
+
       bars_audit.trace('%s: succ end');
     */
   end process_req_deldeal;
@@ -11986,28 +11989,28 @@ is
     l_userid staff$base.id%type; /* Ид. текущего польз. */
     l_cnt    number;
   begin
-  
+
     bars_audit.trace('%s: entry point par[0]=>%s par[1]=>%s',
                      to_char(p_reqid),
                      to_char(p_reqcheck));
-  
+
     l_userid := user_id;
     bars_audit.trace('%s: current user is %s', pn, to_char(l_userid));
-  
+
     update dpt_req_deldeals
        set user_date = sysdate, user_state = p_reqcheck
      where req_id = p_reqid
        and user_id = l_userid
        and user_state is null;
-  
+
     if (sql%rowcount = 0) then
-    
+
       select count(*)
         into l_cnt
         from dpt_req_deldeals
        where req_id = p_reqid
          and user_id = l_userid;
-    
+
       if (l_cnt = 0) then
         bars_error.raise_nerror(g_modcode,
                                 request_not_found,
@@ -12017,15 +12020,15 @@ is
                                 request_user_check_put,
                                 to_char(p_reqid));
       end if;
-    
+
     end if;
-  
+
     bars_audit.trace('%s: user check applied.', pn);
-  
+
     process_request(p_reqid);
-  
+
     bars_audit.trace('%s: succ end', pn);
-  
+
   end put_deldeal_check;
   -- ======================================================================================
   procedure set_bonusreq_state(p_dptid in dpt_bonus_requests.dpt_id%type,
@@ -12033,16 +12036,16 @@ is
     -- Процедура установки признака "Обработано" для запроса по бонусным процентным ставкам
     l_title constant varchar2(100) := 'dpt.setbnreqst';
   begin
-  
+
     bars_audit.trace('%s: entry point par[0]=>%s, par[1]=>%s',
                      l_title,
                      to_char(p_dptid),
                      to_char(p_reqid));
-  
+
     set_request_state(p_reqid, request_allowed);
-  
+
     bars_audit.trace('%s: succ end', l_title);
-  
+
   end set_bonusreq_state;
 
   -- ======================================================================================
@@ -12059,11 +12062,11 @@ is
                      pn,
                      to_char(p_dptid),
                      to_char(p_agrmntid));
-  
+
     -- Создаем запрос
     l_reqid := create_request('AGRMNT_COMMIS', p_dptid);
     bars_audit.trace('%s: req created id=%s', pn, to_char(l_reqid));
-  
+
     -- Сохраняем инф. о активном запросе в рекв. дог.
     dpt.fill_dptparams(p_dptid => p_dptid,
                        p_tag   => dptw_commis_reqid,
@@ -12073,10 +12076,10 @@ is
                        p_val   => to_char(p_agrmntid));
     -- Автообработка спец. для сбер
     put_commis_check(l_reqid, 1);
-  
+
     bars_audit.trace('%s: succ end', pn);
     return l_reqid;
-  
+
   end create_commis_request;
 
   -- ======================================================================================
@@ -12089,24 +12092,24 @@ is
     l_dptid dpt_deposit.deposit_id%type; /*       Ид. деп договора */
   begin
     bars_audit.trace('%s: entry point par[0]=>%s', pn, to_char(p_reqid));
-  
+
     -- Получаем состояние
     l_reqst := get_request_state(p_reqid);
     bars_audit.trace('%s: req state is ', pn, nvl(to_char(l_reqst), 0));
-  
+
     if (l_reqst is null) then
       set_request_state(p_reqid, dpt_web.request_disallowed);
       bars_audit.trace('%s: req auto process to disallowed.', pn);
     end if;
-  
+
     select dpt_id into l_dptid from dpt_requests where req_id = p_reqid;
     bars_audit.trace('%s: req dptid is %s', pn, to_char(l_dptid));
-  
+
     delete from dpt_depositw
      where dpt_id = l_dptid
        and tag in (dptw_commis_reqid, dptw_commis_reqagrmn);
     bars_audit.trace('%s: succ end', pn);
-  
+
   end delete_commis_request;
 
   -- ======================================================================================
@@ -12119,14 +12122,14 @@ is
     l_reqid dpt_requests.req_id%type; /* ид. запроса */
   begin
     bars_audit.trace('%s: entry point par[0]=>%s', pn, to_char(p_dptid));
-  
+
     select to_number(value)
       into l_reqid
       from dpt_depositw
      where dpt_id = p_dptid
        and tag = dptw_commis_reqid;
     bars_audit.trace('%s: active req id is %s', pn, to_char(l_reqid));
-  
+
     return l_reqid;
   exception
     when no_data_found then
@@ -12166,28 +12169,28 @@ is
                      to_char(p_dptid),
                      to_char(p_newint),
                      to_char(p_expdate, 'dd.mm.yyyy'));
-  
+
     l_reqid := create_request('AGRMNT_CHGINT', p_dptid);
     bars_audit.trace('%s: created req header id=%s', pn, to_char(l_reqid));
-  
+
     select branch into l_branch from dpt_requests where req_id = l_reqid;
-  
+
     select acrn.fproc(acc, bankdate)
       into l_cint
       from dpt_deposit
      where deposit_id = p_dptid;
     bars_audit.trace('%s: current int rate is %s', pn, to_char(l_cint));
-  
+
     -- Вставляем расширенную часть запроса
     insert into dpt_req_chgints
       (req_id, reqc_type, reqc_expdate, reqc_oldint, reqc_newint, branch)
     values
       (l_reqid, req_chgint_ind, p_expdate, l_cint, p_newint, l_branch);
     bars_audit.trace('%s: request detail created.', pn);
-  
+
     bars_audit.trace('%s: succ end', pn);
     return l_reqid;
-  
+
   end create_chgintdpt_request;
 
   --
@@ -12214,7 +12217,7 @@ is
                      p_branch,
                      to_char(p_dptdateu, 'dd.mm.yyyy'),
                      to_char(p_dptdatef, 'dd.mm.yyyy'));
-  
+
     for c in (select deposit_id, branch
                 from dpt_deposit
                where vidd = p_dptvidd
@@ -12224,9 +12227,9 @@ is
       bars_audit.trace('%s: creating req for dptid=%s',
                        pn,
                        to_char(c.deposit_id));
-    
+
       l_reqid := create_request('AGRMNT_CHGINT', c.deposit_id);
-    
+
       insert into dpt_req_chgints
         (req_id, reqc_type, reqc_expdate, reqc_begdate, reqc_newbr, branch)
       values
@@ -12234,13 +12237,13 @@ is
       bars_audit.trace('%s: req for dptid=%s created.',
                        pn,
                        to_char(c.deposit_id));
-    
+
       l_reqcnt := l_reqcnt + 1;
     end loop;
-  
+
     bars_audit.trace('%s: succ end reqcnt=%s', pn, to_char(l_reqcnt));
     return l_reqcnt;
-  
+
   end create_chgintvid_request;
 
   --
@@ -12283,30 +12286,30 @@ is
     l_heritor    customer.nmk%type;
     l_codcagent  customer.codcagent%type;
     l_inheritrow dpt_inheritors%rowtype;
-  
+
   begin
-  
+
     bars_audit.trace('%s депозит № %s, рег.№ наследника = %s, доля = %s',
                      l_title,
                      to_char(p_dptid),
                      to_char(p_inheritor),
                      to_char(p_inheritshare));
-  
+
     if (p_certifnum is null or p_certifdate is null) then
       -- не заданы реквизиты свидетельства о праве на наследство
       bars_error.raise_nerror(g_modcode, 'INVALID_INHERIT_CERT');
     end if;
-  
+
     if (p_inheritshare is null or p_inheritdate is null) then
       -- не заданы реквизиты наследника (доля и дата вступления в права наследования)
       bars_error.raise_nerror(g_modcode, 'INVALID_INHERIT_PARAMS');
     end if;
-  
+
     if (p_inheritdate < p_certifdate) then
       -- дата вступу в права має бути більша за дату видачі свідоцтва
       bars_error.raise_nerror(g_modcode, 'INVALID_INHERIT_DATES');
     end if;
-  
+
     -- параметры договора (проверка существования договора)
     begin
       select nd, datz
@@ -12321,7 +12324,7 @@ is
                      l_title,
                      l_dptnum,
                      to_char(l_dptdat, 'dd.mm.yyyy'));
-  
+
     -- параметры клиента-наследника (проверка существования клиента)
     begin
       select nmk, codcagent
@@ -12338,31 +12341,31 @@ is
                      l_title,
                      l_heritor,
                      to_char(l_codcagent));
-  
+
     begin
-    
+
       select *
         into l_inheritrow
         from dpt_inheritors
        where dpt_id = p_dptid
          and inherit_custid = p_inheritor;
-    
+
       bars_audit.trace('%s изменение реквизитов записи в СПН',
                        l_title);
-    
+
       if (l_inheritrow.certif_num != p_certifnum or
          l_inheritrow.certif_date != p_certifdate or
          l_inheritrow.inherit_share != p_inheritshare or
          l_inheritrow.inherit_date != p_inheritdate) then
-      
+
         bars_audit.trace('%s параметры записи изменились',
                          l_title);
-      
+
         if (l_inheritrow.inherit_state = 1) then
           -- наследник уже вступил в права наследования, изменение реквизитов недопустимо
           bars_error.raise_nerror(g_modcode, 'INHERIT_UPDATE_DENIED');
         end if;
-      
+
         update dpt_inheritors
            set inherit_share = p_inheritshare,
                inherit_date  = p_inheritdate,
@@ -12370,7 +12373,7 @@ is
                certif_date   = p_certifdate
          where dpt_id = p_dptid
            and inherit_custid = p_inheritor;
-      
+
         if sql%rowcount = 1 then
           bars_audit.trace('%s изменение зафиксировано в БД',
                            l_title);
@@ -12381,15 +12384,15 @@ is
                                   to_char(p_inheritor),
                                   to_char(p_dptid));
         end if;
-      
+
       else
         bars_audit.trace('%s параметры записи не изменились',
                          l_title);
       end if;
-    
+
     exception
       when no_data_found then
-      
+
         bars_audit.trace('%s регистрация нового наследника',
                          l_title);
         -- сихронізація дати вступу в права спадкоємців (дата вступу у всіх має бути однакова)
@@ -12397,14 +12400,14 @@ is
           into l_bankdate
           from dpt_inheritors
          where dpt_id = p_dptid;
-      
+
         -- якщо по вкладу вже наявний активний спадкоємець то і всі наступні активні
         if inherited_deal(p_dptid, 1) = 'Y' then
           l_inheritrow.inherit_state := 1;
         else
           l_inheritrow.inherit_state := 0;
         end if;
-      
+
         insert into dpt_inheritors
           (dpt_id,
            inherit_custid,
@@ -12427,24 +12430,24 @@ is
            l_branch,
            l_bankdate,
            0);
-      
+
         bars_audit.trace('%s наследник № %s к договору № %s занесен в БД',
                          l_title,
                          to_char(p_inheritor),
                          to_char(p_dptid));
     end;
-  
+
     if inherit_valid_shares(p_dptid, 0) != 'Y' then
-    
+
       -- неверно заданы доли наследников по договору № %s
       bars_error.raise_nerror(g_modcode,
                               'INVALID_INHERIT_SHARE',
                               to_char(p_dptid));
-    
+
     end if;
-  
+
     bars_audit.trace('%s процедура выполнена', l_title);
-  
+
   end inherit_registration;
 
   -- ======================================================================================
@@ -12456,21 +12459,21 @@ is
     l_totalshare number;
     l_result     char(1);
   begin
-  
+
     bars_audit.trace('%s договор № %s, признак окончания регистрации = %s',
                      l_title,
                      to_char(p_dptid),
                      to_char(p_final));
-  
+
     select nvl(sum(inherit_share), 0)
       into l_totalshare
       from dpt_inheritors
      where dpt_id = p_dptid;
-  
+
     bars_audit.trace('%s общая сумма долей = %s',
                      l_title,
                      to_char(l_totalshare));
-  
+
     if p_final = 1 and not (l_totalshare = 100) then
       l_result := 'N';
     elsif p_final = 0 and not (l_totalshare between 0 and 100) then
@@ -12478,13 +12481,13 @@ is
     else
       l_result := 'Y';
     end if;
-  
+
     bars_audit.trace('%s флаг достоверности данных = %s',
                      l_title,
                      l_result);
-  
+
     return l_result;
-  
+
   end inherit_valid_shares;
 
   -- ======================================================================================
@@ -12498,20 +12501,20 @@ is
     bars_audit.trace('%s депозит № %s', l_title, to_char(p_dptid));
     bars_audit.trace('CONTRACT_ID = ' || to_char(p_dptid) ||
                      'TRUSTEE_RNK = ' || to_char(p_inherit_custid));
-  
+
     select sum(inherit_state)
       into l_state
       from dpt_inheritors
      where dpt_id = p_dptid
        and inherit_custid = p_inherit_custid;
-  
+
     if (l_state is null or l_state != 0) then
       -- СПН по договору № %s уже активировано
       bars_error.raise_nerror(g_modcode,
                               'INHERIT_ALREADY_ACTIVATED',
                               to_char(p_dptid));
     end if;
-  
+
     /*
       -- забрав перевірку часток для можливості виплати спадщили одному спадкоємцю (Ощадбанк)
       IF inherit_valid_shares (p_dptid, 1) != 'Y' THEN
@@ -12519,10 +12522,10 @@ is
          bars_error.raise_nerror(g_modcode, 'INVALID_INHERIT_SHARE', to_char(p_dptid));
       END IF;
     */
-  
+
     bars_audit.trace('%s закрытие акт.ДС о правах 3-их лиц и о перечислении вклада',
                      l_title);
-  
+
     for agr in (select a.agrmnt_id,
                        a.agrmnt_num,
                        a.trustee_id,
@@ -12540,20 +12543,20 @@ is
                        to_char(agr.agrmnt_id),
                        to_char(agr.agrmnt_type),
                        agr.agrmnt_typename);
-    
+
       close_agreement(v_dptid        => p_dptid,
                       v_agrid        => agr.agrmnt_id,
                       v_agrnum       => agr.agrmnt_num,
                       v_new_agrmntid => null,
                       v_trustid      => agr.trustee_id);
     end loop;
-  
+
     bars_audit.trace('%s выполнено закрытие ДС',
                      l_title);
-  
+
     bars_audit.trace('%s очистка параметров выплаты процентов и возврата депозита',
                      l_title);
-  
+
     change_deposit_accounts(p_dptid         => p_dptid,
                             p_intrcpname    => null,
                             p_intrcpidcode  => null,
@@ -12563,12 +12566,12 @@ is
                             p_restrcpidcode => null,
                             p_restrcpacc    => null,
                             p_restrcpmfo    => null);
-  
+
     bars_audit.trace('%s выполнена очистка параметров выплаты ',
                      l_title);
-  
+
     update dpt_inheritors set inherit_state = 1 where dpt_id = p_dptid;
-  
+
     if sql%rowcount = 0 then
       -- ошибка активации свидетельства о правах наследования договора № ...
       bars_error.raise_nerror(g_modcode,
@@ -12590,9 +12593,9 @@ is
     l_title  varchar2(60) := 'dpt_web.inherited_deal: ';
     l_result char(1);
   begin
-  
+
     bars_audit.trace('%s договор № %s', l_title, to_char(p_dptid));
-  
+
     select decode(cnt, 0, 'N', 'Y')
       into l_result
       from (select count(*) cnt
@@ -12603,9 +12606,9 @@ is
                      l_title,
                      l_result,
                      to_char(p_param));
-  
+
     return l_result;
-  
+
   end inherited_deal;
 
   -- ======================================================================================
@@ -12625,13 +12628,13 @@ is
     l_payoff_all number;
     l_rest       number;
   begin
-  
+
     bars_audit.trace('%s депозит № %s (счет %s), наследник № %s',
                      l_title,
                      to_char(p_dptid),
                      to_char(p_accid),
                      to_char(p_heritor));
-  
+
     begin
       select *
         into l_heritrow
@@ -12646,11 +12649,11 @@ is
                                 to_char(p_heritor),
                                 to_char(p_dptid));
     end;
-  
+
     bars_audit.trace('%s доля в наследстве = %s %%',
                      l_title,
                      to_char(l_heritrow.inherit_share));
-  
+
     if (l_heritrow.inherit_date > trunc(sysdate) or
        l_heritrow.inherit_state != 1) then
       -- наследник №.. еще не вступил в права наследования договора № ...
@@ -12659,7 +12662,7 @@ is
                               to_char(p_heritor),
                               to_char(p_dptid));
     end if;
-  
+
     -- поиск счета, проверка параметров
     begin
       select a.*
@@ -12680,7 +12683,7 @@ is
                      l_title,
                      l_accrow.nls,
                      to_char(l_accrow.kv));
-  
+
     if l_accrow.ostc != l_accrow.ostb then
       -- невозможно расчитать допустимую сумму выплаты по счету %s / %s - есть незавизир.документы
       bars_error.raise_nerror(g_modcode,
@@ -12688,14 +12691,14 @@ is
                               l_accrow.nls,
                               to_char(l_accrow.kv));
     end if;
-  
+
     /*
       -- Перевірка на вплату спадщини з технічного вкладу
       select vidd
         into l_vidd
         from dpt_deposit
        where deposit_id = p_dptid;
-    
+
       if (l_vidd < 0) then
         begin
           select d.deposit_id, d.acc, d.dat_end, i.acra
@@ -12717,7 +12720,7 @@ is
         end;
       end if;
     */
-  
+
     -- входящий остаток на счете на банк.дату ввода в систему свид-тва о правах на наследство
     begin
       select (ost + dos - kos)
@@ -12746,12 +12749,12 @@ is
                                             'dd.mm.yyyy'));
         end;
     end;
-  
+
     bars_audit.trace('%s вход.остаток на  %s = %s',
                      l_title,
                      to_char(l_heritrow.bankdate, 'dd.mm.yyyy'),
                      to_char(l_saldo0));
-  
+
     -- сумма всех поступлений на счет после ввода в систему свид-тва о правах на наследство
     select nvl(sum(kos), 0), nvl(sum(dos), 0)
       into l_credit, l_debit
@@ -12760,14 +12763,14 @@ is
        and fdat >= l_heritrow.bankdate
        and fdat <= l_bdate;
     -- AND fdat >= l_heritrow.inherit_date AND fdat <= l_bdate;
-  
+
     bars_audit.trace('%s сумма всех поступлений / списаний за период с %s по %s = %s / %s',
                      l_title,
                      to_char(l_heritrow.bankdate, 'dd.mm.yyyy'),
                      to_char(l_bdate, 'dd.mm.yyyy'),
                      to_char(l_credit),
                      to_char(l_debit));
-  
+
     -- сумма выплат данному наследнику
     select nvl(sum(decode(w.value, to_char(p_heritor), s, 0)), 0),
            nvl(sum(s), 0)
@@ -12780,7 +12783,7 @@ is
        and o.fdat <= l_bdate
        and o.ref = w.ref
        and w.tag = 'HERIT';
-  
+
     bars_audit.trace('%s общая сумма выплат наследнику = %s',
                      l_title,
                      to_char(l_payoff));
@@ -12790,37 +12793,37 @@ is
     bars_audit.trace('%s общая сумма выплат "в никуда"  = %s',
                      l_title,
                      to_char((l_debit - l_payoff_all)));
-  
+
     --l_rest := (l_saldo0 + l_credit - (l_debit - l_payoff_all))
     --        * (l_heritrow.inherit_share/100)
     --        - l_payoff;
-  
+
     l_rest := (l_saldo0 + l_credit);
     bars_audit.trace('%s общая сумма наследства = %s',
                      l_title,
                      to_char(l_rest));
-  
+
     l_rest := l_rest - (l_debit - l_payoff_all);
     bars_audit.trace('%s чистая сумма наследства = %s',
                      l_title,
                      to_char(l_rest));
-  
+
     l_rest := round(l_rest * l_heritrow.inherit_share / 100);
     bars_audit.trace('%s общая сумма наследства для наследника = %s',
                      l_title,
                      to_char(l_rest));
-  
+
     l_rest := l_rest - l_payoff;
     bars_audit.trace('%s остаток к выплате наследнику = %s',
                      l_title,
                      to_char(l_rest));
-  
+
     -- на счете может не хватить средств из-за погрешности округления
     l_rest := least(l_rest, l_accrow.ostc);
     bars_audit.trace('%s ИТОГО: %s', l_title, to_char(l_rest));
-  
+
     return l_rest;
-  
+
   end inherit_rest;
 
   -- ======================================================================================
@@ -12831,9 +12834,9 @@ is
     return varchar2 is
     l_cardaccount dpt_deposit.nls_d%type;
   begin
-  
+
     if p_payofftype = 'D' then
-    
+
       begin
         select d.nls_d
           into l_cardaccount
@@ -12847,9 +12850,9 @@ is
         when no_data_found then
           l_cardaccount := null;
       end;
-    
+
     elsif p_payofftype = 'P' then
-    
+
       begin
         select d.nls_p
           into l_cardaccount
@@ -12865,15 +12868,15 @@ is
         when no_data_found then
           l_cardaccount := null;
       end;
-    
+
     else
-    
+
       l_cardaccount := null;
-    
+
     end if;
-  
+
     return l_cardaccount;
-  
+
   end get_payoffcardacc;
   -- ======================================================================================
   -- расчет ставки по счету на дату (корректная обработка нулевых счетов)
@@ -12888,7 +12891,7 @@ is
     l_br    int_ratn.br%type;
     l_op    int_ratn.op%type;
   begin
-  
+
     begin
       select s.ostf - s.dos + s.kos
         into l_saldo
@@ -12902,14 +12905,14 @@ is
       when no_data_found then
         l_saldo := 0;
     end;
-  
+
     if l_saldo != 0 then
-    
+
       l_rate := acrn.fproc(p_dptacc, p_date);
       return l_rate;
-    
+
     else
-    
+
       begin
         select nvl(ir, 0), nvl(br, 0), op
           into l_ir, l_br, l_op
@@ -12925,14 +12928,14 @@ is
         when no_data_found then
           return 0;
       end;
-    
+
       if l_br > 0 then
         -- значение базової ставки на дату
         l_rate := nvl(getbrat(p_date, l_br, p_dptcur, p_dptsum), 0);
       else
         l_rate := 0;
       end if;
-    
+
       l_rate := case
                   when (l_ir + l_rate = 0) then
                    0
@@ -12950,11 +12953,11 @@ is
                       l_ir / l_rate
                    end
                 end;
-    
+
     end if;
-  
+
     return l_rate;
-  
+
   end get_dptrate;
   -- ======================================================================================
   --
@@ -12965,12 +12968,12 @@ is
    is
     title varchar2(60) := 'dpt_web.glpenalty.clear: ';
   begin
-  
+
     bars_audit.trace('%s старт с параметрами (%s, %s)...',
                      title,
                      to_char(p_dptaccid),
                      to_char(p_altintid));
-  
+
     delete from int_ratn
      where acc = p_dptaccid
        and id = p_altintid;
@@ -12983,12 +12986,12 @@ is
     delete from tmp_intarc
      where acc = p_dptaccid
        and id = p_altintid;
-  
+
     bars_audit.trace('%s выполнено для параметров (%s, %s)',
                      title,
                      to_char(p_dptaccid),
                      to_char(p_altintid));
-  
+
   end intl_clear_altintcard;
 
   --
@@ -13004,7 +13007,7 @@ is
    is
     title varchar2(60) := 'dpt_web.glpenalty.fill: ';
   begin
-  
+
     bars_audit.trace('%s старт с параметрами (dptaccid = %s, altintid = %s, intdat1 = %s, intdat2 = %s, penyarate = %s, penyadate = %s)',
                      title,
                      to_char(p_dptaccid),
@@ -13039,28 +13042,28 @@ is
          where acc = p_dptaccid
            and id = p_altintid;
     end;
-  
+
     --
     delete from int_ratn
      where acc = p_dptaccid
        and id = p_altintid;
-  
+
     if ((p_penyadate is not null) and (p_penyarate is not null)) then
-    
+
       -- установка штрафной ставки
       insert into int_ratn
         (acc, id, bdat, ir)
       values
         (p_dptaccid, p_altintid, p_penyadate, p_penyarate);
-    
+
       bars_audit.trace('%s вставлено штрафну ставку (bdat = %s, ir = %s)',
                        title,
                        to_char(p_penyadate, 'DD/MM/YYYY'),
                        to_char(p_penyarate));
-    
+
       -- переносим значення ставок які передують даті штрафної ставки (штрафується не весь термін договору)
       if (p_penyadate > p_intdat1) then
-      
+
         -- копіюєм значення основної ставки
         insert into int_ratn
           (acc, id, bdat, ir, op, br)
@@ -13069,15 +13072,15 @@ is
            where i.acc = p_dptaccid
              and i.id = p_genintid
              and i.bdat < p_penyadate;
-      
+
         bars_audit.trace('%s зкопійовано значення основної ставки (%s записів)...',
                          title,
                          to_char(sql%rowcount));
-      
+
       end if;
-    
+
     else
-    
+
       -- наследование основной ставки
       insert into int_ratn
         (acc, id, bdat, ir, op, br)
@@ -13085,18 +13088,18 @@ is
           from int_ratn i
          where i.acc = p_dptaccid
            and i.id = p_genintid;
-    
+
       bars_audit.trace('%s наследование основной ставки (%s, %s)...',
                        title,
                        to_char(p_dptaccid),
                        to_char(p_altintid));
     end if;
-  
+
     bars_audit.trace('%s виконано для параметрів (%s, %s)',
                      title,
                      to_char(p_dptaccid),
                      to_char(p_altintid));
-  
+
   end intl_fill_altintcard;
   --
   --  внутренняя процедура расчета суммы процентов (RO) и порождения документа (RO + RW)
@@ -13117,13 +13120,13 @@ is
     l_intamount number;
     l_errflg    boolean := false;
   begin
-  
+
     bars_audit.trace('%s старт, режим %s, сумма - %s %s',
                      title,
                      p_mode,
                      to_char(p_dptamount),
                      p_curcode);
-  
+
     -- 0 = расчет, 1 = расчет + проводки
     l_mode := case
                 when p_mode = 'RO' then
@@ -13131,7 +13134,7 @@ is
                 else
                  1
               end;
-  
+
     -- delete from int_queue; -- where acc_id = p_accrec.acc and int_id = p_intid;
     insert into int_queue
       (kf,
@@ -13171,13 +13174,13 @@ is
        substr(p_details, 1, 160),
        '%%1',
        'DPT');
-  
+
     make_int(p_dat2      => p_stopdate,
              p_runmode   => l_mode,
              p_runid     => 0,
              p_intamount => l_intamount,
              p_errflg    => l_errflg);
-  
+
     if l_errflg then
       bars_error.raise_nerror(g_modcode,
                               'MAKE_INT_ERROR',
@@ -13185,16 +13188,16 @@ is
                               to_char(p_accrec.kv),
                               to_char(p_accrec.acc));
     end if;
-  
+
     p_intamount := nvl(l_intamount, 0);
     --p_intamount := nvl(round(l_intamount), 0);
-  
+
     bars_audit.trace('%s выход, начислено %s %s',
                      title,
                      p_mode,
                      to_char(p_intamount),
                      p_curcode);
-  
+
   end intl_calc_interest;
   --
   -- внутренняя процедура проверок при частичном / полном снятии суммы вклада
@@ -13218,9 +13221,9 @@ is
     l_errmsg  varchar2(3000) := null;
     l_done    number;
   begin
-  
+
     bars_audit.trace('%s старт...', title);
-  
+
     if (p_date < p_begdate) then
       -- договор еще не вступил в силу
       l_nopenya := false;
@@ -13297,7 +13300,7 @@ is
       l_errmsg  := null;
     end if;
     bars_audit.trace('%s сообщение - %s', title, l_errmsg);
-  
+
     if l_nopenya then
       p_nopenya := l_nopenya;
       p_errmsg  := null;
@@ -13314,7 +13317,7 @@ is
                          p_errmsg);
       end if;
     end if;
-  
+
   end intl_validate_payoff;
   --
   -- внутренняя процедура формирования t_turndata в разрезе БАНКОВСКИХ дней
@@ -13329,13 +13332,13 @@ is
     l_maxdat  date;
     l_accturn t_turndata;
   begin
-  
+
     bars_audit.trace('%s entry, acc=>%s, datbeg=>%s, datend=>%s',
                      title,
                      to_char(p_accid),
                      to_char(p_datbeg, 'dd.mm.yy'),
                      to_char(p_datend, 'dd.mm.yy'));
-  
+
     -- даты первого и последнего движения по счету
     select min(fdat), max(fdat)
       into l_mindat, l_maxdat
@@ -13354,12 +13357,12 @@ is
                             where s.acc = p_accid
                               and s.fdat < p_datbeg
                               and s.ostf - s.dos + s.kos > 0));
-  
+
     bars_audit.trace('%s 1-st date - %s, last date - %s',
                      title,
                      to_char(l_mindat, 'dd.mm.yy'),
                      to_char(l_maxdat, 'dd.mm.yy'));
-  
+
     select acc,
            fdat,
            pdat,
@@ -13405,7 +13408,7 @@ is
              where acc = p_accid
                and fdat = l_maxdat
                and l_maxdat < p_datend);
-  
+
     if l_accturn.count = 0 then
       select acc,
              p_datend,
@@ -13429,10 +13432,10 @@ is
                                and s.ostf - s.dos + s.kos > 0
                              group by s.acc);
     end if;
-  
+
     p_accturn := l_accturn;
     bars_audit.trace('%s exit', title);
-  
+
   end intl_get_turndata_bnk;
   --
   -- внутренняя процедура формирования t_turndata в разрезе КАЛЕНДАРНЫХ дней
@@ -13447,15 +13450,15 @@ is
     l_maxdat  date;
     l_accturn t_turndata;
   begin
-  
+
     bars_audit.trace('%s entry, acc=>%s, datbeg=>%s, datend=>%s',
                      title,
                      to_char(p_accid),
                      to_char(p_datbeg, 'dd.mm.yy'),
                      to_char(p_datend, 'dd.mm.yy'));
-  
+
     delete from saldoho;
-  
+
     insert into saldoho
       (fdat, pdat, ostf, dos, kos)
       select fdat,
@@ -13496,7 +13499,7 @@ is
                        group by fdat
                        order by fdat)
                where dos + kos != 0);
-  
+
     -- даты первого и последнего движения по счету
     select min(fdat), max(fdat)
       into l_mindat, l_maxdat
@@ -13512,12 +13515,12 @@ is
                              from saldoho s
                             where s.fdat < p_datbeg
                               and s.ostf - s.dos + s.kos > 0));
-  
+
     bars_audit.trace('%s 1-st date - %s, last date - %s',
                      title,
                      to_char(l_mindat, 'dd.mm.yy'),
                      to_char(l_maxdat, 'dd.mm.yy'));
-  
+
     select p_accid,
            fdat,
            pdat,
@@ -13554,7 +13557,7 @@ is
               from saldoho
              where fdat = l_maxdat
                and l_maxdat < p_datend);
-  
+
     if l_accturn.count = 0 then
       select p_accid,
              p_datend,
@@ -13576,10 +13579,10 @@ is
                       where s.fdat < p_datbeg
                         and s.ostf - s.dos + s.kos > 0);
     end if;
-  
+
     p_accturn := l_accturn;
     bars_audit.trace('%s exit', title);
-  
+
   end intl_get_turndata_sys;
   --
   --  внутренняя процедура разметки сумм и дат для начисления процентов
@@ -13598,13 +13601,13 @@ is
     l_turncnt number;
     l_payed   number;
   begin
-  
+
     bars_audit.trace('%s разметка сумм по срокам для счета %s и суммы снятия %s (+%s)...',
                      title,
                      to_char(p_dptaccid),
                      to_char(p_amount),
                      to_char(p_commiss));
-  
+
     -- для режима RO начисление выполняется "в уме", без изменения даты посл.начисления
     -- в любом случае, проценты начислены минимум по текущую дату минус 1 день
     select acr_dat
@@ -13620,7 +13623,7 @@ is
     bars_audit.trace('%s проценты начислены по %s',
                      title,
                      to_char(l_acrdat, 'dd.mm.yy'));
-  
+
     bars_audit.trace('%s тип вычисления остатка - %s',
                      title,
                      to_char(p_intio));
@@ -13639,30 +13642,30 @@ is
                             p_datend  => p_date, -- дата списания средств
                             p_accturn => l_accturn); -- банк.даты с оборотами
     end if;
-  
+
     l_turncnt := l_accturn.count;
-  
+
     for i in 1 .. l_turncnt loop
-    
+
       l_payed := 0;
       for j in i .. l_turncnt loop
         -- общая сумма последующих списаний
         l_payed := l_payed + l_accturn(j).debit;
       end loop;
-    
+
       --входящий остаток минус все последующие списания
       l_accturn(i).rest := greatest(l_accturn(i).saldo - l_payed, 0);
-    
+
       -- сумма для начисления и выплаты по штрафной ставке
       l_accturn(i).rest2pay := least(l_accturn(i).rest, p_amount);
-    
+
       -- сумма для начисления и взыскания штрафа по обычной ставке
       l_accturn(i).rest2take := least(l_accturn(i).rest,
                                       p_amount + p_commiss);
-    
+
       -- конечная дата предыдущего начисления
       l_accturn(i).intdat1 := l_accturn(i).prevdat;
-    
+
       -- конечная дата текущего начисления по ставке част.снятия ( max() = текущая - 1)
       l_accturn(i).intdat2 := case
                                 when l_accturn(i).currdat < p_date then
@@ -13670,7 +13673,7 @@ is
                                 else
                                  l_accturn(i).currdat - 1
                               end;
-    
+
       -- конечная дата текущего начисления по обычной ставке ( max() >= текущая - 1)
       l_accturn(i).intdat3 := case
                                 when l_accturn(i).currdat < p_date then
@@ -13678,7 +13681,7 @@ is
                                 else
                                  l_acrdat -- !!! l_accturn(i).currdat - 1
                               end;
-    
+
       bars_audit.trace('%s %s - %s: вх.ост./Дт/Кт = (%s, %s, %s), ' ||
                        'сумма для нач.по штрафной ставке = %s, ' ||
                        'сумма для нач.и взыскания штрафа = %s',
@@ -13690,23 +13693,23 @@ is
                        to_char(l_accturn(i).credit),
                        to_char(l_accturn(i).rest2pay),
                        to_char(l_accturn(i).rest2take));
-    
+
       bars_audit.trace('%s гран.даты начисления (%s, %s, %s)',
                        title,
                        to_char(l_accturn(i).intdat1, 'dd.mm.yy'),
                        to_char(l_accturn(i).intdat2, 'dd.mm.yy'),
                        to_char(l_accturn(i).intdat3, 'dd.mm.yy'));
-    
+
     end loop;
-  
+
     p_accturn := l_accturn;
-  
+
     bars_audit.trace('%s разметка сумм по срокам для счета %s и суммы снятия %s (+%s) выполнена',
                      title,
                      to_char(p_dptaccid),
                      to_char(p_amount),
                      to_char(p_commiss));
-  
+
   end intl_get_amounts;
   --
   -- внутренняя процедура формирования пакета документов при част./полном снятии суммы со вклада
@@ -13776,28 +13779,28 @@ is
                      title,
                      to_char(p_amount),
                      to_char(p_dptid));
-  
+
     -- реквизиты депозитного счета
     l_accrecd := dpt_web.search_acc_params(p_dptaccid);
     bars_audit.trace('%s деп.счет = %s/%s',
                      title,
                      l_accrecd.acc_num,
                      to_char(l_accrecd.acc_cur));
-  
+
     -- реквизиты процентного счета
     l_accrecp := dpt_web.search_acc_params(p_intaccid);
     bars_audit.trace('%s проц.счет = %s/%s',
                      title,
                      l_accrecp.acc_num,
                      to_char(l_accrecp.acc_cur));
-  
+
     -- реквизиты контрсчета (расходов)
     l_accrece := dpt_web.search_acc_params(p_expaccid);
     bars_audit.trace('%s контр.счет = %s/%s',
                      title,
                      l_accrece.acc_num,
                      to_char(l_accrece.acc_cur));
-  
+
     -- реквизиты контрсчета (расходов) для возврата штрафа
     if p_expaccid2 = p_expaccid then
       l_accrece2 := l_accrece;
@@ -13808,33 +13811,33 @@ is
                      title,
                      l_accrece2.acc_num,
                      to_char(l_accrece2.acc_cur));
-  
+
     -- (ПДФО)
     l_accrect := dpt_web.search_acc_params(p_taxaccid);
     bars_audit.trace('%s контр.рахунок для утримання податку = %s/%s',
                      title,
                      l_accrect.acc_num,
                      to_char(l_accrect.acc_cur));
-  
+
     l_accrect2 := dpt_web.search_acc_params(p_taxaccid2);
     bars_audit.trace('%s контр.рахунок для повернення утриманого податку = %s/%s',
                      title,
                      l_accrect2.acc_num,
                      to_char(l_accrect2.acc_cur));
-  
+
     --(Військовий збір)
     l_accrect_mil := dpt_web.search_acc_params(p_taxaccid_mil);
     bars_audit.trace('%s контр.рахунок для утримання податку (Військовий збір) = %s/%s',
                      title,
                      l_accrect_mil.acc_num,
                      to_char(l_accrect_mil.acc_cur));
-  
+
     l_accrect2_mil := dpt_web.search_acc_params(p_taxaccid2_mil);
     bars_audit.trace('%s контр.рахунок для повернення утриманого податку (Військовий збір)= %s/%s',
                      title,
                      l_accrect2_mil.acc_num,
                      to_char(l_accrect2_mil.acc_cur));
-  
+
     -- реквизиты счета амортизации процентов
     if p_amraccid is not null then
       l_accreca := dpt_web.search_acc_params(p_amraccid);
@@ -13843,7 +13846,7 @@ is
                        l_accreca.acc_num,
                        to_char(l_accreca.acc_cur));
     end if;
-  
+
     -- гривневый эквивалент сумм платежей
     if (l_accrecd.acc_cur = l_accrece.acc_cur) then
       l_vob          := 6;
@@ -13878,7 +13881,7 @@ is
                                      p_tax2pay_mil,
                                      l_bankdate);
     end if;
-  
+
     -- (I) начисление процентов на сумму снятия по штрафной ставке
     -- 1. не фиксируем дату последнего начисления
     -- 2. не формируем ведомость начисленных процентов
@@ -13911,10 +13914,10 @@ is
                      p_ref      => l_refi,
                      p_err_flag => l_errflg,
                      p_err_msg  => l_errmsg);
-    
+
       -- утримання податку з суми нарахованих %% по штрафній ставці за період бази оподаткування
       if (p_tax2pay > 0) then
-      
+
         gl.payv(1,
                 l_refi,
                 l_bankdate,
@@ -13927,9 +13930,9 @@ is
                 l_accrect.acc_num,
                 l_tax2payq);
       end if;
-    
+
       if (p_tax2pay_mil > 0) then
-      
+
         gl.payv(1,
                 l_refi,
                 l_bankdate,
@@ -13946,7 +13949,7 @@ is
                          to_char(p_tax2pay_mil),
                          to_char(l_refi));
       end if;
-    
+
       bars_audit.trace('%s ref(7041 -> 2638 = %s) = %s',
                        title,
                        to_char(p_int2payoff),
@@ -13955,12 +13958,12 @@ is
                        title,
                        to_char(p_tax2pay),
                        to_char(l_refi));
-    
+
       if l_errflg then
         bars_error.raise_nerror(g_modcode, 'PAYDOC_ERROR', l_errmsg);
       end if;
     end if;
-  
+
     -- (II) взыскание штрафа со счета начисленных процентов
     if p_intamount > 0 then
       dpt_web.paydoc(p_dptid    => p_dptid,
@@ -14003,7 +14006,7 @@ is
         bars_error.raise_nerror(g_modcode, 'PAYDOC_ERROR', l_errmsg);
       end if;
     end if;
-  
+
     -- (III.а) взыскание штрафа с депозитного счета на счет расходов банка
     if p_dptamount > 0 then
       if p_amraccid is null then
@@ -14031,7 +14034,7 @@ is
                             1,
                             160);
       end if;
-    
+
       dpt_web.paydoc(p_dptid    => p_dptid,
                      p_vdat     => l_bankdate,
                      p_brancha  => l_branch,
@@ -14067,7 +14070,7 @@ is
         bars_error.raise_nerror(g_modcode, 'PAYDOC_ERROR', l_errmsg);
       end if;
     end if;
-  
+
     -- (III.b) взыскание штрафа с депозитного счета на счет амортизации процентов
     if p_amramount > 0 then
       if p_dptamount > 0 then
@@ -14086,7 +14089,7 @@ is
                             1,
                             160);
       end if;
-    
+
       dpt_web.paydoc(p_dptid    => p_dptid,
                      p_vdat     => l_bankdate,
                      p_brancha  => l_branch,
@@ -14122,7 +14125,7 @@ is
         bars_error.raise_nerror(g_modcode, 'PAYDOC_ERROR', l_errmsg);
       end if;
     end if;
-  
+
     -- (IV) оплата комиссии за частичное снятие или досрочное расторжение
     if p_rkoamount > 0 then
       l_tmp := p_rkoamount;
@@ -14141,7 +14144,7 @@ is
                        to_char(p_rkoamount),
                        to_char(l_refc));
     end if;
-  
+
     -- (V) оплата комиссии за прием на вклад ветхих купюр при частичном снятии или досрочном расторжении
     if p_vetamount > 0 then
       l_tmp := p_vetamount;
@@ -14160,10 +14163,10 @@ is
                        to_char(p_vetamount),
                        to_char(l_refv));
     end if;
-  
+
     if (p_tax2ret > 0) then
       -- повернення утриманого податку з нарахованих %%
-    
+
       l_tt      := '%15';
       l_details := 'Повернення податку з процентних доходів ФО при достроковому розірванні договору №' ||
                    to_char(p_dptid);
@@ -14173,10 +14176,10 @@ is
                  else
                   16
                end);
-    
+
       begin
         -- платим через а не dpt_web.paydoc з paytt через прописані рахунки для орлати в картці операці %15
-      
+
         gl.ref(l_reft);
         gl.in_doc3(ref_   => l_reft,
                    mfoa_  => l_mfo,
@@ -14207,7 +14210,7 @@ is
                    sos_   => null,
                    uid_   => null,
                    prty_  => 0);
-      
+
         gl.payv(null,
                 l_reft,
                 l_bankdate,
@@ -14219,20 +14222,20 @@ is
                 l_accrecp.acc_cur,
                 l_accrecp.acc_num,
                 p_tax2ret);
-      
+
         -- запись документа в хранилище док-тов по депозитному договору ФО
         fill_dpt_payments(p_dptid, l_reft);
-      
+
         bars_audit.trace('%s ref(3522 -> 2638 = %s) = %s',
                          title,
                          to_char(p_tax2ret),
                          to_char(l_reft));
-      
+
       exception
         when others then
           bars_error.raise_nerror('DPT', 'PAYDOC_ERROR', sqlerrm);
       end;
-    
+
       /*
       dpt_web.paydoc( p_dptid      => p_dptid,
                       p_vdat       => l_bankdate,
@@ -14261,18 +14264,18 @@ is
                       p_ref        => l_refT,
                       p_err_flag   => l_errflg,
                       p_err_msg    => l_errmsg);
-      
+
         bars_audit.trace( '%s ref(3522 -> 2638 = %s) = %s', title, to_char(p_tax2ret), to_char(l_refT) );
-      
+
       if l_errflg then
         bars_error.raise_nerror(g_modcode, 'PAYDOC_ERROR', l_errmsg);
       end if;
       */
     end if;
-  
+
     if (p_tax2ret_mil > 0) then
       -- повернення утриманого податку (Військовий збір) з нарахованих %%
-    
+
       l_tt      := 'MIL';
       l_details := 'Повернення податку (Військовий збір) з процентних доходів ФО при достроковому розірванні договору №' ||
                    to_char(p_dptid);
@@ -14282,10 +14285,10 @@ is
                  else
                   16
                end);
-    
+
       begin
         -- платим через а не dpt_web.paydoc з paytt через прописані рахунки для орлати в картці операці MIL
-      
+
         gl.ref(l_reft);
         gl.in_doc3(ref_   => l_reft,
                    mfoa_  => l_mfo,
@@ -14316,7 +14319,7 @@ is
                    sos_   => null,
                    uid_   => null,
                    prty_  => 0);
-      
+
         gl.payv(null,
                 l_reft,
                 l_bankdate,
@@ -14328,22 +14331,22 @@ is
                 l_accrecp.acc_cur,
                 l_accrecp.acc_num,
                 p_tax2ret_mil);
-      
+
         -- запись документа в хранилище док-тов по депозитному договору ФО
         fill_dpt_payments(p_dptid, l_reft);
-      
+
         bars_audit.trace('%s ref(3522 -> 2638 = %s) = %s',
                          title,
                          to_char(p_tax2ret_mil),
                          to_char(l_reft));
-      
+
       exception
         when others then
           bars_error.raise_nerror('DPT', 'PAYDOC_ERROR', sqlerrm);
       end;
-    
+
     end if;
-  
+
     if (p_fullpay = 1)
     -- нефіксувється факт штрафування якщо воно відбувалося в день заключення договору (всі суми = 0)
     -- and coalesce (l_refP, l_refD, l_refA, l_refC, l_refV) is not null)
@@ -14430,22 +14433,22 @@ is
           from dpt_deposit
          where deposit_id = p_dptid;
     end if;
-  
+
     -- Якщо було нараховано % по штрафній ставці то підв"язуєм реф. даної опер. під
     --  операцію стягення штрафу з рахунку нар.%(або рах.депозиту)
-  
+
     if l_refi is not null then
       update oper set refl = l_refi where ref = nvl(l_refp, l_refd);
     end if;
-  
+
     -- Для Ощадбанку якщо вид вкладу не ... то необхідно встановити дату погашення
     --  по рахунку = поточна системна дата та % ставку = 0
-  
+
     bars_audit.trace('%s формирование пакета док-тов при снятии суммы %s по вкладу № %s выполнено',
                      title,
                      to_char(p_amount),
                      to_char(p_dptid));
-  
+
   end intl_make_penaltydocs;
   --
   -- внутренняя процедура расчета невыплач.процентов за прошлые сроки переоформленного вклада
@@ -14465,7 +14468,7 @@ is
     l_currint number;
     l_prevint number(38);
   begin
-  
+
     bars_audit.trace('%s старт, счет %s/%s, остаток на проц.счете %s, период начисления %s',
                      title,
                      p_depaccrow.nls,
@@ -14473,16 +14476,16 @@ is
                      to_char(p_intsaldo),
                      to_char(p_intdat1, 'dd.mm.yyyy'),
                      to_char(p_intdat2, 'dd.mm.yyyy'));
-  
+
     if p_intsaldo = 0 then
-    
+
       l_prevint := 0;
-    
+
     else
-    
+
       -- гран.дата начисления (как минимум, вчерашний день)
       l_intdat2 := greatest(p_bankdat - 1, nvl(p_intdat2, p_bankdat - 1));
-    
+
       -- общая сумма начисленных процентов для текущего переоформления
       intl_clear_altintcard(p_dptaccid => p_depaccrow.acc, -- внутр.номер деп.счета
                             p_altintid => altintid); -- код альтерн.карточки
@@ -14504,24 +14507,24 @@ is
                          p_intamount => l_currint); -- сума начисленных процентов
       intl_clear_altintcard(p_dptaccid => p_depaccrow.acc, -- внутр.номер деп.счета
                             p_altintid => altintid); -- код альтерн.карточки
-    
+
       l_currint := nvl(round(l_currint), 0);
       bars_audit.trace('%s сумма процентов за период с %s по %s = %s',
                        title,
                        to_char(p_intdat1, 'dd.mm.yyyy'),
                        to_char(l_intdat2, 'dd.mm.yyyy'),
                        to_char(l_currint));
-    
+
       l_prevint := greatest(0, p_intsaldo - l_currint);
-    
+
     end if;
-  
+
     p_prevint := l_prevint;
-  
+
     bars_audit.trace('%s выход, сумма процентов прошлых периодов = %s',
                      title,
                      to_char(p_prevint));
-  
+
   end intl_get_prevint;
 
   --
@@ -14583,12 +14586,12 @@ is
     l_termtype    dpt_stop_a.sh_term%type;
     --WITHOUT_PENALTY exception;
   begin
-  
+
     bars_audit.trace('%s дата розірвання договору № %s - %s',
                      title,
                      to_char(p_dpt_id),
                      to_date(p_dat, 'dd/mm/yyyy'));
-  
+
     -- параметры вклада
     begin
       select acc,
@@ -14620,7 +14623,7 @@ is
                      to_char(l_stopid),
                      to_char(l_dat_begin, 'dd.mm.yy'),
                      to_char(l_dat_end, 'dd.mm.yy'));
-  
+
     if not (l_dat_begin <= p_dat and l_dat_end > p_dat and l_stopid != 0) then
       bars_audit.trace('%s штраф не предусмотрен',
                        title);
@@ -14635,14 +14638,14 @@ is
                                   'FINEPARAMS_NOT_FOUND',
                                   to_char(l_stopid));
       end;
-    
+
       bars_audit.trace('%s вичитали карточку штрафа %s - %s',
                        title,
                        to_char(l_stoprow.id),
                        l_stoprow.name);
-    
+
       l_months := months_between(p_dat, l_dat_begin);
-    
+
       if (l_stoprow.sh_proc = 1 and trunc(l_months) < 1) then
         bars_audit.trace('%s факт.срок вклад < 1 мес -> полный штраф',
                          title);
@@ -14663,7 +14666,7 @@ is
                            to_char(l_term) || ' ' || case when
                            l_stoprow.fl = 0 then '%%' when l_stoprow.fl = 1 then
                            'міс.' else 'днів' end);
-        
+
           -- расчет типа и значения штрафа для данного периода
           begin
             select s.sh_proc, s.k_proc, s.k_term, s.sh_term
@@ -14685,7 +14688,7 @@ is
                                title);
               raise;
           end;
-        
+
           bars_audit.trace('%s тип - %s, значение %s',
                            title,
                            case when l_sh_type = 1 then 'Жорсткий штраф' -- по історії змін ставки
@@ -14694,7 +14697,7 @@ is
                            l_sh_type = 5 then 'штраф по баз.ставке' else
                            'пустой штраф' end,
                            to_char(l_sh_rate));
-        
+
           -- Мягкий штраф / Жесткий штраф
           if l_sh_type in (1, 2) then
             if l_sh_rate = 0 then
@@ -14709,11 +14712,11 @@ is
                 l_penaltyrate := (100 - l_sh_rate) * l_dptrate / 100;
               end if;
             end if;
-          
+
             -- Фиксированный процент штрафа
           elsif l_sh_type = 3 then
             l_penaltyrate := l_sh_rate;
-          
+
             -- Штраф по указанной базовой %-ой ставке
           elsif l_sh_type = 5 then
             begin
@@ -14732,19 +14735,19 @@ is
                              title);
             l_penaltyrate := null;
           end if; -- l_sh_type
-        
+
         exception
           when others then
             l_penaltyrate := null;
         end;
       end if;
     end if;
-  
+
     bars_audit.trace('%s штрафна ставка = %s',
                      title,
                      nvl(to_char(l_penaltyrate), 'null'));
     p_penalty_rate := l_penaltyrate;
-  
+
     if l_penaltyrate is not null then
       -- Розрахунок штрафного періоду
       case
@@ -14779,7 +14782,7 @@ is
                                 l_dat_begin
                              end;
           end;
-        
+
       -- Строк штрафу    (Штраф стягується виходячи з параметру "строк штрафа")
         when l_termtype = 2 then
           begin
@@ -14789,7 +14792,7 @@ is
             if l_stoprow.fl = 1 then
               -- срок задан в месяцах
               l_penaltydate := add_months(p_dat, -nvl(l_sh_term, 0));
-            
+
             elsif l_stoprow.fl = 2 then
               -- срок задан в днях
               l_penaltydate := p_dat - nvl(l_sh_term + 1, 0);
@@ -14798,7 +14801,7 @@ is
               bars_error.raise_nerror(g_modcode, 'INVALID_FINE');
             end if;
           end;
-        
+
       -- Неповний рік    (Виплата відсотків відбувається за повний рік)
         when l_termtype = 3 then
           begin
@@ -14810,7 +14813,7 @@ is
                                                                   l_dat_begin) / 12,
                                                    0) /* к-ть повних років */);
           end;
-        
+
       -- Неповний квартал    (Виплата відсотків відбувається за повний квартал)
         when l_termtype = 4 then
           begin
@@ -14822,7 +14825,7 @@ is
                                                                  l_dat_begin) / 3,
                                                   0) /* к-ть повних кварталів */);
           end;
-        
+
       -- Неповні півроку    (Виплата відсотків відбувається за повні півроку)
         when l_termtype = 5 then
           begin
@@ -14834,7 +14837,7 @@ is
                                                                  l_dat_begin) / 6,
                                                   0) /* к-ть повних піврічч */);
           end;
-        
+
       -- Фактичний період (Штраф розраховується за час фактичного строку вкладу)
         else
           -- l_termtype = 0
@@ -14853,12 +14856,12 @@ is
     else
       l_penaltyrate := null;
     end if;
-  
+
     bars_audit.trace('%s выплатим по %s',
                      title,
                      to_char(l_penaltydate, 'dd/mm/yyyy'));
     p_penalty_date := l_penaltydate;
-  
+
   end get_penalty_options;
 
   --
@@ -14969,19 +14972,19 @@ is
     l_errmsg        varchar2(3000);
     l_log_level     positive;
     l_tmp_intrest   number;
-  
+
     l_tax2ret     number := 0;
     l_tax2pay     number := 0;
     l_tax2ret_mil number := 0;
     l_tax2pay_mil number := 0;
-  
+
     l_taxlist        t_taxdata;
     l_taxlist_mil    t_taxdata;
     l_less_stp_dat   number := 0; -- Pavlenko 19/07/2014 BRSMAIN-2752
     l_valid_mobphone number := 0;
     l_inherited      number := 0;
   begin
-  
+
     bars_audit.trace('%s старт с параметрами {%s, %s, %s, %s, %s}',
                      title,
                      to_char(p_dptid),
@@ -14989,43 +14992,43 @@ is
                      to_char(p_fullpay),
                      to_char(p_amount),
                      p_mode);
-  
+
     -- Код депозитного модуля
     if p_modcode is null or p_modcode not in ('DPT', 'DPU') then
       bars_error.raise_nerror(g_modcode,
                               'INVALID_PENALTY_MODCODE',
                               nvl(p_modcode, 'null'));
     end if;
-  
+
     -- режим выполнения процедуры
     if p_mode is null or p_mode not in ('RO', 'RW') then
       bars_error.raise_nerror(g_modcode, 'INVALID_PENALTY_MODE', p_mode);
     end if;
-  
+
     -- тип выплаты
     if p_fullpay is null or p_fullpay not in (0, 1) then
       bars_error.raise_nerror(g_modcode,
                               'INVALID_PENALTY_TYPE',
                               to_char(p_fullpay));
     end if;
-  
+
     -- Встановлюємо присусову трасіровку для штрафування
     l_log_level := bars_audit.get_log_level();
-  
+
     if (l_log_level < bars_audit.log_level_trace) then
       bars_audit.set_log_level(bars_audit.log_level_trace);
       bars_audit.info(title || 'змінено рівень деталізації повідомлень з ' ||
                       to_char(l_log_level) || ' на ' ||
                       to_char(bars_audit.log_level_trace));
     end if;
-  
+
     l_date := least(trunc(sysdate), p_date);
     if l_date != p_date then
       bars_audit.trace('%s дата штрафування не банківський день %s',
                        title,
                        to_char(p_date, 'dd.mm.yyyy'));
     end if;
-  
+
     -- реквизиты договора
     if p_modcode = 'DPT' then
       begin
@@ -15133,18 +15136,18 @@ is
                                   to_char(p_dptid));
       end;
     end if;
-  
+
     l_dealnum := bars_msg.get_msg(g_modcode,
                                   'GLPENALTY_FULLDEALNUM',
                                   l_dealnum,
                                   to_char(l_dealdat, 'dd.mm.yyyy'),
                                   to_char(p_dptid));
-  
+
     -- РАСЧЕТ И ВЗЫСКАНИЕ ШТРАФА
     p_details := bars_msg.get_msg(g_modcode, 'GLPENALTY_TITLE');
     p_details := lpad(p_details, length(p_details) + 13, ' ');
     p_details := rpad(p_details, length(p_details) + 26, ' ');
-  
+
     if p_fullpay = 0 then
       -- при частичном снятии суммы вклада № %s
       str2txt(p_details,
@@ -15154,7 +15157,7 @@ is
       str2txt(p_details,
               bars_msg.get_msg(g_modcode, 'GLPENALTY_FULL', l_dealnum));
     end if;
-  
+
     bars_audit.trace('%s договор № %s, период действия %s - %s, штраф/ставка ЧС - %s/%s',
                      title,
                      l_dealnum,
@@ -15162,20 +15165,20 @@ is
                      to_char(l_enddate, 'dd.mm.yy'),
                      to_char(l_stopid),
                      to_char(l_brwd));
-  
+
     -- Период действия договора: %s - %s
     str2txt(p_details,
             bars_msg.get_msg(g_modcode,
                              'GLPENALTY_TERM',
                              to_char(l_begdate, 'dd.mm.yyyy'),
                              to_char(l_enddate, 'dd.mm.yyyy')));
-  
+
     -- Код штрафа для договора: %s
     str2txt(p_details,
             bars_msg.get_msg(g_modcode,
                              'GLPENALTY_STOPID',
                              to_char(l_stopid)));
-  
+
     -- счет амортизации для авансового вклада = контр.счет в проц.карточке
     if l_avans = 1 then
       l_amraccid := l_expaccid;
@@ -15187,7 +15190,7 @@ is
     else
       l_amraccid := null;
     end if;
-  
+
     -- параметры депозитного счета + блокировка
     begin
       select *
@@ -15204,7 +15207,7 @@ is
                      l_dptaccrow.nls,
                      l_curcode,
                      to_char(l_dptaccrow.ostc));
-  
+
     -- параметры процентного счета + блокировка
     begin
       select *
@@ -15221,7 +15224,7 @@ is
                      l_intaccrow.nls,
                      l_curcode,
                      to_char(l_intaccrow.ostc));
-  
+
     if l_avans = 1 then
       -- параметры счета амортизации + блокировка
       begin
@@ -15240,7 +15243,7 @@ is
                        l_curcode,
                        to_char(l_amraccrow.ostc));
     end if;
-  
+
     -- Текущий остаток на деп.счете %s: %s
     str2txt(p_details,
             bars_msg.get_msg(g_modcode,
@@ -15253,7 +15256,7 @@ is
                              'GLPENALTY_INTACC',
                              l_intaccrow.nls,
                              num2str(l_intaccrow.ostc, l_curcode)));
-  
+
     if l_avans = 1 then
       -- Текущий остаток на счете амортизации %s: %s
       str2txt(p_details,
@@ -15262,7 +15265,7 @@ is
                                l_amraccrow.nls,
                                num2str(l_amraccrow.ostc, l_curcode)));
     end if;
-  
+
     -- уточнение:
     -- для частичного снятия      сумма снятия = заявленная сумма (p_amount)
     -- для досрочного расторжения сумма снятия = факт.остаток на депозитном счете
@@ -15275,13 +15278,13 @@ is
     bars_audit.trace('%s сумма снятия = %s',
                      title,
                      to_char(l_dptamount));
-  
+
     -- Заявленная сумма снятия с депозитного счета: %s
     str2txt(p_details,
             bars_msg.get_msg(g_modcode,
                              'GLPENALTY_AMOUNT',
                              num2str(l_dptamount, l_curcode)));
-  
+
     -- вызов внутренней процедуры проверок при частином / полном снятии суммы вклада
     intl_validate_payoff(p_date      => p_date, -- дата снятия средств
                          p_begdate   => l_begdate, -- дата начала действия договора
@@ -15302,7 +15305,7 @@ is
                               l_dealnum,
                               l_errmsg);
     end if;
-  
+
     -- расчет штрафной ставки
     if not l_nopenya then
       -- значение штрафной ставки берется из настройки штрафа для частичного и полного снятия
@@ -15311,11 +15314,11 @@ is
                        title,
                        to_char(l_penyarate));
     end if;
-  
+
     if l_penyarate is null then
       l_nopenya := true;
     end if;
-  
+
     if l_nopenya then
       bars_audit.trace('%s снятие без штрафных санкций для договора № %s',
                        title,
@@ -15323,10 +15326,10 @@ is
       -- штрафные санкции не предусмотрены
       str2txt(p_details, bars_msg.get_msg(g_modcode, 'GLPENALTY_DENIED'));
     end if;
-  
+
     -- доначисление процентов по основной ставке по истории депозитного счета
     -- p_mode = RW -->  и порождение платежных документов
-  
+
     -- вызов внутренней процедуры расчета суммы процентов и порождения документа
     intl_calc_interest(p_mode      => p_mode, -- RO - расчет, RW - проводки
                        p_date      => l_date, -- дата списания средств
@@ -15341,7 +15344,7 @@ is
     bars_audit.trace('%s сумма доначисления = %s',
                      title,
                      to_char(l_intamount));
-  
+
     /*
       if l_avans = 1 then
          -- амортизация выплаченных авансом процентов по вчерашний день включительно
@@ -15376,7 +15379,7 @@ is
     else
       l_amramount := 0;
     end if;
-  
+
     l_int2pay     := 0; -- сумма процентов к выплате
     l_int2ret     := 0; -- сумма процентов к возврату
     l_amr2ret     := 0; -- сумма амортизированных процентов к возврату
@@ -15384,9 +15387,9 @@ is
     l_tax2pay     := 0; -- сума нарахованих %% за базу оподаткування деп. договору по штрафній ставці
     l_tax2ret_mil := 0; -- сума нарахованих %% за базу оподаткування деп. договору по основній ставці
     l_tax2pay_mil := 0; -- сума нарахованих %% за базу оподаткування деп. договору по штрафній ставці
-  
+
     if (not l_nopenya) then
-    
+
       -- расчет сумм комиссий за частичное снятие / досрочное расторжение
       begin
         select s into l_formula from tts where tt = 'K08';
@@ -15415,13 +15418,13 @@ is
       bars_audit.trace('%s сумма комиссии за РКО = %s',
                        title,
                        to_char(l_penyac));
-    
+
       -- Сумма комиссии за расчетно-касс.обслуживание :%s
       str2txt(p_details,
               bars_msg.get_msg(g_modcode,
                                'GLPENALTY_CMSRKO',
                                num2str(l_penyac, l_curcode)));
-    
+
       -- коміся за виплату коштів що надійшли безготівковим шляхом
       l_penyav := dpt_web.f_get_nocash_commis(p_dptid  => p_dptid,
                                               p_acc    => l_dptaccrow.acc,
@@ -15430,13 +15433,13 @@ is
       bars_audit.trace('%s сума комісії за виплату коштів що надійшли безготівковим шляхом = %s',
                        title,
                        to_char(l_penyav));
-    
+
       -- Сума комісії за виплату коштів що надійшли безготівковим шляхом: %s
       str2txt(p_details,
               bars_msg.get_msg(g_modcode,
                                'GLPENALTY_CMSVET',
                                num2str(l_penyav, l_curcode)));
-    
+
       -- значення штрафної ставки берется з налаштувань штрафу для часткового та повного зняття
       get_penalty_options(p_dpt_id       => p_dptid,
                           p_dat          => l_date,
@@ -15446,26 +15449,26 @@ is
       bars_audit.trace('%s штрафная ставка = %s',
                        title,
                        to_char(l_penyarate));
-    
+
       -- Штрафная ставка = %s%
       str2txt(p_details,
               bars_msg.get_msg(g_modcode,
                                'GLPENALTY_PENYARATE',
                                to_char(l_penyarate, '90D99')));
-    
+
       if (l_penyarate is null) then
         bars_error.raise_nerror(g_modcode,
                                 'PENALTY_RATE_NOT_FOUND',
                                 l_dealnum);
       end if;
-    
+
       -- дата початку періоду для бази оподаткування
       --l_tax_dat_beg := to_date(GetGlobalOption('TAX_DON'), 'dd.mm.yyyy');  -- дата початку утримання податку з нарах.%% згідно постанови
       --l_dat4tax     := greatest(l_tax_dat_beg, l_begdate);                 -- максимальна дата з дати початку дії догов. та дата початку утримання податку
-    
+
       -- ставка податку
       --l_tax_rate    := get_tax_rate();
-    
+
       --  вызов внутренней процедуры расчета сумм и периодов для вычисления процентов к выплате и суммы штрафа
       --  расчет штрафа для суммы снятия / для всей суммы депозита
       intl_get_amounts(p_dptaccid => l_dptaccrow.acc, -- внутр.№ депозитного счета
@@ -15475,16 +15478,16 @@ is
                        p_commiss  => 0, -- сумма комиссии
                        p_intio    => l_intio,
                        p_accturn  => l_accturn);
-    
+
       -- вызов внутренней процедуры очистки альтернативной %-ной карточки (id = 3)
       intl_clear_altintcard(p_dptaccid => l_dptaccid,
                             p_altintid => l_altintid);
-    
+
       l_accturncnt := l_accturn.count;
       bars_audit.trace('%s кол-во движений = %s',
                        title,
                        to_char(l_accturncnt));
-    
+
       -- <<<  >>>
       for i in 1 .. l_accturncnt loop
         --
@@ -15499,7 +15502,7 @@ is
                              p_penyadate => nvl(l_penyadate,
                                                 l_accturn(i).intdat1),
                              p_penyarate => l_penyarate);
-      
+
         -- вызов внутренней процедуры расчета суммы процентов (RO)
         intl_calc_interest(p_mode      => 'RO',
                            p_date      => l_date,
@@ -15510,9 +15513,9 @@ is
                            p_details   => l_details,
                            p_dptamount => l_accturn(i).rest2pay,
                            p_intamount => l_tmp);
-      
+
         l_int2pay := l_int2pay + nvl(l_tmp, 0);
-      
+
         bars_audit.trace('%s за период с %s по %s начислено на сумму %s по штрафной ставке %s = %s',
                          title,
                          to_char(l_accturn(i).intdat1 + 1, 'dd.mm.yy'),
@@ -15520,7 +15523,7 @@ is
                          to_char(l_accturn(i).rest2pay),
                          to_char(l_penyarate),
                          to_char(l_tmp));
-      
+
         -- По штрафной ставке начислено %s %
         str2txt(p_details,
                 bars_msg.get_msg(g_modcode,
@@ -15537,7 +15540,7 @@ is
                                          .intdat2 - l_accturn(i).intdat1,
                                          '99999'),
                                  num2str(l_accturn(i).rest2pay, l_curcode)));
-      
+
         --
         -- расчет %% по основной ставке на сумму снятия и сумму комиссии по дату последнего начисления включительно
         --
@@ -15549,7 +15552,7 @@ is
                              p_intdat2   => l_accturn(i).intdat3,
                              p_penyadate => null,
                              p_penyarate => null);
-      
+
         -- вызов внутренней процедуры расчета суммы процентов (RO)
         intl_calc_interest(p_mode      => 'RO',
                            p_date      => l_date,
@@ -15560,16 +15563,16 @@ is
                            p_details   => l_details,
                            p_dptamount => l_accturn(i).rest2take,
                            p_intamount => l_tmp);
-      
+
         l_int2ret := l_int2ret + nvl(l_tmp, 0);
-      
+
         bars_audit.trace('%s за период с %s по %s начислено на сумму %s по основной ставке = %s',
                          title,
                          to_char(l_accturn(i).intdat1 + 1, 'dd.mm.yy'),
                          to_char(l_accturn(i).intdat3, 'dd.mm.yy'),
                          to_char(l_accturn(i).rest2take),
                          to_char(l_tmp));
-      
+
         -- По основной ставке начислено %s %
         str2txt(p_details,
                 bars_msg.get_msg(g_modcode,
@@ -15586,7 +15589,7 @@ is
                                          .intdat3 - l_accturn(i).intdat1,
                                          '99999'),
                                  num2str(l_accturn(i).rest2take, l_curcode)));
-      
+
         if (l_avans = 1 /* and p_fullpay = 0 */
            ) then
           --
@@ -15615,7 +15618,7 @@ is
                            to_char(l_accturn(i).intdat2, 'dd.mm.yy'),
                            to_char(l_accturn(i).rest2take),
                            to_char(l_tmp));
-        
+
           -- По основной ставке амортизировано %s %
           str2txt(p_details,
                   bars_msg.get_msg(g_modcode,
@@ -15634,12 +15637,12 @@ is
                                            '99999'),
                                    num2str(l_accturn(i).rest2take, l_curcode)));
         end if;
-      
+
         /*
         * ДЛЯ ПОВЕРНЕННЯ / УТРИМАННЯ ПОДАТКУ З ВІДСОТКІВ *
         */
         -- Определение периодов и ставок налогообложения по справочнику TAX_SETTINGS
-      
+
         bars_audit.trace('PENALTY l_acrdat = ' ||
                          to_date(l_acrdat, 'dd/mm/yyyy'));
         select tax_type, tax_int, dat_begin - 1, dat_end
@@ -15647,14 +15650,14 @@ is
           into l_taxlist
           from tax_settings
          where tax_type = 1; -- 1 Налог на пассивные доходы ФЛ
-      
+
         -- Определение периодов и ставок налогообложения по справочнику TAX_SETTINGS
         select tax_type, tax_int, dat_begin - 1, dat_end
           bulk collect
           into l_taxlist_mil
           from tax_settings
          where tax_type = 2; -- 2 Военный сбор
-      
+
         bars_audit.trace('PENALTY Количество периодов налогообложения (ПДФО) = ' ||
                          to_char(l_taxlist.count));
         for j in 1 .. l_taxlist.count loop
@@ -15669,7 +15672,7 @@ is
                            to_char(nvl(l_taxlist(j).tax_date_end,
                                        l_accturn(i).intdat2),
                                    'dd/mm/yyyy'));
-        
+
           intl_fill_altintcard(p_dptaccid  => l_accturn(i).accid,
                                p_genintid  => l_genintid, -- 1
                                p_altintid  => l_altintid, -- 5
@@ -15685,7 +15688,7 @@ is
                                                            .tax_date_begin,
                                                            l_accturn(i).intdat1)),
                                p_penyarate => l_penyarate);
-        
+
           -- вызов внутренней процедуры расчета суммы процентов (RO)
           intl_calc_interest(p_mode      => 'RO',
                              p_date      => l_date,
@@ -15699,7 +15702,7 @@ is
                              p_details   => l_details,
                              p_dptamount => l_accturn(i).rest2pay,
                              p_intamount => l_tmp);
-        
+
           bars_audit.trace('PENALTY: Сумма налога к оплате (l_tax2pay.l_tmp) = ' ||
                            to_char(round(nvl(l_tmp, 0) * l_taxlist(j)
                                          .tax_int,
@@ -15709,7 +15712,7 @@ is
                            to_char(least(l_accturn(i).intdat2,
                                          nvl(l_taxlist(j).tax_date_end,
                                              l_accturn(i).intdat2))));
-        
+
           l_tax2pay := nvl(l_tax2pay, 0) +
                        round(nvl(l_tmp, 0) * l_taxlist(j).tax_int);
           bars_audit.trace('%s за период с %s по %s начислено на сумму %s по штрафной ставке %s = %s',
@@ -15724,7 +15727,7 @@ is
                            to_char(l_accturn(i).rest2pay),
                            to_char(l_penyarate),
                            to_char(l_tmp));
-        
+
           -- По штрафной ставке начислено %s %
           str2txt(p_details,
                   bars_msg.get_msg(g_modcode,
@@ -15748,7 +15751,7 @@ is
                                                     l_accturn(i).intdat1 + 1),
                                            '99999'),
                                    num2str(l_accturn(i).rest2pay, l_curcode)));
-        
+
           ----------------------------------------------------------------------------
           -- розрахунок суми %% нарах. по основній ставці за період бази оподаткування
           --
@@ -15765,7 +15768,7 @@ is
                                                         l_accturn(i).intdat3)),
                                p_penyadate => null,
                                p_penyarate => null);
-        
+
           -- вызов внутренней процедуры расчета суммы процентов (RO)
           intl_calc_interest(p_mode      => 'RO',
                              p_date      => l_date,
@@ -15779,7 +15782,7 @@ is
                              p_details   => l_details,
                              p_dptamount => l_accturn(i).rest2take,
                              p_intamount => l_tmp);
-        
+
           bars_audit.trace('PENALTY: Сумма налога к возврату (l_tax2ret.l_tmp) = ' ||
                            to_char(round(nvl(l_tmp, 0) * l_taxlist(j)
                                          .tax_int,
@@ -15789,7 +15792,7 @@ is
                            to_char(least(l_accturn(i).intdat3,
                                          nvl(l_taxlist(j).tax_date_end,
                                              l_accturn(i).intdat3))));
-        
+
           l_tax2ret := nvl(l_tax2ret, 0) +
                        round(nvl(l_tmp, 0) * l_taxlist(j).tax_int);
           bars_audit.trace('%s за период с %s по %s начислено на сумму %s по основной ставке = %s',
@@ -15803,7 +15806,7 @@ is
                                    'dd.mm.yy'),
                            to_char(l_accturn(i).rest2take),
                            to_char(l_tmp));
-        
+
           -- По основной ставке начислено %s %
           str2txt(p_details,
                   bars_msg.get_msg(g_modcode,
@@ -15855,7 +15858,7 @@ is
                                                            l_accturn    (i)
                                                            .intdat1)),
                                p_penyarate => l_penyarate);
-        
+
           -- вызов внутренней процедуры расчета суммы процентов (RO)
           intl_calc_interest(p_mode      => 'RO',
                              p_date      => l_date,
@@ -15869,7 +15872,7 @@ is
                              p_details   => l_details,
                              p_dptamount => l_accturn(i).rest2pay,
                              p_intamount => l_tmp);
-        
+
           bars_audit.trace('PENALTY (Военный сбор): Сумма налога к оплате (l_tmp) = ' ||
                            to_char(round(nvl(l_tmp, 0) * l_taxlist_mil(z)
                                          .tax_int),
@@ -15879,10 +15882,10 @@ is
                            to_char(least(l_accturn(i).intdat2,
                                          nvl(l_taxlist_mil(z).tax_date_end,
                                              l_accturn    (i).intdat2))));
-        
+
           l_tax2pay_mil := nvl(l_tax2pay_mil, 0) +
                            round(nvl(l_tmp, 0) * l_taxlist_mil(z).tax_int);
-        
+
           bars_audit.trace('%s за период с %s по %s начислено на сумму %s по штрафной ставке %s = %s',
                            title,
                            to_char(greatest(l_taxlist_mil(z).tax_date_begin,
@@ -15895,7 +15898,7 @@ is
                            to_char(l_accturn(i).rest2pay),
                            to_char(l_penyarate),
                            to_char(l_tmp));
-        
+
           -- По штрафной ставке начислено %s %
           str2txt(p_details,
                   bars_msg.get_msg(g_modcode,
@@ -15923,7 +15926,7 @@ is
                                                     l_accturn    (i).intdat1),
                                            '99999'),
                                    num2str(l_accturn(i).rest2pay, l_curcode)));
-        
+
           ----------------------------------------------------------------------------
           -- розрахунок суми %% нарах. по основній ставці за період бази оподаткування
           --
@@ -15942,7 +15945,7 @@ is
                                                         .intdat3)),
                                p_penyadate => null,
                                p_penyarate => null);
-        
+
           -- вызов внутренней процедуры расчета суммы процентов (RO)
           intl_calc_interest(p_mode      => 'RO',
                              p_date      => l_date,
@@ -15956,7 +15959,7 @@ is
                              p_details   => l_details,
                              p_dptamount => l_accturn(i).rest2take,
                              p_intamount => l_tmp);
-        
+
           --l_tax2ret := l_tax2ret + nvl(l_tmp, 0);
           bars_audit.trace('PENALTY (Военный сбор): Сумма налога к возврату (l_tmp) = ' ||
                            to_char(round(nvl(l_tmp, 0) * l_taxlist_mil(z)
@@ -15968,7 +15971,7 @@ is
                                                  nvl(l_taxlist_mil(z)
                                                      .tax_date_end,
                                                      l_accturn    (i).intdat3)))));
-        
+
           l_tax2ret_mil := nvl(l_tax2ret_mil, 0) +
                            round(nvl(l_tmp, 0) * l_taxlist_mil(z).tax_int);
           bars_audit.trace('%s за период с %s по %s начислено на сумму %s по основной ставке = %s',
@@ -15982,7 +15985,7 @@ is
                                    'dd.mm.yy'),
                            to_char(l_accturn(i).rest2take),
                            to_char(l_tmp));
-        
+
           -- По основной ставке начислено %s %
           str2txt(p_details,
                   bars_msg.get_msg(g_modcode,
@@ -16010,7 +16013,7 @@ is
                                                     l_accturn    (i).intdat1),
                                            '99999'),
                                    num2str(l_accturn(i).rest2take, l_curcode)));
-        
+
         end loop;
         /* ********************************************** */
         bars_audit.trace('PENALTY: Сумма налога к возврату (l_tax2ret) = ' ||
@@ -16021,28 +16024,28 @@ is
           l_details := l_details || ' (' ||
                        to_char(l_accturn(i).intdat1 + 1, 'dd.mm.yyyy');
         end if;
-      
+
         if i = l_accturncnt then
           l_details := l_details || ' - ' ||
                        to_char(l_accturn(i).intdat2, 'dd.mm.yyyy') ||
                        ') за штрафною ставкою ' ||
                        to_char(l_penyarate, '90D99');
         end if;
-      
+
       end loop;
       bars_audit.trace('%s назначение платежа - %s',
                        title,
                        l_details);
-    
+
       -- вызов внутренней процедуры очистки альтернативной %-ной карточки (id = 3)
       intl_clear_altintcard(p_dptaccid => l_dptaccid,
                             p_altintid => l_altintid);
-    
+
       l_int2pay     := round(l_int2pay);
       p_int2pay_ing := l_int2pay; --inga
-    
+
       l_int2ret := round(l_int2ret);
-    
+
       bars_audit.trace('%s общая сумма процентов к выплате = %s',
                        title,
                        to_char(l_int2pay));
@@ -16061,7 +16064,7 @@ is
       bars_audit.trace('%s загальна сума податку (ВЗ) до сплати = %s',
                        title,
                        to_char(l_tax2pay_mil));
-    
+
       -- Общая сумма процентов к выплате  :%s
       -- Общая сумма процентов к возврату :%s
       str2txt(p_details,
@@ -16072,14 +16075,14 @@ is
               bars_msg.get_msg(g_modcode,
                                'GLPENALTY_INT2RET',
                                num2str(l_int2ret, l_curcode)));
-    
+
       -- всі кредитові обороти по рахунку нарахованих %%
       select sum(kos)
         into l_tmp
         from saldoa
        where acc = l_intaccrow.acc
          and fdat > l_begdate;
-    
+
       if (l_int2ret > l_tmp) then
         bars_audit.info(title || ' Сума %% до повернення ' ||
                         to_char(l_int2ret) ||
@@ -16087,7 +16090,7 @@ is
                         to_char(l_tmp));
         l_int2ret := l_tmp;
       end if;
-    
+
       -- (inga + baa) высчитаем сумму реально взятого налога по истории
       select nvl(sum(s), 0)
         into l_tmp
@@ -16097,7 +16100,7 @@ is
          and tt = '%15'
          and sos = 5
          and dk = 0;
-    
+
       if (l_tax2ret > l_tmp) then
         bars_audit.info(title || ' Сума податку до повернення ' ||
                         to_char(l_tax2ret) ||
@@ -16105,7 +16108,7 @@ is
                         to_char(l_tmp));
         l_tax2ret := l_tmp;
       end if;
-    
+
       -- (inga + baa) высчитаем сумму реально взятого налога по истории
       select nvl(sum(s), 0)
         into l_tmp
@@ -16115,7 +16118,7 @@ is
          and tt = 'MIL'
          and sos = 5
          and dk = 0;
-    
+
       if (l_tax2ret_mil > l_tmp) then
         bars_audit.info(title ||
                         ' Сума податку (Військовий збір) до повернення ' ||
@@ -16133,10 +16136,10 @@ is
       else
         l_intaccrow.ostb := l_intaccrow.ostc + round(l_intamount);
       end if;
-    
+
       -- остаток на cчете амортизации с учетом доамортизации
       if (l_avans = 1) then
-      
+
         if (p_mode = 'RW') then
           select ostb
             into l_amraccrow.ostb
@@ -16145,19 +16148,19 @@ is
         else
           l_amraccrow.ostb := l_amraccrow.ostc - round(l_amramount);
         end if;
-      
+
         l_amr2ret := round(l_amr2ret);
-      
+
         bars_audit.trace('%s общая сумма аморт.%%  к возврату = %s',
                          title,
                          to_char(l_amr2ret));
-      
+
         -- Общая сумма амортизированных процентов к возврату :%s
         str2txt(p_details,
                 bars_msg.get_msg(g_modcode,
                                  'GLPENALTY_AMR2RET',
                                  num2str(l_amr2ret, l_curcode)));
-      
+
         if (p_fullpay = 1) then
           -- окончательное урегулирование начисленных и выплаченных авансом процентов
           advance_balsettlement(p_dptid  => p_dptid,
@@ -16174,11 +16177,11 @@ is
           l_expbal := 0;
           l_amrbal := 0;
         end if;
-      
+
       end if;
-    
+
     end if; -- (not l_nopenya)
-  
+
     if (p_mode = 'RW') then
       if (l_dptaccrow.nbs != '2620') then
         -- вставка ознаки відбору депозиту на перенесення в архів
@@ -16187,7 +16190,7 @@ is
         bars_audit.trace('%s Поточні рахунки не відмічаємо до закриття',
                          title);
       end if;
-    
+
       -- Pavlenko 19/07/2014 l_less_stp_dat
       begin
         select 1
@@ -16199,42 +16202,42 @@ is
         when no_data_found then
           l_less_stp_dat := 0;
       end;
-    
+
       if (l_dptaccrow.nbs != '2620') and (l_less_stp_dat = 0) then
-      
+
         update int_accn
            set stp_dat =
                (l_date - 1)
          where acc = l_dptaccrow.acc
            and id = l_genintid
            and stp_dat > l_date;
-      
+
         bars_audit.info(title ||
                         ' зупинено нарахування відсотків по депозиту ' ||
                         to_char(p_dptid) ||
                         ' через часкове вилучення коштів.');
-      
+
         update dpt_deposit
            set forbid_extension = 1
          where deposit_id = p_dptid;
-      
+
         bars_audit.info(title ||
                         ' проставлена ознака заборони пролонгації по депозиту ' ||
                         to_char(p_dptid) ||
                         ' через часкове вилучення коштів.');
-      
+
       end if;
-    
+
     end if;
-  
+
     if l_nopenya then
-    
+
       -- без штрафа
       select ostb
         into l_intaccrow.ostb
         from accounts
        where acc = l_intaccid;
-    
+
       p_penalty  := 0; -- сумма штрафа
       p_commiss  := 0; -- сумма комиссии за РКО
       p_commiss2 := 0; -- сумма комиссии за прием ветхих купюр
@@ -16244,21 +16247,21 @@ is
       l_penyad   := 0;
       l_penyac   := 0;
       l_penyav   := 0;
-    
+
     else
       p_commiss  := l_penyac; -- комиссия за РКО
       p_commiss2 := l_penyav; -- комиссия за прием ветхих купюр
       p_penalty  := nvl(l_int2ret, 0) + nvl(l_expbal, 0) + nvl(l_amrbal, 0); -- общая сумма штрафа
-    
+
       if (l_avans = 0) then
         -- зал. на %% рах. + %% нарах. по штр. ставці + податок до повернення - податок з нарах. %% по штр. ставці
         l_tmp := (l_intaccrow.ostb + l_int2pay +
                  (l_tax2ret + l_tax2ret_mil) - (l_tax2pay + l_tax2pay_mil));
-      
+
         l_penyap := least(l_tmp, l_int2ret); -- в т.ч. с проц.счета 2638->6399
         l_penyaa := 0; -- в т.ч. с деп.счета  2630->3500
         l_penyad := greatest(l_int2ret - l_penyap, 0); -- в т.ч. с деп.счета  2630->6399
-      
+
       else
         l_penyap  := 0; -- в т.ч. с проц.счета 2638->6399
         l_penyaa  := least(abs(l_amraccrow.ostb),
@@ -16267,12 +16270,12 @@ is
                               0); -- в т.ч. с деп.счета  2630->6399
         l_int2ret := p_penalty;
       end if;
-    
+
       p_dptrest := least(l_dptaccrow.ostc - l_penyad - l_penyaa - l_penyac -
                          l_penyav,
                          l_dptamount); -- сумма депозита к выплате
       p_intrest := l_int2pay; -- сумма процентов к выплате
-    
+
       -- сумма процентов к выплате = проценты по штрафной ставке на сумму снятия
       --                           + невыплач.проценты за прошлые сроки переоформл.вклада
       intl_get_prevint(p_depaccrow => l_dptaccrow, -- параметры деп.счета
@@ -16286,7 +16289,7 @@ is
                        title,
                        to_char(l_prevrest));
       p_intrest := p_intrest + l_prevrest;
-    
+
       -- доп.проверка для част.снятия - "остаток меньше минимально допустимого"
       if (p_fullpay = 0) then
         -- Операция заблокирована: сумма договора № %s после снятия указанной суммы (%s),
@@ -16304,10 +16307,10 @@ is
                                   num2str(l_minsum, l_curcode));
         end if;
       end if;
-    
+
       if p_mode = 'RW' then
         -- проверка мобильного телефона при досрочном расторжении / только если процедура досрочного запускается в режиме RW
-      
+
         begin
           select count(*)
             into l_inherited
@@ -16319,7 +16322,7 @@ is
             l_inherited := 0;
         end;
         l_valid_mobphone := bars.verify_cellphone_byrnk(l_rnk);
-      
+
         if l_valid_mobphone = 0 and p_fullpay = 1 and l_inherited = 0 then
           -- В картці клієнта не заповнено або невірно заповнено мобільний телефон
           bars_error.raise_nerror('CAC', 'ERROR_MPNO');
@@ -16334,11 +16337,11 @@ is
                                             p_curcode => l_dptaccrow.kv,
                                             p_branch  => l_dptaccrow.branch,
                                             p_penalty => 1);
-        
+
           bars_audit.trace('%s счет расходов для возврата штрафа = %s',
                            title,
                            to_char(l_expaccid2));
-        
+
           -- пошук рахунка для утримання податку з нарахованих відсотків
           begin
             select a.acc
@@ -16351,30 +16354,30 @@ is
             when others then
               l_taxaccid := null;
           end;
-        
+
           bars_audit.trace('%s рахунок для повернення утриманого податку = %s',
                            title,
                            to_char(l_taxaccid));
-        
+
           -- пошук рахунка повернення утриманого податку з нарахованих відсотків
           begin
             select a.acc
               into l_taxaccid2
               from accounts a
              where nls = nbs_ob22_null('3522', '29', l_dptaccrow.branch)
-                  
+
                and kv = gl.baseval
                and dazs is null;
           exception
             when others then
               l_taxaccid2 := null;
           end;
-        
+
           bars_audit.trace('%s рахунок для повернення утриманого податку = %s',
                            title,
                            to_char(l_taxaccid2));
           --(Військовий Збір)
-        
+
           -- пошук рахунка для утримання податку (Військовий Збір)  з нарахованих відсотків
           begin
             select a.acc
@@ -16387,25 +16390,25 @@ is
             when others then
               l_taxaccid_mil := null;
           end;
-        
+
           bars_audit.trace('%s рахунок для повернення утриманого податку (Військовий Збір) = %s',
                            title,
                            to_char(l_taxaccid_mil));
-        
+
           -- пошук рахунка повернення утриманого податку (Військовий Збір) з нарахованих відсотків
           begin
             select a.acc
               into l_taxaccid2_mil
               from accounts a
              where nls = nbs_ob22_null('3522', '30', l_dptaccrow.branch)
-                  
+
                and kv = gl.baseval
                and dazs is null;
           exception
             when others then
               l_taxaccid2_mil := null;
           end;
-        
+
           bars_audit.trace('%s рахунок для повернення утриманого податку (Військовий Збір) = %s',
                            title,
                            to_char(l_taxaccid2_mil));
@@ -16433,7 +16436,7 @@ is
                                 p_tax2pay       => l_tax2pay, -- сума податку для утримання  (з нарахованих %% до виплати по штрафній ставці)
                                 p_tax2ret_mil   => l_tax2ret_mil, -- сума податку (Військовий Збір) для повернення (утриманого з нарахованих %% по основній  ставці)
                                 p_tax2pay_mil   => l_tax2pay_mil); -- сума податку (Військовий Збір)  для утримання  (з нарахованих %% до виплати по штрафній ставці)
-        
+
           if l_avans = 1 and p_fullpay = 1 then
             -- окончательная амортизация выплаченных авансом процентов
             intl_calc_interest(p_mode      => p_mode, -- RO - расчет, RW - проводки
@@ -16449,37 +16452,37 @@ is
                              title,
                              to_char(l_amramount));
           end if;
-        
+
           -- Постанова правління АТ «Ощадбанк» від 24.02.2014 року № 128.
           bars.dpt_ret_early(3, p_dptid);
-        
+
           close_sto_argmnt(p_dptid    => p_dptid,
                            p_accid    => null,
                            p_argmntid => null);
         end if;
       end if;
     end if;
-  
+
     bars_audit.trace('%s ИТОГО: штраф = %s, комиссия за РКО/инкассо = %s / %s',
                      title,
                      to_char(p_penalty),
                      to_char(l_penyac),
                      to_char(l_penyav));
-  
+
     bars_audit.trace('%s ИТОГО: деп.счет: к списанию - %s, к выплате - %s',
                      title,
                      to_char(l_penyad + l_penyaa),
                      to_char(p_dptrest));
-  
+
     bars_audit.trace('%s ИТОГО: проц.счет: к списанию - %s, к выплате - %s',
                      title,
                      to_char(l_penyap),
                      to_char(p_intrest));
-  
+
     bars_audit.trace('%s ИТОГО: сума утриманого податку для повернення - %s',
                      title,
                      to_char(l_tax2ret));
-  
+
     str2txt(p_details, bars_msg.get_msg(g_modcode, 'GLPENALTY_TOTAL')); -- ИТОГ
     str2txt(p_details,
             bars_msg.get_msg(g_modcode,
@@ -16509,26 +16512,26 @@ is
             bars_msg.get_msg(g_modcode,
                              'GLPENALTY_TOTALINT2PAY',
                              num2str(p_intrest, l_curcode))); -- процентов к выплате
-  
+
     if (p_mode = 'RW') and (ebp.get_archive_docid(p_dptid) > 0) then
       -- відправка SMS повідомлення про дострокове повернення депозиту
       send_sms(l_rnk,
                'Depozyt N' || to_char(p_dptid) ||
                ' bulo dostrokovo poverneno.'); --||' u sumi '|| Amount2Str(p_dptrest, l_dptaccrow.kv)  вилучено, оскільки передавало всю суму депозиту в разі часткового зняття. після візування приходить смс про к-ть реально виплачених коштів.
     end if;
-  
+
     bars_audit.trace('%s exit, %s', title, p_details);
-  
+
     -- вертаєм рівень деталізації "по замовчуванню"
     if (l_log_level < bars_audit.log_level_trace) then
-    
+
       bars_audit.set_log_level(l_log_level);
-    
+
       bars_audit.info(title || 'Повернено рівень деталізації повідомлень ' ||
                       to_char(l_log_level) || ' з ' ||
                       to_char(bars_audit.get_log_level()));
     end if;
-  
+
   end global_penalty_ex;
 
   --
@@ -16543,9 +16546,9 @@ is
     l_amount  number(38);
     l_errflg  boolean := false;
   begin
-  
+
     bars_audit.trace('%s entry, dptid => %s', title, to_char(p_dptid));
-  
+
     begin
       select * into l_dptrow from dpt_deposit where deposit_id = p_dptid;
     exception
@@ -16557,7 +16560,7 @@ is
     bars_audit.trace('%s deposit type № %s',
                      title,
                      to_char(l_dptrow.vidd));
-  
+
     select amr_metr
       into l_amrmetr
       from dpt_vidd
@@ -16565,7 +16568,7 @@ is
     bars_audit.trace('%s amortization method № %s',
                      title,
                      to_char(l_amrmetr));
-  
+
     if nvl(l_amrmetr, 0) != 4 then
       -- амортизационный
       -- для вклада не предусмотрено авансовое начисление процентов
@@ -16575,13 +16578,13 @@ is
                               to_char(l_dptrow.datz, 'dd.mm.yyyy'),
                               to_char(p_dptid));
     end if;
-  
+
     -- граничная дата авансового начисления  (пока так)
     l_advdat := l_dptrow.dat_end - 1;
     bars_audit.trace('%s advance stopintdate - %s',
                      title,
                      to_char(l_advdat, 'dd.mm.yyyy'));
-  
+
     -- Авансовое перечисление процентов по договору № ... от ...
     l_nazn := substr(bars_msg.get_msg(g_modcode, 'ADVANCE_MAKEINT_DETAILS1') || ' ' ||
                      l_dptrow.nd || ' ' ||
@@ -16589,9 +16592,9 @@ is
                      to_char(l_dptrow.datz, 'dd/mm/yyyy'),
                      1,
                      160);
-  
+
     bars_audit.trace('%s advance makeint details - %s', title, l_nazn);
-  
+
     insert into int_queue
       (kf,
        branch,
@@ -16638,7 +16641,7 @@ is
          and a.ostc = a.ostb
          and a.ostc > 0
          and nvl(i.acr_dat, a.daos) < l_advdat;
-  
+
     if sql%rowcount = 0 then
       bars_audit.trace('%s nothing to interest', title);
     else
@@ -16647,9 +16650,9 @@ is
                p_runid     => 0, -- № запуска
                p_intamount => l_amount, -- сумма начисленных процентов
                p_errflg    => l_errflg); -- флаг ошибки
-    
+
       bars_audit.trace('%s interest amount - %s', title, to_char(l_amount));
-    
+
       if l_errflg then
         -- ошибка авансового начисления процентов по вкладу
         bars_error.raise_nerror(g_modcode,
@@ -16660,7 +16663,7 @@ is
                                 sqlerrm);
       end if;
     end if;
-  
+
   end advance_makeint;
 
   --
@@ -16674,39 +16677,39 @@ is
     l_ctrlday varchar(2);
     l_date    date;
   begin
-  
+
     bars_audit.trace('%s entry, bdate=>%s, dptype=>%s, workday=>%s',
                      title,
                      to_char(p_bdate, 'dd.mm.yyyy'),
                      to_char(p_dptype),
                      to_char(p_workday));
-  
+
     begin
       select substr(val, 1, 2)
         into l_ctrlday
         from dpt_vidd_params
        where vidd = p_dptype
          and tag = ctrlday_extcncl;
-    
+
       -- первый день прошлого месяца
       l_date := add_months(last_day(p_bdate), -2) + 1;
       while to_char(l_date, 'yyyymm') < to_char(p_bdate, 'yyyymm') and
             to_char(l_date, 'dd') != l_ctrlday loop
         l_date := l_date + 1;
       end loop;
-    
+
     exception
       when no_data_found then
         l_date := p_bdate;
     end;
-  
+
     -- l_date := last_day(p_bdate);
     -- while to_char(l_date, 'mm')  = to_char(p_bdate, 'mm')
     --   and to_char(l_date, 'dd') != l_ctrlday
     -- loop
     --     l_date := l_date - 1;
     -- end loop;
-  
+
     if p_workday = 1 then
       begin
         select dat_next_u(l_date, 1)
@@ -16719,12 +16722,12 @@ is
           null;
       end;
     end if;
-  
+
     bars_audit.trace('%s exit with %s',
                      title,
                      to_char(l_date, 'dd.mm.yyyy'));
     return l_date;
-  
+
   end get_extdatex;
 
   --
@@ -16739,9 +16742,9 @@ is
     l_branch  dpt_deposit.branch%type;
     l_machine dpt_extrefusals.req_machine%type;
   begin
-  
+
     bars_audit.trace('%s entry, dptid=>%s', title, to_char(p_dptid));
-  
+
     begin
       select nd, datz, branch
         into l_dptnum, l_dptdat, l_branch
@@ -16751,7 +16754,7 @@ is
       when no_data_found then
         bars_error.raise_nerror(g_modcode, g_dptnotfound, to_char(p_dptid));
     end;
-  
+
     -- l_machine := substr(sys_context('userenv', 'terminal'), 1, 254);
     l_machine := substr(nvl(bars_audit.get_machine,
                             sys_context('bars_global', 'host_name')),
@@ -16760,7 +16763,7 @@ is
     if l_machine is null then
       l_machine := 'NOT AVAILABLE';
     end if;
-  
+
     begin
       insert into dpt_extrefusals
         (dptid,
@@ -16772,7 +16775,7 @@ is
          req_state)
       values
         (p_dptid, l_branch, gl.auid, gl.bdate, sysdate, l_machine, p_state);
-    
+
       bars_audit.info(bars_msg.get_msg(g_modcode,
                                        'FIX_EXTCANCEL_DONE',
                                        l_dptnum,
@@ -16793,9 +16796,9 @@ is
                                 to_char(p_dptid),
                                 sqlerrm);
     end;
-  
+
     bars_audit.trace('%s exit', title);
-  
+
   end fix_extcancel;
 
   --
@@ -16812,13 +16815,13 @@ is
     l_vrfuserid dpt_extrefusals.vrf_userid%type;
     l_machine   dpt_extrefusals.req_machine%type;
   begin
-  
+
     bars_audit.trace('%s entry, dptid=>%s, state=>%s, reason=>%s',
                      title,
                      to_char(p_dptid),
                      to_char(p_state),
                      p_reason);
-  
+
     begin
       select nd, datz
         into l_dptnum, l_dptdat
@@ -16828,9 +16831,9 @@ is
       when no_data_found then
         bars_error.raise_nerror(g_modcode, g_dptnotfound, to_char(p_dptid));
     end;
-  
+
     l_vrfuserid := gl.auid;
-  
+
     begin
       select req_userid
         into l_requserid
@@ -16846,16 +16849,16 @@ is
                                 to_char(l_dptdat, 'dd.mm.yyyy'),
                                 to_char(p_dptid));
     end;
-  
+
     if l_requserid = l_vrfuserid then
       bars_error.raise_nerror(g_modcode,
                               'VERIFY_EXTCANCEL_DENIED',
                               l_dptnum,
                               to_char(l_dptdat, 'dd.mm.yyyy'),
                               to_char(p_dptid));
-    
+
     end if;
-  
+
     if nvl(p_state, 0) not in (1, -1) then
       bars_error.raise_nerror(g_modcode,
                               'VERIFY_EXTCANCEL_INVALIDSTATE',
@@ -16864,7 +16867,7 @@ is
                               to_char(l_dptdat, 'dd.mm.yyyy'),
                               to_char(p_dptid));
     end if;
-  
+
     -- l_machine := substr(sys_context('userenv', 'terminal'), 1, 254);
     l_machine := substr(nvl(bars_audit.get_machine,
                             sys_context('bars_global', 'host_name')),
@@ -16873,7 +16876,7 @@ is
     if l_machine is null then
       l_machine := 'NOT AVAILABLE';
     end if;
-  
+
     begin
       update dpt_extrefusals
          set req_state   = p_state,
@@ -16900,9 +16903,9 @@ is
                                 to_char(p_dptid),
                                 sqlerrm);
     end;
-  
+
     bars_audit.trace('%s exit', title);
-  
+
   end verify_extcancel;
 
   --
@@ -16918,23 +16921,23 @@ is
     l_lastbnkdate date;
     l_lastsysdate date;
   begin
-  
+
     bars_audit.trace('%s entry, bdate=>%s, isfixed=>%s, mode=>%s',
                      title,
                      to_char(p_bnkdate, 'dd.mm.yyyy'),
                      p_isfixed,
                      to_char(p_mode));
-  
+
     l_lastsysdate := last_day(p_bnkdate); -- последний календарный день месяца
     l_lastbnkdate := dat_last(p_bnkdate, null); -- последний рабочий день месяца
     p_valdate     := dat_next_u(l_lastbnkdate, -p_mode); -- (пред)последний рабочий день месяца
     p_acrdate     := l_lastsysdate; -- последний календарный день месяца
-  
+
     bars_audit.trace('%s exit, valdate=>%s, acrdate=>%s',
                      title,
                      to_char(p_valdate, 'dd.mm.yyyy'),
                      to_char(p_acrdate, 'dd.mm.yyyy'));
-  
+
   end get_mnthintdates;
 
   --
@@ -16966,12 +16969,12 @@ is
     l_intpaydate date;
     --l_fromASVO number;
   begin
-  
+
     bars_audit.trace('%s entry, dptid=>%s,amount=>%s',
                      title,
                      to_char(p_dptid),
                      to_char(p_amount));
-  
+
     begin
       select v.vidd,
              decode(v.amr_metr, 0, 0, 1),
@@ -17015,7 +17018,7 @@ is
                      to_char(l_extend),
                      to_char(l_datbeg, 'dd.mm.yy'),
                      to_char(l_datend, 'dd.mm.yy'));
-  
+
     -- проверка допустимости выплаты процентов по вкладу (1-допустима, 0-недопустима)
     if 0 = dpt.payoff_enable(p_intacc => l_intacc, -- внутр.№ счета начисл.процентов
                              p_freq   => l_freq, -- период-ть выплаты процентов
@@ -17028,17 +17031,17 @@ is
       bars_audit.trace('%s interest payoff denied', title);
       l_amount := 0;
     else
-    
+
       bars_audit.trace('%s intacc saldo = %s', title, to_char(l_intsal));
-    
+
       select * into l_row from accounts where acc = l_depacc;
-    
+
       if (l_avans = 1 and l_freq in (5, 7) and l_datend > l_bdate) then
-      
+
         bars_audit.trace('%s advance deposit with freq = %s',
                          title,
                          to_char(l_freq));
-      
+
         if l_freq = 7 then
           -- выплата на 1 квартал вперед
           l_mnthcnt := 3 *
@@ -17053,7 +17056,7 @@ is
         bars_audit.trace('%s acrdat = %s',
                          title,
                          to_char(l_acrdat, 'dd.mm.yyyy'));
-      
+
         -- заполнение альтернативной процентной карточки  (id = 3)
         intl_fill_altintcard(p_dptaccid  => l_depacc, -- внутр.номер деп.счета
                              p_genintid  => l_genintid, -- код основной карточки
@@ -17075,12 +17078,12 @@ is
         -- очистка альтернативной %-ной карточки (id = 3)
         intl_clear_altintcard(p_dptaccid => l_depacc,
                               p_altintid => l_altintid);
-      
+
         l_amount := nvl(round(l_amount), 0);
         bars_audit.trace('%s total interest = %s',
                          title,
                          to_char(l_amount));
-      
+
         -- сумма всех выплат
         select nvl(sum(dos), 0)
           into l_payed
@@ -17089,19 +17092,19 @@ is
            and fdat >= l_datbeg
            and fdat <= l_bdate;
         bars_audit.trace('%s total payed = %s', title, to_char(l_payed));
-      
+
         l_amount := greatest(l_amount - l_payed, 0);
         bars_audit.trace('%s rest to payoff = %s',
                          title,
                          to_char(l_amount));
-      
+
         -- учитываем план.остаток на счете (абы не выдать больше чем есть)
         l_amount := least(l_amount, l_intsal);
-      
+
       else
-      
+
         bars_audit.trace('%s standart deposit', title);
-      
+
         -- сумма процентов к снятию = план.остаток минус "излишек" начисленных
         -- процентов (%% с даты ближ.выплаты по дату посл.начисления)
         l_intpaydate := dpt.get_intpaydate(p_date   => l_bdate,
@@ -17134,10 +17137,10 @@ is
                              p_dptamount => null,
                              p_intamount => l_overint);
           l_overint := nvl(round(l_overint), 0);
-        
+
           -- за мінусом утриманого податку
           l_overint := l_overint - round(l_overint * get_tax_rate());
-        
+
           -- очистка альтернативной %-ной карточки (id = 3)
           intl_clear_altintcard(p_dptaccid => l_depacc,
                                 p_altintid => l_altintid);
@@ -17175,25 +17178,25 @@ is
             l_fromASVO := 0;
         end;   */
         bars_audit.trace('%s overint = %s', title, to_char(l_overint));
-      
+
         -- описати логіку (поки не понятконо (для авнсових не дає виплатити))
         if nvl(p_amount, 0) = 0 then
           l_amount := greatest(l_intsal - l_overint, 0);
         else
           l_amount := least(p_amount, l_intsal - l_overint);
         end if;
-      
+
       end if;
-    
+
     end if;
-  
+
     bars_audit.trace('%s interest payoff amount = %s',
                      title,
                      to_char(l_amount));
-  
+
     p_amount := l_amount;
     bars_audit.trace('%s exit with %s', title, to_char(p_amount));
-  
+
   end get_intpayoff_amount;
 
   --
@@ -17238,7 +17241,7 @@ is
     l_errflg     boolean;
     l_errmsg     varchar2(3000);
   begin
-  
+
     bars_audit.trace('%s entry, dptid => %s, bdate => %s, branch => %s',
                      title,
                      to_char(p_dptid),
@@ -17285,7 +17288,7 @@ is
                      to_char(l_dptaccid),
                      to_char(l_amraccid),
                      to_char(l_expaccid));
-  
+
     -- параметры депозитного счета + блокировка
     begin
       select *
@@ -17304,11 +17307,11 @@ is
                                                          'dd.mm.yyyy'),
                                                  to_char(l_dptid)));
     end;
-  
+
     l_expaccint := 0;
     l_amraccint := 0;
     l_total_int := 0;
-  
+
     for docs in (with tbl_docs as
                     (select d.fdat dat, sum(d.s) amount
                       from opldok d, opldok k
@@ -17331,12 +17334,12 @@ is
                      from tbl_docs
                    having nvl (sum(amount), 0) != 0
                     order by 1) loop
-    
+
       bars_audit.trace('%s %s at %s',
                        title,
                        to_char(docs.dat, 'dd.mm.yyyy'),
                        to_char(docs.amount));
-    
+
       -- граничная дата начисления
       l_intdat2 := case
                      when docs.dat is null then
@@ -17347,11 +17350,11 @@ is
       bars_audit.trace('%s граничная дата начисления %s',
                        title,
                        to_char(l_intdat2, 'dd.mm.yyyy'));
-    
+
       -- вызов внутренней процедуры очистки доп.процентной карточки (id = 5)
       intl_clear_altintcard(p_dptaccid => l_dptaccid,
                             p_altintid => altintid);
-    
+
       -- вызов внутренней процедуры заполнения доп.процентной карточки и ставки
       intl_fill_altintcard(p_dptaccid  => l_dptaccid,
                            p_genintid  => genintid,
@@ -17360,7 +17363,7 @@ is
                            p_intdat2   => l_intdat2,
                            p_penyadate => null,
                            p_penyarate => null);
-    
+
       -- вызов внутренней процедуры расчета суммы процентов (RO)
       intl_calc_interest(p_mode      => 'RO',
                          p_date      => p_bdate,
@@ -17372,11 +17375,11 @@ is
                          p_dptamount => docs.amount,
                          p_intamount => l_int);
       bars_audit.trace('%s interest amount = %s', title, to_char(l_int));
-    
+
       -- вызов внутренней процедуры очистки доп.процентной карточки (id = 5)
       intl_clear_altintcard(p_dptaccid => l_dptaccid,
                             p_altintid => altintid);
-    
+
       if docs.dat is not null then
         l_expaccint := l_expaccint + nvl(l_int, 0);
       else
@@ -17386,9 +17389,9 @@ is
                        title,
                        to_char(l_expaccint),
                        to_char(l_total_int));
-    
+
     end loop; -- docs
-  
+
     l_expaccint := round(l_expaccint);
     l_total_int := round(l_total_int);
     l_amraccint := l_total_int - l_expaccint;
@@ -17397,19 +17400,19 @@ is
                      to_char(l_expaccint),
                      to_char(l_amraccint),
                      to_char(l_total_int));
-  
+
     if p_mode = 'RW' and l_total_int > 0 then
-    
+
       -- реквизиты счетов депозита/амортизации/расходов
       l_accrecd := search_acc_params(l_dptaccid);
       l_accreca := search_acc_params(l_amraccid);
       l_accrece := search_acc_params(l_expaccid);
-    
+
       l_tt := get_tt(p_type     => dptop_avanspenalty,
                      p_interpay => 0,
                      p_cardpay  => 0,
                      p_currency => l_accrecd.acc_cur);
-    
+
       if l_datend > p_bdate then
         l_details1 := substr(bars_msg.get_msg(g_modcode,
                                               'GLPENALTY_DOCDTL_EXP') ||
@@ -17441,7 +17444,7 @@ is
                              1,
                              160);
       end if;
-    
+
       -- возврат с депозитного счета на счет расходов банка
       if l_expaccint > 0 then
         if l_accrecd.acc_cur = l_accrece.acc_cur then
@@ -17486,7 +17489,7 @@ is
           bars_error.raise_nerror(g_modcode, 'PAYDOC_ERROR', l_errmsg);
         end if;
       end if;
-    
+
       -- возврат с депозитного счета на счет амортизации процентов
       if l_amraccint > 0 then
         paydoc(p_dptid    => l_dptid,
@@ -17524,16 +17527,16 @@ is
           bars_error.raise_nerror(g_modcode, 'PAYDOC_ERROR', l_errmsg);
         end if;
       end if;
-    
+
     end if;
-  
+
     p_expbal := l_expaccint;
     p_amrbal := l_amraccint;
     bars_audit.trace('%s exit with %s / %s',
                      title,
                      to_char(p_expbal),
                      to_char(p_amrbal));
-  
+
   end advance_balsettlement;
 
   --
@@ -17548,13 +17551,13 @@ is
     l_expbal number;
     l_amrbal number;
   begin
-  
+
     bars_audit.trace('%s entry, branch=>%s, bdate=>%s, dptid=>%s',
                      title,
                      p_branch,
                      to_char(p_bdate, 'dd.mm.yyyy'),
                      to_char(p_dptid));
-  
+
     for avans in (select d.deposit_id dptid
                     from dpt_deposit d, int_accn i, dpt_vidd v
                    where d.acc = i.acc
@@ -17575,9 +17578,9 @@ is
                             l_expbal,
                             l_amrbal);
     end loop;
-  
+
     bars_audit.trace('%s exit', title);
-  
+
   end auto_advance_balsettlement;
 
   --
@@ -17595,30 +17598,30 @@ is
     l_tmpnum  integer;
     l_plblock varchar2(3000);
   begin
-  
+
     bars_audit.trace('%s entry, dptid=>%s, runid=>%s, branch=%s, bdate=>%s',
                      title,
                      to_char(p_dptid),
                      to_char(p_runid),
                      p_branch,
                      to_char(p_bdate));
-  
+
     select *
       bulk collect
       into l_extype
       from dpt_vidd_extypes
      where bonus_proc is not null
        and bonus_rate is not null;
-  
+
     for e in 1 .. l_extype.count loop
-    
+
       bars_audit.trace('%s extype № %s, proc - %s',
                        title,
                        to_char(l_extype(e).id),
                        l_extype(e).bonus_proc);
-    
+
       l_plblock := 'begin ' || l_extype(e).bonus_proc || '; end;';
-    
+
       begin
         savepoint sp_extbonus;
         l_cursor := dbms_sql.open_cursor;
@@ -17643,11 +17646,11 @@ is
                                   to_char(p_dptid),
                                   sqlerrm);
       end;
-    
+
     end loop; -- e
-  
+
     bars_audit.trace('%s exit', title);
-  
+
   end auto_extension_bonus;
 
   --
@@ -17663,13 +17666,13 @@ is
     l_tmpnum number(38);
     l_rate   number(10, 4);
   begin
-  
+
     bars_audit.trace('%s entry, dptid => %s, bdate => %s, query => %s',
                      title,
                      to_char(p_dptid),
                      to_char(p_bdate, 'dd.mm.yyyy'),
                      p_query);
-  
+
     l_cursor := dbms_sql.open_cursor;
     dbms_sql.parse(l_cursor, p_query, dbms_sql.native);
     dbms_sql.bind_variable(l_cursor, 'DPTID', p_dptid);
@@ -17678,11 +17681,11 @@ is
     l_tmpnum := dbms_sql.execute_and_fetch(l_cursor);
     dbms_sql.column_value(l_cursor, 1, l_rate);
     dbms_sql.close_cursor(l_cursor);
-  
+
     bars_audit.trace('%s exit with rate %s', title, to_char(l_rate));
-  
+
     return l_rate;
-  
+
   exception
     when others then
       dbms_sql.close_cursor(l_cursor);
@@ -17701,12 +17704,12 @@ is
     l_dat2   date;
     l_avgsal number(38);
   begin
-  
+
     bars_audit.trace('%s entry, dptid => %s, mnthcnt => %s',
                      title,
                      to_char(p_dptrow.deposit_id),
                      to_char(p_mnthcnt));
-  
+
     -- вычисление начальной и конечной дат периода
     select dat_begin
       into l_dat1
@@ -17717,14 +17720,14 @@ is
              where deposit_id = p_dptrow.deposit_id
                and action_id in (0, 3)
                and nvl(cnt_dubl, 0) = (p_dptrow.cnt_dubl + 1) - p_mnthcnt);
-  
+
     l_dat2 := p_dptrow.dat_end - 1;
-  
+
     bars_audit.trace('%s term = (%s,%s)',
                      title,
                      to_char(l_dat1, 'dd.mm.yy'),
                      to_char(l_dat2, 'dd.mm.yy'));
-  
+
     select round(avg(s.ostf - s.dos + s.kos))
       into l_avgsal
       from saldoa s, conductor c
@@ -17736,11 +17739,11 @@ is
                                where s1.acc = s.acc
                                  and s1.fdat <= (l_dat1 + c.num - 1)
                                group by s1.acc);
-  
+
     bars_audit.trace('%s exit with avgsaldo %s', title, to_char(l_avgsal));
-  
+
     return nvl(l_avgsal, 0);
-  
+
   end iextbonus12_get_saldo;
 
   --
@@ -17758,14 +17761,14 @@ is
     l_errflg boolean;
     l_errmsg varchar2(3000);
   begin
-  
+
     bars_audit.trace('%s entry, dptid => %s, amount => %s, bdate => %s, tt => %s',
                      title,
                      to_char(p_dptrow.deposit_id),
                      to_char(p_amount),
                      to_char(p_bdate, 'dd.mm.yyyy'),
                      p_tt);
-  
+
     begin
       select ap.nls,
              ap.kv,
@@ -17803,7 +17806,7 @@ is
                                 to_char(p_dptrow.datz, 'dd.mm.yyyy'),
                                 to_char(p_dptrow.deposit_id));
     end;
-  
+
     l_doc.dk   := 0;
     l_doc.tt   := p_tt;
     l_doc.vdat := p_bdate;
@@ -17815,7 +17818,7 @@ is
                   else
                    round(gl.p_icurval(l_doc.kv, l_doc.s, l_doc.vdat))
                 end;
-  
+
     -- Нарахування додаткових відсотків при .. пролонгації деп.договору № .. від ..
     l_doc.nazn := substr(bars_msg.get_msg(g_modcode,
                                           'EXTBONUS_DOCDTL',
@@ -17826,7 +17829,7 @@ is
                          p_comments,
                          1,
                          160);
-  
+
     paydoc(p_dptid    => p_dptrow.deposit_id,
            p_vdat     => l_doc.vdat,
            p_brancha  => p_dptrow.branch,
@@ -17854,7 +17857,7 @@ is
            p_err_flag => l_errflg,
            p_err_msg  => l_errmsg,
            p_ref      => l_doc.ref);
-  
+
     bars_audit.trace('%s ref (%s - %s = %s) = %s',
                      title,
                      l_doc.nlsa,
@@ -17870,11 +17873,11 @@ is
                               to_char(p_dptrow.deposit_id),
                               l_errmsg);
     end if;
-  
+
     p_docref := l_doc.ref;
-  
+
     bars_audit.trace('%s exit with ref %s', title, to_char(p_docref));
-  
+
   end iextbonus12_paydoc;
 
   --
@@ -17901,7 +17904,7 @@ is
     l_docref    number(38);
     l_cnt       number(38) := 0;
   begin
-  
+
     bars_audit.trace('%s entry, extid => %s, dptid => %s, runid => %s, branch => %s,' ||
                      ' bdate => %s, tt => %s, period => %s',
                      title,
@@ -17912,7 +17915,7 @@ is
                      to_char(p_bdate, 'dd.mm.yyyy'),
                      p_tt,
                      to_char(p_period));
-  
+
     -- функция для расчета значения бонусной процентной ставки
     begin
       select bonus_rate
@@ -17926,7 +17929,7 @@ is
                                 'EXTBONUS_TYPE_NOT_FOUND',
                                 to_char(p_extid));
     end;
-  
+
     -- отбор всех вкладов с пролонгацией, для видов вкладов которых предусмотрен бонус
     select d.*
       bulk collect
@@ -17937,35 +17940,35 @@ is
        and e.id = p_extid
        and d.branch = p_branch
        and d.deposit_id = decode(p_dptid, 0, d.deposit_id, p_dptid);
-  
+
     for i in 1 .. l_dptlist.count loop
-    
+
       bars_audit.trace('%s processing deposit № %s...',
                        title,
                        to_char(l_dptlist(i).deposit_id));
-    
+
       begin
-      
+
         savepoint sp_bonusext;
-      
+
         -- проверка выполнения условия получения бонуса и
         -- определение значения бонусной процентной ставки
         l_bonusrate := iextbonus12_get_rate(p_query => l_query,
                                             p_dptid => l_dptlist(i).deposit_id,
                                             p_bdate => p_bdate);
         bars_audit.trace('%s bonusrate = %s', title, to_char(l_bonusrate));
-      
+
         if l_bonusrate > 0 then
-        
+
           -- расчет остатка, на который начисляется бонус
           l_avgsaldo := iextbonus12_get_saldo(p_dptrow  => l_dptlist(i),
                                               p_mnthcnt => p_period);
           bars_audit.trace('%s avgsaldo = %s', title, to_char(l_avgsaldo));
-        
+
           -- расчет периода, за который начисляются бонусные проценты
           l_dayscnt := (l_dptlist(i).dat_end - 1) - l_dptlist(i).dat_begin + 1;
           bars_audit.trace('%s dayscnt = %s', title, to_char(l_dayscnt));
-        
+
           -- процентная база для начисления процентов
           l_intbase := to_date('3112' ||
                                to_char(l_dptlist(i).dat_begin, 'YYYY'),
@@ -17978,7 +17981,7 @@ is
           bars_audit.trace('%s intamount = %s',
                            title,
                            to_char(l_intamount));
-        
+
           if l_intamount > 0 then
             -- (на сумму %s/%s за %s дн. под %s % годовых)
             l_comments := substr(bars_msg.get_msg(g_modcode,
@@ -17991,7 +17994,7 @@ is
                                                                '990D99'))),
                                  1,
                                  160);
-          
+
             -- оплата документа
             iextbonus12_paydoc(p_dptrow   => l_dptlist(i), -- данные по вкладу
                                p_amount   => l_intamount, -- сумма бонуса
@@ -18000,18 +18003,18 @@ is
                                p_comments => l_comments, -- расчет суммы бонуса
                                p_docref   => l_docref); -- референс документа
             bars_audit.trace('%s docref = %s', title, to_char(l_docref));
-          
+
             -- промежуточная фиксация
             l_cnt := l_cnt + 1;
             if p_runid > 0 and l_cnt >= autocommit then
               commit;
               l_cnt := 0;
             end if;
-          
+
           end if;
-        
+
         end if;
-      
+
       exception
         when others then
           rollback to sp_bonusext;
@@ -18023,11 +18026,11 @@ is
                                   to_char(l_dptlist(i).deposit_id),
                                   sqlerrm);
       end;
-    
+
     end loop; -- i
-  
+
     bars_audit.trace('%s exit', title);
-  
+
   end set_extbonus12avg;
 
   --
@@ -18037,7 +18040,7 @@ is
   function is_demandpt(p_dptid in dpt_deposit.deposit_id%type) return number is
     l_socflg number(1) := 0;
   begin
-  
+
     begin
       select 1
         into l_socflg
@@ -18048,9 +18051,9 @@ is
       when no_data_found then
         l_socflg := 0;
     end;
-  
+
     return l_socflg;
-  
+
   end is_demandpt;
 
   --
@@ -18070,13 +18073,13 @@ is
     l_dpt  t_dpttbl;
     l_r013 specparam.r013%type;
   begin
-  
+
     bars_audit.trace('%s entry, bnkdate=>%s, datend1=>%s, datend2=>%s',
                      title,
                      to_char(p_bnkdate, 'dd.mm.yyyy'),
                      to_char(p_datend1, 'dd.mm.yyyy'),
                      to_char(p_datend2, 'dd.mm.yyyy'));
-  
+
     select deposit_id, acc, branch, dat_end
       bulk collect
       into l_dpt
@@ -18084,18 +18087,18 @@ is
      where dat_end >= p_datend1
        and dat_end <= p_datend2
      order by branch;
-  
+
     for i in 1 .. l_dpt.count loop
-    
+
       bars_audit.trace('%s processing dpt № %s...',
                        title,
                        to_char(l_dpt(i).dptid));
-    
+
       -- представимся подразделением
       if l_dpt(i).branch != sys_context('bars_context', 'user_branch') then
         bars_context.subst_branch(l_dpt(i).branch);
       end if;
-    
+
       begin
         for a in (select a.acc,
                          a.nls,
@@ -18106,9 +18109,9 @@ is
                    where da.accid = a.acc
                      and a.acc = s.acc(+)
                      and da.dptid = l_dpt(i).dptid) loop
-        
+
           bars_audit.trace('%s processing acc № %s...', title, a.nls);
-        
+
           -- значение спецпараметра R013 для депозитного счета
           if a.acc = l_dpt(i).accid then
             if l_dpt(i).datend > p_bnkdate then
@@ -18119,7 +18122,7 @@ is
           else
             l_r013 := null;
           end if;
-        
+
           -- несоответствие реального и требуемого значений R013
           if l_r013 is not null and nvl(a.r013, '_') != l_r013 then
             if a.need2ins = 1 then
@@ -18133,9 +18136,9 @@ is
                              nvl(a.r013, '_'),
                              l_r013);
           end if;
-        
+
         end loop;
-      
+
       exception
         when others then
           bars_context.set_context;
@@ -18144,12 +18147,12 @@ is
                                   to_char(l_dpt(i).dptid),
                                   sqlerrm);
       end;
-    
+
     end loop;
-  
+
     bars_context.set_context;
     bars_audit.trace('%s exit', title);
-  
+
   end auto_sync_r013;
 
   --
@@ -18162,14 +18165,14 @@ is
     title varchar2(60) := 'dptweb.vrfdepreturn:';
     l_flg number(1);
   begin
-  
+
     bars_audit.trace('%s entry, dptid=>%s', title, to_char(p_dptid));
-  
+
     l_flg := 1;
-  
+
     bars_audit.trace('%s exit with %s', title, to_char(l_flg));
     return l_flg;
-  
+
   end verify_depreturn;
 
   --=============================================================================
@@ -18182,24 +18185,24 @@ is
       dat_beg dpt_deposit.dat_begin%type,
       acc     dpt_deposit.acc%type,
       ost     dpt_deposit.limit%type);
-  
+
     l_dptrow t_dptrow;
     title    varchar2(60) := 'DPT_WEB.GET_BONUS_RATE:';
-  
+
     l_br         dpu_vidd.br_id%type;
     l_rate       int_ratn.ir%type;
     l_date       date;
     l_current_br int_ratn.br%type;
     l_viddmin_dt dpt_vidd_update.dateu%type;
-  
+
   begin
-  
+
     begin
       select vidd, kv, dat_begin, acc, fost(acc, gl.bd)
         into l_dptrow
         from dpt_deposit
        where deposit_id = p_dptid;
-    
+
       bars_audit.trace('%s found for deposit_id = %s (vidd = %s, kv = %s, dat_begin = %s, ost = %s)',
                        title,
                        to_char(p_dptid),
@@ -18214,7 +18217,7 @@ is
                          title,
                          to_char(p_dptid));
     end;
-  
+
     begin
       select br
         into l_current_br
@@ -18232,12 +18235,12 @@ is
                          title,
                          to_char(p_dptid));
     end;
-  
+
     if l_rate = 0 then
       null;
     else
       begin
-      
+
         -- COBUSUPABS-4401
         -- Необхідно виправити програмне забезпечення таким чином, щоб 3ДУ змінювала процентну ставку,
         -- відносно пакету послуг ексклюзивного, на ставку яка діяла по цьому виду вкладу на дату відкриття депозиту.
@@ -18250,7 +18253,7 @@ is
              and v.br_id = b.br_id
              and b.br_type = 2 --< Ступінчаста %% ставка
              and dateu <= l_dptrow.dat_beg;
-        
+
           select v.br_id
             into l_br
             from dpt_vidd_update v, brates b
@@ -18275,7 +18278,7 @@ is
           from br_tier_edit
          where br_id = l_br
            and kv = l_dptrow.kv;
-      
+
         -- якщо дату (інакше для депозитів які відкритті раніше нова ставка буде = 0 )
         -- l_date := greatest( l_date, l_dptrow.dat_beg );
         if (l_date < l_dptrow.dat_beg) then
@@ -18287,20 +18290,20 @@ is
                            to_char(l_dptrow.kv),
                            to_char(l_date, 'dd.mm.yyyy'));
         end if;
-      
+
         l_rate := getbrat(l_date, l_br, l_dptrow.kv, l_dptrow.ost);
-      
+
       exception
         when no_data_found then
           l_rate := 0;
       end;
-    
+
     end if;
-  
+
     bars_audit.trace('%s exit, rates => %s ', title, to_char(l_rate));
-  
+
     return l_rate;
-  
+
   end get_bonus_rate;
 
   --
@@ -18313,7 +18316,7 @@ is
     l_kf    varchar2(6);
   begin
     if (p_rnk > 1) then
-    
+
       begin
         -- пошук номеру мобільного телефону
         select "VALUE"
@@ -18322,9 +18325,9 @@ is
          where rnk = p_rnk
            and tag = 'MPNO'
            and isp = 0;
-      
+
         select kf into l_kf from customer where rnk = p_rnk;
-      
+
         case length(l_phone)
           when 9 then
             l_phone := '+380' || l_phone;
@@ -18335,7 +18338,7 @@ is
           else
             null;
         end case;
-      
+
         bars_sms.create_msg(p_msgid           => l_msgid,
                             p_creation_time   => sysdate,
                             p_expiration_time => sysdate + 1,
@@ -18351,7 +18354,7 @@ is
           (msg_id, change_time, rnk)
         values
           (l_msgid, sysdate, p_rnk);
-      
+
       exception
         when no_data_found then
           bars_audit.info('DPT_WEB.SEND_SMS: В клієнта (рнк=' ||
@@ -18360,11 +18363,11 @@ is
         when others then
           bars_audit.info('DPT_WEB.SEND_SMS: Error => ' || sqlerrm);
       end;
-    
+
     else
       bars_audit.info('DPT_WEB.SEND_SMS: Не вказано РНК отримувача SMS повідомлення!');
     end if;
-  
+
   end send_sms;
 
   ---
@@ -18374,10 +18377,10 @@ is
     l_bankdate date;
     l_date_end date;
   begin
-  
+
     l_bankdate := bankdate;
     l_date_end := (l_bankdate + 3);
-  
+
     -- 1) Нагадування про закінчення дії депозитного договору
     for k in (select deposit_id as dpt_id, rnk, dat_end
                 from dpt_deposit
@@ -18387,10 +18390,10 @@ is
                ' zakinchuetsya ' || to_char(k.dat_end, 'dd/mm/yy') ||
                '. Zvernitsya bud-laska v Bank.');
     end loop;
-  
+
     -- 2) Нагадування про програму лояльності "Ексклюзив"
     -- Dlya zbilshennya protsentnoi stavky po Vashomu depozytu zvernitsya bud-laska v Bank.
-  
+
   end sending_messages;
 
   -- ======================================================================================
@@ -18398,7 +18401,7 @@ is
   --
   procedure mark_to_close(p_dptid in dpt_deposit.deposit_id%type) is
   begin
-  
+
     -- Блокуємо можливість зарахування на рахунки договору
     for k in (select accid from dpt_accounts where dptid = p_dptid) loop
       update accounts a
@@ -18406,10 +18409,10 @@ is
        where a.acc = k.accid
          and a.dazs is null;
     end loop;
-  
+
     -- проставляємо відмітку на закриття
     dpt.fill_dptparams(p_dptid, '2CLOS', 'Y');
-  
+
   end mark_to_close;
 
   --==============================================================
@@ -18448,19 +18451,19 @@ is
                        p_tag_id in number,
                        p_text   in varchar2) is
   begin
-  
+
     update dpt_agrw
        set value = trim(p_text)
      where agreement_id = p_agr_id
        and tag_id = p_tag_id; -- для поля Інше - прописью из ДУ  (=1) dpt_dict_agrtag
-  
+
     if (sql%rowcount = 0) then
       insert into dpt_agrw
         (agreement_id, tag_id, value)
       values
         (p_agr_id, p_tag_id, trim(p_text));
     end if;
-  
+
   end agr_params;
 
   -- ======================================================================================
@@ -18471,7 +18474,7 @@ is
     l_title  varchar2(60) := 'dpt_web.dpt_is_pawn: ';
     l_result dpt_depositw.value%type;
   begin
-  
+
     bars_audit.trace('%s договор № %s', l_title, to_char(p_dptid));
     begin
       select nvl(value, 0)
@@ -18483,11 +18486,11 @@ is
       when no_data_found then
         l_result := '0';
     end;
-  
+
     -- bars_audit.trace('%s флаг наследования = %s (p_param = %s)', l_title, l_result, to_char(p_param) );
-  
+
     return l_result;
-  
+
   end dpt_is_pawn;
 
   procedure dpt_is_exclusive(p_rnk  customer.rnk%type,
@@ -18508,7 +18511,7 @@ is
        and (p_ostc - p_kos) < t3.ostc_min
        and months_between(bankdate, t2.dat_begin) >= t3.month_term
        and t2.kv = t3.kv;
-  
+
     if (l_dpt_id > 0) then
       /*SEND_SMS (
       p_rnk,
@@ -18535,23 +18538,23 @@ is
     l_dptacc number;
     l_kv     number;
     l_base   number := 365;
-  
+
     l_msg varchar2(50);
-  
+
     type t_raterec is record(
       dat1 int_ratn_arc.bdat%type,
       dat2 int_ratn_arc.bdat%type,
       ir   int_ratn_arc.ir%type,
       br   int_ratn_arc.br%type,
       op   int_ratn_arc.op%type);
-  
+
     type t_ratedata is table of t_raterec;
-  
+
     l_accturn     t_turndata;
     l_accrates    t_ratedata;
     l_taxlist     t_taxdata;
     l_taxlist_mil t_taxdata;
-  
+
     l_accturn_cnt   number := 0;
     l_accrates_cnt  number := 0;
     l_int           number := 0;
@@ -18583,7 +18586,7 @@ is
                                 ' відбувалось неодноразово. ',
                                 true);
     end;
-  
+
     --l_base := CASE WHEN l_kv = 980 THEN 365 ELSE 360 END;
     bars_audit.trace('Дата досрочного расторжения - ' ||
                      to_char(l_when, 'dd/mm/yyyy'));
@@ -18598,12 +18601,12 @@ is
     loop
        l_accturn (jj).currdat := l_accturn (jj).currdat - 1;
     end loop;*/
-  
+
     bars_audit.trace('START. Количество оборотов по счету за период с ' ||
                      to_char(p_datbeg, 'dd/mm/yyyy') || ' по ' ||
                      to_char(p_datend, 'dd/mm/yyyy') || '=' ||
                      to_char(l_accturn_cnt));
-  
+
     l_tmp_int       := 0;
     l_tmp_tax       := 0;
     l_tmp_tax_mil   := 0;
@@ -18620,9 +18623,9 @@ is
       l_int     := 0;
       l_tax     := 0;
       l_tax_mil := 0;
-    
+
       for i in 1 .. l_accturn_cnt loop
-      
+
         bars_audit.trace('(' ||
                          to_char(l_accturn(i).prevdat, 'dd/mm/yyyy') || '-' ||
                          to_char(l_accturn(i).currdat, 'dd/mm/yyyy') || ')' ||
@@ -18630,7 +18633,7 @@ is
                          to_char(l_accturn(i)
                                  .currdat - l_accturn(i).prevdat) ||
                          ' дн.');
-      
+
         -- 2. Ищем набор периодов + %%ставок, входящим в период расчета штрафных %%
         begin
           select distinct bdat dat1,
@@ -18648,10 +18651,10 @@ is
              and (dpt.fproc(acc, bdat) <> ir and m = 0 or
                  dpt.fproc(acc, bdat) = ir and m = 1)
            order by bdat;
-        
+
           l_accrates_cnt := l_accrates.count;
           l_tmp_int_j    := 0;
-        
+
           for j in 1 .. l_accrates_cnt loop
             if nvl(l_accrates(j).dat2, l_accturn(i).currdat) >
                greatest(l_accrates(j).dat1, l_accturn(i).prevdat) then
@@ -18674,7 +18677,7 @@ is
                                ' дн.' || 'IR = ' ||
                                to_char(l_accrates(j).ir) || ' INT = ' ||
                                to_char(l_tmp_int));
-            
+
               -- 3. Ищем набор периодов + ставок налогообложения (ПДФО) за период расчета штрафных %%
               -- Определение периодов и ставок налогообложения по справочнику TAX_SETTINGS
               select tax_type,
@@ -18688,9 +18691,9 @@ is
                  and dat_begin <=
                      nvl(l_accrates(j).dat2, l_accturn(i).currdat)
                order by dat_begin; -- 1 Налог на пассивные доходы ФЛ
-            
+
               l_tmp_tax_k := 0;
-            
+
               for k in 1 .. l_taxlist.count loop
                 if (least(nvl(l_accrates(j).dat2, l_accturn(i).currdat),
                           l_taxlist(k).tax_date_end) >
@@ -18707,7 +18710,7 @@ is
                                                    l_accturn (i).prevdat),
                                           l_taxlist(k).tax_date_begin) + 1) * l_taxlist(k)
                                .tax_int / l_base;
-                
+
                   bars_audit.trace('     (' ||
                                    to_char(greatest(greatest(l_accrates(j).dat1,
                                                              l_accturn (i)
@@ -18732,11 +18735,11 @@ is
                                    ' дн.' || 'TR = ' ||
                                    to_char(l_taxlist(k).tax_int) ||
                                    ' TAX = ' || to_char(l_tmp_tax));
-                
+
                   l_tmp_tax_k := l_tmp_tax_k + l_tmp_tax;
                 end if;
               end loop; --k
-            
+
               --4. Ищем набор периодов + ставок налогообложения Военного сбора за период расчета штрафных %%
               -- Определение периодов и ставок налогообложения по справочнику TAX_SETTINGS
               select tax_type,
@@ -18749,9 +18752,9 @@ is
                where tax_type = 2
                  and dat_begin <=
                      nvl(l_accrates(j).dat2, l_accturn(i).currdat); -- 2 Военный сбор
-            
+
               l_tmp_tax_mil_l := 0;
-            
+
               for l in 1 .. l_taxlist_mil.count loop
                 if (least(nvl(l_accrates(j).dat2, l_accturn(i).currdat),
                           l_taxlist_mil(l).tax_date_end,
@@ -18769,7 +18772,7 @@ is
                                                        l_accturn (i).prevdat),
                                               l_taxlist_mil(l).tax_date_begin)) * l_taxlist_mil(l)
                                    .tax_int / l_base;
-                
+
                   bars_audit.trace('     (' ||
                                    to_char(greatest(greatest(l_accrates(j).dat1,
                                                              l_accturn (i)
@@ -18796,31 +18799,31 @@ is
                                    ' дн.' || 'TR_MIL = ' ||
                                    to_char(l_taxlist_mil(l).tax_int) ||
                                    ' TAX_MIL = ' || to_char(l_tmp_tax_mil));
-                
+
                   l_tmp_tax_mil_l := l_tmp_tax_mil_l + l_tmp_tax_mil;
                 end if;
               end loop; --k
-            
+
               l_tmp_int_j := l_tmp_int_j + l_tmp_int;
             end if;
           end loop; -- j
-        
+
           l_int     := l_int + l_tmp_int_j;
           l_tax     := l_tax + l_tmp_tax_k;
           l_tax_mil := l_tax_mil + l_tmp_tax_mil_l;
         end;
       end loop; -- i
-    
+
       l_int     := round(l_int, 0);
       l_tax     := round(l_tax, 0);
       l_tax_mil := round(l_tax_mil, 0);
-    
+
       if m = 0 then
         p_sh_int    := l_int;
         p_sh_tax    := l_tax;
         p_sh_taxmil := l_tax_mil;
       end if;
-    
+
       if m = 1 then
         p_int    := l_int;
         p_tax    := l_tax;
@@ -18834,7 +18837,7 @@ is
                        ' ставке за период снято военного сбора ' ||
                        to_char(l_tax_mil));
     end loop;
-  
+
     bars_audit.trace('exit penalty_info');
   end penalty_info;
   /*
@@ -18845,7 +18848,7 @@ is
     l_depositset t_depositset := t_depositset();
     l_count      number;
   begin
-  
+
     select /*+ use_hash(i a) */
      count(dc.deposit_id)
       into l_count
@@ -18861,7 +18864,7 @@ is
        and dc.ref_dps is not null
        and dc.when >= p_datbeg
        and (dc.deposit_id = p_dptid or p_dptid is null);
-  
+
     l_depositset.extend(l_count);
     for k in (select /*+ use_hash(i a) */
                rownum as rw, dc.deposit_id
@@ -18879,7 +18882,7 @@ is
                  and (dc.deposit_id = p_dptid or p_dptid is null)) loop
       l_depositset(k.rw) := t_depositrec(k.deposit_id);
     end loop;
-  
+
     return l_depositset;
   end;
 
@@ -18897,7 +18900,7 @@ is
     pragma autonomous_transaction;
     l_depositset t_depositset := t_depositset();
     l_penaltyset t_penaltyset := t_penaltyset();
-  
+
     l_int       number;
     l_tax       number;
     l_taxmil    number;
@@ -18907,7 +18910,7 @@ is
   begin
     l_depositset := f_get_dptpenalty_set(p_datbeg, p_dptid);
     l_penaltyset.extend(l_depositset.count);
-  
+
     for k in 1 .. l_depositset.count loop
       penalty_info(p_dptid     => l_depositset(k).deposit_id,
                    p_datbeg    => p_datbeg,
@@ -18927,7 +18930,7 @@ is
                                       l_sh_tax,
                                       l_sh_taxmil);
     end loop;
-  
+
     return l_penaltyset;
   end;
 
@@ -18939,27 +18942,27 @@ is
                              p_argmntid in number) is
     l_title varchar2(30) := 'dpt_web.close_sto_argmnt: ';
   begin
-  
+
     bars_audit.trace('%s Start.', l_title);
-  
+
     if (coalesce(p_dptid, p_accid, p_argmntid, -1) = -1) then
       -- Вказано недостатня кількість параметрів для пошуку договору
       bars_audit.info(l_title ||
                       ' Вказано недостатня кількість параметрів для пошуку договору');
     end if;
-  
+
     if (p_argmntid is not null) then
-    
+
       bars_audit.trace('%s p_argmntid = %s.', l_title, to_char(p_argmntid));
-    
+
       sto_all.del_regulartreaty(p_argmntid);
-    
+
     else
-    
+
       if (p_dptid is not null) then
-      
+
         bars_audit.trace('%s p_dptid = %s.', l_title, to_char(p_dptid));
-      
+
         for k in (select s.idd
                     from bars.dpt_accounts d
                     join bars.accounts a
@@ -18967,17 +18970,17 @@ is
                     join bars.sto_det s
                       on (s.nlsb = a.nls and s.kvb = a.kv)
                    where d.dptid = p_dptid) loop
-        
+
           delete from bars.sto_dat where idd = k.idd;
-        
+
           delete from sto_det where idd = k.idd;
-        
+
         end loop;
-      
+
       else
-      
+
         bars_audit.trace('%s p_accid = %s.', l_title, to_char(p_accid));
-      
+
         for k in (select s.idd
                     from bars.dpt_accounts d
                     join bars.accounts a
@@ -18985,19 +18988,19 @@ is
                     join bars.sto_det s
                       on (s.nlsb = a.nls and s.kvb = a.kv)
                    where d.accid = p_accid) loop
-        
+
           delete from bars.sto_dat where idd = k.idd;
-        
+
           delete from sto_det where idd = k.idd;
-        
+
         end loop;
-      
+
       end if;
-    
+
     end if;
-  
+
     bars_audit.trace('%s Exit.', l_title);
-  
+
   end close_sto_argmnt;
 
   function forbidden_amount(p_acc in accounts.acc%type, p_amount in number)
@@ -19012,7 +19015,7 @@ is
                      ':Starts with param. p_acc = %s, p_amount = %s',
                      to_char(p_acc),
                      to_char(p_amount));
-  
+
     begin
       select nvl(dv.limit, 0) * 100, disable_add, nvl(dv.comproc, 0)
         into l_min_summ, l_disable_add, l_comproc
@@ -19023,7 +19026,7 @@ is
       when no_data_found then
         l_is_forbidden := 0;
     end;
-  
+
     if nvl(l_disable_add, 0) = 1 and l_comproc = 0 then
       l_is_forbidden := 1;
     else
@@ -19033,9 +19036,9 @@ is
         l_is_forbidden := 0;
       end if;
     end if;
-  
+
     return l_is_forbidden;
-  
+
   end forbidden_amount;
 
   function check_forbidden_amount(p_acc    in accounts.acc%type,
@@ -19085,7 +19088,7 @@ is
           on (er.dptid = d.deposit_id and er.req_state = 1 and
              er.req_bnkdat <= sysdate)
         left join dpt_depositw dw -- COBUMMFO-5162
-          on (dw.dpt_id = d.deposit_id and dw.tag = '2CLOS' and dw.value = 'Y')     
+          on (dw.dpt_id = d.deposit_id and dw.tag = '2CLOS' and dw.value = 'Y')
        where d.deposit_id = p_dptid
          and (v.fl_dubl = 2 or ec.dpt_id is not null)
          and er.dptid is null
@@ -19096,19 +19099,27 @@ is
       when no_data_found then
         l_out := 0;
     end;
-  
+
     return l_out;
   end;
 
 end dpt_web;
 /
+ show err;
+ 
+PROMPT *** Create  grants  DPT_WEB ***
+grant EXECUTE                                                                on DPT_WEB         to ABS_ADMIN;
+grant EXECUTE                                                                on DPT_WEB         to BARSUPL;
+grant EXECUTE                                                                on DPT_WEB         to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on DPT_WEB         to DPT;
+grant EXECUTE                                                                on DPT_WEB         to DPT_ADMIN;
+grant EXECUTE                                                                on DPT_WEB         to DPT_ROLE;
+grant EXECUTE                                                                on DPT_WEB         to VKLAD;
+grant EXECUTE                                                                on DPT_WEB         to WR_ALL_RIGHTS;
 
-show errors;
-
-grant EXECUTE on DPT_WEB to ABS_ADMIN;
-grant EXECUTE on DPT_WEB to BARSUPL;
-grant EXECUTE on DPT_WEB to BARS_ACCESS_DEFROLE;
-grant EXECUTE on DPT_WEB to DPT;
-grant EXECUTE on DPT_WEB to DPT_ADMIN;
-grant EXECUTE on DPT_WEB to DPT_ROLE;
-grant EXECUTE on DPT_WEB to WR_ALL_RIGHTS;
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_web.sql =========*** End *** ===
+ PROMPT ===================================================================================== 
+ 

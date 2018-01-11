@@ -1,4 +1,13 @@
-create or replace procedure p_fm_bulk_set_params(p_refs in number_list, -- список референсов
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FM_BULK_SET_PARAMS.sql =========
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_FM_BULK_SET_PARAMS ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_FM_BULK_SET_PARAMS (p_refs in number_list, -- список референсов
                                                  p_opr_vid1 in finmon_que.opr_vid1%type, -- код вида операции
                                                  p_opr_vid2 in finmon_que.opr_vid2%type, -- код ОМ
                                                  p_comm2    in finmon_que.comm_vid2%type,-- комментарий к ОМ
@@ -98,14 +107,14 @@ begin
         forall idx in 1..p_vid2.count
           insert into finmon_que_vid2(id, vid)
           select id, p_vid2(idx)
-          from finmon_que where ref in (select * from table(p_refs));             
+          from finmon_que where ref in (select * from table(p_refs));
     end if;
   end if;
   -- если есть доп. коды ВМ
     -- удаляем существующие
   delete from finmon_que_vid3 where id in (select id from finmon_que where ref in (select * from table(p_refs)));
   if p_vid3 is not null and p_vid3.count > 0 then
-    if p_vid3.first is not null then 
+    if p_vid3.first is not null then
         bars_audit.trace('%s: %s vids3 is not empty, processing', g_modcode, $$PLSQL_UNIT);
         -- проставляем новые
         forall idx in 1..p_vid3.count
@@ -118,4 +127,13 @@ begin
   bars_audit.trace('%s: %s done', g_modcode, $$PLSQL_UNIT);
 end p_fm_bulk_set_params;
 /
-grant execute on p_fm_bulk_set_params to bars_access_defrole;
+show err;
+
+PROMPT *** Create  grants  P_FM_BULK_SET_PARAMS ***
+grant EXECUTE                                                                on P_FM_BULK_SET_PARAMS to BARS_ACCESS_DEFROLE;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FM_BULK_SET_PARAMS.sql =========
+PROMPT ===================================================================================== 

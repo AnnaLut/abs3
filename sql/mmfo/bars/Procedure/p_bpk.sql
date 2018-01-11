@@ -1,10 +1,13 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_BPK.sql =========*** Run *** ===
 PROMPT ===================================================================================== 
 
+
 PROMPT *** Create  procedure P_BPK ***
 
-CREATE OR REPLACE PROCEDURE BARS.P_BPK (p_dat01 date) IS
+  CREATE OR REPLACE PROCEDURE BARS.P_BPK (p_dat01 date) IS
 
 /* Версия 2.1   29-09-2017  15-03-2017  16-02-2017
    Формирование портфеля БПК на отчетную дату
@@ -30,13 +33,13 @@ BEGIN
    z23.to_log_rez (user_id , 351 , p_dat01 ,'W4_ACC');
    FOR K IN ( SELECT w.* FROM W4_ACC W where NOT_USE_REZ23 is null )
    LOOP
-      for s in (select a.acc, a.rnk, a.nbs, a.nls, a.kv, a.ob22,  
+      for s in (select a.acc, a.rnk, a.nbs, a.nls, a.kv, a.ob22,
                        DECODE (ACC, k.ACC_PK  , 'SP ', k.ACC_OVR , 'SS ', k.ACC_9129 , 'CR9', k.ACC_3570 , 'ODB', k.ACC_2208 , 'SN ', k.ACC_2627 , 'SP ', k.ACC_2207 , 'SP ',
-                                    k.ACC_3579, 'SK9', k.ACC_2209, 'SPN', k.ACC_2625X, 'SP ', k.ACC_2627X, 'SP ', k.ACC_2625D, 'SP ', k.ACC_2203 , 'SS ') tip  
+                                    k.ACC_3579, 'SK9', k.ACC_2209, 'SPN', k.ACC_2625X, 'SP ', k.ACC_2627X, 'SP ', k.ACC_2625D, 'SP ', k.ACC_2203 , 'SS ') tip
                 from   accounts a
                 where  a.acc in (k.ACC_PK  , k.ACC_OVR , k.ACC_9129 , k.ACC_3570 , k.ACC_2208 , k.ACC_2627, k.ACC_2207,
                                  k.ACC_3579, k.ACC_2209, k.ACC_2625X, k.ACC_2627X, k.ACC_2625D, k.ACC_2203)
-                       and a.nbs not in ('3550','3551') and ost_korr(a.acc,l_dat31,null,a.nbs) < 0 
+                       and a.nbs not in ('3550','3551') and ost_korr(a.acc,l_dat31,null,a.nbs) < 0
                 )
       LOOP
          insert into rez_w4_bpk (nd  , kv  , nls  , nbs  , ob22  , acc  , tip  , tip_kart, fin23  , rnk  , sdate      , wdate    , acc_pk  )
@@ -49,13 +52,13 @@ BEGIN
    z23.to_log_rez (user_id , 351 , p_dat01 ,'BPK_ACC');
    FOR K IN (SELECT w.* FROM bpk_acc W  where dat_end is null )
    LOOP
-      for s in (select a.acc, a.rnk, a.nbs, a.nls, a.kv, a.ob22, 
-                       DECODE (ACC, k.ACC_PK  , 'SP ', k.ACC_OVR , 'SS ', k.ACC_9129, 'CR9', k.ACC_3570 , 'ODB', k.ACC_2208 , 'SN ',  
-                                    k.ACC_2207, 'SP ', k.ACC_3579, 'SK9', k.ACC_2209, 'SPN') tip 
+      for s in (select a.acc, a.rnk, a.nbs, a.nls, a.kv, a.ob22,
+                       DECODE (ACC, k.ACC_PK  , 'SP ', k.ACC_OVR , 'SS ', k.ACC_9129, 'CR9', k.ACC_3570 , 'ODB', k.ACC_2208 , 'SN ',
+                                    k.ACC_2207, 'SP ', k.ACC_3579, 'SK9', k.ACC_2209, 'SPN') tip
                 from   accounts a
                 where  a.acc in (k.ACC_PK  , k.ACC_OVR , k.ACC_9129 , k.ACC_3570 , k.ACC_2208 , k.ACC_2207,
                                  k.ACC_3579, k.ACC_2209)
-                         and a.nbs not in ('3550','3551') and ost_korr(a.acc,l_dat31,null,a.nbs) < 0 
+                         and a.nbs not in ('3550','3551') and ost_korr(a.acc,l_dat31,null,a.nbs) < 0
                   )
       LOOP
          insert into rez_w4_bpk (nd  , kv  , nls  , nbs  , ob22  , acc  , tip  , tip_kart, fin23  , rnk  , sdate, wdate    ,acc_pk  )

@@ -38,7 +38,7 @@ begin
  ACC1_ := null;
  -- цикл k1 по документам по начислению %%
  for k in (select o.ref, a.acc, i.acra, a.nls, ia.nls nlsa, ia.nms nama, c.okpo okpoa,
-                  least(o.s, abs(ia.ostc)) s,
+                  least(o.s, abs(ia.ostb)) s,
                   ia.kv,
                   nvl(i.mfob, a.kf) mfob,
                   nvl(i.nlsb, a.nls) nlsb,
@@ -55,7 +55,10 @@ begin
            join   accounts ia on ia.acc = i.acra
            join   customer c on c.rnk = a.rnk
            left join accounts ra on ra.nls = i.nlsb and ra.kv = i.kvb and ra.kf = i.kf
-           where  o.tt = '%%1' and
+           where  -- o.ref in (90049791601, 90049969101) and
+                  r.reckoning_id = '53335630FB15025AE0530A076206C772' and
+                  o.kf = '322669' and
+                  o.tt = '%%1' and
                   o.sos = 5 and
                   o.vdat = dat_ and
                   o.dk = 0 and
@@ -110,8 +113,7 @@ begin
                          id_o_  => null,
                          sign_  => null,
                          sos_   => 1,
-                         prty_  => null,
-                         uid_   => 7801);
+                         prty_  => null);
 
               paytt(flg_  => 0,
                     ref_  => REF_ ,

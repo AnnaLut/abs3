@@ -20,6 +20,7 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on SUDA            to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on SUDA            to BARS_DM;
 grant EXECUTE                                                                on SUDA            to FINMON01;
+grant EXECUTE                                                                on SUDA            to UPLD;
 
 
 

@@ -28,6 +28,7 @@ begin
          end if;
 
    begin
+      savepoint before_back;
       p_back_dok(Ref_ => p_ref, Lev_ => 5, ReasonId_ => p_reason, Par2_ => l_n, Par3_ => l_v, FullBack_ =>0);
 
 	  chk.put_visa(REF_    => p_ref,
@@ -40,6 +41,7 @@ begin
 
 
       exception when others then
+        rollback to before_back;
         res_text:=case when substr(SQLERRM,1,3)='ORA' then ltrim(substr(SQLERRM,11)) else SQLERRM end;
         res_code:=1;
         return;

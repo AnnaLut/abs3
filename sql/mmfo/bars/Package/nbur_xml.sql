@@ -39,35 +39,35 @@ end NBUR_XML;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.NBUR_XML 
 is
-  
+
   --
   -- constants
   --
   g_body_version  constant varchar2(64) := 'version 1.5  2017.04.11';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
-  
+
   --
   -- types
   --
-  
+
   --
   -- variables
   --
   v_rpt_dt                    nbur_lst_files.report_date%type;
   v_kf                        nbur_lst_files.kf%type;
   V_vrsn_id                   nbur_lst_files.version_id%type;
-  
-  -- 
+
+  --
   -- повертає версію заголовка пакета
-  -- 
-  function header_version 
+  --
+  function header_version
      return varchar2
   is
   begin
     return 'Package '||$$PLSQL_UNIT||' header '||g_header_version||'.';
 
   end header_version;
-  
+
   --
   -- повертає версію тіла пакета
   --
@@ -77,7 +77,7 @@ is
   begin
     return 'Package '||$$PLSQL_UNIT||' body ' || g_body_version || '.';
   end body_version;
-  
+
   --
   -- set report parameters for retrieving XML data in VIEW
   --
@@ -88,18 +88,18 @@ is
   ) is
     title       constant  varchar2(60) := $$PLSQL_UNIT||'.SET_RPT_PARM';
   begin
-    
+
     bars_audit.trace( '%s: Entry with ( p_rpt_dt=%s, p_kf=%s, p_vrsn_id=%s ).'
                     , title, to_char(p_rpt_dt,'dd/mm/yyyy'), p_kf, to_char(p_vrsn_id) );
-    
+
     v_rpt_dt  := p_rpt_dt;
     v_kf      := p_kf;
     v_vrsn_id := p_vrsn_id;
-    
+
     bars_audit.trace( '%s: Exit.', title );
-    
+
   end SET_RPT_PARM;
-  
+
   --
   --
   --
@@ -109,7 +109,7 @@ is
   begin
     return v_rpt_dt;
   end GET_RPT_DT;
-  
+
   --
   --
   --
@@ -119,7 +119,7 @@ is
   begin
     return v_kf;
   end GET_KF;
-  
+
   --
   --
   --
@@ -129,7 +129,7 @@ is
   begin
     return V_vrsn_id;
   end GET_VRSN_ID;
-  
+
   --
   --
   --
@@ -142,17 +142,17 @@ is
     title       constant  varchar2(60) := $$PLSQL_UNIT||'.SET_RPT_PARM';
     l_XmlType             xmltype;
   begin
-    
+
     SET_RPT_PARM
     ( p_rpt_dt  => p_rpt_dt
     , p_kf      => p_kf
     , p_vrsn_id => p_vrsn_id
     );
-    
+
     return 1;
-    
+
   end SET_RPT_PARM;
-  
+
   --
   --
   --
@@ -167,21 +167,21 @@ is
     l_okpo               varchar2(10);
     l_XmlText            varchar2(1024);
   begin
-    
+
     bars_audit.trace( '%s: Entry', title );
-    
+
     l_rpt_code := NBUR_FILES.F_GET_KODF( p_file_id );
-    
-    -- 
+
+    --
 $if ACC_PARAMS.MMFO $then
     l_okpo := BRANCH_ATTRIBUTE_UTL.GET_VALUE( p_branch_code    => '/'||p_kf||'/'
                                             , p_attribute_code => 'OKPO' );
 $else
     l_okpo := F_OUROKPO();
 $end
-    
+
     bars_audit.trace( '%s: l_rpt_code=%s, l_okpo=%s.', title, l_rpt_code, l_okpo );
-    
+
     l_XmlText := '<?xml version="1.0" encoding="utf-8" standalone="yes"?>';
     l_XmlText := l_XmlText || chr(10) || '<NBUSTATREPORT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">';
     l_XmlText := l_XmlText || chr(10) || '  <HEAD>';
@@ -189,14 +189,14 @@ $end
     l_XmlText := l_XmlText || chr(10) || '    <EDRPOU>'||l_okpo||'</EDRPOU>';
     l_XmlText := l_XmlText || chr(10) || '    <REPORTDATE>'||to_char(p_rpt_date,g_dt_fmt)||'</REPORTDATE>';
     l_XmlText := l_XmlText || chr(10) || '  </HEAD>';
-    
+
     bars_audit.trace( '%s: Exit with => %s', title,  chr(10)||l_XmlText );
-    
+
     return l_XmlText;
-    
+
   end GET_FILE_HEAD;
-  
-  
+
+
   --
   --
   --
@@ -207,18 +207,18 @@ $end
   is
     l_file_body          XmlType;
   begin
-    
+
     bars_audit.trace( $$PLSQL_UNIT||'.GET_FILE_BODY: Entry' );
-    
+
     -- l_file_body := appendChildXML( GET_FILE_HEAD( p_rpt_code, p_rpt_date ), 'NBUSTATREPORT', l_file_body );
     -- dbms_xmldom.appendchild(v_node1, v_node2);
-    
+
     bars_audit.info( $$PLSQL_UNIT||'.GET_FILE_BODY: Exit with:' ||CHR(10)|| dbms_lob.substr( l_file_body.getClobVal(), 4000 ) );
-    
+
     return l_file_body;
-    
+
   end GET_FILE_BODY;
-   
+
   --
   -- GET_REPORT_RECORDSET
   --
@@ -229,19 +229,19 @@ $end
   , p_vrsn_id     in     nbur_lst_files.version_id%type
   , p_recordset      out sys_refcursor
   ) is
-    l_frst_dt            date; -- 
-    l_last_dt            date; -- 
-    l_prvn_dt            date; -- 
+    l_frst_dt            date; --
+    l_last_dt            date; --
+    l_prvn_dt            date; --
   begin
-    
+
     bars_audit.trace( $$PLSQL_UNIT||'.GET_XML_RECORDSET: Entry with ( p_file_id=%s ).', to_char(p_file_id) );
-  
+
     l_frst_dt := add_months(trunc(p_rpt_dt,'MM'),-1);
-    
+
     l_last_dt := last_day(l_frst_dt);
-    
+
     l_prvn_dt := l_last_dt + 1;
-  
+
     open p_recordset
     for select /* XML_RPT_3E */ 1              as NN
              , 'A3E001'                        as EKP
@@ -251,10 +251,10 @@ $end
              , z.S031                          as IDS031  --
              , d1.CC_ID                        as Q003_2  -- 102
              , to_char(d1.SDATE,g_dt_fmt)      as Q007_1  -- 103
-             , 0                               as T070_14 -- 
+             , 0                               as T070_14 --
              , b.DBT_ADJ_KOS                   as T070_15 -- 335
              , b.INT_ADJ_KOS                   as T070_16 -- 336
-             , 0                               as T070_17 -- 
+             , 0                               as T070_17 --
              , d2.CC_ID                        as Q003_5  -- 307
              , to_char(d2.SDATE,g_dt_fmt)      as Q007_5  -- 308
              , to_char(d2.WDATE,g_dt_fmt)      as Q007_6  -- 309
@@ -271,7 +271,7 @@ $end
              , c1.OKPO                         as K020_2  -- 315
              , t2.TXT                          as S080_1  -- 316
              , rz.S080                         as S080_2  -- 317
-             , nvl(tx.CCY_ID  ,db.KV)          as IDR030  -- 
+             , nvl(tx.CCY_ID  ,db.KV)          as IDR030  --
              , nvl(tx.DBT_AMNT,  0  )          as T070_12 -- 332
              , nvl(tx.INT_AMNT,  0  )          as T070_13 -- 333
              , ct.ZAL_NAME                     as Q001_5  -- 318
@@ -279,7 +279,7 @@ $end
              , ct.ZAL_KOL                      as Q015_4  -- 320
              , cc.NMK                          as Q001_6  -- 321
              , cc.OKPO                         as K020_3  -- 322
-             , abs( nvl(cb.ost,  0) 
+             , abs( nvl(cb.ost,  0)
                   - nvl(cb.crDos,0)
                   + nvl(cb.crKos,0) )          as T070_11 -- 323
              , ct.ZAL_OBL                      as KU_2    -- 324
@@ -320,7 +320,7 @@ $end
           join CC_DEAL  d1 --
             on ( d1.KF = z.KF and d1.ND = z.ND )
           join ( select rd.ND
-                      , nvl(bd.dos ,0) + nvl(bd.crdos ,0) as DBT_ADJ_KOS                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                      , nvl(bd.dos ,0) + nvl(bd.crdos ,0) as DBT_ADJ_KOS
                       , nvl(bi.dos ,0) + nvl(bi.crdos ,0) as INT_ADJ_KOS
                    from ND_ACC   rd
                    join ACCOUNTS ad
@@ -339,7 +339,7 @@ $end
                     and ( bd.ACC is Not Null or bi.ACC is Not Null ) -- наявні залишки / обороти в звітному міс.
                ) b
             on ( b.ND = d1.ND )
-          join CC_DEAL  d2 -- 
+          join CC_DEAL  d2 --
             on ( d2.KF = z.KF  and d2.ND = z.REF_ND )
           join ND_TXT t1
             on ( t1.ND = d2.ND and t1.TAG = 'KREDZ' )
@@ -392,7 +392,7 @@ $end
                     and dc.VOB not in ( 96, 99 )
                     and dc.SOS = 5
                   group by r.ND, ak.KV
-               ) tx -- сума погашения по кредиту 
+               ) tx -- сума погашения по кредиту
             on ( tx.ND = d2.ND )
           join ( select r.ND
                       , a.KV
@@ -407,7 +407,7 @@ $end
                   group by r.ND, a.KV
                ) db
             on ( db.ND = d2.ND )
-          join ( -- Показатели по видам залога под кредиты, которые находятся в залоге 
+          join ( -- Показатели по видам залога под кредиты, которые находятся в залоге
                  select unique dr.ND
                       , ac.KF  as CLT_KF
                       , ac.ACC as CLT_ACC
@@ -423,7 +423,7 @@ $end
                ) cl
             on ( cl.ND = d2.ND )
           left
-          join CUSTOMER cc 
+          join CUSTOMER cc
             on ( cc.RNK = cl.CLT_RNK )
           left
           join AGG_MONBALS cb
@@ -435,7 +435,7 @@ $end
                      , ZAL_RAJ,  ZAL_GOR
                      , ZAL_ADR,  ZAL_STAN
                      , replace(ZAL_DAT,'/','.') as ZAL_DAT
-                     , ZAL_ST_D, ZAL_STRA 
+                     , ZAL_ST_D, ZAL_STRA
                   from ( select KF, ACC, TAG, VALUE
                            from ACCOUNTSW
                           where TAG in ('ZAL_NAME' -- 318
@@ -457,7 +457,7 @@ $end
                                                 ,'ZAL_ADR'  as ZAL_ADR,  'ZAL_STAN' as ZAL_STAN
                                                 ,'ZAL_DAT'  as ZAL_DAT,  'ZAL_ST_D' as ZAL_ST_D
                                                 ,'ZAL_STRA' as ZAL_STRA)
-                       ) 
+                       )
                ) ct
             on ( ct.KF = cl.CLT_KF and ct.ACC = cl.CLT_ACC )
           left
@@ -469,9 +469,9 @@ $end
             on ( rz.ND = d2.ND )
          where d1.SDATE <= l_last_dt
            and d1.WDATE  > l_last_dt;
-  
+
   END PREPARE_RECORDSET;
-  
+
   --
   --
   --
@@ -488,52 +488,52 @@ $end
     l_rcur               SYS_REFCURSOR;
     l_xml                xmltype;
   begin
-    
+
     bars_audit.trace( '%s: Entry.', title );
-    
+
     DBMS_LOB.CREATETEMPORARY( l_clob, TRUE /*, SYS.DBMS_LOB.TRANSACTION*/ );
-    
+
     PREPARE_RECORDSET( p_file_id, p_rpt_dt, p_kf, p_vrsn_id, l_rcur );
-    
+
     l_ctx := dbms_xmlgen.newContext( l_rcur );
-    
+
     dbms_xmlgen.setRowSetTag( l_ctx, NULL );
     dbms_xmlgen.setRowTag( l_ctx, 'DATA' );
     dbms_xmlgen.setNullHandling( l_ctx, dbms_xmlgen.EMPTY_TAG ); -- NULL_ATTR - Sets xsi:nil="true".
-    
+
     l_xml := dbms_xmlgen.getxmltype(l_ctx);
-    
+
     if ( l_xml Is Not Null )
     then
-      
+
       -- l_clob := XMLSerialize( DOCUMENT l_xml AS CLOB );
       l_clob := l_xml.getclobval();
-      
+
     else
       bars_audit.info( title||': getxmltype return Null' );
     end if;
-    
+
     dbms_xmlgen.closeContext(l_ctx);
-    
+
     CLOSE l_rcur;
-    
+
     l_clob := GET_FILE_HEAD( p_file_id, p_rpt_dt, p_kf ) || chr(10) || l_clob || '</NBUSTATREPORT>';
-    
+
     -- КОСТИЛІ:
-    
+
     -- заміна <P1/> на <P1></P1> (для NULL значень)
     l_clob := REGEXP_REPLACE( l_clob, '<([^>]+?)/>', '<\1></\1>' );
-    
+
     -- вставка атрибуту xsi:nil для елементів Q007_7 та Q007_8
 --  l_clob := REGEXP_REPLACE( l_clob, '(<Q007_7|<Q007_8)([^ xsi:nil])', '\1 xsi:nil = "true" \2' );
     l_clob := REGEXP_REPLACE( l_clob, '(<Q007_7|<Q007_8)(></)', '\1 xsi:nil = "true" \2' );
-    
+
     p_file_body := l_clob;
-    
+
     DBMS_LOB.FREETEMPORARY( l_clob );
 
     bars_audit.trace( '%s: Exit.', title );
-    
+
   end CRT_FILE;
 
 

@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpt_pf.sql =========*** Run *** ====
  PROMPT ===================================================================================== 
  
-CREATE OR REPLACE PACKAGE DPT_PF
+  CREATE OR REPLACE PACKAGE BARS.DPT_PF 
 IS
    G_HEADER_VERSION   CONSTANT VARCHAR2 (64) := ' version 1.05 22.11.2017';
 
@@ -38,7 +38,7 @@ IS
    PROCEDURE CREATE_DOCS_BY_LIST;
 END DPT_PF;
 /
-CREATE OR REPLACE PACKAGE BODY DPT_PF
+CREATE OR REPLACE PACKAGE BODY BARS.DPT_PF 
 IS
 --============ <Comments> =====================================================
 -- 25.10.2011 - BAA додано оновлення поля з датою останньої виплати вкладнику
@@ -521,7 +521,7 @@ IS
              || CHR (10)
              || DBMS_UTILITY.format_error_backtrace ());
     END NOT_GET_PENSION;
-    
+
     --==================================================================================================
     -- Подготовка данных для отчета по карточным счетам
     --
@@ -538,64 +538,64 @@ IS
             execute immediate 'alter table T_W4_OTCH_PF truncate partition for ('||l_ctx_mfo||')';
         exception
             when others then
-                if sqlcode = -54 then 
+                if sqlcode = -54 then
                     bars_audit.error('DPT_PF.not_get_pension_w4: error: resource busy');
-                    return; 
-                else raise; 
+                    return;
+                else raise;
                 end if;
         end;
         bars_audit.info('DPT_PF.not_get_pension_w4: Начинаем накопление данных');
-        insert /*+ append parallel(8) */ into T_W4_OTCH_PF (branch, 
-                                                            nls, 
-                                                            rnk, 
-                                                            okpo, 
-                                                            nmk, 
-                                                            bday, 
-                                                            pass_ser, 
-                                                            pass_num, 
-                                                            indx1, 
-                                                            np1, 
-                                                            adr1, 
-                                                            indx2, 
-                                                            np2, 
-                                                            adr2, 
-                                                            card_code, 
-                                                            code, 
-                                                            pr, 
-                                                            zar_365, 
-                                                            zar_n_365, 
-                                                            dmin_zar, 
-                                                            dmax_zar, 
-                                                            spi_365, 
-                                                            spi_365_dw, 
-                                                            dmax_spi, 
-                                                            ost_2625, 
+        insert /*+ append parallel(8) */ into T_W4_OTCH_PF (branch,
+                                                            nls,
+                                                            rnk,
+                                                            okpo,
+                                                            nmk,
+                                                            bday,
+                                                            pass_ser,
+                                                            pass_num,
+                                                            indx1,
+                                                            np1,
+                                                            adr1,
+                                                            indx2,
+                                                            np2,
+                                                            adr2,
+                                                            card_code,
+                                                            code,
+                                                            pr,
+                                                            zar_365,
+                                                            zar_n_365,
+                                                            dmin_zar,
+                                                            dmax_zar,
+                                                            spi_365,
+                                                            spi_365_dw,
+                                                            dmax_spi,
+                                                            ost_2625,
                                                             kf)
-        select x.branch, 
-               x.nls, 
-               x.rnk, 
-               x.okpo, 
-               x.nmk, 
-               x.bday, 
-               x.PASS_SER, 
-               x.PASS_NUM, 
+        select x.branch,
+               x.nls,
+               x.rnk,
+               x.okpo,
+               x.nmk,
+               x.bday,
+               x.PASS_SER,
+               x.PASS_NUM,
                ca.zip as indx1,
-               ca.locality as np1, 
-               ca.address as adr1, 
-               cb.zip as indx2, 
-               cb.locality as np2, 
-               cb.address as adr2, 
-               x.CARD_CODE, 
-               x.CODE, 
-               x.PR, 
-               x.ZAR_365, 
-               x.ZAR_N_365, 
-               x.DMIN_ZAR, 
-               x.DMAX_ZAR, 
-               x.SPI_365, 
-               x.SPI_365_DW, 
-               x.DMAX_SPI, 
-               fost(x.acc, p_dat)/100 as ost_2625, 
+               ca.locality as np1,
+               ca.address as adr1,
+               cb.zip as indx2,
+               cb.locality as np2,
+               cb.address as adr2,
+               x.CARD_CODE,
+               x.CODE,
+               x.PR,
+               x.ZAR_365,
+               x.ZAR_N_365,
+               x.DMIN_ZAR,
+               x.DMAX_ZAR,
+               x.SPI_365,
+               x.SPI_365_DW,
+               x.DMAX_SPI,
+               fost(x.acc, p_dat)/100 as ost_2625,
                l_ctx_mfo
         from (
         select /*+ parallel(8) use_hash(wg wc w4 a2) */
@@ -664,7 +664,7 @@ IS
                                                          '')),
                                            'АВСЕІКМНОРТХ',
                                            'ABCEIKMHOPTX')
-                                
+
                                 ) then
                             nvl(o2.s, 0)
                            else
@@ -735,14 +735,14 @@ IS
                   wg.CODE
         ) x left join customer_address ca on (x.rnk=ca.rnk  and ca.type_id=1)
                  left join customer_address cb on (x.rnk=cb.rnk  and cb.type_id=2)
-        where x.ZAR_365>0 /*and x.ZAR_N_365>9*/ and (x.SPI_365=0 or x.SPI_365=x.SPI_365_DW or x.SPI_365_DW>0)
+        where x.ZAR_365>0 and x.ZAR_N_365>9 and (x.SPI_365=0 or x.SPI_365=x.SPI_365_DW or x.SPI_365_DW>0)
         --  and x.DMAX_SPI >= add_months(p_dat-365+1,-1) -- DELTA
-        --  and x.dmin_zar<=p_dat-365+1
+          and x.dmin_zar<=p_dat-365+1
           and x.dmax_zar>=add_months(TO_DATE('01.'||to_char(EXTRACT(MONTH FROM p_dat))||'.'||to_char(EXTRACT(YEAR FROM p_dat)),'dd.mm.yyyy'),-1);
 
         bars_audit.info('DPT_PF.not_get_pension_w4: finish');
     end not_get_pension_w4;
-    
+
 
     --==================================================================================================
     -- Створення документів за списком (зарахування пенсії)
@@ -875,15 +875,11 @@ IS
 
 END DPT_PF;
 /
-show err;
+ show err;
  
-
 PROMPT *** Create  grants  DPT_PF ***
-
 grant DEBUG,EXECUTE                                                          on DPT_PF          to BARS_ACCESS_DEFROLE;
-
 grant EXECUTE                                                                on DPT_PF          to DPT_ADMIN;
-
 
  
  

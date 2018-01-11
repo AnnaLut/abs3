@@ -1031,11 +1031,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
 
             l_kv:=get_kv(p_kv);
             begin
-  
+
               select a.isp,
                      a.branch,
                      s.branch
-                into l_userid, 
+                into l_userid,
                      l_branch_acc,
                      l_branch_usr
                 from
@@ -1049,14 +1049,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
                     raise_application_error(-20000, 'Рахунок відправника не знайдено!');
             end;
             -- представляемся отделением
-                
+
             if l_branch_usr = '/' then
                l_branch_usr := case p_dk when 1 then '/'||p_mfoa||'/' else '/'||p_mfob||'/' end;
             end if;
-            
+
             if l_branch_usr like l_branch_acc||'%' then
                bc.subst_branch(l_branch_acc);
-            else 
+            else
                bc.subst_branch(l_branch_usr);
             end if;
 
