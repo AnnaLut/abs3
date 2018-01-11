@@ -53,11 +53,14 @@ function GetMfoCom(val)
 	var input = new Array();
 	var output = new Array();
 
-    input.val = val;
-    
- //   output = GetWebServiceData('GetMfoCom', val, 1);
-    
-	
-	//lb_title_bank.innerText = output;						
+	input.val = val;
+
+    //output = GetWebServiceData('GetMfoCom', "300056", 1);
+
+    var title_bank = parent.ExecSync('GetMfoCom', {
+        val: val
+    }).d;
+
+    lb_title_bank.innerText = title_bank;						
 }
 

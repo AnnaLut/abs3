@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Web;
 using System.Xml.Serialization;
 
-namespace BarsWeb.Areas.Ndi.Models
+namespace BarsWeb.Areas.Ndi.Models.ViewModels
 {
     /// <summary>
     /// Summary description for MainOptionsModel

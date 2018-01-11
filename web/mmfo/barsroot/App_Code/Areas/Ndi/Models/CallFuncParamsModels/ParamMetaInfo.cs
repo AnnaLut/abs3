@@ -1,6 +1,5 @@
 ﻿
 using System.Collections.Generic;
-using BarsWeb.Areas.Ndi.Infrastructure.Helpers;
 
 namespace BarsWeb.Areas.Ndi.Models
 {

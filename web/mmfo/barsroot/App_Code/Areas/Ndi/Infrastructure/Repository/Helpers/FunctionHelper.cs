@@ -8,36 +8,33 @@ using System.Web;
 /// <summary>
 /// Summary description for FunctionHelper
 /// </summary>
-namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers
+public class FunctionHelper
 {
-    public class FunctionHelper
+	public FunctionHelper()
+	{
+		//
+		// TODO: Add constructor logic here
+		//
+	}
+
+    public static void GetCustomer()
     {
-        public FunctionHelper()
+        using (OracleConnection connection = new OracleConnection("Data Source=COBUMMFO_DEV_E;User ID=bars_access_user;Proxy User ID=appserver;Proxy Password=appserver;Pooling=yes;"))
         {
-            //
-            // TODO: Add constructor logic here
-            //
-        }
+            connection.Open();
 
-        public static void GetCustomer()
-        {
-            using (OracleConnection connection = new OracleConnection("Data Source=COBUMMFO_DEV_E;User ID=bars_access_user;Proxy User ID=appserver;Proxy Password=appserver;Pooling=yes;"))
+            OracleCommand command = new OracleCommand("bars.test_udt.get_customer", connection) { CommandType = CommandType.StoredProcedure };
+
+            OracleParameter customer = new OracleParameter("p_customer", OracleDbType.Object, ParameterDirection.ReturnValue);
+            customer.UdtTypeName = "BARS.T_CUSTOMER";
+
+            command.Parameters.Add(customer);
+
+            command.ExecuteNonQuery();
+
+            foreach (OracleParameter p in command.Parameters)
             {
-                connection.Open();
-
-                OracleCommand command = new OracleCommand("bars.test_udt.get_customer", connection) { CommandType = CommandType.StoredProcedure };
-
-                OracleParameter customer = new OracleParameter("p_customer", OracleDbType.Object, ParameterDirection.ReturnValue);
-                customer.UdtTypeName = "BARS.T_CUSTOMER";
-
-                command.Parameters.Add(customer);
-
-                command.ExecuteNonQuery();
-
-                foreach (OracleParameter p in command.Parameters)
-                {
-                    Console.WriteLine("UserId : " + p.ParameterName + " " + p.Value);
-                }
+                Console.WriteLine("UserId : " + p.ParameterName + " " + p.Value);
             }
         }
     }

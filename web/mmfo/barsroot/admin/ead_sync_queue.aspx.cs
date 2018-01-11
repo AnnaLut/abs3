@@ -177,8 +177,8 @@ public partial class admin_ead_sync_queue : System.Web.UI.Page
 
         Bars.EAD.EadPack ep = new Bars.EAD.EadPack(new ibank.core.BbConnection());
         Decimal? ID;
-
-        ID = ep.MSG_CREATE("DICT", "EA-UB", null, KF);
+        
+        ID = ep.MSG_CREATE("DICT", "EA-UB", KF);
         ep.MSG_PROCESS(ID, KF);
 
     }

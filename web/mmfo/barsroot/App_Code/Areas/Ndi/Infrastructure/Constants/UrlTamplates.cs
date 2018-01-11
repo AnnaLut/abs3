@@ -6,32 +6,29 @@ using System.Web;
 /// <summary>
 /// Summary description for UrlTamplates
 /// </summary>
-namespace BarsWeb.Areas.Ndi.Infrastructure.Constants
+public class UrlTamplates
 {
-    public class UrlTamplates
+    public static string BaseUrlTemplate = "/barsroot/ndi/";
+    public static string MainUrlTemplate = BaseUrlTemplate + "referencebook/GetRefBookData/";
+    public static string CallFunctionUrl = BaseUrlTemplate + "referencebook/CallRefFunction/";
+    public static string CallFuncWithMultypleRowsUrl = BaseUrlTemplate + "referencebook/CallFuncWithMultypleRows/";
+
+    public UrlTamplates()
+	{
+		//
+		// TODO: Add constructor logic here
+		//
+	}
+
+    public static List<string> GetAllUrlTamplates()
     {
-        public static string BaseUrlTemplate = "/barsroot/ndi/";
-        public static string MainUrlTemplate = BaseUrlTemplate + "referencebook/GetRefBookData/";
-        public static string CallFunctionUrl = BaseUrlTemplate + "referencebook/CallRefFunction/";
-        public static string CallFuncWithMultypleRowsUrl = BaseUrlTemplate + "referencebook/CallFuncWithMultypleRows/";
-
-        public UrlTamplates()
-        {
-            //
-            // TODO: Add constructor logic here
-            //
-        }
-
-        public static List<string> GetAllUrlTamplates()
-        {
-            List<string> allTemplates = new List<string>()
+        List<string> allTemplates = new List<string>()
         {
             BaseUrlTemplate,
             MainUrlTemplate,
             CallFunctionUrl,
             CallFuncWithMultypleRowsUrl
         };
-            return allTemplates;
-        }
+        return allTemplates;
     }
 }

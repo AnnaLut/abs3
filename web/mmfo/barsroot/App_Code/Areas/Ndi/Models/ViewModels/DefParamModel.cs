@@ -7,16 +7,13 @@ using System.Web;
 /// <summary>
 /// Summary description for DefParamModel
 /// </summary>
-namespace BarsWeb.Areas.Ndi.Models
-{ 
-    public class DefParamModel
+public class DefParamModel
+{
+    public DefParamModel()
     {
-        public DefParamModel()
-        {
-            this.InsertDefParams = new List<FieldProperties>();
-        }
-        public List<FieldProperties> InsertDefParams { get; set; }
-        public string Base64InsertDefParamsString { get; set; }
-
+        this.InsertDefParams = new List<FieldProperties>();
     }
+    public List<FieldProperties> InsertDefParams { get; set; }
+    public string Base64InsertDefParamsString { get; set; }
+
 }

@@ -8,7 +8,6 @@ using BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation;
 using System;
 using System.Data;
 using BarsWeb.Areas.Ndi.Models.DbModels;
-using BarsWeb.Areas.Ndi.Infrastructure.Helpers.BarsWeb.Areas.Ndi.Infrastructure.Helpers;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {

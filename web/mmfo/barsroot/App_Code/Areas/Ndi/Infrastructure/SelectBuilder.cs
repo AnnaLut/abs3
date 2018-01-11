@@ -7,8 +7,6 @@ using BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation;
 using BarsWeb.Areas.Ndi.Models;
 using Oracle.DataAccess.Client;
 using BarsWeb.Areas.Ndi.Models.FilterModels;
-using BarsWeb.Areas.Ndi.Models.DbModels;
-using BarsWeb.Areas.Ndi.Infrastructure.Constants;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
@@ -203,7 +201,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 isFuncOnly = true;
                 function = new FunNSIEditFParams(searchparamValue).BuildToCallFunctionMetaInfo(function);
                 function.TABID = nativeTabelId;
-                function.PROC_EXEC = "SELECTED_ONE";
+                function.PROC_EXEC = "ON_ROW_CLICK";
                 function.ColumnId = Convert.ToInt32(sParColumn);
             }
             res = UrlTamplates.MainUrlTemplate + "?" + "sParColumn" + "=" + sParColumn + "&" + "nativeTabelId" + "=" + nativeTabelId;
