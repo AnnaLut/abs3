@@ -32,19 +32,6 @@ COMMENT ON COLUMN FINMON.METASORT.SORTPOS IS 'Порядок в сортировке';
 
 
 
-PROMPT *** Create  constraint R_METASORT_COLS ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.METASORT ADD CONSTRAINT R_METASORT_COLS FOREIGN KEY (TABNAME, COLNAME)
-	  REFERENCES FINMON.METACOLS (TABNAME, COLNAME) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XPK_METASORT ***
 begin   
  execute immediate '
@@ -71,6 +58,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  METASORT ***
+grant SELECT                                                                 on METASORT        to BARSREADER_ROLE;
 
 
 

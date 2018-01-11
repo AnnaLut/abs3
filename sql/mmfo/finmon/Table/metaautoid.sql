@@ -28,19 +28,6 @@ COMMENT ON COLUMN FINMON.METAAUTOID.COLNAME IS 'Имя колонки';
 
 
 
-PROMPT *** Create  constraint R_METAAUTOID_COLS ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.METAAUTOID ADD CONSTRAINT R_METAAUTOID_COLS FOREIGN KEY (TABNAME, COLNAME)
-	  REFERENCES FINMON.METACOLS (TABNAME, COLNAME) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XPK_METAAUTOID ***
 begin   
  execute immediate '
@@ -67,6 +54,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  METAAUTOID ***
+grant SELECT                                                                 on METAAUTOID      to BARSREADER_ROLE;
 
 
 

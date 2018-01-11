@@ -59,6 +59,7 @@ exception when others then
 
 PROMPT *** Create  grants  K_DFM01C ***
 grant SELECT                                                                 on K_DFM01C        to BARS;
+grant SELECT                                                                 on K_DFM01C        to BARSREADER_ROLE;
 grant SELECT                                                                 on K_DFM01C        to FINMON01;
 
 

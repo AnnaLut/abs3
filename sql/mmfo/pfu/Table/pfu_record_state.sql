@@ -42,10 +42,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PFU_RECORD_STATE_NN ***
+PROMPT *** Create  constraint CC_PFU_RECORD_STATENAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_RECORD_STATE ADD CONSTRAINT CC_PFU_RECORD_STATE_NN CHECK (STATE IS NOT NULL) ENABLE';
+  ALTER TABLE PFU.PFU_RECORD_STATE ADD CONSTRAINT CC_PFU_RECORD_STATENAME_NN CHECK (STATE_NAME IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -54,10 +54,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PFU_RECORD_STATENAME_NN ***
+PROMPT *** Create  constraint CC_PFU_RECORD_STATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_RECORD_STATE ADD CONSTRAINT CC_PFU_RECORD_STATENAME_NN CHECK (STATE_NAME IS NOT NULL) ENABLE';
+  ALTER TABLE PFU.PFU_RECORD_STATE ADD CONSTRAINT CC_PFU_RECORD_STATE_NN CHECK (STATE IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -80,7 +80,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  PFU_RECORD_STATE ***
+grant SELECT                                                                 on PFU_RECORD_STATE to BARSREADER_ROLE;
 grant SELECT                                                                 on PFU_RECORD_STATE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on PFU_RECORD_STATE to UPLD;
 
 
 

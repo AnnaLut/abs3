@@ -53,10 +53,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111516 ***
+PROMPT *** Create  constraint SYS_C00111514 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_SESSION_TRACKING MODIFY (SYS_TIME NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_SESSION_TRACKING MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -77,10 +77,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111514 ***
+PROMPT *** Create  constraint SYS_C00111516 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_SESSION_TRACKING MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_SESSION_TRACKING MODIFY (SYS_TIME NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -101,6 +101,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  PFU_SESSION_TRACKING ***
+grant SELECT                                                                 on PFU_SESSION_TRACKING to BARSREADER_ROLE;
+grant SELECT                                                                 on PFU_SESSION_TRACKING to UPLD;
 
 
 

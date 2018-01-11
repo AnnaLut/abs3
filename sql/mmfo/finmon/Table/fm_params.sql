@@ -70,6 +70,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_PARAMS ***
+grant SELECT                                                                 on FM_PARAMS       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FM_PARAMS       to FINMON01;
 
 

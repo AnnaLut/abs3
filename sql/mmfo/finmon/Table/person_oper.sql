@@ -52,71 +52,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint R_POPER_OPER ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.PERSON_OPER ADD CONSTRAINT R_POPER_OPER FOREIGN KEY (OPER_ID, BRANCH_ID)
-	  REFERENCES FINMON.OPER (ID, BRANCH_ID) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_POPER_PERSON ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.PERSON_OPER ADD CONSTRAINT R_POPER_PERSON FOREIGN KEY (PERSON_ID, BRANCH_ID)
-	  REFERENCES FINMON.PERSON (ID, BRANCH_ID) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_POPER_KDFM08 ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.PERSON_OPER ADD CONSTRAINT R_POPER_KDFM08 FOREIGN KEY (CL_TYPE)
-	  REFERENCES FINMON.K_DFM08 (CODE) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_POPER_PBANK ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.PERSON_OPER ADD CONSTRAINT R_POPER_PBANK FOREIGN KEY (PBANK_ID)
-	  REFERENCES FINMON.PERSON_BANK (ID) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_POPER_BANK ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.PERSON_OPER ADD CONSTRAINT R_POPER_BANK FOREIGN KEY (BRANCH_ID)
-	  REFERENCES FINMON.BANK (ID) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index XPK_PERSON_OPER ***
 begin   
  execute immediate '
@@ -132,6 +67,7 @@ exception when others then
 
 PROMPT *** Create  grants  PERSON_OPER ***
 grant SELECT                                                                 on PERSON_OPER     to BARS;
+grant SELECT                                                                 on PERSON_OPER     to BARSREADER_ROLE;
 
 
 

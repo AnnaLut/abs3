@@ -70,71 +70,6 @@ COMMENT ON COLUMN FINMON.PERSON.BRANCH_ID IS '';
 
 
 
-PROMPT *** Create  constraint R_PERSON_KDFM11_U ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.PERSON ADD CONSTRAINT R_PERSON_KDFM11_U FOREIGN KEY (ADR_OBL_U)
-	  REFERENCES FINMON.K_DFM11 (CODE) DEFERRABLE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_PERSON_KDFM11_P ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.PERSON ADD CONSTRAINT R_PERSON_KDFM11_P FOREIGN KEY (ADR_OBL_P)
-	  REFERENCES FINMON.K_DFM11 (CODE) DEFERRABLE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_PERSON_KDFM07 ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.PERSON ADD CONSTRAINT R_PERSON_KDFM07 FOREIGN KEY (CL_STP)
-	  REFERENCES FINMON.K_DFM07 (CODE) DEFERRABLE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_PERSON_KDFM04 ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.PERSON ADD CONSTRAINT R_PERSON_KDFM04 FOREIGN KEY (DOC_TYP_P)
-	  REFERENCES FINMON.K_DFM04 (CODE) DEFERRABLE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_PERSON_BANK ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.PERSON ADD CONSTRAINT R_PERSON_BANK FOREIGN KEY (BRANCH_ID)
-	  REFERENCES FINMON.BANK (ID) DEFERRABLE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XPK_PERSON ***
 begin   
  execute immediate '
@@ -149,35 +84,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint R_PERSON_KDFM12 ***
+PROMPT *** Create  constraint NK_PERSON_CLID ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.PERSON ADD CONSTRAINT R_PERSON_KDFM12 FOREIGN KEY (CL_REZ)
-	  REFERENCES FINMON.K_DFM12 (CODE) DEFERRABLE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_PERSON_CLNM1 ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.PERSON MODIFY (CL_NM1 CONSTRAINT NK_PERSON_CLNM1 NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_PERSON_CLREZ ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.PERSON MODIFY (CL_REZ CONSTRAINT NK_PERSON_CLREZ NOT NULL ENABLE)';
+  ALTER TABLE FINMON.PERSON MODIFY (CL_ID CONSTRAINT NK_PERSON_CLID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -198,10 +108,22 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_PERSON_CLID ***
+PROMPT *** Create  constraint NK_PERSON_CLREZ ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.PERSON MODIFY (CL_ID CONSTRAINT NK_PERSON_CLID NOT NULL ENABLE)';
+  ALTER TABLE FINMON.PERSON MODIFY (CL_REZ CONSTRAINT NK_PERSON_CLREZ NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint NK_PERSON_CLNM1 ***
+begin   
+ execute immediate '
+  ALTER TABLE FINMON.PERSON MODIFY (CL_NM1 CONSTRAINT NK_PERSON_CLNM1 NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -239,6 +161,7 @@ exception when others then
 
 PROMPT *** Create  grants  PERSON ***
 grant SELECT                                                                 on PERSON          to BARS;
+grant SELECT                                                                 on PERSON          to BARSREADER_ROLE;
 
 
 

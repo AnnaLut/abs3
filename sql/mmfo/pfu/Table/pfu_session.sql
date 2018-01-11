@@ -68,31 +68,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_PFU_SESSION_REF_PFU_REQUEST ***
-begin   
- execute immediate '
-  ALTER TABLE PFU.PFU_SESSION ADD CONSTRAINT FK_PFU_SESSION_REF_PFU_REQUEST FOREIGN KEY (REQUEST_ID)
-	  REFERENCES PFU.PFU_REQUEST (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00111534 ***
-begin   
- execute immediate '
-  ALTER TABLE PFU.PFU_SESSION MODIFY (STATE_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C00111532 ***
 begin   
  execute immediate '
@@ -117,11 +92,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SESSION_REF_STATE ***
+PROMPT *** Create  constraint SYS_C00111534 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_SESSION ADD CONSTRAINT FK_SESSION_REF_STATE FOREIGN KEY (STATE_ID)
-	  REFERENCES PFU.PFU_SESSION_STATE (ID) ENABLE';
+  ALTER TABLE PFU.PFU_SESSION MODIFY (STATE_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -142,6 +116,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  PFU_SESSION ***
+grant SELECT                                                                 on PFU_SESSION     to BARSREADER_ROLE;
+grant SELECT                                                                 on PFU_SESSION     to UPLD;
 
 
 
