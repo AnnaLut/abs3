@@ -15,7 +15,7 @@
   la_  number;
   ln_  number;
 BEGIN
- bars_audit.info('VKRZN PAR AMF_= '||AMF_||'NLS_= '||NLS_);
+ --bars_audit.info('VKRZN PAR AMF_= '||AMF_||'NLS_= '||NLS_);
   la_ := 5; --length(amf_);
   ln_ := length(nls_);
   if nvl(ln_,0)<5 then

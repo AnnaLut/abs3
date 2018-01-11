@@ -1,4 +1,10 @@
-CREATE OR REPLACE FUNCTION BARS.get_nls_tt (
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/function/get_nls_tt.sql =========*** Run ***
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE FUNCTION BARS.GET_NLS_TT (
    p_tt_in       tts.tt%type,
    p_nls_type    varchar2,
    p_s           varchar2     default null,
@@ -26,16 +32,16 @@ begin
       and tt=p_tt_in
       and nls_type=p_nls_type;
   exception
-        when no_data_found then 
-        
-         begin 
+        when no_data_found then
+
+         begin
           select trim(nls_stmt) into l_nls_stmt from tmp_tts_region
           where kf=0
             and tt=p_tt_in
             and nls_type=p_nls_type
             and substr(nls_stmt,1,2)='#(';
          exception
-           when no_data_found then  
+           when no_data_found then
            l_nls_stmt:=null;
          end;
   end;
@@ -66,5 +72,14 @@ begin
 
 end ;
 /
-grant execute on bars.get_nls_tt to  bars_access_defrole;
-/
+ show err;
+ 
+PROMPT *** Create  grants  GET_NLS_TT ***
+grant EXECUTE                                                                on GET_NLS_TT      to BARS_ACCESS_DEFROLE;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/function/get_nls_tt.sql =========*** End ***
+ PROMPT ===================================================================================== 
+ 

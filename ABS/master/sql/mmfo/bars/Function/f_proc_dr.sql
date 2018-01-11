@@ -1,27 +1,10 @@
-/*
-update cc_vidd set name ='Розміщення 1510 - Депозит овернайт,                      where vidd = 1510   ;
-update cc_vidd set name ='Розміщення 1513 - короткострокові депозити'              where vidd = 1512   ;
-update cc_vidd set name ='Розміщення 1513 - Довгострокові депозити'                where vidd = 1515   ;
-update cc_vidd set name ='Розміщення 1521 - Кредити овернайт'                      where vidd = 1521   ;
-update cc_vidd set name ='Розмiщення  1522-Кредити наданi за операцiями репо'      where vidd = 1522   ;
-update cc_vidd set name ='Розміщення 1524 - Кредити  короткострокові'              where vidd = 1523   ;
-update cc_vidd set name ='Розміщення 1524 - Кредити довгострокові'                 where vidd = 1524   ;
-update cc_vidd set name ='Залучення 1610  - Депозит овернайт'                      where vidd = 1610   ;
-update cc_vidd set name ='Залучення 1613 - короткострокові депозити'               where vidd = 1612   ;
-update cc_vidd set name ='Залучення 1613 - довгострокові  депозити'                where vidd = 1613   ;
-update cc_vidd set name ='Залучення 1621 - Кредити овернайт'                       where vidd = 1621   ;
-update cc_vidd set name ='Залучення 1622--Кредити залученi за операцiями репо'     where vidd = 1622   ;
-update cc_vidd set name ='Залучення 1623 - Кредити  короткострокові'               where vidd = 1623   ;
-update cc_vidd set name ='Залучення 1623 - Кредити  довгострокові'                 where vidd = 1624   ;
 
-update cc_vidd set name ='Залучення 2701 -  короткострокові кредити, залучені Банком від інших організацій'  where vidd = 2700;
-update cc_vidd set name ='Залучення 2701 - довгострокові кредити, залучені Банком від інших організацій' '   where vidd = 2701;
-
-
-commit;
-*/
-
-CREATE OR REPLACE FUNCTION BARS.F_PROC_DR
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_proc_dr.sql =========*** Run *** 
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE FUNCTION BARS.F_PROC_DR 
    (p_acc   INT,
     p_sour  INT       DEFAULT 4,      -- источник финансирования
     p_type  INT       DEFAULT 0,      -- 1 = НЕ перех.мес
@@ -33,7 +16,7 @@ RETURN INT
 --19.12.2017 Sta + Lit 2701 +2700
 
 --15.12.2017 Sta Уточнения для об22 по бал.7017
---29.11.2017 Sta Поиск в accounts по NLS (NLSALT) = счету из PROC_DR 
+--29.11.2017 Sta Поиск в accounts по NLS (NLSALT) = счету из PROC_DR
 -- ============================================================================
 --        Функция расчета контрсчета для начисления %%
 --   из справочника "Счета доходов-расходов по процентных Акт-Пас" (PROC_DR)
@@ -49,7 +32,7 @@ IS
   l_acc67  INT;
   l_nls67  VARCHAR2(14);
  ---------------------------------------------
-  nbs_  char(4); 
+  nbs_  char(4);
   ob22_ char(2);
  ---------------------------------------------
 
@@ -62,7 +45,7 @@ BEGIN
 --RE: 2701 (короткострокові) - не подбирается счет расходов, должен быть БС=7060 (ОБ22=01)/
 
      If    p_nbs  in ('1510') then nbs_ := '6011'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '02'; End If ;  ---Депозити овернайт, що розмўщенў в ўнших банках
-     ElsIf p_nbs  in ('1512') then nbs_ := '6012'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '03'; End If ;  ---Короткостроковў вклади (депозити), що розмўщенў в 
+     ElsIf p_nbs  in ('1512') then nbs_ := '6012'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '03'; End If ;  ---Короткостроковў вклади (депозити), що розмўщенў в
      ElsIf p_nbs  in ('1513') then nbs_ := '6012'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '03'; End If ;  ---Довгостроковў вклади (депозити), що розмўщенў в ўн
      ElsIf p_nbs  in ('1521') then nbs_ := '6014'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '02'; End If ;  ---кредити овернайт, що наданў ўншим банкам
      ElsIf p_nbs  in ('1522') then nbs_ := '6015'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '02'; End If ;  ---кредити, що наданў ўншим банкам за операцўями репо
@@ -83,7 +66,7 @@ BEGIN
                   RETURN   l_acc67 ;
      EXCEPTION    WHEN NO_DATA_FOUND THEN   null;
      end;
- 
+
   end if;
 
   -- Нац.валюта
@@ -120,8 +103,8 @@ BEGIN
        l_code:=l_notax;   -- переопределим код для PROC_DR
     end if;
 --------------конец MежбанкКреДепо-------------
-  
-  
+
+
   /*IF p_mode = 'MKD' THEN
     l_rnk := p_acc;
     l_nbs := p_nbs;
@@ -196,3 +179,23 @@ BEGIN
 
 END F_PROC_DR;
 /
+ show err;
+ 
+PROMPT *** Create  grants  F_PROC_DR ***
+grant EXECUTE                                                                on F_PROC_DR       to ABS_ADMIN;
+grant EXECUTE                                                                on F_PROC_DR       to BARS010;
+grant EXECUTE                                                                on F_PROC_DR       to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on F_PROC_DR       to CUST001;
+grant EXECUTE                                                                on F_PROC_DR       to DPT_ROLE;
+grant EXECUTE                                                                on F_PROC_DR       to FOREX;
+grant EXECUTE                                                                on F_PROC_DR       to RCC_DEAL;
+grant EXECUTE                                                                on F_PROC_DR       to WR_ACRINT;
+grant EXECUTE                                                                on F_PROC_DR       to WR_ALL_RIGHTS;
+grant EXECUTE                                                                on F_PROC_DR       to WR_VIEWACC;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_proc_dr.sql =========*** End *** 
+ PROMPT ===================================================================================== 
+ 

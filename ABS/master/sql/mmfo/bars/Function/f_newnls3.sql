@@ -1,4 +1,10 @@
-CREATE OR REPLACE FUNCTION BARS.F_NEWNLS3
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_newnls3.sql =========*** Run *** 
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE FUNCTION BARS.F_NEWNLS3 
  ( acc2_        INT,             -- ACC счета
    descrname_   VARCHAR2,        -- тип счета
    nbs2_        VARCHAR2,        -- номер балансового счета
@@ -208,8 +214,16 @@ BEGIN
    RETURN TO_NUMBER (vkrzn (amfo5_, nlsnew_));
 
 END f_newnls3;
+ 
 /
-
-show err;
-
+ show err;
+ 
+PROMPT *** Create  grants  F_NEWNLS3 ***
 grant EXECUTE                                                                on F_NEWNLS3       to WR_ALL_RIGHTS;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_newnls3.sql =========*** End *** 
+ PROMPT ===================================================================================== 
+ 

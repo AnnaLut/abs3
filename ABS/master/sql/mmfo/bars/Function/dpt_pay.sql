@@ -62,6 +62,8 @@ END DPT_PAY;
  show err;
  
 PROMPT *** Create  grants  DPT2PAY ***
+grant SELECT                                                                 on DPT2PAY         to BARSREADER_ROLE;
+grant SELECT                                                                 on DPT2PAY         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT2PAY         to WR_ALL_RIGHTS;
 
  
