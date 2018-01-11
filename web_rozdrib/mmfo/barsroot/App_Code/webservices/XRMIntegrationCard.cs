@@ -615,6 +615,7 @@ namespace Bars.WebServices
             }
             public class XRMDKBORes
             {
+                public Decimal TransactionId;
                 public decimal? DealId;
                 public DateTime? StartDate;
                 public int ResultCode;
@@ -693,6 +694,7 @@ namespace Bars.WebServices
                 {
                     cmd.Dispose();
                 }
+                XRMDKBORes.TransactionId = XRMDKBOReq.TransactionId;
                 return XRMDKBORes;
             }
 
@@ -881,7 +883,7 @@ namespace Bars.WebServices
                     }
                     catch (System.Exception ex)
                     {
-                        XRMInstantList.ErrorMessage = String.Format(XRMIntegrationUtl.TransactionErrorMessage, ex.InnerException);
+                        XRMInstantList.ErrorMessage = ex.Message;
                         Array.Resize(ref XRMInstantListSet, 1);
                         XRMInstantListSet[0] = XRMInstantList;
                         return XRMInstantListSet;
@@ -1123,6 +1125,7 @@ namespace Bars.WebServices
                             }
                             else
                             {
+                                res.TransactionId = reqItem.TransactionId;
                                 res.ResultMessage = TransSuccess == -1 ? String.Format(XRMIntegrationUtl.TransactionExistsMessage, reqItem.TransactionId) : String.Format(XRMIntegrationUtl.TransactionErrorMessage, reqItem.TransactionId);
                                 res.ResultCode = -1;
                                 resList.Add(res);

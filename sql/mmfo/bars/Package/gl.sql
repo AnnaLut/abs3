@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/gl.sql =========*** Run *** ========
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.GL 
+CREATE OR REPLACE PACKAGE BARS.GL
 IS
 --***************************************************************--
 --                 General Ledger Package Header
@@ -110,7 +104,7 @@ IS
 --
 --cvl               cus_rec;
 
-  doc      oper%rowtype;     -- GLОбраз документа
+  doc      oper%rowtype;     -- Образ документа
   opl      opldok%rowtype;   -- Образ записи проводки
   cus      customer%rowtype; -- Образ записи клиентов
   acc      accounts%rowtype; -- образ записи счетов
@@ -528,7 +522,12 @@ function USR_ID return number;
 
 END gl;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.GL 
+
+show errors;
+
+----------------------------------------------------------------------
+
+create or replace package body GL
 is
   --***************************************************************--
   --                     General Ledger Package
@@ -538,7 +537,7 @@ is
   --
   --***************************************************************--
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$7.11 2017-10-26';
+  G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$7.13 2017-12-29';
 
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := '';
 
@@ -3316,15 +3315,16 @@ BEGIN
 --        if ( sql%rowcount = 0 )
 --        then
           gl.ref( ref_ );
+
           insert
             into OPER ( REF, TT, PDAT, VDAT, VOB, KF, BRANCH, TOBO )
           values ( ref_,'R00', fdat_, fdat_, vob_, l_kf, l_branch, l_branch )
           return VOB
             into vobO_;
+
+--        bars_audit.info( 'SOS0: ref='||ref_||', vob='||vob_||', vobO='||vobO_ );
 --        end if;
---
---        vobO_ := vob_;
---
+
         END IF;
 
         IF sde_>0
@@ -3350,10 +3350,11 @@ BEGIN
       exception
         when others then
           rollback to this#accountT00;
+          vobO_ := 0;
           j := j + 1;
-          bars_audit.error('SOS0 ('||acc_||') ERROR:'||SUBSTR(sqlerrm
-                           ||chr(10)||dbms_utility.format_error_backtrace
-                           ,1,3000));
+          bars_audit.error( 'SOS0 ( ref='||to_char(ref_)||', acc='||to_char(acc_)||', fdat='||
+                            to_char(fdat_, 'dd.mm.yyyy')||', vob='||to_char(vob_)||' ) ERROR:'||
+                            SubStr( sqlerrm||chr(10)||dbms_utility.format_error_backtrace, 1, 3000 ) );
       end;
 
       savepoint this#accountT00;
@@ -3419,7 +3420,7 @@ is
   l_branch           oper.branch%type := '/'||l_kf||'/';
 begin
 
-  bars_audit.trace( '%s: Entry.', title );
+  bars_audit.info( title||': Entry.' );
 
   gl.fSOS0 := 1;
 
@@ -3454,7 +3455,9 @@ begin
               where t.SOS  = 4
                 and t.TT   = 'PVP'
                 and t.FDAT = l_bnk_dt
-                and t.KF   = l_kf )
+                and t.KF   = l_kf
+                for update of q.REF nowait
+           )
   loop
 
     bars_audit.trace( '%s: ref=%s, acc=%s, dk=%s, s=%s, sq=%s.', title
@@ -3497,7 +3500,7 @@ begin
   gl.bDATE := GL.GBD;
   gl.fSOS0 := 0;
 
-  bars_audit.trace( '%s: Exit.', title );
+  bars_audit.info( title||': Exit.' );
 
 exception
   when OTHERS then
@@ -3524,7 +3527,8 @@ END create_paysos0_job;
 --
 -- Оплата проводок sos=0 по всем МФО
 --
-procedure paysos0_full is
+procedure paysos0_full
+is
 begin
   for c in (select kf from mv_kf)
   loop
@@ -3766,45 +3770,31 @@ BEGIN
   param;
 END gl;
 /
- show err;
- 
-PROMPT *** Create  grants  GL ***
-grant EXECUTE                                                                on GL              to ABS_ADMIN;
-grant EXECUTE                                                                on GL              to BARS009;
-grant EXECUTE                                                                on GL              to BARS010;
-grant EXECUTE                                                                on GL              to BARS014;
-grant EXECUTE                                                                on GL              to BARS015;
-grant EXECUTE                                                                on GL              to BARSAQ with grant option;
-grant EXECUTE                                                                on GL              to BARSAQ_ADM with grant option;
-grant EXECUTE                                                                on GL              to BARSDWH_ACCESS_USER;
-grant EXECUTE                                                                on GL              to BARSREADER_ROLE;
-grant EXECUTE                                                                on GL              to BARSUPL;
-grant EXECUTE                                                                on GL              to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on GL              to BARS_DM;
-grant EXECUTE                                                                on GL              to FINMON;
-grant EXECUTE                                                                on GL              to INSPECTOR;
-grant EXECUTE                                                                on GL              to OPERKKK;
-grant EXECUTE                                                                on GL              to PYOD001;
-grant EXECUTE                                                                on GL              to RCC_DEAL;
-grant EXECUTE                                                                on GL              to RPBN001;
-grant EXECUTE                                                                on GL              to START1;
-grant EXECUTE                                                                on GL              to SWTOSS;
-grant EXECUTE                                                                on GL              to TASK_LIST;
-grant EXECUTE                                                                on GL              to TEST;
-grant EXECUTE                                                                on GL              to TOSS;
-grant EXECUTE                                                                on GL              to UPLD;
-grant EXECUTE                                                                on GL              to USER100101;
-grant EXECUTE                                                                on GL              to WR_ACRINT;
-grant EXECUTE                                                                on GL              to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on GL              to WR_CREDIT;
-grant EXECUTE                                                                on GL              to WR_DEPOSIT_U;
-grant EXECUTE                                                                on GL              to WR_DOCHAND;
-grant EXECUTE                                                                on GL              to WR_DOC_INPUT;
-grant EXECUTE                                                                on GL              to WR_IMPEXP;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/gl.sql =========*** End *** ========
- PROMPT ===================================================================================== 
- 
+show err;
+
+exec sys.utl_recomp.recomp_serial('BARS');
+
+grant EXECUTE on GL to ABS_ADMIN;
+grant EXECUTE on GL to BARSAQ with grant option;
+grant EXECUTE on GL to BARSAQ_ADM with grant option;
+grant EXECUTE on GL to BARSDWH_ACCESS_USER;
+grant EXECUTE on GL to BARSUPL;
+grant EXECUTE on GL to BARS_ACCESS_DEFROLE;
+grant EXECUTE on GL to BARS_DM;
+grant EXECUTE on GL to FINMON;
+grant EXECUTE on GL to INSPECTOR;
+grant EXECUTE on GL to PYOD001;
+grant EXECUTE on GL to RCC_DEAL;
+grant EXECUTE on GL to RPBN001;
+grant EXECUTE on GL to START1;
+grant EXECUTE on GL to SWTOSS;
+grant EXECUTE on GL to TASK_LIST;
+grant EXECUTE on GL to TOSS;
+grant EXECUTE on GL to WR_ACRINT;
+grant EXECUTE on GL to WR_ALL_RIGHTS;
+grant EXECUTE on GL to WR_CREDIT;
+grant EXECUTE on GL to WR_DEPOSIT_U;
+grant EXECUTE on GL to WR_DOCHAND;
+grant EXECUTE on GL to WR_DOC_INPUT;
+grant EXECUTE on GL to WR_IMPEXP;

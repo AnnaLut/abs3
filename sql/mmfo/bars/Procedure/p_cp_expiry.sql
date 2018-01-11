@@ -7,10 +7,10 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_CP_EXPIRY ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_CP_EXPIRY (P_CP_ID       IN     NUMBER,
+CREATE OR REPLACE PROCEDURE P_CP_EXPIRY (P_CP_ID       IN     NUMBER,
                                               P_MODE        IN     NUMBER)
 IS
-/*2.3 2015.12.29*/
+/*2.4 2017.12.04*/
    MODCODE          CONSTANT CHAR (2) NOT NULL := 'CP';
    TITLE            CONSTANT CHAR (7) NOT NULL := 'CP_EXP:';
    ERRMSGDIM        CONSTANT NUMBER (38) NOT NULL := 3000;
@@ -599,6 +599,9 @@ BEGIN
       L_NAZN := REPLACE(L_NAZN, '*KOL*',     TO_CHAR(-L_CP_DATA(I).KOL));
       L_NAZN := REPLACE(L_NAZN, '*DATEXP*',  TO_CHAR(L_CP_DATA(I).EXPDATE,'dd/mm/yyyy'));
       L_DOCREC.NAZN := SUBSTR(L_NAZN,1,160);
+      if L_DOCREC.Vob is null then
+        L_DOCREC.Vob := case when L_DOCREC.kv =  980 then 6 else 16 end;
+      end if;  
       L_EXP_REF := CP_MAKE_DOC(L_DOCREC);
       begin
         insert into cp_payments(CP_REF,OP_REF)
