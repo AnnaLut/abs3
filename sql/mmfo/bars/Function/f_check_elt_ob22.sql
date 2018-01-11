@@ -1,4 +1,10 @@
-CREATE OR REPLACE FUNCTION F_CHECK_ELT_OB22
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_check_elt_ob22.sql =========*** R
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE FUNCTION BARS.F_CHECK_ELT_OB22 
 (p_id int, p_nbs varchar2, p_ob22 varchar2)
 RETURN e_tarif.ob22_3570%type IS
 
@@ -17,7 +23,7 @@ if p_ob22 is null then l_ret:='-9'; return l_ret; end if;
   select count(*) into l_3570 from e_tarif e where e.ob22_3570 = p_ob22;
   exception when others then l_3570:=0;
   end;
-  
+
   begin
   select count(*) into l_3579 from e_tarif e where e.ob22_3579 = p_ob22;
   exception when others then l_3579:=0;
@@ -74,7 +80,7 @@ if p_ob22 is null then l_ret:='-9'; return l_ret; end if;
     if p_nbs='3570' and p_ob22='38' then RETURN p_ob22; end if;
  end if;
 
- end if;  -- id  
+ end if;  -- id
 else
  if p_ob22 is null then l_ret:='-9'; return l_ret; end if;
 
@@ -130,8 +136,20 @@ else
  end if;
 
  end if;  -- id
-end if; 
+end if;
 
 RETURN l_ret;
 end;
 /
+ show err;
+ 
+PROMPT *** Create  grants  F_CHECK_ELT_OB22 ***
+grant EXECUTE                                                                on F_CHECK_ELT_OB22 to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on F_CHECK_ELT_OB22 to START1;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_check_elt_ob22.sql =========*** E
+ PROMPT ===================================================================================== 
+ 

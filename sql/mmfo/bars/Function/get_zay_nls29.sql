@@ -1,4 +1,10 @@
-CREATE OR REPLACE function BARS.get_zay_nls29(p_mode integer)
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/function/get_zay_nls29.sql =========*** Run 
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE FUNCTION BARS.GET_ZAY_NLS29 (p_mode integer)
 -- Функция возвращает счет 2900 прописанный в справочнике zay_mfo_nls29
 -- если входящий параметр:
 --  - равен 1, то возвращаем счет nls29ca - торговый счет РУ открытый в ЦА;
@@ -61,3 +67,15 @@ end;
   return l_result;
 end get_zay_nls29;
 /
+ show err;
+ 
+PROMPT *** Create  grants  GET_ZAY_NLS29 ***
+grant EXECUTE                                                                on GET_ZAY_NLS29   to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on GET_ZAY_NLS29   to START1;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/function/get_zay_nls29.sql =========*** End 
+ PROMPT ===================================================================================== 
+ 

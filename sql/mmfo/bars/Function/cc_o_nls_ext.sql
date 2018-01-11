@@ -1,4 +1,10 @@
-CREATE OR REPLACE function BARS.CC_O_NLS_EXT
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/function/cc_o_nls_ext.sql =========*** Run *
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE FUNCTION BARS.CC_O_NLS_EXT 
   (bal_     in varchar2,
    RNK_     in int,
    sour_    in int,
@@ -26,10 +32,10 @@ RETURN number IS
   NBS_SS  accounts.NBS%type :=null ;
    KV_SS   accounts.KV%type :=null ;
   OB22_SS  specparam_int.OB22%type  ;
-  l_newnbs number; 
+  l_newnbs number;
 BEGIN
-   l_newnbs := NEWNBS.GET_STATE;   
-   
+   l_newnbs := NEWNBS.GET_STATE;
+
    TT_:=substr(rtrim(ltrim(nvl(TT_,'%%1'))),1,3);
    tip_:=rtrim(ltrim(tip3_));
    tip_NLS:=rtrim(ltrim(tip_bal_));
@@ -185,7 +191,7 @@ ELSIF tip_='SD'   and (substr(bal_,4,1) = '5' or (substr(bal_,4,1) = '6') or (su
      elsIf nbs_SS in (case when l_newnbs = 0 then '2062' else '2063' end, '2063') then NBS_SD:=case when l_newnbs = 0 then '6026' else '6025' end;
      elsIf nbs_SS in ('2072', '2073') then NBS_SD:='6027';
      elsIf nbs_SS in (case when l_newnbs = 0 then '2082' else '2083' end, '2083') then NBS_SD:=case when l_newnbs = 0 then '6029' else '6027' end;
-     elsIf nbs_SS in (case when l_newnbs = 0 then '9020' else '9000' end, case when l_newnbs = 0 then '9023' else '9003' end ,'9122') then NBS_SD:=case when l_newnbs = 0 then '6118' else '6518' end;   
+     elsIf nbs_SS in (case when l_newnbs = 0 then '9020' else '9000' end, case when l_newnbs = 0 then '9023' else '9003' end ,'9122') then NBS_SD:=case when l_newnbs = 0 then '6118' else '6518' end;
      end if;
 
     select acc
@@ -311,3 +317,15 @@ END IF;
 RETURN ACC_;
 END CC_O_NLS_EXT;
 /
+ show err;
+ 
+PROMPT *** Create  grants  CC_O_NLS_EXT ***
+grant EXECUTE                                                                on CC_O_NLS_EXT    to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on CC_O_NLS_EXT    to RCC_DEAL;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/function/cc_o_nls_ext.sql =========*** End *
+ PROMPT ===================================================================================== 
+ 

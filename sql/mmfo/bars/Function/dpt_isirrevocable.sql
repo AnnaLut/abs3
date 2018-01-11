@@ -1,4 +1,10 @@
-CREATE OR REPLACE FUNCTION BARS.dpt_isirrevocable (
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/function/dpt_isirrevocable.sql =========*** 
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE FUNCTION BARS.DPT_ISIRREVOCABLE (
    p_dptid IN dpt_deposit.deposit_id%TYPE)
    RETURN INT
 IS
@@ -36,10 +42,19 @@ BEGIN
    EXCEPTION
       WHEN NO_DATA_FOUND
       THEN l_irrevocable := 0;
-   END;  
+   END;
 
    RETURN l_irrevocable;
 END dpt_isirrevocable;
 /
-grant execute on dpt_isirrevocable to bars_access_defrole;
-/
+ show err;
+ 
+PROMPT *** Create  grants  DPT_ISIRREVOCABLE ***
+grant EXECUTE                                                                on DPT_ISIRREVOCABLE to BARS_ACCESS_DEFROLE;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/function/dpt_isirrevocable.sql =========*** 
+ PROMPT ===================================================================================== 
+ 

@@ -14,23 +14,35 @@
 --- Функція розрахунку регулятивного капіталу  ---
 --- з врахуванням зміни версій	   	                    ---
 ---------------------------------------------------------------------------
------ 			  Версія від 02.04.2007	   				    ---
+----- 			  Версія від 25.05.2017	   				    ---
 ---------------------------------------------------------------------------
-   datz1_ 	 DATE := TO_DATE('01052005','ddmmyyyy');
-   datz2_ 	 DATE := TO_DATE('01042007','ddmmyyyy');
    sum_k	 NUMBER;
+   fmt_       VARCHAR2(30):='999G999G999G990D99';
+
+   PROCEDURE p_ins(p_kod_ VARCHAR2, p_val_ NUMBER) IS
+        pragma     AUTONOMOUS_TRANSACTION;
+   BEGIN
+       IF kodf_ IS NOT NULL AND userid_ IS NOT NULL THEN
+           INSERT INTO OTCN_LOG (kodf, userid, txt)
+           VALUES(kodf_,userid_,p_kod_||TO_CHAR(p_val_/100, fmt_));
+           commit;
+       END IF;
+   END;
 BEGIN
-   IF dat_ < datz1_ THEN
-   	  sum_k := Rkapital_V1(dat_, kodf_, userid_);
-   ELSIF dat_ < datz2_ THEN
-   	  sum_k := Rkapital_V2(dat_, kodf_, userid_, type_);
-   ELSE
-   	  sum_k := Rkapital_V3(dat_, kodf_, userid_, type_);
-   END IF;
+   p_ins('Дата для регулятивного капіталу: '||TO_CHAR(dat_,'dd.mm.yyyy'), NULL);
+
+   SELECT nvl(a.sumrk, 0)
+   into sum_k
+   FROM REGCAPITAL a 
+   WHERE a.fdat = (select max(fdat) 
+                   from REGCAPITAL 
+                   where fdat <= Dat_ and
+                         nvl(a.sumrk, 0) <> 0);
+
+   p_ins('Регулятивний капітал (із REGCAPITAL): ', sum_k);
 
    RETURN sum_k;
 END Rkapital;
- 
 /
  show err;
  
