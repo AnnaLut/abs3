@@ -98,7 +98,7 @@
         p_tracking_comment in varchar2,
         p_date in date
         );
-        
+
     procedure set_acc_unblock_dblk(
         p_nls varchar2,
         p_kf  varchar2,
@@ -110,12 +110,12 @@
         p_line_id in integer,
         p_tracking_comment in varchar2,
         p_date in date);
-        
+
     procedure set_epp_unblock_dblk(
         p_line_id in integer,
         p_tracking_comment in varchar2,
         p_date in date
-        );        
+        );
 
     procedure set_epp_unblock(
         p_line_id in integer,
@@ -137,10 +137,10 @@
 
     procedure r_card_block_procesing(p_file_data in clob,
                                      p_file_id   in number);
-                                     
+
     procedure r_card_unblock_procesing(p_file_data in clob,
                                        p_file_id   in number);
-                                       
+
     procedure r_check_epp_state_procesing(p_file_data in clob,
                                  p_file_id   in number);
 
@@ -148,7 +148,7 @@
         p_epp_line in pfu_epp_line%rowtype);
 end;
 /
-create or replace package body pfu_epp_utl as
+CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
 
     function read_epp_batch_list_request(
         p_request_id in integer,
@@ -385,7 +385,7 @@ create or replace package body pfu_epp_utl as
           track_line(p_line_id, pfu_epp_utl.LINE_STATE_CARD_BLOCKED_DBLK, p_tracking_comment, null);
         end;
     end;
-    
+
     procedure set_epp_unblock_dblk(
         p_line_id in integer,
         p_tracking_comment in varchar2,
@@ -480,7 +480,7 @@ create or replace package body pfu_epp_utl as
           --track_line(p_line_id, pfu_epp_utl.LINE_STATE_CARD_BLOCKED_DBLK, p_tracking_comment, null);
         end;
     end;
-    
+
     procedure set_acc_unblock_dblk(
         p_nls varchar2,
         p_kf  varchar2,
@@ -793,7 +793,7 @@ create or replace package body pfu_epp_utl as
                                         p_stack_trace      => sqlerrm || chr(10) ||dbms_utility.format_error_backtrace());
 
     end;
-    
+
     procedure r_card_unblock_procesing(p_file_data in clob,
                                        p_file_id   in number) is
       l_parser   dbms_xmlparser.parser;

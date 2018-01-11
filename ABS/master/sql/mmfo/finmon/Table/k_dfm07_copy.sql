@@ -29,6 +29,9 @@ COMMENT ON COLUMN FINMON.K_DFM07_COPY.D_CLOSE IS '';
 
 
 
+PROMPT *** Create  grants  K_DFM07_COPY ***
+grant SELECT                                                                 on K_DFM07_COPY    to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

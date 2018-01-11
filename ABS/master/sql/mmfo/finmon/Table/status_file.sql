@@ -55,6 +55,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  STATUS_FILE ***
+grant SELECT                                                                 on STATUS_FILE     to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

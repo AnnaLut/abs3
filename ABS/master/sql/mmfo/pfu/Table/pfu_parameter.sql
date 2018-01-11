@@ -30,12 +30,10 @@ COMMENT ON COLUMN PFU.PFU_PARAMETER.NAME IS '';
 
 
 
-PROMPT *** Create  constraint PK_PFU_PARAMETER ***
+PROMPT *** Create  constraint SYS_C00111453 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_PARAMETER ADD CONSTRAINT PK_PFU_PARAMETER PRIMARY KEY (KEY)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGD  ENABLE';
+  ALTER TABLE PFU.PFU_PARAMETER MODIFY (KEY NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -44,10 +42,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111453 ***
+PROMPT *** Create  constraint PK_PFU_PARAMETER ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_PARAMETER MODIFY (KEY NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_PARAMETER ADD CONSTRAINT PK_PFU_PARAMETER PRIMARY KEY (KEY)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -68,6 +68,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  PFU_PARAMETER ***
+grant SELECT                                                                 on PFU_PARAMETER   to BARSREADER_ROLE;
+grant SELECT                                                                 on PFU_PARAMETER   to UPLD;
 
 
 

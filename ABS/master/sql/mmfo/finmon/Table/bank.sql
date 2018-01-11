@@ -78,50 +78,12 @@ COMMENT ON COLUMN FINMON.BANK.STATUS IS '';
 
 
 
-PROMPT *** Create  constraint R_BANK_K_DFM05 ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.BANK ADD CONSTRAINT R_BANK_K_DFM05 FOREIGN KEY (UST_VID)
-	  REFERENCES FINMON.K_DFM05 (CODE) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_BANK_VDP_TLF ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.BANK MODIFY (VDP_TLF CONSTRAINT NK_BANK_VDP_TLF NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XPK_BANK ***
 begin   
  execute immediate '
   ALTER TABLE FINMON.BANK ADD CONSTRAINT XPK_BANK PRIMARY KEY (ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE USERS  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_BANK_K_DFM07 ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.BANK ADD CONSTRAINT R_BANK_K_DFM07 FOREIGN KEY (UST_TYP)
-	  REFERENCES FINMON.K_DFM07 (CODE) DEFERRABLE ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -262,11 +224,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BANK_STATUS ***
+PROMPT *** Create  constraint NK_BANK_VDP_TLF ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.BANK ADD CONSTRAINT FK_BANK_STATUS FOREIGN KEY (STATUS)
-	  REFERENCES FINMON.K_DFM06 (CODE) ENABLE';
+  ALTER TABLE FINMON.BANK MODIFY (VDP_TLF CONSTRAINT NK_BANK_VDP_TLF NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -304,6 +265,7 @@ exception when others then
 
 PROMPT *** Create  grants  BANK ***
 grant SELECT                                                                 on BANK            to BARS;
+grant SELECT                                                                 on BANK            to BARSREADER_ROLE;
 
 
 

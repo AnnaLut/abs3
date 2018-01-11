@@ -50,32 +50,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint R_OPERNOTES_OPER ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.OPER_NOTES ADD CONSTRAINT R_OPERNOTES_OPER FOREIGN KEY (OPER_ID, BRANCH_ID)
-	  REFERENCES FINMON.OPER (ID, BRANCH_ID) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_OPERNOTES_BANK ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.OPER_NOTES ADD CONSTRAINT R_OPERNOTES_BANK FOREIGN KEY (BRANCH_ID)
-	  REFERENCES FINMON.BANK (ID) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_OPER_NOTES_BRANCH_ID ***
 begin   
  execute immediate '
@@ -100,6 +74,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  OPER_NOTES ***
+grant SELECT                                                                 on OPER_NOTES      to BARSREADER_ROLE;
 
 
 

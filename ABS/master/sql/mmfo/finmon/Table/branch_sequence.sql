@@ -48,10 +48,12 @@ COMMENT ON COLUMN FINMON.BRANCH_SEQUENCE.IS_ACTIVE IS '';
 
 
 
-PROMPT *** Create  constraint NK_SEQ_ID_FILEIN ***
+PROMPT *** Create  constraint XPK_BRANCH_SEQUENCE ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.BRANCH_SEQUENCE MODIFY (ID_FILE_IN CONSTRAINT NK_SEQ_ID_FILEIN NOT NULL ENABLE)';
+  ALTER TABLE FINMON.BRANCH_SEQUENCE ADD CONSTRAINT XPK_BRANCH_SEQUENCE PRIMARY KEY (BRANCH_ID, IS_ACTIVE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE SYSTEM  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -72,25 +74,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint R_BRANCH_SEQUENCE_BANK ***
+PROMPT *** Create  constraint NK_SEQ_ID_FILEIN ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.BRANCH_SEQUENCE ADD CONSTRAINT R_BRANCH_SEQUENCE_BANK FOREIGN KEY (BRANCH_ID)
-	  REFERENCES FINMON.BANK (ID) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint XPK_BRANCH_SEQUENCE ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.BRANCH_SEQUENCE ADD CONSTRAINT XPK_BRANCH_SEQUENCE PRIMARY KEY (BRANCH_ID, IS_ACTIVE)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE SYSTEM  ENABLE';
+  ALTER TABLE FINMON.BRANCH_SEQUENCE MODIFY (ID_FILE_IN CONSTRAINT NK_SEQ_ID_FILEIN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -123,10 +110,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_BRANCE_SEQUENCE_IS_ACTIVE ***
+PROMPT *** Create  constraint NK_SEQ_ID_USERS ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.BRANCH_SEQUENCE MODIFY (IS_ACTIVE CONSTRAINT NK_BRANCE_SEQUENCE_IS_ACTIVE NOT NULL ENABLE)';
+  ALTER TABLE FINMON.BRANCH_SEQUENCE MODIFY (ID_USERS CONSTRAINT NK_SEQ_ID_USERS NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -207,10 +194,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_SEQ_ID_USERS ***
+PROMPT *** Create  constraint NK_BRANCE_SEQUENCE_IS_ACTIVE ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.BRANCH_SEQUENCE MODIFY (ID_USERS CONSTRAINT NK_SEQ_ID_USERS NOT NULL ENABLE)';
+  ALTER TABLE FINMON.BRANCH_SEQUENCE MODIFY (IS_ACTIVE CONSTRAINT NK_BRANCE_SEQUENCE_IS_ACTIVE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -231,6 +218,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  BRANCH_SEQUENCE ***
+grant SELECT                                                                 on BRANCH_SEQUENCE to BARSREADER_ROLE;
 
 
 

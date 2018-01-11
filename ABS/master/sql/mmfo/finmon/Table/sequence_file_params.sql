@@ -46,19 +46,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SEQUENCE_FP_BRANCH_ID ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.SEQUENCE_FILE_PARAMS ADD CONSTRAINT FK_SEQUENCE_FP_BRANCH_ID FOREIGN KEY (BRANCH_ID)
-	  REFERENCES FINMON.BANK (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_SEQUENCE_FP_BRANCH_ID ***
 begin   
  execute immediate '
@@ -95,6 +82,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  SEQUENCE_FILE_PARAMS ***
+grant SELECT                                                                 on SEQUENCE_FILE_PARAMS to BARSREADER_ROLE;
 
 
 

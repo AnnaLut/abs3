@@ -46,32 +46,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint R_FMOPERVID3_K_DFM02 ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.OPR_VID3 ADD CONSTRAINT R_FMOPERVID3_K_DFM02 FOREIGN KEY (VID)
-	  REFERENCES FINMON.K_DFM03 (CODE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_FMOPERVID3_REF ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.OPR_VID3 ADD CONSTRAINT FK_FMOPERVID3_REF FOREIGN KEY (ID, BRANCH_ID)
-	  REFERENCES FINMON.OPER (ID, BRANCH_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_FMOPERVID3_REF ***
 begin   
  execute immediate '
@@ -123,6 +97,7 @@ exception when others then
 
 PROMPT *** Create  grants  OPR_VID3 ***
 grant SELECT                                                                 on OPR_VID3        to BARS;
+grant SELECT                                                                 on OPR_VID3        to BARSREADER_ROLE;
 
 
 

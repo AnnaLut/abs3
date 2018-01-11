@@ -94,19 +94,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_PFU_EPP_KILLED_TYPEID ***
-begin   
- execute immediate '
-  ALTER TABLE PFU.PFU_EPP_KILLED ADD CONSTRAINT FK_PFU_EPP_KILLED_TYPEID FOREIGN KEY (KILL_TYPE)
-	  REFERENCES PFU.PFU_EPP_KILL_TYPE (ID_TYPE) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_PFU_EPP_KILLED ***
 begin   
  execute immediate '
@@ -121,7 +108,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  PFU_EPP_KILLED ***
+grant SELECT                                                                 on PFU_EPP_KILLED  to BARSREADER_ROLE;
 grant SELECT                                                                 on PFU_EPP_KILLED  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on PFU_EPP_KILLED  to UPLD;
 
 
 

@@ -16,7 +16,8 @@ begin
 	RESPONSE_DATA BLOB, 
 	STATE_ID NUMBER(5,0), 
 	FAILURES_COUNT NUMBER(5,0), 
-	UPD_DATE DATE
+	UPD_DATE DATE, 
+	KF VARCHAR2(6)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -34,6 +35,7 @@ end;
 
 
 COMMENT ON TABLE PFU.TRANSPORT_UNIT IS '';
+COMMENT ON COLUMN PFU.TRANSPORT_UNIT.KF IS '';
 COMMENT ON COLUMN PFU.TRANSPORT_UNIT.UPD_DATE IS '';
 COMMENT ON COLUMN PFU.TRANSPORT_UNIT.ID IS '';
 COMMENT ON COLUMN PFU.TRANSPORT_UNIT.UNIT_TYPE_ID IS '';
@@ -84,10 +86,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111522 ***
+PROMPT *** Create  constraint SYS_C00111519 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.TRANSPORT_UNIT MODIFY (FAILURES_COUNT NOT NULL ENABLE)';
+  ALTER TABLE PFU.TRANSPORT_UNIT MODIFY (RECEIVER_URL NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -120,10 +122,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111519 ***
+PROMPT *** Create  constraint SYS_C00111522 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.TRANSPORT_UNIT MODIFY (RECEIVER_URL NOT NULL ENABLE)';
+  ALTER TABLE PFU.TRANSPORT_UNIT MODIFY (FAILURES_COUNT NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -143,15 +145,12 @@ exception when others then
  end;
 /
 
-PROMPT *** ADD field KF ***
-begin   
- execute immediate '
-	alter table PFU.TRANSPORT_UNIT add kf VARCHAR2(6)';
-exception when others then 
-    if sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/
+
+
+PROMPT *** Create  grants  TRANSPORT_UNIT ***
+grant SELECT                                                                 on TRANSPORT_UNIT  to BARSREADER_ROLE;
+grant SELECT                                                                 on TRANSPORT_UNIT  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -97,6 +97,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  METALOOKUP ***
+grant SELECT                                                                 on METALOOKUP      to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

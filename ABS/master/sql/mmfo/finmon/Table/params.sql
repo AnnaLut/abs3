@@ -71,6 +71,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  PARAMS ***
+grant SELECT                                                                 on PARAMS          to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

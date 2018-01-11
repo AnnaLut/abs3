@@ -150,84 +150,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OPER_RI_NUMB ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.OPER ADD CONSTRAINT FK_OPER_RI_NUMB FOREIGN KEY (RI_NUMB)
-	  REFERENCES FINMON.DECISION (RI_NUMB) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_OPER_K_DFM02 ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.OPER ADD CONSTRAINT R_OPER_K_DFM02 FOREIGN KEY (OPR_VID2)
-	  REFERENCES FINMON.K_DFM02 (CODE) DEFERRABLE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_OPER_K_DFM03 ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.OPER ADD CONSTRAINT R_OPER_K_DFM03 FOREIGN KEY (OPR_VID3)
-	  REFERENCES FINMON.K_DFM03 (CODE) DEFERRABLE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_OPER_K_DFM06 ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.OPER ADD CONSTRAINT R_OPER_K_DFM06 FOREIGN KEY (OPR_ACT)
-	  REFERENCES FINMON.K_DFM06 (CODE) DEFERRABLE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_OPER_K_DFM10 ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.OPER ADD CONSTRAINT R_OPER_K_DFM10 FOREIGN KEY (OPR_OZN)
-	  REFERENCES FINMON.K_DFM10 (CODE) DEFERRABLE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_OPER_K_DFM14 ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.OPER ADD CONSTRAINT R_OPER_K_DFM14 FOREIGN KEY (ERR_CODE)
-	  REFERENCES FINMON.K_DFM14 (CODE) DEFERRABLE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XAK_OPER_KL_IDDATE_BRANCH ***
 begin   
  execute immediate '
@@ -248,32 +170,6 @@ begin
   ALTER TABLE FINMON.OPER ADD CONSTRAINT XPK_OPER PRIMARY KEY (ID, BRANCH_ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE USERS  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_OPER_DFILE_OUT ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.OPER ADD CONSTRAINT R_OPER_DFILE_OUT FOREIGN KEY (DFILE_ID, BRANCH_ID)
-	  REFERENCES FINMON.FILE_OUT (ID, BRANCH_ID) DEFERRABLE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_OPER_FILE_OUT ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.OPER ADD CONSTRAINT R_OPER_FILE_OUT FOREIGN KEY (FILE_ID, BRANCH_ID)
-	  REFERENCES FINMON.FILE_OUT (ID, BRANCH_ID) DEFERRABLE DISABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -486,19 +382,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint R_OPER_BANK ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.OPER ADD CONSTRAINT R_OPER_BANK FOREIGN KEY (BRANCH_ID)
-	  REFERENCES FINMON.BANK (ID) DEFERRABLE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index XAK_OPER_KL_IDDATE_UNIQUE ***
 begin   
  execute immediate '
@@ -584,6 +467,7 @@ exception when others then
 
 PROMPT *** Create  grants  OPER ***
 grant SELECT                                                                 on OPER            to BARS;
+grant SELECT                                                                 on OPER            to BARSREADER_ROLE;
 
 
 

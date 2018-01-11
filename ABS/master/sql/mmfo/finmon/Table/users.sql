@@ -72,32 +72,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_USERS_BRANCH_ID ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.USERS ADD CONSTRAINT FK_USERS_BRANCH_ID FOREIGN KEY (BRANCH_ID)
-	  REFERENCES FINMON.BANK (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_USERS_STATUS ***
-begin   
- execute immediate '
-  ALTER TABLE FINMON.USERS ADD CONSTRAINT FK_USERS_STATUS FOREIGN KEY (STATUS)
-	  REFERENCES FINMON.K_DFM06 (CODE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_USERS_VDP_POS ***
 begin   
  execute immediate '
@@ -110,10 +84,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_USERS_BRANCH_ID ***
+PROMPT *** Create  constraint NK_USERS_VDP_NM1 ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.USERS MODIFY (BRANCH_ID CONSTRAINT NK_USERS_BRANCH_ID NOT NULL ENABLE)';
+  ALTER TABLE FINMON.USERS MODIFY (VDP_NM1 CONSTRAINT NK_USERS_VDP_NM1 NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -158,10 +132,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_USERS_VDP_NM1 ***
+PROMPT *** Create  constraint NK_USERS_BRANCH_ID ***
 begin   
  execute immediate '
-  ALTER TABLE FINMON.USERS MODIFY (VDP_NM1 CONSTRAINT NK_USERS_VDP_NM1 NOT NULL ENABLE)';
+  ALTER TABLE FINMON.USERS MODIFY (BRANCH_ID CONSTRAINT NK_USERS_BRANCH_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -185,6 +159,7 @@ exception when others then
 
 PROMPT *** Create  grants  USERS ***
 grant SELECT                                                                 on USERS           to BARS;
+grant SELECT                                                                 on USERS           to BARSREADER_ROLE;
 
 
 

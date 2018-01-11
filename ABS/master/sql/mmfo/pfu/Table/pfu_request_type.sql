@@ -42,12 +42,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_PFU_REQUEST_TYPE ***
+PROMPT *** Create  constraint SYS_C00111496 ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_REQUEST_TYPE ADD CONSTRAINT PK_PFU_REQUEST_TYPE PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGD  ENABLE';
+  ALTER TABLE PFU.PFU_REQUEST_TYPE MODIFY (REQUEST_TYPE_CODE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -68,10 +66,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00111496 ***
+PROMPT *** Create  constraint PK_PFU_REQUEST_TYPE ***
 begin   
  execute immediate '
-  ALTER TABLE PFU.PFU_REQUEST_TYPE MODIFY (REQUEST_TYPE_CODE NOT NULL ENABLE)';
+  ALTER TABLE PFU.PFU_REQUEST_TYPE ADD CONSTRAINT PK_PFU_REQUEST_TYPE PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -92,6 +92,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  PFU_REQUEST_TYPE ***
+grant SELECT                                                                 on PFU_REQUEST_TYPE to BARSREADER_ROLE;
+grant SELECT                                                                 on PFU_REQUEST_TYPE to UPLD;
 
 
 
