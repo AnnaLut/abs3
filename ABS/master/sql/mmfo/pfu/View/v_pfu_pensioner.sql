@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_PFU_PENSIONER ***
 
-  CREATE OR REPLACE FORCE VIEW PFU.V_PFU_PENSIONER ("ID", "KF", "BRANCH", "RNK", "NMK", "OKPO", "ADR", "DATE_ON", "DATE_OFF", "PASSP", "SER", "NUMDOC", "PDATE", "ORGAN", "BDAY", "BPLACE", "CELLPHONE", "STATE", "COMM", "NLS", "DAOS", "BLOCK_DATE", "BLOCK_TYPE", "TYPE_PENSIONER") AS 
+  CREATE OR REPLACE FORCE VIEW PFU.V_PFU_PENSIONER ("ID", "KF", "BRANCH", "RNK", "NMK", "OKPO", "ADR", "DATE_ON", "DATE_OFF", "PASSP", "SER", "NUMDOC", "PDATE", "ORGAN", "BDAY", "BPLACE", "CELLPHONE", "STATE", "COMM", "NLS", "DAOS", "BLOCK_DATE", "BLOCK_TYPE", "TYPE_PENSIONER", "IS_OKPO_WELL") AS 
   select p.id,
           p.kf,
           p.branch,
