@@ -4,7 +4,6 @@ using Oracle.DataAccess.Client;
 using BarsWeb.Areas.Ndi.Models;
 using Areas.Ndi.Models;
 using System;
-using BarsWeb.Areas.Ndi.Models.SelectModels;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {

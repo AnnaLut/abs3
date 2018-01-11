@@ -1,5 +1,4 @@
 ﻿using Areas.Ndi.Models;
-using BarsWeb.Areas.Ndi.Models.DbModels;
 using BarsWeb.Areas.Ndi.Models.FilterModels;
 using System.Collections.Generic;
 

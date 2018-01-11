@@ -1267,7 +1267,6 @@
     //menu - кнопка с выпадающим меню
     //item - конкретный пункт меню который нажали
     onCallFunctionMenuClick: function (menu, item) {
-        debugger;
         var thisController = this;
         //каждый пункт меню содержит свойство metaInfo с информацией о вызываемой процедуре
         var funcMetaInfo = item.metaInfo;
@@ -1292,7 +1291,6 @@
     },
 
     onToolBtnclick: function (button) {
-        debugger;
         var thisController = this;
         var referenceGrid = thisController.getGrid();
         //каждый пункт меню содержит свойство metaInfo с информацией о вызываемой процедуре
@@ -2296,16 +2294,8 @@
                 }
             },
             failure: function (conn, response) {
-                if(conn && conn.request)
-                {
-                    if(conn.request.responseText === '')
-                        return;
-                    Ext.Msg.show({ title: "Виникли проблеми при з'єднанні з сервером", msg: conn.request.responseText + '</br> </br>', icon: Ext.Msg.ERROR, buttons: Ext.Msg.OK });
-                }
-                else
-                    return;
                 //обработка при неудачном запросе на сервер
-
+                Ext.Msg.show({ title: "Виникли проблеми при з'єднанні з сервером", msg: conn.responseText + '</br> </br>', icon: Ext.Msg.ERROR, buttons: Ext.Msg.OK });
             }
         });
     },   
@@ -2333,7 +2323,7 @@
     onExportToExcelBtnClick: function (menu, item) {
         var grid = menu.up('referenceGrid');
         debugger;
-
+        
         var columnsHiddenNames = ExtApp.utils.RefBookUtils.getHiddenColumnsFromLocalSrorage(grid.metadata.localStorageModel);
         
            
@@ -2388,7 +2378,7 @@
     //заполнить параметры и вызвать sql-процедуру определенного типа
     //metaInfo - метаописание процедуры, параметров
     callSqlFunction: function (funcMetaInfo) {
-        debugger;
+        
         var thisController = this;
         var referenceGrid = thisController.getGrid();
         var gridSelectModel = referenceGrid.getSelectionModel();
@@ -2782,7 +2772,7 @@
 
                         });
 
-                    var emptyParam = Ext.Array.findBy(params, function (param) { return param.Value === "" || param.Value == undefined});
+                    var emptyParam = Ext.Array.findBy(params, function (param) { return param.Value == "" });
                     if (emptyParam) {
                         if (emptyParam.Name)
                             Ext.MessageBox.show({
@@ -3023,12 +3013,10 @@
             Ext.each(func.paramsInfo, function (par) {
 
                 if (par.IsInput == false) {
-                    var colParam = Ext.Array.findBy(referenceGrid.metadata.columnsInfo, function (i) { return i.COLNAME == par.Name; });
-                    if(colParam)
                     currentParams.rowParams.push({
                         Name: par.Name,
                         //для невводимых параметров тип параметра берем из метаданных колонки, с которой берем значение
-                        Type: colParam.COLTYPE,
+                        Type: Ext.Array.findBy(referenceGrid.metadata.columnsInfo, function (i) { return i.COLNAME == par.Name; }).COLTYPE,
                         //присваиваем значению параметра значение с выбранной строки грида
                         Value: selectedRow.data[par.Name]
                     });
@@ -3052,7 +3040,6 @@
                 //заполняем параметры функции значения которых нужно взять из текущей строки грида
 
                 Ext.each(multiParam.ListColumnNames, function (name) {
- 
                         currentParams.rowParams.push({
                             Name: par.Name,
                             //для невводимых параметров тип параметра берем из метаданных колонки, с которой берем значение

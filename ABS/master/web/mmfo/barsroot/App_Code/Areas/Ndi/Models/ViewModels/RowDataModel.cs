@@ -7,14 +7,11 @@ using System.Web;
 /// <summary>
 /// Summary description for RowsDataModel
 /// </summary>
-namespace BarsWeb.Areas.Ndi.Models.ViewModels
+public class RowDataModel
 {
-    public class RowDataModel
+    public RowDataModel()
     {
-        public RowDataModel()
-        {
 
-        }
-        public List<FieldProperties> RowFilds { get; set; }
     }
+    public List<FieldProperties> RowFilds { get; set; }
 }
