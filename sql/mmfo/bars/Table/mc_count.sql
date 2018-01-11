@@ -51,19 +51,6 @@ COMMENT ON COLUMN BARS.MC_COUNT.MC_NUM IS '';
 
 
 
-PROMPT *** Create  constraint R_MC_MFO_BANKS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MC_COUNT ADD CONSTRAINT R_MC_MFO_BANKS FOREIGN KEY (MFO)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XPK_MC_COUNT ***
 begin   
  execute immediate '
@@ -92,9 +79,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  MC_COUNT ***
+grant SELECT                                                                 on MC_COUNT        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MC_COUNT        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MC_COUNT        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MC_COUNT        to START1;
+grant SELECT                                                                 on MC_COUNT        to UPLD;
 
 
 

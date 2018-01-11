@@ -89,7 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CM_CREDITS ***
+grant SELECT                                                                 on CM_CREDITS      to BARSREADER_ROLE;
 grant SELECT                                                                 on CM_CREDITS      to BARS_DM;
+grant SELECT                                                                 on CM_CREDITS      to UPLD;
 
 
 

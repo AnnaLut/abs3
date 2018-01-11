@@ -62,6 +62,21 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint PK_CIGSYNCDATA ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIG_SYNC_DATA ADD CONSTRAINT PK_CIGSYNCDATA PRIMARY KEY (DATA_ID, DATA_TYPE, BRANCH)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_CIGSYNCDATA ***
 begin   
  execute immediate '
@@ -76,9 +91,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_SYNC_DATA ***
+grant SELECT                                                                 on CIG_SYNC_DATA   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIG_SYNC_DATA   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_SYNC_DATA   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIG_SYNC_DATA   to CIG_ROLE;
+grant SELECT                                                                 on CIG_SYNC_DATA   to UPLD;
 
 
 

@@ -51,45 +51,6 @@ COMMENT ON COLUMN BARS.REP_ACCG_OTCHG.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_REPACCOTCH_ACCG ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REP_ACCG_OTCHG ADD CONSTRAINT FK_REPACCOTCH_ACCG FOREIGN KEY (ACCGRP)
-	  REFERENCES BARS.REP_ACCGRP (ACCGRP) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_REPACCOTCH_OTCHG ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REP_ACCG_OTCHG ADD CONSTRAINT FK_REPACCOTCH_OTCHG FOREIGN KEY (OTCHGRP)
-	  REFERENCES BARS.REP_OTCHGRP (OTCHGRP) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_REPACCGOTCHG_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REP_ACCG_OTCHG ADD CONSTRAINT FK_REPACCGOTCHG_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_REPACCGOTCHG_KF_NN ***
 begin   
  execute immediate '
@@ -132,10 +93,12 @@ exception when others then
 PROMPT *** Create  grants  REP_ACCG_OTCHG ***
 grant SELECT                                                                 on REP_ACCG_OTCHG  to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REP_ACCG_OTCHG  to BARS014;
+grant SELECT                                                                 on REP_ACCG_OTCHG  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REP_ACCG_OTCHG  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REP_ACCG_OTCHG  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REP_ACCG_OTCHG  to RPBN001;
 grant SELECT                                                                 on REP_ACCG_OTCHG  to TASK_LIST;
+grant SELECT                                                                 on REP_ACCG_OTCHG  to UPLD;
 grant FLASHBACK,SELECT                                                       on REP_ACCG_OTCHG  to WR_REFREAD;
 
 

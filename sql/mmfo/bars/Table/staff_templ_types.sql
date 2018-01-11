@@ -65,19 +65,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_TEMPLTYPES_TEMPLTYPES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_TEMPL_TYPES ADD CONSTRAINT FK_TEMPLTYPES_TEMPLTYPES FOREIGN KEY (PARENT_ID)
-	  REFERENCES BARS.STAFF_TEMPL_TYPES (TEMPLTYPE_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_TEMPLTYPES_ID_NN ***
 begin   
  execute immediate '
@@ -116,9 +103,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  STAFF_TEMPL_TYPES ***
+grant SELECT                                                                 on STAFF_TEMPL_TYPES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_TEMPL_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF_TEMPL_TYPES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_TEMPL_TYPES to START1;
+grant SELECT                                                                 on STAFF_TEMPL_TYPES to UPLD;
 
 
 

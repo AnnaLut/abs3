@@ -91,60 +91,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_ADM_RESOURCE_ACTIVITY ***
+PROMPT *** Create  constraint SYS_C0025752 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_ACTIVITY ADD CONSTRAINT PK_ADM_RESOURCE_ACTIVITY PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0025757 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_ACTIVITY MODIFY (ACTION_USER_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0025756 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_ACTIVITY MODIFY (ACTION_TIME NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0025755 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_ACTIVITY MODIFY (ACCESS_MODE_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0025754 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_ACTIVITY MODIFY (RESOURCE_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.ADM_RESOURCE_ACTIVITY MODIFY (GRANTEE_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -165,10 +115,60 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025752 ***
+PROMPT *** Create  constraint SYS_C0025754 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ADM_RESOURCE_ACTIVITY MODIFY (GRANTEE_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.ADM_RESOURCE_ACTIVITY MODIFY (RESOURCE_ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C0025755 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADM_RESOURCE_ACTIVITY MODIFY (ACCESS_MODE_ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C0025756 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADM_RESOURCE_ACTIVITY MODIFY (ACTION_TIME NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C0025757 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADM_RESOURCE_ACTIVITY MODIFY (ACTION_USER_ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_ADM_RESOURCE_ACTIVITY ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADM_RESOURCE_ACTIVITY ADD CONSTRAINT PK_ADM_RESOURCE_ACTIVITY PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -219,7 +219,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ADM_RESOURCE_ACTIVITY ***
+grant SELECT                                                                 on ADM_RESOURCE_ACTIVITY to BARSREADER_ROLE;
 grant SELECT                                                                 on ADM_RESOURCE_ACTIVITY to BARS_DM;
+grant SELECT                                                                 on ADM_RESOURCE_ACTIVITY to UPLD;
 
 
 

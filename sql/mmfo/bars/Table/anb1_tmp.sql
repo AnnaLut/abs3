@@ -69,9 +69,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ANB1_TMP ***
+grant SELECT                                                                 on ANB1_TMP        to BARSREADER_ROLE;
 grant SELECT                                                                 on ANB1_TMP        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANB1_TMP        to BARS_DM;
 grant SELECT                                                                 on ANB1_TMP        to SALGL;
+grant SELECT                                                                 on ANB1_TMP        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ANB1_TMP        to WR_ALL_RIGHTS;
 
 

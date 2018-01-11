@@ -69,32 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ACCE_ACCOUNTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCE ADD CONSTRAINT FK_ACCE_ACCOUNTS FOREIGN KEY (KF, ACC)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ACCE_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACCE ADD CONSTRAINT FK_ACCE_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_ACCE_KF_NN ***
 begin   
  execute immediate '
@@ -121,10 +95,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACCE ***
+grant SELECT                                                                 on ACCE            to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on ACCE            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCE            to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on ACCE            to OPERKKK;
 grant DELETE,INSERT,SELECT                                                   on ACCE            to TECH_MOM1;
+grant SELECT                                                                 on ACCE            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACCE            to WR_ALL_RIGHTS;
 
 

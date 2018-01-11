@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  S240_DNI ***
+grant SELECT                                                                 on S240_DNI        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S240_DNI        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on S240_DNI        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S240_DNI        to SALGL;
+grant SELECT                                                                 on S240_DNI        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on S240_DNI        to WR_ALL_RIGHTS;
 
 

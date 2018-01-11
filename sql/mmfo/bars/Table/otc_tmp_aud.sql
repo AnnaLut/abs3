@@ -48,8 +48,10 @@ COMMENT ON COLUMN BARS.OTC_TMP_AUD.TXT IS 'Сообщение об ошибке';
 
 PROMPT *** Create  grants  OTC_TMP_AUD ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTC_TMP_AUD     to ABS_ADMIN;
+grant SELECT                                                                 on OTC_TMP_AUD     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTC_TMP_AUD     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTC_TMP_AUD     to RPBN002;
+grant SELECT                                                                 on OTC_TMP_AUD     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTC_TMP_AUD     to WR_ALL_RIGHTS;
 
 

@@ -56,7 +56,7 @@ begin
 	NLS VARCHAR2(15), 
 	REGDATE DATE DEFAULT sysdate, 
 	PROCDATE DATE
-   ) SEGMENT CREATION DEFERRED 
+   ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSDYND 
@@ -209,8 +209,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  KKFORBK_DATA ***
+grant SELECT                                                                 on KKFORBK_DATA    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KKFORBK_DATA    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KKFORBK_DATA    to CM_ACCESS_ROLE;
+grant SELECT                                                                 on KKFORBK_DATA    to UPLD;
 
 
 

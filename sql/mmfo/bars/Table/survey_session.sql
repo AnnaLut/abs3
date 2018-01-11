@@ -63,143 +63,6 @@ COMMENT ON COLUMN BARS.SURVEY_SESSION.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_SURVEYSESSION_STAFF$BASE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_SESSION ADD CONSTRAINT FK_SURVEYSESSION_STAFF$BASE FOREIGN KEY (USER_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SURVEYSESSION_SURVEY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_SESSION ADD CONSTRAINT FK_SURVEYSESSION_SURVEY FOREIGN KEY (SURVEY_ID)
-	  REFERENCES BARS.SURVEY (SURVEY_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEYSESSION_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_SESSION MODIFY (BRANCH CONSTRAINT CC_SURVEYSESSION_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEYSESSION_COMPLETED_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_SESSION MODIFY (COMPLETED CONSTRAINT CC_SURVEYSESSION_COMPLETED_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEYSESSION_FLDECLINE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_SESSION MODIFY (FL_DECLINE CONSTRAINT CC_SURVEYSESSION_FLDECLINE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEYSESSION_USERID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_SESSION MODIFY (USER_ID CONSTRAINT CC_SURVEYSESSION_USERID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEYSESSION_SURVEYID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_SESSION MODIFY (SURVEY_ID CONSTRAINT CC_SURVEYSESSION_SURVEYID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEYSESSION_RNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_SESSION MODIFY (RNK CONSTRAINT CC_SURVEYSESSION_RNK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SURVEYSESSION_CUSTOMER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_SESSION ADD CONSTRAINT FK_SURVEYSESSION_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SURVEYSESSION_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_SESSION ADD CONSTRAINT FK_SURVEYSESSION_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SURVEYSESSION_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_SESSION ADD CONSTRAINT FK_SURVEYSESSION_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SURVEYSESSION_COMPLETED ***
 begin   
  execute immediate '
@@ -264,6 +127,78 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_SURVEYSESSION_RNK_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_SESSION MODIFY (RNK CONSTRAINT CC_SURVEYSESSION_RNK_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SURVEYSESSION_SURVEYID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_SESSION MODIFY (SURVEY_ID CONSTRAINT CC_SURVEYSESSION_SURVEYID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SURVEYSESSION_USERID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_SESSION MODIFY (USER_ID CONSTRAINT CC_SURVEYSESSION_USERID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SURVEYSESSION_FLDECLINE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_SESSION MODIFY (FL_DECLINE CONSTRAINT CC_SURVEYSESSION_FLDECLINE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SURVEYSESSION_COMPLETED_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_SESSION MODIFY (COMPLETED CONSTRAINT CC_SURVEYSESSION_COMPLETED_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SURVEYSESSION_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SURVEY_SESSION MODIFY (BRANCH CONSTRAINT CC_SURVEYSESSION_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_SURVEYSESSION ***
 begin   
  execute immediate '
@@ -292,10 +227,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  SURVEY_SESSION ***
+grant SELECT                                                                 on SURVEY_SESSION  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY_SESSION  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SURVEY_SESSION  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY_SESSION  to DPT_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY_SESSION  to RCC_DEAL;
+grant SELECT                                                                 on SURVEY_SESSION  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SURVEY_SESSION  to WR_ALL_RIGHTS;
 grant DELETE,SELECT                                                          on SURVEY_SESSION  to WR_CREDIT;
 

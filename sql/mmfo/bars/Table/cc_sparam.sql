@@ -55,45 +55,6 @@ COMMENT ON COLUMN BARS.CC_SPARAM.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_CCSPARAM_ACCOUNTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_SPARAM ADD CONSTRAINT FK_CCSPARAM_ACCOUNTS FOREIGN KEY (KF, ACC)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_V_9129 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_SPARAM ADD CONSTRAINT FK_V_9129 FOREIGN KEY (VIDD_9129)
-	  REFERENCES BARS.VID_9129 (VIDD_9129) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CCSPARAM_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_SPARAM ADD CONSTRAINT FK_CCSPARAM_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C005108 ***
 begin   
  execute immediate '
@@ -146,11 +107,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_SPARAM ***
+grant SELECT                                                                 on CC_SPARAM       to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CC_SPARAM       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_SPARAM       to BARS_DM;
 grant SELECT                                                                 on CC_SPARAM       to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_SPARAM       to RCC_DEAL;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CC_SPARAM       to START1;
+grant SELECT                                                                 on CC_SPARAM       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_SPARAM       to WR_ALL_RIGHTS;
 
 

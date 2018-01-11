@@ -120,12 +120,14 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_VIDD_SCHEME ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_SCHEME to ABS_ADMIN;
+grant SELECT                                                                 on DPT_VIDD_SCHEME to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_SCHEME to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VIDD_SCHEME to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_SCHEME to DPT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_SCHEME to DPT_ADMIN;
 grant SELECT                                                                 on DPT_VIDD_SCHEME to DPT_ROLE;
 grant SELECT                                                                 on DPT_VIDD_SCHEME to START1;
+grant SELECT                                                                 on DPT_VIDD_SCHEME to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_SCHEME to WR_ALL_RIGHTS;
 
 

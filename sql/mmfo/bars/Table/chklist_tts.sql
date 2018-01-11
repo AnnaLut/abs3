@@ -85,22 +85,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CHKLISTTTS_PRIORITY_NN ***
+PROMPT *** Create  constraint UK_CHKLISTTTS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CHKLIST_TTS MODIFY (PRIORITY CONSTRAINT CC_CHKLISTTTS_PRIORITY_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CHKLISTTTS_IDCHK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CHKLIST_TTS MODIFY (IDCHK CONSTRAINT CC_CHKLISTTTS_IDCHK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CHKLIST_TTS ADD CONSTRAINT UK_CHKLISTTTS UNIQUE (TT, PRIORITY)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -121,11 +111,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CHKLISTTTS_TTS ***
+PROMPT *** Create  constraint CC_CHKLISTTTS_IDCHK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CHKLIST_TTS ADD CONSTRAINT FK_CHKLISTTTS_TTS FOREIGN KEY (TT)
-	  REFERENCES BARS.TTS (TT) ENABLE';
+  ALTER TABLE BARS.CHKLIST_TTS MODIFY (IDCHK CONSTRAINT CC_CHKLISTTTS_IDCHK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -134,38 +123,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CHKLISTTTS_INCHARGELIST ***
+PROMPT *** Create  constraint CC_CHKLISTTTS_PRIORITY_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CHKLIST_TTS ADD CONSTRAINT FK_CHKLISTTTS_INCHARGELIST FOREIGN KEY (F_IN_CHARGE)
-	  REFERENCES BARS.IN_CHARGE_LIST (IN_CHARGE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint UK_CHKLISTTTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CHKLIST_TTS ADD CONSTRAINT UK_CHKLISTTTS UNIQUE (TT, PRIORITY)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CHKLISTTTS_CHKLIST ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CHKLIST_TTS ADD CONSTRAINT FK_CHKLISTTTS_CHKLIST FOREIGN KEY (IDCHK)
-	  REFERENCES BARS.CHKLIST (IDCHK) ENABLE';
+  ALTER TABLE BARS.CHKLIST_TTS MODIFY (PRIORITY CONSTRAINT CC_CHKLISTTTS_PRIORITY_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -203,11 +164,13 @@ exception when others then
 
 PROMPT *** Create  grants  CHKLIST_TTS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CHKLIST_TTS     to ABS_ADMIN;
+grant SELECT                                                                 on CHKLIST_TTS     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CHKLIST_TTS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHKLIST_TTS     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CHKLIST_TTS     to CHKLIST_TTS;
 grant SELECT                                                                 on CHKLIST_TTS     to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CHKLIST_TTS     to TECH005;
+grant SELECT                                                                 on CHKLIST_TTS     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CHKLIST_TTS     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CHKLIST_TTS     to WR_REFREAD;
 

@@ -107,19 +107,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CCTRANSUPDATE_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_TRANS_UPDATE ADD CONSTRAINT FK_CCTRANSUPDATE_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index XAI_CCTRANS_UPDATEEFFDAT ***
 begin   
  execute immediate '
@@ -176,8 +163,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_TRANS_UPDATE ***
+grant SELECT                                                                 on CC_TRANS_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_TRANS_UPDATE to BARSUPL;
 grant SELECT                                                                 on CC_TRANS_UPDATE to BARS_DM;
+grant SELECT                                                                 on CC_TRANS_UPDATE to UPLD;
 
 
 

@@ -12,8 +12,8 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''CC_TRANS_ARC'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''CC_TRANS_ARC'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''CC_TRANS_ARC'', ''WHOLE'' , null, null, null, null);
+               bpa.alter_policy_info(''CC_TRANS_ARC'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''CC_TRANS_ARC'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
           '; 
@@ -36,7 +36,8 @@ begin
 	REFP NUMBER(38,0), 
 	COMM VARCHAR2(100), 
 	ID0 NUMBER, 
-	MDAT DATE
+	MDAT DATE, 
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -54,6 +55,7 @@ PROMPT *** ALTER_POLICIES to CC_TRANS_ARC ***
 
 
 COMMENT ON TABLE BARS.CC_TRANS_ARC IS 'Транши выдачи кредита';
+COMMENT ON COLUMN BARS.CC_TRANS_ARC.KF IS '';
 COMMENT ON COLUMN BARS.CC_TRANS_ARC.NPP IS '№ пп - первичный ключ';
 COMMENT ON COLUMN BARS.CC_TRANS_ARC.REF IS 'Реф.операции выдачи';
 COMMENT ON COLUMN BARS.CC_TRANS_ARC.ACC IS 'ACC счета SS';
@@ -68,10 +70,8 @@ COMMENT ON COLUMN BARS.CC_TRANS_ARC.COMM IS 'Комментарий';
 COMMENT ON COLUMN BARS.CC_TRANS_ARC.ID0 IS 'Iд.Поч.Траншу(Ід.)';
 COMMENT ON COLUMN BARS.CC_TRANS_ARC.MDAT IS 'дата модиф.';
 
-exec bars_policy_adm.add_column_kf(p_table_name => 'CC_TRANS_ARC');
-exec bars_policy_adm.alter_policy_info(p_table_name => 'CC_TRANS_ARC', p_policy_group => 'WHOLE', p_select_policy => null, p_insert_policy => 'E', p_update_policy => 'E', p_delete_policy => 'E');
-exec bars_policy_adm.alter_policy_info(p_table_name => 'CC_TRANS_ARC', p_policy_group => 'FILIAL', p_select_policy => 'M', p_insert_policy => 'M', p_update_policy => 'M', p_delete_policy => 'M');
-exec bars_policy_adm.alter_policies(p_table_name => 'CC_TRANS_ARC');
+
+
 
 PROMPT *** Create  constraint PK_CCTRANSARC ***
 begin   
@@ -115,9 +115,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_TRANS_ARC ***
+grant SELECT                                                                 on CC_TRANS_ARC    to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_TRANS_ARC    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_TRANS_ARC    to BARS_DM;
 grant SELECT                                                                 on CC_TRANS_ARC    to START1;
+grant SELECT                                                                 on CC_TRANS_ARC    to UPLD;
 
 
 

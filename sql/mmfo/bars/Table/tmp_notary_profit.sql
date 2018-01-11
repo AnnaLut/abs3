@@ -94,10 +94,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119247 ***
+PROMPT *** Create  constraint SYS_C00119244 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_NOTARY_PROFIT MODIFY (PROFIT NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_NOTARY_PROFIT MODIFY (NBSOB22 NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -130,16 +130,20 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119244 ***
+PROMPT *** Create  constraint SYS_C00119247 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_NOTARY_PROFIT MODIFY (NBSOB22 NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_NOTARY_PROFIT MODIFY (PROFIT NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
+
+PROMPT *** Create  grants  TMP_NOTARY_PROFIT ***
+grant SELECT                                                                 on TMP_NOTARY_PROFIT to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_NOTARY_PROFIT to UPLD;
 
 
 

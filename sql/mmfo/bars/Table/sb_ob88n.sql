@@ -56,8 +56,10 @@ COMMENT ON COLUMN BARS.SB_OB88N.A010 IS '';
 
 
 PROMPT *** Create  grants  SB_OB88N ***
+grant SELECT                                                                 on SB_OB88N        to BARSREADER_ROLE;
 grant SELECT                                                                 on SB_OB88N        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_OB88N        to SB_OB88N;
+grant SELECT                                                                 on SB_OB88N        to UPLD;
 
 
 

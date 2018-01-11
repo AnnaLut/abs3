@@ -73,62 +73,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_WCSJOBS_BID_BIDS_ID ***
+PROMPT *** Create  constraint CC_WCSJOBS_RSIQSTCNT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_JOBS ADD CONSTRAINT FK_WCSJOBS_BID_BIDS_ID FOREIGN KEY (BID_ID)
-	  REFERENCES BARS.WCS_BIDS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_WCSJOBS_IQID_IQS_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_JOBS ADD CONSTRAINT FK_WCSJOBS_IQID_IQS_ID FOREIGN KEY (IQUERY_ID)
-	  REFERENCES BARS.WCS_INFOQUERIES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_WCSJOBS_SID_JOBSTATUSES_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_JOBS ADD CONSTRAINT FK_WCSJOBS_SID_JOBSTATUSES_ID FOREIGN KEY (STATUS_ID)
-	  REFERENCES BARS.WCS_JOB_STATUSES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_WCSJOBS_RSSID_STATES_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_JOBS ADD CONSTRAINT FK_WCSJOBS_RSSID_STATES_ID FOREIGN KEY (RS_STATE_ID)
-	  REFERENCES BARS.WCS_STATES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_WCSJOBS_RSID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_JOBS MODIFY (RS_ID CONSTRAINT CC_WCSJOBS_RSID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_JOBS MODIFY (RS_IQS_TCNT CONSTRAINT CC_WCSJOBS_RSIQSTCNT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -185,10 +133,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_WCSJOBS_RSIQSTCNT_NN ***
+PROMPT *** Create  constraint CC_WCSJOBS_RSID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_JOBS MODIFY (RS_IQS_TCNT CONSTRAINT CC_WCSJOBS_RSIQSTCNT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_JOBS MODIFY (RS_ID CONSTRAINT CC_WCSJOBS_RSID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -211,8 +159,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_JOBS ***
+grant SELECT                                                                 on WCS_JOBS        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_JOBS        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_JOBS        to START1;
+grant SELECT                                                                 on WCS_JOBS        to UPLD;
 
 
 

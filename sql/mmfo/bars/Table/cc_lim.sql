@@ -67,6 +67,30 @@ COMMENT ON COLUMN BARS.CC_LIM.NOT_SN IS '1= В занную дату Не платить нач.доходы 
 
 
 
+PROMPT *** Create  constraint CC_CCLIM_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_LIM MODIFY (KF CONSTRAINT CC_CCLIM_KF_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C00137391 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CC_LIM MODIFY (ACC NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint XPK_CC_LIM ***
 begin   
  execute immediate '
@@ -81,11 +105,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CCLIM_ACCOUNTS ***
+PROMPT *** Create  constraint SYS_C00137389 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_LIM ADD CONSTRAINT FK_CCLIM_ACCOUNTS FOREIGN KEY (ACC)
-	  REFERENCES BARS.ACCOUNTS (ACC) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CC_LIM MODIFY (ND NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -94,36 +117,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CC_LIM ***
+PROMPT *** Create  constraint SYS_C00137390 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CC_LIM ADD CONSTRAINT FK_CC_LIM FOREIGN KEY (ND)
-	  REFERENCES BARS.CC_DEAL (ND) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CCLIM_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_LIM ADD CONSTRAINT FK_CCLIM_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CCLIM_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_LIM MODIFY (KF CONSTRAINT CC_CCLIM_KF_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CC_LIM MODIFY (FDAT NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -174,10 +171,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_LIM ***
+grant SELECT                                                                 on CC_LIM          to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_LIM          to BARSUPL;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CC_LIM          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_LIM          to BARS_DM;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CC_LIM          to RCC_DEAL;
+grant SELECT                                                                 on CC_LIM          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_LIM          to WR_ALL_RIGHTS;
 
 

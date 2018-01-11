@@ -162,106 +162,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C006416 ***
+PROMPT *** Create  constraint SYS_C006406 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.AOT MODIFY (KF NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006415 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.AOT MODIFY (SOS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006414 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.AOT MODIFY (DAT_A NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006413 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.AOT MODIFY (DATP NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006412 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.AOT MODIFY (DATD NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006411 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.AOT MODIFY (KV NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006410 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.AOT MODIFY (VOB NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006409 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.AOT MODIFY (DK NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C006408 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.AOT MODIFY (NLSB NOT NULL ENABLE)';
+  ALTER TABLE BARS.AOT MODIFY (NLSA NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -282,10 +186,106 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C006406 ***
+PROMPT *** Create  constraint SYS_C006408 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.AOT MODIFY (NLSA NOT NULL ENABLE)';
+  ALTER TABLE BARS.AOT MODIFY (NLSB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006409 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.AOT MODIFY (DK NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006410 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.AOT MODIFY (VOB NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006411 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.AOT MODIFY (KV NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006412 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.AOT MODIFY (DATD NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006413 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.AOT MODIFY (DATP NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006414 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.AOT MODIFY (DAT_A NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006415 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.AOT MODIFY (SOS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C006416 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.AOT MODIFY (KF NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -294,7 +294,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  AOT ***
+grant SELECT                                                                 on AOT             to BARSREADER_ROLE;
 grant SELECT                                                                 on AOT             to BARS_DM;
+grant SELECT                                                                 on AOT             to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on AOT             to WR_ALL_RIGHTS;
 
 

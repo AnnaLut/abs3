@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  REP_OTCHGRP ***
+grant SELECT                                                                 on REP_OTCHGRP     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REP_OTCHGRP     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REP_OTCHGRP     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REP_OTCHGRP     to RPBN001;
+grant SELECT                                                                 on REP_OTCHGRP     to UPLD;
 
 
 

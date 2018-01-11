@@ -78,8 +78,10 @@ exception when others then
 
 PROMPT *** Create  grants  NBS_BRANCH ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBS_BRANCH      to ABS_ADMIN;
+grant SELECT                                                                 on NBS_BRANCH      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBS_BRANCH      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBS_BRANCH      to BARS_DM;
+grant SELECT                                                                 on NBS_BRANCH      to UPLD;
 
 
 

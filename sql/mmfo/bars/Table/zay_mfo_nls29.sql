@@ -26,7 +26,8 @@ begin
   CREATE TABLE BARS.ZAY_MFO_NLS29 
    (	MFO VARCHAR2(6), 
 	NLS29 VARCHAR2(15), 
-	NLS29CA VARCHAR2(15)
+	NLS29CA VARCHAR2(15), 
+	NLS6114 VARCHAR2(16)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -47,6 +48,7 @@ COMMENT ON TABLE BARS.ZAY_MFO_NLS29 IS 'Справочник торговых счетов 2900 модуля "
 COMMENT ON COLUMN BARS.ZAY_MFO_NLS29.MFO IS 'МФО';
 COMMENT ON COLUMN BARS.ZAY_MFO_NLS29.NLS29 IS 'Торговый счет РУ';
 COMMENT ON COLUMN BARS.ZAY_MFO_NLS29.NLS29CA IS 'Торговый счет РУ открытый в ЦА';
+COMMENT ON COLUMN BARS.ZAY_MFO_NLS29.NLS6114 IS '';
 
 
 
@@ -79,7 +81,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAY_MFO_NLS29 ***
+grant SELECT                                                                 on ZAY_MFO_NLS29   to BARSREADER_ROLE;
 grant SELECT                                                                 on ZAY_MFO_NLS29   to BARS_DM;
+grant SELECT                                                                 on ZAY_MFO_NLS29   to UPLD;
 
 
 

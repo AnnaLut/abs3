@@ -75,12 +75,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK2_OWMSGCODE ***
+PROMPT *** Create  constraint CC_OWMSGCODE_DK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OW_MSGCODE ADD CONSTRAINT UK2_OWMSGCODE UNIQUE (SYNTHCODE)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD  ENABLE';
+  ALTER TABLE BARS.OW_MSGCODE ADD CONSTRAINT CC_OWMSGCODE_DK CHECK (dk in (0,1)) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -117,10 +115,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OWMSGCODE_DK ***
+PROMPT *** Create  constraint UK2_OWMSGCODE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OW_MSGCODE ADD CONSTRAINT CC_OWMSGCODE_DK CHECK (dk in (0,1)) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.OW_MSGCODE ADD CONSTRAINT UK2_OWMSGCODE UNIQUE (SYNTHCODE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -171,9 +171,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_MSGCODE ***
+grant SELECT                                                                 on OW_MSGCODE      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_MSGCODE      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_MSGCODE      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_MSGCODE      to OW;
+grant SELECT                                                                 on OW_MSGCODE      to UPLD;
 
 
 

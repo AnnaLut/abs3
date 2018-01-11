@@ -104,46 +104,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C008159 ***
+PROMPT *** Create  constraint SYS_C008154 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_CIM_FANTOMS_BOUND MODIFY (BRANCH NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008158 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_CIM_FANTOMS_BOUND MODIFY (MODIFY_DATE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008157 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_CIM_FANTOMS_BOUND MODIFY (CREATE_DATE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C008156 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_CIM_FANTOMS_BOUND MODIFY (S NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_CIM_FANTOMS_BOUND MODIFY (FANTOM_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -164,10 +128,46 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C008154 ***
+PROMPT *** Create  constraint SYS_C008156 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_CIM_FANTOMS_BOUND MODIFY (FANTOM_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_CIM_FANTOMS_BOUND MODIFY (S NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008157 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_CIM_FANTOMS_BOUND MODIFY (CREATE_DATE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008158 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_CIM_FANTOMS_BOUND MODIFY (MODIFY_DATE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C008159 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_CIM_FANTOMS_BOUND MODIFY (BRANCH NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -176,7 +176,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_CIM_FANTOMS_BOUND ***
+grant SELECT                                                                 on TMP_CIM_FANTOMS_BOUND to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_CIM_FANTOMS_BOUND to BARS_DM;
+grant SELECT                                                                 on TMP_CIM_FANTOMS_BOUND to UPLD;
 
 
 

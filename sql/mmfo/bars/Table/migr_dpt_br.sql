@@ -127,10 +127,12 @@ exception when others then
 
 PROMPT *** Create  grants  MIGR_DPT_BR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on MIGR_DPT_BR     to ABS_ADMIN;
+grant SELECT                                                                 on MIGR_DPT_BR     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MIGR_DPT_BR     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MIGR_DPT_BR     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MIGR_DPT_BR     to DPT_ADMIN;
 grant SELECT                                                                 on MIGR_DPT_BR     to START1;
+grant SELECT                                                                 on MIGR_DPT_BR     to UPLD;
 grant FLASHBACK,SELECT                                                       on MIGR_DPT_BR     to WR_REFREAD;
 
 

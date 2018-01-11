@@ -45,10 +45,36 @@ COMMENT ON COLUMN BARS.DEB_REG_RNK.SUMD IS '';
 
 
 
+
+PROMPT *** Create  constraint PK_DEB_REG_RNK ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DEB_REG_RNK ADD CONSTRAINT PK_DEB_REG_RNK PRIMARY KEY (RNK) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index PK_DEB_REG_RNK ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.PK_DEB_REG_RNK ON BARS.DEB_REG_RNK (RNK) ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  DEB_REG_RNK ***
+grant SELECT                                                                 on DEB_REG_RNK     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEB_REG_RNK     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEB_REG_RNK     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEB_REG_RNK     to START1;
+grant SELECT                                                                 on DEB_REG_RNK     to UPLD;
 
 
 

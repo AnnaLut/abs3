@@ -59,19 +59,6 @@ COMMENT ON COLUMN BARS.BOPBANK.REGNUM_N IS '';
 
 
 
-PROMPT *** Create  constraint FK_BOPBANK_SWBANKS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BOPBANK ADD CONSTRAINT FK_BOPBANK_SWBANKS FOREIGN KEY (BIC)
-	  REFERENCES BARS.SW_BANKS (BIC) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XPK_BOPBANK ***
 begin   
  execute immediate '
@@ -101,12 +88,14 @@ exception when others then
 
 PROMPT *** Create  grants  BOPBANK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BOPBANK         to ABS_ADMIN;
+grant SELECT                                                                 on BOPBANK         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BOPBANK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BOPBANK         to BARS_DM;
 grant SELECT                                                                 on BOPBANK         to OPERKKK;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BOPBANK         to PB1;
 grant SELECT                                                                 on BOPBANK         to PYOD001;
 grant SELECT                                                                 on BOPBANK         to START1;
+grant SELECT                                                                 on BOPBANK         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BOPBANK         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BOPBANK         to WR_REFREAD;
 

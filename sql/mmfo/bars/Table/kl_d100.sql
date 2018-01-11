@@ -27,7 +27,8 @@ begin
    (	D100 VARCHAR2(2), 
 	TXT VARCHAR2(128), 
 	D_OPEN DATE, 
-	D_CLOSE DATE
+	D_CLOSE DATE, 
+	D_MODE DATE
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -49,13 +50,13 @@ COMMENT ON COLUMN BARS.KL_D100.D100 IS '';
 COMMENT ON COLUMN BARS.KL_D100.TXT IS '';
 COMMENT ON COLUMN BARS.KL_D100.D_OPEN IS '';
 COMMENT ON COLUMN BARS.KL_D100.D_CLOSE IS '';
+COMMENT ON COLUMN BARS.KL_D100.D_MODE IS '';
 
 
 
 PROMPT *** Create  grants  KL_D100 ***
-grant FLASHBACK,SELECT                                                       on KL_D100         to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on KL_D100         to BARS_DM;
-grant FLASHBACK,SELECT                                                       on KL_D100         to WR_REFREAD;
+grant SELECT                                                                 on KL_D100         to BARSREADER_ROLE;
+grant SELECT                                                                 on KL_D100         to UPLD;
 
 
 

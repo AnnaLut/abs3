@@ -64,12 +64,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_DWHREPORTSTYPE_ID ***
+PROMPT *** Create  constraint CC_DWHREPORTSTYPE_NAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DWH_REPORT_TYPE ADD CONSTRAINT PK_DWHREPORTSTYPE_ID PRIMARY KEY (ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.DWH_REPORT_TYPE MODIFY (NAME CONSTRAINT CC_DWHREPORTSTYPE_NAME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -78,10 +76,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DWHREPORTSTYPE_NAME_NN ***
+PROMPT *** Create  constraint PK_DWHREPORTSTYPE_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DWH_REPORT_TYPE MODIFY (NAME CONSTRAINT CC_DWHREPORTSTYPE_NAME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DWH_REPORT_TYPE ADD CONSTRAINT PK_DWHREPORTSTYPE_ID PRIMARY KEY (ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -104,7 +104,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DWH_REPORT_TYPE ***
+grant SELECT                                                                 on DWH_REPORT_TYPE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DWH_REPORT_TYPE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on DWH_REPORT_TYPE to UPLD;
 
 
 

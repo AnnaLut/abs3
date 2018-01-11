@@ -215,12 +215,12 @@ COMMENT ON COLUMN BARS.ZAYAVKA_RU.COUNTRY IS '';
 
 
 
-PROMPT *** Create  constraint UK_ZAYAVKARU ***
+PROMPT *** Create  constraint PK_ZAYAVKARU ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAYAVKA_RU ADD CONSTRAINT UK_ZAYAVKARU UNIQUE (MFO, REQ_ID)
+  ALTER TABLE BARS.ZAYAVKA_RU ADD CONSTRAINT PK_ZAYAVKARU PRIMARY KEY (ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  TABLESPACE BRSMDLD  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -229,12 +229,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_ZAYAVKARU ***
+PROMPT *** Create  constraint UK_ZAYAVKARU ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAYAVKA_RU ADD CONSTRAINT PK_ZAYAVKARU PRIMARY KEY (ID)
+  ALTER TABLE BARS.ZAYAVKA_RU ADD CONSTRAINT UK_ZAYAVKARU UNIQUE (MFO, REQ_ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLD  ENABLE NOVALIDATE';
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -271,9 +271,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAYAVKA_RU ***
+grant SELECT                                                                 on ZAYAVKA_RU      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAYAVKA_RU      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAYAVKA_RU      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAYAVKA_RU      to START1;
+grant SELECT                                                                 on ZAYAVKA_RU      to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAYAVKA_RU      to ZAY;
 
 

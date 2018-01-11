@@ -360,12 +360,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_NBU23_REZ_ARC_ID ***
+PROMPT *** Create  constraint SYS_C00120460 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBU23_REZ_ARC ADD CONSTRAINT PK_NBU23_REZ_ARC_ID PRIMARY KEY (ID, KV)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.NBU23_REZ_ARC MODIFY (ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -386,10 +384,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00120460 ***
+PROMPT *** Create  constraint PK_NBU23_REZ_ARC_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBU23_REZ_ARC MODIFY (ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBU23_REZ_ARC ADD CONSTRAINT PK_NBU23_REZ_ARC_ID PRIMARY KEY (ID, KV)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -454,8 +454,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBU23_REZ_ARC ***
+grant SELECT                                                                 on NBU23_REZ_ARC   to BARSREADER_ROLE;
 grant SELECT                                                                 on NBU23_REZ_ARC   to RCC_DEAL;
 grant SELECT                                                                 on NBU23_REZ_ARC   to START1;
+grant SELECT                                                                 on NBU23_REZ_ARC   to UPLD;
 
 
 

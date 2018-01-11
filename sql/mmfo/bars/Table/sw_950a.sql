@@ -69,49 +69,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SW950A_TABVAL ***
+PROMPT *** Create  constraint CC_SW950A_SWREF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_950A ADD CONSTRAINT FK_SW950A_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SW950A_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_950A ADD CONSTRAINT FK_SW950A_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SW950A_SWJOURNAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_950A ADD CONSTRAINT FK_SW950A_SWJOURNAL FOREIGN KEY (SWREF)
-	  REFERENCES BARS.SW_JOURNAL (SWREF) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SW950A_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_950A MODIFY (KF CONSTRAINT CC_SW950A_KF_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SW_950A MODIFY (SWREF CONSTRAINT CC_SW950A_SWREF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -156,10 +117,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SW950A_SWREF_NN ***
+PROMPT *** Create  constraint CC_SW950A_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_950A MODIFY (SWREF CONSTRAINT CC_SW950A_SWREF_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.SW_950A MODIFY (KF CONSTRAINT CC_SW950A_KF_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -182,7 +143,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_950A ***
+grant SELECT                                                                 on SW_950A         to BARSREADER_ROLE;
 grant SELECT                                                                 on SW_950A         to BARS_DM;
+grant SELECT                                                                 on SW_950A         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_950A         to WR_ALL_RIGHTS;
 
 

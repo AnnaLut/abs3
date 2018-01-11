@@ -115,9 +115,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  PHONE_CITY_CODE ***
+grant SELECT                                                                 on PHONE_CITY_CODE to BARSREADER_ROLE;
 grant SELECT                                                                 on PHONE_CITY_CODE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PHONE_CITY_CODE to BARS_DM;
 grant SELECT                                                                 on PHONE_CITY_CODE to CUST001;
+grant SELECT                                                                 on PHONE_CITY_CODE to UPLD;
 
 
 

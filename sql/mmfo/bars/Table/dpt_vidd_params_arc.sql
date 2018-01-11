@@ -62,18 +62,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTVIDDPARAMSA_VAL_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_PARAMS_ARC MODIFY (VAL CONSTRAINT CC_DPTVIDDPARAMSA_VAL_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DPTVIDDPARAMSA_TAG_NN ***
 begin   
  execute immediate '
@@ -85,9 +73,23 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint CC_DPTVIDDPARAMSA_VAL_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_PARAMS_ARC MODIFY (VAL CONSTRAINT CC_DPTVIDDPARAMSA_VAL_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  DPT_VIDD_PARAMS_ARC ***
+grant SELECT                                                                 on DPT_VIDD_PARAMS_ARC to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on DPT_VIDD_PARAMS_ARC to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VIDD_PARAMS_ARC to BARS_DM;
+grant SELECT                                                                 on DPT_VIDD_PARAMS_ARC to UPLD;
 
 
 

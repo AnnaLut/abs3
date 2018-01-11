@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_DEBM ***
+grant SELECT                                                                 on FIN_DEBM        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_DEBM        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_DEBM        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_DEBM        to START1;
+grant SELECT                                                                 on FIN_DEBM        to UPLD;
 
 
 

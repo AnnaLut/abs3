@@ -72,8 +72,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  VIP_ACCOUNT_MANAGER ***
+grant SELECT                                                                 on VIP_ACCOUNT_MANAGER to BARSREADER_ROLE;
 grant SELECT                                                                 on VIP_ACCOUNT_MANAGER to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VIP_ACCOUNT_MANAGER to START1;
+grant SELECT                                                                 on VIP_ACCOUNT_MANAGER to UPLD;
 
 
 

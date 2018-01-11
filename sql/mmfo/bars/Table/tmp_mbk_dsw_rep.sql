@@ -66,6 +66,10 @@ COMMENT ON COLUMN BARS.TMP_MBK_DSW_REP.CON IS '';
 
 
 
+PROMPT *** Create  grants  TMP_MBK_DSW_REP ***
+grant SELECT                                                                 on TMP_MBK_DSW_REP to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_MBK_DSW_REP to UPLD;
+
 
 
 PROMPT ===================================================================================== 

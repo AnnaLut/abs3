@@ -137,49 +137,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_STAFFTTS_TTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_TTS ADD CONSTRAINT FK_STAFFTTS_TTS FOREIGN KEY (TT)
-	  REFERENCES BARS.TTS (TT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_STAFFTTS_ID_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.STAFF_TTS MODIFY (ID CONSTRAINT CC_STAFFTTS_ID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_STAFFTTS_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_TTS ADD CONSTRAINT FK_STAFFTTS_STAFF FOREIGN KEY (ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_STAFFTTS_STAFF2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_TTS ADD CONSTRAINT FK_STAFFTTS_STAFF2 FOREIGN KEY (GRANTOR)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -205,11 +166,13 @@ PROMPT *** Create  grants  STAFF_TTS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_TTS       to ABS_ADMIN;
 grant REFERENCES,SELECT                                                      on STAFF_TTS       to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on STAFF_TTS       to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on STAFF_TTS       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF_TTS       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF_TTS       to BARS_DM;
 grant SELECT                                                                 on STAFF_TTS       to PYOD001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_TTS       to STAFF_TTS;
 grant SELECT                                                                 on STAFF_TTS       to START1;
+grant SELECT                                                                 on STAFF_TTS       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF_TTS       to WR_ALL_RIGHTS;
 grant SELECT                                                                 on STAFF_TTS       to WR_DOC_INPUT;
 grant FLASHBACK,SELECT                                                       on STAFF_TTS       to WR_REFREAD;

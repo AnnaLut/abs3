@@ -47,9 +47,11 @@ COMMENT ON COLUMN BARS.KOD_A021.A021 IS '';
 
 
 PROMPT *** Create  grants  KOD_A021 ***
+grant SELECT                                                                 on KOD_A021        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_A021        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_A021        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_A021        to START1;
+grant SELECT                                                                 on KOD_A021        to UPLD;
 
 
 

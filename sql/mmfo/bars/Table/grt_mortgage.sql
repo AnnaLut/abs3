@@ -101,83 +101,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_MORTGAGE_DEALS ***
+PROMPT *** Create  constraint CC_GRTMORTGAGE_ROOMSCNT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_MORTGAGE ADD CONSTRAINT FK_MORTGAGE_DEALS FOREIGN KEY (DEAL_ID)
-	  REFERENCES BARS.GRT_DEALS (DEAL_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTMORTGAGE_BUILDNUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_MORTGAGE MODIFY (BUILDING_NUM CONSTRAINT CC_GRTMORTGAGE_BUILDNUM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTMORTGAGE_BUILDTYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_MORTGAGE MODIFY (BUIDING_TYPE CONSTRAINT CC_GRTMORTGAGE_BUILDTYPE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTMORTGAGE_ADDR_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_MORTGAGE MODIFY (ADDR CONSTRAINT CC_GRTMORTGAGE_ADDR_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTMORTGAGE_FLOOR_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_MORTGAGE MODIFY (FLOOR CONSTRAINT CC_GRTMORTGAGE_FLOOR_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTMORTGAGE_LIVINGSPACE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_MORTGAGE MODIFY (LIVING_SPACE CONSTRAINT CC_GRTMORTGAGE_LIVINGSPACE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTMORTGAGE_TOTASPACE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_MORTGAGE MODIFY (TOTAL_SPACE CONSTRAINT CC_GRTMORTGAGE_TOTASPACE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.GRT_MORTGAGE MODIFY (ROOMS_CNT CONSTRAINT CC_GRTMORTGAGE_ROOMSCNT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -198,10 +125,70 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_GRTMORTGAGE_ROOMSCNT_NN ***
+PROMPT *** Create  constraint CC_GRTMORTGAGE_TOTASPACE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_MORTGAGE MODIFY (ROOMS_CNT CONSTRAINT CC_GRTMORTGAGE_ROOMSCNT_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.GRT_MORTGAGE MODIFY (TOTAL_SPACE CONSTRAINT CC_GRTMORTGAGE_TOTASPACE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTMORTGAGE_LIVINGSPACE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_MORTGAGE MODIFY (LIVING_SPACE CONSTRAINT CC_GRTMORTGAGE_LIVINGSPACE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTMORTGAGE_FLOOR_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_MORTGAGE MODIFY (FLOOR CONSTRAINT CC_GRTMORTGAGE_FLOOR_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTMORTGAGE_ADDR_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_MORTGAGE MODIFY (ADDR CONSTRAINT CC_GRTMORTGAGE_ADDR_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTMORTGAGE_BUILDTYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_MORTGAGE MODIFY (BUIDING_TYPE CONSTRAINT CC_GRTMORTGAGE_BUILDTYPE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GRTMORTGAGE_BUILDNUM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GRT_MORTGAGE MODIFY (BUILDING_NUM CONSTRAINT CC_GRTMORTGAGE_BUILDNUM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -224,9 +211,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRT_MORTGAGE ***
+grant SELECT                                                                 on GRT_MORTGAGE    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRT_MORTGAGE    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRT_MORTGAGE    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRT_MORTGAGE    to START1;
+grant SELECT                                                                 on GRT_MORTGAGE    to UPLD;
 
 
 

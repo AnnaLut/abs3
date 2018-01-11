@@ -69,6 +69,8 @@ exception when others then
 
 
 PROMPT *** Create  grants  KL_F8B ***
+grant SELECT                                                                 on KL_F8B          to BARSREADER_ROLE;
+grant SELECT                                                                 on KL_F8B          to UPLD;
 grant FLASHBACK,SELECT                                                       on KL_F8B          to WR_REFREAD;
 
 

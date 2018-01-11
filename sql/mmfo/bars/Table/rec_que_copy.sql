@@ -49,8 +49,10 @@ COMMENT ON COLUMN BARS.REC_QUE_COPY.OTM IS '';
 
 
 PROMPT *** Create  grants  REC_QUE_COPY ***
+grant SELECT                                                                 on REC_QUE_COPY    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REC_QUE_COPY    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REC_QUE_COPY    to START1;
+grant SELECT                                                                 on REC_QUE_COPY    to UPLD;
 
 
 

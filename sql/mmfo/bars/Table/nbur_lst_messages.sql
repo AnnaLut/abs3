@@ -11,7 +11,9 @@ PROMPT *** ALTER_POLICY_INFO to NBUR_LST_MESSAGES ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''NBUR_LST_MESSAGES'', ''WHOLE'' , null, null, null, null);
+               bpa.alter_policy_info(''NBUR_LST_MESSAGES'', ''CENTER'' , null, ''E'', ''E'', ''E'');
+               bpa.alter_policy_info(''NBUR_LST_MESSAGES'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''NBUR_LST_MESSAGES'', ''WHOLE'' , ''M'', ''M'', ''M'', ''E'');
                null;
            end; 
           '; 
@@ -81,11 +83,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_NBURLSTMESES_LSTFILES ***
+PROMPT *** Create  constraint CC_NBURLSTMESES_REPORTCD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_LST_MESSAGES ADD CONSTRAINT FK_NBURLSTMESES_LSTFILES FOREIGN KEY (REPORT_DATE, KF, VERSION_ID)
-	  REFERENCES BARS.NBUR_LST_VERSIONS (REPORT_DATE, KF, VERSION_ID) ENABLE';
+  ALTER TABLE BARS.NBUR_LST_MESSAGES MODIFY (REPORT_CODE CONSTRAINT CC_NBURLSTMESES_REPORTCD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -118,18 +119,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_NBURLSTMESES_REPORTCD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBUR_LST_MESSAGES MODIFY (REPORT_CODE CONSTRAINT CC_NBURLSTMESES_REPORTCD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index UK_NBURLSTMESES ***
 begin   
  execute immediate '
@@ -144,9 +133,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_LST_MESSAGES ***
+grant SELECT                                                                 on NBUR_LST_MESSAGES to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_LST_MESSAGES to BARSUPL;
 grant SELECT                                                                 on NBUR_LST_MESSAGES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_LST_MESSAGES to BARS_DM;
+grant SELECT                                                                 on NBUR_LST_MESSAGES to UPLD;
 
 
 

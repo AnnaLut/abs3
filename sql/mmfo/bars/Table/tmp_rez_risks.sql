@@ -105,8 +105,10 @@ COMMENT ON COLUMN BARS.TMP_REZ_RISKS.FL IS '';
 
 
 PROMPT *** Create  grants  TMP_REZ_RISKS ***
+grant SELECT                                                                 on TMP_REZ_RISKS   to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_REZ_RISKS   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_REZ_RISKS   to RCC_DEAL;
+grant SELECT                                                                 on TMP_REZ_RISKS   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_REZ_RISKS   to WR_ALL_RIGHTS;
 
 

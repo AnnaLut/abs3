@@ -67,36 +67,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BPKARSENALTARIF_STR ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_ARSENAL_TARIF ADD CONSTRAINT FK_BPKARSENALTARIF_STR FOREIGN KEY (ID)
-	  REFERENCES BARS.BPK_ARSENAL_STR (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_BPKARSENALTARIF_KF_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.BPK_ARSENAL_TARIF MODIFY (KF CONSTRAINT CC_BPKARSENALTARIF_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_BPKARSENALTARIF_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_ARSENAL_TARIF ADD CONSTRAINT FK_BPKARSENALTARIF_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -143,9 +117,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_ARSENAL_TARIF ***
+grant SELECT                                                                 on BPK_ARSENAL_TARIF to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BPK_ARSENAL_TARIF to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_ARSENAL_TARIF to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_ARSENAL_TARIF to OBPC;
+grant SELECT                                                                 on BPK_ARSENAL_TARIF to UPLD;
 grant FLASHBACK,SELECT                                                       on BPK_ARSENAL_TARIF to WR_REFREAD;
 
 

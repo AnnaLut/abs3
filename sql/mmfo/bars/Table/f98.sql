@@ -103,9 +103,11 @@ COMMENT ON COLUMN BARS.F98.ND IS '';
 
 
 PROMPT *** Create  grants  F98 ***
+grant SELECT                                                                 on F98             to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on F98             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on F98             to BARS_DM;
 grant DELETE,INSERT,SELECT                                                   on F98             to F_500;
+grant SELECT                                                                 on F98             to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on F98             to ZAY;
 
 

@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_PAYFLAG ***
+grant SELECT                                                                 on CIM_PAYFLAG     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_PAYFLAG     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_PAYFLAG     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_PAYFLAG     to CIM_ROLE;
+grant SELECT                                                                 on CIM_PAYFLAG     to UPLD;
 
 
 

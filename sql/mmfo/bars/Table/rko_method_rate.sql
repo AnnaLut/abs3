@@ -101,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  RKO_METHOD_RATE ***
+grant SELECT                                                                 on RKO_METHOD_RATE to BARSREADER_ROLE;
 grant SELECT                                                                 on RKO_METHOD_RATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RKO_METHOD_RATE to BARS_DM;
 grant SELECT                                                                 on RKO_METHOD_RATE to CUST001;
+grant SELECT                                                                 on RKO_METHOD_RATE to UPLD;
 
 
 

@@ -69,19 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_WCSDRB_TID_WCSDRBTPS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_DRB ADD CONSTRAINT FK_WCSDRB_TID_WCSDRBTPS FOREIGN KEY (TYPE_ID)
-	  REFERENCES BARS.WCS_DRB_TYPES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_WCSDRB_NAME_NN ***
 begin   
  execute immediate '
@@ -120,8 +107,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_DRB ***
+grant SELECT                                                                 on WCS_DRB         to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_DRB         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_DRB         to BARS_DM;
+grant SELECT                                                                 on WCS_DRB         to UPLD;
 
 
 

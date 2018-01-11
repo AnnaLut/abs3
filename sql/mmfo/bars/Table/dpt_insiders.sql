@@ -99,9 +99,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_INSIDERS ***
+grant SELECT                                                                 on DPT_INSIDERS    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_INSIDERS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_INSIDERS    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_INSIDERS    to DPT_ADMIN;
+grant SELECT                                                                 on DPT_INSIDERS    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_INSIDERS    to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_INSIDERS    to WR_REFREAD;
 

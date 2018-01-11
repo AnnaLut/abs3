@@ -111,7 +111,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CRSOUR_IMP_DEALS ***
+grant SELECT                                                                 on CRSOUR_IMP_DEALS to BARSREADER_ROLE;
 grant SELECT                                                                 on CRSOUR_IMP_DEALS to BARS_DM;
+grant SELECT                                                                 on CRSOUR_IMP_DEALS to UPLD;
 
 
 

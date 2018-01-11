@@ -59,12 +59,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_ATTRIBUTE_CURRENT_DATE ***
+PROMPT *** Create  constraint SYS_C0025683 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_CURRENT_DATE ADD CONSTRAINT PK_ATTRIBUTE_CURRENT_DATE PRIMARY KEY (ATTRIBUTE_KIND_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.ATTRIBUTE_CURRENT_DATE MODIFY (CURRENT_VALUE_DATE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -73,10 +71,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025683 ***
+PROMPT *** Create  constraint PK_ATTRIBUTE_CURRENT_DATE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_CURRENT_DATE MODIFY (CURRENT_VALUE_DATE NOT NULL ENABLE)';
+  ALTER TABLE BARS.ATTRIBUTE_CURRENT_DATE ADD CONSTRAINT PK_ATTRIBUTE_CURRENT_DATE PRIMARY KEY (ATTRIBUTE_KIND_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -99,7 +99,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ATTRIBUTE_CURRENT_DATE ***
+grant SELECT                                                                 on ATTRIBUTE_CURRENT_DATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ATTRIBUTE_CURRENT_DATE to BARS_DM;
+grant SELECT                                                                 on ATTRIBUTE_CURRENT_DATE to UPLD;
 
 
 

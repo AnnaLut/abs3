@@ -63,9 +63,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACC262005 ***
+grant SELECT                                                                 on ACC262005       to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on ACC262005       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC262005       to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on ACC262005       to START1;
+grant SELECT                                                                 on ACC262005       to UPLD;
 
 
 

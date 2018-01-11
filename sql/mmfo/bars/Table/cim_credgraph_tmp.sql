@@ -114,9 +114,11 @@ COMMENT ON COLUMN BARS.CIM_CREDGRAPH_TMP.ADAPTIVE IS 'Врахування дострокового по
 
 
 PROMPT *** Create  grants  CIM_CREDGRAPH_TMP ***
+grant SELECT                                                                 on CIM_CREDGRAPH_TMP to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CREDGRAPH_TMP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_CREDGRAPH_TMP to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_CREDGRAPH_TMP to CIM_ROLE;
+grant SELECT                                                                 on CIM_CREDGRAPH_TMP to UPLD;
 
 
 

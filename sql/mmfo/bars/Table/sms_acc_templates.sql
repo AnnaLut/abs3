@@ -71,19 +71,6 @@ COMMENT ON COLUMN BARS.SMS_ACC_TEMPLATES.NBSB IS '';
 
 
 
-PROMPT *** Create  constraint FK_SMS_TEMPLATES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SMS_ACC_TEMPLATES ADD CONSTRAINT FK_SMS_TEMPLATES FOREIGN KEY (ID)
-	  REFERENCES BARS.SMS_TEMPLATES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C005500 ***
 begin   
  execute immediate '
@@ -110,7 +97,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SMS_ACC_TEMPLATES ***
+grant SELECT                                                                 on SMS_ACC_TEMPLATES to BARSREADER_ROLE;
 grant SELECT                                                                 on SMS_ACC_TEMPLATES to BARS_DM;
+grant SELECT                                                                 on SMS_ACC_TEMPLATES to UPLD;
 
 
 

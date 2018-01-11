@@ -155,6 +155,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  BE_LIBS ***
+grant SELECT                                                                 on BE_LIBS         to BARSREADER_ROLE;
 grant SELECT                                                                 on BE_LIBS         to BARSUPL;
 grant SELECT                                                                 on BE_LIBS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BE_LIBS         to BARS_DM;

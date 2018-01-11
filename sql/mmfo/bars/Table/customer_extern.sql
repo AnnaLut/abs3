@@ -107,96 +107,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CUSTOMEREXTERN_PASSP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_EXTERN ADD CONSTRAINT FK_CUSTOMEREXTERN_PASSP FOREIGN KEY (DOC_TYPE)
-	  REFERENCES BARS.PASSP (PASSP) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMEREXTERN_SEX ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_EXTERN ADD CONSTRAINT FK_CUSTOMEREXTERN_SEX FOREIGN KEY (SEX)
-	  REFERENCES BARS.SEX (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMEREXTERN_COUNTRY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_EXTERN ADD CONSTRAINT FK_CUSTOMEREXTERN_COUNTRY FOREIGN KEY (COUNTRY)
-	  REFERENCES BARS.COUNTRY (COUNTRY) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMEREXTERN_FS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_EXTERN ADD CONSTRAINT FK_CUSTOMEREXTERN_FS FOREIGN KEY (FS)
-	  REFERENCES BARS.FS (FS) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMEREXTERN_VED ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_EXTERN ADD CONSTRAINT FK_CUSTOMEREXTERN_VED FOREIGN KEY (VED)
-	  REFERENCES BARS.VED (VED) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTOMEREXTERN_SED ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_EXTERN ADD CONSTRAINT FK_CUSTOMEREXTERN_SED FOREIGN KEY (SED)
-	  REFERENCES BARS.SED (SED) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMEREXTERN_SEX_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_EXTERN MODIFY (SEX CONSTRAINT CC_CUSTOMEREXTERN_SEX_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_CUSTOMEREXTERN_ID_NN ***
 begin   
  execute immediate '
@@ -209,11 +119,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CUSTOMEREXTERN_ISE ***
+PROMPT *** Create  constraint CC_CUSTOMEREXTERN_SEX_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTOMER_EXTERN ADD CONSTRAINT FK_CUSTOMEREXTERN_ISE FOREIGN KEY (ISE)
-	  REFERENCES BARS.ISE (ISE) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CUSTOMER_EXTERN MODIFY (SEX CONSTRAINT CC_CUSTOMEREXTERN_SEX_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -236,10 +145,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUSTOMER_EXTERN ***
+grant SELECT                                                                 on CUSTOMER_EXTERN to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTOMER_EXTERN to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_EXTERN to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_EXTERN to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_EXTERN to CUST001;
+grant SELECT                                                                 on CUSTOMER_EXTERN to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTOMER_EXTERN to WR_ALL_RIGHTS;
 
 

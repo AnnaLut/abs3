@@ -24,7 +24,7 @@ PROMPT *** Create  table FIN_QUESTION ***
 begin 
   execute immediate '
   CREATE TABLE BARS.FIN_QUESTION 
-   (	NAME VARCHAR2(254), 
+   (	NAME VARCHAR2(512), 
 	ORD NUMBER(*,0), 
 	KOD VARCHAR2(4), 
 	IDF NUMBER(*,0), 
@@ -111,8 +111,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_QUESTION ***
+grant SELECT                                                                 on FIN_QUESTION    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_QUESTION    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_QUESTION    to BARS_DM;
+grant SELECT                                                                 on FIN_QUESTION    to UPLD;
 
 
 

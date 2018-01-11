@@ -123,19 +123,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SWTEMPLATE_TABVAL_KV ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_TEMPLATE ADD CONSTRAINT FK_SWTEMPLATE_TABVAL_KV FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SW_TEMPLATE_RECID_NN ***
 begin   
  execute immediate '
@@ -213,9 +200,11 @@ exception when others then
 
 PROMPT *** Create  grants  SW_TEMPLATE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_TEMPLATE     to BARSAQ;
+grant SELECT                                                                 on SW_TEMPLATE     to BARSREADER_ROLE;
 grant SELECT                                                                 on SW_TEMPLATE     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_TEMPLATE     to BARS_DM;
 grant SELECT                                                                 on SW_TEMPLATE     to START1;
+grant SELECT                                                                 on SW_TEMPLATE     to UPLD;
 
 
 

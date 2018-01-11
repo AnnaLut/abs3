@@ -87,50 +87,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTSTAFF_BRANCH ***
+PROMPT *** Create  constraint CC_DPTSTAFF_USERID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_STAFF ADD CONSTRAINT FK_DPTSTAFF_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTSTAFF_BANKS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_STAFF ADD CONSTRAINT FK_DPTSTAFF_BANKS FOREIGN KEY (MFO)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTSTAFF_STAFF2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_STAFF ADD CONSTRAINT FK_DPTSTAFF_STAFF2 FOREIGN KEY (ISP)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTSTAFF_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_STAFF ADD CONSTRAINT FK_DPTSTAFF_STAFF FOREIGN KEY (USERID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPT_STAFF MODIFY (USERID CONSTRAINT CC_DPTSTAFF_USERID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -143,18 +103,6 @@ PROMPT *** Create  constraint CC_DPTSTAFF_BRANCH_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.DPT_STAFF MODIFY (BRANCH CONSTRAINT CC_DPTSTAFF_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTSTAFF_USERID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_STAFF MODIFY (USERID CONSTRAINT CC_DPTSTAFF_USERID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -178,6 +126,7 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_STAFF ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_STAFF       to ABS_ADMIN;
+grant SELECT                                                                 on DPT_STAFF       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_STAFF       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_STAFF       to BARS_DM;
 grant SELECT                                                                 on DPT_STAFF       to CC_DOC;
@@ -185,6 +134,7 @@ grant DELETE,INSERT,SELECT,UPDATE                                            on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_STAFF       to DPT_ADMIN;
 grant SELECT                                                                 on DPT_STAFF       to KLBX;
 grant SELECT                                                                 on DPT_STAFF       to START1;
+grant SELECT                                                                 on DPT_STAFF       to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_STAFF       to VKLAD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_STAFF       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_STAFF       to WR_REFREAD;

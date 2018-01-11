@@ -93,9 +93,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BATCH_IMMOBILE ***
+grant SELECT                                                                 on BATCH_IMMOBILE  to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on BATCH_IMMOBILE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BATCH_IMMOBILE  to BARS_DM;
 grant INSERT,SELECT,UPDATE                                                   on BATCH_IMMOBILE  to START1;
+grant SELECT                                                                 on BATCH_IMMOBILE  to UPLD;
 
 
 

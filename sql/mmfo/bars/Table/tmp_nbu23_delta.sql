@@ -122,10 +122,10 @@ COMMENT ON COLUMN BARS.TMP_NBU23_DELTA.DDD IS '';
 
 
 
-PROMPT *** Create  constraint CC_TMPNBU23DELTA_KF_NN ***
+PROMPT *** Create  constraint PK_TMP_NBU23_DELTA ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_NBU23_DELTA MODIFY (KF CONSTRAINT CC_TMPNBU23DELTA_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_NBU23_DELTA ADD CONSTRAINT PK_TMP_NBU23_DELTA PRIMARY KEY (FDAT, ACC, ID) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -134,10 +134,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_TMP_NBU23_DELTA ***
+PROMPT *** Create  constraint CC_TMPNBU23DELTA_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_NBU23_DELTA ADD CONSTRAINT PK_TMP_NBU23_DELTA PRIMARY KEY (FDAT, ACC, ID) ENABLE';
+  ALTER TABLE BARS.TMP_NBU23_DELTA MODIFY (KF CONSTRAINT CC_TMPNBU23DELTA_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -158,8 +158,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_NBU23_DELTA ***
+grant SELECT                                                                 on TMP_NBU23_DELTA to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_NBU23_DELTA to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_NBU23_DELTA to START1;
+grant SELECT                                                                 on TMP_NBU23_DELTA to UPLD;
 
 
 

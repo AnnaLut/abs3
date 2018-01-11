@@ -104,8 +104,10 @@ exception when others then
 
 PROMPT *** Create  grants  STAFF_PROFILES ***
 grant SELECT                                                                 on STAFF_PROFILES  to ABS_ADMIN;
+grant SELECT                                                                 on STAFF_PROFILES  to BARSREADER_ROLE;
 grant SELECT                                                                 on STAFF_PROFILES  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF_PROFILES  to BARS_DM;
+grant SELECT                                                                 on STAFF_PROFILES  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF_PROFILES  to WR_ALL_RIGHTS;
 
 

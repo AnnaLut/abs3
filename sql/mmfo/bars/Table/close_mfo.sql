@@ -83,9 +83,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CLOSE_MFO ***
+grant SELECT                                                                 on CLOSE_MFO       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CLOSE_MFO       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CLOSE_MFO       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CLOSE_MFO       to START1;
+grant SELECT                                                                 on CLOSE_MFO       to UPLD;
 grant FLASHBACK,SELECT                                                       on CLOSE_MFO       to WR_REFREAD;
 
 

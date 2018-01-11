@@ -91,8 +91,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CHECK_TAG ***
+grant SELECT                                                                 on CHECK_TAG       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CHECK_TAG       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHECK_TAG       to BARS_DM;
+grant SELECT                                                                 on CHECK_TAG       to UPLD;
 
 
 

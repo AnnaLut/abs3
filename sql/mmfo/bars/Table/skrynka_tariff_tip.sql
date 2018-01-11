@@ -117,10 +117,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_TARIFF_TIP ***
+grant SELECT                                                                 on SKRYNKA_TARIFF_TIP to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_TARIFF_TIP to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SKRYNKA_TARIFF_TIP to BARS_DM;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_TARIFF_TIP to DEP_SKRN;
 grant SELECT                                                                 on SKRYNKA_TARIFF_TIP to START1;
+grant SELECT                                                                 on SKRYNKA_TARIFF_TIP to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_TARIFF_TIP to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SKRYNKA_TARIFF_TIP to WR_REFREAD;
 

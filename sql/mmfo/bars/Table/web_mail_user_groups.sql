@@ -103,8 +103,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WEB_MAIL_USER_GROUPS ***
+grant SELECT                                                                 on WEB_MAIL_USER_GROUPS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_MAIL_USER_GROUPS to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WEB_MAIL_USER_GROUPS to START1;
+grant SELECT                                                                 on WEB_MAIL_USER_GROUPS to UPLD;
 grant FLASHBACK,SELECT                                                       on WEB_MAIL_USER_GROUPS to WR_REFREAD;
 
 

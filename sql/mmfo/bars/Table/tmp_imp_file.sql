@@ -43,7 +43,9 @@ COMMENT ON COLUMN BARS.TMP_IMP_FILE.LINE IS '';
 
 
 PROMPT *** Create  grants  TMP_IMP_FILE ***
+grant SELECT                                                                 on TMP_IMP_FILE    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_IMP_FILE    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on TMP_IMP_FILE    to UPLD;
 
 
 

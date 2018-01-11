@@ -89,6 +89,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  PER_QUE ***
+grant SELECT                                                                 on PER_QUE         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PER_QUE         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PER_QUE         to START1;
 

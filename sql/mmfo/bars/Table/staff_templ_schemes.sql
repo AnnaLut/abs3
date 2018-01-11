@@ -171,9 +171,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  STAFF_TEMPL_SCHEMES ***
+grant SELECT                                                                 on STAFF_TEMPL_SCHEMES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_TEMPL_SCHEMES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF_TEMPL_SCHEMES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_TEMPL_SCHEMES to START1;
+grant SELECT                                                                 on STAFF_TEMPL_SCHEMES to UPLD;
 
 
 

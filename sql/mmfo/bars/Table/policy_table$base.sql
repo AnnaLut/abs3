@@ -72,9 +72,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  POLICY_TABLE$BASE ***
+grant SELECT                                                                 on POLICY_TABLE$BASE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on POLICY_TABLE$BASE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on POLICY_TABLE$BASE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on POLICY_TABLE$BASE to START1;
+grant SELECT                                                                 on POLICY_TABLE$BASE to UPLD;
 
 
 

@@ -92,11 +92,13 @@ exception when others then
 
 PROMPT *** Create  grants  EK2_V ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on EK2_V           to ABS_ADMIN;
+grant SELECT                                                                 on EK2_V           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on EK2_V           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EK2_V           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EK2_V           to EK2_V;
 grant SELECT                                                                 on EK2_V           to RPBN002;
 grant SELECT                                                                 on EK2_V           to START1;
+grant SELECT                                                                 on EK2_V           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on EK2_V           to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on EK2_V           to WR_REFREAD;
 

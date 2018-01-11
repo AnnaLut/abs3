@@ -63,19 +63,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OBPCTRANSINF_OBPCTRANS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OBPC_TRANS_INF ADD CONSTRAINT FK_OBPCTRANSINF_OBPCTRANS FOREIGN KEY (TRAN_TYPE)
-	  REFERENCES BARS.OBPC_TRANS (TRAN_TYPE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_OBPCTRANSINF_TRANSITNLS_NN ***
 begin   
  execute immediate '
@@ -102,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OBPC_TRANS_INF ***
+grant SELECT                                                                 on OBPC_TRANS_INF  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_TRANS_INF  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OBPC_TRANS_INF  to OBPC;
+grant SELECT                                                                 on OBPC_TRANS_INF  to UPLD;
 grant FLASHBACK,SELECT                                                       on OBPC_TRANS_INF  to WR_REFREAD;
 
 

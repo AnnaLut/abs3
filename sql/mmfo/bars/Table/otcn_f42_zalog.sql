@@ -51,18 +51,6 @@ COMMENT ON COLUMN BARS.OTCN_F42_ZALOG.OST IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C0010166 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OTCN_F42_ZALOG MODIFY (ACCS NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C0010165 ***
 begin   
  execute immediate '
@@ -74,10 +62,24 @@ exception when others then
 
 
 
+
+PROMPT *** Create  constraint SYS_C0010166 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.OTCN_F42_ZALOG MODIFY (ACCS NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  OTCN_F42_ZALOG ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F42_ZALOG  to ABS_ADMIN;
+grant SELECT                                                                 on OTCN_F42_ZALOG  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F42_ZALOG  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F42_ZALOG  to RPBN002;
+grant SELECT                                                                 on OTCN_F42_ZALOG  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_F42_ZALOG  to WR_ALL_RIGHTS;
 
 

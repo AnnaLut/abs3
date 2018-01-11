@@ -90,8 +90,10 @@ exception when others then
 
 PROMPT *** Create  grants  ZAY_BACK ***
 grant FLASHBACK,REFERENCES,SELECT                                            on ZAY_BACK        to BARSAQ with grant option;
+grant SELECT                                                                 on ZAY_BACK        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAY_BACK        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAY_BACK        to BARS_DM;
+grant SELECT                                                                 on ZAY_BACK        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAY_BACK        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on ZAY_BACK        to WR_REFREAD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_BACK        to ZAY;

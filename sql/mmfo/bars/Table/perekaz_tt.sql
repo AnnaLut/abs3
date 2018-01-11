@@ -63,19 +63,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_PEREKAZ_TT_TTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PEREKAZ_TT ADD CONSTRAINT FK_PEREKAZ_TT_TTS FOREIGN KEY (TT)
-	  REFERENCES BARS.TTS (TT) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_PEREKAZ_TT_TT_NN ***
 begin   
  execute immediate '
@@ -114,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  PEREKAZ_TT ***
+grant SELECT                                                                 on PEREKAZ_TT      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PEREKAZ_TT      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PEREKAZ_TT      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PEREKAZ_TT      to START1;
+grant SELECT                                                                 on PEREKAZ_TT      to UPLD;
 
 
 

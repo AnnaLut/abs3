@@ -69,32 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTBRATES_MODCODE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BRATES ADD CONSTRAINT FK_DPTBRATES_MODCODE FOREIGN KEY (MOD_CODE)
-	  REFERENCES BARS.BARS_SUPP_MODULES (MOD_CODE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTBRATES_BASEY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BRATES ADD CONSTRAINT FK_DPTBRATES_BASEY FOREIGN KEY (BASEY)
-	  REFERENCES BARS.BASEY (BASEY) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DPTBRATES_MODCODE_NN ***
 begin   
  execute immediate '
@@ -198,12 +172,14 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_BRATES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_BRATES      to ABS_ADMIN;
+grant SELECT                                                                 on DPT_BRATES      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_BRATES      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_BRATES      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_BRATES      to DPT_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_BRATES      to DPT_ROLE;
 grant SELECT                                                                 on DPT_BRATES      to REFSYNC_USR;
 grant SELECT                                                                 on DPT_BRATES      to TECH001;
+grant SELECT                                                                 on DPT_BRATES      to UPLD;
 
 
 

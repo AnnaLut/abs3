@@ -190,10 +190,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMADLDOCRPTDTLARCH_REF_NN ***
+PROMPT *** Create  constraint CC_DMADLDOCRPTDTLARCH_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_ADL_DOC_RPT_DTL_ARCH MODIFY (REF CONSTRAINT CC_DMADLDOCRPTDTLARCH_REF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_ADL_DOC_RPT_DTL_ARCH MODIFY (KF CONSTRAINT CC_DMADLDOCRPTDTLARCH_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -214,10 +214,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DMADLDOCRPTDTLARCH_KF_NN ***
+PROMPT *** Create  constraint CC_DMADLDOCRPTDTLARCH_REF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_DM_ADL_DOC_RPT_DTL_ARCH MODIFY (KF CONSTRAINT CC_DMADLDOCRPTDTLARCH_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.NBUR_DM_ADL_DOC_RPT_DTL_ARCH MODIFY (REF CONSTRAINT CC_DMADLDOCRPTDTLARCH_REF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -295,8 +295,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_DM_ADL_DOC_RPT_DTL_ARCH ***
+grant SELECT                                                                 on NBUR_DM_ADL_DOC_RPT_DTL_ARCH to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_DM_ADL_DOC_RPT_DTL_ARCH to BARSUPL;
 grant SELECT                                                                 on NBUR_DM_ADL_DOC_RPT_DTL_ARCH to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on NBUR_DM_ADL_DOC_RPT_DTL_ARCH to UPLD;
 
 
 

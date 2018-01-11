@@ -91,8 +91,10 @@ COMMENT ON COLUMN BARS.TMP_SVOD.NAZN IS 'Назначение платежа';
 
 
 PROMPT *** Create  grants  TMP_SVOD ***
+grant SELECT                                                                 on TMP_SVOD        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SVOD        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SVOD        to RPBN001;
+grant SELECT                                                                 on TMP_SVOD        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_SVOD        to WR_ALL_RIGHTS;
 
 

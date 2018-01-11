@@ -69,19 +69,6 @@ COMMENT ON COLUMN BARS.NBUR_REF_SEL_TRANS.PR_DEL IS 'Ознака видалення (=1 - вилу
 
 
 
-PROMPT *** Create  constraint FK_REFSELTRANS_REFFILES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBUR_REF_SEL_TRANS ADD CONSTRAINT FK_REFSELTRANS_REFFILES FOREIGN KEY (FILE_ID)
-	  REFERENCES BARS.NBUR_REF_FILES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C0084972 ***
 begin   
  execute immediate '
@@ -108,7 +95,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_REF_SEL_TRANS ***
+grant SELECT                                                                 on NBUR_REF_SEL_TRANS to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_REF_SEL_TRANS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on NBUR_REF_SEL_TRANS to UPLD;
 
 
 

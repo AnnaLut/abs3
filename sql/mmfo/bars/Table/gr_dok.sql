@@ -49,9 +49,11 @@ COMMENT ON COLUMN BARS.GR_DOK.NAME IS '';
 
 
 PROMPT *** Create  grants  GR_DOK ***
+grant SELECT                                                                 on GR_DOK          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on GR_DOK          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GR_DOK          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GR_DOK          to SALGL;
+grant SELECT                                                                 on GR_DOK          to UPLD;
 grant FLASHBACK,SELECT                                                       on GR_DOK          to WR_REFREAD;
 
 

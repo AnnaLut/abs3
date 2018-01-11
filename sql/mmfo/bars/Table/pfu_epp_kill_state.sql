@@ -100,7 +100,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  PFU_EPP_KILL_STATE ***
+grant SELECT                                                                 on PFU_EPP_KILL_STATE to BARSREADER_ROLE;
 grant SELECT                                                                 on PFU_EPP_KILL_STATE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on PFU_EPP_KILL_STATE to UPLD;
 
 
 

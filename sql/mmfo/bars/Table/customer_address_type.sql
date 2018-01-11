@@ -101,6 +101,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUSTOMER_ADDRESS_TYPE ***
+grant SELECT                                                                 on CUSTOMER_ADDRESS_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTOMER_ADDRESS_TYPE to BARSUPL;
 grant SELECT                                                                 on CUSTOMER_ADDRESS_TYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTOMER_ADDRESS_TYPE to BARS_DM;

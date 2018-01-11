@@ -1,117 +1,125 @@
-begin
-  BPA.ALTER_POLICY_INFO( 'MIDDLE_NAMES', 'WHOLE' , NULL, NULL, NULL, NULL );
-  BPA.ALTER_POLICY_INFO( 'MIDDLE_NAMES', 'FILIAL', null, null, null, null );
-end;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/MIDDLE_NAMES.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** ALTER_POLICY_INFO to MIDDLE_NAMES ***
+
+
+BEGIN 
+        execute immediate  
+          'begin  
+               bpa.alter_policy_info(''MIDDLE_NAMES'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''MIDDLE_NAMES'', ''WHOLE'' , null, null, null, null);
+               null;
+           end; 
+          '; 
+END; 
 /
 
-prompt ... 
+PROMPT *** Create  table MIDDLE_NAMES ***
+begin 
+  execute immediate '
+  CREATE TABLE BARS.MIDDLE_NAMES 
+   (	MIDDLEID NUMBER(10,0), 
+	MIDDLEUA VARCHAR2(50), 
+	MIDDLERU VARCHAR2(50), 
+	SEXID CHAR(1), 
+	FIRSTID NUMBER(10,0), 
+	MIDDLEUAOF VARCHAR2(50), 
+	MIDDLEUAROD VARCHAR2(50), 
+	MIDDLEUADAT VARCHAR2(50), 
+	MIDDLEUAVIN VARCHAR2(50), 
+	MIDDLEUATVO VARCHAR2(50), 
+	MIDDLEUAPRE VARCHAR2(50), 
+	MIDDLERUROD VARCHAR2(50), 
+	MIDDLERUDAT VARCHAR2(50), 
+	MIDDLERUVIN VARCHAR2(50), 
+	MIDDLERUTVO VARCHAR2(50), 
+	MIDDLERUPRE VARCHAR2(50)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  TABLESPACE BRSDYND ';
+exception when others then       
+  if sqlcode=-955 then null; else raise; end if; 
+end; 
+/
 
 
--- Create table
-begin
-    execute immediate 'create table MIDDLE_NAMES
-(
-  middleid    NUMBER(10) not null,
-  middleua    VARCHAR2(50),
-  middleru    VARCHAR2(50),
-  sexid       CHAR(1),
-  firstid     NUMBER(10),
-  middleuaof  VARCHAR2(50),
-  middleuarod VARCHAR2(50),
-  middleuadat VARCHAR2(50),
-  middleuavin VARCHAR2(50),
-  middleuatvo VARCHAR2(50),
-  middleuapre VARCHAR2(50),
-  middlerurod VARCHAR2(50),
-  middlerudat VARCHAR2(50),
-  middleruvin VARCHAR2(50),
-  middlerutvo VARCHAR2(50),
-  middlerupre VARCHAR2(50)
-)
-tablespace BRSDYND
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 128K
-    next 128K
-    minextents 1
-    maxextents unlimited
-  )';
- exception when others then 
-    if sqlcode = -955 then null; else raise; 
-    end if; 
-end;
-/ 
-
--- Add comments to the table 
-comment on table BARS.MIDDLE_NAMES
-  is 'Довідник по-батькові';
--- Add comments to the columns 
-comment on column BARS.MIDDLE_NAMES.middleid
-  is 'ID';
-comment on column BARS.MIDDLE_NAMES.middleua
-  is 'По батькові (укр)';
-comment on column BARS.MIDDLE_NAMES.middleru
-  is 'По батькові (рос)';
-comment on column BARS.MIDDLE_NAMES.sexid
-  is 'Стать';
-comment on column BARS.MIDDLE_NAMES.firstid
-  is 'ссылка на FIRST_NAMES';
-comment on column BARS.MIDDLE_NAMES.middleuaof
-  is 'Звернення (укр)';
-comment on column BARS.MIDDLE_NAMES.middleuarod
-  is 'Родовий відмінок (укр)';
-comment on column BARS.MIDDLE_NAMES.middleuadat
-  is 'Давальний відмінок (укр)';
-comment on column BARS.MIDDLE_NAMES.middleuavin
-  is 'Знахідний відмінок (укр)';
-comment on column BARS.MIDDLE_NAMES.middleuatvo
-  is 'Орудний відмінок (укр)';
-comment on column BARS.MIDDLE_NAMES.middleuapre
-  is 'Місцевий відмінок (укр)';
-comment on column BARS.MIDDLE_NAMES.middlerurod
-  is 'Родовий відмінок (рос)';
-comment on column BARS.MIDDLE_NAMES.middlerudat
-  is 'Давальний відмінок (рос)';
-comment on column BARS.MIDDLE_NAMES.middleruvin
-  is 'Знахідний відмінок (рос)';
-comment on column BARS.MIDDLE_NAMES.middlerutvo
-  is 'Орудний відмінок (рос)';
-comment on column BARS.MIDDLE_NAMES.middlerupre
-  is 'Місцевий відмінок (рос)';
-
--- Create/Recreate primary, unique and foreign key constraints 
-begin
-    execute immediate 'alter table MIDDLE_NAMES
-  add constraint PK_MIDDLENAMES primary key (MIDDLEID)
-  using index 
-  tablespace BRSDYND
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 128K
-    next 128K
-    minextents 1
-    maxextents unlimited
-  )';
- exception when others then 
-    if sqlcode = -2261 or sqlcode = -2260 then null; else raise; 
-    end if; 
-end;
-/ 
 
 
-begin
-    execute immediate 'alter table MIDDLE_NAMES
-  add constraint FK_MIDDLENAMES foreign key (SEXID)
-  references BARS.SEX (ID)';
- exception when others then 
-    if sqlcode = -2275 then null; else raise; 
-    end if; 
-end;
-/ 
+PROMPT *** ALTER_POLICIES to MIDDLE_NAMES ***
+ exec bpa.alter_policies('MIDDLE_NAMES');
 
+
+COMMENT ON TABLE BARS.MIDDLE_NAMES IS 'Довідник по-батькові';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.MIDDLEID IS 'ID';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.MIDDLEUA IS 'По батькові (укр)';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.MIDDLERU IS 'По батькові (рос)';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.SEXID IS 'Стать';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.FIRSTID IS 'ссылка на FIRST_NAMES';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.MIDDLEUAOF IS 'Звернення (укр)';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.MIDDLEUAROD IS 'Родовий відмінок (укр)';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.MIDDLEUADAT IS 'Давальний відмінок (укр)';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.MIDDLEUAVIN IS 'Знахідний відмінок (укр)';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.MIDDLEUATVO IS 'Орудний відмінок (укр)';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.MIDDLEUAPRE IS 'Місцевий відмінок (укр)';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.MIDDLERUROD IS 'Родовий відмінок (рос)';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.MIDDLERUDAT IS 'Давальний відмінок (рос)';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.MIDDLERUVIN IS 'Знахідний відмінок (рос)';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.MIDDLERUTVO IS 'Орудний відмінок (рос)';
+COMMENT ON COLUMN BARS.MIDDLE_NAMES.MIDDLERUPRE IS 'Місцевий відмінок (рос)';
+
+
+
+
+PROMPT *** Create  constraint SYS_C00137533 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MIDDLE_NAMES MODIFY (MIDDLEID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_MIDDLENAMES ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MIDDLE_NAMES ADD CONSTRAINT PK_MIDDLENAMES PRIMARY KEY (MIDDLEID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index PK_MIDDLENAMES ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.PK_MIDDLENAMES ON BARS.MIDDLE_NAMES (MIDDLEID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
+PROMPT *** Create  grants  MIDDLE_NAMES ***
+grant SELECT                                                                 on MIDDLE_NAMES    to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Table/MIDDLE_NAMES.sql =========*** End *** 
+PROMPT ===================================================================================== 

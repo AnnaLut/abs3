@@ -69,32 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_NBUCONTR_CUSTOMER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBU_CONTR ADD CONSTRAINT FK_NBUCONTR_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_NBUCONTR_TOPCONTRACTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NBU_CONTR ADD CONSTRAINT FK_NBUCONTR_TOPCONTRACTS FOREIGN KEY (PID)
-	  REFERENCES BARS.TOP_CONTRACTS (PID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_NBUCONTR ***
 begin   
  execute immediate '
@@ -109,8 +83,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBU_CONTR ***
+grant SELECT                                                                 on NBU_CONTR       to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on NBU_CONTR       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBU_CONTR       to BARS_DM;
+grant SELECT                                                                 on NBU_CONTR       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NBU_CONTR       to WR_ALL_RIGHTS;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on NBU_CONTR       to ZAY;
 

@@ -133,8 +133,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_CRVFILES ***
+grant SELECT                                                                 on OW_CRVFILES     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_CRVFILES     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_CRVFILES     to OW;
+grant SELECT                                                                 on OW_CRVFILES     to UPLD;
 
 
 

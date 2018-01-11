@@ -54,50 +54,10 @@ COMMENT ON COLUMN BARS.MONEX_MV_UO.OB22_KOM IS '¡‡Î+Œ¡22 ÍÓÏ≥Ò≥ø';
 
 
 
-PROMPT *** Create  constraint FK_MONEXMVUO_MV ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MONEX_MV_UO ADD CONSTRAINT FK_MONEXMVUO_MV FOREIGN KEY (MV)
-	  REFERENCES BARS.MONEX0 (KOD_NBU) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_MONEXUOMV_29_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.MONEX_MV_UO MODIFY (OB22_2909 CONSTRAINT CC_MONEXUOMV_29_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_MONEXMVUO_UO ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MONEX_MV_UO ADD CONSTRAINT FK_MONEXMVUO_UO FOREIGN KEY (UO)
-	  REFERENCES BARS.MONEX_UO (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint XPK_MONEXMVUO ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.MONEX_MV_UO ADD CONSTRAINT XPK_MONEXMVUO PRIMARY KEY (MV, UO)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -130,6 +90,20 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint XPK_MONEXMVUO ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.MONEX_MV_UO ADD CONSTRAINT XPK_MONEXMVUO PRIMARY KEY (MV, UO)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index XPK_MONEXMVUO ***
 begin   
  execute immediate '
@@ -144,8 +118,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  MONEX_MV_UO ***
+grant SELECT                                                                 on MONEX_MV_UO     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MONEX_MV_UO     to BARS_ACCESS_DEFROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on MONEX_MV_UO     to START1;
+grant SELECT                                                                 on MONEX_MV_UO     to UPLD;
 
 
 

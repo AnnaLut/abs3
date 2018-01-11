@@ -115,10 +115,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  DEMAND_CARD_TYPE ***
+grant SELECT                                                                 on DEMAND_CARD_TYPE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEMAND_CARD_TYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEMAND_CARD_TYPE to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEMAND_CARD_TYPE to OBPC;
 grant SELECT                                                                 on DEMAND_CARD_TYPE to RPBN001;
+grant SELECT                                                                 on DEMAND_CARD_TYPE to UPLD;
 
 
 

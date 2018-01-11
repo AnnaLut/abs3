@@ -53,19 +53,6 @@ COMMENT ON COLUMN BARS.SW_FLD.I_FLAG IS 'Признак обработки';
 
 
 
-PROMPT *** Create  constraint FK_SWFLD_SWTAG ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_FLD ADD CONSTRAINT FK_SWFLD_SWTAG FOREIGN KEY (TAG)
-	  REFERENCES BARS.SW_TAG (TAG) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SWFLD_TAG_NN ***
 begin   
  execute immediate '
@@ -155,9 +142,11 @@ exception when others then
 
 PROMPT *** Create  grants  SW_FLD ***
 grant SELECT                                                                 on SW_FLD          to BARS013;
+grant SELECT                                                                 on SW_FLD          to BARSREADER_ROLE;
 grant SELECT                                                                 on SW_FLD          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_FLD          to BARS_DM;
 grant SELECT                                                                 on SW_FLD          to SWTOSS;
+grant SELECT                                                                 on SW_FLD          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_FLD          to WR_ALL_RIGHTS;
 
 

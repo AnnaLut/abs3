@@ -63,19 +63,6 @@ COMMENT ON COLUMN BARS.XML_REFLIST_REQV.REQV_MESS IS 'Тип сообщения от ТВБВ для 
 
 
 
-PROMPT *** Create  constraint FK_XMLREFREQV_TABLE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML_REFLIST_REQV ADD CONSTRAINT FK_XMLREFREQV_TABLE FOREIGN KEY (KLTABLE_NAME)
-	  REFERENCES BARS.XML_REFLIST (KLTABLE_NAME) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NN_XMLREFREQV_TABLE ***
 begin   
  execute immediate '
@@ -104,8 +91,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_REFLIST_REQV ***
+grant SELECT                                                                 on XML_REFLIST_REQV to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_REFLIST_REQV to BARS_DM;
 grant SELECT                                                                 on XML_REFLIST_REQV to KLBX;
+grant SELECT                                                                 on XML_REFLIST_REQV to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_REFLIST_REQV to WR_ALL_RIGHTS;
 
 

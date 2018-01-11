@@ -51,19 +51,6 @@ COMMENT ON COLUMN BARS.DDBS.BRANCH IS 'Код безбалансового подразделения';
 
 
 
-PROMPT *** Create  constraint FK_DDBS_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DDBS ADD CONSTRAINT FK_DDBS_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DDBS_DDBID_NN ***
 begin   
  execute immediate '
@@ -116,7 +103,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DDBS ***
+grant SELECT                                                                 on DDBS            to BARSREADER_ROLE;
 grant SELECT                                                                 on DDBS            to BARS_DM;
+grant SELECT                                                                 on DDBS            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DDBS            to WR_ALL_RIGHTS;
 
 

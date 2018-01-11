@@ -91,8 +91,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  K_DFM01D ***
+grant SELECT                                                                 on K_DFM01D        to BARSREADER_ROLE;
 grant SELECT                                                                 on K_DFM01D        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on K_DFM01D        to BARS_DM;
+grant SELECT                                                                 on K_DFM01D        to UPLD;
 
 
 

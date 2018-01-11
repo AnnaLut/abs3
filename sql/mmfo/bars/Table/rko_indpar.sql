@@ -101,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  RKO_INDPAR ***
+grant SELECT                                                                 on RKO_INDPAR      to BARSREADER_ROLE;
 grant SELECT                                                                 on RKO_INDPAR      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RKO_INDPAR      to BARS_DM;
 grant SELECT                                                                 on RKO_INDPAR      to CUST001;
+grant SELECT                                                                 on RKO_INDPAR      to UPLD;
 
 
 

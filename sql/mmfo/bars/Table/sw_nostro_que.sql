@@ -87,6 +87,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_NOSTRO_QUE ***
+grant SELECT                                                                 on SW_NOSTRO_QUE   to BARSREADER_ROLE;
 grant SELECT                                                                 on SW_NOSTRO_QUE   to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SW_NOSTRO_QUE   to SWTOSS;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_NOSTRO_QUE   to WR_ALL_RIGHTS;

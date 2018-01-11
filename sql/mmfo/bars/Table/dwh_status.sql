@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DWH_STATUS ***
+grant SELECT                                                                 on DWH_STATUS      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DWH_STATUS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DWH_STATUS      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DWH_STATUS      to START1;
+grant SELECT                                                                 on DWH_STATUS      to UPLD;
 
 
 

@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''NBUR_TMP_DEL_70'', ''CENTER'' , null, ''E'', ''E'', ''E'');
-               bpa.alter_policy_info(''NBUR_TMP_DEL_70'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''NBUR_TMP_DEL_70'', ''FILIAL'' , null, ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''NBUR_TMP_DEL_70'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -69,9 +69,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  NBUR_TMP_DEL_70 ***
+grant SELECT                                                                 on NBUR_TMP_DEL_70 to BARSREADER_ROLE;
 grant SELECT                                                                 on NBUR_TMP_DEL_70 to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NBUR_TMP_DEL_70 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NBUR_TMP_DEL_70 to RPBN002;
+grant SELECT                                                                 on NBUR_TMP_DEL_70 to UPLD;
+grant FLASHBACK,SELECT                                                       on NBUR_TMP_DEL_70 to WR_REFREAD;
 
 
 

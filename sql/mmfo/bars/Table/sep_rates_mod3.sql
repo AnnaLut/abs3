@@ -115,9 +115,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SEP_RATES_MOD3 ***
+grant SELECT                                                                 on SEP_RATES_MOD3  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SEP_RATES_MOD3  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEP_RATES_MOD3  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEP_RATES_MOD3  to SEP_RATES_ROLE;
+grant SELECT                                                                 on SEP_RATES_MOD3  to UPLD;
 grant FLASHBACK,SELECT                                                       on SEP_RATES_MOD3  to WR_REFREAD;
 
 

@@ -109,10 +109,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CLVREQARC_APRSTATUS_NN ***
+PROMPT *** Create  constraint CC_CLVREQARC_REQDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CLV_REQUEST_ARC MODIFY (APR_STATUS CONSTRAINT CC_CLVREQARC_APRSTATUS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CLV_REQUEST_ARC MODIFY (REQ_DATE CONSTRAINT CC_CLVREQARC_REQDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -169,10 +169,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CLVREQARC_REQDATE_NN ***
+PROMPT *** Create  constraint CC_CLVREQARC_APRSTATUS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CLV_REQUEST_ARC MODIFY (REQ_DATE CONSTRAINT CC_CLVREQARC_REQDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CLV_REQUEST_ARC MODIFY (APR_STATUS CONSTRAINT CC_CLVREQARC_APRSTATUS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -195,7 +195,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CLV_REQUEST_ARC ***
+grant SELECT                                                                 on CLV_REQUEST_ARC to BARSREADER_ROLE;
 grant SELECT                                                                 on CLV_REQUEST_ARC to BARS_DM;
+grant SELECT                                                                 on CLV_REQUEST_ARC to UPLD;
 
 
 

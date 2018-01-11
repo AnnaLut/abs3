@@ -11,9 +11,9 @@ PROMPT *** ALTER_POLICY_INFO to OTCN_F42_CP ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''OTCN_F42_CP'', ''CENTER'' , null, null, null, null);
+               bpa.alter_policy_info(''OTCN_F42_CP'', ''CENTER'' , null, ''E'', ''E'', ''E'');
                bpa.alter_policy_info(''OTCN_F42_CP'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''OTCN_F42_CP'', ''WHOLE'' , null, null, null, null);
+               bpa.alter_policy_info(''OTCN_F42_CP'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
           '; 
@@ -101,11 +101,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  OTCN_F42_CP ***
+grant SELECT                                                                 on OTCN_F42_CP     to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on OTCN_F42_CP     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_F42_CP     to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on OTCN_F42_CP     to RPBN002;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on OTCN_F42_CP     to SALGL;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on OTCN_F42_CP     to START1;
+grant SELECT                                                                 on OTCN_F42_CP     to UPLD;
 
 
 

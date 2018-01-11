@@ -94,8 +94,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CBIREP_QUERIES_DATA ***
+grant SELECT                                                                 on CBIREP_QUERIES_DATA to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CBIREP_QUERIES_DATA to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CBIREP_QUERIES_DATA to BARS_DM;
+grant SELECT                                                                 on CBIREP_QUERIES_DATA to UPLD;
 
 
 

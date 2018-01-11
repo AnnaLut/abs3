@@ -67,32 +67,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_FIREWALL_USER_IP_ADR_ACTION ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FIREWALL_USER_IP_ADDRESS ADD CONSTRAINT FK_FIREWALL_USER_IP_ADR_ACTION FOREIGN KEY (ACTION)
-	  REFERENCES BARS.FIREWALL_USER_ACTION (CODE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_FIREWALL_USER_IP_ADR_USRID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FIREWALL_USER_IP_ADDRESS ADD CONSTRAINT FK_FIREWALL_USER_IP_ADR_USRID FOREIGN KEY (USRID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_FIREWALL_USER_IP_ADR_IP_ADR ***
 begin   
  execute immediate '
@@ -131,9 +105,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIREWALL_USER_IP_ADDRESS ***
+grant SELECT                                                                 on FIREWALL_USER_IP_ADDRESS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIREWALL_USER_IP_ADDRESS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIREWALL_USER_IP_ADDRESS to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIREWALL_USER_IP_ADDRESS to FIREWALL_USER_IP_ADDRESS;
+grant SELECT                                                                 on FIREWALL_USER_IP_ADDRESS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIREWALL_USER_IP_ADDRESS to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on FIREWALL_USER_IP_ADDRESS to WR_REFREAD;
 

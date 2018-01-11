@@ -46,7 +46,9 @@ COMMENT ON COLUMN BARS.IMPORT_TYPES.NAME IS '';
 
 
 PROMPT *** Create  grants  IMPORT_TYPES ***
+grant SELECT                                                                 on IMPORT_TYPES    to BARSREADER_ROLE;
 grant SELECT                                                                 on IMPORT_TYPES    to BARS_DM;
+grant SELECT                                                                 on IMPORT_TYPES    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on IMPORT_TYPES    to WR_ALL_RIGHTS;
 
 

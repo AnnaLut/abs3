@@ -46,6 +46,18 @@ COMMENT ON COLUMN BARS.TMP_W4_PRODUCT_DOC.DOC_ID IS '';
 
 
 
+PROMPT *** Create  constraint SYS_C00119198 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TMP_W4_PRODUCT_DOC MODIFY (GRP_CODE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C00119199 ***
 begin   
  execute immediate '
@@ -57,17 +69,9 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint SYS_C00119198 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_W4_PRODUCT_DOC MODIFY (GRP_CODE NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
+PROMPT *** Create  grants  TMP_W4_PRODUCT_DOC ***
+grant SELECT                                                                 on TMP_W4_PRODUCT_DOC to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_W4_PRODUCT_DOC to UPLD;
 
 
 

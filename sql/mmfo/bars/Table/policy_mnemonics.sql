@@ -50,19 +50,6 @@ COMMENT ON COLUMN BARS.POLICY_MNEMONICS.POLICY_TYPE IS 'Тип политики';
 
 
 
-PROMPT *** Create  constraint FK_PLCMNEMONICS_PLCTYPES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.POLICY_MNEMONICS ADD CONSTRAINT FK_PLCMNEMONICS_PLCTYPES FOREIGN KEY (POLICY_TYPE)
-	  REFERENCES BARS.POLICY_TYPES (POLICY_TYPE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_PLCMNEMONICS_PLCNMPREFIX_NN ***
 begin   
  execute immediate '
@@ -128,8 +115,10 @@ exception when others then
 
 PROMPT *** Create  grants  POLICY_MNEMONICS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on POLICY_MNEMONICS to ABS_ADMIN;
+grant SELECT                                                                 on POLICY_MNEMONICS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on POLICY_MNEMONICS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on POLICY_MNEMONICS to BARS_DM;
+grant SELECT                                                                 on POLICY_MNEMONICS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on POLICY_MNEMONICS to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on POLICY_MNEMONICS to WR_REFREAD;
 

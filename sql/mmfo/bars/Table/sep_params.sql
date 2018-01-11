@@ -66,10 +66,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SEPCONFIG_KF_NN ***
+PROMPT *** Create  constraint CC_SEPCONFIG_PARNAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEP_PARAMS MODIFY (KF CONSTRAINT CC_SEPCONFIG_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEP_PARAMS MODIFY (PAR_NAME CONSTRAINT CC_SEPCONFIG_PARNAME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -78,10 +78,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SEPCONFIG_PARNAME_NN ***
+PROMPT *** Create  constraint CC_SEPCONFIG_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SEP_PARAMS MODIFY (PAR_NAME CONSTRAINT CC_SEPCONFIG_PARNAME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SEP_PARAMS MODIFY (KF CONSTRAINT CC_SEPCONFIG_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -104,8 +104,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SEP_PARAMS ***
+grant SELECT                                                                 on SEP_PARAMS      to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SEP_PARAMS      to BARS_ACCESS_DEFROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SEP_PARAMS      to TOSS;
+grant SELECT                                                                 on SEP_PARAMS      to UPLD;
 
 
 

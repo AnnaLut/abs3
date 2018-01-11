@@ -59,9 +59,11 @@ COMMENT ON COLUMN BARS.TMP_ACCOUNTS_COUNT.K IS '';
 
 
 PROMPT *** Create  grants  TMP_ACCOUNTS_COUNT ***
+grant SELECT                                                                 on TMP_ACCOUNTS_COUNT to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_ACCOUNTS_COUNT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_ACCOUNTS_COUNT to BARS_DM;
 grant SELECT                                                                 on TMP_ACCOUNTS_COUNT to START1;
+grant SELECT                                                                 on TMP_ACCOUNTS_COUNT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_ACCOUNTS_COUNT to WR_ALL_RIGHTS;
 
 

@@ -69,19 +69,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CRDDTBASE_TID_QTYPES_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_CREDITDATA_BASE ADD CONSTRAINT FK_CRDDTBASE_TID_QTYPES_ID FOREIGN KEY (TYPE_ID)
-	  REFERENCES BARS.WCS_QUESTION_TYPES (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_WCSCRDDATABASE_NAME_NN ***
 begin   
  execute immediate '
@@ -106,10 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_WCSCRDDATABASE_ORD_NN ***
+PROMPT *** Create  constraint CC_WCSCRDDATABASE_STID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_CREDITDATA_BASE MODIFY (ORD CONSTRAINT CC_WCSCRDDATABASE_ORD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_CREDITDATA_BASE MODIFY (STATE_ID CONSTRAINT CC_WCSCRDDATABASE_STID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -118,10 +105,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_WCSCRDDATABASE_STID_NN ***
+PROMPT *** Create  constraint CC_WCSCRDDATABASE_ORD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_CREDITDATA_BASE MODIFY (STATE_ID CONSTRAINT CC_WCSCRDDATABASE_STID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_CREDITDATA_BASE MODIFY (ORD CONSTRAINT CC_WCSCRDDATABASE_ORD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -144,8 +131,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_CREDITDATA_BASE ***
+grant SELECT                                                                 on WCS_CREDITDATA_BASE to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_CREDITDATA_BASE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_CREDITDATA_BASE to BARS_DM;
+grant SELECT                                                                 on WCS_CREDITDATA_BASE to UPLD;
 
 
 

@@ -77,8 +77,10 @@ COMMENT ON COLUMN BARS.NAL_K52_TMP.R7 IS '';
 
 
 PROMPT *** Create  grants  NAL_K52_TMP ***
+grant SELECT                                                                 on NAL_K52_TMP     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAL_K52_TMP     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAL_K52_TMP     to NALOG;
+grant SELECT                                                                 on NAL_K52_TMP     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NAL_K52_TMP     to WR_ALL_RIGHTS;
 
 

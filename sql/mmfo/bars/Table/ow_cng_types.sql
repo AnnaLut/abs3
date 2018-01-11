@@ -11,8 +11,8 @@ PROMPT *** ALTER_POLICY_INFO to OW_CNG_TYPES ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''OW_CNG_TYPES'', ''FILIAL'' , null, ''E'', ''E'', ''E'');
-               bpa.alter_policy_info(''OW_CNG_TYPES'', ''WHOLE'' , null, null, null, null);
+               bpa.alter_policy_info(''OW_CNG_TYPES'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''OW_CNG_TYPES'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
           '; 
@@ -52,12 +52,10 @@ COMMENT ON COLUMN BARS.OW_CNG_TYPES.DESCR IS '';
 
 
 
-PROMPT *** Create  constraint PK_OWCNGTYPES ***
+PROMPT *** Create  constraint CC_OWCNGTYPES_NBS_OW_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OW_CNG_TYPES ADD CONSTRAINT PK_OWCNGTYPES PRIMARY KEY (NBS_OW)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.OW_CNG_TYPES MODIFY (NBS_OW CONSTRAINT CC_OWCNGTYPES_NBS_OW_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -66,10 +64,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_OWCNGTYPES_NBS_OW_NN ***
+PROMPT *** Create  constraint PK_OWCNGTYPES ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OW_CNG_TYPES MODIFY (NBS_OW CONSTRAINT CC_OWCNGTYPES_NBS_OW_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.OW_CNG_TYPES ADD CONSTRAINT PK_OWCNGTYPES PRIMARY KEY (NBS_OW)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -92,7 +92,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_CNG_TYPES ***
+grant SELECT                                                                 on OW_CNG_TYPES    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_CNG_TYPES    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on OW_CNG_TYPES    to UPLD;
 grant FLASHBACK,SELECT                                                       on OW_CNG_TYPES    to WR_REFREAD;
 
 

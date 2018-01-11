@@ -66,7 +66,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CLIM_MFO ***
+grant SELECT                                                                 on CLIM_MFO        to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CLIM_MFO        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CLIM_MFO        to UPLD;
 
 
 

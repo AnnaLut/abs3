@@ -209,8 +209,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_ACC_UPDATE ***
+grant SELECT                                                                 on BPK_ACC_UPDATE  to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_ACC_UPDATE  to BARSUPL;
 grant SELECT                                                                 on BPK_ACC_UPDATE  to BARS_DM;
+grant SELECT                                                                 on BPK_ACC_UPDATE  to UPLD;
 
 
 

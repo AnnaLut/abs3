@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_STATE_GROUPS ***
+grant SELECT                                                                 on CIG_STATE_GROUPS to BARSREADER_ROLE;
 grant SELECT                                                                 on CIG_STATE_GROUPS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_STATE_GROUPS to BARS_DM;
+grant SELECT                                                                 on CIG_STATE_GROUPS to UPLD;
 
 
 

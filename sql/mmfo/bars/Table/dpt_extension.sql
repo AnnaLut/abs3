@@ -77,45 +77,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTEXT_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_EXTENSION ADD CONSTRAINT FK_DPTEXT_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTEXT_DPTEXTMETHOD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_EXTENSION ADD CONSTRAINT FK_DPTEXT_DPTEXTMETHOD FOREIGN KEY (METHOD)
-	  REFERENCES BARS.DPT_EXTENSION_METHOD (METHOD) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTEXT_INTOP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_EXTENSION ADD CONSTRAINT FK_DPTEXT_INTOP FOREIGN KEY (OP)
-	  REFERENCES BARS.INT_OP (OP) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DPTEXT_ID_NN ***
 begin   
  execute immediate '
@@ -140,10 +101,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTEXT_BRANCH_NN ***
+PROMPT *** Create  constraint CC_DPTEXT_NDUBL_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_EXTENSION MODIFY (BRANCH CONSTRAINT CC_DPTEXT_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_EXTENSION MODIFY (N_DUBL CONSTRAINT CC_DPTEXT_NDUBL_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -152,10 +113,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTEXT_NDUBL_NN ***
+PROMPT *** Create  constraint CC_DPTEXT_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_EXTENSION MODIFY (N_DUBL CONSTRAINT CC_DPTEXT_NDUBL_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_EXTENSION MODIFY (BRANCH CONSTRAINT CC_DPTEXT_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -179,10 +140,12 @@ exception when others then
 
 PROMPT *** Create  grants  DPT_EXTENSION ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_EXTENSION   to ABS_ADMIN;
+grant SELECT                                                                 on DPT_EXTENSION   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_EXTENSION   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_EXTENSION   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_EXTENSION   to DPT_ADMIN;
 grant SELECT                                                                 on DPT_EXTENSION   to START1;
+grant SELECT                                                                 on DPT_EXTENSION   to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_EXTENSION   to VKLAD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_EXTENSION   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_EXTENSION   to WR_REFREAD;

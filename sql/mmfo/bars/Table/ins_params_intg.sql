@@ -138,7 +138,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  INS_PARAMS_INTG ***
+grant SELECT                                                                 on INS_PARAMS_INTG to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INS_PARAMS_INTG to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on INS_PARAMS_INTG to UPLD;
 
 
 

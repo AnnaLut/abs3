@@ -221,10 +221,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_JOBS_LOG_ARCH ***
+grant SELECT                                                                 on DPT_JOBS_LOG_ARCH to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_JOBS_LOG_ARCH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_JOBS_LOG_ARCH to BARS_DM;
 grant SELECT                                                                 on DPT_JOBS_LOG_ARCH to DPT_ADMIN;
 grant SELECT                                                                 on DPT_JOBS_LOG_ARCH to RPBN001;
+grant SELECT                                                                 on DPT_JOBS_LOG_ARCH to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_JOBS_LOG_ARCH to WR_ALL_RIGHTS;
 
 

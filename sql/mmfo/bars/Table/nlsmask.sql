@@ -108,11 +108,13 @@ exception when others then
 
 PROMPT *** Create  grants  NLSMASK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on NLSMASK         to ABS_ADMIN;
+grant SELECT                                                                 on NLSMASK         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NLSMASK         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NLSMASK         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NLSMASK         to NLSMASK;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NLSMASK         to NLSMASK_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NLSMASK         to START1;
+grant SELECT                                                                 on NLSMASK         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NLSMASK         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on NLSMASK         to WR_REFREAD;
 

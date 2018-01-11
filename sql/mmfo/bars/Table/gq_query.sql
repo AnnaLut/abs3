@@ -95,58 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_GQQUERY_REQUEST_NN ***
+PROMPT *** Create  constraint CC_GQQUERY_QUERYID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GQ_QUERY MODIFY (REQUEST CONSTRAINT CC_GQQUERY_REQUEST_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GQQUERY_USERID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GQ_QUERY MODIFY (USER_ID CONSTRAINT CC_GQQUERY_USERID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GQQUERY_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GQ_QUERY MODIFY (BRANCH CONSTRAINT CC_GQQUERY_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GQQUERY_REQUESTDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GQ_QUERY MODIFY (REQUEST_DATE CONSTRAINT CC_GQQUERY_REQUESTDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GQQUERY_QUERYSTATUS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GQ_QUERY MODIFY (QUERY_STATUS CONSTRAINT CC_GQQUERY_QUERYSTATUS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.GQ_QUERY MODIFY (QUERY_ID CONSTRAINT CC_GQQUERY_QUERYID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -167,11 +119,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_GQQUERY_BRANCH ***
+PROMPT *** Create  constraint CC_GQQUERY_QUERYSTATUS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GQ_QUERY ADD CONSTRAINT FK_GQQUERY_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+  ALTER TABLE BARS.GQ_QUERY MODIFY (QUERY_STATUS CONSTRAINT CC_GQQUERY_QUERYSTATUS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -180,11 +131,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_GQQUERY_STAFF ***
+PROMPT *** Create  constraint CC_GQQUERY_REQUESTDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GQ_QUERY ADD CONSTRAINT FK_GQQUERY_STAFF FOREIGN KEY (USER_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+  ALTER TABLE BARS.GQ_QUERY MODIFY (REQUEST_DATE CONSTRAINT CC_GQQUERY_REQUESTDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -193,10 +143,34 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_GQQUERY_QUERYID_NN ***
+PROMPT *** Create  constraint CC_GQQUERY_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GQ_QUERY MODIFY (QUERY_ID CONSTRAINT CC_GQQUERY_QUERYID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.GQ_QUERY MODIFY (BRANCH CONSTRAINT CC_GQQUERY_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GQQUERY_USERID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GQ_QUERY MODIFY (USER_ID CONSTRAINT CC_GQQUERY_USERID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_GQQUERY_REQUEST_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.GQ_QUERY MODIFY (REQUEST CONSTRAINT CC_GQQUERY_REQUEST_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -233,7 +207,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  GQ_QUERY ***
+grant SELECT                                                                 on GQ_QUERY        to BARSREADER_ROLE;
 grant SELECT                                                                 on GQ_QUERY        to BARS_DM;
+grant SELECT                                                                 on GQ_QUERY        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on GQ_QUERY        to WR_ALL_RIGHTS;
 
 

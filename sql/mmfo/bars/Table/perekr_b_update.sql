@@ -95,44 +95,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_PEREKRBUPDATE_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PEREKR_B_UPDATE MODIFY (KF CONSTRAINT CC_PEREKRBUPDATE_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_PRKRB_UPD_S ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PEREKR_B_UPDATE ADD CONSTRAINT R_PRKRB_UPD_S FOREIGN KEY (KF, IDS)
-	  REFERENCES BARS.PEREKR_S (KF, IDS) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_PEREKRBUPDATE_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PEREKR_B_UPDATE ADD CONSTRAINT FK_PEREKRBUPDATE_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C008738 ***
 begin   
  execute immediate '
@@ -265,11 +227,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint R_PRKRB_UPD_R ***
+PROMPT *** Create  constraint CC_PEREKRBUPDATE_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PEREKR_B_UPDATE ADD CONSTRAINT R_PRKRB_UPD_R FOREIGN KEY (KF, IDR)
-	  REFERENCES BARS.PEREKR_R (KF, IDR) ENABLE';
+  ALTER TABLE BARS.PEREKR_B_UPDATE MODIFY (KF CONSTRAINT CC_PEREKRBUPDATE_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -294,9 +255,11 @@ exception when others then
 PROMPT *** Create  grants  PEREKR_B_UPDATE ***
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on PEREKR_B_UPDATE to ABS_ADMIN;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on PEREKR_B_UPDATE to BARS015;
+grant SELECT                                                                 on PEREKR_B_UPDATE to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on PEREKR_B_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PEREKR_B_UPDATE to BARS_DM;
 grant SELECT                                                                 on PEREKR_B_UPDATE to START1;
+grant SELECT                                                                 on PEREKR_B_UPDATE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PEREKR_B_UPDATE to WR_ALL_RIGHTS;
 
 

@@ -103,6 +103,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_OB_INITIATOR ***
+grant SELECT                                                                 on CP_OB_INITIATOR to BARSREADER_ROLE;
 grant SELECT                                                                 on CP_OB_INITIATOR to BARSUPL;
 grant FLASHBACK,SELECT                                                       on CP_OB_INITIATOR to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_OB_INITIATOR to BARS_DM;

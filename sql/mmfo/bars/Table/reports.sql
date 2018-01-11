@@ -105,93 +105,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_REPORTS_USEARC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REPORTS MODIFY (USEARC CONSTRAINT CC_REPORTS_USEARC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_REPORTS_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REPORTS MODIFY (BRANCH CONSTRAINT CC_REPORTS_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_REPORTS_FORM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REPORTS MODIFY (FORM CONSTRAINT CC_REPORTS_FORM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_REPORTS_DESC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REPORTS MODIFY (DESCRIPTION CONSTRAINT CC_REPORTS_DESC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_REPORTS_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REPORTS ADD CONSTRAINT FK_REPORTS_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_REPORTS_REPORTSF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REPORTS ADD CONSTRAINT FK_REPORTS_REPORTSF FOREIGN KEY (IDF)
-	  REFERENCES BARS.REPORTSF (IDF) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_REPS_FORM_REPFORMS_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.REPORTS ADD CONSTRAINT FK_REPS_FORM_REPFORMS_ID FOREIGN KEY (FORM)
-	  REFERENCES BARS.REPORT_FORMS (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_REPORTS_ID_NN ***
 begin   
  execute immediate '
@@ -216,6 +129,54 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_REPORTS_DESC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REPORTS MODIFY (DESCRIPTION CONSTRAINT CC_REPORTS_DESC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_REPORTS_FORM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REPORTS MODIFY (FORM CONSTRAINT CC_REPORTS_FORM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_REPORTS_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REPORTS MODIFY (BRANCH CONSTRAINT CC_REPORTS_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_REPORTS_USEARC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.REPORTS MODIFY (USEARC CONSTRAINT CC_REPORTS_USEARC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_REPORTS ***
 begin   
  execute immediate '
@@ -231,10 +192,12 @@ exception when others then
 
 PROMPT *** Create  grants  REPORTS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPORTS         to ABS_ADMIN;
+grant SELECT                                                                 on REPORTS         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REPORTS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on REPORTS         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REPORTS         to REPORTS;
 grant SELECT                                                                 on REPORTS         to START1;
+grant SELECT                                                                 on REPORTS         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on REPORTS         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on REPORTS         to WR_REFREAD;
 

@@ -105,9 +105,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_REPORT_PARAMS ***
+grant SELECT                                                                 on BPK_REPORT_PARAMS to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_REPORT_PARAMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_REPORT_PARAMS to BARS_DM;
 grant SELECT                                                                 on BPK_REPORT_PARAMS to OBPC;
+grant SELECT                                                                 on BPK_REPORT_PARAMS to UPLD;
 
 
 

@@ -77,32 +77,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CCPROL_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_PROL ADD CONSTRAINT FK_CCPROL_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CCPROL_ACCOUNTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_PROL ADD CONSTRAINT FK_CCPROL_ACCOUNTS FOREIGN KEY (KF, ACC)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_CC_PROL_ND ***
 begin   
  execute immediate '
@@ -166,11 +140,13 @@ exception when others then
 
 PROMPT *** Create  grants  CC_PROL ***
 grant SELECT                                                                 on CC_PROL         to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on CC_PROL         to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_PROL         to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_PROL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_PROL         to BARS_DM;
 grant SELECT                                                                 on CC_PROL         to FOREX;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_PROL         to RCC_DEAL;
+grant SELECT                                                                 on CC_PROL         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_PROL         to WR_ALL_RIGHTS;
 
 

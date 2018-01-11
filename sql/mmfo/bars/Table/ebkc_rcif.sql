@@ -119,6 +119,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBKC_RCIF ***
+grant SELECT                                                                 on EBKC_RCIF       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBKC_RCIF       to BARS_ACCESS_DEFROLE;
 
 

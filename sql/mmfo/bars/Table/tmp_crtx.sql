@@ -57,6 +57,8 @@ COMMENT ON COLUMN BARS.TMP_CRTX.SQ IS '';
 
 
 PROMPT *** Create  grants  TMP_CRTX ***
+grant SELECT                                                                 on TMP_CRTX        to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_CRTX        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_CRTX        to WR_ALL_RIGHTS;
 
 

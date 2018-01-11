@@ -71,8 +71,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBK_CLIENT_ANALYSIS_ERRORS ***
+grant SELECT                                                                 on EBK_CLIENT_ANALYSIS_ERRORS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBK_CLIENT_ANALYSIS_ERRORS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBK_CLIENT_ANALYSIS_ERRORS to BARS_DM;
+grant SELECT                                                                 on EBK_CLIENT_ANALYSIS_ERRORS to UPLD;
 
 
 

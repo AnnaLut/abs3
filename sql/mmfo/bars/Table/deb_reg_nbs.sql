@@ -87,9 +87,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DEB_REG_NBS ***
+grant SELECT                                                                 on DEB_REG_NBS     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEB_REG_NBS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEB_REG_NBS     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEB_REG_NBS     to RCC_DEAL;
+grant SELECT                                                                 on DEB_REG_NBS     to UPLD;
 grant FLASHBACK,SELECT                                                       on DEB_REG_NBS     to WR_REFREAD;
 
 

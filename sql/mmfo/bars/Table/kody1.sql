@@ -53,8 +53,10 @@ COMMENT ON COLUMN BARS.KODY1.N IS '';
 
 
 PROMPT *** Create  grants  KODY1 ***
+grant SELECT                                                                 on KODY1           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KODY1           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KODY1           to START1;
+grant SELECT                                                                 on KODY1           to UPLD;
 
 
 

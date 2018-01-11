@@ -88,8 +88,10 @@ COMMENT ON COLUMN BARS.OVR_INTX.MOD1 IS '=1-признак реального начисления';
 
 
 PROMPT *** Create  grants  OVR_INTX ***
+grant SELECT                                                                 on OVR_INTX        to BARSREADER_ROLE;
 grant SELECT                                                                 on OVR_INTX        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OVR_INTX        to START1;
+grant SELECT                                                                 on OVR_INTX        to UPLD;
 
 
 

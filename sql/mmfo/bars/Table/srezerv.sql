@@ -89,58 +89,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SREZ_S080 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SREZERV ADD CONSTRAINT FK_SREZ_S080 FOREIGN KEY (S080)
-	  REFERENCES BARS.CRISK (CRISK) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SREZERV_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SREZERV ADD CONSTRAINT FK_SREZERV_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SREZERV_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SREZERV ADD CONSTRAINT FK_SREZERV_ID FOREIGN KEY (ID)
-	  REFERENCES BARS.SREZ_ID (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SREZ_CUSTTYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SREZERV ADD CONSTRAINT FK_SREZ_CUSTTYPE FOREIGN KEY (CUSTTYPE)
-	  REFERENCES BARS.CUSTTYPE (CUSTTYPE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_SREZERV_CUSTTYPE ***
 begin   
  execute immediate '
@@ -153,10 +101,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SREZERV_BRANCH_NN ***
+PROMPT *** Create  constraint NK_SREZERV_S080 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SREZERV MODIFY (BRANCH CONSTRAINT CC_SREZERV_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SREZERV MODIFY (S080 CONSTRAINT NK_SREZERV_S080 NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -165,10 +113,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NK_SREZERV_S080 ***
+PROMPT *** Create  constraint CC_SREZERV_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SREZERV MODIFY (S080 CONSTRAINT NK_SREZERV_S080 NOT NULL ENABLE)';
+  ALTER TABLE BARS.SREZERV MODIFY (BRANCH CONSTRAINT CC_SREZERV_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -191,9 +139,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SREZERV ***
+grant SELECT                                                                 on SREZERV         to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SREZERV         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SREZERV         to BARS_DM;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SREZERV         to RCC_DEAL;
+grant SELECT                                                                 on SREZERV         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SREZERV         to WR_ALL_RIGHTS;
 
 

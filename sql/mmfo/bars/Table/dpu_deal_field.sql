@@ -67,32 +67,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPUDEALFIELD_METATABLES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL_FIELD ADD CONSTRAINT FK_DPUDEALFIELD_METATABLES FOREIGN KEY (REF_TAB_ID)
-	  REFERENCES BARS.META_TABLES (TABID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPUDEALFIELD_METACOLUMNS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPU_DEAL_FIELD ADD CONSTRAINT FK_DPUDEALFIELD_METACOLUMNS FOREIGN KEY (REF_TAB_ID, REF_COL_NM)
-	  REFERENCES BARS.META_COLUMNS (TABID, COLNAME) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DPUDEALFIELD_REFCOLNM ***
 begin   
  execute immediate '
@@ -144,10 +118,12 @@ exception when others then
 
 PROMPT *** Create  grants  DPU_DEAL_FIELD ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_DEAL_FIELD  to ABS_ADMIN;
+grant SELECT                                                                 on DPU_DEAL_FIELD  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_DEAL_FIELD  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPU_DEAL_FIELD  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPU_DEAL_FIELD  to DPT_ADMIN;
 grant SELECT                                                                 on DPU_DEAL_FIELD  to START1;
+grant SELECT                                                                 on DPU_DEAL_FIELD  to UPLD;
 
 
 

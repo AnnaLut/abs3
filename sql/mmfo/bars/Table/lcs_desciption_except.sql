@@ -77,8 +77,10 @@ exception when others then
 
 PROMPT *** Create  grants  LCS_DESCIPTION_EXCEPT ***
 grant SELECT                                                                 on LCS_DESCIPTION_EXCEPT to ABS_ADMIN;
+grant SELECT                                                                 on LCS_DESCIPTION_EXCEPT to BARSREADER_ROLE;
 grant SELECT                                                                 on LCS_DESCIPTION_EXCEPT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on LCS_DESCIPTION_EXCEPT to BARS_DM;
+grant SELECT                                                                 on LCS_DESCIPTION_EXCEPT to UPLD;
 
 
 

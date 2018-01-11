@@ -104,19 +104,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_F504_2_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIM_F504_DETAIL2 ADD CONSTRAINT FK_F504_2_ID FOREIGN KEY (F504_ID)
-	  REFERENCES BARS.CIM_F504 (F504_ID) ON DELETE CASCADE DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_F504_DET2_ID ***
 begin   
  execute immediate '
@@ -145,7 +132,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_F504_DETAIL2 ***
+grant SELECT                                                                 on CIM_F504_DETAIL2 to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F504_DETAIL2 to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CIM_F504_DETAIL2 to UPLD;
 
 
 

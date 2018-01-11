@@ -128,11 +128,13 @@ exception when others then
 
 PROMPT *** Create  grants  KF39 ***
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on KF39            to ABS_ADMIN;
+grant SELECT                                                                 on KF39            to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on KF39            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KF39            to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KF39            to KF39;
 grant SELECT                                                                 on KF39            to PYOD001;
 grant SELECT                                                                 on KF39            to RPBN002;
+grant SELECT                                                                 on KF39            to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KF39            to WR_ALL_RIGHTS;
 grant SELECT                                                                 on KF39            to ZAY;
 

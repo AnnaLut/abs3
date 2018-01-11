@@ -51,8 +51,10 @@ COMMENT ON COLUMN BARS.PC730.OST IS '';
 
 
 PROMPT *** Create  grants  PC730 ***
+grant SELECT                                                                 on PC730           to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PC730           to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PC730           to START1;
+grant SELECT                                                                 on PC730           to UPLD;
 
 
 

@@ -51,10 +51,10 @@ COMMENT ON COLUMN BARS.CIG_D16.TXT IS '';
 
 
 
-PROMPT *** Create  constraint PK_CIG_D16 ***
+PROMPT *** Create  constraint UK_CIG_D16_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_D16 ADD CONSTRAINT PK_CIG_D16 PRIMARY KEY (KOD)
+  ALTER TABLE BARS.CIG_D16 ADD CONSTRAINT UK_CIG_D16_ID UNIQUE (ID)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE';
 exception when others then
@@ -65,10 +65,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_CIG_D16_ID ***
+PROMPT *** Create  constraint PK_CIG_D16 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIG_D16 ADD CONSTRAINT UK_CIG_D16_ID UNIQUE (ID)
+  ALTER TABLE BARS.CIG_D16 ADD CONSTRAINT PK_CIG_D16 PRIMARY KEY (KOD)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE';
 exception when others then
@@ -107,9 +107,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_D16 ***
+grant SELECT                                                                 on CIG_D16         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIG_D16         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIG_D16         to BARS_DM;
 grant SELECT                                                                 on CIG_D16         to CIG_ROLE;
+grant SELECT                                                                 on CIG_D16         to UPLD;
 
 
 

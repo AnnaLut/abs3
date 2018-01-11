@@ -117,9 +117,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_CUSTOMER_CHANGES ***
+grant SELECT                                                                 on DPT_CUSTOMER_CHANGES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_CUSTOMER_CHANGES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_CUSTOMER_CHANGES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_CUSTOMER_CHANGES to DPT_ADMIN;
+grant SELECT                                                                 on DPT_CUSTOMER_CHANGES to UPLD;
 
 
 

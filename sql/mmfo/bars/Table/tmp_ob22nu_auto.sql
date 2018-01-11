@@ -74,8 +74,10 @@ COMMENT ON COLUMN BARS.TMP_OB22NU_AUTO.KS IS '';
 
 
 PROMPT *** Create  grants  TMP_OB22NU_AUTO ***
+grant SELECT                                                                 on TMP_OB22NU_AUTO to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OB22NU_AUTO to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OB22NU_AUTO to START1;
+grant SELECT                                                                 on TMP_OB22NU_AUTO to UPLD;
 
 
 

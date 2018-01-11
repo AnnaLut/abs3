@@ -113,32 +113,6 @@ COMMENT ON COLUMN BARS.XML_IMPDOCS.USERID IS 'Код исполнителя';
 
 
 
-PROMPT *** Create  constraint XFK_XMLIMPDOCS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML_IMPDOCS ADD CONSTRAINT XFK_XMLIMPDOCS FOREIGN KEY (KF, DAT, FN)
-	  REFERENCES BARS.XML_IMPFILES (KF, DAT, FN) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint XFK_XMLIMPDOCS_STAT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML_IMPDOCS ADD CONSTRAINT XFK_XMLIMPDOCS_STAT FOREIGN KEY (STATUS)
-	  REFERENCES BARS.XML_IMPSTATUS (STATUS) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_XMLIMPDOCS_KF_NN ***
 begin   
  execute immediate '
@@ -193,8 +167,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_IMPDOCS ***
+grant SELECT                                                                 on XML_IMPDOCS     to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_IMPDOCS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on XML_IMPDOCS     to OPER000;
+grant SELECT                                                                 on XML_IMPDOCS     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_IMPDOCS     to WR_ALL_RIGHTS;
 
 

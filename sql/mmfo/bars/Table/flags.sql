@@ -106,11 +106,13 @@ exception when others then
 
 PROMPT *** Create  grants  FLAGS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on FLAGS           to ABS_ADMIN;
+grant SELECT                                                                 on FLAGS           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FLAGS           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FLAGS           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FLAGS           to FLAGS;
 grant SELECT                                                                 on FLAGS           to START1;
 grant SELECT                                                                 on FLAGS           to TECH005;
+grant SELECT                                                                 on FLAGS           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FLAGS           to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on FLAGS           to WR_REFREAD;
 

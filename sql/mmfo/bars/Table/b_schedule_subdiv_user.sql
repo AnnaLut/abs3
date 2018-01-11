@@ -48,10 +48,12 @@ COMMENT ON COLUMN BARS.B_SCHEDULE_SUBDIV_USER.CHIEF IS 'ќзнака кер≥вника -1';
 
 
 
-PROMPT *** Create  constraint CC_BSCHEDSUBDIVU_NN ***
+PROMPT *** Create  constraint PK_BSCHEDSUBDIVU ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.B_SCHEDULE_SUBDIV_USER ADD CONSTRAINT CC_BSCHEDSUBDIVU_NN CHECK (IDU IS NOT NULL) ENABLE';
+  ALTER TABLE BARS.B_SCHEDULE_SUBDIV_USER ADD CONSTRAINT PK_BSCHEDSUBDIVU PRIMARY KEY (IDU)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -60,12 +62,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_BSCHEDSUBDIVU ***
+PROMPT *** Create  constraint CC_BSCHEDSUBDIVU_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.B_SCHEDULE_SUBDIV_USER ADD CONSTRAINT PK_BSCHEDSUBDIVU PRIMARY KEY (IDU)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
+  ALTER TABLE BARS.B_SCHEDULE_SUBDIV_USER ADD CONSTRAINT CC_BSCHEDSUBDIVU_NN CHECK (IDU IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -88,9 +88,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  B_SCHEDULE_SUBDIV_USER ***
+grant SELECT                                                                 on B_SCHEDULE_SUBDIV_USER to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on B_SCHEDULE_SUBDIV_USER to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on B_SCHEDULE_SUBDIV_USER to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on B_SCHEDULE_SUBDIV_USER to START1;
+grant SELECT                                                                 on B_SCHEDULE_SUBDIV_USER to UPLD;
 
 
 

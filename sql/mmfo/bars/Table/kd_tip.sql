@@ -86,10 +86,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  KD_TIP ***
+grant SELECT                                                                 on KD_TIP          to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on KD_TIP          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KD_TIP          to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on KD_TIP          to KD_888;
 grant SELECT                                                                 on KD_TIP          to RCC_DEAL;
+grant SELECT                                                                 on KD_TIP          to UPLD;
 grant FLASHBACK,SELECT                                                       on KD_TIP          to WR_REFREAD;
 
 

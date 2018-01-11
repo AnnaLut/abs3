@@ -128,9 +128,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SEC_LOGINS ***
+grant SELECT                                                                 on SEC_LOGINS      to BARSREADER_ROLE;
 grant SELECT                                                                 on SEC_LOGINS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEC_LOGINS      to BARS_DM;
 grant SELECT                                                                 on SEC_LOGINS      to START1;
+grant SELECT                                                                 on SEC_LOGINS      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SEC_LOGINS      to WR_ALL_RIGHTS;
 
 

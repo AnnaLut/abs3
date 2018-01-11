@@ -66,7 +66,9 @@ COMMENT ON COLUMN BARS.MIGR_MAILNLS.ISP_OWNER IS '';
 
 
 PROMPT *** Create  grants  MIGR_MAILNLS ***
+grant SELECT                                                                 on MIGR_MAILNLS    to BARSREADER_ROLE;
 grant SELECT                                                                 on MIGR_MAILNLS    to BARS_DM;
+grant SELECT                                                                 on MIGR_MAILNLS    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MIGR_MAILNLS    to WR_ALL_RIGHTS;
 
 

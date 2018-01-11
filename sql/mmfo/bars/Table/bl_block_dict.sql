@@ -153,8 +153,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  BL_BLOCK_DICT ***
+grant SELECT                                                                 on BL_BLOCK_DICT   to BARSREADER_ROLE;
 grant SELECT                                                                 on BL_BLOCK_DICT   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BL_BLOCK_DICT   to RBLOCK;
+grant SELECT                                                                 on BL_BLOCK_DICT   to UPLD;
 
 
 

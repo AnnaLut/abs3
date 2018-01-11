@@ -53,7 +53,9 @@ COMMENT ON COLUMN BARS.CA_SECT.UPR_RELATION IS '';
 
 
 PROMPT *** Create  grants  CA_SECT ***
+grant SELECT                                                                 on CA_SECT         to BARSREADER_ROLE;
 grant SELECT                                                                 on CA_SECT         to BARS_DM;
+grant SELECT                                                                 on CA_SECT         to UPLD;
 
 
 

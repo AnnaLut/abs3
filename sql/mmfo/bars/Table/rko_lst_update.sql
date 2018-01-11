@@ -95,10 +95,12 @@ COMMENT ON COLUMN BARS.RKO_LST_UPDATE.SOS IS 'Стан договору';
 
 
 
-PROMPT *** Create  constraint CC_RKOLSTUPDATE_CHGACTION_NN ***
+PROMPT *** Create  constraint PK_RKOLSTUPDATE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.RKO_LST_UPDATE MODIFY (CHGACTION CONSTRAINT CC_RKOLSTUPDATE_CHGACTION_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.RKO_LST_UPDATE ADD CONSTRAINT PK_RKOLSTUPDATE PRIMARY KEY (IDUPD)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -119,12 +121,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_RKOLSTUPDATE ***
+PROMPT *** Create  constraint CC_RKOLSTUPDATE_CHGACTION_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.RKO_LST_UPDATE ADD CONSTRAINT PK_RKOLSTUPDATE PRIMARY KEY (IDUPD)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.RKO_LST_UPDATE MODIFY (CHGACTION CONSTRAINT CC_RKOLSTUPDATE_CHGACTION_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -145,10 +145,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_RKOLSTUPDATE_ACC_NN ***
+PROMPT *** Create  constraint CC_RKOLSTUPDATE_EFFECTDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.RKO_LST_UPDATE MODIFY (ACC CONSTRAINT CC_RKOLSTUPDATE_ACC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.RKO_LST_UPDATE MODIFY (EFFECTDATE CONSTRAINT CC_RKOLSTUPDATE_EFFECTDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -193,10 +193,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_RKOLSTUPDATE_EFFECTDATE_NN ***
+PROMPT *** Create  constraint CC_RKOLSTUPDATE_ACC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.RKO_LST_UPDATE MODIFY (EFFECTDATE CONSTRAINT CC_RKOLSTUPDATE_EFFECTDATE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.RKO_LST_UPDATE MODIFY (ACC CONSTRAINT CC_RKOLSTUPDATE_ACC_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -261,6 +261,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  RKO_LST_UPDATE ***
+grant SELECT                                                                 on RKO_LST_UPDATE  to BARSREADER_ROLE;
 grant SELECT                                                                 on RKO_LST_UPDATE  to BARSUPL;
 grant SELECT                                                                 on RKO_LST_UPDATE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RKO_LST_UPDATE  to BARS_DM;

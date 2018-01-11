@@ -49,9 +49,11 @@ COMMENT ON COLUMN BARS.CCK_WORKER_BANK.DESCRIPTION IS 'Опис';
 
 
 PROMPT *** Create  grants  CCK_WORKER_BANK ***
+grant SELECT                                                                 on CCK_WORKER_BANK to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_WORKER_BANK to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_WORKER_BANK to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_WORKER_BANK to RCC_DEAL;
+grant SELECT                                                                 on CCK_WORKER_BANK to UPLD;
 
 
 

@@ -61,9 +61,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUST_TYP ***
+grant SELECT                                                                 on CUST_TYP        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_TYP        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUST_TYP        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_TYP        to START1;
+grant SELECT                                                                 on CUST_TYP        to UPLD;
 
 
 

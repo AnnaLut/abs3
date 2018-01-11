@@ -49,6 +49,18 @@ COMMENT ON COLUMN BARS.BRANCH_ATTRIBUTE_VALUE.ATTRIBUTE_VALUE IS 'Значение аттри
 
 
 
+PROMPT *** Create  constraint SYS_C0030813 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BRANCH_ATTRIBUTE_VALUE MODIFY (ATTRIBUTE_CODE NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C0030814 ***
 begin   
  execute immediate '
@@ -61,12 +73,14 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0030813 ***
+PROMPT *** Create  index IDX_BRANCH_ATTRIBUTE_VALUE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BRANCH_ATTRIBUTE_VALUE MODIFY (ATTRIBUTE_CODE NOT NULL ENABLE)';
+  CREATE INDEX BARS.IDX_BRANCH_ATTRIBUTE_VALUE ON BARS.BRANCH_ATTRIBUTE_VALUE (ATTRIBUTE_CODE) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS COMPRESS 1 
+  TABLESPACE BRSMDLI ';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+  if  sqlcode=-955  then null; else raise; end if;
  end;
 /
 
@@ -87,8 +101,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  BRANCH_ATTRIBUTE_VALUE ***
+grant SELECT                                                                 on BRANCH_ATTRIBUTE_VALUE to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRANCH_ATTRIBUTE_VALUE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH_ATTRIBUTE_VALUE to BARS_DM;
+grant SELECT                                                                 on BRANCH_ATTRIBUTE_VALUE to UPLD;
 
 
 

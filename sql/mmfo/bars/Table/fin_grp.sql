@@ -65,9 +65,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_GRP ***
+grant SELECT                                                                 on FIN_GRP         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_GRP         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_GRP         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_GRP         to R_FIN2;
+grant SELECT                                                                 on FIN_GRP         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_GRP         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on FIN_GRP         to WR_REFREAD;
 

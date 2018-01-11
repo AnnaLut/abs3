@@ -128,7 +128,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIREWALL_JOB_MODULE_PARAMS ***
+grant SELECT                                                                 on FIREWALL_JOB_MODULE_PARAMS to BARSREADER_ROLE;
 grant SELECT                                                                 on FIREWALL_JOB_MODULE_PARAMS to BARS_DM;
+grant SELECT                                                                 on FIREWALL_JOB_MODULE_PARAMS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIREWALL_JOB_MODULE_PARAMS to WR_ALL_RIGHTS;
 
 

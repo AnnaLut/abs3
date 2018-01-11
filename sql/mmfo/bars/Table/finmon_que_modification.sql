@@ -73,58 +73,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_FINMONQUEMODIFICATION_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FINMON_QUE_MODIFICATION ADD CONSTRAINT FK_FINMONQUEMODIFICATION_ID FOREIGN KEY (ID)
-	  REFERENCES BARS.FINMON_QUE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_FINMON_QMOD_MODTYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FINMON_QUE_MODIFICATION ADD CONSTRAINT R_FINMON_QMOD_MODTYPE FOREIGN KEY (MOD_TYPE)
-	  REFERENCES BARS.FINMON_QUE_MODTYPE (MOD_TYPE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint R_FINMON_QMOD_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FINMON_QUE_MODIFICATION ADD CONSTRAINT R_FINMON_QMOD_STAFF FOREIGN KEY (USER_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_FINMONQUEMODIFICATION_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FINMON_QUE_MODIFICATION ADD CONSTRAINT FK_FINMONQUEMODIFICATION_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NK_FINMONQUEMODIFICATION_ID ***
 begin   
  execute immediate '
@@ -163,9 +111,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FINMON_QUE_MODIFICATION ***
+grant SELECT                                                                 on FINMON_QUE_MODIFICATION to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on FINMON_QUE_MODIFICATION to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FINMON_QUE_MODIFICATION to BARS_DM;
 grant SELECT                                                                 on FINMON_QUE_MODIFICATION to FINMON01;
+grant SELECT                                                                 on FINMON_QUE_MODIFICATION to UPLD;
 grant FLASHBACK,SELECT                                                       on FINMON_QUE_MODIFICATION to WR_REFREAD;
 
 

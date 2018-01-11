@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CH_BIC ***
+grant SELECT                                                                 on CH_BIC          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CH_BIC          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CH_BIC          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CH_BIC          to RCH_1;
+grant SELECT                                                                 on CH_BIC          to UPLD;
 grant FLASHBACK,SELECT                                                       on CH_BIC          to WR_REFREAD;
 
 

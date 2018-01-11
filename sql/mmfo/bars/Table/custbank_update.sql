@@ -93,19 +93,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_CUSTBANKUPDATE_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTBANK_UPDATE ADD CONSTRAINT FK_CUSTBANKUPDATE_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_CUSTBANK_UPDATE ***
 begin   
  execute immediate '
@@ -174,7 +161,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CUSTBANK_UPDATE ***
+grant SELECT                                                                 on CUSTBANK_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTBANK_UPDATE to BARS_DM;
+grant SELECT                                                                 on CUSTBANK_UPDATE to UPLD;
 
 
 

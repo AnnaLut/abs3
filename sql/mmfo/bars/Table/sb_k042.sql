@@ -55,8 +55,10 @@ COMMENT ON COLUMN BARS.SB_K042.CC_NAME IS '';
 
 
 PROMPT *** Create  grants  SB_K042 ***
+grant SELECT                                                                 on SB_K042         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_K042         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SB_K042         to START1;
+grant SELECT                                                                 on SB_K042         to UPLD;
 
 
 

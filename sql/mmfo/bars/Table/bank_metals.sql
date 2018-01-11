@@ -87,32 +87,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BANKMETALS_BANKMETALSTYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BANK_METALS ADD CONSTRAINT FK_BANKMETALS_BANKMETALSTYPE FOREIGN KEY (TYPE_)
-	  REFERENCES BARS.BANK_METALS_TYPE (KOD) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_BANKMETALS_TABVAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BANK_METALS ADD CONSTRAINT FK_BANKMETALS_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_BANKMETALS_KOD_NN ***
 begin   
  execute immediate '
@@ -175,6 +149,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  BANK_METALS ***
+grant SELECT                                                                 on BANK_METALS     to BARSREADER_ROLE;
 grant SELECT                                                                 on BANK_METALS     to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BANK_METALS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BANK_METALS     to BARS_DM;

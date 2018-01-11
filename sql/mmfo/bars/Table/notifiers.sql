@@ -104,9 +104,11 @@ exception when others then
 
 PROMPT *** Create  grants  NOTIFIERS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on NOTIFIERS       to ABS_ADMIN;
+grant SELECT                                                                 on NOTIFIERS       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NOTIFIERS       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NOTIFIERS       to BARS_DM;
 grant SELECT                                                                 on NOTIFIERS       to START1;
+grant SELECT                                                                 on NOTIFIERS       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NOTIFIERS       to WR_ALL_RIGHTS;
 
 

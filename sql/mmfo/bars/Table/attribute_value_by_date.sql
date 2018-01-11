@@ -76,10 +76,10 @@ COMMENT ON COLUMN BARS.ATTRIBUTE_VALUE_BY_DATE.NESTED_TABLE_ID IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C0025695 ***
+PROMPT *** Create  constraint SYS_C0025694 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_VALUE_BY_DATE MODIFY (OBJECT_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.ATTRIBUTE_VALUE_BY_DATE MODIFY (ATTRIBUTE_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -88,10 +88,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0025694 ***
+PROMPT *** Create  constraint SYS_C0025695 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ATTRIBUTE_VALUE_BY_DATE MODIFY (ATTRIBUTE_ID NOT NULL ENABLE)';
+  ALTER TABLE BARS.ATTRIBUTE_VALUE_BY_DATE MODIFY (OBJECT_ID NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -173,7 +173,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ATTRIBUTE_VALUE_BY_DATE ***
+grant SELECT                                                                 on ATTRIBUTE_VALUE_BY_DATE to BARSREADER_ROLE;
 grant SELECT                                                                 on ATTRIBUTE_VALUE_BY_DATE to BARS_DM;
+grant SELECT                                                                 on ATTRIBUTE_VALUE_BY_DATE to UPLD;
 
 
 

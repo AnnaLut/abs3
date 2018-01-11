@@ -89,9 +89,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CP_OB_MARKET ***
+grant SELECT                                                                 on CP_OB_MARKET    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CP_OB_MARKET    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_OB_MARKET    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_OB_MARKET    to START1;
+grant SELECT                                                                 on CP_OB_MARKET    to UPLD;
 grant FLASHBACK,SELECT                                                       on CP_OB_MARKET    to WR_REFREAD;
 
 

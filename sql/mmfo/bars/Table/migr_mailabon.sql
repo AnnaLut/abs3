@@ -64,7 +64,9 @@ COMMENT ON COLUMN BARS.MIGR_MAILABON.WHOLEDEPART IS '';
 
 
 PROMPT *** Create  grants  MIGR_MAILABON ***
+grant SELECT                                                                 on MIGR_MAILABON   to BARSREADER_ROLE;
 grant SELECT                                                                 on MIGR_MAILABON   to BARS_DM;
+grant SELECT                                                                 on MIGR_MAILABON   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MIGR_MAILABON   to WR_ALL_RIGHTS;
 
 

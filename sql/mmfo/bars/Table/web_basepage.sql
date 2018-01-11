@@ -47,8 +47,10 @@ COMMENT ON COLUMN BARS.WEB_BASEPAGE.URL_MASK IS '';
 
 
 PROMPT *** Create  grants  WEB_BASEPAGE ***
+grant SELECT                                                                 on WEB_BASEPAGE    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WEB_BASEPAGE    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WEB_BASEPAGE    to START1;
+grant SELECT                                                                 on WEB_BASEPAGE    to UPLD;
 
 
 

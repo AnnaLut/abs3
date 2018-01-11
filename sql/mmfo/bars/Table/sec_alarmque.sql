@@ -88,6 +88,7 @@ exception when others then
 
 PROMPT *** Create  grants  SEC_ALARMQUE ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEC_ALARMQUE    to ABS_ADMIN;
+grant SELECT                                                                 on SEC_ALARMQUE    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SEC_ALARMQUE    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SEC_ALARMQUE    to START1;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SEC_ALARMQUE    to WR_ALL_RIGHTS;

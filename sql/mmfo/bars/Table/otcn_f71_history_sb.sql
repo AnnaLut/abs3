@@ -72,19 +72,6 @@ COMMENT ON COLUMN BARS.OTCN_F71_HISTORY_SB.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_OTCNF71HISTORYSB_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OTCN_F71_HISTORY_SB ADD CONSTRAINT FK_OTCNF71HISTORYSB_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C008629 ***
 begin   
  execute immediate '
@@ -136,9 +123,11 @@ exception when others then
 
 PROMPT *** Create  grants  OTCN_F71_HISTORY_SB ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F71_HISTORY_SB to ABS_ADMIN;
+grant SELECT                                                                 on OTCN_F71_HISTORY_SB to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F71_HISTORY_SB to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_F71_HISTORY_SB to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F71_HISTORY_SB to RPBN002;
+grant SELECT                                                                 on OTCN_F71_HISTORY_SB to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_F71_HISTORY_SB to WR_ALL_RIGHTS;
 
 

@@ -64,10 +64,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119215 ***
+PROMPT *** Create  constraint SYS_C00119213 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_OBPC_TRANS_OUT MODIFY (W4_MSGCODE NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_OBPC_TRANS_OUT MODIFY (TT NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -88,16 +88,20 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119213 ***
+PROMPT *** Create  constraint SYS_C00119215 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_OBPC_TRANS_OUT MODIFY (TT NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_OBPC_TRANS_OUT MODIFY (W4_MSGCODE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
+
+PROMPT *** Create  grants  TMP_OBPC_TRANS_OUT ***
+grant SELECT                                                                 on TMP_OBPC_TRANS_OUT to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_OBPC_TRANS_OUT to UPLD;
 
 
 

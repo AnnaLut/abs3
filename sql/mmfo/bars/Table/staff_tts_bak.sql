@@ -60,6 +60,18 @@ COMMENT ON COLUMN BARS.STAFF_TTS_BAK.GRANTOR IS '';
 
 
 
+PROMPT *** Create  constraint SYS_C0025762 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STAFF_TTS_BAK MODIFY (TT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint SYS_C0025763 ***
 begin   
  execute immediate '
@@ -71,17 +83,9 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint SYS_C0025762 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_TTS_BAK MODIFY (TT NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
+PROMPT *** Create  grants  STAFF_TTS_BAK ***
+grant SELECT                                                                 on STAFF_TTS_BAK   to BARSREADER_ROLE;
+grant SELECT                                                                 on STAFF_TTS_BAK   to UPLD;
 
 
 

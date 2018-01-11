@@ -98,8 +98,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  MIGRATION_LOG ***
+grant SELECT                                                                 on MIGRATION_LOG   to BARSREADER_ROLE;
 grant SELECT                                                                 on MIGRATION_LOG   to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on MIGRATION_LOG   to FINMON;
+grant SELECT                                                                 on MIGRATION_LOG   to UPLD;
 
 
 

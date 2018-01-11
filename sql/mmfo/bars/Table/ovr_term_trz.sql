@@ -57,6 +57,10 @@ COMMENT ON COLUMN BARS.OVR_TERM_TRZ.TRZ IS 'Код события:
 
 
 
+PROMPT *** Create  grants  OVR_TERM_TRZ ***
+grant SELECT                                                                 on OVR_TERM_TRZ    to BARSREADER_ROLE;
+grant SELECT                                                                 on OVR_TERM_TRZ    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

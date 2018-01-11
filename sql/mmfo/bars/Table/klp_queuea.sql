@@ -129,10 +129,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  KLP_QUEUEA ***
+grant SELECT                                                                 on KLP_QUEUEA      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_QUEUEA      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KLP_QUEUEA      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_QUEUEA      to OPERKKK;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KLP_QUEUEA      to TECH_MOM1;
+grant SELECT                                                                 on KLP_QUEUEA      to UPLD;
 
 
 

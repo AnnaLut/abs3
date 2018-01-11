@@ -56,9 +56,6 @@ COMMENT ON COLUMN BARS.KOD_R020.D_CLOSE IS '';
 
 
 
-PROMPT *** Create  grants  KOD_R020 ***
-grant SELECT                                                                 on KOD_R020        to BARS_DM;
-
 
 
 PROMPT ===================================================================================== 

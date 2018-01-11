@@ -102,11 +102,13 @@ exception when others then
 
 PROMPT *** Create  grants  STAN_OBS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAN_OBS        to ABS_ADMIN;
+grant SELECT                                                                 on STAN_OBS        to BARSREADER_ROLE;
 grant SELECT                                                                 on STAN_OBS        to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAN_OBS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAN_OBS        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAN_OBS        to RCC_DEAL;
 grant SELECT                                                                 on STAN_OBS        to START1;
+grant SELECT                                                                 on STAN_OBS        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAN_OBS        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on STAN_OBS        to WR_REFREAD;
 

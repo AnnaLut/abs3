@@ -61,8 +61,10 @@ COMMENT ON COLUMN BARS.TMP_MESL.OSTIK IS '';
 
 
 PROMPT *** Create  grants  TMP_MESL ***
+grant SELECT                                                                 on TMP_MESL        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_MESL        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_MESL        to START1;
+grant SELECT                                                                 on TMP_MESL        to UPLD;
 
 
 

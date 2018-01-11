@@ -46,37 +46,8 @@ begin
       ACCESS PARAMETERS
       ( nologfile      )
       LOCATION
-       ( ''sec_audit_arch_2016-12-28'', 
-         ''sec_audit_arch_2016-12-29'', 
-         ''sec_audit_arch_2016-12-30'', 
-         ''sec_audit_arch_2016-12-31'', 
-         ''sec_audit_arch_2017-01-01'', 
-         ''sec_audit_arch_2017-01-02'', 
-         ''sec_audit_arch_2017-01-03'', 
-         ''sec_audit_arch_2017-01-04'', 
-         ''sec_audit_arch_2017-01-05'', 
-         ''sec_audit_arch_2017-01-06'', 
-         ''sec_audit_arch_2017-01-07'', 
-         ''sec_audit_arch_2017-01-08'', 
-         ''sec_audit_arch_2017-01-09'', 
-         ''sec_audit_arch_2017-01-10'', 
-         ''sec_audit_arch_2017-01-11'', 
-         ''sec_audit_arch_2017-01-12'', 
-         ''sec_audit_arch_2017-01-13'', 
-         ''sec_audit_arch_2017-01-14'', 
-         ''sec_audit_arch_2017-01-15'', 
-         ''sec_audit_arch_2017-01-16'', 
-         ''sec_audit_arch_2017-01-17'', 
-         ''sec_audit_arch_2017-01-18'', 
-         ''sec_audit_arch_2017-01-19'', 
-         ''sec_audit_arch_2017-01-20'', 
-         ''sec_audit_arch_2017-01-21'', 
-         ''sec_audit_arch_2017-01-22'', 
-         ''sec_audit_arch_2017-01-23'', 
-         ''sec_audit_arch_2017-01-24'', 
-         ''sec_audit_arch_2017-01-25'', 
-         ''sec_audit_arch_2017-01-26'', 
-         ''sec_audit_arch_2017-01-27''
+       ( ''sec_audit_arch_2017-11-26'', 
+         ''sec_audit_arch_2017-11-27''
        )
     )';
 exception when others then       
@@ -111,7 +82,9 @@ COMMENT ON COLUMN BARS.SEC_AUDIT_ARCH.CLIENT_IDENTIFIER IS '';
 
 
 PROMPT *** Create  grants  SEC_AUDIT_ARCH ***
+grant SELECT                                                                 on SEC_AUDIT_ARCH  to BARSREADER_ROLE;
 grant SELECT                                                                 on SEC_AUDIT_ARCH  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on SEC_AUDIT_ARCH  to UPLD;
 
 
 

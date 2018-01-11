@@ -117,119 +117,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_GRTDEALS_GRTTYPES ***
+PROMPT *** Create  constraint CC_GRTDEALS_GRTTYPEID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_DEALS ADD CONSTRAINT FK_GRTDEALS_GRTTYPES FOREIGN KEY (GRT_TYPE_ID)
-	  REFERENCES BARS.GRT_TYPES (TYPE_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTDEALS_STATUSDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_DEALS MODIFY (STATUS_DATE CONSTRAINT CC_GRTDEALS_STATUSDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTDEALS_STATUSID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_DEALS MODIFY (STATUS_ID CONSTRAINT CC_GRTDEALS_STATUSID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTDEALS_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_DEALS MODIFY (BRANCH CONSTRAINT CC_GRTDEALS_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTDEALS_STAFFID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_DEALS MODIFY (STAFF_ID CONSTRAINT CC_GRTDEALS_STAFFID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTDEALS_GRTCURCODE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_DEALS MODIFY (GRT_SUM_CURCODE CONSTRAINT CC_GRTDEALS_GRTCURCODE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTDEALS_GRTINITSUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_DEALS MODIFY (GRT_SUM CONSTRAINT CC_GRTDEALS_GRTINITSUM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTDEALS_GRTCNT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_DEALS MODIFY (GRT_CNT CONSTRAINT CC_GRTDEALS_GRTCNT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTDEALS_DEALDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_DEALS MODIFY (DEAL_DATE CONSTRAINT CC_GRTDEALS_DEALDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTDEALS_DEALRNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_DEALS MODIFY (DEAL_RNK CONSTRAINT CC_GRTDEALS_DEALRNK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.GRT_DEALS MODIFY (GRT_TYPE_ID CONSTRAINT CC_GRTDEALS_GRTTYPEID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -250,11 +141,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_GRTDEALS_GRTPLACES ***
+PROMPT *** Create  constraint CC_GRTDEALS_DEALRNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_DEALS ADD CONSTRAINT FK_GRTDEALS_GRTPLACES FOREIGN KEY (GRT_PLACE_ID)
-	  REFERENCES BARS.GRT_PLACES (PLACE_ID) ENABLE';
+  ALTER TABLE BARS.GRT_DEALS MODIFY (DEAL_RNK CONSTRAINT CC_GRTDEALS_DEALRNK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -263,11 +153,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_GRTDEALS_CUSTOMER ***
+PROMPT *** Create  constraint CC_GRTDEALS_DEALDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_DEALS ADD CONSTRAINT FK_GRTDEALS_CUSTOMER FOREIGN KEY (DEAL_RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE';
+  ALTER TABLE BARS.GRT_DEALS MODIFY (DEAL_DATE CONSTRAINT CC_GRTDEALS_DEALDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -276,11 +165,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_GRTDEALS_GRTUNITS ***
+PROMPT *** Create  constraint CC_GRTDEALS_GRTCNT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_DEALS ADD CONSTRAINT FK_GRTDEALS_GRTUNITS FOREIGN KEY (GRT_UNIT)
-	  REFERENCES BARS.GRT_UNITS (UNIT_ID) ENABLE';
+  ALTER TABLE BARS.GRT_DEALS MODIFY (GRT_CNT CONSTRAINT CC_GRTDEALS_GRTCNT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -289,11 +177,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_GRTDEALS_STAFF ***
+PROMPT *** Create  constraint CC_GRTDEALS_GRTINITSUM_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_DEALS ADD CONSTRAINT FK_GRTDEALS_STAFF FOREIGN KEY (STAFF_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+  ALTER TABLE BARS.GRT_DEALS MODIFY (GRT_SUM CONSTRAINT CC_GRTDEALS_GRTINITSUM_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -302,11 +189,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_GRTDEALS_BRANCH ***
+PROMPT *** Create  constraint CC_GRTDEALS_GRTCURCODE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_DEALS ADD CONSTRAINT FK_GRTDEALS_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
+  ALTER TABLE BARS.GRT_DEALS MODIFY (GRT_SUM_CURCODE CONSTRAINT CC_GRTDEALS_GRTCURCODE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -315,11 +201,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_GRTDEALS_TABVAL ***
+PROMPT *** Create  constraint CC_GRTDEALS_STAFFID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_DEALS ADD CONSTRAINT FK_GRTDEALS_TABVAL FOREIGN KEY (GRT_SUM_CURCODE)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE';
+  ALTER TABLE BARS.GRT_DEALS MODIFY (STAFF_ID CONSTRAINT CC_GRTDEALS_STAFFID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -328,11 +213,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_GRTDEALS_FREQ ***
+PROMPT *** Create  constraint CC_GRTDEALS_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_DEALS ADD CONSTRAINT FK_GRTDEALS_FREQ FOREIGN KEY (CHK_FREQ)
-	  REFERENCES BARS.FREQ (FREQ) ENABLE';
+  ALTER TABLE BARS.GRT_DEALS MODIFY (BRANCH CONSTRAINT CC_GRTDEALS_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -341,11 +225,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_GRTDEALS_GRTDEALSTATUSES ***
+PROMPT *** Create  constraint CC_GRTDEALS_STATUSID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_DEALS ADD CONSTRAINT FK_GRTDEALS_GRTDEALSTATUSES FOREIGN KEY (STATUS_ID)
-	  REFERENCES BARS.GRT_DEAL_STATUSES (STATUS_ID) ENABLE';
+  ALTER TABLE BARS.GRT_DEALS MODIFY (STATUS_ID CONSTRAINT CC_GRTDEALS_STATUSID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -354,23 +237,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_GRTDEALS_GRTSUBJECTS ***
+PROMPT *** Create  constraint CC_GRTDEALS_STATUSDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.GRT_DEALS ADD CONSTRAINT FK_GRTDEALS_GRTSUBJECTS FOREIGN KEY (GRT_SUBJ_ID)
-	  REFERENCES BARS.GRT_SUBJECTS (SUBJ_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_GRTDEALS_GRTTYPEID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.GRT_DEALS MODIFY (GRT_TYPE_ID CONSTRAINT CC_GRTDEALS_GRTTYPEID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.GRT_DEALS MODIFY (STATUS_DATE CONSTRAINT CC_GRTDEALS_STATUSDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -407,10 +277,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRT_DEALS ***
+grant SELECT                                                                 on GRT_DEALS       to BARSREADER_ROLE;
 grant SELECT                                                                 on GRT_DEALS       to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRT_DEALS       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRT_DEALS       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRT_DEALS       to START1;
+grant SELECT                                                                 on GRT_DEALS       to UPLD;
 
 
 

@@ -50,9 +50,11 @@ COMMENT ON COLUMN BARS.EXCEPTIONS.CONSTRAINT IS '';
 
 
 PROMPT *** Create  grants  EXCEPTIONS ***
+grant SELECT                                                                 on EXCEPTIONS      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EXCEPTIONS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EXCEPTIONS      to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EXCEPTIONS      to START1;
+grant SELECT                                                                 on EXCEPTIONS      to UPLD;
 
 
 

@@ -49,6 +49,10 @@ COMMENT ON COLUMN BARS.ADR_HOMEPART_TYPE.VALUE IS '';
 
 
 
+PROMPT *** Create  grants  ADR_HOMEPART_TYPE ***
+grant SELECT                                                                 on ADR_HOMEPART_TYPE to BARSREADER_ROLE;
+grant SELECT                                                                 on ADR_HOMEPART_TYPE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

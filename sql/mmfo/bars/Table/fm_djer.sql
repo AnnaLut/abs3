@@ -77,11 +77,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  FM_DJER ***
+grant SELECT                                                                 on FM_DJER         to BARSREADER_ROLE;
 grant SELECT                                                                 on FM_DJER         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_DJER         to BARS_DM;
 grant SELECT                                                                 on FM_DJER         to CUST001;
 grant SELECT                                                                 on FM_DJER         to FINMON01;
 grant SELECT                                                                 on FM_DJER         to START1;
+grant SELECT                                                                 on FM_DJER         to UPLD;
 
 
 

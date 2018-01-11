@@ -54,11 +54,13 @@ COMMENT ON COLUMN BARS.KOD_E2_2.DATA_C IS '';
 
 PROMPT *** Create  grants  KOD_E2_2 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_E2_2        to ABS_ADMIN;
+grant SELECT                                                                 on KOD_E2_2        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KOD_E2_2        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KOD_E2_2        to BARS_DM;
 grant SELECT                                                                 on KOD_E2_2        to PYOD001;
 grant SELECT                                                                 on KOD_E2_2        to RPBN002;
 grant SELECT                                                                 on KOD_E2_2        to START1;
+grant SELECT                                                                 on KOD_E2_2        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KOD_E2_2        to WR_ALL_RIGHTS;
 
 

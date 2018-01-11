@@ -55,19 +55,6 @@ COMMENT ON COLUMN BARS.XML2_MFO.NLS IS '';
 
 
 
-PROMPT *** Create  constraint FK_XML2MFO ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML2_MFO ADD CONSTRAINT FK_XML2MFO FOREIGN KEY (BM)
-	  REFERENCES BARS.XML2_BM (BM) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XPK_XML2MFO ***
 begin   
  execute immediate '
@@ -97,8 +84,10 @@ exception when others then
 
 PROMPT *** Create  grants  XML2_MFO ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on XML2_MFO        to ABS_ADMIN;
+grant SELECT                                                                 on XML2_MFO        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML2_MFO        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on XML2_MFO        to PYOD001;
+grant SELECT                                                                 on XML2_MFO        to UPLD;
 grant FLASHBACK,SELECT                                                       on XML2_MFO        to WR_REFREAD;
 
 

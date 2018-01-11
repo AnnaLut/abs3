@@ -84,7 +84,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_KVED ***
+grant SELECT                                                                 on FIN_KVED        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FIN_KVED        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on FIN_KVED        to UPLD;
 
 
 

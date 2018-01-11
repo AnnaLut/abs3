@@ -63,11 +63,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SVOPRUCHREL_ID_TO ***
+PROMPT *** Create  constraint CC_SVOPRUCHREL_IDTO_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SV_OPRUCH_REL ADD CONSTRAINT FK_SVOPRUCHREL_ID_TO FOREIGN KEY (OWNER_ID_TO)
-	  REFERENCES BARS.SV_OWNER (ID) ENABLE';
+  ALTER TABLE BARS.SV_OPRUCH_REL ADD CONSTRAINT CC_SVOPRUCHREL_IDTO_NN CHECK (OWNER_ID_TO IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -87,21 +86,11 @@ exception when others then
 
 
 
-
-PROMPT *** Create  constraint CC_SVOPRUCHREL_IDTO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SV_OPRUCH_REL ADD CONSTRAINT CC_SVOPRUCHREL_IDTO_NN CHECK (OWNER_ID_TO IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
 PROMPT *** Create  grants  SV_OPRUCH_REL ***
+grant SELECT                                                                 on SV_OPRUCH_REL   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_OPRUCH_REL   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SV_OPRUCH_REL   to RPBN002;
+grant SELECT                                                                 on SV_OPRUCH_REL   to UPLD;
 
 
 

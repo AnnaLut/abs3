@@ -99,10 +99,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_AIM ***
+grant SELECT                                                                 on CC_AIM          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_AIM          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_AIM          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_AIM          to CC_AIM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_AIM          to RCC_DEAL;
+grant SELECT                                                                 on CC_AIM          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_AIM          to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CC_AIM          to WR_CREDIT;
 grant FLASHBACK,SELECT                                                       on CC_AIM          to WR_REFREAD;

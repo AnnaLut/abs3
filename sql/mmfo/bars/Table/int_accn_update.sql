@@ -105,22 +105,12 @@ COMMENT ON COLUMN BARS.INT_ACCN_UPDATE.NLSB IS '—чет получател€ дл€ выплаты %';
 
 
 
-PROMPT *** Create  constraint SYS_C005680 ***
+PROMPT *** Create  constraint PK_INTACCN_UPDATE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_ACCN_UPDATE MODIFY (METR NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C005679 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_ACCN_UPDATE MODIFY (ID NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.INT_ACCN_UPDATE ADD CONSTRAINT PK_INTACCN_UPDATE PRIMARY KEY (IDUPD)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -141,12 +131,22 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_INTACCN_UPDATE ***
+PROMPT *** Create  constraint SYS_C005679 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_ACCN_UPDATE ADD CONSTRAINT PK_INTACCN_UPDATE PRIMARY KEY (IDUPD)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.INT_ACCN_UPDATE MODIFY (ID NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C005680 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_ACCN_UPDATE MODIFY (METR NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -167,10 +167,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_INTACCNUPD_GLOBALBD_NN ***
+PROMPT *** Create  constraint SYS_C005682 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_ACCN_UPDATE MODIFY (GLOBAL_BDATE CONSTRAINT CC_INTACCNUPD_GLOBALBD_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.INT_ACCN_UPDATE MODIFY (FREQ NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -239,10 +239,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C005682 ***
+PROMPT *** Create  constraint CC_INTACCNUPD_GLOBALBD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_ACCN_UPDATE MODIFY (FREQ NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.INT_ACCN_UPDATE MODIFY (GLOBAL_BDATE CONSTRAINT CC_INTACCNUPD_GLOBALBD_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -307,10 +307,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  INT_ACCN_UPDATE ***
+grant SELECT                                                                 on INT_ACCN_UPDATE to BARSREADER_ROLE;
 grant SELECT                                                                 on INT_ACCN_UPDATE to BARSUPL;
 grant SELECT                                                                 on INT_ACCN_UPDATE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_ACCN_UPDATE to BARS_DM;
 grant SELECT                                                                 on INT_ACCN_UPDATE to START1;
+grant SELECT                                                                 on INT_ACCN_UPDATE to UPLD;
 
 
 

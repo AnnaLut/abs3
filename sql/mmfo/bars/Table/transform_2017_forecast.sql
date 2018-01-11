@@ -1,4 +1,12 @@
---drop table transform_2017_forecast;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/TRANSFORM_2017_FORECAST.sql =========*
+PROMPT ===================================================================================== 
+
+
+PROMPT *** ALTER_POLICY_INFO to TRANSFORM_2017_FORECAST ***
+
 
 BEGIN 
         execute immediate  
@@ -12,47 +20,96 @@ BEGIN
 END; 
 /
 
-
+PROMPT *** Create  table TRANSFORM_2017_FORECAST ***
 begin 
   execute immediate '
-CREATE TABLE BARS.TRANSFORM_2017_FORECAST
-( KF              VARCHAR2(6 BYTE),
-  KV              NUMBER(3),
-  ACC             NUMBER(38)                    NOT NULL,
-  NBS             CHAR(4 BYTE),
-  NLS             VARCHAR2(15 BYTE),
-  OB22            CHAR(2 BYTE),
-  NEW_NBS         CHAR(4 BYTE),
-  NEW_OB22        CHAR(2 BYTE),
-  NEW_NLS         VARCHAR2(14 BYTE),
-  INSERT_DATE     DATE
-)';
+  CREATE TABLE BARS.TRANSFORM_2017_FORECAST 
+   (	KF VARCHAR2(6), 
+	KV NUMBER(3,0), 
+	ACC NUMBER(38,0), 
+	NBS CHAR(4), 
+	NLS VARCHAR2(15), 
+	OB22 CHAR(2), 
+	NEW_NBS CHAR(4), 
+	NEW_OB22 CHAR(2), 
+	NEW_NLS VARCHAR2(14), 
+	INSERT_DATE DATE
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  TABLESPACE BRSDYND ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
-                                                   
-declare
-  e_idx_exists           exception;
-  pragma exception_init( e_idx_exists,      -00955 );
-  e_col_already_idx      exception;
-  pragma exception_init( e_col_already_idx, -01408 );
-begin
-  execute immediate 'create unique index UK_TRANSFORM_FORECAST_ACC ON TRANSFORM_2017_FORECAST ( ACC ) TABLESPACE BRSMDLI';
 
-declare
-  e_idx_exists           exception;
-  pragma exception_init( e_idx_exists,      -00955 );
-  e_col_already_idx      exception;
-  pragma exception_init( e_col_already_idx, -01408 );
-begin
-  execute immediate 'create unique index UK_TRANSFORM_FORECAST_NLS ON TRANSFORM_2017_FORECAST ( KF, NEW_NLS, KV ) TABLESPACE BRSMDLI COMPRESS 1';
-  dbms_output.put_line( 'Index created.' );
-exception
-  when e_idx_exists 
-  then dbms_output.put_line( 'Name is already used by an existing object.' );
-  when e_col_already_idx 
-  then dbms_output.put_line( 'Such column list already indexed.' );
-end;
+
+
+
+PROMPT *** ALTER_POLICIES to TRANSFORM_2017_FORECAST ***
+ exec bpa.alter_policies('TRANSFORM_2017_FORECAST');
+
+
+COMMENT ON TABLE BARS.TRANSFORM_2017_FORECAST IS '';
+COMMENT ON COLUMN BARS.TRANSFORM_2017_FORECAST.KF IS '';
+COMMENT ON COLUMN BARS.TRANSFORM_2017_FORECAST.KV IS '';
+COMMENT ON COLUMN BARS.TRANSFORM_2017_FORECAST.ACC IS '';
+COMMENT ON COLUMN BARS.TRANSFORM_2017_FORECAST.NBS IS '';
+COMMENT ON COLUMN BARS.TRANSFORM_2017_FORECAST.NLS IS '';
+COMMENT ON COLUMN BARS.TRANSFORM_2017_FORECAST.OB22 IS '';
+COMMENT ON COLUMN BARS.TRANSFORM_2017_FORECAST.NEW_NBS IS '';
+COMMENT ON COLUMN BARS.TRANSFORM_2017_FORECAST.NEW_OB22 IS '';
+COMMENT ON COLUMN BARS.TRANSFORM_2017_FORECAST.NEW_NLS IS '';
+COMMENT ON COLUMN BARS.TRANSFORM_2017_FORECAST.INSERT_DATE IS '';
+
+
+
+
+PROMPT *** Create  constraint SYS_C00139401 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.TRANSFORM_2017_FORECAST MODIFY (ACC NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
 /
-grant select on TRANSFORM_2017_FORECAST to bars_access_defrole; 
+
+
+
+
+PROMPT *** Create  index XUK_TRANSFORM_FORECAST ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.XUK_TRANSFORM_FORECAST ON BARS.TRANSFORM_2017_FORECAST (KF, NEW_NLS) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index XAK_TRANSFORM_FORECAST_ACC ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.XAK_TRANSFORM_FORECAST_ACC ON BARS.TRANSFORM_2017_FORECAST (ACC) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
+PROMPT *** Create  grants  TRANSFORM_2017_FORECAST ***
+grant SELECT                                                                 on TRANSFORM_2017_FORECAST to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on TRANSFORM_2017_FORECAST to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Table/TRANSFORM_2017_FORECAST.sql =========*
+PROMPT ===================================================================================== 

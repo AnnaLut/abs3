@@ -161,9 +161,25 @@ exception when others then
 
 
 
+
+PROMPT *** Create  index I_ATTR_HISTORY_OBJECTID ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I_ATTR_HISTORY_OBJECTID ON BARS.ATTRIBUTE_HISTORY (OBJECT_ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS COMPRESS 1 
+  TABLESPACE BRSBIGI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  ATTRIBUTE_HISTORY ***
+grant SELECT                                                                 on ATTRIBUTE_HISTORY to BARSREADER_ROLE;
 grant SELECT                                                                 on ATTRIBUTE_HISTORY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ATTRIBUTE_HISTORY to BARS_DM;
+grant SELECT                                                                 on ATTRIBUTE_HISTORY to UPLD;
 
 
 

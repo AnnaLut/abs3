@@ -59,10 +59,10 @@ COMMENT ON COLUMN BARS.W4_PRODUCT_MASK.TIP IS '';
 
 
 
-PROMPT *** Create  constraint CC_W4PRODUCTMASK_GRPCODE_NN ***
+PROMPT *** Create  constraint CC_W4PRODUCTMASK_CODE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_PRODUCT_MASK MODIFY (GRP_CODE CONSTRAINT CC_W4PRODUCTMASK_GRPCODE_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.W4_PRODUCT_MASK MODIFY (CODE CONSTRAINT CC_W4PRODUCTMASK_CODE_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -83,10 +83,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_W4PRODUCTMASK_CODE_NN ***
+PROMPT *** Create  constraint CC_W4PRODUCTMASK_GRPCODE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_PRODUCT_MASK MODIFY (CODE CONSTRAINT CC_W4PRODUCTMASK_CODE_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.W4_PRODUCT_MASK MODIFY (GRP_CODE CONSTRAINT CC_W4PRODUCTMASK_GRPCODE_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -143,9 +143,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  W4_PRODUCT_MASK ***
+grant SELECT                                                                 on W4_PRODUCT_MASK to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on W4_PRODUCT_MASK to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_PRODUCT_MASK to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on W4_PRODUCT_MASK to OW;
+grant SELECT                                                                 on W4_PRODUCT_MASK to UPLD;
 
 
 

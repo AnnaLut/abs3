@@ -48,7 +48,9 @@ COMMENT ON COLUMN BARS.TMP_CRKR_REPORT.SS IS '';
 
 
 PROMPT *** Create  grants  TMP_CRKR_REPORT ***
+grant SELECT                                                                 on TMP_CRKR_REPORT to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_CRKR_REPORT to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on TMP_CRKR_REPORT to UPLD;
 
 
 

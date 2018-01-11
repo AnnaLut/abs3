@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  GRT_VEHICLE_TYPES ***
+grant SELECT                                                                 on GRT_VEHICLE_TYPES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on GRT_VEHICLE_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on GRT_VEHICLE_TYPES to BARS_DM;
+grant SELECT                                                                 on GRT_VEHICLE_TYPES to UPLD;
 
 
 

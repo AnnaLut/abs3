@@ -116,8 +116,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WEB_IMPORT_FILES ***
+grant SELECT                                                                 on WEB_IMPORT_FILES to BARSREADER_ROLE;
 grant SELECT                                                                 on WEB_IMPORT_FILES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WEB_IMPORT_FILES to BARS_DM;
+grant SELECT                                                                 on WEB_IMPORT_FILES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_IMPORT_FILES to WR_ALL_RIGHTS;
 grant SELECT                                                                 on WEB_IMPORT_FILES to WR_IMPEXP;
 

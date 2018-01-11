@@ -53,8 +53,10 @@ COMMENT ON COLUMN BARS.POST_A.UNPACK IS '';
 
 
 PROMPT *** Create  grants  POST_A ***
+grant SELECT                                                                 on POST_A          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on POST_A          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on POST_A          to START1;
+grant SELECT                                                                 on POST_A          to UPLD;
 
 
 

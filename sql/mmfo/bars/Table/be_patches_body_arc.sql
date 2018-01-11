@@ -68,19 +68,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BEPATCHBODYARC_BEPATCHESARC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BE_PATCHES_BODY_ARC ADD CONSTRAINT FK_BEPATCHBODYARC_BEPATCHESARC FOREIGN KEY (PATH_NAME, INS_DATE)
-	  REFERENCES BARS.BE_PATCHES_ARC (PATH_NAME, INS_DATE) ON DELETE CASCADE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_BEPATCHBODYARC_PATHNAME_NN ***
 begin   
  execute immediate '
@@ -119,7 +106,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  BE_PATCHES_BODY_ARC ***
+grant SELECT                                                                 on BE_PATCHES_BODY_ARC to BARSREADER_ROLE;
 grant SELECT                                                                 on BE_PATCHES_BODY_ARC to BARS_DM;
+grant SELECT                                                                 on BE_PATCHES_BODY_ARC to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BE_PATCHES_BODY_ARC to WR_ALL_RIGHTS;
 
 

@@ -114,8 +114,10 @@ COMMENT ON COLUMN BARS.QUEST_SL_TEMP_EXPLAIN2.QBLOCK_NAME IS '';
 
 
 PROMPT *** Create  grants  QUEST_SL_TEMP_EXPLAIN2 ***
+grant SELECT                                                                 on QUEST_SL_TEMP_EXPLAIN2 to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on QUEST_SL_TEMP_EXPLAIN2 to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on QUEST_SL_TEMP_EXPLAIN2 to START1;
+grant SELECT                                                                 on QUEST_SL_TEMP_EXPLAIN2 to UPLD;
 
 
 

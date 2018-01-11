@@ -89,10 +89,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTBLANK_BRANCH_NN ***
+PROMPT *** Create  constraint UK_DPTBLANK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_BLANK MODIFY (BRANCH CONSTRAINT CC_DPTBLANK_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_BLANK ADD CONSTRAINT UK_DPTBLANK UNIQUE (KF, ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -101,58 +103,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTBLANK_KF_NN ***
+PROMPT *** Create  constraint CC_DPTBLANK_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_BLANK MODIFY (KF CONSTRAINT CC_DPTBLANK_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBLANK_STAFFID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BLANK MODIFY (STAFF_ID CONSTRAINT CC_DPTBLANK_STAFFID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBLANK_STATUS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BLANK MODIFY (STATUS CONSTRAINT CC_DPTBLANK_STATUS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBLANK_DOCSCHEMEID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BLANK MODIFY (DOC_SCHEME_ID CONSTRAINT CC_DPTBLANK_DOCSCHEMEID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBLANK_DEPOSITID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BLANK MODIFY (DEPOSIT_ID CONSTRAINT CC_DPTBLANK_DEPOSITID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_BLANK MODIFY (ID CONSTRAINT CC_DPTBLANK_ID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -173,12 +127,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_DPTBLANK ***
+PROMPT *** Create  constraint CC_DPTBLANK_DEPOSITID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_BLANK ADD CONSTRAINT UK_DPTBLANK UNIQUE (KF, ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.DPT_BLANK MODIFY (DEPOSIT_ID CONSTRAINT CC_DPTBLANK_DEPOSITID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -187,11 +139,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTBLANK_BRANCH ***
+PROMPT *** Create  constraint CC_DPTBLANK_DOCSCHEMEID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_BLANK ADD CONSTRAINT FK_DPTBLANK_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
+  ALTER TABLE BARS.DPT_BLANK MODIFY (DOC_SCHEME_ID CONSTRAINT CC_DPTBLANK_DOCSCHEMEID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -200,11 +151,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTBLANK_STAFF ***
+PROMPT *** Create  constraint CC_DPTBLANK_STATUS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_BLANK ADD CONSTRAINT FK_DPTBLANK_STAFF FOREIGN KEY (STAFF_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
+  ALTER TABLE BARS.DPT_BLANK MODIFY (STATUS CONSTRAINT CC_DPTBLANK_STATUS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -213,11 +163,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTBLANK_DOCSCHEME ***
+PROMPT *** Create  constraint CC_DPTBLANK_STAFFID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_BLANK ADD CONSTRAINT FK_DPTBLANK_DOCSCHEME FOREIGN KEY (DOC_SCHEME_ID)
-	  REFERENCES BARS.DOC_SCHEME (ID) ENABLE';
+  ALTER TABLE BARS.DPT_BLANK MODIFY (STAFF_ID CONSTRAINT CC_DPTBLANK_STAFFID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -226,11 +175,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTBLANK_KF ***
+PROMPT *** Create  constraint CC_DPTBLANK_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_BLANK ADD CONSTRAINT FK_DPTBLANK_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
+  ALTER TABLE BARS.DPT_BLANK MODIFY (KF CONSTRAINT CC_DPTBLANK_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -239,36 +187,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTBLANK_DPTDPTALL2 ***
+PROMPT *** Create  constraint CC_DPTBLANK_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_BLANK ADD CONSTRAINT FK_DPTBLANK_DPTDPTALL2 FOREIGN KEY (KF, DEPOSIT_ID)
-	  REFERENCES BARS.DPT_DEPOSIT_ALL (KF, DEPOSIT_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTBLANK_DPTBLANK2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BLANK ADD CONSTRAINT FK_DPTBLANK_DPTBLANK2 FOREIGN KEY (KF, ID_FAULTY)
-	  REFERENCES BARS.DPT_BLANK (KF, ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBLANK_ID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BLANK MODIFY (ID CONSTRAINT CC_DPTBLANK_ID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_BLANK MODIFY (BRANCH CONSTRAINT CC_DPTBLANK_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -333,10 +255,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_BLANK ***
+grant SELECT                                                                 on DPT_BLANK       to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on DPT_BLANK       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_BLANK       to BARS_DM;
 grant INSERT,SELECT,UPDATE                                                   on DPT_BLANK       to DPT_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on DPT_BLANK       to START1;
+grant SELECT                                                                 on DPT_BLANK       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_BLANK       to WR_ALL_RIGHTS;
 
 

@@ -77,10 +77,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  FINMON_QUE_STATUS ***
+grant SELECT                                                                 on FINMON_QUE_STATUS to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FINMON_QUE_STATUS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FINMON_QUE_STATUS to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on FINMON_QUE_STATUS to FINMON;
 grant DELETE,INSERT,SELECT,UPDATE                                            on FINMON_QUE_STATUS to FINMON01;
+grant SELECT                                                                 on FINMON_QUE_STATUS to UPLD;
 
 
 

@@ -53,19 +53,6 @@ COMMENT ON COLUMN BARS.XML2_ID.BM IS '';
 
 
 
-PROMPT *** Create  constraint FK_XML2ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.XML2_ID ADD CONSTRAINT FK_XML2ID FOREIGN KEY (BM)
-	  REFERENCES BARS.XML2_BM (BM) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint XPK_XML2ID ***
 begin   
  execute immediate '
@@ -95,9 +82,11 @@ exception when others then
 
 PROMPT *** Create  grants  XML2_ID ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on XML2_ID         to ABS_ADMIN;
+grant SELECT                                                                 on XML2_ID         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML2_ID         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on XML2_ID         to BARS_DM;
 grant DELETE,SELECT,UPDATE                                                   on XML2_ID         to PYOD001;
+grant SELECT                                                                 on XML2_ID         to UPLD;
 grant FLASHBACK,SELECT                                                       on XML2_ID         to WR_REFREAD;
 
 

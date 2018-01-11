@@ -77,6 +77,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  SPECPARAM_CP_OB ***
+grant SELECT                                                                 on SPECPARAM_CP_OB to BARSREADER_ROLE;
 grant SELECT                                                                 on SPECPARAM_CP_OB to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPECPARAM_CP_OB to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SPECPARAM_CP_OB to BARS_DM;

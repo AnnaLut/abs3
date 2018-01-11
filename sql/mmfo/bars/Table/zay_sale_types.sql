@@ -75,7 +75,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAY_SALE_TYPES ***
+grant SELECT                                                                 on ZAY_SALE_TYPES  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_SALE_TYPES  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on ZAY_SALE_TYPES  to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_SALE_TYPES  to ZAY;
 
 

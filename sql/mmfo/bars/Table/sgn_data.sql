@@ -93,11 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SGNDATA_SGNTYPE_ID ***
+PROMPT *** Create  constraint CC_SGNDATA_CRDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SGN_DATA ADD CONSTRAINT FK_SGNDATA_SGNTYPE_ID FOREIGN KEY (SIGN_TYPE)
-	  REFERENCES BARS.SGN_TYPE (ID) ENABLE';
+  ALTER TABLE BARS.SGN_DATA MODIFY (CREATING_DATE CONSTRAINT CC_SGNDATA_CRDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -132,18 +131,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SGNDATA_CRDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SGN_DATA MODIFY (CREATING_DATE CONSTRAINT CC_SGNDATA_CRDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_SGNDATA ***
 begin   
  execute immediate '
@@ -158,8 +145,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SGN_DATA ***
+grant SELECT                                                                 on SGN_DATA        to BARSREADER_ROLE;
 grant SELECT                                                                 on SGN_DATA        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SGN_DATA        to TOSS;
+grant SELECT                                                                 on SGN_DATA        to UPLD;
 
 
 

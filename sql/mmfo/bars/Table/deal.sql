@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''DEAL'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''DEAL'', ''FILIAL'' , null, ''E'', ''E'', ''E'');
+               bpa.alter_policy_info(''DEAL'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''DEAL'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -67,10 +67,10 @@ COMMENT ON COLUMN BARS.DEAL.CURATOR_ID IS 'Ідентифікатор співробітника банку - к
 
 
 
-PROMPT *** Create  constraint CC_DEAL_START_DATE_NN ***
+PROMPT *** Create  constraint CC_DEAL_CUSTOMER_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DEAL ADD CONSTRAINT CC_DEAL_START_DATE_NN CHECK (START_DATE IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
+  ALTER TABLE BARS.DEAL ADD CONSTRAINT CC_DEAL_CUSTOMER_ID_NN CHECK (CUSTOMER_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -79,10 +79,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DEAL_CUSTOMER_ID_NN ***
+PROMPT *** Create  constraint CC_DEAL_START_DATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DEAL ADD CONSTRAINT CC_DEAL_CUSTOMER_ID_NN CHECK (CUSTOMER_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
+  ALTER TABLE BARS.DEAL ADD CONSTRAINT CC_DEAL_START_DATE_NN CHECK (START_DATE IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -117,37 +117,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DEAL_REF_PRODUCT ***
+PROMPT *** Create  constraint CC_DEAL_ID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DEAL ADD CONSTRAINT FK_DEAL_REF_PRODUCT FOREIGN KEY (PRODUCT_ID)
-	  REFERENCES BARS.DEAL_PRODUCT (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DEAL_REFERENCE_CUSTOMER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEAL ADD CONSTRAINT FK_DEAL_REFERENCE_CUSTOMER FOREIGN KEY (CUSTOMER_ID)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DEAL_REFERENCE_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEAL ADD CONSTRAINT FK_DEAL_REFERENCE_BRANCH FOREIGN KEY (BRANCH_ID)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DEAL MODIFY (ID CONSTRAINT CC_DEAL_ID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -160,44 +133,6 @@ PROMPT *** Create  constraint CC_DEAL_TYPE_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.DEAL MODIFY (DEAL_TYPE_ID CONSTRAINT CC_DEAL_TYPE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DEAL_REF_CURATOR ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEAL ADD CONSTRAINT FK_DEAL_REF_CURATOR FOREIGN KEY (CURATOR_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DEAL_REF_OBJ_TYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEAL ADD CONSTRAINT FK_DEAL_REF_OBJ_TYPE FOREIGN KEY (DEAL_TYPE_ID)
-	  REFERENCES BARS.OBJECT_TYPE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DEAL_ID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEAL MODIFY (ID CONSTRAINT CC_DEAL_ID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -248,7 +183,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DEAL ***
+grant SELECT                                                                 on DEAL            to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on DEAL            to BARS_DM;
+grant SELECT                                                                 on DEAL            to UPLD;
 
 
 

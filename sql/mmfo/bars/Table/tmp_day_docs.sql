@@ -84,8 +84,10 @@ COMMENT ON COLUMN BARS.TMP_DAY_DOCS.NAZN IS '';
 
 
 PROMPT *** Create  grants  TMP_DAY_DOCS ***
+grant SELECT                                                                 on TMP_DAY_DOCS    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DAY_DOCS    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DAY_DOCS    to START1;
+grant SELECT                                                                 on TMP_DAY_DOCS    to UPLD;
 
 
 

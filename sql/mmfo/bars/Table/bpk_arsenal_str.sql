@@ -91,19 +91,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BPKARSENALSTR_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_ARSENAL_STR ADD CONSTRAINT FK_BPKARSENALSTR_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_BPKARSENALSTR_ID_NN ***
 begin   
  execute immediate '
@@ -144,9 +131,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_ARSENAL_STR ***
+grant SELECT                                                                 on BPK_ARSENAL_STR to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BPK_ARSENAL_STR to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_ARSENAL_STR to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_ARSENAL_STR to OBPC;
+grant SELECT                                                                 on BPK_ARSENAL_STR to UPLD;
 grant FLASHBACK,SELECT                                                       on BPK_ARSENAL_STR to WR_REFREAD;
 
 

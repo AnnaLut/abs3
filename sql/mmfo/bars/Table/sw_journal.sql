@@ -129,342 +129,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SWJOURNAL_ACCOUNTS2 ***
+PROMPT *** Create  constraint UK2_SWJOURNAL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT FK_SWJOURNAL_ACCOUNTS2 FOREIGN KEY (KF, ACCD)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_MT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (MT CONSTRAINT CC_SWJOURNAL_MT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (KF CONSTRAINT CC_SWJOURNAL_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_APPFLAG_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (APP_FLAG CONSTRAINT CC_SWJOURNAL_APPFLAG_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_IMPORTED_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (IMPORTED CONSTRAINT CC_SWJOURNAL_IMPORTED_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_LAUACT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (LAU_ACT CONSTRAINT CC_SWJOURNAL_LAUACT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_SOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (SOS CONSTRAINT CC_SWJOURNAL_SOS_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_PAGE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (PAGE CONSTRAINT CC_SWJOURNAL_PAGE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_VDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (VDATE CONSTRAINT CC_SWJOURNAL_VDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_DATEIN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (DATE_IN CONSTRAINT CC_SWJOURNAL_DATEIN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_AMOUNT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (AMOUNT CONSTRAINT CC_SWJOURNAL_AMOUNT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_RECEIVER_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (RECEIVER CONSTRAINT CC_SWJOURNAL_RECEIVER_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_SENDER_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (SENDER CONSTRAINT CC_SWJOURNAL_SENDER_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_IOIND_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (IO_IND CONSTRAINT CC_SWJOURNAL_IOIND_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_TRN_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (TRN CONSTRAINT CC_SWJOURNAL_TRN_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_SWREF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL MODIFY (SWREF CONSTRAINT CC_SWJOURNAL_SWREF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SWJOURNAL_ACCOUNTS3 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT FK_SWJOURNAL_ACCOUNTS3 FOREIGN KEY (KF, ACCK)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SWJOURNAL_SWBANKS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT FK_SWJOURNAL_SWBANKS2 FOREIGN KEY (RECEIVER)
-	  REFERENCES BARS.SW_BANKS (BIC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SWJOURNAL_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT FK_SWJOURNAL_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SWJOURNAL_SWBANKS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT FK_SWJOURNAL_SWBANKS FOREIGN KEY (SENDER)
-	  REFERENCES BARS.SW_BANKS (BIC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SWJOURNAL_STAFF2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT FK_SWJOURNAL_STAFF2 FOREIGN KEY (LAU_UID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SWJOURNAL_TABVAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT FK_SWJOURNAL_TABVAL FOREIGN KEY (CURRENCY)
-	  REFERENCES BARS.TABVAL$GLOBAL (LCV) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SWJOURNAL_SWMT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT FK_SWJOURNAL_SWMT FOREIGN KEY (MT)
-	  REFERENCES BARS.SW_MT (MT) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_SOS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT CC_SWJOURNAL_SOS CHECK (sos in (0, -2)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_IMPORTED ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT CC_SWJOURNAL_IMPORTED CHECK (imported in (''Y'', ''N'')) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_LAUACT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT CC_SWJOURNAL_LAUACT CHECK (lau_act in (0, 1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_FLAGS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT CC_SWJOURNAL_FLAGS CHECK (flags in (''L'')) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SWJOURNAL_IOIND ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT CC_SWJOURNAL_IOIND CHECK (io_ind in (''I'', ''O'')) ENABLE';
+  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT UK2_SWJOURNAL UNIQUE (KF, SWREF)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -487,12 +157,238 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK2_SWJOURNAL ***
+PROMPT *** Create  constraint CC_SWJOURNAL_IOIND ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT UK2_SWJOURNAL UNIQUE (KF, SWREF)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT CC_SWJOURNAL_IOIND CHECK (io_ind in (''I'', ''O'')) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_FLAGS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT CC_SWJOURNAL_FLAGS CHECK (flags in (''L'')) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_LAUACT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT CC_SWJOURNAL_LAUACT CHECK (lau_act in (0, 1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_IMPORTED ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT CC_SWJOURNAL_IMPORTED CHECK (imported in (''Y'', ''N'')) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_SOS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL ADD CONSTRAINT CC_SWJOURNAL_SOS CHECK (sos in (0, -2)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_SWREF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (SWREF CONSTRAINT CC_SWJOURNAL_SWREF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_TRN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (TRN CONSTRAINT CC_SWJOURNAL_TRN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_IOIND_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (IO_IND CONSTRAINT CC_SWJOURNAL_IOIND_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_SENDER_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (SENDER CONSTRAINT CC_SWJOURNAL_SENDER_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_RECEIVER_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (RECEIVER CONSTRAINT CC_SWJOURNAL_RECEIVER_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_AMOUNT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (AMOUNT CONSTRAINT CC_SWJOURNAL_AMOUNT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_DATEIN_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (DATE_IN CONSTRAINT CC_SWJOURNAL_DATEIN_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_VDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (VDATE CONSTRAINT CC_SWJOURNAL_VDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_PAGE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (PAGE CONSTRAINT CC_SWJOURNAL_PAGE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_SOS_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (SOS CONSTRAINT CC_SWJOURNAL_SOS_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_LAUACT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (LAU_ACT CONSTRAINT CC_SWJOURNAL_LAUACT_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_IMPORTED_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (IMPORTED CONSTRAINT CC_SWJOURNAL_IMPORTED_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_APPFLAG_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (APP_FLAG CONSTRAINT CC_SWJOURNAL_APPFLAG_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (KF CONSTRAINT CC_SWJOURNAL_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SWJOURNAL_MT_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SW_JOURNAL MODIFY (MT CONSTRAINT CC_SWJOURNAL_MT_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -600,11 +496,13 @@ exception when others then
 
 PROMPT *** Create  grants  SW_JOURNAL ***
 grant SELECT,UPDATE                                                          on SW_JOURNAL      to BARS013;
+grant SELECT                                                                 on SW_JOURNAL      to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on SW_JOURNAL      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_JOURNAL      to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on SW_JOURNAL      to FOREX;
 grant SELECT                                                                 on SW_JOURNAL      to START1;
 grant SELECT,UPDATE                                                          on SW_JOURNAL      to SWTOSS;
+grant SELECT                                                                 on SW_JOURNAL      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_JOURNAL      to WR_ALL_RIGHTS;
 
 

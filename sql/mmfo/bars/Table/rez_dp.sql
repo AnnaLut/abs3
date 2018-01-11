@@ -64,10 +64,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010350 ***
+PROMPT *** Create  constraint SYS_C0010349 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.REZ_DP MODIFY (KV NOT NULL ENABLE)';
+  ALTER TABLE BARS.REZ_DP MODIFY (ND NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -76,10 +76,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010349 ***
+PROMPT *** Create  constraint SYS_C0010350 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.REZ_DP MODIFY (ND NOT NULL ENABLE)';
+  ALTER TABLE BARS.REZ_DP MODIFY (KV NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -100,8 +100,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  REZ_DP ***
+grant SELECT                                                                 on REZ_DP          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZ_DP          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on REZ_DP          to START1;
+grant SELECT                                                                 on REZ_DP          to UPLD;
 
 
 

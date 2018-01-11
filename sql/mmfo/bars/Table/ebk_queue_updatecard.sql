@@ -95,8 +95,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBK_QUEUE_UPDATECARD ***
+grant SELECT                                                                 on EBK_QUEUE_UPDATECARD to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBK_QUEUE_UPDATECARD to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBK_QUEUE_UPDATECARD to BARS_DM;
+grant SELECT                                                                 on EBK_QUEUE_UPDATECARD to UPLD;
 
 
 

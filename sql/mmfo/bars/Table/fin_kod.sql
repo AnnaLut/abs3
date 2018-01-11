@@ -107,8 +107,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  FIN_KOD ***
+grant SELECT                                                                 on FIN_KOD         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_KOD         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_KOD         to BARS_DM;
+grant SELECT                                                                 on FIN_KOD         to UPLD;
 
 
 

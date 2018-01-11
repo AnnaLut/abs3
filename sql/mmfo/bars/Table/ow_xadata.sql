@@ -77,19 +77,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OWXADATA_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_XADATA ADD CONSTRAINT FK_OWXADATA_STAFF FOREIGN KEY (UNFORM_USER)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_OWXADATA_FILENAME_NN ***
 begin   
  execute immediate '
@@ -128,8 +115,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_XADATA ***
+grant SELECT                                                                 on OW_XADATA       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_XADATA       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_XADATA       to OW;
+grant SELECT                                                                 on OW_XADATA       to UPLD;
 
 
 

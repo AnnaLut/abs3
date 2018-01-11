@@ -88,10 +88,12 @@ exception when others then
 
 PROMPT *** Create  grants  SW_OPT ***
 grant SELECT                                                                 on SW_OPT          to BARS013;
+grant SELECT                                                                 on SW_OPT          to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_OPT          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_OPT          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_OPT          to SWIFT001;
 grant SELECT                                                                 on SW_OPT          to SWTOSS;
+grant SELECT                                                                 on SW_OPT          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SW_OPT          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SW_OPT          to WR_REFREAD;
 

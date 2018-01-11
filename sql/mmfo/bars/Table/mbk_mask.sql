@@ -91,10 +91,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  MBK_MASK ***
+grant SELECT                                                                 on MBK_MASK        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MBK_MASK        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MBK_MASK        to BARS_DM;
 grant SELECT                                                                 on MBK_MASK        to FOREX;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MBK_MASK        to MBK_MASK;
+grant SELECT                                                                 on MBK_MASK        to UPLD;
 grant FLASHBACK,SELECT                                                       on MBK_MASK        to WR_REFREAD;
 
 

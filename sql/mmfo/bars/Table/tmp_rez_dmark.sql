@@ -91,8 +91,10 @@ COMMENT ON COLUMN BARS.TMP_REZ_DMARK.OTD IS '';
 
 
 PROMPT *** Create  grants  TMP_REZ_DMARK ***
+grant SELECT                                                                 on TMP_REZ_DMARK   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_REZ_DMARK   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_REZ_DMARK   to START1;
+grant SELECT                                                                 on TMP_REZ_DMARK   to UPLD;
 
 
 

@@ -24,19 +24,18 @@ PROMPT *** Create  table SB_P0851 ***
 begin 
   execute immediate '
   CREATE TABLE BARS.SB_P0851 
-   (	R020 CHAR(4), 
-	P080 CHAR(4), 
-	R020_FA CHAR(4), 
-	OB22 CHAR(2), 
+   (	R020 VARCHAR2(4), 
+	P080 VARCHAR2(4), 
+	R020_FA VARCHAR2(4), 
+	OB22 VARCHAR2(2), 
 	TXT VARCHAR2(254), 
-	AP CHAR(1), 
-	PRIZN_VIDP CHAR(1), 
+	AP VARCHAR2(1), 
+	PRIZN_VIDP VARCHAR2(1), 
 	D_OPEN DATE, 
 	D_CLOSE DATE, 
-	COD_ACT CHAR(1), 
-	GR_FA CHAR(4), 
-	GR_IN CHAR(1), 
-	ROWPD VARCHAR2(156)
+	COD_ACT VARCHAR2(1), 
+	GR_FA VARCHAR2(4), 
+	GR_IN VARCHAR2(1)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -66,14 +65,11 @@ COMMENT ON COLUMN BARS.SB_P0851.D_CLOSE IS '';
 COMMENT ON COLUMN BARS.SB_P0851.COD_ACT IS '';
 COMMENT ON COLUMN BARS.SB_P0851.GR_FA IS '';
 COMMENT ON COLUMN BARS.SB_P0851.GR_IN IS '';
-COMMENT ON COLUMN BARS.SB_P0851.ROWPD IS '';
 
 
 
 PROMPT *** Create  grants  SB_P0851 ***
-grant DELETE,INSERT,SELECT,UPDATE                                            on SB_P0851        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on SB_P0851        to BARS_DM;
-grant DELETE,INSERT,SELECT,UPDATE                                            on SB_P0851        to START1;
+grant SELECT                                                                 on SB_P0851        to UPLD;
 
 
 

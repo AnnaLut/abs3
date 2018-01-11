@@ -57,19 +57,6 @@ COMMENT ON COLUMN BARS.DPT_VIDD_BONUSES.REC_FINALLY IS 'Признак окончания просмо
 
 
 
-PROMPT *** Create  constraint FK_DPTVIDDBONUS_DPTBONUS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_BONUSES ADD CONSTRAINT FK_DPTVIDDBONUS_DPTBONUS FOREIGN KEY (BONUS_ID)
-	  REFERENCES BARS.DPT_BONUSES (BONUS_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_DPTVIDDBONUS ***
 begin   
  execute immediate '
@@ -84,83 +71,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTVIDDBONUS_RECFINALLY_NN ***
+PROMPT *** Create  constraint UK_DPTVIDDBONUS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_BONUSES MODIFY (REC_FINALLY CONSTRAINT CC_DPTVIDDBONUS_RECFINALLY_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTVIDDBONUS_RECACTIVITY_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_BONUSES MODIFY (REC_ACTIVITY CONSTRAINT CC_DPTVIDDBONUS_RECACTIVITY_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTVIDDBONUS_RECRANG_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_BONUSES MODIFY (REC_RANG CONSTRAINT CC_DPTVIDDBONUS_RECRANG_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTVIDDBONUS_BONUSID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_BONUSES MODIFY (BONUS_ID CONSTRAINT CC_DPTVIDDBONUS_BONUSID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTVIDDBONUS_VIDD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_BONUSES MODIFY (VIDD CONSTRAINT CC_DPTVIDDBONUS_VIDD_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTVIDDBONUS_DPTVIDD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_BONUSES ADD CONSTRAINT FK_DPTVIDDBONUS_DPTVIDD FOREIGN KEY (VIDD)
-	  REFERENCES BARS.DPT_VIDD (VIDD) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTVIDDBONUS_RECFINALLY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_BONUSES ADD CONSTRAINT CC_DPTVIDDBONUS_RECFINALLY CHECK (rec_finally IN (''Y'',''N'')) ENABLE';
+  ALTER TABLE BARS.DPT_VIDD_BONUSES ADD CONSTRAINT UK_DPTVIDDBONUS UNIQUE (VIDD, REC_RANG)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -181,12 +97,70 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_DPTVIDDBONUS ***
+PROMPT *** Create  constraint CC_DPTVIDDBONUS_RECFINALLY ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_VIDD_BONUSES ADD CONSTRAINT UK_DPTVIDDBONUS UNIQUE (VIDD, REC_RANG)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.DPT_VIDD_BONUSES ADD CONSTRAINT CC_DPTVIDDBONUS_RECFINALLY CHECK (rec_finally IN (''Y'',''N'')) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTVIDDBONUS_VIDD_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_BONUSES MODIFY (VIDD CONSTRAINT CC_DPTVIDDBONUS_VIDD_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTVIDDBONUS_BONUSID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_BONUSES MODIFY (BONUS_ID CONSTRAINT CC_DPTVIDDBONUS_BONUSID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTVIDDBONUS_RECRANG_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_BONUSES MODIFY (REC_RANG CONSTRAINT CC_DPTVIDDBONUS_RECRANG_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTVIDDBONUS_RECACTIVITY_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_BONUSES MODIFY (REC_ACTIVITY CONSTRAINT CC_DPTVIDDBONUS_RECACTIVITY_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTVIDDBONUS_RECFINALLY_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_VIDD_BONUSES MODIFY (REC_FINALLY CONSTRAINT CC_DPTVIDDBONUS_RECFINALLY_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -223,9 +197,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_VIDD_BONUSES ***
+grant SELECT                                                                 on DPT_VIDD_BONUSES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_BONUSES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VIDD_BONUSES to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VIDD_BONUSES to DPT_ADMIN;
+grant SELECT                                                                 on DPT_VIDD_BONUSES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VIDD_BONUSES to WR_ALL_RIGHTS;
 
 

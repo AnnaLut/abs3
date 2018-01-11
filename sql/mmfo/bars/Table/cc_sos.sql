@@ -89,11 +89,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_SOS ***
+grant SELECT                                                                 on CC_SOS          to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_SOS          to BARSUPL;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on CC_SOS          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_SOS          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_SOS          to CC_SOS;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on CC_SOS          to RCC_DEAL;
+grant SELECT                                                                 on CC_SOS          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_SOS          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CC_SOS          to WR_REFREAD;
 

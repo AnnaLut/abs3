@@ -62,19 +62,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ACCNLO_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ACC_NLO ADD CONSTRAINT FK_ACCNLO_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_ACCNLO_KF_NN ***
 begin   
  execute immediate '
@@ -101,10 +88,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACC_NLO ***
+grant SELECT                                                                 on ACC_NLO         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_NLO         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_NLO         to BARS_DM;
 grant SELECT                                                                 on ACC_NLO         to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_NLO         to START1;
+grant SELECT                                                                 on ACC_NLO         to UPLD;
 
 
 

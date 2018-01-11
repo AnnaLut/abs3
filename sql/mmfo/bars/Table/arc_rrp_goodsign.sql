@@ -163,9 +163,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  ARC_RRP_GOODSIGN ***
+grant SELECT                                                                 on ARC_RRP_GOODSIGN to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ARC_RRP_GOODSIGN to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ARC_RRP_GOODSIGN to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ARC_RRP_GOODSIGN to START1;
+grant SELECT                                                                 on ARC_RRP_GOODSIGN to UPLD;
 
 
 

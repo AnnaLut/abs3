@@ -88,7 +88,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DICT_PURPOSE_TRANS ***
+grant SELECT                                                                 on DICT_PURPOSE_TRANS to BARSREADER_ROLE;
 grant SELECT                                                                 on DICT_PURPOSE_TRANS to BARS_DM;
+grant SELECT                                                                 on DICT_PURPOSE_TRANS to UPLD;
 
 
 

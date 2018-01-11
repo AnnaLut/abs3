@@ -59,32 +59,6 @@ COMMENT ON COLUMN BARS.SOS_TRACK.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_SOSTRACK_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOS_TRACK ADD CONSTRAINT FK_SOSTRACK_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SOSTRACK_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SOS_TRACK ADD CONSTRAINT FK_SOSTRACK_STAFF FOREIGN KEY (USERID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SOSTRACK_REF_NN ***
 begin   
  execute immediate '
@@ -109,12 +83,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_SOSTRACK ***
+PROMPT *** Create  constraint CC_SOSTRACK_NEWSOS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SOS_TRACK ADD CONSTRAINT PK_SOSTRACK PRIMARY KEY (REF, SOS_TRACKER)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGD  ENABLE';
+  ALTER TABLE BARS.SOS_TRACK MODIFY (NEW_SOS CONSTRAINT CC_SOSTRACK_NEWSOS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -159,10 +131,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SOSTRACK_NEWSOS_NN ***
+PROMPT *** Create  constraint PK_SOSTRACK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SOS_TRACK MODIFY (NEW_SOS CONSTRAINT CC_SOSTRACK_NEWSOS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SOS_TRACK ADD CONSTRAINT PK_SOSTRACK PRIMARY KEY (REF, SOS_TRACKER)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -186,6 +160,7 @@ exception when others then
 
 PROMPT *** Create  grants  SOS_TRACK ***
 grant FLASHBACK,REFERENCES,SELECT                                            on SOS_TRACK       to BARSAQ with grant option;
+grant SELECT                                                                 on SOS_TRACK       to BARSREADER_ROLE;
 grant SELECT                                                                 on SOS_TRACK       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SOS_TRACK       to START1;
 

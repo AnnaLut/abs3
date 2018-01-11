@@ -55,10 +55,10 @@ COMMENT ON COLUMN BARS.TMP_ACCM_SNAP_LAST.KOSQ IS '';
 
 
 
-PROMPT *** Create  constraint CC_TMPACCMSNAPL_ACC_NN ***
+PROMPT *** Create  constraint PK_TMPACCMSNAPL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_ACCM_SNAP_LAST MODIFY (ACC CONSTRAINT CC_TMPACCMSNAPL_ACC_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_ACCM_SNAP_LAST ADD CONSTRAINT PK_TMPACCMSNAPL PRIMARY KEY (ACC) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -67,10 +67,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_TMPACCMSNAPL ***
+PROMPT *** Create  constraint CC_TMPACCMSNAPL_ACC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_ACCM_SNAP_LAST ADD CONSTRAINT PK_TMPACCMSNAPL PRIMARY KEY (ACC) ENABLE';
+  ALTER TABLE BARS.TMP_ACCM_SNAP_LAST MODIFY (ACC CONSTRAINT CC_TMPACCMSNAPL_ACC_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -91,8 +91,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_ACCM_SNAP_LAST ***
+grant SELECT                                                                 on TMP_ACCM_SNAP_LAST to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_ACCM_SNAP_LAST to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_ACCM_SNAP_LAST to START1;
+grant SELECT                                                                 on TMP_ACCM_SNAP_LAST to UPLD;
 
 
 

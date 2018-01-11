@@ -76,6 +76,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  TMP_CP_WORK ***
+grant SELECT                                                                 on TMP_CP_WORK     to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_CP_WORK     to UPLD;
+
 
 
 PROMPT *** Create SYNONYM  to TMP_CP_WORK ***

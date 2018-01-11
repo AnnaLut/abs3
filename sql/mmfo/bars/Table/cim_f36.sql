@@ -52,7 +52,8 @@ begin
 	P25 VARCHAR2(12), 
 	CREATE_DATE DATE, 
 	P27 VARCHAR2(3), 
-	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'', ''user_branch'')
+	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'', ''user_branch''), 
+	P21_NEW DATE
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -70,6 +71,7 @@ PROMPT *** ALTER_POLICIES to CIM_F36 ***
 
 
 COMMENT ON TABLE BARS.CIM_F36 IS 'Порушення строків розрахунків';
+COMMENT ON COLUMN BARS.CIM_F36.P21_NEW IS 'Актуальна дата першого дня порушення';
 COMMENT ON COLUMN BARS.CIM_F36.BRANCH IS 'Підрозділ';
 COMMENT ON COLUMN BARS.CIM_F36.B041 IS 'Код підрозділу';
 COMMENT ON COLUMN BARS.CIM_F36.K020 IS 'Код ОКПО';
@@ -103,22 +105,12 @@ COMMENT ON COLUMN BARS.CIM_F36.P27 IS 'Примітка (порядковий номер запису для зап
 
 
 
-PROMPT *** Create  constraint SYS_C0048931 ***
+PROMPT *** Create  constraint PK_CIM_F36 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_F36 MODIFY (P16 NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C0048930 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CIM_F36 MODIFY (K020 NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_F36 ADD CONSTRAINT PK_CIM_F36 PRIMARY KEY (BRANCH, B041, K020, P17, P16, DOC_DATE, P21, P14, P01, CREATE_DATE)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -139,12 +131,22 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_CIM_F36 ***
+PROMPT *** Create  constraint SYS_C0048930 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_F36 ADD CONSTRAINT PK_CIM_F36 PRIMARY KEY (BRANCH, B041, K020, P17, P16, DOC_DATE, P21, P14, P01, CREATE_DATE)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.CIM_F36 MODIFY (K020 NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C0048931 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_F36 MODIFY (P16 NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -165,10 +167,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0048938 ***
+PROMPT *** Create  constraint SYS_C0048933 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_F36 MODIFY (P18 NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_F36 MODIFY (P21 NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -225,10 +227,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0048933 ***
+PROMPT *** Create  constraint SYS_C0048938 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_F36 MODIFY (P21 NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_F36 MODIFY (P18 NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -248,18 +250,13 @@ exception when others then
  end;
 /
 
-begin
-    execute immediate 'alter table bars.cim_f36 add (p21_new  date)';
- exception when others then 
-    if sqlcode = -1430 then null; else raise; 
-    end if; 
-end;
-/ 
-COMMENT ON COLUMN bars.CIM_f36.p21_new IS 'Актуальна дата першого дня порушення';
+
 
 PROMPT *** Create  grants  CIM_F36 ***
+grant SELECT                                                                 on CIM_F36         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F36         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F36         to CIM_ROLE;
+grant SELECT                                                                 on CIM_F36         to UPLD;
 
 
 

@@ -93,19 +93,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OTCNARCHPEREOC_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OTCN_ARCH_PEREOC ADD CONSTRAINT FK_OTCNARCHPEREOC_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SYS_C006140 ***
 begin   
  execute immediate '
@@ -168,9 +155,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  OTCN_ARCH_PEREOC ***
+grant SELECT                                                                 on OTCN_ARCH_PEREOC to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_ARCH_PEREOC to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_ARCH_PEREOC to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_ARCH_PEREOC to START1;
+grant SELECT                                                                 on OTCN_ARCH_PEREOC to UPLD;
 
 
 

@@ -132,11 +132,13 @@ exception when others then
 
 PROMPT *** Create  grants  OTCN_F08_HISTORY ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_F08_HISTORY to ABS_ADMIN;
+grant SELECT                                                                 on OTCN_F08_HISTORY to BARSREADER_ROLE;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on OTCN_F08_HISTORY to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OTCN_F08_HISTORY to BARS_DM;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on OTCN_F08_HISTORY to RPBN002;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on OTCN_F08_HISTORY to SALGL;
 grant SELECT                                                                 on OTCN_F08_HISTORY to START1;
+grant SELECT                                                                 on OTCN_F08_HISTORY to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_F08_HISTORY to WR_ALL_RIGHTS;
 
 

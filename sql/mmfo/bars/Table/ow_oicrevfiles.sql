@@ -91,11 +91,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_OWOICREVFILES_KF ***
+PROMPT *** Create  constraint CC_OWOICREVFILES_FILENAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.OW_OICREVFILES ADD CONSTRAINT FK_OWOICREVFILES_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.OW_OICREVFILES ADD CONSTRAINT CC_OWOICREVFILES_FILENAME_NN CHECK (FILE_NAME IS NOT NULL) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -108,18 +107,6 @@ PROMPT *** Create  constraint CC_OWOICREVFILES_KF_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.OW_OICREVFILES MODIFY (KF CONSTRAINT CC_OWOICREVFILES_KF_NN NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_OWOICREVFILES_FILENAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.OW_OICREVFILES ADD CONSTRAINT CC_OWOICREVFILES_FILENAME_NN CHECK (FILE_NAME IS NOT NULL) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -142,9 +129,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_OICREVFILES ***
+grant SELECT                                                                 on OW_OICREVFILES  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_OICREVFILES  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_OICREVFILES  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_OICREVFILES  to OW;
+grant SELECT                                                                 on OW_OICREVFILES  to UPLD;
 
 
 

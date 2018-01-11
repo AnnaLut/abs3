@@ -111,46 +111,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C009478 ***
+PROMPT *** Create  constraint SYS_C009473 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FOREX_A MODIFY (NLSB NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009477 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FOREX_A MODIFY (KVB NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009476 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FOREX_A MODIFY (ACCB NOT NULL ENABLE NOVALIDATE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C009475 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.FOREX_A MODIFY (NLSA NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.FOREX_A MODIFY (ACCA NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -171,10 +135,46 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C009473 ***
+PROMPT *** Create  constraint SYS_C009475 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FOREX_A MODIFY (ACCA NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.FOREX_A MODIFY (NLSA NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009476 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FOREX_A MODIFY (ACCB NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009477 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FOREX_A MODIFY (KVB NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C009478 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.FOREX_A MODIFY (NLSB NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -197,9 +197,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  FOREX_A ***
+grant SELECT                                                                 on FOREX_A         to BARSREADER_ROLE;
 grant SELECT                                                                 on FOREX_A         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FOREX_A         to BARS_DM;
 grant SELECT                                                                 on FOREX_A         to START1;
+grant SELECT                                                                 on FOREX_A         to UPLD;
 
 
 

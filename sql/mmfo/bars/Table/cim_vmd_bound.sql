@@ -79,10 +79,12 @@ COMMENT ON COLUMN BARS.CIM_VMD_BOUND.BORG_REASON IS 'Причина заборгованості';
 
 
 
-PROMPT *** Create  constraint CC_CIMVMDBOUND_DIRECT_NN ***
+PROMPT *** Create  constraint PK_CIMVMDBOUND ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_VMD_BOUND MODIFY (DIRECT CONSTRAINT CC_CIMVMDBOUND_DIRECT_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_VMD_BOUND ADD CONSTRAINT PK_CIMVMDBOUND PRIMARY KEY (BOUND_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -91,12 +93,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_CIMVMDBOUND ***
+PROMPT *** Create  constraint CC_CIMVMDBOUND_DIRECT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_VMD_BOUND ADD CONSTRAINT PK_CIMVMDBOUND PRIMARY KEY (BOUND_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CIM_VMD_BOUND MODIFY (DIRECT CONSTRAINT CC_CIMVMDBOUND_DIRECT_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -191,9 +191,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_VMD_BOUND ***
+grant SELECT                                                                 on CIM_VMD_BOUND   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_VMD_BOUND   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_VMD_BOUND   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_VMD_BOUND   to CIM_ROLE;
+grant SELECT                                                                 on CIM_VMD_BOUND   to UPLD;
 
 
 

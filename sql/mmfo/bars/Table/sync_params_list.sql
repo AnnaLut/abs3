@@ -53,19 +53,6 @@ COMMENT ON COLUMN BARS.SYNC_PARAMS_LIST.REQUIRED IS 'Відмітка про обов`язковість
 
 
 
-PROMPT *** Create  constraint FK_SYNCPARAMSLIST_SNAME ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SYNC_PARAMS_LIST ADD CONSTRAINT FK_SYNCPARAMSLIST_SNAME FOREIGN KEY (SERVICE_NAME)
-	  REFERENCES BARS.SYNC_METADATA (SERVICE_NAME) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SYNCPARAMSLIST_SNAME_NN ***
 begin   
  execute immediate '
@@ -142,8 +129,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SYNC_PARAMS_LIST ***
+grant SELECT                                                                 on SYNC_PARAMS_LIST to BARSREADER_ROLE;
 grant SELECT                                                                 on SYNC_PARAMS_LIST to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SYNC_PARAMS_LIST to BARS_DM;
+grant SELECT                                                                 on SYNC_PARAMS_LIST to UPLD;
 
 
 

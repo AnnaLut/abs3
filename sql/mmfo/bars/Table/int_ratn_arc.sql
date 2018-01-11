@@ -85,62 +85,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_INTRATNARC_KF_NN ***
+PROMPT *** Create  constraint CC_INTRATNARC_VID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_RATN_ARC MODIFY (KF CONSTRAINT CC_INTRATNARC_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_INTRATNARC_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_RATN_ARC ADD CONSTRAINT FK_INTRATNARC_STAFF FOREIGN KEY (IDU)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_INTRATNARC_INTIDN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_RATN_ARC ADD CONSTRAINT FK_INTRATNARC_INTIDN FOREIGN KEY (ID)
-	  REFERENCES BARS.INT_IDN (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_INTRATNARC_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_RATN_ARC ADD CONSTRAINT FK_INTRATNARC_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_INTRATNARC_ACCOUNTS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_RATN_ARC ADD CONSTRAINT FK_INTRATNARC_ACCOUNTS2 FOREIGN KEY (KF, ACC)
-	  REFERENCES BARS.ACCOUNTS (KF, ACC) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.INT_RATN_ARC ADD CONSTRAINT CC_INTRATNARC_VID CHECK (vid in (''D'', ''I'', ''U'')) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -245,10 +193,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_INTRATNARC_VID ***
+PROMPT *** Create  constraint CC_INTRATNARC_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_RATN_ARC ADD CONSTRAINT CC_INTRATNARC_VID CHECK (vid in (''D'', ''I'', ''U'')) ENABLE';
+  ALTER TABLE BARS.INT_RATN_ARC MODIFY (KF CONSTRAINT CC_INTRATNARC_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -314,10 +262,12 @@ exception when others then
 
 PROMPT *** Create  grants  INT_RATN_ARC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_RATN_ARC    to ABS_ADMIN;
+grant SELECT                                                                 on INT_RATN_ARC    to BARSREADER_ROLE;
 grant SELECT                                                                 on INT_RATN_ARC    to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_RATN_ARC    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on INT_RATN_ARC    to BARS_DM;
 grant SELECT                                                                 on INT_RATN_ARC    to START1;
+grant SELECT                                                                 on INT_RATN_ARC    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_RATN_ARC    to WR_ALL_RIGHTS;
 
 

@@ -77,9 +77,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  IND_INFL ***
+grant SELECT                                                                 on IND_INFL        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on IND_INFL        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on IND_INFL        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on IND_INFL        to STO;
+grant SELECT                                                                 on IND_INFL        to UPLD;
 grant FLASHBACK,SELECT                                                       on IND_INFL        to WR_REFREAD;
 
 

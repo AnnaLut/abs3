@@ -74,6 +74,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  ADR_STREET_TYPES ***
+grant SELECT                                                                 on ADR_STREET_TYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on ADR_STREET_TYPES to BARSUPL;
 grant SELECT                                                                 on ADR_STREET_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ADR_STREET_TYPES to START1;

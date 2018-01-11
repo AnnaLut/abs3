@@ -107,9 +107,11 @@ COMMENT ON COLUMN BARS.ACC_OVER_REP1.RNK IS '';
 
 
 PROMPT *** Create  grants  ACC_OVER_REP1 ***
+grant SELECT                                                                 on ACC_OVER_REP1   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_REP1   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_OVER_REP1   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_OVER_REP1   to START1;
+grant SELECT                                                                 on ACC_OVER_REP1   to UPLD;
 
 
 

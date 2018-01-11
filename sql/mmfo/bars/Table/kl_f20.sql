@@ -78,11 +78,13 @@ exception when others then
 
 PROMPT *** Create  grants  KL_F20 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F20          to ABS_ADMIN;
+grant SELECT                                                                 on KL_F20          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F20          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KL_F20          to BARS_DM;
 grant SELECT                                                                 on KL_F20          to RPBN002;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KL_F20          to SALGL;
 grant SELECT                                                                 on KL_F20          to START1;
+grant SELECT                                                                 on KL_F20          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KL_F20          to WR_ALL_RIGHTS;
 
 

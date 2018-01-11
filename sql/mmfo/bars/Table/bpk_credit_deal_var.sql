@@ -99,19 +99,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BPKCRDTDEALVAR_BPKCRDTDEAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_CREDIT_DEAL_VAR ADD CONSTRAINT FK_BPKCRDTDEALVAR_BPKCRDTDEAL FOREIGN KEY (DEAL_ND)
-	  REFERENCES BARS.BPK_CREDIT_DEAL (DEAL_ND) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_BPKCRDTDEALVAR_KF_NN ***
 begin   
  execute immediate '
@@ -124,10 +111,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKCRDTDEALVAR_ADJFLG_NN ***
+PROMPT *** Create  constraint CC_BPKCRDTDEALVAR_DEALND_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_CREDIT_DEAL_VAR MODIFY (ADJ_FLG CONSTRAINT CC_BPKCRDTDEALVAR_ADJFLG_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BPK_CREDIT_DEAL_VAR MODIFY (DEAL_ND CONSTRAINT CC_BPKCRDTDEALVAR_DEALND_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -184,10 +171,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_BPKCRDTDEALVAR_DEALND_NN ***
+PROMPT *** Create  constraint CC_BPKCRDTDEALVAR_ADJFLG_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.BPK_CREDIT_DEAL_VAR MODIFY (DEAL_ND CONSTRAINT CC_BPKCRDTDEALVAR_DEALND_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.BPK_CREDIT_DEAL_VAR MODIFY (ADJ_FLG CONSTRAINT CC_BPKCRDTDEALVAR_ADJFLG_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -224,6 +211,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_CREDIT_DEAL_VAR ***
+grant SELECT                                                                 on BPK_CREDIT_DEAL_VAR to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_CREDIT_DEAL_VAR to BARSUPL;
 grant SELECT                                                                 on BPK_CREDIT_DEAL_VAR to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_CREDIT_DEAL_VAR to BARS_DM;

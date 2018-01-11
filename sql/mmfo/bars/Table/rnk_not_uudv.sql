@@ -74,9 +74,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  RNK_NOT_UUDV ***
+grant SELECT                                                                 on RNK_NOT_UUDV    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNK_NOT_UUDV    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNK_NOT_UUDV    to RCC_DEAL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNK_NOT_UUDV    to START1;
+grant SELECT                                                                 on RNK_NOT_UUDV    to UPLD;
 
 
 

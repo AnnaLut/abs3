@@ -47,6 +47,10 @@ COMMENT ON COLUMN BARS.TMP_OW_MSGCODE.SYNTHCODE IS '';
 
 
 
+PROMPT *** Create  grants  TMP_OW_MSGCODE ***
+grant SELECT                                                                 on TMP_OW_MSGCODE  to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_OW_MSGCODE  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

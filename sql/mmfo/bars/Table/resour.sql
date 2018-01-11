@@ -85,32 +85,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_RESOUR_BANKS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.RESOUR ADD CONSTRAINT FK_RESOUR_BANKS FOREIGN KEY (MFO)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_RESOUR_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.RESOUR ADD CONSTRAINT FK_RESOUR_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_RESOUR_MFO_NN ***
 begin   
  execute immediate '
@@ -149,10 +123,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  RESOUR ***
+grant SELECT                                                                 on RESOUR          to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on RESOUR          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RESOUR          to BARS_DM;
 grant SELECT                                                                 on RESOUR          to START1;
 grant SELECT,UPDATE                                                          on RESOUR          to TOSS;
+grant SELECT                                                                 on RESOUR          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RESOUR          to WR_ALL_RIGHTS;
 
 

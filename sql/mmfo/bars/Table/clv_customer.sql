@@ -119,10 +119,12 @@ COMMENT ON COLUMN BARS.CLV_CUSTOMER.NREZID_CODE IS '';
 
 
 
-PROMPT *** Create  constraint CC_CLVCUSTOMER_RNK_NN ***
+PROMPT *** Create  constraint PK_CLVCUSTOMER ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CLV_CUSTOMER MODIFY (RNK CONSTRAINT CC_CLVCUSTOMER_RNK_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.CLV_CUSTOMER ADD CONSTRAINT PK_CLVCUSTOMER PRIMARY KEY (RNK)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -131,12 +133,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_CLVCUSTOMER ***
+PROMPT *** Create  constraint CC_CLVCUSTOMER_RNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CLV_CUSTOMER ADD CONSTRAINT PK_CLVCUSTOMER PRIMARY KEY (RNK)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGD  ENABLE';
+  ALTER TABLE BARS.CLV_CUSTOMER MODIFY (RNK CONSTRAINT CC_CLVCUSTOMER_RNK_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -231,9 +231,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CLV_CUSTOMER ***
+grant SELECT                                                                 on CLV_CUSTOMER    to BARSREADER_ROLE;
 grant SELECT                                                                 on CLV_CUSTOMER    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CLV_CUSTOMER    to BARS_DM;
 grant SELECT                                                                 on CLV_CUSTOMER    to CUST001;
+grant SELECT                                                                 on CLV_CUSTOMER    to UPLD;
 
 
 

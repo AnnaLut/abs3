@@ -49,32 +49,6 @@ COMMENT ON COLUMN BARS.ZAY_QUEUE.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_ZAYQUEUE_ZAYAVKA ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAY_QUEUE ADD CONSTRAINT FK_ZAYQUEUE_ZAYAVKA FOREIGN KEY (ID)
-	  REFERENCES BARS.ZAYAVKA (ID) ON DELETE CASCADE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAYQUEUE_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAY_QUEUE ADD CONSTRAINT FK_ZAYQUEUE_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_ZAYQUEUE_KF_NN ***
 begin   
  execute immediate '
@@ -116,6 +90,7 @@ exception when others then
 
 PROMPT *** Create  grants  ZAY_QUEUE ***
 grant FLASHBACK,REFERENCES,SELECT                                            on ZAY_QUEUE       to BARSAQ with grant option;
+grant SELECT                                                                 on ZAY_QUEUE       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_QUEUE       to BARS_ACCESS_DEFROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAY_QUEUE       to WR_ALL_RIGHTS;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_QUEUE       to ZAY;

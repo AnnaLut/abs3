@@ -98,7 +98,9 @@ COMMENT ON COLUMN BARS.TMP_REZ_OBESP23_03.PR_IMP IS '';
 
 
 PROMPT *** Create  grants  TMP_REZ_OBESP23_03 ***
+grant SELECT                                                                 on TMP_REZ_OBESP23_03 to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_REZ_OBESP23_03 to BARS_DM;
+grant SELECT                                                                 on TMP_REZ_OBESP23_03 to UPLD;
 
 
 

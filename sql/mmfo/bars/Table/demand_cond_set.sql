@@ -126,11 +126,13 @@ exception when others then
 
 PROMPT *** Create  grants  DEMAND_COND_SET ***
 grant SELECT                                                                 on DEMAND_COND_SET to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on DEMAND_COND_SET to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEMAND_COND_SET to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEMAND_COND_SET to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEMAND_COND_SET to DEMAND;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEMAND_COND_SET to OBPC;
 grant SELECT                                                                 on DEMAND_COND_SET to START1;
+grant SELECT                                                                 on DEMAND_COND_SET to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DEMAND_COND_SET to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DEMAND_COND_SET to WR_REFREAD;
 

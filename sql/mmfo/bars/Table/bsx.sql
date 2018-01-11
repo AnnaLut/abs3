@@ -101,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BSX ***
+grant SELECT                                                                 on BSX             to BARSREADER_ROLE;
 grant SELECT                                                                 on BSX             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BSX             to BARS_DM;
 grant SELECT                                                                 on BSX             to SALGL;
+grant SELECT                                                                 on BSX             to UPLD;
 
 
 

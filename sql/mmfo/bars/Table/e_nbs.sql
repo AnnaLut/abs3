@@ -89,10 +89,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  E_NBS ***
+grant SELECT                                                                 on E_NBS           to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on E_NBS           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on E_NBS           to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on E_NBS           to ELT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on E_NBS           to START1;
+grant SELECT                                                                 on E_NBS           to UPLD;
 grant FLASHBACK,SELECT                                                       on E_NBS           to WR_REFREAD;
 
 

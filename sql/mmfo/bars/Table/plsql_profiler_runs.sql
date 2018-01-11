@@ -87,6 +87,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  PLSQL_PROFILER_RUNS ***
+grant SELECT                                                                 on PLSQL_PROFILER_RUNS to BARSREADER_ROLE;
+grant SELECT                                                                 on PLSQL_PROFILER_RUNS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

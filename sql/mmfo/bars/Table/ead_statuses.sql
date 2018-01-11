@@ -101,7 +101,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  EAD_STATUSES ***
+grant SELECT                                                                 on EAD_STATUSES    to BARSREADER_ROLE;
 grant SELECT                                                                 on EAD_STATUSES    to BARS_DM;
+grant SELECT                                                                 on EAD_STATUSES    to UPLD;
 
 
 

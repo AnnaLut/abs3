@@ -67,8 +67,10 @@ COMMENT ON COLUMN BARS.SPR_SB.PR_VIBOR IS '';
 
 
 PROMPT *** Create  grants  SPR_SB ***
+grant SELECT                                                                 on SPR_SB          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPR_SB          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPR_SB          to START1;
+grant SELECT                                                                 on SPR_SB          to UPLD;
 
 
 

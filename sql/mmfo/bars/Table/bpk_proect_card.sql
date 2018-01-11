@@ -67,19 +67,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_BPKPROECTCARD_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_PROECT_CARD ADD CONSTRAINT FK_BPKPROECTCARD_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_BPKPROECTCARD_KF_NN ***
 begin   
  execute immediate '
@@ -106,9 +93,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  BPK_PROECT_CARD ***
+grant SELECT                                                                 on BPK_PROECT_CARD to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_PROECT_CARD to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_PROECT_CARD to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BPK_PROECT_CARD to OW;
+grant SELECT                                                                 on BPK_PROECT_CARD to UPLD;
 
 
 

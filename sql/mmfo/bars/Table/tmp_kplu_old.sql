@@ -114,7 +114,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_KPLU_OLD ***
+grant SELECT                                                                 on TMP_KPLU_OLD    to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_KPLU_OLD    to BARS_DM;
+grant SELECT                                                                 on TMP_KPLU_OLD    to UPLD;
 
 
 

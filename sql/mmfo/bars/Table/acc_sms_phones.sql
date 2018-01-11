@@ -119,10 +119,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  ACC_SMS_PHONES ***
+grant SELECT                                                                 on ACC_SMS_PHONES  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_SMS_PHONES  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_SMS_PHONES  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_SMS_PHONES  to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_SMS_PHONES  to START1;
+grant SELECT                                                                 on ACC_SMS_PHONES  to UPLD;
 
 
 

@@ -87,8 +87,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  SUMMCODES ***
+grant SELECT                                                                 on SUMMCODES       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SUMMCODES       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SUMMCODES       to START1;
+grant SELECT                                                                 on SUMMCODES       to UPLD;
 
 
 

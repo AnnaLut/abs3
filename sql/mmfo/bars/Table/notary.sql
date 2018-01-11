@@ -145,18 +145,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C0010636 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NOTARY ADD CHECK (STATE_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint UK_NOTARY ***
 begin   
  execute immediate '
@@ -172,6 +160,18 @@ exception when others then
 
 
 PROMPT *** Create  constraint SYS_C0010635 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.NOTARY ADD CHECK (STATE_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C0010636 ***
 begin   
  execute immediate '
   ALTER TABLE BARS.NOTARY ADD CHECK (STATE_ID IS NOT NULL) DEFERRABLE INITIALLY DEFERRED ENABLE NOVALIDATE';
@@ -239,8 +239,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  NOTARY ***
+grant SELECT                                                                 on NOTARY          to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NOTARY          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NOTARY          to BARS_DM;
+grant SELECT                                                                 on NOTARY          to UPLD;
 
 
 

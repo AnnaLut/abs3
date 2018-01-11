@@ -76,9 +76,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  S6_HIST_PR_VIEW ***
+grant SELECT                                                                 on S6_HIST_PR_VIEW to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_HIST_PR_VIEW to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on S6_HIST_PR_VIEW to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on S6_HIST_PR_VIEW to START1;
+grant SELECT                                                                 on S6_HIST_PR_VIEW to UPLD;
 
 
 

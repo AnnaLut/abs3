@@ -62,8 +62,10 @@ COMMENT ON COLUMN BARS.TMP_PRIOCOM_DOC_REVISE.DOCSUM IS '';
 
 
 PROMPT *** Create  grants  TMP_PRIOCOM_DOC_REVISE ***
+grant SELECT                                                                 on TMP_PRIOCOM_DOC_REVISE to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_PRIOCOM_DOC_REVISE to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_PRIOCOM_DOC_REVISE to START1;
+grant SELECT                                                                 on TMP_PRIOCOM_DOC_REVISE to UPLD;
 
 
 

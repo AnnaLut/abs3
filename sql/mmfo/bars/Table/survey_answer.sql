@@ -95,10 +95,15 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SURVEYANSWER_KF_NN ***
+PROMPT *** Create  constraint CC_SURVEYANSWER_FMT ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SURVEY_ANSWER MODIFY (KF CONSTRAINT CC_SURVEYANSWER_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SURVEY_ANSWER ADD CONSTRAINT CC_SURVEYANSWER_FMT CHECK ( 1 = DECODE(answer_opt,  NULL, 0, 1) 
+      + DECODE(answer_id,   NULL, 0, 1) 
+      + DECODE(answer_char, NULL, 0, 1) 
+      + DECODE(answer_numb, NULL, 0, 1) 
+      + DECODE(answer_date, NULL, 0, 1) 
+	  + answer_null ) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -107,34 +112,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SURVEYANSWER_BRANCH_NN ***
+PROMPT *** Create  constraint CC_SURVEYANSWER_SESSIONID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SURVEY_ANSWER MODIFY (BRANCH CONSTRAINT CC_SURVEYANSWER_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEYANSWER_ANSWERNULL_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_ANSWER MODIFY (ANSWER_NULL CONSTRAINT CC_SURVEYANSWER_ANSWERNULL_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEYANSWER_ANSWERPOS_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_ANSWER MODIFY (ANSWER_POS CONSTRAINT CC_SURVEYANSWER_ANSWERPOS_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SURVEY_ANSWER MODIFY (SESSION_ID CONSTRAINT CC_SURVEYANSWER_SESSIONID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -155,15 +136,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SURVEYANSWER_FMT ***
+PROMPT *** Create  constraint CC_SURVEYANSWER_ANSWERPOS_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SURVEY_ANSWER ADD CONSTRAINT CC_SURVEYANSWER_FMT CHECK ( 1 = DECODE(answer_opt,  NULL, 0, 1) 
-      + DECODE(answer_id,   NULL, 0, 1) 
-      + DECODE(answer_char, NULL, 0, 1) 
-      + DECODE(answer_numb, NULL, 0, 1) 
-      + DECODE(answer_date, NULL, 0, 1) 
-	  + answer_null ) ENABLE';
+  ALTER TABLE BARS.SURVEY_ANSWER MODIFY (ANSWER_POS CONSTRAINT CC_SURVEYANSWER_ANSWERPOS_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -172,11 +148,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SURVEYANSWER_SURVEYANSWOPT ***
+PROMPT *** Create  constraint CC_SURVEYANSWER_ANSWERNULL_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SURVEY_ANSWER ADD CONSTRAINT FK_SURVEYANSWER_SURVEYANSWOPT FOREIGN KEY (ANSWER_OPT)
-	  REFERENCES BARS.SURVEY_ANSWER_OPT (OPT_ID) ENABLE';
+  ALTER TABLE BARS.SURVEY_ANSWER MODIFY (ANSWER_NULL CONSTRAINT CC_SURVEYANSWER_ANSWERNULL_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -185,11 +160,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SURVEYANSWER_SURVEYQUEST ***
+PROMPT *** Create  constraint CC_SURVEYANSWER_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SURVEY_ANSWER ADD CONSTRAINT FK_SURVEYANSWER_SURVEYQUEST FOREIGN KEY (QUEST_ID)
-	  REFERENCES BARS.SURVEY_QUEST (QUEST_ID) ENABLE';
+  ALTER TABLE BARS.SURVEY_ANSWER MODIFY (BRANCH CONSTRAINT CC_SURVEYANSWER_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -198,49 +172,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SURVEYANSWER_BRANCH ***
+PROMPT *** Create  constraint CC_SURVEYANSWER_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SURVEY_ANSWER ADD CONSTRAINT FK_SURVEYANSWER_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SURVEYANSWER_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_ANSWER ADD CONSTRAINT FK_SURVEYANSWER_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SURVEYANSWER_SURVEYSESSION2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_ANSWER ADD CONSTRAINT FK_SURVEYANSWER_SURVEYSESSION2 FOREIGN KEY (KF, SESSION_ID)
-	  REFERENCES BARS.SURVEY_SESSION (KF, SESSION_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SURVEYANSWER_SESSIONID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SURVEY_ANSWER MODIFY (SESSION_ID CONSTRAINT CC_SURVEYANSWER_SESSIONID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SURVEY_ANSWER MODIFY (KF CONSTRAINT CC_SURVEYANSWER_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -263,11 +198,13 @@ exception when others then
 
 
 PROMPT *** Create  grants  SURVEY_ANSWER ***
+grant SELECT                                                                 on SURVEY_ANSWER   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY_ANSWER   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SURVEY_ANSWER   to BARS_DM;
 grant SELECT                                                                 on SURVEY_ANSWER   to DPT_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY_ANSWER   to DPT_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SURVEY_ANSWER   to RCC_DEAL;
+grant SELECT                                                                 on SURVEY_ANSWER   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SURVEY_ANSWER   to WR_ALL_RIGHTS;
 grant DELETE                                                                 on SURVEY_ANSWER   to WR_CREDIT;
 

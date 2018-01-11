@@ -50,7 +50,9 @@ COMMENT ON COLUMN BARS.OTCN_FA7_REZ2.SUM IS '';
 
 
 PROMPT *** Create  grants  OTCN_FA7_REZ2 ***
+grant SELECT                                                                 on OTCN_FA7_REZ2   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_FA7_REZ2   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on OTCN_FA7_REZ2   to UPLD;
 
 
 

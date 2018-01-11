@@ -89,9 +89,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_STATE_HISTORY_ACTION ***
+grant SELECT                                                                 on WCS_STATE_HISTORY_ACTION to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_STATE_HISTORY_ACTION to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_STATE_HISTORY_ACTION to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on WCS_STATE_HISTORY_ACTION to START1;
+grant SELECT                                                                 on WCS_STATE_HISTORY_ACTION to UPLD;
 
 
 

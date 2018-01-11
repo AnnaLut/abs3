@@ -11,7 +11,7 @@ PROMPT *** ALTER_POLICY_INFO to EBKC_GCIF ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''EBKC_GCIF'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''EBKC_GCIF'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''EBKC_GCIF'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -31,7 +31,7 @@ begin
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
-  TABLESPACE BRSDYND ';
+  TABLESPACE BRSMDLD ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
@@ -90,12 +90,12 @@ exception when others then
 
 
 
-PROMPT *** Create  index IU1_EBKC_GCIF ***
+PROMPT *** Create  index UK_EBKCGCIF_GCIF ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.IU1_EBKC_GCIF ON BARS.EBKC_GCIF (GCIF) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND ';
+  CREATE UNIQUE INDEX BARS.UK_EBKCGCIF_GCIF ON BARS.EBKC_GCIF (KF, GCIF) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS COMPRESS 1 
+  TABLESPACE BRSMDLI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
@@ -104,12 +104,12 @@ exception when others then
 
 
 
-PROMPT *** Create  index IU2_EBKC_GCIF ***
+PROMPT *** Create  index UK_EBKCGCIF_RNK ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.IU2_EBKC_GCIF ON BARS.EBKC_GCIF (KF, RNK) 
+  CREATE UNIQUE INDEX BARS.UK_EBKCGCIF_RNK ON BARS.EBKC_GCIF (RNK) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND ';
+  TABLESPACE BRSMDLI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
@@ -118,8 +118,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  EBKC_GCIF ***
+grant SELECT                                                                 on EBKC_GCIF       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBKC_GCIF       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on EBKC_GCIF       to BARS_DM;
+grant SELECT                                                                 on EBKC_GCIF       to UPLD;
 
 
 

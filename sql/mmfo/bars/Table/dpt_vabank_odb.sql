@@ -51,8 +51,10 @@ COMMENT ON COLUMN BARS.DPT_VABANK_ODB.NLS_VABANK IS '';
 
 
 PROMPT *** Create  grants  DPT_VABANK_ODB ***
+grant SELECT                                                                 on DPT_VABANK_ODB  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_VABANK_ODB  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPT_VABANK_ODB  to BARS_DM;
+grant SELECT                                                                 on DPT_VABANK_ODB  to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_VABANK_ODB  to VKLAD;
 grant FLASHBACK,SELECT                                                       on DPT_VABANK_ODB  to WR_REFREAD;
 

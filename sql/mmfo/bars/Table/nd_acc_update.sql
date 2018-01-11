@@ -181,8 +181,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  ND_ACC_UPDATE ***
+grant SELECT                                                                 on ND_ACC_UPDATE   to BARSREADER_ROLE;
 grant SELECT                                                                 on ND_ACC_UPDATE   to BARSUPL;
 grant SELECT                                                                 on ND_ACC_UPDATE   to BARS_DM;
+grant SELECT                                                                 on ND_ACC_UPDATE   to UPLD;
 
 
 

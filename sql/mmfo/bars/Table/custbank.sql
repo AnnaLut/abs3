@@ -71,45 +71,6 @@ COMMENT ON COLUMN BARS.CUSTBANK.BKI IS 'Îçíàêà ïåðåäà÷³ ÏÂÁÊ²';
 
 
 
-PROMPT *** Create  constraint R_SWBANKS_CUSTBANK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTBANK ADD CONSTRAINT R_SWBANKS_CUSTBANK FOREIGN KEY (BIC)
-	  REFERENCES BARS.SW_BANKS (BIC) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTBANK_CUSTOMER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTBANK ADD CONSTRAINT FK_CUSTBANK_CUSTOMER FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_CUSTBANK_BANKS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTBANK ADD CONSTRAINT FK_CUSTBANK_BANKS FOREIGN KEY (MFO)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_CUSTBANK_RNK_NN ***
 begin   
  execute immediate '
@@ -134,10 +95,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTBANK_BKI_NN ***
+PROMPT *** Create  constraint PK_CUSTBANK ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTBANK ADD CONSTRAINT CC_CUSTBANK_BKI_NN CHECK (bki is not null) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CUSTBANK ADD CONSTRAINT PK_CUSTBANK PRIMARY KEY (RNK)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -146,12 +109,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_CUSTBANK ***
+PROMPT *** Create  constraint CC_CUSTBANK_BKI_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTBANK ADD CONSTRAINT PK_CUSTBANK PRIMARY KEY (RNK)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CUSTBANK ADD CONSTRAINT CC_CUSTBANK_BKI_NN CHECK (bki is not null) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -175,6 +136,7 @@ exception when others then
 
 PROMPT *** Create  grants  CUSTBANK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTBANK        to ABS_ADMIN;
+grant SELECT                                                                 on CUSTBANK        to BARSREADER_ROLE;
 grant SELECT                                                                 on CUSTBANK        to BARSUPL;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on CUSTBANK        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUSTBANK        to BARS_DM;
@@ -182,6 +144,7 @@ grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on 
 grant SELECT                                                                 on CUSTBANK        to FOREX;
 grant SELECT                                                                 on CUSTBANK        to RPBN002;
 grant SELECT                                                                 on CUSTBANK        to START1;
+grant SELECT                                                                 on CUSTBANK        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTBANK        to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CUSTBANK        to WR_CUSTLIST;
 grant SELECT                                                                 on CUSTBANK        to WR_CUSTREG;

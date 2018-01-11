@@ -58,6 +58,10 @@ COMMENT ON COLUMN BARS.TMP_SNO.SA IS '';
 
 
 
+PROMPT *** Create  grants  TMP_SNO ***
+grant SELECT                                                                 on TMP_SNO         to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_SNO         to UPLD;
+
 
 
 PROMPT ===================================================================================== 

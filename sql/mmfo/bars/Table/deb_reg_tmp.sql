@@ -85,19 +85,6 @@ COMMENT ON COLUMN BARS.DEB_REG_TMP.KF IS '';
 
 
 
-PROMPT *** Create  constraint FK_DEBREGTMP_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DEB_REG_TMP ADD CONSTRAINT FK_DEBREGTMP_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DEBREGTMP_CCOLOR_NN ***
 begin   
  execute immediate '
@@ -122,9 +109,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DEB_REG_TMP ***
+grant SELECT                                                                 on DEB_REG_TMP     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEB_REG_TMP     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEB_REG_TMP     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEB_REG_TMP     to DEB_REG;
+grant SELECT                                                                 on DEB_REG_TMP     to UPLD;
 
 
 

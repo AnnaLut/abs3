@@ -94,72 +94,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_PARAMSPRIMELOAD ***
+PROMPT *** Create  constraint SYS_C00118471 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PARAMS_PRIME_LOAD ADD CONSTRAINT UK_PARAMSPRIMELOAD UNIQUE (TT, PRIME, IS_CA)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00118477 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PARAMS_PRIME_LOAD MODIFY (IS_CA NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00118476 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PARAMS_PRIME_LOAD MODIFY (G_IS_EDIT NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00118475 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PARAMS_PRIME_LOAD MODIFY (G_IS_EMPTY NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00118474 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PARAMS_PRIME_LOAD MODIFY (B_IS_EDIT NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint SYS_C00118473 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.PARAMS_PRIME_LOAD MODIFY (B_IS_EMPTY NOT NULL ENABLE)';
+  ALTER TABLE BARS.PARAMS_PRIME_LOAD MODIFY (N_IS_EMPTY NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -180,10 +118,72 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00118471 ***
+PROMPT *** Create  constraint SYS_C00118473 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.PARAMS_PRIME_LOAD MODIFY (N_IS_EMPTY NOT NULL ENABLE)';
+  ALTER TABLE BARS.PARAMS_PRIME_LOAD MODIFY (B_IS_EMPTY NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C00118474 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PARAMS_PRIME_LOAD MODIFY (B_IS_EDIT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C00118475 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PARAMS_PRIME_LOAD MODIFY (G_IS_EMPTY NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C00118476 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PARAMS_PRIME_LOAD MODIFY (G_IS_EDIT NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C00118477 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PARAMS_PRIME_LOAD MODIFY (IS_CA NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint UK_PARAMSPRIMELOAD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.PARAMS_PRIME_LOAD ADD CONSTRAINT UK_PARAMSPRIMELOAD UNIQUE (TT, PRIME, IS_CA)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -204,6 +204,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  PARAMS_PRIME_LOAD ***
+grant SELECT                                                                 on PARAMS_PRIME_LOAD to BARSREADER_ROLE;
+grant SELECT                                                                 on PARAMS_PRIME_LOAD to UPLD;
 
 
 

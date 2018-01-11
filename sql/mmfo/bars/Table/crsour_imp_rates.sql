@@ -75,7 +75,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CRSOUR_IMP_RATES ***
+grant SELECT                                                                 on CRSOUR_IMP_RATES to BARSREADER_ROLE;
 grant SELECT                                                                 on CRSOUR_IMP_RATES to BARS_DM;
+grant SELECT                                                                 on CRSOUR_IMP_RATES to UPLD;
 
 
 

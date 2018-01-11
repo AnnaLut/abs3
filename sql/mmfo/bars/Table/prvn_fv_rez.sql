@@ -92,9 +92,11 @@ COMMENT ON COLUMN BARS.PRVN_FV_REZ.IRC_CCY IS 'корректировка за мес€ц (не знаю н
 
 
 PROMPT *** Create  grants  PRVN_FV_REZ ***
+grant SELECT                                                                 on PRVN_FV_REZ     to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on PRVN_FV_REZ     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRVN_FV_REZ     to BARS_DM;
 grant SELECT                                                                 on PRVN_FV_REZ     to START1;
+grant SELECT                                                                 on PRVN_FV_REZ     to UPLD;
 
 
 

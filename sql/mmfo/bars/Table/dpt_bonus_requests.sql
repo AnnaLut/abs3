@@ -103,316 +103,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTBONUSREQ_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (BRANCH CONSTRAINT CC_DPTBONUSREQ_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (KF CONSTRAINT CC_DPTBONUSREQ_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_REQBDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_BDATE CONSTRAINT CC_DPTBONUSREQ_REQBDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_REQSTATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_STATE CONSTRAINT CC_DPTBONUSREQ_REQSTATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_REQDELETED_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_DELETED CONSTRAINT CC_DPTBONUSREQ_REQDELETED_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_REQRECALC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_RECALC CONSTRAINT CC_DPTBONUSREQ_REQRECALC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_REQCONFIRM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_CONFIRM CONSTRAINT CC_DPTBONUSREQ_REQCONFIRM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_REQAUTO_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_AUTO CONSTRAINT CC_DPTBONUSREQ_REQAUTO_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_REQUSER_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_USER CONSTRAINT CC_DPTBONUSREQ_REQUSER_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_REQDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_DATE CONSTRAINT CC_DPTBONUSREQ_REQDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_BONUSID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (BONUS_ID CONSTRAINT CC_DPTBONUSREQ_BONUSID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_DPTID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (DPT_ID CONSTRAINT CC_DPTBONUSREQ_DPTID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_REQID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQ_ID CONSTRAINT CC_DPTBONUSREQ_REQID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTBONUSREQ_DPTBONUS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT FK_DPTBONUSREQ_DPTBONUS FOREIGN KEY (BONUS_ID)
-	  REFERENCES BARS.DPT_BONUSES (BONUS_ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTBONUSREQ_STAFF2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT FK_DPTBONUSREQ_STAFF2 FOREIGN KEY (PROCESS_USER)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTBONUSREQ_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT FK_DPTBONUSREQ_STAFF FOREIGN KEY (REQUEST_USER)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTBONUSREQ_REQSTATE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT FK_DPTBONUSREQ_REQSTATE FOREIGN KEY (REQUEST_STATE)
-	  REFERENCES BARS.DPT_BONUS_REQUEST_STATES (STATE_CODE) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTBONUSREQ_BRANCH ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT FK_DPTBONUSREQ_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTBONUSREQ_DPTREQS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT FK_DPTBONUSREQ_DPTREQS2 FOREIGN KEY (KF, REQ_ID)
-	  REFERENCES BARS.DPT_REQUESTS (KF, REQ_ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTBONUSREQ_DPTDPTALL2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT FK_DPTBONUSREQ_DPTDPTALL2 FOREIGN KEY (KF, DPT_ID)
-	  REFERENCES BARS.DPT_DEPOSIT_ALL (KF, DEPOSIT_ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPTBONUSREQ_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT FK_DPTBONUSREQ_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_REQAUTO ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT CC_DPTBONUSREQ_REQAUTO CHECK (request_auto IN (''Y'',''N'')) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint PK_DPTBONUSREQ ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT PK_DPTBONUSREQ PRIMARY KEY (DPT_ID, BONUS_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_BONUSVALFC ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT CC_DPTBONUSREQ_BONUSVALFC CHECK ( (request_state = ''ALLOW'' AND bonus_value_fact IS NOT NULL) OR request_state != ''ALLOW'') ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTBONUSREQ_BONUSVALPL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT CC_DPTBONUSREQ_BONUSVALPL CHECK ( (request_auto = ''Y'' AND bonus_value_plan IS NOT NULL) OR request_auto = ''N'') ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DPTBONUSREQ_REQDELETED ***
 begin   
  execute immediate '
@@ -437,6 +127,212 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint CC_DPTBONUSREQ_BONUSVALPL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT CC_DPTBONUSREQ_BONUSVALPL CHECK ( (request_auto = ''Y'' AND bonus_value_plan IS NOT NULL) OR request_auto = ''N'') ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_BONUSVALFC ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT CC_DPTBONUSREQ_BONUSVALFC CHECK ( (request_state = ''ALLOW'' AND bonus_value_fact IS NOT NULL) OR request_state != ''ALLOW'') ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint PK_DPTBONUSREQ ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT PK_DPTBONUSREQ PRIMARY KEY (DPT_ID, BONUS_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_REQAUTO ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS ADD CONSTRAINT CC_DPTBONUSREQ_REQAUTO CHECK (request_auto IN (''Y'',''N'')) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_REQID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQ_ID CONSTRAINT CC_DPTBONUSREQ_REQID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_DPTID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (DPT_ID CONSTRAINT CC_DPTBONUSREQ_DPTID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_BONUSID_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (BONUS_ID CONSTRAINT CC_DPTBONUSREQ_BONUSID_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_REQDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_DATE CONSTRAINT CC_DPTBONUSREQ_REQDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_REQUSER_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_USER CONSTRAINT CC_DPTBONUSREQ_REQUSER_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_REQAUTO_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_AUTO CONSTRAINT CC_DPTBONUSREQ_REQAUTO_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_REQCONFIRM_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_CONFIRM CONSTRAINT CC_DPTBONUSREQ_REQCONFIRM_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_REQRECALC_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_RECALC CONSTRAINT CC_DPTBONUSREQ_REQRECALC_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_REQDELETED_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_DELETED CONSTRAINT CC_DPTBONUSREQ_REQDELETED_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_REQSTATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_STATE CONSTRAINT CC_DPTBONUSREQ_REQSTATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_REQBDATE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (REQUEST_BDATE CONSTRAINT CC_DPTBONUSREQ_REQBDATE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (KF CONSTRAINT CC_DPTBONUSREQ_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_DPTBONUSREQ_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.DPT_BONUS_REQUESTS MODIFY (BRANCH CONSTRAINT CC_DPTBONUSREQ_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  index PK_DPTBONUSREQ ***
 begin   
  execute immediate '
@@ -451,7 +347,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_BONUS_REQUESTS ***
+grant SELECT                                                                 on DPT_BONUS_REQUESTS to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_BONUS_REQUESTS to BARS_DM;
+grant SELECT                                                                 on DPT_BONUS_REQUESTS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_BONUS_REQUESTS to WR_ALL_RIGHTS;
 
 

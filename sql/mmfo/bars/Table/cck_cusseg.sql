@@ -89,6 +89,7 @@ exception when others then
 
 PROMPT *** Create  grants  CCK_CUSSEG ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_CUSSEG      to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on CCK_CUSSEG      to BARSREADER_ROLE;
 grant SELECT                                                                 on CCK_CUSSEG      to BARSUPL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_CUSSEG      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_CUSSEG      to BARS_DM;

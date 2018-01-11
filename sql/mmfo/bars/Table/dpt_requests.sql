@@ -95,82 +95,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTREQS_BRANCH_NN ***
+PROMPT *** Create  constraint UK_DPTREQS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQUESTS MODIFY (BRANCH CONSTRAINT CC_DPTREQS_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTREQS_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQUESTS MODIFY (KF CONSTRAINT CC_DPTREQS_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTREQS_DPTID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQUESTS MODIFY (DPT_ID CONSTRAINT CC_DPTREQS_DPTID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTREQS_REQCRUSERID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQUESTS MODIFY (REQ_CRUSERID CONSTRAINT CC_DPTREQS_REQCRUSERID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTREQS_REQCRDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQUESTS MODIFY (REQ_CRDATE CONSTRAINT CC_DPTREQS_REQCRDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTREQS_REQBDATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQUESTS MODIFY (REQ_BDATE CONSTRAINT CC_DPTREQS_REQBDATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTREQS_REQTYPEID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQUESTS MODIFY (REQTYPE_ID CONSTRAINT CC_DPTREQS_REQTYPEID_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_REQUESTS ADD CONSTRAINT UK_DPTREQS UNIQUE (KF, REQ_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -191,11 +121,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTREQS_DPTDPTALL2 ***
+PROMPT *** Create  constraint CC_DPTREQS_REQTYPEID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQUESTS ADD CONSTRAINT FK_DPTREQS_DPTDPTALL2 FOREIGN KEY (KF, DPT_ID)
-	  REFERENCES BARS.DPT_DEPOSIT_ALL (KF, DEPOSIT_ID) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPT_REQUESTS MODIFY (REQTYPE_ID CONSTRAINT CC_DPTREQS_REQTYPEID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -204,11 +133,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTREQS_KF ***
+PROMPT *** Create  constraint CC_DPTREQS_REQBDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQUESTS ADD CONSTRAINT FK_DPTREQS_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPT_REQUESTS MODIFY (REQ_BDATE CONSTRAINT CC_DPTREQS_REQBDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -217,11 +145,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTREQS_STAFF2 ***
+PROMPT *** Create  constraint CC_DPTREQS_REQCRDATE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQUESTS ADD CONSTRAINT FK_DPTREQS_STAFF2 FOREIGN KEY (REQ_PRCUSERID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPT_REQUESTS MODIFY (REQ_CRDATE CONSTRAINT CC_DPTREQS_REQCRDATE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -230,11 +157,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTREQS_STAFF ***
+PROMPT *** Create  constraint CC_DPTREQS_REQCRUSERID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQUESTS ADD CONSTRAINT FK_DPTREQS_STAFF FOREIGN KEY (REQ_CRUSERID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPT_REQUESTS MODIFY (REQ_CRUSERID CONSTRAINT CC_DPTREQS_REQCRUSERID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -243,11 +169,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTREQS_BRANCH ***
+PROMPT *** Create  constraint CC_DPTREQS_DPTID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQUESTS ADD CONSTRAINT FK_DPTREQS_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPT_REQUESTS MODIFY (DPT_ID CONSTRAINT CC_DPTREQS_DPTID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -256,11 +181,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTREQS_DPTREQTYPES ***
+PROMPT *** Create  constraint CC_DPTREQS_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQUESTS ADD CONSTRAINT FK_DPTREQS_DPTREQTYPES FOREIGN KEY (REQTYPE_ID)
-	  REFERENCES BARS.DPT_REQ_TYPES (REQTYPE_ID) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPT_REQUESTS MODIFY (KF CONSTRAINT CC_DPTREQS_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -269,12 +193,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_DPTREQS ***
+PROMPT *** Create  constraint CC_DPTREQS_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQUESTS ADD CONSTRAINT UK_DPTREQS UNIQUE (KF, REQ_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
+  ALTER TABLE BARS.DPT_REQUESTS MODIFY (BRANCH CONSTRAINT CC_DPTREQS_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -325,7 +247,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_REQUESTS ***
+grant SELECT                                                                 on DPT_REQUESTS    to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_REQUESTS    to BARS_DM;
+grant SELECT                                                                 on DPT_REQUESTS    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_REQUESTS    to WR_ALL_RIGHTS;
 
 

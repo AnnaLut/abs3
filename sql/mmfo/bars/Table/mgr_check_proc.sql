@@ -60,12 +60,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_MGRCHECKPROC ***
+PROMPT *** Create  constraint CC_MGRCHECKPROC_CRTIME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.MGR_CHECK_PROC ADD CONSTRAINT PK_MGRCHECKPROC PRIMARY KEY (PROC_NAME)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD  ENABLE';
+  ALTER TABLE BARS.MGR_CHECK_PROC MODIFY (CREATION_TIME CONSTRAINT CC_MGRCHECKPROC_CRTIME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -74,10 +72,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_MGRCHECKPROC_CRTIME_NN ***
+PROMPT *** Create  constraint PK_MGRCHECKPROC ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.MGR_CHECK_PROC MODIFY (CREATION_TIME CONSTRAINT CC_MGRCHECKPROC_CRTIME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.MGR_CHECK_PROC ADD CONSTRAINT PK_MGRCHECKPROC PRIMARY KEY (PROC_NAME)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLD  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -98,6 +98,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  MGR_CHECK_PROC ***
+grant SELECT                                                                 on MGR_CHECK_PROC  to BARSREADER_ROLE;
 
 
 

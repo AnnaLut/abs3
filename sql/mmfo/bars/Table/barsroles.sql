@@ -116,9 +116,11 @@ exception when others then
 
 PROMPT *** Create  grants  BARSROLES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BARSROLES       to ABS_ADMIN;
+grant SELECT                                                                 on BARSROLES       to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BARSROLES       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BARSROLES       to BARS_DM;
 grant SELECT                                                                 on BARSROLES       to START1;
+grant SELECT                                                                 on BARSROLES       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BARSROLES       to WR_ALL_RIGHTS;
 
 

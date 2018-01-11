@@ -43,7 +43,7 @@ begin
 	SWAP_TAG NUMBER, 
 	DEAL_TAG NUMBER(*,0), 
 	KODF VARCHAR2(4), 
-	KOD VARCHAR2(15), 
+	KOD VARCHAR2(20), 
 	BVQ NUMBER, 
 	BVQA NUMBER, 
 	BVQB NUMBER, 
@@ -96,8 +96,10 @@ COMMENT ON COLUMN BARS.TMP_SWAP_ARC.B IS '';
 
 
 PROMPT *** Create  grants  TMP_SWAP_ARC ***
+grant SELECT                                                                 on TMP_SWAP_ARC    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SWAP_ARC    to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_SWAP_ARC    to START1;
+grant SELECT                                                                 on TMP_SWAP_ARC    to UPLD;
 
 
 

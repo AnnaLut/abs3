@@ -81,8 +81,10 @@ COMMENT ON COLUMN BARS.TMP_DPT_RPT.NAZN IS '';
 
 
 PROMPT *** Create  grants  TMP_DPT_RPT ***
+grant SELECT                                                                 on TMP_DPT_RPT     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DPT_RPT     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_DPT_RPT     to START1;
+grant SELECT                                                                 on TMP_DPT_RPT     to UPLD;
 
 
 

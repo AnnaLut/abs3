@@ -101,9 +101,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CC_SVK ***
+grant SELECT                                                                 on CC_SVK          to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_SVK          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_SVK          to BARS_DM;
 grant SELECT                                                                 on CC_SVK          to RCC_DEAL;
+grant SELECT                                                                 on CC_SVK          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_SVK          to WR_ALL_RIGHTS;
 
 

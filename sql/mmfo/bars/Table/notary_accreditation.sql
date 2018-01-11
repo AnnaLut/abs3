@@ -63,19 +63,6 @@ COMMENT ON COLUMN BARS.NOTARY_ACCREDITATION.STATE_ID IS 'Стан акредитації (0 - з
 
 
 
-PROMPT *** Create  constraint FK_NOTARY_ACCRED_REF_NOTARY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.NOTARY_ACCREDITATION ADD CONSTRAINT FK_NOTARY_ACCRED_REF_NOTARY FOREIGN KEY (NOTARY_ID)
-	  REFERENCES BARS.NOTARY (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_NOTARY_ACCR_ID_NN ***
 begin   
  execute immediate '
@@ -140,8 +127,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  NOTARY_ACCREDITATION ***
+grant SELECT                                                                 on NOTARY_ACCREDITATION to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NOTARY_ACCREDITATION to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NOTARY_ACCREDITATION to BARS_DM;
+grant SELECT                                                                 on NOTARY_ACCREDITATION to UPLD;
 
 
 

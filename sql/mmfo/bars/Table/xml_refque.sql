@@ -103,7 +103,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  XML_REFQUE ***
+grant SELECT                                                                 on XML_REFQUE      to BARSREADER_ROLE;
 grant SELECT                                                                 on XML_REFQUE      to BARS_DM;
+grant SELECT                                                                 on XML_REFQUE      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on XML_REFQUE      to WR_ALL_RIGHTS;
 
 

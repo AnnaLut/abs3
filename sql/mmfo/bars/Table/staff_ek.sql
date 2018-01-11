@@ -65,19 +65,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_STAFFEK_STAFF$BASE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.STAFF_EK ADD CONSTRAINT FK_STAFFEK_STAFF$BASE FOREIGN KEY (ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ON DELETE CASCADE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_STAFFEK_ID_NN ***
 begin   
  execute immediate '
@@ -116,10 +103,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  STAFF_EK ***
+grant SELECT                                                                 on STAFF_EK        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF_EK        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF_EK        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_EK        to DPT_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_EK        to STAFF_EK;
+grant SELECT                                                                 on STAFF_EK        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF_EK        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on STAFF_EK        to WR_REFREAD;
 

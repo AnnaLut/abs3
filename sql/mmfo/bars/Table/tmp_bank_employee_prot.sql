@@ -52,9 +52,11 @@ COMMENT ON COLUMN BARS.TMP_BANK_EMPLOYEE_PROT.NUMDOC IS 'Номер документа';
 
 
 PROMPT *** Create  grants  TMP_BANK_EMPLOYEE_PROT ***
+grant SELECT                                                                 on TMP_BANK_EMPLOYEE_PROT to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_BANK_EMPLOYEE_PROT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_BANK_EMPLOYEE_PROT to RCC_DEAL;
 grant SELECT                                                                 on TMP_BANK_EMPLOYEE_PROT to START1;
+grant SELECT                                                                 on TMP_BANK_EMPLOYEE_PROT to UPLD;
 
 
 

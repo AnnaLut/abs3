@@ -107,7 +107,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  W4_TARIF ***
+grant SELECT                                                                 on W4_TARIF        to BARSREADER_ROLE;
 grant SELECT                                                                 on W4_TARIF        to BARS_DM;
+grant SELECT                                                                 on W4_TARIF        to UPLD;
 
 
 

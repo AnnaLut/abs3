@@ -84,7 +84,9 @@ COMMENT ON COLUMN BARS.KRYM_GAZT.ID IS '';
 
 PROMPT *** Create  grants  KRYM_GAZT ***
 grant DELETE,SELECT,UPDATE                                                   on KRYM_GAZT       to BARS015;
+grant SELECT                                                                 on KRYM_GAZT       to BARSREADER_ROLE;
 grant DELETE,SELECT,UPDATE                                                   on KRYM_GAZT       to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on KRYM_GAZT       to UPLD;
 
 
 

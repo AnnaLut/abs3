@@ -173,8 +173,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  CRSOUR_DEALS ***
+grant SELECT                                                                 on CRSOUR_DEALS    to BARSREADER_ROLE;
 grant SELECT                                                                 on CRSOUR_DEALS    to BARS_DM;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on CRSOUR_DEALS    to CDB;
+grant SELECT                                                                 on CRSOUR_DEALS    to UPLD;
 
 
 

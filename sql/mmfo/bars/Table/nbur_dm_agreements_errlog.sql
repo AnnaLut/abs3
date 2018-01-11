@@ -90,6 +90,10 @@ COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ERRLOG.CUST_ID IS '';
 
 
 
+PROMPT *** Create  grants  NBUR_DM_AGREEMENTS_ERRLOG ***
+grant SELECT                                                                 on NBUR_DM_AGREEMENTS_ERRLOG to BARSREADER_ROLE;
+grant SELECT                                                                 on NBUR_DM_AGREEMENTS_ERRLOG to UPLD;
+
 
 
 PROMPT ===================================================================================== 

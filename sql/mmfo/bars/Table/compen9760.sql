@@ -88,19 +88,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_COMPEN9760_MFO ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.COMPEN9760 ADD CONSTRAINT FK_COMPEN9760_MFO FOREIGN KEY (MFO)
-	  REFERENCES BARS.BANKS$BASE (MFO) ON DELETE CASCADE ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_COMPEN9760 ***
 begin   
  execute immediate '
@@ -115,7 +102,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  COMPEN9760 ***
+grant SELECT                                                                 on COMPEN9760      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on COMPEN9760      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on COMPEN9760      to UPLD;
 
 
 

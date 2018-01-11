@@ -79,10 +79,12 @@ COMMENT ON COLUMN BARS.CIM_ACTS.FILE_DATE IS '';
 
 
 
-PROMPT *** Create  constraint CC_CIMACTS_DIRECT_NN ***
+PROMPT *** Create  constraint PK_ACTS ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_ACTS MODIFY (DIRECT CONSTRAINT CC_CIMACTS_DIRECT_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_ACTS ADD CONSTRAINT PK_ACTS PRIMARY KEY (ACT_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -103,12 +105,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint PK_ACTS ***
+PROMPT *** Create  constraint CC_CIMACTS_DIRECT_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_ACTS ADD CONSTRAINT PK_ACTS PRIMARY KEY (ACT_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CIM_ACTS MODIFY (DIRECT CONSTRAINT CC_CIMACTS_DIRECT_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -129,10 +129,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMACTS_BRANCH_NN ***
+PROMPT *** Create  constraint CC_CIMACTS_RNK_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_ACTS MODIFY (BRANCH CONSTRAINT CC_CIMACTS_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_ACTS MODIFY (RNK CONSTRAINT CC_CIMACTS_RNK_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -177,10 +177,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CIMACTS_RNK_NN ***
+PROMPT *** Create  constraint CC_CIMACTS_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CIM_ACTS MODIFY (RNK CONSTRAINT CC_CIMACTS_RNK_NN NOT NULL ENABLE NOVALIDATE)';
+  ALTER TABLE BARS.CIM_ACTS MODIFY (BRANCH CONSTRAINT CC_CIMACTS_BRANCH_NN NOT NULL ENABLE NOVALIDATE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -203,9 +203,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIM_ACTS ***
+grant SELECT                                                                 on CIM_ACTS        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_ACTS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_ACTS        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_ACTS        to CIM_ROLE;
+grant SELECT                                                                 on CIM_ACTS        to UPLD;
 
 
 

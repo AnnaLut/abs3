@@ -71,6 +71,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  SGN_USER_TRACE ***
+grant SELECT                                                                 on SGN_USER_TRACE  to BARSREADER_ROLE;
+grant SELECT                                                                 on SGN_USER_TRACE  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

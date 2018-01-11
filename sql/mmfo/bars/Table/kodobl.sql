@@ -83,9 +83,11 @@ COMMENT ON COLUMN BARS.KODOBL.KOD_CKV IS '';
 
 
 PROMPT *** Create  grants  KODOBL ***
+grant SELECT                                                                 on KODOBL          to BARSREADER_ROLE;
 grant SELECT                                                                 on KODOBL          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KODOBL          to BARS_DM;
 grant SELECT                                                                 on KODOBL          to SALGL;
+grant SELECT                                                                 on KODOBL          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KODOBL          to WR_ALL_RIGHTS;
 
 

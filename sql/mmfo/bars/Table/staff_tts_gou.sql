@@ -60,7 +60,9 @@ COMMENT ON COLUMN BARS.STAFF_TTS_GOU.GRANTOR IS '';
 
 
 PROMPT *** Create  grants  STAFF_TTS_GOU ***
+grant SELECT                                                                 on STAFF_TTS_GOU   to BARSREADER_ROLE;
 grant SELECT                                                                 on STAFF_TTS_GOU   to BARS_DM;
+grant SELECT                                                                 on STAFF_TTS_GOU   to UPLD;
 
 
 

@@ -103,7 +103,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  CIG_STATES ***
+grant SELECT                                                                 on CIG_STATES      to BARSREADER_ROLE;
 grant SELECT                                                                 on CIG_STATES      to BARS_DM;
+grant SELECT                                                                 on CIG_STATES      to UPLD;
 
 
 

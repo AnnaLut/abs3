@@ -65,32 +65,6 @@ COMMENT ON COLUMN BARS.BL_PERSON.BASE_ID IS '';
 
 
 
-PROMPT *** Create  constraint BL_PERSON_BASE1 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_PERSON ADD CONSTRAINT BL_PERSON_BASE1 FOREIGN KEY (BASE_ID)
-	  REFERENCES BARS.BL_BASE_DICT (BASE_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint BL_PERSON_USER_FK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BL_PERSON ADD CONSTRAINT BL_PERSON_USER_FK FOREIGN KEY (USER_ID)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint NN_BL_PERSON_ID ***
 begin   
  execute immediate '
@@ -183,8 +157,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  BL_PERSON ***
+grant SELECT                                                                 on BL_PERSON       to BARSREADER_ROLE;
 grant SELECT                                                                 on BL_PERSON       to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BL_PERSON       to RBL;
+grant SELECT                                                                 on BL_PERSON       to UPLD;
 
 
 

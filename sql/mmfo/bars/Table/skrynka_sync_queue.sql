@@ -57,19 +57,6 @@ COMMENT ON COLUMN BARS.SKRYNKA_SYNC_QUEUE.ERR_TEXT IS '';
 
 
 
-PROMPT *** Create  constraint FK_BR_SKRYN_SYNC_QUEUE_TYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_SYNC_QUEUE ADD CONSTRAINT FK_BR_SKRYN_SYNC_QUEUE_TYPE FOREIGN KEY (SYNC_TYPE)
-	  REFERENCES BARS.SKRYNKA_SYNC_TYPE (TYPE) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint SKRYNKA_SYNC_QUEUE ***
 begin   
  execute immediate '
@@ -158,7 +145,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_SYNC_QUEUE ***
+grant SELECT                                                                 on SKRYNKA_SYNC_QUEUE to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_SYNC_QUEUE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on SKRYNKA_SYNC_QUEUE to UPLD;
 
 
 

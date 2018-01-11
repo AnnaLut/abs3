@@ -62,10 +62,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119181 ***
+PROMPT *** Create  constraint SYS_C00119179 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_OW_IIC_MSGCODE MODIFY (MSGCODE NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_OW_IIC_MSGCODE MODIFY (MFOA NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -86,16 +86,20 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00119179 ***
+PROMPT *** Create  constraint SYS_C00119181 ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.TMP_OW_IIC_MSGCODE MODIFY (MFOA NOT NULL ENABLE)';
+  ALTER TABLE BARS.TMP_OW_IIC_MSGCODE MODIFY (MSGCODE NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
 
+
+PROMPT *** Create  grants  TMP_OW_IIC_MSGCODE ***
+grant SELECT                                                                 on TMP_OW_IIC_MSGCODE to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_OW_IIC_MSGCODE to UPLD;
 
 
 

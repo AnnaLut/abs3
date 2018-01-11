@@ -89,7 +89,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  SP_B040 ***
+grant SELECT                                                                 on SP_B040         to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on SP_B040         to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on SP_B040         to UPLD;
 grant FLASHBACK,SELECT                                                       on SP_B040         to WR_REFREAD;
 
 

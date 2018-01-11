@@ -81,19 +81,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SWBANKSUPD_SWCHRSETS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SW_BANKS_UPD ADD CONSTRAINT FK_SWBANKSUPD_SWCHRSETS FOREIGN KEY (CHRSET)
-	  REFERENCES BARS.SW_CHRSETS (SETID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_SWBANKSUPD_IDUPD_NN ***
 begin   
  execute immediate '
@@ -144,9 +131,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  SW_BANKS_UPD ***
+grant SELECT                                                                 on SW_BANKS_UPD    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_BANKS_UPD    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SW_BANKS_UPD    to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SW_BANKS_UPD    to START1;
+grant SELECT                                                                 on SW_BANKS_UPD    to UPLD;
 
 
 

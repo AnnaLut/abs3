@@ -52,12 +52,14 @@ COMMENT ON COLUMN BARS.RNBU_0.VIEW_NAME IS '';
 
 PROMPT *** Create  grants  RNBU_0 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_0          to ABS_ADMIN;
+grant SELECT                                                                 on RNBU_0          to BARSREADER_ROLE;
 grant ALTER,DELETE,FLASHBACK,INSERT,SELECT,UPDATE                            on RNBU_0          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RNBU_0          to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on RNBU_0          to RNBU_0;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on RNBU_0          to RPBN002;
 grant ALTER,DELETE,INSERT,SELECT,UPDATE                                      on RNBU_0          to SALGL;
 grant SELECT                                                                 on RNBU_0          to START1;
+grant SELECT                                                                 on RNBU_0          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on RNBU_0          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on RNBU_0          to WR_REFREAD;
 

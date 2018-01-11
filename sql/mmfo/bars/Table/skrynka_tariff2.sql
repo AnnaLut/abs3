@@ -63,23 +63,7 @@ COMMENT ON COLUMN BARS.SKRYNKA_TARIFF2.BRANCH IS '';
 COMMENT ON COLUMN BARS.SKRYNKA_TARIFF2.KF IS '';
 
 
-  
-begin 
-  execute immediate 
-    ' ALTER TABLE BARS.SKRYNKA_TARIFF2 DROP CONSTRAINT PK_SKRYNKATARIFF2';
-exception when others then 
-  if sqlcode=-2443 then null; else raise; end if;
-end;
-/
 
-begin 
-  execute immediate 
-    ' DROP INDEX BARS.PK_SKRYNKATARIFF2';
-exception when others then 
-  if sqlcode=-1418 then null; else raise; end if;
-end;
-/
- 
 
 PROMPT *** Create  constraint PK_SKRYNKATARIFF2 ***
 begin   
@@ -95,49 +79,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SKRYNKATARIFF2_BRANCH ***
+PROMPT *** Create  constraint NN_SKRYNKA_TARIFF2_TARIFF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_TARIFF2 ADD CONSTRAINT FK_SKRYNKATARIFF2_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SKRTARIFF2_SKRYNKATARIFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_TARIFF2 ADD CONSTRAINT FK_SKRTARIFF2_SKRYNKATARIFF FOREIGN KEY (KF, TARIFF)
-	  REFERENCES BARS.SKRYNKA_TARIFF (KF, TARIFF) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_SKRYNKATARIFF2_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_TARIFF2 ADD CONSTRAINT FK_SKRYNKATARIFF2_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SKRYNKATARIFF2_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SKRYNKA_TARIFF2 MODIFY (KF CONSTRAINT CC_SKRYNKATARIFF2_KF_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SKRYNKA_TARIFF2 MODIFY (TARIFF CONSTRAINT NN_SKRYNKA_TARIFF2_TARIFF NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -194,10 +139,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint NN_SKRYNKA_TARIFF2_TARIFF ***
+PROMPT *** Create  constraint CC_SKRYNKATARIFF2_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SKRYNKA_TARIFF2 MODIFY (TARIFF CONSTRAINT NN_SKRYNKA_TARIFF2_TARIFF NOT NULL ENABLE)';
+  ALTER TABLE BARS.SKRYNKA_TARIFF2 MODIFY (KF CONSTRAINT CC_SKRYNKATARIFF2_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -220,10 +165,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  SKRYNKA_TARIFF2 ***
+grant SELECT                                                                 on SKRYNKA_TARIFF2 to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_TARIFF2 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SKRYNKA_TARIFF2 to BARS_DM;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on SKRYNKA_TARIFF2 to DEP_SKRN;
 grant SELECT                                                                 on SKRYNKA_TARIFF2 to START1;
+grant SELECT                                                                 on SKRYNKA_TARIFF2 to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SKRYNKA_TARIFF2 to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SKRYNKA_TARIFF2 to WR_REFREAD;
 

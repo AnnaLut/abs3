@@ -93,6 +93,10 @@ COMMENT ON COLUMN BARS.TMP_FX_NETTING.USERID IS '';
 
 
 
+PROMPT *** Create  grants  TMP_FX_NETTING ***
+grant SELECT                                                                 on TMP_FX_NETTING  to BARSREADER_ROLE;
+grant SELECT                                                                 on TMP_FX_NETTING  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

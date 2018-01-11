@@ -90,7 +90,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  ASYNC_PARAM ***
+grant SELECT                                                                 on ASYNC_PARAM     to BARSREADER_ROLE;
 grant SELECT                                                                 on ASYNC_PARAM     to BARS_DM;
+grant SELECT                                                                 on ASYNC_PARAM     to UPLD;
 
 
 

@@ -69,6 +69,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  OTCN_FA7_DAPP ***
+grant SELECT                                                                 on OTCN_FA7_DAPP   to BARSREADER_ROLE;
+grant SELECT                                                                 on OTCN_FA7_DAPP   to UPLD;
+
 
 
 PROMPT ===================================================================================== 

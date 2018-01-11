@@ -65,32 +65,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPANBS_DPATYPE ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPA_NBS ADD CONSTRAINT FK_DPANBS_DPATYPE FOREIGN KEY (TYPE)
-	  REFERENCES BARS.DPA_TYPE (TYPE) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_DPANBS_PS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPA_NBS ADD CONSTRAINT FK_DPANBS_PS FOREIGN KEY (NBS)
-	  REFERENCES BARS.PS (NBS) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DPANBS_TAXOTYPE ***
 begin   
  execute immediate '
@@ -118,10 +92,12 @@ exception when others then
 
 PROMPT *** Create  grants  DPA_NBS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPA_NBS         to ABS_ADMIN;
+grant SELECT                                                                 on DPA_NBS         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPA_NBS         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPA_NBS         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPA_NBS         to DPA_NBS;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPA_NBS         to RPBN002;
+grant SELECT                                                                 on DPA_NBS         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPA_NBS         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPA_NBS         to WR_REFREAD;
 

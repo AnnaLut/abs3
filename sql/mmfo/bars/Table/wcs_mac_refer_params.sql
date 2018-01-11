@@ -71,32 +71,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_MACREFPARS_MID_MACS_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_MAC_REFER_PARAMS ADD CONSTRAINT FK_MACREFPARS_MID_MACS_ID FOREIGN KEY (MAC_ID)
-	  REFERENCES BARS.WCS_MACS (ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_MACREFPARS_TID_MT_TID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.WCS_MAC_REFER_PARAMS ADD CONSTRAINT FK_MACREFPARS_TID_MT_TID FOREIGN KEY (TAB_ID)
-	  REFERENCES BARS.META_TABLES (TABID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_MACREFPARS_TAB_ID_NN ***
 begin   
  execute immediate '
@@ -109,10 +83,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_MACREFPARS_SEMFIELD_NN ***
+PROMPT *** Create  constraint CC_MACREFPARS_KEYFIELD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_MAC_REFER_PARAMS MODIFY (SEMANTIC_FIELD CONSTRAINT CC_MACREFPARS_SEMFIELD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_MAC_REFER_PARAMS MODIFY (KEY_FIELD CONSTRAINT CC_MACREFPARS_KEYFIELD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -121,10 +95,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_MACREFPARS_KEYFIELD_NN ***
+PROMPT *** Create  constraint CC_MACREFPARS_SEMFIELD_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.WCS_MAC_REFER_PARAMS MODIFY (KEY_FIELD CONSTRAINT CC_MACREFPARS_KEYFIELD_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.WCS_MAC_REFER_PARAMS MODIFY (SEMANTIC_FIELD CONSTRAINT CC_MACREFPARS_SEMFIELD_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -147,8 +121,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WCS_MAC_REFER_PARAMS ***
+grant SELECT                                                                 on WCS_MAC_REFER_PARAMS to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_MAC_REFER_PARAMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WCS_MAC_REFER_PARAMS to BARS_DM;
+grant SELECT                                                                 on WCS_MAC_REFER_PARAMS to UPLD;
 
 
 

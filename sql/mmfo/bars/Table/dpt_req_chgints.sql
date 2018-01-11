@@ -89,34 +89,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_DPTREQCHGINTS_BRANCH_NN ***
+PROMPT *** Create  constraint CC_DPTREQCHGINTS_TYPER ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQ_CHGINTS MODIFY (BRANCH CONSTRAINT CC_DPTREQCHGINTS_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTREQCHGINTS_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQ_CHGINTS MODIFY (KF CONSTRAINT CC_DPTREQCHGINTS_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTREQCHGINTS_REQCTYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQ_CHGINTS MODIFY (REQC_TYPE CONSTRAINT CC_DPTREQCHGINTS_REQCTYPE_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.DPT_REQ_CHGINTS ADD CONSTRAINT CC_DPTREQCHGINTS_TYPER CHECK ((reqc_type = 1 and reqc_oldint is not null and reqc_newint is not null) or (reqc_type = 2 and reqc_newbr is not null and reqc_begdate is not null)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -137,11 +113,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTREQCHGINTS_DPTREQS2 ***
+PROMPT *** Create  constraint CC_DPTREQCHGINTS_REQCTYPE_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQ_CHGINTS ADD CONSTRAINT FK_DPTREQCHGINTS_DPTREQS2 FOREIGN KEY (KF, REQ_ID)
-	  REFERENCES BARS.DPT_REQUESTS (KF, REQ_ID) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPT_REQ_CHGINTS MODIFY (REQC_TYPE CONSTRAINT CC_DPTREQCHGINTS_REQCTYPE_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -150,11 +125,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTREQCHGINTS_KF ***
+PROMPT *** Create  constraint CC_DPTREQCHGINTS_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQ_CHGINTS ADD CONSTRAINT FK_DPTREQCHGINTS_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.DPT_REQ_CHGINTS MODIFY (KF CONSTRAINT CC_DPTREQCHGINTS_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -163,23 +137,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_DPTREQCHGINTS_BRANCH ***
+PROMPT *** Create  constraint CC_DPTREQCHGINTS_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.DPT_REQ_CHGINTS ADD CONSTRAINT FK_DPTREQCHGINTS_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_DPTREQCHGINTS_TYPER ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_REQ_CHGINTS ADD CONSTRAINT CC_DPTREQCHGINTS_TYPER CHECK ((reqc_type = 1 and reqc_oldint is not null and reqc_newint is not null) or (reqc_type = 2 and reqc_newbr is not null and reqc_begdate is not null)) ENABLE';
+  ALTER TABLE BARS.DPT_REQ_CHGINTS MODIFY (BRANCH CONSTRAINT CC_DPTREQCHGINTS_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -202,7 +163,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPT_REQ_CHGINTS ***
+grant SELECT                                                                 on DPT_REQ_CHGINTS to BARSREADER_ROLE;
 grant SELECT                                                                 on DPT_REQ_CHGINTS to BARS_DM;
+grant SELECT                                                                 on DPT_REQ_CHGINTS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_REQ_CHGINTS to WR_ALL_RIGHTS;
 
 

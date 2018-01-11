@@ -131,8 +131,10 @@ COMMENT ON COLUMN BARS.TMP_LICS_ELPAY.FN_A IS '';
 
 
 PROMPT *** Create  grants  TMP_LICS_ELPAY ***
+grant SELECT                                                                 on TMP_LICS_ELPAY  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_LICS_ELPAY  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_LICS_ELPAY  to START1;
+grant SELECT                                                                 on TMP_LICS_ELPAY  to UPLD;
 
 
 

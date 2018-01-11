@@ -87,10 +87,12 @@ exception when others then
 
 
 PROMPT *** Create  grants  ZAY_BAOP ***
+grant SELECT                                                                 on ZAY_BAOP        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ZAY_BAOP        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAY_BAOP        to BARS_DM;
 grant INSERT                                                                 on ZAY_BAOP        to OPERKKK;
 grant DELETE,SELECT,UPDATE                                                   on ZAY_BAOP        to TECH_MOM1;
+grant SELECT                                                                 on ZAY_BAOP        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAY_BAOP        to WR_ALL_RIGHTS;
 grant INSERT                                                                 on ZAY_BAOP        to ZAY;
 

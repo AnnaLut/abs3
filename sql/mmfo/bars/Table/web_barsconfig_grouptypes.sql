@@ -89,8 +89,10 @@ exception when others then
 
 
 PROMPT *** Create  grants  WEB_BARSCONFIG_GROUPTYPES ***
+grant SELECT                                                                 on WEB_BARSCONFIG_GROUPTYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on WEB_BARSCONFIG_GROUPTYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on WEB_BARSCONFIG_GROUPTYPES to BARS_DM;
+grant SELECT                                                                 on WEB_BARSCONFIG_GROUPTYPES to UPLD;
 grant SELECT                                                                 on WEB_BARSCONFIG_GROUPTYPES to WEBTECH;
 grant SELECT                                                                 on WEB_BARSCONFIG_GROUPTYPES to WR_ADMIN;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WEB_BARSCONFIG_GROUPTYPES to WR_ALL_RIGHTS;

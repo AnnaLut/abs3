@@ -47,9 +47,11 @@ COMMENT ON COLUMN BARS.ANI_SP_KD.FDAT IS '';
 
 
 PROMPT *** Create  grants  ANI_SP_KD ***
+grant SELECT                                                                 on ANI_SP_KD       to BARSREADER_ROLE;
 grant SELECT                                                                 on ANI_SP_KD       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ANI_SP_KD       to BARS_DM;
 grant SELECT                                                                 on ANI_SP_KD       to SALGL;
+grant SELECT                                                                 on ANI_SP_KD       to UPLD;
 
 
 

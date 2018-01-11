@@ -111,19 +111,6 @@ COMMENT ON COLUMN BARS.DPA_FILE_COUNTERS.TAXD_SEQ_DEFAULT IS 'Номер последнего ф
 
 
 
-PROMPT *** Create  constraint FK_DPAFILECOUNTERS_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPA_FILE_COUNTERS ADD CONSTRAINT FK_DPAFILECOUNTERS_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_DPAFILECOUNTERS_KF_NN ***
 begin   
  execute immediate '
@@ -136,9 +123,11 @@ exception when others then
 
 
 PROMPT *** Create  grants  DPA_FILE_COUNTERS ***
+grant SELECT                                                                 on DPA_FILE_COUNTERS to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on DPA_FILE_COUNTERS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DPA_FILE_COUNTERS to BARS_DM;
 grant SELECT,UPDATE                                                          on DPA_FILE_COUNTERS to RPBN002;
+grant SELECT                                                                 on DPA_FILE_COUNTERS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPA_FILE_COUNTERS to WR_ALL_RIGHTS;
 
 
