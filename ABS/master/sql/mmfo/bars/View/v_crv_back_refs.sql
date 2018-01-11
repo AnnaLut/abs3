@@ -15,8 +15,10 @@ select c.back_ref, 'PAYMENT' flg, c.todo, p."REF",p."DEAL_TAG",p."TT",p."VOB",p.
 where c.payment_ref=p.ref(+);
 
 PROMPT *** Create  grants  V_CRV_BACK_REFS ***
+grant SELECT                                                                 on V_CRV_BACK_REFS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CRV_BACK_REFS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CRV_BACK_REFS to START1;
+grant SELECT                                                                 on V_CRV_BACK_REFS to UPLD;
 
 
 

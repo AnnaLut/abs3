@@ -14,8 +14,10 @@ PROMPT *** Create  view V_ZAPROS2 ***
    ORDER BY   r020;
 
 PROMPT *** Create  grants  V_ZAPROS2 ***
+grant SELECT                                                                 on V_ZAPROS2       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAPROS2       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ZAPROS2       to START1;
+grant SELECT                                                                 on V_ZAPROS2       to UPLD;
 
 
 

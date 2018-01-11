@@ -19,8 +19,10 @@ PROMPT *** Create  view V_OBPC_TRAN ***
         or n.branch is null );
 
 PROMPT *** Create  grants  V_OBPC_TRAN ***
+grant SELECT                                                                 on V_OBPC_TRAN     to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_OBPC_TRAN     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OBPC_TRAN     to OBPC;
+grant SELECT                                                                 on V_OBPC_TRAN     to UPLD;
 grant FLASHBACK,SELECT                                                       on V_OBPC_TRAN     to WR_REFREAD;
 
 

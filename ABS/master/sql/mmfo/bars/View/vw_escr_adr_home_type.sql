@@ -15,7 +15,9 @@ SELECT 2 id, 'домоволодіння' NAME, 'д/в.' VALUE
   FROM dual;
 
 PROMPT *** Create  grants  VW_ESCR_ADR_HOME_TYPE ***
+grant SELECT                                                                 on VW_ESCR_ADR_HOME_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_ADR_HOME_TYPE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VW_ESCR_ADR_HOME_TYPE to UPLD;
 
 
 

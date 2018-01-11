@@ -27,8 +27,10 @@ PROMPT *** Create  view V_CCK_RESTR ***
      FROM cck_restr_acc;
 
 PROMPT *** Create  grants  V_CCK_RESTR ***
+grant SELECT                                                                 on V_CCK_RESTR     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_CCK_RESTR     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CCK_RESTR     to START1;
+grant SELECT                                                                 on V_CCK_RESTR     to UPLD;
 
 
 

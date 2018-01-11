@@ -24,7 +24,9 @@ PROMPT *** Create  view V_WCS_SCANCOPY_QUESTIONS ***
  order by sq.scopy_id, sq.ord;
 
 PROMPT *** Create  grants  V_WCS_SCANCOPY_QUESTIONS ***
+grant SELECT                                                                 on V_WCS_SCANCOPY_QUESTIONS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SCANCOPY_QUESTIONS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_SCANCOPY_QUESTIONS to UPLD;
 
 
 

@@ -30,7 +30,9 @@ PROMPT *** Create  view V_SUMPOG_2ND ***
    ORDER BY TO_DATE (g.CC_ID, 'dd/mm/yyyy'), g.KV, g.ND;
 
 PROMPT *** Create  grants  V_SUMPOG_2ND ***
+grant SELECT                                                                 on V_SUMPOG_2ND    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SUMPOG_2ND    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_SUMPOG_2ND    to UPLD;
 
 
 

@@ -11,7 +11,9 @@ PROMPT *** Create  view M_ROLE_FIL ***
   select FILTR_ROLE (r.ID) FID , r."ID",r."CODE",r."NAME",r."ACC",r."ARMC",r."ARMW",r."CHK",r."OTC",r."TTS",r."STA" from M_ROLE r;
 
 PROMPT *** Create  grants  M_ROLE_FIL ***
+grant SELECT                                                                 on M_ROLE_FIL      to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_FIL      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on M_ROLE_FIL      to UPLD;
 
 
 

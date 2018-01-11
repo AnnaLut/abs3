@@ -12,7 +12,9 @@ PROMPT *** Create  view V_USERADM_TTS ***
 
 PROMPT *** Create  grants  V_USERADM_TTS ***
 grant SELECT                                                                 on V_USERADM_TTS   to ABS_ADMIN;
+grant SELECT                                                                 on V_USERADM_TTS   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USERADM_TTS   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_USERADM_TTS   to UPLD;
 
 
 

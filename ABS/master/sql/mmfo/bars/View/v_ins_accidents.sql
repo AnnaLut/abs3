@@ -26,7 +26,9 @@ PROMPT *** Create  view V_INS_ACCIDENTS ***
  order by a.deal_id, a.acdt_date;
 
 PROMPT *** Create  grants  V_INS_ACCIDENTS ***
+grant SELECT                                                                 on V_INS_ACCIDENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_ACCIDENTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_INS_ACCIDENTS to UPLD;
 
 
 

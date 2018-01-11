@@ -14,7 +14,9 @@ PROMPT *** Create  view V_BL_LOST_PASS ***
      FROM bl_lost_pass;
 
 PROMPT *** Create  grants  V_BL_LOST_PASS ***
+grant SELECT                                                                 on V_BL_LOST_PASS  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BL_LOST_PASS  to RBL;
+grant SELECT                                                                 on V_BL_LOST_PASS  to UPLD;
 
 
 

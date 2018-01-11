@@ -13,8 +13,10 @@ PROMPT *** Create  view V_OPER_FM_DEPARTMENT ***
  where o.userid in (select userid from otd_user where otd in (select otd from otd_user where userid=user_id));
 
 PROMPT *** Create  grants  V_OPER_FM_DEPARTMENT ***
+grant SELECT                                                                 on V_OPER_FM_DEPARTMENT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OPER_FM_DEPARTMENT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OPER_FM_DEPARTMENT to START1;
+grant SELECT                                                                 on V_OPER_FM_DEPARTMENT to UPLD;
 
 
 

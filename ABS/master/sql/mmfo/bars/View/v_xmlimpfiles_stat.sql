@@ -18,8 +18,10 @@ PROMPT *** Create  view V_XMLIMPFILES_STAT ***
           group by f.fn, f.dat, f.userid, f.branch );
 
 PROMPT *** Create  grants  V_XMLIMPFILES_STAT ***
+grant SELECT                                                                 on V_XMLIMPFILES_STAT to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_XMLIMPFILES_STAT to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_XMLIMPFILES_STAT to OPER000;
+grant SELECT                                                                 on V_XMLIMPFILES_STAT to UPLD;
 grant FLASHBACK,SELECT                                                       on V_XMLIMPFILES_STAT to WR_REFREAD;
 
 

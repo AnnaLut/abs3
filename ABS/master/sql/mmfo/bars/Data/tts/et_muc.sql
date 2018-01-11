@@ -332,7 +332,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции K07
-prompt Наименование операции: розрахунки за виплачені перекази по системі  "Золота Корона"
+prompt Наименование операции: K07 розрахунки за виплачені перекази по системі  "Золота Корона"
 declare
   cnt_  number;
 begin
@@ -341,11 +341,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K07', 'розрахунки за виплачені перекази по системі  "Золота Корона"', 1, null, null, '373910300465', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', 'розрахунки за виплачені перекази по системі  "Юністрім"');
+    values ('K07', 'K07 розрахунки за виплачені перекази по системі  "Золота Корона"', 1, null, null, '373910300465', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', 'розрахунки за виплачені перекази по системі  "Юністрім"');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K07', name='розрахунки за виплачені перекази по системі  "Золота Корона"', dk=1, nlsm=null, kv=null, nlsk='373910300465', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn='розрахунки за виплачені перекази по системі  "Юністрім"'
+         set tt='K07', name='K07 розрахунки за виплачені перекази по системі  "Золота Корона"', dk=1, nlsm=null, kv=null, nlsk='373910300465', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn='розрахунки за виплачені перекази по системі  "Юністрім"'
        where tt='K07';
   end;
   --------------------------------

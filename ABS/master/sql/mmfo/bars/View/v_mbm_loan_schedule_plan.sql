@@ -19,7 +19,9 @@ PROMPT *** Create  view V_MBM_LOAN_SCHEDULE_PLAN ***
    FROM CC_LIM CC ORDER BY CC.FDAT ASC;
 
 PROMPT *** Create  grants  V_MBM_LOAN_SCHEDULE_PLAN ***
+grant SELECT                                                                 on V_MBM_LOAN_SCHEDULE_PLAN to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBM_LOAN_SCHEDULE_PLAN to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_MBM_LOAN_SCHEDULE_PLAN to UPLD;
 
 
 

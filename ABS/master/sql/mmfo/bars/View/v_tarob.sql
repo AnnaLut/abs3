@@ -45,8 +45,10 @@ PROMPT *** Create  view V_TAROB ***
           AND a.ob22 = SUBSTR (k.kod, 5, 2);
 
 PROMPT *** Create  grants  V_TAROB ***
+grant SELECT                                                                 on V_TAROB         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_TAROB         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TAROB         to PYOD001;
+grant SELECT                                                                 on V_TAROB         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_TAROB         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_TAROB         to WR_REFREAD;
 

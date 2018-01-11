@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'CP_INFO: Iнформацiя з бiрж';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'CP_INFO';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,11 +124,11 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BYR', 'N', 'Код біржі', 1.3, 22, 0, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '0', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'FDAT', 'D', 'Дата', 1.5, 7, 2, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '0', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'ID', 'N', '№ пп', .6, 22, 1, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '0', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NOMIN', 'N', 'Обсяг~ за день~ шт', 1, 22, 4, 1, 0, 1, 0, '', '', 1, 0, 'sum(NOMIN)', 0, 0, 0, '0', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'STOIM', 'N', 'Обсяг~ за день~ грн', 1, 22, 3, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(STOIM)', 0, 0, 0, '0', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BYR', 'N', 'Код біржі', '1.3', 22, 0, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '0', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'FDAT', 'D', 'Дата', '1.5', 7, 2, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '0', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'ID', 'N', '№ пп', '.6', 22, 1, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '0', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NOMIN', 'N', 'Обсяг~ за день~ шт', '1', 22, 4, 1, 0, 1, 0, '', '', 1, 0, 'sum(NOMIN)', 0, 0, 0, '0', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'STOIM', 'N', 'Обсяг~ за день~ грн', '1', 22, 3, 1, 0, 0, 0, '', '# ##0.00', 1, 0, 'sum(STOIM)', 0, 0, 0, '0', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CP_BYR');

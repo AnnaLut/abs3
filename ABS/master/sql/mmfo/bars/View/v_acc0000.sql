@@ -38,8 +38,10 @@ PROMPT *** Create  view V_ACC0000 ***
             WHERE g.dat1 + (c.num - 1) <= g.dat2) d;
 
 PROMPT *** Create  grants  V_ACC0000 ***
+grant SELECT                                                                 on V_ACC0000       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACC0000       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ACC0000       to SALGL;
+grant SELECT                                                                 on V_ACC0000       to UPLD;
 
 
 

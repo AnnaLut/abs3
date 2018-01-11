@@ -12,7 +12,9 @@ PROMPT *** Create  view V_CIM_KOD_Z202 ***
 where id between 1 and 6;
 
 PROMPT *** Create  grants  V_CIM_KOD_Z202 ***
+grant SELECT                                                                 on V_CIM_KOD_Z202  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_KOD_Z202  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_KOD_Z202  to UPLD;
 
 
 

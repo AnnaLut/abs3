@@ -12,8 +12,10 @@ PROMPT *** Create  view FIN_DEBX1 ***
 where a.dazs is null and a.nbs||a.ob22=f.nbs_n  ;
 
 PROMPT *** Create  grants  FIN_DEBX1 ***
+grant SELECT                                                                 on FIN_DEBX1       to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_DEBX1       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_DEBX1       to START1;
+grant SELECT                                                                 on FIN_DEBX1       to UPLD;
 
 
 

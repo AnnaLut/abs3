@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'ДЕФ-2.СРЕДНЕAРИФМЕТИЧЕСКИЕ ОСТАТКИ по бал.сч. за период';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'NADA5';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,21 +124,21 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 2, 'B', 'D', 'Начальная~дата', null, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'BRANCH', 'C', 'Бранч', null, null, 10, 0, 1, 0, 0, '', '', 1, 0, 'to_char(count( distinct NADA5.branch))', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'E', 'D', 'Конечная~дата', null, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KOL', 'N', 'Кол~дней', null, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KV', 'N', 'Вал', null, null, 30, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NBS', 'C', 'Бал~счет', null, null, 20, 0, 1, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'OB22', 'C', 'Об~22', null, null, 25, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'OSTQS', 'N', 'Сред.ост~в эквив', null, null, 50, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum( NADA5.OSTQS) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'OSTS', 'N', 'Сред.ост~в номин', null, null, 45, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'MFO', 'C', 'МФО', null, null, 4, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'SEGMENT', 'C', 'Сегмент', null, null, 17, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'ZN50', 'C', 'Код~ фин~рез', null, null, 18, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'PAP', 'C', 'А/П', null, null, 19, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'BRANCH2', 'C', 'Код~ Бранч-2', null, null, 5, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'SPOK', 'C', 'Код СПОК', null, null, 55, 0, 1, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'B', 'D', 'Начальная~дата', '', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'BRANCH', 'C', 'Бранч', '', null, 10, 0, 1, 0, 0, '', '', 1, 0, 'to_char(count( distinct NADA5.branch))', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'E', 'D', 'Конечная~дата', '', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KOL', 'N', 'Кол~дней', '', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KV', 'N', 'Вал', '', null, 30, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NBS', 'C', 'Бал~счет', '', null, 20, 0, 1, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'OB22', 'C', 'Об~22', '', null, 25, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'OSTQS', 'N', 'Сред.ост~в эквив', '', null, 50, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum( NADA5.OSTQS) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'OSTS', 'N', 'Сред.ост~в номин', '', null, 45, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'MFO', 'C', 'МФО', '', null, 4, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'SEGMENT', 'C', 'Сегмент', '', null, 17, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'ZN50', 'C', 'Код~ фин~рез', '', null, 18, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'PAP', 'C', 'А/П', '', null, 19, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'BRANCH2', 'C', 'Код~ Бранч-2', '', null, 5, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'SPOK', 'C', 'Код СПОК', '', null, 55, 0, 1, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('BRANCH');

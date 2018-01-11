@@ -42,6 +42,8 @@ PROMPT *** Create  view AQ$MODULE_REQUEST_QT ***
                              EXPIRATION_REASON , sender_name SENDER_NAME, sender_address SENDER_ADDRESS, sender_protocol SENDER_PROTOCOL, dequeue_msgid ORIGINAL_MSGID  FROM "MODULE_REQUEST_QT" WHERE state != 7 AND   state != 9 WITH READ ONLY;
 
 PROMPT *** Create  grants  AQ$MODULE_REQUEST_QT ***
+grant SELECT                                                                 on AQ$MODULE_REQUEST_QT to BARSREADER_ROLE;
+grant SELECT                                                                 on AQ$MODULE_REQUEST_QT to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on AQ$MODULE_REQUEST_QT to WR_ALL_RIGHTS;
 
 

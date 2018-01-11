@@ -46,7 +46,9 @@ PROMPT *** Create  view V_DOCS_NOT_PAYD_IN_START ***
                           FROM tmp_log);
 
 PROMPT *** Create  grants  V_DOCS_NOT_PAYD_IN_START ***
+grant SELECT                                                                 on V_DOCS_NOT_PAYD_IN_START to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOCS_NOT_PAYD_IN_START to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DOCS_NOT_PAYD_IN_START to UPLD;
 
 
 

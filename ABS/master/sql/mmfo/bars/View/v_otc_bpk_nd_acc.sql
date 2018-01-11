@@ -22,6 +22,10 @@ PROMPT *** Create  view V_OTC_BPK_ND_ACC ***
                       ACC_TOVR,
                       ACC_W4));
 
+PROMPT *** Create  grants  V_OTC_BPK_ND_ACC ***
+grant SELECT                                                                 on V_OTC_BPK_ND_ACC to BARSREADER_ROLE;
+grant SELECT                                                                 on V_OTC_BPK_ND_ACC to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -61,10 +61,12 @@ PROMPT *** Create  view PROVODKI ***
 
 PROMPT *** Create  grants  PROVODKI ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on PROVODKI        to ABS_ADMIN;
+grant SELECT                                                                 on PROVODKI        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PROVODKI        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PROVODKI        to RPBN001;
 grant SELECT                                                                 on PROVODKI        to SALGL;
 grant SELECT                                                                 on PROVODKI        to START1;
+grant SELECT                                                                 on PROVODKI        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PROVODKI        to WR_ALL_RIGHTS;
 
 

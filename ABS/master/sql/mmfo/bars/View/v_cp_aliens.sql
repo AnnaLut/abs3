@@ -24,7 +24,9 @@ PROMPT *** Create  view V_CP_ALIENS ***
     WHERE UPPER (f.bick) = UPPER (s.bic(+)) AND b.KODC(+) = f.kod_G;
 
 PROMPT *** Create  grants  V_CP_ALIENS ***
+grant SELECT                                                                 on V_CP_ALIENS     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_ALIENS     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CP_ALIENS     to UPLD;
 
 
 

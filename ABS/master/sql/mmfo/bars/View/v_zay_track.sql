@@ -20,12 +20,14 @@ PROMPT *** Create  view V_ZAY_TRACK ***
                     -1, '«н€та з в≥зи',
                     '')
                viza_name
-       FROM zay_track z, staff s
+       FROM zay_track z, staff$base s
       WHERE z.userid = s.id AND z.new_sos = 0
    ORDER BY z.id, z.track_id;
 
 PROMPT *** Create  grants  V_ZAY_TRACK ***
+grant SELECT                                                                 on V_ZAY_TRACK     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY_TRACK     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ZAY_TRACK     to UPLD;
 grant SELECT                                                                 on V_ZAY_TRACK     to ZAY;
 
 

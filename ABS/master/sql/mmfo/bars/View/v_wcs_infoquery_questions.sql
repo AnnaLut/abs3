@@ -23,7 +23,9 @@ PROMPT *** Create  view V_WCS_INFOQUERY_QUESTIONS ***
  order by iq.ord;
 
 PROMPT *** Create  grants  V_WCS_INFOQUERY_QUESTIONS ***
+grant SELECT                                                                 on V_WCS_INFOQUERY_QUESTIONS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_INFOQUERY_QUESTIONS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_INFOQUERY_QUESTIONS to UPLD;
 
 
 

@@ -17,8 +17,10 @@ where a.acc=c.acc and b.acc=c.acco and
 cu.acc=a.acc and cu.rnk=u.rnk;
 
 PROMPT *** Create  grants  V_OVER ***
+grant SELECT                                                                 on V_OVER          to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OVER          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OVER          to START1;
+grant SELECT                                                                 on V_OVER          to UPLD;
 
 
 

@@ -1,5 +1,14 @@
-create or replace view v_trance_dpa as
-SELECT 'Відкритий в результаті трансформації' AS oc
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_TRANCE_DPA.sql =========*** Run *** =
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_TRANCE_DPA ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_TRANCE_DPA ("OC", "NLSALT", "KV", "DAT_ALT") AS 
+  SELECT 'Відкритий в результаті трансформації' AS oc
       ,a.nlsalt
       ,a.kv
       ,a.dat_alt
@@ -36,11 +45,15 @@ SELECT 'Закритий в результаті трансформації' AS ot
              ,4) = dpa.nbs
    AND a.nls = ree.nls
    AND a.kv = ree.kv
-   AND a.nbs IS NOT NULL   
+   AND a.nbs IS NOT NULL
    AND ree.ot = 6;
-   
-grant select on v_trance_dpa to bars_access_defrole;   
-   
- 
-comment on table v_trance_dpa is 'Відомість відкр/закр рах. для ДПА (трансформація)';
 
+PROMPT *** Create  grants  V_TRANCE_DPA ***
+grant SELECT                                                                 on V_TRANCE_DPA    to BARS_ACCESS_DEFROLE;
+grant FLASHBACK,SELECT                                                       on V_TRANCE_DPA    to WR_REFREAD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_TRANCE_DPA.sql =========*** End *** =
+PROMPT ===================================================================================== 

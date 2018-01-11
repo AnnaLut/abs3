@@ -59,9 +59,11 @@ PROMPT *** Create  view V_CP_ARCH ***
           AND ct.REF(+) = a.REF;
 
 PROMPT *** Create  grants  V_CP_ARCH ***
+grant SELECT                                                                 on V_CP_ARCH       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_ARCH       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CP_ARCH       to CP_ROLE;
 grant SELECT                                                                 on V_CP_ARCH       to START1;
+grant SELECT                                                                 on V_CP_ARCH       to UPLD;
 
 
 

@@ -14,8 +14,10 @@ PROMPT *** Create  view STAN_FIN23S ***
     select 4, 'Г=Критичний' from dual;
 
 PROMPT *** Create  grants  STAN_FIN23S ***
+grant SELECT                                                                 on STAN_FIN23S     to BARSREADER_ROLE;
 grant SELECT                                                                 on STAN_FIN23S     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAN_FIN23S     to START1;
+grant SELECT                                                                 on STAN_FIN23S     to UPLD;
 
 
 

@@ -141,7 +141,9 @@ PROMPT *** Create  view V_CIG_CC_DEAL ***
     WHERE   acc_9129 IS NOT NULL  AND o.acc_pk = a.acc;
 
 PROMPT *** Create  grants  V_CIG_CC_DEAL ***
+grant SELECT                                                                 on V_CIG_CC_DEAL   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIG_CC_DEAL   to CIG_LOADER;
+grant SELECT                                                                 on V_CIG_CC_DEAL   to UPLD;
 
 
 

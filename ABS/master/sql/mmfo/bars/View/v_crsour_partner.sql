@@ -19,7 +19,9 @@ where c.kf = sys_context('bars_context', 'user_mfo') and
                       b.mfo <> sys_context('bars_context', 'user_mfo')*/);
 
 PROMPT *** Create  grants  V_CRSOUR_PARTNER ***
+grant SELECT                                                                 on V_CRSOUR_PARTNER to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CRSOUR_PARTNER to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CRSOUR_PARTNER to UPLD;
 
 
 

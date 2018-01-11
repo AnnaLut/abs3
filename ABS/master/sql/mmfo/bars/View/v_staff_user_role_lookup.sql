@@ -14,7 +14,9 @@ where  t.state_id = 1 /*user_role_utl.ROLE_STATE_ACTIVE*/
 ;
 
 PROMPT *** Create  grants  V_STAFF_USER_ROLE_LOOKUP ***
+grant SELECT                                                                 on V_STAFF_USER_ROLE_LOOKUP to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFF_USER_ROLE_LOOKUP to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STAFF_USER_ROLE_LOOKUP to UPLD;
 
 
 

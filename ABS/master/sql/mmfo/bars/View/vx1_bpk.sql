@@ -14,7 +14,9 @@ PROMPT *** Create  view VX1_BPK ***
      from w4_acc  ;
 
 PROMPT *** Create  grants  VX1_BPK ***
+grant SELECT                                                                 on VX1_BPK         to BARSREADER_ROLE;
 grant SELECT                                                                 on VX1_BPK         to BARS_DM;
+grant SELECT                                                                 on VX1_BPK         to UPLD;
 
 
 

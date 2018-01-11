@@ -55,6 +55,7 @@ PROMPT *** Create  view V_GL ***
      where a.acc=s.acc (+);
 
 PROMPT *** Create  grants  V_GL ***
+grant SELECT                                                                 on V_GL            to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GL            to BARSUPL;
 grant SELECT                                                                 on V_GL            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_GL            to START1;

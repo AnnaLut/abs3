@@ -38,11 +38,13 @@ PROMPT *** Create  view SAL_BRANCH ***
 
 PROMPT *** Create  grants  SAL_BRANCH ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SAL_BRANCH      to ABS_ADMIN;
+grant SELECT                                                                 on SAL_BRANCH      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SAL_BRANCH      to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SAL_BRANCH      to RCC_DEAL;
 grant SELECT                                                                 on SAL_BRANCH      to RPBN001;
 grant SELECT                                                                 on SAL_BRANCH      to SALGL;
 grant SELECT                                                                 on SAL_BRANCH      to START1;
+grant SELECT                                                                 on SAL_BRANCH      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SAL_BRANCH      to WR_ALL_RIGHTS;
 grant SELECT                                                                 on SAL_BRANCH      to WR_CUSTLIST;
 

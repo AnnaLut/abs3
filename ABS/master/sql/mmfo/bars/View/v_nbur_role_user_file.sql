@@ -56,6 +56,10 @@ PROMPT *** Create  view V_NBUR_ROLE_USER_FILE ***
     on ( ru.ROLE_ID = rf.ROLE_ID )
 ;
 
+PROMPT *** Create  grants  V_NBUR_ROLE_USER_FILE ***
+grant SELECT                                                                 on V_NBUR_ROLE_USER_FILE to BARSREADER_ROLE;
+grant SELECT                                                                 on V_NBUR_ROLE_USER_FILE to UPLD;
+
 
 
 PROMPT ===================================================================================== 

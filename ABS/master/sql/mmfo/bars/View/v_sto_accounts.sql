@@ -25,7 +25,9 @@ where  a.nbs in ('2625') and
        a.kf = sys_context('bars_context', 'user_mfo');
 
 PROMPT *** Create  grants  V_STO_ACCOUNTS ***
+grant SELECT                                                                 on V_STO_ACCOUNTS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STO_ACCOUNTS  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STO_ACCOUNTS  to UPLD;
 
 
 

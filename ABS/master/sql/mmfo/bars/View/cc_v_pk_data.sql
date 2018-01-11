@@ -18,7 +18,9 @@ PROMPT *** Create  view CC_V_PK_DATA ***
  ;
 
 PROMPT *** Create  grants  CC_V_PK_DATA ***
+grant SELECT                                                                 on CC_V_PK_DATA    to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_V_PK_DATA    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CC_V_PK_DATA    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_V_PK_DATA    to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CC_V_PK_DATA    to WR_CREDIT;
 

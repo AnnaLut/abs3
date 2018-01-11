@@ -11,8 +11,10 @@ PROMPT *** Create  view V_FOREX_PAR ***
   select "PAR","VAL","COMM","KF" from PARAMS$BASE  where par like 'FX%';
 
 PROMPT *** Create  grants  V_FOREX_PAR ***
+grant SELECT                                                                 on V_FOREX_PAR     to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_FOREX_PAR     to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_FOREX_PAR     to START1;
+grant SELECT                                                                 on V_FOREX_PAR     to UPLD;
 
 
 

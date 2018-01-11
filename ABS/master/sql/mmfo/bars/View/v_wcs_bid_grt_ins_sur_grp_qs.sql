@@ -75,7 +75,9 @@ PROMPT *** Create  view V_WCS_BID_GRT_INS_SUR_GRP_QS ***
     or next_rectype_id != 'SECTION';
 
 PROMPT *** Create  grants  V_WCS_BID_GRT_INS_SUR_GRP_QS ***
+grant SELECT                                                                 on V_WCS_BID_GRT_INS_SUR_GRP_QS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_BID_GRT_INS_SUR_GRP_QS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_BID_GRT_INS_SUR_GRP_QS to UPLD;
 
 
 

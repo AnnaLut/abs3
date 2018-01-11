@@ -125,8 +125,10 @@ group by accs,dat,userid
  ;
 
 PROMPT *** Create  grants  V_ZALOG_BY_COL ***
+grant SELECT                                                                 on V_ZALOG_BY_COL  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZALOG_BY_COL  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ZALOG_BY_COL  to RCC_DEAL;
+grant SELECT                                                                 on V_ZALOG_BY_COL  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ZALOG_BY_COL  to WR_ALL_RIGHTS;
 
 

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Список договорів регулярних платежів на обробку бек-офісом';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_STO_DET_NEW';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,25 +124,25 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH_CARD', 'C', 'Відділення,~де відкрито~картковий рахунок~платника', null, 30, 16, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'BRANCH_MADE', 'C', 'Відділення', null, 30, 15, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DAT1', 'D', 'Дата "З"', null, 10, 2, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DAT2', 'D', 'Дата "по"', null, 10, 3, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DISCLAIM_ID', 'N', 'Причина~відмови~(в разі відхилення)', null, 22, 0, 1, 0, 1, 1, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'FREQ', 'C', 'Періодичність~виконання', null, 35, 4, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'FSUM', 'C', 'Сума платежу~формула суми', null, 100, 13, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'IDD', 'N', 'Ідентифікатор~договору', null, 22, 1, 1, 1, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'KVA', 'N', 'Валюта~рахунку~платника', null, 22, 7, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'KVB', 'N', 'Валюта~рахунку~отримувача', null, 22, 9, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'MFOB', 'C', 'МФО~отримувача', null, 12, 11, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'NAZN', 'C', 'Призначення платежу', null, 160, 12, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'NLSA', 'C', 'Рахунок~платника', null, 15, 6, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'NLSB', 'C', 'Рахунток~отримувача', null, 15, 8, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'OKPO', 'C', 'Код отримувача', null, 10, 14, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'POLU', 'C', 'Назва~отримувача', null, 38, 10, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'STATUS_ID', 'N', 'Статус', null, 22, -1, 1, 0, 1, 1, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'USERID_MADE', 'N', 'Користувач', null, 22, 17, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'WEND', 'N', 'Врахування~вихідних~днів(+1/-1)', null, 22, 5, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BRANCH_CARD', 'C', 'Відділення,~де відкрито~картковий рахунок~платника', '', 30, 16, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BRANCH_MADE', 'C', 'Відділення', '', 30, 15, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAT1', 'D', 'Дата "З"', '', 10, 2, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DAT2', 'D', 'Дата "по"', '', 10, 3, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DISCLAIM_ID', 'N', 'Причина~відмови~(в разі відхилення)', '', 22, 0, 1, 0, 1, 1, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'FREQ', 'C', 'Періодичність~виконання', '', 35, 4, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'FSUM', 'C', 'Сума платежу~формула суми', '', 100, 13, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'IDD', 'N', 'Ідентифікатор~договору', '', 22, 1, 1, 1, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'KVA', 'N', 'Валюта~рахунку~платника', '', 22, 7, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'KVB', 'N', 'Валюта~рахунку~отримувача', '', 22, 9, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'MFOB', 'C', 'МФО~отримувача', '', 12, 11, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'NAZN', 'C', 'Призначення платежу', '', 160, 12, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'NLSA', 'C', 'Рахунок~платника', '', 15, 6, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'NLSB', 'C', 'Рахунток~отримувача', '', 15, 8, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'OKPO', 'C', 'Код отримувача', '', 10, 14, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'POLU', 'C', 'Назва~отримувача', '', 38, 10, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'STATUS_ID', 'N', 'Статус', '', 22, -1, 1, 0, 1, 1, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'USERID_MADE', 'N', 'Користувач', '', 22, 17, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'WEND', 'N', 'Врахування~вихідних~днів(+1/-1)', '', 22, 5, 1, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('STO_DISCLAIMER');

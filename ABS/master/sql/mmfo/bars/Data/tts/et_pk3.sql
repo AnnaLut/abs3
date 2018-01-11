@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции PK3
-prompt Наименование операции: p) П-Дебет картрахунку (мультивалютна)
+prompt Наименование операции: PK3 p) П-Дебет картрахунку (мультивалютна)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('PK3', 'p) П-Дебет картрахунку (мультивалютна)', 1, null, null, null, null, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''03''))', null, '0000100000000000000000000000000000010110000000000000000000000000', null);
+    values ('PK3', 'PK3 p) П-Дебет картрахунку (мультивалютна)', 1, null, null, null, null, null, null, null, null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''03''))', null, '0000100000000000000000000000000000010110000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='PK3', name='p) П-Дебет картрахунку (мультивалютна)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='0000100000000000000000000000000000010110000000000000000000000000', nazn=null
+         set tt='PK3', name='PK3 p) П-Дебет картрахунку (мультивалютна)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='0000100000000000000000000000000000010110000000000000000000000000', nazn=null
        where tt='PK3';
   end;
   --------------------------------

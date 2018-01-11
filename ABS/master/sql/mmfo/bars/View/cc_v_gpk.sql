@@ -13,8 +13,10 @@ PROMPT *** Create  view CC_V_GPK ***
    SELECT 3 GPK, '3.Погашенння кредиту рівними долями з %% ( ануїтет )' name from dual;
 
 PROMPT *** Create  grants  CC_V_GPK ***
+grant SELECT                                                                 on CC_V_GPK        to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_V_GPK        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_V_GPK        to START1;
+grant SELECT                                                                 on CC_V_GPK        to UPLD;
 
 
 

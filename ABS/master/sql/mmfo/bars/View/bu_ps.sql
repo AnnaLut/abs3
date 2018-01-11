@@ -15,8 +15,10 @@ union all select '_38 ', 'Iншi операцiйнi, за операцiями з фiлiями банку' from d
  ;
 
 PROMPT *** Create  grants  BU_PS ***
+grant SELECT                                                                 on BU_PS           to BARSREADER_ROLE;
 grant SELECT                                                                 on BU_PS           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BU_PS           to SALGL;
+grant SELECT                                                                 on BU_PS           to UPLD;
 
 
 

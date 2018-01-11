@@ -41,8 +41,10 @@ PROMPT *** Create  view V_OBPC_PFILES ***
  group by f_n, f_d ;
 
 PROMPT *** Create  grants  V_OBPC_PFILES ***
+grant SELECT                                                                 on V_OBPC_PFILES   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_PFILES   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OBPC_PFILES   to OBPC;
+grant SELECT                                                                 on V_OBPC_PFILES   to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_PFILES   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_OBPC_PFILES   to WR_REFREAD;
 

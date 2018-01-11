@@ -1,21 +1,14 @@
-CREATE OR REPLACE FORCE VIEW BARS.V_XOZ_RU_CA
-(
-   REC,
-   MFOA,
-   NLSA,
-   NAM_A,
-   S,
-   D_REC,
-   NAZN,
-   REF1,
-   REFD_RU,
-   OB22,
-   RU,
-   NAME,
-   PROD
-)
-AS
-   SELECT w.REC,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_XOZ_RU_CA.sql =========*** Run *** ==
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_XOZ_RU_CA ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_XOZ_RU_CA ("REC", "MFOA", "NLSA", "NAM_A", "S", "D_REC", "NAZN", "REF1", "REFD_RU", "OB22", "RU", "NAME", "PROD") AS 
+  SELECT w.REC,
           w.MFOA,
           w.NLSA,
           w.NAM_A,
@@ -46,8 +39,13 @@ AS
           banks_ru b
     WHERE b.mfo = w.mfoa;
 
-/
+PROMPT *** Create  grants  V_XOZ_RU_CA ***
+grant SELECT                                                                 on V_XOZ_RU_CA     to BARSREADER_ROLE;
+grant SELECT                                                                 on V_XOZ_RU_CA     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_XOZ_RU_CA     to UPLD;
 
-ALTER VIEW V_XOZ_RU_CA
-    COMPILE; 
-/
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_XOZ_RU_CA.sql =========*** End *** ==
+PROMPT ===================================================================================== 

@@ -24,8 +24,10 @@ select 'цдтл' origin, a.c1, t.c4, a.c6, a.c7, a.c8, a.c9, t.c2, t.c13, t.c34, t.
    and a.c1 = t.c1;
 
 PROMPT *** Create  grants  V_FINMON_REFT ***
+grant SELECT                                                                 on V_FINMON_REFT   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_FINMON_REFT   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_FINMON_REFT   to FINMON01;
+grant SELECT                                                                 on V_FINMON_REFT   to UPLD;
 grant FLASHBACK,SELECT                                                       on V_FINMON_REFT   to WR_REFREAD;
 
 

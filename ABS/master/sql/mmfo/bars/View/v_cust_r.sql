@@ -22,9 +22,11 @@ PROMPT *** Create  view V_CUST_R ***
     WHERE c.rnk = w.rnk AND w.tag = 'RIZIK';
 
 PROMPT *** Create  grants  V_CUST_R ***
+grant SELECT                                                                 on V_CUST_R        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CUST_R        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CUST_R        to CUST001;
 grant SELECT                                                                 on V_CUST_R        to FINMON01;
+grant SELECT                                                                 on V_CUST_R        to UPLD;
 
 
 

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции KBP
-prompt Наименование операции: off  DPT - Викуп нерозмінної частини валюти по курсу купівлі
+prompt Наименование операции: KBP off  DPT - Викуп нерозмінної частини валюти по курсу купівлі
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KBP', 'off  DPT - Викуп нерозмінної частини валюти по курсу купівлі', 1, null, null, null, 980, null, '#(tobopack.GetToboCASH)', '#(tobopack.GetToboCASH)', null, 0, 0, 1, 0, null, null, 56, null, '#(nbs_ob22 (''3800'',''10''))', null, '0000100001010000000000000000000000010000000000000000000000010000', 'Викуп нерозмінного залишку при поверненні депозиту згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('KBP', 'KBP off  DPT - Викуп нерозмінної частини валюти по курсу купівлі', 1, null, null, null, 980, null, '#(tobopack.GetToboCASH)', '#(tobopack.GetToboCASH)', null, 0, 0, 1, 0, null, null, 56, null, '#(nbs_ob22 (''3800'',''10''))', null, '0000100001010000000000000000000000010000000000000000000000010000', 'Викуп нерозмінного залишку при поверненні депозиту згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KBP', name='off  DPT - Викуп нерозмінної частини валюти по курсу купівлі', dk=1, nlsm=null, kv=null, nlsk=null, kvk=980, nlss=null, nlsa='#(tobopack.GetToboCASH)', nlsb='#(tobopack.GetToboCASH)', mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=56, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=null, flags='0000100001010000000000000000000000010000000000000000000000010000', nazn='Викуп нерозмінного залишку при поверненні депозиту згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='KBP', name='KBP off  DPT - Викуп нерозмінної частини валюти по курсу купівлі', dk=1, nlsm=null, kv=null, nlsk=null, kvk=980, nlss=null, nlsa='#(tobopack.GetToboCASH)', nlsb='#(tobopack.GetToboCASH)', mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=56, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=null, flags='0000100001010000000000000000000000010000000000000000000000010000', nazn='Викуп нерозмінного залишку при поверненні депозиту згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='KBP';
   end;
   --------------------------------

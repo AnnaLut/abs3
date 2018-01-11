@@ -12,9 +12,11 @@ PROMPT *** Create  view BRANCH_PARAMS_VALUES ***
  ;
 
 PROMPT *** Create  grants  BRANCH_PARAMS_VALUES ***
+grant SELECT                                                                 on BRANCH_PARAMS_VALUES to BARSREADER_ROLE;
 grant SELECT                                                                 on BRANCH_PARAMS_VALUES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BRANCH_PARAMS_VALUES to PYOD001;
 grant SELECT                                                                 on BRANCH_PARAMS_VALUES to START1;
+grant SELECT                                                                 on BRANCH_PARAMS_VALUES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BRANCH_PARAMS_VALUES to WR_ALL_RIGHTS;
 
 

@@ -13,7 +13,9 @@ PROMPT *** Create  view V_EBKC_GROUPS_LEGAL ***
  order by id;
 
 PROMPT *** Create  grants  V_EBKC_GROUPS_LEGAL ***
+grant SELECT                                                                 on V_EBKC_GROUPS_LEGAL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_EBKC_GROUPS_LEGAL to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_EBKC_GROUPS_LEGAL to UPLD;
 
 
 

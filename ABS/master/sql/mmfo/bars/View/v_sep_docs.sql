@@ -7,67 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_SEP_DOCS ***
 
-CREATE OR REPLACE FORCE VIEW BARS.V_SEP_DOCS
-(
-   REC,
-   REF,
-   MFOA,
-   NLSA,
-   MFOB,
-   NLSB,
-   DK,
-   S,
-   VOB,
-   ND,
-   KV,
-   DATD,
-   DATP,
-   NAM_A,
-   NAM_B,
-   NAZN,
-   NAZNK,
-   NAZNS,
-   ID_A,
-   ID_B,
-   ID_O,
-   REF_A,
-   BIS,
-   SIGN,
-   FN_A,
-   DAT_A,
-   REC_A,
-   FN_B,
-   DAT_B,
-   REC_B,
-   D_REC,
-   BLK,
-   SOS,
-   PRTY,
-   FA_NAME,
-   FA_LN,
-   FA_T_ARM3,
-   FA_T_ARM2,
-   FC_NAME,
-   FC_LN,
-   FC_T1_ARM2,
-   FC_T2_ARM2,
-   FB_NAME,
-   FB_LN,
-   FB_T_ARM2,
-   FB_T_ARM3,
-   FB_D_ARM3,
-   KF,
-   DAT_2,
-   FN,
-   DAT,
-   DATK,
-   DATKB,
-   NB,
-   NBA,
-   VOB_NAME
-)
-AS
-   SELECT a."REC",
+  CREATE OR REPLACE FORCE VIEW BARS.V_SEP_DOCS ("REC", "REF", "MFOA", "NLSA", "MFOB", "NLSB", "DK", "S", "VOB", "ND", "KV", "DATD", "DATP", "NAM_A", "NAM_B", "NAZN", "NAZNK", "NAZNS", "ID_A", "ID_B", "ID_O", "REF_A", "BIS", "SIGN", "FN_A", "DAT_A", "REC_A", "FN_B", "DAT_B", "REC_B", "D_REC", "BLK", "SOS", "PRTY", "FA_NAME", "FA_LN", "FA_T_ARM3", "FA_T_ARM2", "FC_NAME", "FC_LN", "FC_T1_ARM2", "FC_T2_ARM2", "FB_NAME", "FB_LN", "FB_T_ARM2", "FB_T_ARM3", "FB_D_ARM3", "KF", "DAT_2", "FN", "DAT", "DATK", "DATKB", "NB", "NBA", "VOB_NAME") AS 
+  SELECT a."REC",
           a."REF",
           a."MFOA",
           a."NLSA",
@@ -145,9 +86,10 @@ AS
           AND a.kf = z.kf
           AND a.vob = v.vob;
 
-
-GRANT SELECT ON BARS.V_SEP_DOCS TO BARSREADER_ROLE;
-GRANT SELECT ON BARS.V_SEP_DOCS TO BARS_ACCESS_DEFROLE;
+PROMPT *** Create  grants  V_SEP_DOCS ***
+grant SELECT                                                                 on V_SEP_DOCS      to BARSREADER_ROLE;
+grant SELECT                                                                 on V_SEP_DOCS      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_SEP_DOCS      to UPLD;
 
 
 

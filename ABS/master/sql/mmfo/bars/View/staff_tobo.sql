@@ -13,9 +13,11 @@ from STAFF_BRANCH_K
  ;
 
 PROMPT *** Create  grants  STAFF_TOBO ***
+grant SELECT                                                                 on STAFF_TOBO      to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF_TOBO      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF_TOBO      to SALGL;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STAFF_TOBO      to STAFF_TOBO;
+grant SELECT                                                                 on STAFF_TOBO      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STAFF_TOBO      to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on STAFF_TOBO      to WR_REFREAD;
 

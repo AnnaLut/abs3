@@ -19,7 +19,9 @@ select a.kodf, a.a017, a.semantic
 
 PROMPT *** Create  grants  V_STAFFTIPADM_ALL_NBUREPS ***
 grant SELECT                                                                 on V_STAFFTIPADM_ALL_NBUREPS to ABS_ADMIN;
+grant SELECT                                                                 on V_STAFFTIPADM_ALL_NBUREPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFFTIPADM_ALL_NBUREPS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STAFFTIPADM_ALL_NBUREPS to UPLD;
 
 
 

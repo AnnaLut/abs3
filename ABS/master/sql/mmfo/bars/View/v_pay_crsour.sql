@@ -12,7 +12,9 @@ PROMPT *** Create  view V_PAY_CRSOUR ***
 from   table(cdb_mediator.make_docinput(to_number(pul.get_mas_ini_val('ND'))));
 
 PROMPT *** Create  grants  V_PAY_CRSOUR ***
+grant SELECT                                                                 on V_PAY_CRSOUR    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PAY_CRSOUR    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_PAY_CRSOUR    to UPLD;
 
 
 

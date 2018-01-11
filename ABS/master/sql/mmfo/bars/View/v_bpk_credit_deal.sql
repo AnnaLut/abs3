@@ -34,8 +34,10 @@ PROMPT *** Create  view V_BPK_CREDIT_DEAL ***
    and d.acc_2209 = a9.acc(+);
 
 PROMPT *** Create  grants  V_BPK_CREDIT_DEAL ***
+grant SELECT                                                                 on V_BPK_CREDIT_DEAL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BPK_CREDIT_DEAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BPK_CREDIT_DEAL to OW;
+grant SELECT                                                                 on V_BPK_CREDIT_DEAL to UPLD;
 
 
 

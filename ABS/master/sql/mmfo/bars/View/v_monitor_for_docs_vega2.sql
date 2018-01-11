@@ -14,6 +14,10 @@ group by mfo
 order by mfo
 ;
 
+PROMPT *** Create  grants  V_MONITOR_FOR_DOCS_VEGA2 ***
+grant SELECT                                                                 on V_MONITOR_FOR_DOCS_VEGA2 to BARSREADER_ROLE;
+grant SELECT                                                                 on V_MONITOR_FOR_DOCS_VEGA2 to UPLD;
+
 
 
 PROMPT ===================================================================================== 

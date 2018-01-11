@@ -15,8 +15,10 @@ PROMPT *** Create  view V_RKO_TARIF ***
    and a.id = t.indpar(+);
 
 PROMPT *** Create  grants  V_RKO_TARIF ***
+grant SELECT                                                                 on V_RKO_TARIF     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_RKO_TARIF     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_RKO_TARIF     to CUST001;
+grant SELECT                                                                 on V_RKO_TARIF     to UPLD;
 
 
 

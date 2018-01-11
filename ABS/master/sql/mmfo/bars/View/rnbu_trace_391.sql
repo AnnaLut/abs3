@@ -11,8 +11,10 @@ PROMPT *** Create  view RNBU_TRACE_391 ***
   select  RNBU_TRACE."RECID",RNBU_TRACE."USERID",RNBU_TRACE."NLS",RNBU_TRACE."KV",RNBU_TRACE."ODATE",RNBU_TRACE."KODP",RNBU_TRACE."ZNAP",RNBU_TRACE."NBUC",RNBU_TRACE."ISP",RNBU_TRACE."RNK",RNBU_TRACE."ACC",RNBU_TRACE."REF",RNBU_TRACE."COMM",RNBU_TRACE."ND",RNBU_TRACE."MDATE",RNBU_TRACE."TOBO" from RNBU_TRACE;
 
 PROMPT *** Create  grants  RNBU_TRACE_391 ***
+grant SELECT                                                                 on RNBU_TRACE_391  to BARSREADER_ROLE;
 grant SELECT                                                                 on RNBU_TRACE_391  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RNBU_TRACE_391  to RPBN002;
+grant SELECT                                                                 on RNBU_TRACE_391  to UPLD;
 
 
 

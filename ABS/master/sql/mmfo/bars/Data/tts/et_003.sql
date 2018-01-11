@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции K03
-prompt Наименование операции: Комісія за списання з рахунків ФО згідно ф.143
+prompt Наименование операции: K03 Комісія за списання з рахунків ФО згідно ф.143
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K03', 'Комісія за списання з рахунків ФО згідно ф.143', 1, null, 980, '#(nbs_ob22 (''6110'',''09''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF( 3, #(KVA), #(NLSA), #(S) )', null, 5, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', 'Kомісія за Списання безготівк.коштів з рах.ФО згідно ф.143');
+    values ('K03', 'K03 Комісія за списання з рахунків ФО згідно ф.143', 1, null, 980, '#(nbs_ob22 (''6510'',''09''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF( 3, #(KVA), #(NLSA), #(S) )', null, 5, null, null, null, '0100100000000000000000000000000000000000000000000000000000000000', 'Kомісія за Списання безготівк.коштів з рах.ФО згідно ф.143');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K03', name='Комісія за списання з рахунків ФО згідно ф.143', dk=1, nlsm=null, kv=980, nlsk='#(nbs_ob22 (''6110'',''09''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF( 3, #(KVA), #(NLSA), #(S) )', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn='Kомісія за Списання безготівк.коштів з рах.ФО згідно ф.143'
+         set tt='K03', name='K03 Комісія за списання з рахунків ФО згідно ф.143', dk=1, nlsm=null, kv=980, nlsk='#(nbs_ob22 (''6510'',''09''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF( 3, #(KVA), #(NLSA), #(S) )', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn='Kомісія за Списання безготівк.коштів з рах.ФО згідно ф.143'
        where tt='K03';
   end;
   --------------------------------
@@ -134,7 +134,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции 003
-prompt Наименование операции: Списання з рахунку ФО згідно форми 143
+prompt Наименование операции: 003 Списання з рахунку ФО згідно форми 143
 declare
   cnt_  number;
 begin
@@ -143,11 +143,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('003', 'Списання з рахунку ФО згідно форми 143', 1, null, 980, '#(nbs_ob22(''2909'',''18''))', 980, null, null, '#(nbs_ob22(''2909'',''18''))', null, 1, 0, 0, 0, null, null, null, null, null, null, '0001100000000000000000000001000000000000000000000000000000000000', 'Списано на користь юридичної особи форма №143');
+    values ('003', '003 Списання з рахунку ФО згідно форми 143', 1, null, 980, '#(nbs_ob22(''2909'',''18''))', 980, null, null, '#(nbs_ob22(''2909'',''18''))', null, 1, 0, 0, 0, null, null, null, null, null, null, '0001100000000000000000000001000000000000000000000000000000000000', 'Списано на користь юридичної особи форма №143');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='003', name='Списання з рахунку ФО згідно форми 143', dk=1, nlsm=null, kv=980, nlsk='#(nbs_ob22(''2909'',''18''))', kvk=980, nlss=null, nlsa=null, nlsb='#(nbs_ob22(''2909'',''18''))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0001100000000000000000000001000000000000000000000000000000000000', nazn='Списано на користь юридичної особи форма №143'
+         set tt='003', name='003 Списання з рахунку ФО згідно форми 143', dk=1, nlsm=null, kv=980, nlsk='#(nbs_ob22(''2909'',''18''))', kvk=980, nlss=null, nlsa=null, nlsb='#(nbs_ob22(''2909'',''18''))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0001100000000000000000000001000000000000000000000000000000000000', nazn='Списано на користь юридичної особи форма №143'
        where tt='003';
   end;
   --------------------------------

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -57,8 +58,9 @@ declare
 
 begin
 
-  l_tabsemantic := 'Довідник "Дані про афілійовані особи банку" для файлу #95)';
+  l_tabsemantic := 'Довідник "Дані про афілійовані особи банку" (для файлу #95)';
   l_tablinesdef := '20';
+  l_tabselect_statement := '';
   l_tabname     := 'NBUR_KOR_DATA_F95';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,18 +124,18 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'Порядковий~номер~афільованої~особи', 1.3, 22, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'VAR_01', 'C', 'Назва~афілійованої~особи', 8, 135, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'VAR_02', 'C', 'Місцезнаходження~афілійованої~особи', 8, 135, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'VAR_03', 'C', 'Ідентифі~каційний~код', 1, 10, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'VAR_04', 'C', 'Код резидентності~афілійованої~особи', 2, 1, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'VAR_05', 'D', 'Дата~набуття статусу~афілійованої особи', 2, 10, 6, 1, 0, 0, 0, '', 'dd.MM.yyyy', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'VAR_06', 'C', 'Відношення~афілійованої особи~до банку', 2, 1, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'VAR_07', 'N', 'Розмір~статутного фонду~афілійованої особи', 2, 22, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'VAR_08', 'N', 'Відсоток~прямої участі~на дату набуття статусу', 2, 22, 9, 1, 0, 0, 0, '', '99999.0000', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'VAR_09', 'N', 'Відсоток~опосер. участі~на дату набуття статусу', 2, 22, 10, 1, 0, 0, 0, '', '99999.0000', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'VAR_10', 'N', 'Відсоток~прямої участі~афілійованої особи', 2, 22, 11, 1, 0, 0, 0, '', '99999.0000', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'VAR_11', 'N', 'Відсоток~опосер/ участі~афілійованої особи', 2, 22, 12, 1, 0, 0, 0, '', '99999.0000', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'Порядковий~номер~афільованої~особи', '1.3', 22, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'VAR_01', 'C', 'Назва~афілійованої~особи', '8', 135, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'VAR_02', 'C', 'Місцезнаходження~афілійованої~особи', '8', 135, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'VAR_03', 'C', 'Ідентифі~каційний~код', '1', 10, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'VAR_04', 'C', 'Код резидентності~афілійованої~особи', '2', 1, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'VAR_05', 'D', 'Дата~набуття статусу~афілійованої особи', '2', 10, 6, 1, 0, 0, 0, '', 'dd.MM.yyyy', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'VAR_06', 'C', 'Відношення~афілійованої особи~до банку', '2', 1, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'VAR_07', 'N', 'Розмір~статутного фонду~афілійованої особи', '2', 22, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'VAR_08', 'N', 'Відсоток~прямої участі~на дату набуття статусу', '2', 22, 9, 1, 0, 0, 0, '', '99999.0000', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'VAR_09', 'N', 'Відсоток~опосер. участі~на дату набуття статусу', '2', 22, 10, 1, 0, 0, 0, '', '99999.0000', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'VAR_10', 'N', 'Відсоток~прямої участі~афілійованої особи', '2', 22, 11, 1, 0, 0, 0, '', '99999.0000', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'VAR_11', 'N', 'Відсоток~опосер/ участі~афілійованої особи', '2', 22, 12, 1, 0, 0, 0, '', '99999.0000', 1, 0, '', 0, 0, 1, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 1, 'ASC ');

@@ -17,7 +17,9 @@ PROMPT *** Create  view V_WCS_SURVEYS ***
  order by s.id;
 
 PROMPT *** Create  grants  V_WCS_SURVEYS ***
+grant SELECT                                                                 on V_WCS_SURVEYS   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SURVEYS   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_SURVEYS   to UPLD;
 
 
 

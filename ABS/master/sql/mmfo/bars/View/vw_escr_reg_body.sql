@@ -373,7 +373,9 @@ PROMPT *** Create  view VW_ESCR_REG_BODY ***
              ON to_char(t.txt) = to_char(t5.id) AND t5.date_to IS NULL;
 
 PROMPT *** Create  grants  VW_ESCR_REG_BODY ***
+grant SELECT                                                                 on VW_ESCR_REG_BODY to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_REG_BODY to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VW_ESCR_REG_BODY to UPLD;
 
 
 

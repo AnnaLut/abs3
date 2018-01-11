@@ -16,8 +16,10 @@ PROMPT *** Create  view CORP_RNK ***
  ;
 
 PROMPT *** Create  grants  CORP_RNK ***
+grant SELECT                                                                 on CORP_RNK        to BARSREADER_ROLE;
 grant SELECT                                                                 on CORP_RNK        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CORP_RNK        to START1;
+grant SELECT                                                                 on CORP_RNK        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CORP_RNK        to WR_ALL_RIGHTS;
 
 

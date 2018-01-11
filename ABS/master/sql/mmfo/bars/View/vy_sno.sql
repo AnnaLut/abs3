@@ -16,7 +16,9 @@ SELECT 1 bal, 'Зменшити з ПОЧАТКУ'
  ORDER BY 1;
 
 PROMPT *** Create  grants  VY_SNO ***
+grant SELECT                                                                 on VY_SNO          to BARSREADER_ROLE;
 grant SELECT                                                                 on VY_SNO          to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VY_SNO          to UPLD;
 
 
 

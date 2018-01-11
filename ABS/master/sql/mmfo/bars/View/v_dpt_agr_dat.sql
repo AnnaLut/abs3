@@ -20,8 +20,10 @@ PROMPT *** Create  view V_DPT_AGR_DAT ***
  ;
 
 PROMPT *** Create  grants  V_DPT_AGR_DAT ***
+grant SELECT                                                                 on V_DPT_AGR_DAT   to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_DPT_AGR_DAT   to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_DPT_AGR_DAT   to DPT_ROLE;
+grant SELECT                                                                 on V_DPT_AGR_DAT   to UPLD;
 
 
 

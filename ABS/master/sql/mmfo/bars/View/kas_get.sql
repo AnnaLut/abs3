@@ -35,8 +35,10 @@ where k.branch = sys_context('bars_context','user_branch')
   ;
 
 PROMPT *** Create  grants  KAS_GET ***
+grant SELECT                                                                 on KAS_GET         to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on KAS_GET         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KAS_GET         to PYOD001;
+grant SELECT                                                                 on KAS_GET         to UPLD;
 grant FLASHBACK,SELECT                                                       on KAS_GET         to WR_REFREAD;
 
 

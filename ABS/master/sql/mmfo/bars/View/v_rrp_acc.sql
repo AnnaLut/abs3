@@ -16,8 +16,10 @@ PROMPT *** Create  view V_RRP_ACC ***
                   WHERE lkl_rrp.mfo=(select val from params where par='MFOP') AND lkl_rrp.kv  = 980;
 
 PROMPT *** Create  grants  V_RRP_ACC ***
+grant SELECT                                                                 on V_RRP_ACC       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RRP_ACC       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_RRP_ACC       to START1;
+grant SELECT                                                                 on V_RRP_ACC       to UPLD;
 
 
 

@@ -22,7 +22,9 @@ PROMPT *** Create  view V_DPU_PENALTY_PARAMS ***
 ;
 
 PROMPT *** Create  grants  V_DPU_PENALTY_PARAMS ***
+grant SELECT                                                                 on V_DPU_PENALTY_PARAMS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPU_PENALTY_PARAMS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DPU_PENALTY_PARAMS to UPLD;
 
 
 

@@ -20,7 +20,9 @@ PROMPT *** Create  view V_WCS_SUBPRODUCT_TEMPLATES ***
  order by st.subproduct_id, st.print_state_id, st.template_id;
 
 PROMPT *** Create  grants  V_WCS_SUBPRODUCT_TEMPLATES ***
+grant SELECT                                                                 on V_WCS_SUBPRODUCT_TEMPLATES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SUBPRODUCT_TEMPLATES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_SUBPRODUCT_TEMPLATES to UPLD;
 
 
 

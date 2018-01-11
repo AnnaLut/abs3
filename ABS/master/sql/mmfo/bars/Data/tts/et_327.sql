@@ -89,7 +89,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции KP7
-prompt Наименование операции: d: Комісія за переказ готівки з ФО (доч до 327)
+prompt Наименование операции: KP7 d: Комісія за переказ готівки з ФО (доч до 327)
 declare
   cnt_  number;
 begin
@@ -98,11 +98,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KP7', 'd: Комісія за переказ готівки з ФО (доч до 327)', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, '#(nbs_ob22 (''6110'',''26''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(150, #(KVA),#(NLSA), #(S))', null, 5, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('KP7', 'KP7 d: Комісія за переказ готівки з ФО (доч до 327)', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, '#(nbs_ob22 (''6510'',''26''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(150, #(KVA),#(NLSA), #(S))', null, 5, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KP7', name='d: Комісія за переказ готівки з ФО (доч до 327)', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kv=980, nlsk='#(nbs_ob22 (''6110'',''26''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(150, #(KVA),#(NLSA), #(S))', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='KP7', name='KP7 d: Комісія за переказ готівки з ФО (доч до 327)', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kv=980, nlsk='#(nbs_ob22 (''6510'',''26''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(150, #(KVA),#(NLSA), #(S))', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='KP7';
   end;
   --------------------------------
@@ -143,7 +143,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции 327
-prompt Наименование операции: Приймання платежiв за реаліз.товари і послуги (з комісією)
+prompt Наименование операции: 327 Приймання платежiв за реаліз.товари і послуги (з комісією)
 declare
   cnt_  number;
 begin
@@ -152,11 +152,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('327', 'Приймання платежiв за реаліз.товари і послуги (з комісією)', 1, '#(nbs_ob22 (''2902'',''06''))', 980, '#(get_proc_nls(''T00'',#(KVA)))', 980, null, '#(nbs_ob22 (''2902'',''06''))', null, null, 1, 1, 0, 0, null, null, null, null, null, null, '0201100000000000000001000000000000110000000000000000000000000000', null);
+    values ('327', '327 Приймання платежiв за реаліз.товари і послуги (з комісією)', 1, '#(nbs_ob22 (''2902'',''06''))', 980, '#(get_proc_nls(''T00'',#(KVA)))', 980, null, '#(nbs_ob22 (''2902'',''06''))', null, null, 1, 1, 0, 0, null, null, null, null, null, null, '0201100000000000000001000000000000110000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='327', name='Приймання платежiв за реаліз.товари і послуги (з комісією)', dk=1, nlsm='#(nbs_ob22 (''2902'',''06''))', kv=980, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''2902'',''06''))', nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0201100000000000000001000000000000110000000000000000000000000000', nazn=null
+         set tt='327', name='327 Приймання платежiв за реаліз.товари і послуги (з комісією)', dk=1, nlsm='#(nbs_ob22 (''2902'',''06''))', kv=980, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''2902'',''06''))', nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0201100000000000000001000000000000110000000000000000000000000000', nazn=null
        where tt='327';
   end;
   --------------------------------

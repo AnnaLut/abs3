@@ -15,6 +15,10 @@ PROMPT *** Create  view FIN_INV_TYPE ***
     and f1.idf = f2.idf
   order by   1);
 
+PROMPT *** Create  grants  FIN_INV_TYPE ***
+grant SELECT                                                                 on FIN_INV_TYPE    to BARSREADER_ROLE;
+grant SELECT                                                                 on FIN_INV_TYPE    to UPLD;
+
 
 
 PROMPT ===================================================================================== 

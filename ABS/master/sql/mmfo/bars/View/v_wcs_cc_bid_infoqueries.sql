@@ -14,7 +14,9 @@ PROMPT *** Create  view V_WCS_CC_BID_INFOQUERIES ***
    and bi.service_id = 'SECRETARY_CC';
 
 PROMPT *** Create  grants  V_WCS_CC_BID_INFOQUERIES ***
+grant SELECT                                                                 on V_WCS_CC_BID_INFOQUERIES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_CC_BID_INFOQUERIES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_CC_BID_INFOQUERIES to UPLD;
 
 
 

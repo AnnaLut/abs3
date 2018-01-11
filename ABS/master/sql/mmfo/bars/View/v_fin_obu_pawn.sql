@@ -37,7 +37,9 @@ union all
                     cp.pawn_23 = c.pawn(+)  and  c.s080(+) = 1 and a.pawn = cp.pawn and a.nd = dc.nd;
 
 PROMPT *** Create  grants  V_FIN_OBU_PAWN ***
+grant SELECT                                                                 on V_FIN_OBU_PAWN  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_FIN_OBU_PAWN  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_FIN_OBU_PAWN  to UPLD;
 
 
 

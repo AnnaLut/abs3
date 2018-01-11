@@ -24,8 +24,10 @@ PROMPT *** Create  view NBU23_NLO ***
 ;
 
 PROMPT *** Create  grants  NBU23_NLO ***
+grant SELECT                                                                 on NBU23_NLO       to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on NBU23_NLO       to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on NBU23_NLO       to START1;
+grant SELECT                                                                 on NBU23_NLO       to UPLD;
 
 
 

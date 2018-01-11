@@ -14,7 +14,9 @@ from branch_attribute_value bav,
 where b.branch = bav.branch_code;
 
 PROMPT *** Create  grants  V_DEPRICATED_BRANCH_PARAMETERS ***
-grant SELECT                                                                 on V_DEPRICATED_BRANCH_PARAMETERS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DEPRICATED_BRANCH_PARAMETERS to BARSREADER_ROLE;
+grant SELECT,UPDATE                                                          on V_DEPRICATED_BRANCH_PARAMETERS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DEPRICATED_BRANCH_PARAMETERS to UPLD;
 
 
 

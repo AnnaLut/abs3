@@ -41,15 +41,19 @@ PROMPT *** Create  view V_PER_NL_ ***
   ;
 
 PROMPT *** Create  grants  V_PER_NLY ***
+grant SELECT                                                                 on V_PER_NLY       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,SELECT                                                on V_PER_NLY       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PER_NLY       to RCC_DEAL;
+grant SELECT                                                                 on V_PER_NLY       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_PER_NLY       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_PER_NLY       to WR_REFREAD;
 
 PROMPT *** Create  grants  V_PER_NL_ ***
+grant SELECT                                                                 on V_PER_NL_       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,SELECT                                                on V_PER_NL_       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PER_NL_       to RCC_DEAL;
 grant DELETE,FLASHBACK,SELECT                                                on V_PER_NL_       to START1;
+grant SELECT                                                                 on V_PER_NL_       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_PER_NL_       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_PER_NL_       to WR_REFREAD;
 

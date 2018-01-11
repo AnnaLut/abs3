@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции EDP
-prompt Наименование операции: Виплата вкладу в іноз.валюті в еквіваленті
+prompt Наименование операции: EDP Виплата вкладу в іноз.валюті в еквіваленті
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('EDP', 'Виплата вкладу в іноз.валюті в еквіваленті', 1, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 1, 0, null, null, 55, null, '#(nbs_ob22 (''3800'',''10''))', 0, '0000100000000000000000000000000000010000000000000000000000010000', 'Повернення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('EDP', 'EDP Виплата вкладу в іноз.валюті в еквіваленті', 1, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 1, 0, null, null, 55, null, '#(nbs_ob22 (''3800'',''10''))', 0, '0000100000000000000000000000000000010000000000000000000000010000', 'Повернення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='EDP', name='Виплата вкладу в іноз.валюті в еквіваленті', dk=1, nlsm=null, kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=55, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=0, flags='0000100000000000000000000000000000010000000000000000000000010000', nazn='Повернення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='EDP', name='EDP Виплата вкладу в іноз.валюті в еквіваленті', dk=1, nlsm=null, kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=55, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=0, flags='0000100000000000000000000000000000010000000000000000000000010000', nazn='Повернення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='EDP';
   end;
   --------------------------------

@@ -25,9 +25,11 @@ PROMPT *** Create  view V_SOCIALAGENCYACCTYPES ***
    INNER JOIN ps p on (p.nbs = a.accmask);
 
 PROMPT *** Create  grants  V_SOCIALAGENCYACCTYPES ***
+grant SELECT                                                                 on V_SOCIALAGENCYACCTYPES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SOCIALAGENCYACCTYPES to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_SOCIALAGENCYACCTYPES to DPT_ROLE;
 grant SELECT                                                                 on V_SOCIALAGENCYACCTYPES to START1;
+grant SELECT                                                                 on V_SOCIALAGENCYACCTYPES to UPLD;
 grant SELECT                                                                 on V_SOCIALAGENCYACCTYPES to WR_ALL_RIGHTS;
 
 

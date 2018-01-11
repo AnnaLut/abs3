@@ -36,8 +36,10 @@ PROMPT *** Create  view V_CC_SOB ***
           AND d.branch LIKE SYS_CONTEXT ('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  V_CC_SOB ***
+grant SELECT                                                                 on V_CC_SOB        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CC_SOB        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_CC_SOB        to RCC_DEAL;
+grant SELECT                                                                 on V_CC_SOB        to UPLD;
 grant FLASHBACK,SELECT                                                       on V_CC_SOB        to WR_REFREAD;
 
 

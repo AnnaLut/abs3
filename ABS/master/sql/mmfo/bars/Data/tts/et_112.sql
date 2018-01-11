@@ -89,7 +89,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции !IM
-prompt Наименование операции: STOP-правило для іменних чеків
+prompt Наименование операции: !IM STOP-правило для іменних чеків
 declare
   cnt_  number;
 begin
@@ -98,11 +98,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!IM', 'STOP-правило для іменних чеків', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(156,#(KVA),'''',#(S), #(REF))', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('!IM', '!IM STOP-правило для іменних чеків', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(156,#(KVA),'''',#(S), #(REF))', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!IM', name='STOP-правило для іменних чеків', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(156,#(KVA),'''',#(S), #(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='!IM', name='!IM STOP-правило для іменних чеків', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(156,#(KVA),'''',#(S), #(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='!IM';
   end;
   --------------------------------
@@ -227,11 +227,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('102', '102 Комісія за обробку іменних чеків в USD', 0, '37397906547', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'F_DOP(#(REF),''PO_KK'')*GL.P_ICURVAL( #(KVA), F_TARIF (59, #(KVA), #(NLSA), #(S) ), BANKDATE)', null, 5, null, null, null, '0000100000000000000000000000000000010000000000100000000000000000', 'Комісія ін.банку за обробку іменних чеків USD');
+    values ('102', '102 Комісія за обробку іменних чеків в USD', 0, '#(nbs_ob22(''3739'',''06''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'F_DOP(#(REF),''PO_KK'')*GL.P_ICURVAL( #(KVA), F_TARIF (59, #(KVA), #(NLSA), #(S) ), BANKDATE)', null, 5, null, null, null, '0000100000000000000000000000000000010000000000100000000000000000', 'Комісія ін.банку за обробку іменних чеків USD');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='102', name='102 Комісія за обробку іменних чеків в USD', dk=0, nlsm='37397906547', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_DOP(#(REF),''PO_KK'')*GL.P_ICURVAL( #(KVA), F_TARIF (59, #(KVA), #(NLSA), #(S) ), BANKDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000010000000000100000000000000000', nazn='Комісія ін.банку за обробку іменних чеків USD'
+         set tt='102', name='102 Комісія за обробку іменних чеків в USD', dk=0, nlsm='#(nbs_ob22(''3739'',''06''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_DOP(#(REF),''PO_KK'')*GL.P_ICURVAL( #(KVA), F_TARIF (59, #(KVA), #(NLSA), #(S) ), BANKDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000010000000000100000000000000000', nazn='Комісія ін.банку за обробку іменних чеків USD'
        where tt='102';
   end;
   --------------------------------
@@ -281,11 +281,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('117', '117 Комісія за прийом іменних чеків ', 0, '#(nbs_ob22 (''6110'',''B0''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF_CONV(58,#(KVA),#(NLSA),#(S))', null, 5, null, '#(tobopack.GetTOBOParam(''VP_10''))', null, '0100100000000000000000000000000000000000000000000000000000000000', 'Комісія по сплаті іменних чеків');
+    values ('117', '117 Комісія за прийом іменних чеків ', 0, '#(nbs_ob22 (''6510'',''B0''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF_CONV(58,#(KVA),#(NLSA),#(S))', null, 5, null, '#(tobopack.GetTOBOParam(''VP_10''))', null, '0100100000000000000000000000000000000000000000000000000000000000', 'Комісія по сплаті іменних чеків');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='117', name='117 Комісія за прийом іменних чеків ', dk=0, nlsm='#(nbs_ob22 (''6110'',''B0''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF_CONV(58,#(KVA),#(NLSA),#(S))', s2=null, sk=5, proc=null, s3800='#(tobopack.GetTOBOParam(''VP_10''))', rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn='Комісія по сплаті іменних чеків'
+         set tt='117', name='117 Комісія за прийом іменних чеків ', dk=0, nlsm='#(nbs_ob22 (''6510'',''B0''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF_CONV(58,#(KVA),#(NLSA),#(S))', s2=null, sk=5, proc=null, s3800='#(tobopack.GetTOBOParam(''VP_10''))', rang=null, flags='0100100000000000000000000000000000000000000000000000000000000000', nazn='Комісія по сплаті іменних чеків'
        where tt='117';
   end;
   --------------------------------
@@ -330,6 +330,17 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6110'', ''117'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
+    values ('6510', '117', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''6510'', ''117'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;

@@ -14,6 +14,8 @@ PROMPT *** Create  view A_SK_ZB ***
  ;
 
 PROMPT *** Create  grants  A_SK_ZB ***
+grant SELECT                                                                 on A_SK_ZB         to BARSREADER_ROLE;
+grant SELECT                                                                 on A_SK_ZB         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on A_SK_ZB         to WR_ALL_RIGHTS;
 
 

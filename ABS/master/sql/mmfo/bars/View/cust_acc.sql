@@ -15,6 +15,7 @@ PROMPT *** Create  grants  CUST_ACC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_ACC        to ABS_ADMIN;
 grant SELECT                                                                 on CUST_ACC        to BARS009;
 grant SELECT                                                                 on CUST_ACC        to BARS010;
+grant SELECT                                                                 on CUST_ACC        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_ACC        to BARS_ACCESS_DEFROLE;
 grant INSERT,SELECT,UPDATE                                                   on CUST_ACC        to CUST001;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on CUST_ACC        to FINMON;
@@ -25,6 +26,7 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on CUST_ACC        to RPBN002;
 grant SELECT                                                                 on CUST_ACC        to SALGL;
 grant SELECT                                                                 on CUST_ACC        to START1;
+grant SELECT                                                                 on CUST_ACC        to UPLD;
 grant SELECT                                                                 on CUST_ACC        to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUST_ACC        to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CUST_ACC        to WR_CREPORTS;

@@ -15,9 +15,11 @@ PROMPT *** Create  view V_SHM_TARIF ***
 
 PROMPT *** Create  grants  V_SHM_TARIF ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_SHM_TARIF     to ABS_ADMIN;
+grant SELECT                                                                 on V_SHM_TARIF     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_SHM_TARIF     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SHM_TARIF     to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_SHM_TARIF     to TECH005;
+grant SELECT                                                                 on V_SHM_TARIF     to UPLD;
 
 
 

@@ -77,7 +77,9 @@ PROMPT *** Create  view V_CP_CODE_ZAL ***
 ORDER BY CP_KOD.ID ASC;
 
 PROMPT *** Create  grants  V_CP_CODE_ZAL ***
+grant SELECT                                                                 on V_CP_CODE_ZAL   to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_CP_CODE_ZAL   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CP_CODE_ZAL   to UPLD;
 
 
 

@@ -34,8 +34,10 @@ NVL( b.CUKOSQ,0)
 
 PROMPT *** Create  grants  ACCM_AGG_MONBALS ***
 grant SELECT                                                                 on ACCM_AGG_MONBALS to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on ACCM_AGG_MONBALS to BARSREADER_ROLE;
 grant SELECT                                                                 on ACCM_AGG_MONBALS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCM_AGG_MONBALS to START1;
+grant SELECT                                                                 on ACCM_AGG_MONBALS to UPLD;
 
 
 

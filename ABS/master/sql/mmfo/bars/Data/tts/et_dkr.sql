@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DKR
-prompt Наименование операции: Зарахування на картрахунок c  депозитного рахунку 
+prompt Наименование операции: DKR Зарахування на картрахунок c  депозитного рахунку
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DKR', 'Зарахування на картрахунок c  депозитного рахунку ', 1, null, null, '#(bpk_get_transit(''10'',#(NLSA),#(NLSB),#(KVA)))', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1100100000000000000000000001000000010000000000000000000000000000', 'Зарахування на  картрахунок');
+    values ('DKR', 'DKR Зарахування на картрахунок c  депозитного рахунку', 1, null, null, '#(bpk_get_transit(''10'',#(NLSA),#(NLSB),#(KVA)))', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1100100000000000000000000001000000010000000000000000000000000000', 'Зарахування на  картрахунок');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DKR', name='Зарахування на картрахунок c  депозитного рахунку ', dk=1, nlsm=null, kv=null, nlsk='#(bpk_get_transit(''10'',#(NLSA),#(NLSB),#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1100100000000000000000000001000000010000000000000000000000000000', nazn='Зарахування на  картрахунок'
+         set tt='DKR', name='DKR Зарахування на картрахунок c  депозитного рахунку', dk=1, nlsm=null, kv=null, nlsk='#(bpk_get_transit(''10'',#(NLSA),#(NLSB),#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1100100000000000000000000001000000010000000000000000000000000000', nazn='Зарахування на  картрахунок'
        where tt='DKR';
   end;
   --------------------------------

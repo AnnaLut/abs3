@@ -20,8 +20,10 @@ PROMPT *** Create  view V_PRIOCOM_FILTER_CLIENTS ***
 from customer;
 
 PROMPT *** Create  grants  V_PRIOCOM_FILTER_CLIENTS ***
+grant SELECT                                                                 on V_PRIOCOM_FILTER_CLIENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PRIOCOM_FILTER_CLIENTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PRIOCOM_FILTER_CLIENTS to START1;
+grant SELECT                                                                 on V_PRIOCOM_FILTER_CLIENTS to UPLD;
 
 
 

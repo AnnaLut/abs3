@@ -30,7 +30,9 @@ where o.cancel_date is null and
       (o.stop_date is null or o.stop_date >= bankdate())*/;
 
 PROMPT *** Create  grants  V_STO_ORDER_SBON_FREE ***
+grant SELECT                                                                 on V_STO_ORDER_SBON_FREE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STO_ORDER_SBON_FREE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STO_ORDER_SBON_FREE to UPLD;
 
 
 

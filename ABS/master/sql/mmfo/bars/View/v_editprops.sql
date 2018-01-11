@@ -29,7 +29,9 @@ PROMPT *** Create  view V_EDITPROPS ***
            AND o.branch LIKE SYS_CONTEXT ('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  V_EDITPROPS ***
+grant SELECT                                                                 on V_EDITPROPS     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_EDITPROPS     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_EDITPROPS     to UPLD;
 
 
 

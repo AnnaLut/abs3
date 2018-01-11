@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -57,32 +58,36 @@ declare
 
 begin
 
-  l_tabsemantic := 'Р¦С–РЅРЅРѕСЃС‚С–, С‰Рѕ Р·Р±РµСЂС–РіР°СЋС‚СЊСЃСЏ РІ СЃС…РѕРІРёС‰С– СѓСЃС‚Р°РЅРѕРІ Р±Р°РЅРєСѓ';
+  l_tabsemantic := 'Цінності, що зберігаються в сховищі установ банку';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'VALUABLES';
 
-  -- РїРѕР»СѓС‡Р°РµРј РєРѕРґ С‚Р°Р±Р»РёС†С‹
+  -- получаем код таблицы
   l_tabid := bars_metabase.get_tabid(l_tabname);
 
-  -- РµСЃР»Рё С‚Р°Р±Р»РёС†Р° РЅРµ РѕРїРёСЃР°РЅР° РІ Р‘РњР”
+  -- если таблица не описана в БМД
   if l_tabid is null then
 
-    -- РїРѕР»СѓС‡Р°РµРј РєРѕРґ РґР»СЏ РЅРѕРІРѕР№ С‚Р°Р±Р»РёС†С‹
+    -- получаем код для новой таблицы
     l_tabid := bars_metabase.get_newtabid();
 
-    -- РґРѕР±Р°РІР»СЏРµРј РѕРїРёСЃР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ РІ Р‘РњР”
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    -- добавляем описание таблицы в БМД
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
-  -- РµСЃР»Рё С‚Р°Р±Р»РёС†Р° РѕРїРёСЃР°РЅР° РІ Р‘РњР”
+  -- если таблица описана в БМД
   else
 
-    -- РѕР±РЅРѕРІР»СЏРµРј СЃРµРјР°РЅС‚РёРєСѓ С‚Р°Р±Р»РёС†С‹
+    -- обновляем семантику таблицы
     bars_metabase.set_tabsemantic(l_tabid, l_tabsemantic);
 
-    -- РѕР±РЅРѕРІР»СЏРµРј linesdef С‚Р°Р±Р»РёС†С‹
+    -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
 
-    -- СЃРѕС…СЂР°РЅСЏРµРј СЃСЃС‹Р»РєРё СЃР»РѕР¶РЅС‹С… РїРѕР»РµР№ РґСЂСѓРіРёС… С‚Р°Р±Р»РёС† РЅР° РїРѕР»СЏ РЅР°С€РµР№ С‚Р°Р±Р»РёС†С‹
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
+
+    -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
       bulk collect
       into l_extrnval
@@ -90,7 +95,7 @@ begin
      where e.srctabid = l_tabid
        and e.srctabid = c.tabid and e.srccolid = c.colid;
 
-    -- СЃРѕС…СЂР°РЅСЏРµРј СЃСЃС‹Р»РєРё РґР»СЏ СѓСЃР»РѕРІРёР№ С„РёР»СЊС‚СЂР° РїРѕР»РµР№ РґСЂСѓРіРёС… С‚Р°Р±Р»РёС† РЅР° РїРѕР»СЏ РЅР°С€РµР№ С‚Р°Р±Р»РёС†С‹
+    -- сохраняем ссылки для условий фильтра полей других таблиц на поля нашей таблицы
     select b.hosttabid, b.hostcolkeyid, c.colname, v.colname, b.addtabalias, v.semantic
       bulk collect
       into l_browsetbl
@@ -99,49 +104,49 @@ begin
        and b.addtabid = c.tabid and b.addcolkeyid = c.colid
        and b.addtabid = v.tabid and b.var_colid = v.colid;
 
-    -- СЃРѕС…СЂР°РЅСЏРµРј СЃСЃС‹Р»РєРё РїРѕР»РµР№ РґСЂСѓРіРёС… С‚Р°Р±Р»РёС† РЅР° РЅР°С€Сѓ РІР»РѕР¶РµРЅРЅСѓСЋ С‚Р°Р±Р»РёС†Сѓ
+    -- сохраняем ссылки полей других таблиц на нашу вложенную таблицу
     select tabid, colid, filter_code, flag_ins, flag_del, flag_upd
       bulk collect
       into l_filtertbl
       from meta_filtertbl
      where filter_tabid = l_tabid and tabid <> l_tabid;
 
-    -- СЃРѕС…СЂР°РЅСЏРµРј Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РјРµР¶РґСѓ РєРѕР»РѕРЅРєР°РјРё С‚Р°Р±Р»РёС†С‹
+    -- сохраняем зависимости между колонками таблицы
     select id, tabid, colid, event, depcolid, action_type, action_name, default_value, condition
       bulk collect
       into l_dependency
       from meta_dependency_cols
      where tabid = l_tabid;
 
-    -- СѓРґР°Р»СЏРµРј РѕРїРёСЃР°РЅРёРµ РїРѕР»РµР№
+    -- удаляем описание полей
     bars_metabase.delete_metatables(l_tabid);
 
   end if;
 
-  -- РґРѕР±Р°РІР»СЏРµРј РѕРїРёСЃР°РЅРёРµ РїРѕР»РµР№
-  bars_metabase.add_column(l_tabid, 1, 'OB22', 'C', 'РљРѕРґ~(Р‘Р +OB22)~С†iРЅРЅРѕСЃС‚i~~9819~9820~9821', 1.1, 6, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'NAME', 'C', 'РќР°Р·РІР°~С†iРЅРЅРѕСЃС‚i', 5, 50, 2, 1, 0, 1, 0, '', '', 1, 0, 'PUL.GET(''BRA'')', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NOMINAL', 'N', 'РќРѕРјС–РЅР°Р»СЊРЅР°~РІР°СЂС‚iСЃС‚СЊ~С†iРЅРЅРѕСЃС‚i~РІ РєРѕРї.', 1, 22, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'CENA', 'N', 'Р¦iРЅР°~РїСЂРѕРґР°Р¶Сѓ~~РІ РєРѕРї.', 1, 22, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'OB22_989', 'C', 'РљРѕРґ~OB22~РґР»СЏ РїС–РґР·РІС–С‚Сѓ~~9898~9890~9892', 1, 2, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'OB22_DOR', 'C', 'РљРѕРґ~OB22~РґР»СЏ РґРѕСЂРѕРіРё~РЅРѕРІС–~9899~9891~9893', 1, 2, 6, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'OB22_SPL', 'C', 'РљРѕРґ~OB22~РґР»СЏ~СЃРїР»Р°С‡РµРЅi~9812', 1, 2, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'OB22_205', 'C', 'РљРѕРґ~OB22~РґР»СЏ~2905/2805', 1, 2, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'OB22_DORS', 'C', 'РљРѕРґ~OB22~РґР»СЏ РґРѕСЂРѕРіРё~СЃРїР»Р°С‡РµРЅС–~9899', 1, 2, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  -- добавляем описание полей
+  bars_metabase.add_column(l_tabid, 1, 'OB22', 'C', 'Код~(БР+OB22)~цiнностi~~9819~9820~9821', '1.1', 6, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'NAME', 'C', 'Назва~цiнностi', '5', 50, 2, 1, 0, 1, 0, '', '', 1, 0, 'PUL.GET(''BRA'')', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NOMINAL', 'N', 'Номінальна~вартiсть~цiнностi~в коп.', '1', 22, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'CENA', 'N', 'Цiна~продажу~~в коп.', '1', 22, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'OB22_989', 'C', 'Код~OB22~для підзвіту~~9898~9890~9892', '1', 2, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'OB22_DOR', 'C', 'Код~OB22~для дороги~нові~9899~9891~9893', '1', 2, 6, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'OB22_SPL', 'C', 'Код~OB22~для~сплаченi~9812', '1', 2, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'OB22_205', 'C', 'Код~OB22~для~2905/2805', '1', 2, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'OB22_DORS', 'C', 'Код~OB22~для дороги~сплачені~9899', '1', 2, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
-  -- РґРѕР±Р°РІР»СЏРµРј РѕРїРёСЃР°РЅРёРµ СЃРѕСЂС‚РёСЂРѕРІРєРё
+  -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 1, 'ASC ');
 
-  -- РѕС‡РёС‰Р°РµРј РѕРїРёСЃР°РЅРёРµ С„СѓРЅРєС†РёР№ РЅР° СЃРїСЂР°РІРѕС‡РЅРёРє
+  -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
 
-  -- РґРѕР±Р°РІР»СЏРµРј РѕРїРёСЃР°РЅРёРµ С„СѓРЅРєС†РёРё РЅР° СЃРїСЂР°РІРѕС‡РЅРёРє
-  bars_metabase.add_nsifunction(l_tabid, 2, 'РЈСЃС‚Р°РЅРѕРІРёС‚Рё С–РЅС€РёР№ Р‘Р РђРќР§-2 Р°Р±Рѕ 2+ Р°Р±Рѕ 3 СЂiРІРЅСЏ', 'PUL.PUT(''BRA'',:BRA)', ':BRA(SEM=Р‘СЂР°РЅС‡,TYPE=S,REF=BRANCH_VAR)', 'ONCE', '', '', '', '', '', 102);
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 2, 'Установити інший БРАНЧ-2 або 2+ або 3 рiвня', 'PUL.PUT(''BRA'',:BRA)', ':BRA(SEM=Бранч,TYPE=S,REF=BRANCH_VAR)', 'ONCE', '', '', '', '', '', 102);
 
-  -- РґРѕР±Р°РІР»СЏРµРј РѕРїРёСЃР°РЅРёРµ С„СѓРЅРєС†РёРё РЅР° СЃРїСЂР°РІРѕС‡РЅРёРє
-  bars_metabase.add_nsifunction(l_tabid, 3, 'Р’С–РґРєСЂРёС‚Рё СЂР°С…СѓРЅРєРё РґР»СЏ РІРёР±СЂР°РЅРёС… Р¦Р†РќРќРћРЎРўР•Р™ ', 'OP_BR_SX1( PUL.GET(''BRA''), :OB22 )', '', 'EACH', 'Р’С–РґРєСЂРёС‚Рё СЂР°С… РґР»СЏ РІРёР±СЂР°РЅРёС… С†С–РЅРЅРѕСЃС‚РµР№ ?', 'Р’РёРєРѕРЅР°РЅРѕ!', '', '', '', 80);
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 3, 'Відкрити рахунки для вибраних ЦІННОСТЕЙ ', 'OP_BR_SX1( PUL.GET(''BRA''), :OB22 )', '', 'EACH', 'Відкрити рах для вибраних цінностей ?', 'Виконано!', '', '', '', 80);
 
-  -- РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј СЃСЃС‹Р»РєРё СЃР»РѕР¶РЅС‹С… РїРѕР»РµР№ РґСЂСѓРіРёС… С‚Р°Р±Р»РёС†
+  -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop
     l_newcolid := bars_metabase.get_colid(l_tabid, l_extrnval(i).srccolname);
     if (l_newcolid is not null) then
@@ -157,7 +162,7 @@ begin
     end if;
   end loop;
 
-  -- РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј СЃСЃС‹Р»РєРё РїРѕР»РµР№ РґР»СЏ СѓСЃР»РѕРІРёР№ С„РёР»СЊС‚СЂР° РґСЂСѓРіРёС… С‚Р°Р±Р»РёС†
+  -- восстанавливаем ссылки полей для условий фильтра других таблиц
   for i in 1..l_browsetbl.count loop
     l_newcolid := bars_metabase.get_colid(l_tabid, l_browsetbl(i).addcolname);
     l_varcolid := bars_metabase.get_colid(l_tabid, l_browsetbl(i).varcolname);
@@ -173,7 +178,7 @@ begin
     end if;
   end loop;
 
-  -- РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј СЃСЃС‹Р»РєРё РїРѕР»РµР№ РґСЂСѓРіРёС… С‚Р°Р±Р»РёС† РЅР° РЅР°С€Сѓ РІР»РѕР¶РµРЅРЅСѓСЋ С‚Р°Р±Р»РёС†Сѓ
+  -- восстанавливаем ссылки полей других таблиц на нашу вложенную таблицу
   for i in 1..l_filtertbl.count loop
     bars_metabase.add_filtertbl(
       l_filtertbl(i).tabid,
@@ -185,7 +190,7 @@ begin
       l_filtertbl(i).flag_upd);
   end loop;
 
-  -- РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РјРµР¶РґСѓ РєРѕР»РѕРЅРєР°РјРё С‚Р°Р±Р»РёС†С‹
+  -- восстанавливаем зависимости между колонками таблицы
   for i in 1..l_dependency.count loop
     bars_metabase.add_dependency(
       l_dependency(i).tabid,

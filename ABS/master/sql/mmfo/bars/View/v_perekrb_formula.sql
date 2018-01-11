@@ -18,7 +18,9 @@ PROMPT *** Create  view V_PEREKRB_FORMULA ***
 PROMPT *** Create  grants  V_PEREKRB_FORMULA ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_PEREKRB_FORMULA to ABS_ADMIN;
 grant SELECT,UPDATE                                                          on V_PEREKRB_FORMULA to BARS015;
+grant SELECT                                                                 on V_PEREKRB_FORMULA to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_PEREKRB_FORMULA to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_PEREKRB_FORMULA to UPLD;
 grant FLASHBACK,SELECT                                                       on V_PEREKRB_FORMULA to WR_REFREAD;
 
 

@@ -53,8 +53,10 @@ PROMPT *** Create  view RET_2012 ***
           AND o.pdat >= TO_DATE ('27-05-2012', 'dd-mm-yyyy');
 
 PROMPT *** Create  grants  RET_2012 ***
+grant SELECT                                                                 on RET_2012        to BARSREADER_ROLE;
 grant SELECT                                                                 on RET_2012        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on RET_2012        to PYOD001;
+grant SELECT                                                                 on RET_2012        to UPLD;
 
 
 

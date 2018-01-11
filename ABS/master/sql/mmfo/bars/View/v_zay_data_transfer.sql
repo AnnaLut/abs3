@@ -61,7 +61,9 @@ PROMPT *** Create  view V_ZAY_DATA_TRANSFER ***
    ORDER BY 1 DESC;
 
 PROMPT *** Create  grants  V_ZAY_DATA_TRANSFER ***
+grant SELECT                                                                 on V_ZAY_DATA_TRANSFER to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY_DATA_TRANSFER to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ZAY_DATA_TRANSFER to UPLD;
 grant SELECT                                                                 on V_ZAY_DATA_TRANSFER to ZAY;
 
 

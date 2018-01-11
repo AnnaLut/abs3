@@ -20,9 +20,11 @@ PROMPT *** Create  view CC_W_LIM ***
          );
 
 PROMPT *** Create  grants  CC_W_LIM ***
+grant SELECT                                                                 on CC_W_LIM        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_W_LIM        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_W_LIM        to RCC_DEAL;
 grant SELECT                                                                 on CC_W_LIM        to START1;
+grant SELECT                                                                 on CC_W_LIM        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_W_LIM        to WR_ALL_RIGHTS;
 grant SELECT                                                                 on CC_W_LIM        to WR_CREDIT;
 grant FLASHBACK,SELECT                                                       on CC_W_LIM        to WR_REFREAD;

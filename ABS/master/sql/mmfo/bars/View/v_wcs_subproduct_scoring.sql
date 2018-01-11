@@ -13,7 +13,9 @@ PROMPT *** Create  view V_WCS_SUBPRODUCT_SCORING ***
  where ss.scoring_id = s.scoring_id;
 
 PROMPT *** Create  grants  V_WCS_SUBPRODUCT_SCORING ***
+grant SELECT                                                                 on V_WCS_SUBPRODUCT_SCORING to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SUBPRODUCT_SCORING to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_SUBPRODUCT_SCORING to UPLD;
 
 
 

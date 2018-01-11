@@ -199,9 +199,11 @@ PROMPT *** Create  view V_CHECK_ACCOUNT_PARAMS_ROW ***
                            AND INSTR (cp.pawn, p.pawn) = 0)));
 
 PROMPT *** Create  grants  V_CHECK_ACCOUNT_PARAMS_ROW ***
+grant SELECT                                                                 on V_CHECK_ACCOUNT_PARAMS_ROW to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CHECK_ACCOUNT_PARAMS_ROW to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CHECK_ACCOUNT_PARAMS_ROW to RPBN002;
 grant SELECT                                                                 on V_CHECK_ACCOUNT_PARAMS_ROW to TECH005;
+grant SELECT                                                                 on V_CHECK_ACCOUNT_PARAMS_ROW to UPLD;
 
 
 

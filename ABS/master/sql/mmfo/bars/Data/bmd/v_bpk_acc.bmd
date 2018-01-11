@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'БПК. Рахунки';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_BPK_ACC';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,32 +124,32 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Відділення', 1.8, 30, 1, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'RNK', 'N', 'Реєстр. №~клієнта', 1.2, 22, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'OKPO', 'C', 'ЗКПО', 1.4, 14, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NMK', 'C', 'Назва~клієнта', 4, 70, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'TIP_NAME', 'C', 'Тип~карткового~рахунку', 4, 35, 5, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'LCV', 'C', 'Вал.', .8, 3, 6, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NLS_PK', 'C', 'Картковий~рахунок', 1.6, 14, 7, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'DAZS_PK', 'D', 'Дата~закриття~рахунку', 1.2, 10, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'LIM_PK', 'N', 'Ліміт~карткового~рахунку', 1.2, 22, 9, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'OST_PK', 'N', 'Залишок~карткового~рахунку', 1.2, 22, 10, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NLS_OVR', 'C', 'Кред.~рахунок', 1.6, 14, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'OST_OVR', 'N', 'Залишок~кред.~рахунку', 1.2, 22, 12, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'NLS_3570', 'C', 'Рахунок~нарах.дох.~3570', 1.6, 14, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'OST_3570', 'N', 'Залишок~рахунку~нарах.дох.~3570', 1.2, 22, 14, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'NLS_2208', 'C', 'Рахунок~нарах.дох~за кред.~2208', 1.6, 14, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'OST_2208', 'N', 'Залишок~рахунку~нарах.дох.~за кред.~2208', 1.2, 22, 16, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'NLS_9129', 'C', 'Рахунок~невик. ліміту~9129', 1.6, 14, 17, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'OST_9129', 'N', 'Залишок~рахунку~невик. ліміту~9129', 1.2, 22, 18, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'NLS_2207', 'C', 'Рахунок~простр.~2207', 1.6, 14, 19, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'OST_2207', 'N', 'Залишок~рахунку~простр.~2207', 1.2, 22, 20, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'NLS_3579', 'C', 'Рахунок~простр.~3579', 1.6, 14, 21, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'OST_3579', 'N', 'Залишок~рахунку~простр.~3579', 1.2, 22, 22, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'NLS_2209', 'C', 'Рахунок~простр.~2209', 1.6, 14, 23, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'OST_2209', 'N', 'Залишок~рахунку~простр.~2209', 1.2, 22, 24, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'KV', 'N', 'Вал', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'ACC_PK', 'N', 'Acc_PK', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Відділення', '1.8', 30, 1, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'RNK', 'N', 'Реєстр. №~клієнта', '1.2', 22, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'OKPO', 'C', 'ЗКПО', '1.4', 14, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NMK', 'C', 'Назва~клієнта', '4', 70, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'TIP_NAME', 'C', 'Тип~карткового~рахунку', '4', 35, 5, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'LCV', 'C', 'Вал.', '.8', 3, 6, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NLS_PK', 'C', 'Картковий~рахунок', '1.6', 14, 7, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'DAZS_PK', 'D', 'Дата~закриття~рахунку', '1.2', 10, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'LIM_PK', 'N', 'Ліміт~карткового~рахунку', '1.2', 22, 9, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'OST_PK', 'N', 'Залишок~карткового~рахунку', '1.2', 22, 10, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NLS_OVR', 'C', 'Кред.~рахунок', '1.6', 14, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'OST_OVR', 'N', 'Залишок~кред.~рахунку', '1.2', 22, 12, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'NLS_3570', 'C', 'Рахунок~нарах.дох.~3570', '1.6', 14, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'OST_3570', 'N', 'Залишок~рахунку~нарах.дох.~3570', '1.2', 22, 14, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'NLS_2208', 'C', 'Рахунок~нарах.дох~за кред.~2208', '1.6', 14, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'OST_2208', 'N', 'Залишок~рахунку~нарах.дох.~за кред.~2208', '1.2', 22, 16, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'NLS_9129', 'C', 'Рахунок~невик. ліміту~9129', '1.6', 14, 17, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'OST_9129', 'N', 'Залишок~рахунку~невик. ліміту~9129', '1.2', 22, 18, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'NLS_2207', 'C', 'Рахунок~простр.~2207', '1.6', 14, 19, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'OST_2207', 'N', 'Залишок~рахунку~простр.~2207', '1.2', 22, 20, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'NLS_3579', 'C', 'Рахунок~простр.~3579', '1.6', 14, 21, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'OST_3579', 'N', 'Залишок~рахунку~простр.~3579', '1.2', 22, 22, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'NLS_2209', 'C', 'Рахунок~простр.~2209', '1.6', 14, 23, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'OST_2209', 'N', 'Залишок~рахунку~простр.~2209', '1.2', 22, 24, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'KV', 'N', 'Вал', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'ACC_PK', 'N', 'Acc_PK', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 1, 'ASC ');

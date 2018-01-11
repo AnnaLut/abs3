@@ -15,8 +15,10 @@ PROMPT *** Create  view V_CC_INS_TAG ***
    WHERE d.rnk=c.rnk AND d.SOS<15;
 
 PROMPT *** Create  grants  V_CC_INS_TAG ***
+grant SELECT                                                                 on V_CC_INS_TAG    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CC_INS_TAG    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CC_INS_TAG    to START1;
+grant SELECT                                                                 on V_CC_INS_TAG    to UPLD;
 
 
 

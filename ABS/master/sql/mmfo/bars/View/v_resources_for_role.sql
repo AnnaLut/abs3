@@ -67,7 +67,9 @@ PROMPT *** Create  view V_RESOURCES_FOR_ROLE ***
                  AND r.resource_id = t.resource_id);
 
 PROMPT *** Create  grants  V_RESOURCES_FOR_ROLE ***
+grant SELECT                                                                 on V_RESOURCES_FOR_ROLE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RESOURCES_FOR_ROLE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_RESOURCES_FOR_ROLE to UPLD;
 
 
 

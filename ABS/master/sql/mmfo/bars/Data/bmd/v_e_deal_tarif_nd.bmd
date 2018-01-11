@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Тарифи угод (послуги)';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'V_E_DEAL_TARIF_ND';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,21 +124,21 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'DAT_BEG', 'D', 'Підключено послугу', 2, 10, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DAT_END', 'D', 'Відключено послугу', 2, 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DAT_LB', 'D', 'Підключено інд. тариф', 2, 10, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DAT_LE', 'D', 'Відключено інд. тариф', 2, 10, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DAYS', 'N', 'Кількість~днів~користування', 1.5, 22, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'E_SUMT', 'N', 'Заг. тариф~за послугу вцілому', null, 22, 8, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'E_SUMT1', 'N', 'Розрах.~сума за послугу', null, 22, 7, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'ID', 'N', 'Код~послуги', .4, 22, 2, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NAME', 'C', 'Назва послуги', 3, 120, 3, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'N_SUMT', 'N', 'Інд. тариф~за послугу вцілому', null, 22, 9, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'N_SUMT1', 'N', 'N_SUMT1', null, 22, null, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'OTM', 'B', 'Вкл.', .3, 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'S_POROG', 'N', 's_porog', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'S_TAR_POR1', 'N', 'Тариф 1', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'S_TAR_POR2', 'N', 'Тариф 2', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'DAT_BEG', 'D', 'Підключено послугу', '2', 10, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DAT_END', 'D', 'Відключено послугу', '2', 10, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAT_LB', 'D', 'Підключено інд. тариф', '2', 10, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DAT_LE', 'D', 'Відключено інд. тариф', '2', 10, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DAYS', 'N', 'Кількість~днів~користування', '1.5', 22, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'E_SUMT', 'N', 'Заг. тариф~за послугу вцілому', '', 22, 8, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'E_SUMT1', 'N', 'Розрах.~сума за послугу', '', 22, 7, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'ID', 'N', 'Код~послуги', '.4', 22, 2, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NAME', 'C', 'Назва послуги', '3', 120, 3, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'N_SUMT', 'N', 'Інд. тариф~за послугу вцілому', '', 22, 9, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'N_SUMT1', 'N', 'N_SUMT1', '', 22, null, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'OTM', 'B', 'Вкл.', '.3', 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'S_POROG', 'N', 's_porog', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'S_TAR_POR1', 'N', 'Тариф 1', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'S_TAR_POR2', 'N', 'Тариф 2', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 2, 'ASC ');

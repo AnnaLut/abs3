@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'OVRN-4) Протокол розрахунку проц по солідарному ОВР';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_OVR_INTX';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,27 +124,27 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 0, 'NPP', 'N', '№ пп', null, null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'Рахунок~участник ', null, null, 80, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ACC8', 'N', 'Консол~рах~ACC8', null, null, 99, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'AKT8', 'N', 'Сума~АКТ зал', null, null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'CDAT', 'D', 'Календ~дата', null, null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'IA2', 'N', 'Cтанд~% А-ст ', null, null, 22, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'IA8', 'N', 'Пільгова~% А-ст ', null, null, 6, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'IP2', 'N', 'Cтанд~% П-ст ', null, null, 23, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'IP8', 'N', 'Пільгова~% П-ст ', null, null, 9, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'KA', 'N', 'Коеф~АКТ', null, null, 5, 0, 0, 0, 0, '', '0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'KP', 'N', 'Коеф~ПАС', null, null, 8, 0, 0, 0, 0, '', '0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'OST2', 'N', 'Сальдо~учасника', null, null, 21, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'PAS8', 'N', 'Сума~ПАС зал', null, null, 7, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'PR', 'N', 'Заг сума %%~за день', null, null, 30, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (PR)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'PR2', 'N', 'Сума проц~по станд.%', null, null, 26, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(PR2)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'PR8', 'N', 'Сума проц~по солід.%', null, null, 29, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (PR8)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'S2', 'N', 'Баз.сумма~для станд.%', null, null, 25, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'S8', 'N', 'Баз.сумма~для солід.%', null, null, 28, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'SAL8', 'N', 'Сальдо~консол.', null, null, 3, 0, 1, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'VN', 'N', 'Призн нар.', null, null, 35, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'RNK', 'N', 'RNK уч.', null, null, 70, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 0, 'NPP', 'N', '№ пп', '', null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'Рахунок~участник ', '', null, 80, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ACC8', 'N', 'Консол~рах~ACC8', '', null, 99, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'AKT8', 'N', 'Сума~АКТ зал', '', null, 4, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'CDAT', 'D', 'Календ~дата', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'IA2', 'N', 'Cтанд~% А-ст ', '', null, 22, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'IA8', 'N', 'Пільгова~% А-ст ', '', null, 6, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'IP2', 'N', 'Cтанд~% П-ст ', '', null, 23, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'IP8', 'N', 'Пільгова~% П-ст ', '', null, 9, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'KA', 'N', 'Коеф~АКТ', '', null, 5, 0, 0, 0, 0, '', '0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'KP', 'N', 'Коеф~ПАС', '', null, 8, 0, 0, 0, 0, '', '0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'OST2', 'N', 'Сальдо~учасника', '', null, 21, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'PAS8', 'N', 'Сума~ПАС зал', '', null, 7, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'PR', 'N', 'Заг сума %%~за день', '', null, 30, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (PR)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'PR2', 'N', 'Сума проц~по станд.%', '', null, 26, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(PR2)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'PR8', 'N', 'Сума проц~по солід.%', '', null, 29, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (PR8)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'S2', 'N', 'Баз.сумма~для станд.%', '', null, 25, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'S8', 'N', 'Баз.сумма~для солід.%', '', null, 28, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'SAL8', 'N', 'Сальдо~консол.', '', null, 3, 0, 1, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'VN', 'N', 'Призн нар.', '', null, 35, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'RNK', 'N', 'RNK уч.', '', null, 70, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('ACCOUNTS');

@@ -11,8 +11,10 @@ PROMPT *** Create  view V_KB_R013 ***
   select r020, R020||'.'||R013 kl, substr(TXT,1,100) txt,  D_OPEN from  KL_R013 where prem ='สม'  and d_close is null;
 
 PROMPT *** Create  grants  V_KB_R013 ***
+grant SELECT                                                                 on V_KB_R013       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_KB_R013       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_KB_R013       to START1;
+grant SELECT                                                                 on V_KB_R013       to UPLD;
 
 
 

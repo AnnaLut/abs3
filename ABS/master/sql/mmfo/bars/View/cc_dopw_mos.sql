@@ -53,7 +53,9 @@ PROMPT *** Create  view CC_DOPW_MOS ***
 ORDER BY t.name;
 
 PROMPT *** Create  grants  CC_DOPW_MOS ***
+grant SELECT                                                                 on CC_DOPW_MOS     to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_DOPW_MOS     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CC_DOPW_MOS     to UPLD;
 
 
 

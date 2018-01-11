@@ -44,8 +44,10 @@ PROMPT *** Create  view V_XMLIMPDOCS_UI ***
  ;
 
 PROMPT *** Create  grants  V_XMLIMPDOCS_UI ***
+grant SELECT                                                                 on V_XMLIMPDOCS_UI to BARSREADER_ROLE;
 grant SELECT                                                                 on V_XMLIMPDOCS_UI to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_XMLIMPDOCS_UI to OPER000;
+grant SELECT                                                                 on V_XMLIMPDOCS_UI to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_XMLIMPDOCS_UI to WR_ALL_RIGHTS;
 
 

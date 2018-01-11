@@ -13,8 +13,10 @@ PROMPT *** Create  view NBU23_OVR_BN ***
   where o.acc=a.acc and a.rnk=c.rnk and c.custtype = 1;
 
 PROMPT *** Create  grants  NBU23_OVR_BN ***
+grant SELECT                                                                 on NBU23_OVR_BN    to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on NBU23_OVR_BN    to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on NBU23_OVR_BN    to START1;
+grant SELECT                                                                 on NBU23_OVR_BN    to UPLD;
 
 
 

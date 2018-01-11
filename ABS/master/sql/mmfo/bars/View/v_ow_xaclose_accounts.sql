@@ -17,8 +17,10 @@ PROMPT *** Create  view V_OW_XACLOSE_ACCOUNTS ***
    and a.rnk = c.rnk;
 
 PROMPT *** Create  grants  V_OW_XACLOSE_ACCOUNTS ***
+grant SELECT                                                                 on V_OW_XACLOSE_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OW_XACLOSE_ACCOUNTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OW_XACLOSE_ACCOUNTS to OW;
+grant SELECT                                                                 on V_OW_XACLOSE_ACCOUNTS to UPLD;
 
 
 

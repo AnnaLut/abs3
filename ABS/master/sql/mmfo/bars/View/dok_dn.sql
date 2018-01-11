@@ -18,8 +18,10 @@ from dok_dn1 where s<>0 and id in (9,99) group by fdat
 ;
 
 PROMPT *** Create  grants  DOK_DN ***
+grant SELECT                                                                 on DOK_DN          to BARSREADER_ROLE;
 grant SELECT                                                                 on DOK_DN          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DOK_DN          to START1;
+grant SELECT                                                                 on DOK_DN          to UPLD;
 
 
 

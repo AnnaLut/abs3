@@ -1,6 +1,14 @@
-CREATE OR REPLACE FORCE VIEW v_accp_branch
-AS
-SELECT branch, obl
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ACCP_BRANCH.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_ACCP_BRANCH ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_ACCP_BRANCH ("BRANCH", "OBL") AS 
+  SELECT branch, obl
      FROM (SELECT branch, obl
              FROM (SELECT branch,
                           b040,
@@ -21,4 +29,12 @@ SELECT branch, obl
             SELECT branch, obl
               FROM ACCP_BRANCH);
 
-GRANT DELETE, INSERT, SELECT, UPDATE ON v_accp_branch TO BARS_ACCESS_DEFROLE;          
+PROMPT *** Create  grants  V_ACCP_BRANCH ***
+grant DELETE,INSERT,SELECT,UPDATE                                            on V_ACCP_BRANCH   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ACCP_BRANCH   to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ACCP_BRANCH.sql =========*** End *** 
+PROMPT ===================================================================================== 

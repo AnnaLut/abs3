@@ -27,6 +27,7 @@ grant DELETE,INSERT,SELECT,UPDATE                                            on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on BANKS           to BANKS_V;
 grant FLASHBACK,REFERENCES,SELECT                                            on BANKS           to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on BANKS           to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on BANKS           to BARSREADER_ROLE;
 grant SELECT                                                                 on BANKS           to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BANKS           to BARS_ACCESS_DEFROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,REFERENCES,SELECT,UPDATE on BANKS           to FINMON;
@@ -38,6 +39,7 @@ grant SELECT                                                                 on 
 grant UPDATE                                                                 on BANKS           to TECH007;
 grant INSERT,SELECT,UPDATE                                                   on BANKS           to TECH020;
 grant SELECT,UPDATE                                                          on BANKS           to TOSS;
+grant SELECT                                                                 on BANKS           to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BANKS           to WR_ALL_RIGHTS;
 grant SELECT                                                                 on BANKS           to WR_CREDIT;
 grant SELECT                                                                 on BANKS           to WR_CUSTREG;

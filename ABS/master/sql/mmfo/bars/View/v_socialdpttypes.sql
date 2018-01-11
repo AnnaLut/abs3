@@ -25,9 +25,11 @@ PROMPT *** Create  view V_SOCIALDPTTYPES ***
  ;
 
 PROMPT *** Create  grants  V_SOCIALDPTTYPES ***
+grant SELECT                                                                 on V_SOCIALDPTTYPES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SOCIALDPTTYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SOCIALDPTTYPES to BARS_CONNECT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_SOCIALDPTTYPES to DPT_ROLE;
+grant SELECT                                                                 on V_SOCIALDPTTYPES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SOCIALDPTTYPES to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_SOCIALDPTTYPES to WR_REFREAD;
 

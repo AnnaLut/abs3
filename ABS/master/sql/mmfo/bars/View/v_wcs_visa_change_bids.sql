@@ -29,7 +29,9 @@ PROMPT *** Create  view V_WCS_VISA_CHANGE_BIDS ***
    and sb.branch like sys_context('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  V_WCS_VISA_CHANGE_BIDS ***
+grant SELECT                                                                 on V_WCS_VISA_CHANGE_BIDS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_VISA_CHANGE_BIDS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_VISA_CHANGE_BIDS to UPLD;
 
 
 

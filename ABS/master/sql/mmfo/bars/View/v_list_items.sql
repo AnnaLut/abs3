@@ -21,7 +21,9 @@ PROMPT *** Create  view V_LIST_ITEMS ***
  WHERE t.is_active = 'Y';
 
 PROMPT *** Create  grants  V_LIST_ITEMS ***
+grant SELECT                                                                 on V_LIST_ITEMS    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_LIST_ITEMS    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_LIST_ITEMS    to UPLD;
 
 
 

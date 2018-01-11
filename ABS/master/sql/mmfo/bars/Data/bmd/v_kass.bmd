@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Виконання заявок на підкріплення кас';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'V_KASS';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,30 +124,30 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'NSM', 'N', 'Номер~зміни', 1, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Код~бранчу', 2, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NAME', 'C', 'Назва~бранчу', 3, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DAT2', 'D', 'Дата~поставки', 1.3, null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'IDZ', 'N', 'Сист. №~заявки', 1.2, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'SVID', 'C', 'Тип заявки', 1.5, null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'KV', 'N', 'Код~валюти', 1, null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'KODV', 'C', 'Код~виробу', 1.1, null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NAMEV', 'C', 'Назва виробу', 2.5, null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'S1', 'N', 'Сума~готівки', 1.2, null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'K2', 'N', 'Кількість~виробів з БМ', 1.3, null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'K3', 'N', 'Кількість~монет', 1.3, null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'K4', 'N', 'Кількість~цінн.98*', 1.3, null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'NOMS', 'C', 'Номер~інкас.сумки~(мішка)', 1, null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'IDS', 'N', 'Сист.№~Сумки', 1, null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'CENA', 'N', 'Облікова ціна~виробу', 1.4, null, 17, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'SUMK_REF', 'N', 'Довідник~інкас.сумок~відділення', 1.4, null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=KAS_U[ACCESSCODE=>1][CONDITIONS=>KAS_U.D_CLOS is null and KAS_U.IDS in (select ids from kas_bu where kas_bu.BRANCH=:BRANCH )][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'VID', 'N', 'VID', 1.5, null, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'SOS', 'N', 'SOS', 1.5, null, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'REFA', 'N', 'REFA', 1.5, null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'REFB', 'N', 'REFB', 1, null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'IDM', 'N', 'IDM', 1, null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'D', 'N', 'IDZ', 1.5, null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'DD', 'N', 'IDS', 1.5, null, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'NSM', 'N', 'Номер~зміни', '1', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Код~бранчу', '2', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NAME', 'C', 'Назва~бранчу', '3', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DAT2', 'D', 'Дата~поставки', '1.3', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'IDZ', 'N', 'Сист. №~заявки', '1.2', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'SVID', 'C', 'Тип заявки', '1.5', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'KV', 'N', 'Код~валюти', '1', null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'KODV', 'C', 'Код~виробу', '1.1', null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NAMEV', 'C', 'Назва виробу', '2.5', null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'S1', 'N', 'Сума~готівки', '1.2', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'K2', 'N', 'Кількість~виробів з БМ', '1.3', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'K3', 'N', 'Кількість~монет', '1.3', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'K4', 'N', 'Кількість~цінн.98*', '1.3', null, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'NOMS', 'C', 'Номер~інкас.сумки~(мішка)', '1', null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'IDS', 'N', 'Сист.№~Сумки', '1', null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'CENA', 'N', 'Облікова ціна~виробу', '1.4', null, 17, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'SUMK_REF', 'N', 'Довідник~інкас.сумок~відділення', '1.4', null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=KAS_U[ACCESSCODE=>1][CONDITIONS=>KAS_U.D_CLOS is null and KAS_U.IDS in (select ids from kas_bu where kas_bu.BRANCH=:BRANCH )][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'VID', 'N', 'VID', '1.5', null, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'SOS', 'N', 'SOS', '1.5', null, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'REFA', 'N', 'REFA', '1.5', null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'REFB', 'N', 'REFB', '1', null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'IDM', 'N', 'IDM', '1', null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'D', 'N', 'IDZ', '1.5', null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'DD', 'N', 'IDS', '1.5', null, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
 
   -- добавляем описание процедур
   bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'kasz_w.KASS_UPD(:S1,:K2,:K3,:K4,:IDZ,:IDS,:CENA,:BRANCH,:VID)');

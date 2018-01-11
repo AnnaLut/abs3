@@ -22,7 +22,9 @@ PROMPT *** Create  view WCS_PARTNERS ***
     WHERE a.ID_MATHER IS NOT NULL AND m.id = a.ID_MATHER AND m.FLAG_A = 1;
 
 PROMPT *** Create  grants  WCS_PARTNERS ***
+grant SELECT                                                                 on WCS_PARTNERS    to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on WCS_PARTNERS    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on WCS_PARTNERS    to UPLD;
 
 
 

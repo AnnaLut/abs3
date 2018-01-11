@@ -32,8 +32,10 @@ select 'SOC', s.contract_id, s.contract_num, to_char(s.contract_date, 'dd.mm.yyy
  ;
 
 PROMPT *** Create  grants  V_DPTRPTPARAMS ***
+grant SELECT                                                                 on V_DPTRPTPARAMS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPTRPTPARAMS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPTRPTPARAMS  to RPBN001;
+grant SELECT                                                                 on V_DPTRPTPARAMS  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPTRPTPARAMS  to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_DPTRPTPARAMS  to WR_CREPORTS;
 

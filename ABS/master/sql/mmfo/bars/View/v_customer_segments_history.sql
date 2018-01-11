@@ -23,7 +23,7 @@ PROMPT *** Create  view V_CUSTOMER_SEGMENTS_HISTORY ***
                WHEN 'CUSTOMER_SEGMENT_FINANCIAL' THEN BARS.LIST_UTL.GET_ITEM_NAME ('CUSTOMER_SEGMENT_FINANCIAL', PREV_VAL)
                ELSE TO_CHAR (PREV_VAL)
             END
-               AS ATTRIBUTE_val
+               AS ATTRIBUTE_VAL
        FROM (
        SELECT ROW_NUMBER() OVER(PARTITION BY c.rnk, ah.ATTRIBUTE_ID ORDER BY ah.VALID_FROM DESC, ah.id DESC) AS rownumber,
               BARS.ATTRIBUTE_UTL.GET_ATTRIBUTE_NAME(ah.ATTRIBUTE_ID) AS attribute_name,
@@ -33,7 +33,8 @@ PROMPT *** Create  view V_CUSTOMER_SEGMENTS_HISTORY ***
               LAG(ah.id, 1, NULL) OVER(PARTITION BY c.rnk, ah.ATTRIBUTE_ID ORDER BY ah.VALID_FROM, ah.id) AS prev_id,
               LAG(ah.NUMBER_VALUE, 1, null) OVER(PARTITION BY c.rnk, ah.ATTRIBUTE_ID ORDER BY ah.VALID_FROM, ah.id) AS prev_val,
               LAG(ah.VALID_FROM, 1, NULL) OVER(PARTITION BY c.rnk, ah.ATTRIBUTE_ID ORDER BY ah.VALID_FROM, ah.id) AS prev_val_date_start,
-              LAG(ah.VALID_THROUGH, 1, NULL) OVER(PARTITION BY c.rnk, ah.ATTRIBUTE_ID ORDER BY ah.VALID_THROUGH, ah.id) AS prev_date_stop,
+-- 11.10.2017 COBUSUPABS-6479             LAG(ah.VALID_THROUGH, 1, NULL) OVER(PARTITION BY c.rnk, ah.ATTRIBUTE_ID ORDER BY ah.VALID_THROUGH, ah.id) AS prev_date_stop,
+              ah.VALID_FROM AS prev_date_stop,
               BARS.ATTRIBUTE_UTL.GET_ATTRIBUTE_CODE(ah.attribute_id) AS ATTRIBUTE_CODE
          FROM BARS.ATTRIBUTE_HISTORY ah
 --         left join ( select attribute_id, object_id, max(NUMBER_VALUE ) keep (dense_rank last order by VALUE_DATE) as NUMBER_VALUE from BARS.attribute_value_by_date group by attribute_id, object_id) avd ON ah.attribute_id = avd.attribute_id and ah.object_id = avd.object_id
@@ -49,11 +50,13 @@ PROMPT *** Create  view V_CUSTOMER_SEGMENTS_HISTORY ***
                                                               'CUSTOMER_SEGMENT_PRODUCTS_AMNT'))
           AND ah.valid_from <= bars.bankdate()
                     )
-      WHERE rownumber < 3 AND prev_val IS NOT NULL
+      WHERE prev_val IS NOT NULL -- 11.10.2017 COBUSUPABS-6479    and rownumber < 3
    ORDER BY 3, 1;
 
 PROMPT *** Create  grants  V_CUSTOMER_SEGMENTS_HISTORY ***
+grant SELECT                                                                 on V_CUSTOMER_SEGMENTS_HISTORY to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,MERGE VIEW,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_CUSTOMER_SEGMENTS_HISTORY to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CUSTOMER_SEGMENTS_HISTORY to UPLD;
 
 
 

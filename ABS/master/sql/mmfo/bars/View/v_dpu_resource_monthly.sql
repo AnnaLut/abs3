@@ -20,7 +20,9 @@ PROMPT *** Create  view V_DPU_RESOURCE_MONTHLY ***
 ;
 
 PROMPT *** Create  grants  V_DPU_RESOURCE_MONTHLY ***
+grant SELECT                                                                 on V_DPU_RESOURCE_MONTHLY to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPU_RESOURCE_MONTHLY to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DPU_RESOURCE_MONTHLY to UPLD;
 
 
 

@@ -32,6 +32,10 @@ PROMPT *** Create  view V_ZAYP ***
             AND a.nls <> z.nlsv
    ORDER BY 3, 2, 1;
 
+PROMPT *** Create  grants  V_ZAYP ***
+grant SELECT                                                                 on V_ZAYP          to BARSREADER_ROLE;
+grant SELECT                                                                 on V_ZAYP          to UPLD;
+
 
 
 PROMPT ===================================================================================== 

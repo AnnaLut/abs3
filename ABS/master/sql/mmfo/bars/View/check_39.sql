@@ -39,8 +39,10 @@ where
  (o.nlsa like '2903%' and o.nlsb like '2900%') );
 
 PROMPT *** Create  grants  CHECK_39 ***
+grant SELECT                                                                 on CHECK_39        to BARSREADER_ROLE;
 grant SELECT                                                                 on CHECK_39        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHECK_39        to START1;
+grant SELECT                                                                 on CHECK_39        to UPLD;
 
 
 

@@ -132,15 +132,14 @@ begin
   bars_metabase.add_column(l_tabid, 6, 'ID_CP', 'N', 'ID ЦП', '1', 6, 6, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 7, 'NAME_OP', 'C', 'Тип операції~над ЦП', '3', 55, 7, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
 
-  -- добавляем описание сложного поля(особливе поле для вибору з довідника)
+  -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CP_VOPER');
   l_newcolid := bars_metabase.get_colid(l_newtabid, 'ID');
   if (l_newtabid is not null and l_newcolid is not null) then
     bars_metabase.add_extrnval(l_tabid, 4, l_newtabid, l_newcolid, '', '', '', 'DICT_NAME');
   else
-    dbms_output.put_line('В БМД не описана таблица CP_VOPER для описания сложного поля таблицы V_CP_KODW.');
+    dbms_output.put_line('В БМД не описана таблица CP_VOPER для описания сложного поля таблицы V_CP_REFW.');
   end if;
-
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

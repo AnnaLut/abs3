@@ -33,8 +33,10 @@ where  substr(nls, 1,2)<>'86' and
        substr(nlsk,1,2)<>'26');
 
 PROMPT *** Create  grants  BUCH_B ***
+grant SELECT                                                                 on BUCH_B          to BARSREADER_ROLE;
 grant SELECT                                                                 on BUCH_B          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BUCH_B          to START1;
+grant SELECT                                                                 on BUCH_B          to UPLD;
 
 
 

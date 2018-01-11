@@ -43,9 +43,11 @@ select b.br_id, b.name, t.br_type, t.name, null, null, null, null, null, null, n
  ;
 
 PROMPT *** Create  grants  V_BRATES_ACTIVE ***
+grant SELECT                                                                 on V_BRATES_ACTIVE to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BRATES_ACTIVE to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BRATES_ACTIVE to DPT_ADMIN;
 grant SELECT                                                                 on V_BRATES_ACTIVE to START1;
+grant SELECT                                                                 on V_BRATES_ACTIVE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BRATES_ACTIVE to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_BRATES_ACTIVE to WR_REFREAD;
 

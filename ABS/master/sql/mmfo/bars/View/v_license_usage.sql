@@ -21,8 +21,10 @@ PROMPT *** Create  view V_LICENSE_USAGE ***
  ;
 
 PROMPT *** Create  grants  V_LICENSE_USAGE ***
+grant SELECT                                                                 on V_LICENSE_USAGE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_LICENSE_USAGE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_LICENSE_USAGE to START1;
+grant SELECT                                                                 on V_LICENSE_USAGE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_LICENSE_USAGE to WR_ALL_RIGHTS;
 
 

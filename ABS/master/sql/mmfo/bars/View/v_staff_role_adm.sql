@@ -16,7 +16,9 @@ from   staff_role t
 where  state_id <> 3 /*user_role_utl,ROLE_STATE_CLOSED*/;
 
 PROMPT *** Create  grants  V_STAFF_ROLE_ADM ***
+grant SELECT                                                                 on V_STAFF_ROLE_ADM to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFF_ROLE_ADM to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STAFF_ROLE_ADM to UPLD;
 
 
 

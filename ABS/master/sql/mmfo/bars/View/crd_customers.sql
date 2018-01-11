@@ -17,6 +17,8 @@ PROMPT *** Create  view CRD_CUSTOMERS ***
 
 PROMPT *** Create  grants  CRD_CUSTOMERS ***
 grant SELECT                                                                 on CRD_CUSTOMERS   to BARSDWH_ACCESS_USER;
+grant SELECT                                                                 on CRD_CUSTOMERS   to BARSREADER_ROLE;
+grant SELECT                                                                 on CRD_CUSTOMERS   to UPLD;
 
 
 

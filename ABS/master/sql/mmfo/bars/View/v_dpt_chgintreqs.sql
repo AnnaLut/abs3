@@ -42,9 +42,11 @@ with read only
  ;
 
 PROMPT *** Create  grants  V_DPT_CHGINTREQS ***
+grant SELECT                                                                 on V_DPT_CHGINTREQS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_CHGINTREQS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_CHGINTREQS to DPT_ADMIN;
 grant SELECT                                                                 on V_DPT_CHGINTREQS to DPT_ROLE;
+grant SELECT                                                                 on V_DPT_CHGINTREQS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_CHGINTREQS to WR_ALL_RIGHTS;
 
 

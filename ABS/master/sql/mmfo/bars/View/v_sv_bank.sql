@@ -21,8 +21,10 @@ PROMPT *** Create  view V_SV_BANK ***
 from SV_BANK;
 
 PROMPT *** Create  grants  V_SV_BANK ***
+grant SELECT                                                                 on V_SV_BANK       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SV_BANK       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SV_BANK       to RPBN002;
+grant SELECT                                                                 on V_SV_BANK       to UPLD;
 
 
 

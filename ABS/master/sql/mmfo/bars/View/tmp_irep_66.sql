@@ -11,8 +11,10 @@ PROMPT *** Create  view TMP_IREP_66 ***
   select substr(kodp,1,2) COL_P1, substr(kodp,3,4) COL_P2, substr(kodp,7,2) COL_P3, znap COL_P4,  TMP_IREP."KODP",TMP_IREP."DATF",TMP_IREP."KODF",TMP_IREP."ZNAP",TMP_IREP."NBUC",TMP_IREP."KF",TMP_IREP."ERR_MSG",TMP_IREP."FL_MOD" from TMP_IREP;
 
 PROMPT *** Create  grants  TMP_IREP_66 ***
+grant SELECT                                                                 on TMP_IREP_66     to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_IREP_66     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TMP_IREP_66     to RPBN002;
+grant SELECT                                                                 on TMP_IREP_66     to UPLD;
 
 
 

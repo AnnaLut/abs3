@@ -26,7 +26,9 @@ from accounts a, customer c,
              and o.kv=a.kv and a.kf=o.kf and nvl(decode(o.direct, 0, o.nlsb, o.nlsa),null) = a.nls and o.direct<2;
 
 PROMPT *** Create  grants  V_CIM_FOUND_PAYMENTS ***
+grant SELECT                                                                 on V_CIM_FOUND_PAYMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_FOUND_PAYMENTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_FOUND_PAYMENTS to UPLD;
 
 
 

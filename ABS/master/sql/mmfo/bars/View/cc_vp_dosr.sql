@@ -79,7 +79,9 @@ PROMPT *** Create  view CC_VP_DOSR ***
                   AND a8.ostb < 0);
 
 PROMPT *** Create  grants  CC_VP_DOSR ***
+grant SELECT                                                                 on CC_VP_DOSR      to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on CC_VP_DOSR      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CC_VP_DOSR      to UPLD;
 
 
 

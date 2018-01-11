@@ -38,7 +38,7 @@ PROMPT *** Create  view V_INTEREST_CCK ***
     ON a.acc = t.account_id
   JOIN int_accn i
     ON i.acc = a.acc
-   AND i.id = a.pap - 1
+   AND i.id = t.interest_kind
   JOIN customer c
     ON c.rnk = a.rnk
   LEFT JOIN accounts ia
@@ -51,7 +51,9 @@ PROMPT *** Create  view V_INTEREST_CCK ***
 ;
 
 PROMPT *** Create  grants  V_INTEREST_CCK ***
+grant SELECT                                                                 on V_INTEREST_CCK  to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_INTEREST_CCK  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_INTEREST_CCK  to UPLD;
 
 
 

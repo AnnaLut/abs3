@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Рахунки прострочені < 30 та > 30 днів';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'ACC_30';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,20 +124,20 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'Внутрішній~номер~рахунку', null, 22, null, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'Код~валюти', null, 22, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NLS', 'C', 'Номер рахунку', null, 15, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'S30/100', 'N', 'Сумма ном.~до~30 днів', null, 22, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(S30)/100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'S31/100', 'N', 'Сумма ном.~понад~30 днів', null, 22, 12, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(S31)/100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'SQ30/100', 'N', 'Сумма екв.~до~30 днів', null, 22, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(SQ30)/100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'SQ31/100', 'N', 'Сумма екв.~понад~30 днів', null, 22, 13, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(SQ31)/100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'SQ_OB22_30/100', 'N', 'Сумма екв.~по OB22~до 30 днів', null, 22, 7, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(SQ_OB22_30)/100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'S_OB22_30/100', 'N', 'Сумма ном.~по OB22~до 30 днів', null, 22, 6, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(S_OB22_30)/100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'S_OB22_31/100', 'N', 'Сумма ном.~по OB22~понад 30 днів', null, 22, 8, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(S_OB22_31)/100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'SQ_OB22_31/100', 'N', 'Сумма екв.~по OB22~понад 30 днів', null, 22, 9, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(SQ_OB22_31)/100', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'BRANCH', 'C', 'Відділення', null, null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'RNK', 'N', 'РНК клієнта', null, null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'NMK', 'C', 'Назва клієнта', null, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'Внутрішній~номер~рахунку', '', 22, null, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'Код~валюти', '', 22, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NLS', 'C', 'Номер рахунку', '', 15, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'S30/100', 'N', 'Сумма ном.~до~30 днів', '', 22, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(S30)/100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'S31/100', 'N', 'Сумма ном.~понад~30 днів', '', 22, 12, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(S31)/100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'SQ30/100', 'N', 'Сумма екв.~до~30 днів', '', 22, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(SQ30)/100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'SQ31/100', 'N', 'Сумма екв.~понад~30 днів', '', 22, 13, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(SQ31)/100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'SQ_OB22_30/100', 'N', 'Сумма екв.~по OB22~до 30 днів', '', 22, 7, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(SQ_OB22_30)/100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'S_OB22_30/100', 'N', 'Сумма ном.~по OB22~до 30 днів', '', 22, 6, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(S_OB22_30)/100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'S_OB22_31/100', 'N', 'Сумма ном.~по OB22~понад 30 днів', '', 22, 8, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(S_OB22_31)/100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'SQ_OB22_31/100', 'N', 'Сумма екв.~по OB22~понад 30 днів', '', 22, 9, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(SQ_OB22_31)/100', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'BRANCH', 'C', 'Відділення', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'RNK', 'N', 'РНК клієнта', '', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'NMK', 'C', 'Назва клієнта', '', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 2, 2, 'ASC ');

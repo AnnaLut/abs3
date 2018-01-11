@@ -42,6 +42,8 @@ PROMPT *** Create  view AQ$SW_AQ_DOCMSG ***
                              EXPIRATION_REASON , sender_name SENDER_NAME, sender_address SENDER_ADDRESS, sender_protocol SENDER_PROTOCOL, dequeue_msgid ORIGINAL_MSGID  FROM "SW_AQ_DOCMSG" WHERE state != 7 AND   state != 9 WITH READ ONLY;
 
 PROMPT *** Create  grants  AQ$SW_AQ_DOCMSG ***
+grant SELECT                                                                 on AQ$SW_AQ_DOCMSG to BARSREADER_ROLE;
+grant SELECT                                                                 on AQ$SW_AQ_DOCMSG to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on AQ$SW_AQ_DOCMSG to WR_ALL_RIGHTS;
 
 

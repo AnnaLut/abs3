@@ -14,8 +14,10 @@ PROMPT *** Create  view V_W4_TR2924 ***
    and length(branch) = 15 ;
 
 PROMPT *** Create  grants  V_W4_TR2924 ***
+grant SELECT                                                                 on V_W4_TR2924     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_TR2924     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_W4_TR2924     to START1;
+grant SELECT                                                                 on V_W4_TR2924     to UPLD;
 
 
 

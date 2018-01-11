@@ -15,8 +15,10 @@ where
  exists (select 1 from operapp where codeapp  = PUL.GET('ARM') and  codeoper = o.codeoper);
 
 PROMPT *** Create  grants  M_ROLE_AF ***
+grant SELECT                                                                 on M_ROLE_AF       to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_AF       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on M_ROLE_AF       to START1;
+grant SELECT                                                                 on M_ROLE_AF       to UPLD;
 
 
 

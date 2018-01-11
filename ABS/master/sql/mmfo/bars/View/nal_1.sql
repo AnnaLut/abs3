@@ -11,8 +11,10 @@ PROMPT *** Create  view NAL_1 ***
   SELECT distinct nls,nms from nal_dec where nls is not null;
 
 PROMPT *** Create  grants  NAL_1 ***
+grant SELECT                                                                 on NAL_1           to BARSREADER_ROLE;
 grant SELECT                                                                 on NAL_1           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NAL_1           to START1;
+grant SELECT                                                                 on NAL_1           to UPLD;
 
 
 

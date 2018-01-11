@@ -31,8 +31,10 @@ GROUP BY p.tt, p.userid, p.ref, p.nd, p.nlsa, p.mfob, p.nlsb, p.s, v.kod,
 HAVING sum(decode(o.dk,0,o.s,-o.s))<>0;
 
 PROMPT *** Create  grants  K2 ***
+grant SELECT                                                                 on K2              to BARSREADER_ROLE;
 grant SELECT                                                                 on K2              to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on K2              to START1;
+grant SELECT                                                                 on K2              to UPLD;
 
 
 

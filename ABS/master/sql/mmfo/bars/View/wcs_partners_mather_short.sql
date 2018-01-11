@@ -14,7 +14,9 @@ PROMPT *** Create  view WCS_PARTNERS_MATHER_SHORT ***
     WHERE ID_MATHER IS NULL and FLAG_A =1;
 
 PROMPT *** Create  grants  WCS_PARTNERS_MATHER_SHORT ***
+grant SELECT                                                                 on WCS_PARTNERS_MATHER_SHORT to BARSREADER_ROLE;
 grant SELECT                                                                 on WCS_PARTNERS_MATHER_SHORT to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on WCS_PARTNERS_MATHER_SHORT to UPLD;
 
 
 

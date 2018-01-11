@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'L2) Вал-Лоро : SWIFT -> SWIFT';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'LORO_SWT_SWT';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,23 +124,23 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'S', 'N', 'Сума~списання~з 1600/980 ', null, null, 50, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DATE_IN', 'D', 'Дата~надходж', null, null, 51, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'MT', 'N', 'Код~SWT', null, null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NLS', 'C', 'Рах(A)~вiдправника~1600/980 ', null, null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'SENDER', 'C', 'BIC-Код(A)~вiдправника', null, null, 3, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'SWREF', 'N', 'Реф~SWT~повiд.', null, null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'SWIFTMsgView(hWndMDI, :SWREF )', 0);
-  bars_metabase.add_column(l_tabid, 9, 'VDATE', 'D', 'Дата~валютув', null, null, 52, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'ACCD', 'C', 'ACC-Рах', null, null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NMS', 'C', 'Назва Рах(A)~вiдправника~1600/980 ', null, null, 60, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'OTM', 'B', 'Ок~!', null, null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'K57', 'C', 'SWIFT-57~банк-B~отримувача', null, 160, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'K58', 'C', 'SWIFT-58~данi (B)~отримувача', null, 160, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'K59', 'C', 'SWIFT-59~данi (B)~отримувача', null, 160, 18, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'K70', 'C', 'SWIFT-70~Remittance~Information', null, 160, 19, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'K72', 'C', 'SWIFT-72~Sender-Receiver~Information', null, 160, 20, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'KOD_N', 'C', '1-ПБ~Код~ Приз.пл', null, null, 11, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'K50', 'C', 'SWIFT-50~Платник', null, 160, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'S', 'N', 'Сума~списання~з 1600/980 ', '', null, 50, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DATE_IN', 'D', 'Дата~надходж', '', null, 51, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'MT', 'N', 'Код~SWT', '', null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NLS', 'C', 'Рах(A)~вiдправника~1600/980 ', '', null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'SENDER', 'C', 'BIC-Код(A)~вiдправника', '', null, 3, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'SWREF', 'N', 'Реф~SWT~повiд.', '', null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'SWIFTMsgView(hWndMDI, :SWREF )', 0);
+  bars_metabase.add_column(l_tabid, 9, 'VDATE', 'D', 'Дата~валютув', '', null, 52, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'ACCD', 'C', 'ACC-Рах', '', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NMS', 'C', 'Назва Рах(A)~вiдправника~1600/980 ', '', null, 60, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'OTM', 'B', 'Ок~!', '', null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'K57', 'C', 'SWIFT-57~банк-B~отримувача', '', 160, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'K58', 'C', 'SWIFT-58~данi (B)~отримувача', '', 160, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'K59', 'C', 'SWIFT-59~данi (B)~отримувача', '', 160, 18, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'K70', 'C', 'SWIFT-70~Remittance~Information', '', 160, 19, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'K72', 'C', 'SWIFT-72~Sender-Receiver~Information', '', 160, 20, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'KOD_N', 'C', '1-ПБ~Код~ Приз.пл', '', null, 11, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'K50', 'C', 'SWIFT-50~Платник', '', 160, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('BOPCODE');

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции KB8
-prompt Наименование операции: off DPT - Списання з транзиту на основн. рахунок деп. вкладу в ТВБВ
+prompt Наименование операции: KB8 off DPT - Списання з транзиту на основн. рахунок деп. вкладу в ТВБ
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KB8', 'off DPT - Списання з транзиту на основн. рахунок деп. вкладу в ТВБВ', 1, '#(tobopack.GetTOBOParam(''TRDPT''))', null, '#(bars_xmlklb_dpt.main_nls)', null, null, '#(tobopack.GetTOBOParam(''TRDPT''))', '#(bars_xmlklb_dpt.main_nls()))', null, 0, 0, 0, 0, null, null, null, null, null, null, '0001100000000000000000000000000000010000000000100000000000000000', null);
+    values ('KB8', 'KB8 off DPT - Списання з транзиту на основн. рахунок деп. вкладу в ТВБ', 1, '#(tobopack.GetTOBOParam(''TRDPT''))', null, '#(bars_xmlklb_dpt.main_nls)', null, null, '#(tobopack.GetTOBOParam(''TRDPT''))', '#(bars_xmlklb_dpt.main_nls()))', null, 0, 0, 0, 0, null, null, null, null, null, null, '0001100000000000000000000000000000010000000000100000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KB8', name='off DPT - Списання з транзиту на основн. рахунок деп. вкладу в ТВБВ', dk=1, nlsm='#(tobopack.GetTOBOParam(''TRDPT''))', kv=null, nlsk='#(bars_xmlklb_dpt.main_nls)', kvk=null, nlss=null, nlsa='#(tobopack.GetTOBOParam(''TRDPT''))', nlsb='#(bars_xmlklb_dpt.main_nls()))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0001100000000000000000000000000000010000000000100000000000000000', nazn=null
+         set tt='KB8', name='KB8 off DPT - Списання з транзиту на основн. рахунок деп. вкладу в ТВБ', dk=1, nlsm='#(tobopack.GetTOBOParam(''TRDPT''))', kv=null, nlsk='#(bars_xmlklb_dpt.main_nls)', kvk=null, nlss=null, nlsa='#(tobopack.GetTOBOParam(''TRDPT''))', nlsb='#(bars_xmlklb_dpt.main_nls()))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0001100000000000000000000000000000010000000000100000000000000000', nazn=null
        where tt='KB8';
   end;
   --------------------------------

@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K68', 'K68  Комiсiя за ЧЕК Казначейства ', 1, '#(F_DOP(#(REF),''S3570''))', 980, '#(nbs_ob22 (''6110'',''44''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_DOP(#(REF),''PR068'')*#(S)/100', null, null, null, null, null, '0000000000000000000000000000000000000000000000000000000000000000', null);
+    values ('K68', 'K68  Комiсiя за ЧЕК Казначейства ', 1, '#(F_DOP(#(REF),''S3570''))', 980, '#(nbs_ob22 (''6510'',''44''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_DOP(#(REF),''PR068'')*#(S)/100', null, null, null, null, null, '0000000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K68', name='K68  Комiсiя за ЧЕК Казначейства ', dk=1, nlsm='#(F_DOP(#(REF),''S3570''))', kv=980, nlsk='#(nbs_ob22 (''6110'',''44''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_DOP(#(REF),''PR068'')*#(S)/100', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='K68', name='K68  Комiсiя за ЧЕК Казначейства ', dk=1, nlsm='#(F_DOP(#(REF),''S3570''))', kv=980, nlsk='#(nbs_ob22 (''6510'',''44''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_DOP(#(REF),''PR068'')*#(S)/100', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='K68';
   end;
   --------------------------------

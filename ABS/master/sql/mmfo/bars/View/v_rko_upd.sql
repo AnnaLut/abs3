@@ -27,9 +27,11 @@ PROMPT *** Create  view V_RKO_UPD ***
     WHERE r.acc = a0.acc AND r.acc1 = a1.acc(+) AND r.acc2 = a2.acc(+) AND r.accd = a3.acc(+);
 
 PROMPT *** Create  grants  V_RKO_UPD ***
+grant SELECT                                                                 on V_RKO_UPD       to BARSREADER_ROLE;
 grant DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_RKO_UPD       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_RKO_UPD       to RKO;
 grant DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on V_RKO_UPD       to START1;
+grant SELECT                                                                 on V_RKO_UPD       to UPLD;
 grant FLASHBACK,SELECT                                                       on V_RKO_UPD       to WR_REFREAD;
 
 

@@ -48,7 +48,9 @@ PROMPT *** Create  view V_PAY_INTEREST_CRSOUR ***
 ;
 
 PROMPT *** Create  grants  V_PAY_INTEREST_CRSOUR ***
+grant SELECT                                                                 on V_PAY_INTEREST_CRSOUR to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PAY_INTEREST_CRSOUR to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_PAY_INTEREST_CRSOUR to UPLD;
 
 
 

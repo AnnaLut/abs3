@@ -7,9 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TBU_W4ACC_9129 ***
 
-  CREATE OR REPLACE TRIGGER BARS.TBU_W4ACC_9129 
-  before update of acc_9129  ON BARS.W4_ACC  for each row
-   WHEN (
+  CREATE OR REPLACE TRIGGER BARS.TBU_W4ACC_9129 BEFORE UPDATE OF "ACC_9129" ON "BARS"."W4_ACC" FOR EACH ROW 
+  WHEN (
 old.acc_9129 is null and new.acc_9129 is not null
       ) declare
   l_cus int;   l_rnk number; l_kat23 int; l_k23 number;
@@ -36,6 +35,7 @@ begin
   :new.k23   := l_k23  ;
 
 end TBU_W4ACC_9129;
+
 
 
 /

@@ -13,8 +13,10 @@ from branch b, (SELECT BRANCH,VAL FROM branch_parameters WHERE tag = 'TIP') p
 where b.branch = p.branch (+);
 
 PROMPT *** Create  grants  V_BRANCH_TIP ***
+grant SELECT                                                                 on V_BRANCH_TIP    to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_BRANCH_TIP    to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_BRANCH_TIP    to SALGL;
+grant SELECT                                                                 on V_BRANCH_TIP    to UPLD;
 
 
 

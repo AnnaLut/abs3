@@ -69,8 +69,10 @@ select 4, 'відсоткова ставка',
  where plan_rate != fact_rate;
 
 PROMPT *** Create  grants  V_DPT_INTFAULTS ***
+grant SELECT                                                                 on V_DPT_INTFAULTS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_INTFAULTS to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPT_INTFAULTS to DPT_ADMIN;
+grant SELECT                                                                 on V_DPT_INTFAULTS to UPLD;
 grant FLASHBACK,SELECT                                                       on V_DPT_INTFAULTS to WR_REFREAD;
 
 

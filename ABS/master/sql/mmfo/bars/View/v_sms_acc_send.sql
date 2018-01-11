@@ -8,7 +8,7 @@ PROMPT =========================================================================
 PROMPT *** Create  view V_SMS_ACC_SEND ***
 
   CREATE OR REPLACE FORCE VIEW BARS.V_SMS_ACC_SEND ("KF", "NMK", "NLS", "PHONE", "CNT", "ACC", "ACC_CLEARANCE", "NLS_CLEARANCE", "F_OST", "OKPO", "RNK", "KV", "NLS_PAY", "ACC_CLEARANCE_EXP", "F_OST_EXP", "NLS_CLEARANCE_EXP") AS 
- select 
+  select
 KF,
 NMK,
 NLS,
@@ -179,9 +179,9 @@ nls_clearance_exp
                               WHERE     T11.MSG_ID = T12.MSG_ID
                                     AND T11.STATUS = 'SUBMITTED'
                                     AND T11.PAYEDREF IS NULL
-                                    AND t12.acc = t4.acc))							
-		where acc_clearance_exp not in(540108513)						
-group by 
+                                    AND t12.acc = t4.acc))
+		where acc_clearance_exp not in(540108513)
+group by
 KF,
 NMK,
 NLS,
@@ -198,9 +198,11 @@ f_ost_exp,
 nls_clearance_exp ;
 
 PROMPT *** Create  grants  V_SMS_ACC_SEND ***
+grant SELECT                                                                 on V_SMS_ACC_SEND  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SMS_ACC_SEND  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SMS_ACC_SEND  to DPT_ADMIN;
 grant SELECT                                                                 on V_SMS_ACC_SEND  to DPT_ROLE;
+grant SELECT                                                                 on V_SMS_ACC_SEND  to UPLD;
 
 
 

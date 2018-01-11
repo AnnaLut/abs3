@@ -57,7 +57,9 @@ PROMPT *** Create  view V_CIM_BOUND_VMD ***
         ) a;
 
 PROMPT *** Create  grants  V_CIM_BOUND_VMD ***
+grant SELECT                                                                 on V_CIM_BOUND_VMD to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_BOUND_VMD to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_BOUND_VMD to UPLD;
 
 
 

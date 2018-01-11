@@ -31,7 +31,9 @@ where terua.name = eca.name
   and terua.cust_type = 'P';
 
 PROMPT *** Create  grants  V_EBKC_PRIV_ATTR_RECOMEND ***
+grant SELECT                                                                 on V_EBKC_PRIV_ATTR_RECOMEND to BARSREADER_ROLE;
 grant SELECT                                                                 on V_EBKC_PRIV_ATTR_RECOMEND to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_EBKC_PRIV_ATTR_RECOMEND to UPLD;
 
 
 

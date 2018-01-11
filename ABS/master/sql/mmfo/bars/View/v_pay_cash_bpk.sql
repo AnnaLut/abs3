@@ -26,8 +26,10 @@ where a.rnk  = w.rnk
   and a.ostc = a.ostb;
 
 PROMPT *** Create  grants  V_PAY_CASH_BPK ***
+grant SELECT                                                                 on V_PAY_CASH_BPK  to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_PAY_CASH_BPK  to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_PAY_CASH_BPK  to PYOD001;
+grant SELECT                                                                 on V_PAY_CASH_BPK  to UPLD;
 
 
 

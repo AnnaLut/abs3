@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции BP1
-prompt Наименование операции: d Оприбуткування інв.монет на суму ном.вартості
+prompt Наименование операции: BP1 d Оприбуткування інв.монет на суму ном.вартості
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('BP1', 'd Оприбуткування інв.монет на суму ном.вартості', 0, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH1007'',0))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', 39, null, null, null, '0000100001000001000000000000000000010000000000000000000000000000', null);
+    values ('BP1', 'BP1 d Оприбуткування інв.монет на суму ном.вартості', 0, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH1007'',0))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', 'F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', 39, null, null, null, '0000100001000001000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='BP1', name='d Оприбуткування інв.монет на суму ном.вартості', dk=0, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH1007'',0))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', s2='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', sk=39, proc=null, s3800=null, rang=null, flags='0000100001000001000000000000000000010000000000000000000000000000', nazn=null
+         set tt='BP1', name='BP1 d Оприбуткування інв.монет на суму ном.вартості', dk=0, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH1007'',0))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', s2='F_DOP(#(REF),''BM__K'') * F_DOP(#(REF),''BM__Y'') *100', sk=39, proc=null, s3800=null, rang=null, flags='0000100001000001000000000000000000010000000000000000000000000000', nazn=null
        where tt='BP1';
   end;
   --------------------------------
@@ -352,11 +352,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('B27', 'B27-Оприбуткування інвестиційних монет в ТВБВ ІІІ рівня', 0, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH17'',0))', null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH11'',0))', null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH17'',0))', '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH11'',0))', null, 1, 0, 0, 0, null, null, null, null, null, null, '1000100000000000000000000000000000010000000000000000000000000000', 'оприбуткування інвестиційних монет в ТВБВ ІІІ рівня');
+    values ('B27', 'B27-Оприбуткування інвестиційних монет в ТВБВ ІІІ рівня', 0, '#(get_nls_tt(''B27'',''NLSM''))', null, '#(get_nls_tt(''B27'',''NLSK''))', null, null, '#(get_nls_tt(''B27'',''NLSA''))', '#(get_nls_tt(''B27'',''NLSB''))', null, 1, 0, 0, 0, null, null, null, null, null, null, '1000100000000000000000000000000000010000000000000000000000000000', 'оприбуткування інвестиційних монет в ТВБВ ІІІ рівня');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='B27', name='B27-Оприбуткування інвестиційних монет в ТВБВ ІІІ рівня', dk=0, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH17'',0))', kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH11'',0))', kvk=null, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH17'',0))', nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH11'',0))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1000100000000000000000000000000000010000000000000000000000000000', nazn='оприбуткування інвестиційних монет в ТВБВ ІІІ рівня'
+         set tt='B27', name='B27-Оприбуткування інвестиційних монет в ТВБВ ІІІ рівня', dk=0, nlsm='#(get_nls_tt(''B27'',''NLSM''))', kv=null, nlsk='#(get_nls_tt(''B27'',''NLSK''))', kvk=null, nlss=null, nlsa='#(get_nls_tt(''B27'',''NLSA''))', nlsb='#(get_nls_tt(''B27'',''NLSB''))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1000100000000000000000000000000000010000000000000000000000000000', nazn='оприбуткування інвестиційних монет в ТВБВ ІІІ рівня'
        where tt='B27';
   end;
   --------------------------------

@@ -17,8 +17,10 @@ PROMPT *** Create  view V_OVR_INTX ***
 from  bars.OVR_INTX  ;
 
 PROMPT *** Create  grants  V_OVR_INTX ***
+grant SELECT                                                                 on V_OVR_INTX      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OVR_INTX      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OVR_INTX      to START1;
+grant SELECT                                                                 on V_OVR_INTX      to UPLD;
 
 
 

@@ -11,7 +11,9 @@ PROMPT *** Create  view V_CIM_KOD_Z201 ***
   select ID, NAME from CIM_CREDIT_PREPAY;
 
 PROMPT *** Create  grants  V_CIM_KOD_Z201 ***
+grant SELECT                                                                 on V_CIM_KOD_Z201  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_KOD_Z201  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_KOD_Z201  to UPLD;
 
 
 

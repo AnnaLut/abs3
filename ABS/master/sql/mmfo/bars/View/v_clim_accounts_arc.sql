@@ -17,7 +17,9 @@ PROMPT *** Create  view V_CLIM_ACCOUNTS_ARC ***
           AND (dazs IS NULL OR dazs >= clim_ru_pack.get_paramdate);
 
 PROMPT *** Create  grants  V_CLIM_ACCOUNTS_ARC ***
+grant SELECT                                                                 on V_CLIM_ACCOUNTS_ARC to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CLIM_ACCOUNTS_ARC to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CLIM_ACCOUNTS_ARC to UPLD;
 
 
 

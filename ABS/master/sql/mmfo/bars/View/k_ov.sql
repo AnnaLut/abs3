@@ -28,8 +28,10 @@ from ( select acck, kv, nlsk,
       );
 
 PROMPT *** Create  grants  K_OV ***
+grant SELECT                                                                 on K_OV            to BARSREADER_ROLE;
 grant SELECT                                                                 on K_OV            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on K_OV            to START1;
+grant SELECT                                                                 on K_OV            to UPLD;
 
 
 

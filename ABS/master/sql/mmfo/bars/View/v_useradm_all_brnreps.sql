@@ -19,8 +19,10 @@ select b.id, b.description, decode(b.r_type, 1, 'Ë', 'Ö')
    and nvl(b.r_type, 0) in (0, 1);
 
 PROMPT *** Create  grants  V_USERADM_ALL_BRNREPS ***
+grant SELECT                                                                 on V_USERADM_ALL_BRNREPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USERADM_ALL_BRNREPS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_USERADM_ALL_BRNREPS to START1;
+grant SELECT                                                                 on V_USERADM_ALL_BRNREPS to UPLD;
 
 
 

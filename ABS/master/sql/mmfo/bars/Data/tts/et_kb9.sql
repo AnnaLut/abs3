@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DP!
-prompt Наименование операции: +D: STOP-правило на поповнення вкладу
+prompt Наименование операции: DP! +D: STOP-правило на поповнення вкладу
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DP!', '+D: STOP-правило на поповнення вкладу', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, '0', null, null, null, null, 0, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('DP!', 'DP! +D: STOP-правило на поповнення вкладу', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, '0', null, null, null, null, 0, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DP!', name='+D: STOP-правило на поповнення вкладу', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='0', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='DP!', name='DP! +D: STOP-правило на поповнення вкладу', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='0', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='DP!';
   end;
   --------------------------------
@@ -57,7 +57,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции KB8
-prompt Наименование операции: off DPT - Списання з транзиту на основн. рахунок деп. вкладу в ТВБВ
+prompt Наименование операции: KB8 off DPT - Списання з транзиту на основн. рахунок деп. вкладу в ТВБ
 declare
   cnt_  number;
 begin
@@ -66,11 +66,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KB8', 'off DPT - Списання з транзиту на основн. рахунок деп. вкладу в ТВБВ', 1, '#(tobopack.GetTOBOParam(''TRDPT''))', null, '#(bars_xmlklb_dpt.main_nls)', null, null, '#(tobopack.GetTOBOParam(''TRDPT''))', '#(bars_xmlklb_dpt.main_nls()))', null, 0, 0, 0, 0, null, null, null, null, null, null, '0001100000000000000000000000000000010000000000100000000000000000', null);
+    values ('KB8', 'KB8 off DPT - Списання з транзиту на основн. рахунок деп. вкладу в ТВБ', 1, '#(tobopack.GetTOBOParam(''TRDPT''))', null, '#(bars_xmlklb_dpt.main_nls)', null, null, '#(tobopack.GetTOBOParam(''TRDPT''))', '#(bars_xmlklb_dpt.main_nls()))', null, 0, 0, 0, 0, null, null, null, null, null, null, '0001100000000000000000000000000000010000000000100000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KB8', name='off DPT - Списання з транзиту на основн. рахунок деп. вкладу в ТВБВ', dk=1, nlsm='#(tobopack.GetTOBOParam(''TRDPT''))', kv=null, nlsk='#(bars_xmlklb_dpt.main_nls)', kvk=null, nlss=null, nlsa='#(tobopack.GetTOBOParam(''TRDPT''))', nlsb='#(bars_xmlklb_dpt.main_nls()))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0001100000000000000000000000000000010000000000100000000000000000', nazn=null
+         set tt='KB8', name='KB8 off DPT - Списання з транзиту на основн. рахунок деп. вкладу в ТВБ', dk=1, nlsm='#(tobopack.GetTOBOParam(''TRDPT''))', kv=null, nlsk='#(bars_xmlklb_dpt.main_nls)', kvk=null, nlss=null, nlsa='#(tobopack.GetTOBOParam(''TRDPT''))', nlsb='#(bars_xmlklb_dpt.main_nls()))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0001100000000000000000000000000000010000000000100000000000000000', nazn=null
        where tt='KB8';
   end;
   --------------------------------
@@ -166,7 +166,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции KB9
-prompt Наименование операции: off DPT - Поповнення вкладу гот. ГРН
+prompt Наименование операции: KB9 off DPT - Поповнення вкладу гот. ГРН
 declare
   cnt_  number;
 begin
@@ -175,11 +175,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KB9', 'off DPT - Поповнення вкладу гот. ГРН', 0, '#(tobopack.GetTOBOParam(''TRDPT''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(tobopack.GetTOBOParam(''TRDPT''))', '#( TOBOPACK.GetToboCASH)', null, 0, 0, 0, 0, null, null, 16, null, null, null, '0001100001000000000000000000000000010000000000100000000000000000', null);
+    values ('KB9', 'KB9 off DPT - Поповнення вкладу гот. ГРН', 0, '#(tobopack.GetTOBOParam(''TRDPT''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, '#(tobopack.GetTOBOParam(''TRDPT''))', '#( TOBOPACK.GetToboCASH)', null, 0, 0, 0, 0, null, null, 16, null, null, null, '0001100001000000000000000000000000010000000000100000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KB9', name='off DPT - Поповнення вкладу гот. ГРН', dk=0, nlsm='#(tobopack.GetTOBOParam(''TRDPT''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(tobopack.GetTOBOParam(''TRDPT''))', nlsb='#( TOBOPACK.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=16, proc=null, s3800=null, rang=null, flags='0001100001000000000000000000000000010000000000100000000000000000', nazn=null
+         set tt='KB9', name='KB9 off DPT - Поповнення вкладу гот. ГРН', dk=0, nlsm='#(tobopack.GetTOBOParam(''TRDPT''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa='#(tobopack.GetTOBOParam(''TRDPT''))', nlsb='#( TOBOPACK.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=16, proc=null, s3800=null, rang=null, flags='0001100001000000000000000000000000010000000000100000000000000000', nazn=null
        where tt='KB9';
   end;
   --------------------------------

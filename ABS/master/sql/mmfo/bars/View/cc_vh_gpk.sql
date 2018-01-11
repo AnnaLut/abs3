@@ -16,6 +16,8 @@ PROMPT *** Create  view CC_VH_GPK ***
           nt1.ND = d.ND and nt1.TAG = 'VIDK' and nt2.ND = d.ND and nt2.TAG = 'AIM';
 
 PROMPT *** Create  grants  CC_VH_GPK ***
+grant SELECT                                                                 on CC_VH_GPK       to BARSREADER_ROLE;
+grant SELECT                                                                 on CC_VH_GPK       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_VH_GPK       to WR_ALL_RIGHTS;
 
 

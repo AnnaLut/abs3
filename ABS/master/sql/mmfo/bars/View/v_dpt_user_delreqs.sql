@@ -25,8 +25,10 @@ with read only
  ;
 
 PROMPT *** Create  grants  V_DPT_USER_DELREQS ***
+grant SELECT                                                                 on V_DPT_USER_DELREQS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_USER_DELREQS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_USER_DELREQS to DPT_ROLE;
+grant SELECT                                                                 on V_DPT_USER_DELREQS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_USER_DELREQS to WR_ALL_RIGHTS;
 
 

@@ -1,17 +1,14 @@
-create or replace force view V_TOBO_ACCOUNTS
-( ACC, NLS, NLSALT, KV, KF, BRANCH, NBS, NBS2, DAOS, DAPP, ISP, RNK, NMS
-, LIM, OSTB, OSTC, OSTF, OSTQ, OSTX, DOS, KOS, DOSQ, KOSQ, PAP, TIP, VID
-, TRCN, MDATE, DAZS, SEC, ACCC, BLKD, BLKK, POS, SECI, SECO, GRP, TOBO, LCV
-, DIG, DENOM, OST, OB22, NOTIFIER_REF, BDATE, OPT, DAPPQ
-, INTACCN
-, FIO
-, R011
-, R013
-, S180
-, S240
-, OKPO
-) AS
-SELECT a.acc,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_TOBO_ACCOUNTS.sql =========*** Run **
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_TOBO_ACCOUNTS ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_TOBO_ACCOUNTS ("ACC", "NLS", "NLSALT", "KV", "KF", "BRANCH", "NBS", "NBS2", "DAOS", "DAPP", "ISP", "RNK", "NMS", "LIM", "OSTB", "OSTC", "OSTF", "OSTQ", "OSTX", "DOS", "KOS", "DOSQ", "KOSQ", "PAP", "TIP", "VID", "TRCN", "MDATE", "DAZS", "SEC", "ACCC", "BLKD", "BLKK", "POS", "SECI", "SECO", "GRP", "TOBO", "LCV", "DIG", "DENOM", "OST", "OB22", "NOTIFIER_REF", "BDATE", "OPT", "DAPPQ", "INTACCN", "FIO", "R011", "R013", "S180", "S240", "OKPO") AS 
+  SELECT a.acc,
        a.nls,
        a.nlsalt,
        a.kv,
@@ -73,11 +70,17 @@ join   staff$base u on u.id = a.isp
 cross join table(account_utl.pipe_saldo_line(a.acc, gl.bd)) s
 left join specparam p on p.acc = a.acc;
 
+PROMPT *** Create  grants  V_TOBO_ACCOUNTS ***
+grant SELECT                                                                 on V_TOBO_ACCOUNTS to BARSREADER_ROLE;
+grant SELECT                                                                 on V_TOBO_ACCOUNTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_TOBO_ACCOUNTS to UPLD;
+grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_TOBO_ACCOUNTS to WR_ALL_RIGHTS;
+grant SELECT                                                                 on V_TOBO_ACCOUNTS to WR_CUSTLIST;
+grant SELECT                                                                 on V_TOBO_ACCOUNTS to WR_TOBO_ACCOUNTS_LIST;
+grant SELECT                                                                 on V_TOBO_ACCOUNTS to WR_VIEWACC;
 
-show err
 
-grant SELECT on V_TOBO_ACCOUNTS to BARS_ACCESS_DEFROLE;
-grant SELECT on V_TOBO_ACCOUNTS to WR_ALL_RIGHTS;
-grant SELECT on V_TOBO_ACCOUNTS to WR_CUSTLIST;
-grant SELECT on V_TOBO_ACCOUNTS to WR_TOBO_ACCOUNTS_LIST;
-grant SELECT on V_TOBO_ACCOUNTS to WR_VIEWACC;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_TOBO_ACCOUNTS.sql =========*** End **
+PROMPT ===================================================================================== 

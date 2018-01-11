@@ -14,8 +14,10 @@ PROMPT *** Create  view V_PK_TIPS ***
  ;
 
 PROMPT *** Create  grants  V_PK_TIPS ***
+grant SELECT                                                                 on V_PK_TIPS       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PK_TIPS       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PK_TIPS       to OBPC;
+grant SELECT                                                                 on V_PK_TIPS       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_PK_TIPS       to WR_ALL_RIGHTS;
 
 

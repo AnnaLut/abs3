@@ -59,7 +59,7 @@ declare
 begin
 
   l_tabsemantic := 'Розрахунок простроч.заборгованості за КД, в т.ч. за пенею та 3% річних ';
-  l_tablinesdef := '';
+  l_tablinesdef := '10';
   l_tabselect_statement := '';
   l_tabname     := 'V_605';
 

@@ -19,8 +19,10 @@ PROMPT *** Create  view V_DPT_BONUSES_FREE ***
  ;
 
 PROMPT *** Create  grants  V_DPT_BONUSES_FREE ***
+grant SELECT                                                                 on V_DPT_BONUSES_FREE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_BONUSES_FREE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_BONUSES_FREE to DPT_ROLE;
+grant SELECT                                                                 on V_DPT_BONUSES_FREE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_BONUSES_FREE to WR_ALL_RIGHTS;
 
 

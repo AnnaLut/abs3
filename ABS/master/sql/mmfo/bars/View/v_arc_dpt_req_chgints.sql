@@ -16,6 +16,8 @@ PROMPT *** Create  view V_ARC_DPT_REQ_CHGINTS ***
  ;
 
 PROMPT *** Create  grants  V_ARC_DPT_REQ_CHGINTS ***
+grant SELECT                                                                 on V_ARC_DPT_REQ_CHGINTS to BARSREADER_ROLE;
+grant SELECT                                                                 on V_ARC_DPT_REQ_CHGINTS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ARC_DPT_REQ_CHGINTS to WR_ALL_RIGHTS;
 
 

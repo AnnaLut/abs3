@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции 169
-prompt Наименование операции: Погашення наперед нарахованих процентних доходів за кред.операціями
+prompt Наименование операции: 169 Погашення наперед нарахованих процентних доходів за кред.операціям
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('169', 'Погашення наперед нарахованих процентних доходів за кред.операціями', 0, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, null, null, 14, null, null, null, '0000100001000000000000000011000000010000000000000000000000000000', 'Погашення  суми безнадійної заборгованості за кредитними операціями, списаної за рахунок резерву ');
+    values ('169', '169 Погашення наперед нарахованих процентних доходів за кред.операціям', 0, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, null, null, 14, null, null, null, '0000100001000000000000000011000000010000000000000000000000000000', 'Погашення  суми безнадійної заборгованості за кредитними операціями, списаної за рахунок резерву ');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='169', name='Погашення наперед нарахованих процентних доходів за кред.операціями', dk=0, nlsm=null, kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=null, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=14, proc=null, s3800=null, rang=null, flags='0000100001000000000000000011000000010000000000000000000000000000', nazn='Погашення  суми безнадійної заборгованості за кредитними операціями, списаної за рахунок резерву '
+         set tt='169', name='169 Погашення наперед нарахованих процентних доходів за кред.операціям', dk=0, nlsm=null, kv=null, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=null, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=14, proc=null, s3800=null, rang=null, flags='0000100001000000000000000011000000010000000000000000000000000000', nazn='Погашення  суми безнадійної заборгованості за кредитними операціями, списаної за рахунок резерву '
        where tt='169';
   end;
   --------------------------------

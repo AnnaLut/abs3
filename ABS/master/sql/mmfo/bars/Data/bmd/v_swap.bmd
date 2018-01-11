@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'FOREX: Перегляд та Переоцінка/Закриття/Анулювання угод';
   l_tablinesdef := '30';
+  l_tabselect_statement := '';
   l_tabname     := 'V_SWAP';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,38 +124,38 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'DAT', 'D', 'Дата~заключення', 1.1, null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DAT_A', 'D', 'Дата~надходження А', 1.4, null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DAT_B', 'D', 'Дата~відправки Б', 1.4, null, 21, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DEAL_TAG', 'N', 'Сист.№ кінцевої~(єдиної) угоди', 1.2, null, 66, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KVA', 'N', 'Вал А', .7, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KVB', 'N', 'Вал Б', .7, null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'NTIK', 'C', 'Тiкет~Бух.док', 1.3, null, 7, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/DocView/Docs/DocumentDateFilter?type=1', 'ShowAllDocs(hWndMDI,1,0," a.ref in (select r.ref from FX_DEAL_REF r,fx_deal x where x.deal_tag=r.deal_tag and (x.swap_tag=:SWAP_TAG or x.deal_tag=:DEAL_TAG )) ", " Бух.док по угоді " )', 0);
-  bars_metabase.add_column(l_tabid, 16, 'PVX', 'N', 'PVq прав.варт~поточна + або -', null, null, 26, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(PVX)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'RNK', 'N', 'РНК~партнера', 1.2, null, 8, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'SUMA', 'N', 'Сума~надходження А', null, null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'SUMB', 'N', 'Сума~відправки Б', null, null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'SWAP_TAG', 'N', 'Сист.№ почат~СВОП угоди', 1.3, null, 64, 0, 0, 0, 0, '', '', 1, 1, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'IRA', 'N', '% ст А', .5, null, 92, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'IRB', 'N', '% ст Б', .5, null, 94, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'B', 'D', 'Звiтна дата', 1.1, null, 80, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'OTM', 'B', '!!! Виконати~ПЕРЕОЦІНКУ~угоди', 1.2, null, 32, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'PVX1', 'N', 'PVq1 прав.варт~поперед + або -', null, null, 25, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(PVX1)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'REF', 'N', 'Реф блоку~проводок~End_SWAP', 1.3, null, 35, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF', 'DocViewContentsEx(hWndForm, :REF)', 0);
-  bars_metabase.add_column(l_tabid, 34, 'OTM1', 'B', '!!! Виконати~ЗАКРИТТЯ~угоди', 1.2, null, 68, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'SOS', 'N', 'Поточний~Стан~Угоди', .9, null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 36, 'IRAE', 'N', 'Эф.% ст по~МБ дл PV~вал.А', 1.1, null, 27, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 37, 'IRBE', 'N', 'Эф.% ст  по~МБ дл PV~вал.Б', 1.1, null, 28, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 38, 'TERMA', 'N', 'Залиш~днів вал.А', .9, null, 73, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 39, 'TERMB', 'N', 'Залиш~днів вал.Б', .9, null, 74, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 40, 'KOD', 'C', 'Тип угоди 2', 1.1, null, 72, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 41, 'KODF', 'C', 'Тип угоди 1', 1.1, null, 70, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 42, 'BVQ', 'N', 'Різниця~екв A` -  B` ', null, null, 75, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(BVQ)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 43, 'BVQA', 'N', 'На Зв.дату~екв A` ', null, null, 76, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(BVQA)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 44, 'BVQB', 'N', 'На Зв.дату~екв B` ', null, null, 77, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(BVQB)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 45, 'DEL1', 'C', 'Анул гол(поч)~угоду', null, null, 65, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', 'F1_Select(13,"FOREX.FX_DEL (1,:SWAP_TAG);Анул.поч.угоду "|| Str( :SWAP_TAG) || " ?; ОК !" )', 0);
-  bars_metabase.add_column(l_tabid, 46, 'DELX', 'C', 'Анул~ВСЮ угоду', null, null, 67, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', 'F1_Select(13,"FOREX.FX_DEL  (0,:DEAL_TAG);Анул.ВСЮ.угоду "|| Str( :DEAL_TAG) || " ?; ОК !" )', 0);
-  bars_metabase.add_column(l_tabid, 47, 'NMK', 'A', 'Найменування контрагента', 3, null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'DAT', 'D', 'Дата~заключення', '1.1', null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DAT_A', 'D', 'Дата~надходження А', '1.4', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAT_B', 'D', 'Дата~відправки Б', '1.4', null, 21, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DEAL_TAG', 'N', 'Сист.№ кінцевої~(єдиної) угоди', '1.2', null, 66, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KVA', 'N', 'Вал А', '.7', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KVB', 'N', 'Вал Б', '.7', null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'NTIK', 'C', 'Тiкет~Бух.док', '1.3', null, 7, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '/barsroot/DocView/Docs/DocumentDateFilter?type=1', 'ShowAllDocs(hWndMDI,1,0," a.ref in (select r.ref from FX_DEAL_REF r,fx_deal x where x.deal_tag=r.deal_tag and (x.swap_tag=:SWAP_TAG or x.deal_tag=:DEAL_TAG )) ", " Бух.док по угоді " )', 0);
+  bars_metabase.add_column(l_tabid, 16, 'PVX', 'N', 'PVq прав.варт~поточна + або -', '', null, 26, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(PVX)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'RNK', 'N', 'РНК~партнера', '1.2', null, 8, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'SUMA', 'N', 'Сума~надходження А', '', null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'SUMB', 'N', 'Сума~відправки Б', '', null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'SWAP_TAG', 'N', 'Сист.№ почат~СВОП угоди', '1.3', null, 64, 0, 0, 0, 0, '', '', 1, 1, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'IRA', 'N', '% ст А', '.5', null, 92, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'IRB', 'N', '% ст Б', '.5', null, 94, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'B', 'D', 'Звiтна дата', '1.1', null, 80, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'OTM', 'B', '!!! Виконати~ПЕРЕОЦІНКУ~угоди', '1.2', null, 32, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'PVX1', 'N', 'PVq1 прав.варт~поперед + або -', '', null, 25, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(PVX1)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'REF', 'N', 'Реф блоку~проводок~End_SWAP', '1.3', null, 35, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF', 'DocViewContentsEx(hWndForm, :REF)', 0);
+  bars_metabase.add_column(l_tabid, 34, 'OTM1', 'B', '!!! Виконати~ЗАКРИТТЯ~угоди', '1.2', null, 68, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'SOS', 'N', 'Поточний~Стан~Угоди', '.9', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'IRAE', 'N', 'Эф.% ст по~МБ дл PV~вал.А', '1.1', null, 27, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'IRBE', 'N', 'Эф.% ст  по~МБ дл PV~вал.Б', '1.1', null, 28, 0, 0, 0, 0, '', '#0.0000', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'TERMA', 'N', 'Залиш~днів вал.А', '.9', null, 73, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'TERMB', 'N', 'Залиш~днів вал.Б', '.9', null, 74, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'KOD', 'C', 'Тип угоди 2', '1.1', null, 72, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 41, 'KODF', 'C', 'Тип угоди 1', '1.1', null, 70, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 42, 'BVQ', 'N', 'Різниця~екв A` -  B` ', '', null, 75, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(BVQ)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 43, 'BVQA', 'N', 'На Зв.дату~екв A` ', '', null, 76, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(BVQA)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 44, 'BVQB', 'N', 'На Зв.дату~екв B` ', '', null, 77, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(BVQB)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 45, 'DEL1', 'C', 'Анул гол(поч)~угоду', '', null, 65, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', 'F1_Select(13,"FOREX.FX_DEL (1,:SWAP_TAG);Анул.поч.угоду "|| Str( :SWAP_TAG) || " ?; ОК !" )', 0);
+  bars_metabase.add_column(l_tabid, 46, 'DELX', 'C', 'Анул~ВСЮ угоду', '', null, 67, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', 'F1_Select(13,"FOREX.FX_DEL  (0,:DEAL_TAG);Анул.ВСЮ.угоду "|| Str( :DEAL_TAG) || " ?; ОК !" )', 0);
+  bars_metabase.add_column(l_tabid, 47, 'NMK', 'A', 'Найменування контрагента', '3', null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

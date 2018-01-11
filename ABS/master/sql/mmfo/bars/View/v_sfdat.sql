@@ -14,8 +14,10 @@ PROMPT *** Create  view V_SFDAT ***
      FROM DUAL;
 
 PROMPT *** Create  grants  V_SFDAT ***
+grant SELECT                                                                 on V_SFDAT         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SFDAT         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SFDAT         to START1;
+grant SELECT                                                                 on V_SFDAT         to UPLD;
 
 
 

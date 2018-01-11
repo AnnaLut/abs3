@@ -23,7 +23,9 @@ where   g.column_value = gs.id and
  ;
 
 PROMPT *** Create  grants  V_KLBX_ACCOUNTS ***
+grant SELECT                                                                 on V_KLBX_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_KLBX_ACCOUNTS to KLBX;
+grant SELECT                                                                 on V_KLBX_ACCOUNTS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_KLBX_ACCOUNTS to WR_ALL_RIGHTS;
 
 

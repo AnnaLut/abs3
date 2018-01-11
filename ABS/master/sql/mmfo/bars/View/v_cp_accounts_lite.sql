@@ -66,7 +66,9 @@ PROMPT *** Create  view V_CP_ACCOUNTS_LITE ***
     WHERE a.kv = v.kv AND a.acc = s.acc(+) AND a.acc = ca.cp_acc and a.isp=sb.id;
 
 PROMPT *** Create  grants  V_CP_ACCOUNTS_LITE ***
+grant SELECT                                                                 on V_CP_ACCOUNTS_LITE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_ACCOUNTS_LITE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CP_ACCOUNTS_LITE to UPLD;
 
 
 

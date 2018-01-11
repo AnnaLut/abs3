@@ -159,8 +159,10 @@ PROMPT *** Create  view CC_PD9 ***
 ;
 
 PROMPT *** Create  grants  CC_PD9 ***
+grant SELECT                                                                 on CC_PD9          to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on CC_PD9          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_PD9          to RCC_DEAL;
+grant SELECT                                                                 on CC_PD9          to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_PD9          to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CC_PD9          to WR_REFREAD;
 

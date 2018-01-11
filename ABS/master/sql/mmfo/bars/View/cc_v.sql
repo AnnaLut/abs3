@@ -1,7 +1,14 @@
-CREATE OR REPLACE VIEW CC_V
-(id, nd, cc_id, vidd, rnk, aim, sour, kv, s, freq, gpk, acckred, mfokred, dsdate, abdate, dwdate, awdate, apdate, refv, refp, istval, s090, s080, pr, ostc, nls, acc, grp, sec, srok, sos, obs, namk, crisk, acc8, prim, basem, day, dazs, branch, custtype, okpo, prod, sdog, kprolog, daysn, ndi, rcoun, rdat, limit)
-AS
-SELECT d.user_id,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/CC_V.sql =========*** Run *** =========
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view CC_V ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.CC_V ("ID", "ND", "CC_ID", "VIDD", "RNK", "AIM", "SOUR", "KV", "S", "FREQ", "GPK", "ACCKRED", "MFOKRED", "DSDATE", "ABDATE", "DWDATE", "AWDATE", "APDATE", "REFV", "REFP", "ISTVAL", "S090", "S080", "PR", "OSTC", "NLS", "ACC", "GRP", "SEC", "SROK", "SOS", "OBS", "NAMK", "CRISK", "ACC8", "PRIM", "BASEM", "DAY", "DAZS", "BRANCH", "CUSTTYPE", "OKPO", "PROD", "SDOG", "KPROLOG", "DAYSN", "NDI", "RCOUN", "RDAT", "LIMIT") AS 
+  SELECT d.user_id,
        d.nd,
        d.cc_id,
        d.vidd,
@@ -84,4 +91,19 @@ SELECT d.user_id,
                                    where substr(txt, 1, 1) = '2'
                                      and tag = 'CCSRC'
                                      and nd = d.nd));
-/
+
+PROMPT *** Create  grants  CC_V ***
+grant SELECT                                                                 on CC_V            to BARSREADER_ROLE;
+grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_V            to BARS_ACCESS_DEFROLE;
+grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_V            to RCC_DEAL;
+grant SELECT                                                                 on CC_V            to START1;
+grant SELECT                                                                 on CC_V            to UPLD;
+grant SELECT                                                                 on CC_V            to WCS_SYNC_USER;
+grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_V            to WR_ALL_RIGHTS;
+grant FLASHBACK,SELECT                                                       on CC_V            to WR_REFREAD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/CC_V.sql =========*** End *** =========
+PROMPT ===================================================================================== 

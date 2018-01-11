@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции VMO
-prompt Наименование операции: :p Импорт ОДНОВАЛЮТНЫХ
+prompt Наименование операции: VMO :p Импорт ОДНОВАЛЮТНЫХ
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('VMO', ':p Импорт ОДНОВАЛЮТНЫХ', 1, null, null, null, null, null, null, null, '300465', 0, 0, 0, 0, null, null, null, null, null, 99, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('VMO', 'VMO :p Импорт ОДНОВАЛЮТНЫХ', 1, null, null, null, null, null, null, null, '300465', 0, 0, 0, 0, null, null, null, null, null, 99, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='VMO', name=':p Импорт ОДНОВАЛЮТНЫХ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob='300465', flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=99, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='VMO', name='VMO :p Импорт ОДНОВАЛЮТНЫХ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob='300465', flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=99, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='VMO';
   end;
   --------------------------------

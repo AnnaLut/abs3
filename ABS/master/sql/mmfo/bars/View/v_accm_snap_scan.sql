@@ -25,8 +25,10 @@ PROMPT *** Create  view V_ACCM_SNAP_SCAN ***
  where s.mod_acc = a.acc;
 
 PROMPT *** Create  grants  V_ACCM_SNAP_SCAN ***
+grant SELECT                                                                 on V_ACCM_SNAP_SCAN to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACCM_SNAP_SCAN to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ACCM_SNAP_SCAN to START1;
+grant SELECT                                                                 on V_ACCM_SNAP_SCAN to UPLD;
 
 
 

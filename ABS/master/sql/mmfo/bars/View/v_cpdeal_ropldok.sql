@@ -25,7 +25,9 @@ PROMPT *** Create  view V_CPDEAL_ROPLDOK ***
        AND o.fdat BETWEEN CD.DAT_UG AND NVL (cd.dazs, bankdate);
 
 PROMPT *** Create  grants  V_CPDEAL_ROPLDOK ***
+grant SELECT                                                                 on V_CPDEAL_ROPLDOK to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CPDEAL_ROPLDOK to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CPDEAL_ROPLDOK to UPLD;
 
 
 

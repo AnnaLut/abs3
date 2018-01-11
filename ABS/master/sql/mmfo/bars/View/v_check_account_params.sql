@@ -79,9 +79,11 @@ from rnbu_trace where substr(kodp,8,1) = '0'
  ;
 
 PROMPT *** Create  grants  V_CHECK_ACCOUNT_PARAMS ***
+grant SELECT                                                                 on V_CHECK_ACCOUNT_PARAMS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CHECK_ACCOUNT_PARAMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CHECK_ACCOUNT_PARAMS to RPBN002;
 grant SELECT                                                                 on V_CHECK_ACCOUNT_PARAMS to TECH005;
+grant SELECT                                                                 on V_CHECK_ACCOUNT_PARAMS to UPLD;
 
 
 

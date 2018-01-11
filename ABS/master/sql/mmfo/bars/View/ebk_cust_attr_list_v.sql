@@ -37,7 +37,9 @@ from  customer c,
 where eca.group_id is not null;
 
 PROMPT *** Create  grants  EBK_CUST_ATTR_LIST_V ***
+grant SELECT                                                                 on EBK_CUST_ATTR_LIST_V to BARSREADER_ROLE;
 grant SELECT                                                                 on EBK_CUST_ATTR_LIST_V to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on EBK_CUST_ATTR_LIST_V to UPLD;
 
 
 

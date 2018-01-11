@@ -93,7 +93,9 @@ PROMPT *** Create  view V_WCS_SBP_DETAILS ***
      FROM wcs_subproducts sbp;
 
 PROMPT *** Create  grants  V_WCS_SBP_DETAILS ***
+grant SELECT                                                                 on V_WCS_SBP_DETAILS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SBP_DETAILS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_SBP_DETAILS to UPLD;
 
 
 

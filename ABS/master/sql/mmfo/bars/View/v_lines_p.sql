@@ -12,8 +12,10 @@ PROMPT *** Create  view V_LINES_P ***
 where dat=(select max(dat) from lines_p where nls=p.nls and otype=p.otype);
 
 PROMPT *** Create  grants  V_LINES_P ***
+grant SELECT                                                                 on V_LINES_P       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_LINES_P       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_LINES_P       to CC_DOC;
+grant SELECT                                                                 on V_LINES_P       to UPLD;
 
 
 

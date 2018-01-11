@@ -37,7 +37,9 @@ PROMPT *** Create  view V_STO_SBON_PROVIDER ***
      order by 7;
 
 PROMPT *** Create  grants  V_STO_SBON_PROVIDER ***
+grant SELECT                                                                 on V_STO_SBON_PROVIDER to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STO_SBON_PROVIDER to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STO_SBON_PROVIDER to UPLD;
 
 
 

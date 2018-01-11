@@ -56,7 +56,9 @@ PROMPT *** Create  view V_MBM_CUSTOMERS ***
     WHERE custtype IN (2,3);
 
 PROMPT *** Create  grants  V_MBM_CUSTOMERS ***
+grant SELECT                                                                 on V_MBM_CUSTOMERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBM_CUSTOMERS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_MBM_CUSTOMERS to UPLD;
 
 
 

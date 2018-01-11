@@ -15,9 +15,11 @@ WHERE  KF=SYS_CONTEXT('bars_context','params_mfo')
  ;
 
 PROMPT *** Create  grants  NAL_DEC8 ***
+grant SELECT                                                                 on NAL_DEC8        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NAL_DEC8        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAL_DEC8        to NALOG;
 grant DELETE,INSERT,SELECT,UPDATE                                            on NAL_DEC8        to NAL_DEC8;
+grant SELECT                                                                 on NAL_DEC8        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on NAL_DEC8        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on NAL_DEC8        to WR_REFREAD;
 

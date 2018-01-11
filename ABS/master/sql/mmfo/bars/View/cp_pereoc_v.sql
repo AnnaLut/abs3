@@ -324,9 +324,11 @@ PROMPT *** Create  view CP_PEREOC_V ***
                   AND v.emi = k.emi) t;
 
 PROMPT *** Create  grants  CP_PEREOC_V ***
+grant SELECT                                                                 on CP_PEREOC_V     to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on CP_PEREOC_V     to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on CP_PEREOC_V     to CP_ROLE;
 grant SELECT                                                                 on CP_PEREOC_V     to START1;
+grant SELECT                                                                 on CP_PEREOC_V     to UPLD;
 
 
 

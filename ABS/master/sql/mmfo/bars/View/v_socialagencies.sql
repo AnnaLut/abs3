@@ -30,9 +30,11 @@ PROMPT *** Create  view V_SOCIALAGENCIES ***
  ;
 
 PROMPT *** Create  grants  V_SOCIALAGENCIES ***
+grant SELECT                                                                 on V_SOCIALAGENCIES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SOCIALAGENCIES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SOCIALAGENCIES to BARS_CONNECT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_SOCIALAGENCIES to DPT_ROLE;
+grant SELECT                                                                 on V_SOCIALAGENCIES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SOCIALAGENCIES to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_SOCIALAGENCIES to WR_REFREAD;
 

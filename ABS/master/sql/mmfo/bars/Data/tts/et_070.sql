@@ -165,11 +165,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('070', '070-Виявлення нестачі готівки до встановлення винних осіб', 1, null, 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', 980, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', null, 1, 0, 0, 0, null, null, 61, null, null, null, '1101100001000000000000000001000000010000000000000000000000000000', 'Виявлення нестачі готівки до встановлення винних осіб');
+    values ('070', '070-Виявлення нестачі готівки до встановлення винних осіб', 1, null, 980, '#(get_nls_tt(''070'',''NLSK''))', 980, null, null, '#(get_nls_tt(''070'',''NLSB''))', null, 1, 0, 0, 0, null, null, 61, null, null, null, '1101100001000000000000000001000000010000000000000000000000000000', 'Виявлення нестачі готівки до встановлення винних осіб');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='070', name='070-Виявлення нестачі готівки до встановлення винних осіб', dk=1, nlsm=null, kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', kvk=980, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=61, proc=null, s3800=null, rang=null, flags='1101100001000000000000000001000000010000000000000000000000000000', nazn='Виявлення нестачі готівки до встановлення винних осіб'
+         set tt='070', name='070-Виявлення нестачі готівки до встановлення винних осіб', dk=1, nlsm=null, kv=980, nlsk='#(get_nls_tt(''070'',''NLSK''))', kvk=980, nlss=null, nlsa=null, nlsb='#(get_nls_tt(''070'',''NLSB''))', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=61, proc=null, s3800=null, rang=null, flags='1101100001000000000000000001000000010000000000000000000000000000', nazn='Виявлення нестачі готівки до встановлення винних осіб'
        where tt='070';
   end;
   --------------------------------

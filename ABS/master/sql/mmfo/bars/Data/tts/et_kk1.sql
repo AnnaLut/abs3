@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции KKS
-prompt Наименование операции: --KKS/КП. STOP-правило на перебільшення ЛІМІТа
+prompt Наименование операции: KKS --KKS/КП. STOP-правило на перебільшення ЛІМІТа
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KKS', '--KKS/КП. STOP-правило на перебільшення ЛІМІТа', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'STOP_KK ( #(REF) )', null, null, null, null, null, '0000100000000000000000000000000000000000000000100000000000000000', null);
+    values ('KKS', 'KKS --KKS/КП. STOP-правило на перебільшення ЛІМІТа', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'STOP_KK ( #(REF) )', null, null, null, null, null, '0000100000000000000000000000000000000000000000100000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KKS', name='--KKS/КП. STOP-правило на перебільшення ЛІМІТа', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='STOP_KK ( #(REF) )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000100000000000000000', nazn=null
+         set tt='KKS', name='KKS --KKS/КП. STOP-правило на перебільшення ЛІМІТа', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='STOP_KK ( #(REF) )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000100000000000000000', nazn=null
        where tt='KKS';
   end;
   --------------------------------
@@ -56,51 +56,8 @@ begin
   end;
 end;
 /
-prompt Создание / Обновление операции ZZZ
-prompt Наименование операции: LCS. Стоп правило на перевірку лімітів. 
-declare
-  cnt_  number;
-begin
-  --------------------------------
-  -- Основные свойства операции --
-  --------------------------------
-  begin
-    insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('ZZZ', 'LCS. Стоп правило на перевірку лімітів. ', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'LCS_PACK_SERVICE.F_STOP(#(REF))', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
-  exception
-    when dup_val_on_index then 
-      update tts
-         set tt='ZZZ', name='LCS. Стоп правило на перевірку лімітів. ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='LCS_PACK_SERVICE.F_STOP(#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
-       where tt='ZZZ';
-  end;
-  --------------------------------
-  ----------- Реквизиты ----------
-  --------------------------------
-  delete from op_rules where tt='ZZZ';
-  --------------------------------
-  ------ Связанные операции ------
-  --------------------------------
-  delete from ttsap where tt='ZZZ';
-  --------------------------------
-  ------- Балансовые счета -------
-  --------------------------------
-  delete from ps_tts where tt='ZZZ';
-  --------------------------------
-  -------- Виды документов -------
-  --------------------------------
-  delete from tts_vob where tt='ZZZ';
-  --------------------------------
-  -------- Группы контроля -------
-  --------------------------------
-  delete from chklist_tts where tt='ZZZ';
-  --------------------------------
-  ------------- Папки ------------
-  --------------------------------
-  delete from folders_tts where tt='ZZZ';
-end;
-/
 prompt Создание / Обновление операции KK1
-prompt Наименование операции: --KK1/КП. Внутрішнє для Кредитів
+prompt Наименование операции: KK1 --KK1/КП. Внутрішнє для Кредитів
 declare
   cnt_  number;
 begin
@@ -109,11 +66,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KK1', '--KK1/КП. Внутрішнє для Кредитів', 1, null, null, null, null, null, null, null, null, 1, 0, 0, 0, null, null, 61, null, null, null, '0001100000000000000000000001000000010000000000100000000000000000', null);
+    values ('KK1', 'KK1 --KK1/КП. Внутрішнє для Кредитів', 1, null, null, null, null, null, null, null, null, 1, 0, 0, 0, null, null, 61, null, null, null, '0001100000000000000000000001000000010000000000100000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KK1', name='--KK1/КП. Внутрішнє для Кредитів', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=61, proc=null, s3800=null, rang=null, flags='0001100000000000000000000001000000010000000000100000000000000000', nazn=null
+         set tt='KK1', name='KK1 --KK1/КП. Внутрішнє для Кредитів', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=61, proc=null, s3800=null, rang=null, flags='0001100000000000000000000001000000010000000000100000000000000000', nazn=null
        where tt='KK1';
   end;
   --------------------------------
@@ -209,17 +166,6 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (ttsap: ''KKS'', ''KK1'', 0) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into ttsap(ttap, tt, dk)
-    values ('ZZZ', 'KK1', 0);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ttsap: ''ZZZ'', ''KK1'', 0) - первичный ключ не найден!');
       else raise;
       end if;
   end;

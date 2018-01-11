@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('C4A', 'C4A(доч.CN4) Комісія банку за прийом переказу в ГРН', 1, '#(swi_get_acc(''7109''))', 980, '#(swi_get_acc(''2809''))', 980, null, null, null, null, 1, 0, 0, 0, 'f_swi_sum(1)', 'f_swi_sum(1)', null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('C4A', 'C4A(доч.CN4) Комісія банку за прийом переказу в ГРН', 1, '#(swi_get_acc(''7509''))', 980, '#(swi_get_acc(''2809''))', 980, null, null, null, null, 1, 0, 0, 0, 'f_swi_sum(1)', 'f_swi_sum(1)', null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='C4A', name='C4A(доч.CN4) Комісія банку за прийом переказу в ГРН', dk=1, nlsm='#(swi_get_acc(''7109''))', kv=980, nlsk='#(swi_get_acc(''2809''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s='f_swi_sum(1)', s2='f_swi_sum(1)', sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='C4A', name='C4A(доч.CN4) Комісія банку за прийом переказу в ГРН', dk=1, nlsm='#(swi_get_acc(''7509''))', kv=980, nlsk='#(swi_get_acc(''2809''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s='f_swi_sum(1)', s2='f_swi_sum(1)', sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='C4A';
   end;
   --------------------------------

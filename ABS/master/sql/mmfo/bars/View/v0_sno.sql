@@ -40,7 +40,9 @@ PROMPT *** Create  view V0_SNO ***
    AND d.branch LIKE sys_context('bars_context', 'user_branch') || '%';
 
 PROMPT *** Create  grants  V0_SNO ***
+grant SELECT                                                                 on V0_SNO          to BARSREADER_ROLE;
 grant SELECT                                                                 on V0_SNO          to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V0_SNO          to UPLD;
 
 
 

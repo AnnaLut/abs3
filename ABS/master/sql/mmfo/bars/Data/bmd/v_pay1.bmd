@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Список планових платежів позичальників ФО по КД ';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_PAY1';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,34 +124,34 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Бранч', null, null, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CC_ID', 'C', '№ ~КД', null, null, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'FDAT', 'D', 'Платiжна~дата', null, null, 17, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'GPK', 'C', 'Тип~погаш', null, null, 30, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KV', 'N', 'Вал', null, null, 1, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'ND', 'N', 'Реф~КД', null, null, 2, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NMK', 'C', 'П I Б', null, null, 10, 1, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'OKPO', 'C', 'Iд.~код', null, null, 12, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'SDATE', 'D', 'Дата~початку', null, null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'SN', 'N', 'Норм.~%% борг~в вал', null, null, 21, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'SN8', 'N', 'Пеня~в грн', null, null, 28, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'SP', 'N', 'Просроч.~Осн.борг~в вал', null, null, 22, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SPB', 'C', 'Сп.роб~банку', null, null, 35, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SPN', 'N', 'Просроч.~%% борг~в вал', null, null, 23, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'SS', 'N', 'Норм.~Осн.борг~в вал~графік', null, null, 20, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'TABN', 'C', 'Таб.№', null, null, 36, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'TELD', 'C', 'Тел~дом', null, null, 14, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'TELW', 'C', 'Тел~роб', null, null, 16, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'WDATE', 'D', 'Дата~заверш', null, null, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'SI', 'N', 'До сплати~разом~в вал', null, null, 25, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'PROD', 'C', 'Код~продукту', null, null, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'F_KAN', 'C', 'Канікули', null, null, 18, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'PL_SS', 'N', 'Норм.~Осн.борг~в вал', null, null, 19, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'DAT_FS', 'D', 'План~Дата~розр~фін стану', null, null, 38, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'DAT_INSU', 'D', 'План~Дата~перев~страховки', null, null, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'DAT_ZAL', 'D', 'План~Дата~перев~застави', null, null, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'SF', 'N', 'До сплати~всього~в вал', null, null, 26, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'TELM', 'C', 'Тел~моб', null, null, 13, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Бранч', '', null, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CC_ID', 'C', '№ ~КД', '', null, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'FDAT', 'D', 'Платiжна~дата', '', null, 17, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'GPK', 'C', 'Тип~погаш', '', null, 30, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KV', 'N', 'Вал', '', null, 1, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'ND', 'N', 'Реф~КД', '', null, 2, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NMK', 'C', 'П I Б', '', null, 10, 1, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'OKPO', 'C', 'Iд.~код', '', null, 12, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'SDATE', 'D', 'Дата~початку', '', null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'SN', 'N', 'Норм.~%% борг~в вал', '', null, 21, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'SN8', 'N', 'Пеня~в грн', '', null, 28, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'SP', 'N', 'Просроч.~Осн.борг~в вал', '', null, 22, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SPB', 'C', 'Сп.роб~банку', '', null, 35, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SPN', 'N', 'Просроч.~%% борг~в вал', '', null, 23, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'SS', 'N', 'Норм.~Осн.борг~в вал~графік', '', null, 20, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'TABN', 'C', 'Таб.№', '', null, 36, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'TELD', 'C', 'Тел~дом', '', null, 14, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'TELW', 'C', 'Тел~роб', '', null, 16, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'WDATE', 'D', 'Дата~заверш', '', null, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'SI', 'N', 'До сплати~разом~в вал', '', null, 25, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'PROD', 'C', 'Код~продукту', '', null, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'F_KAN', 'C', 'Канікули', '', null, 18, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'PL_SS', 'N', 'Норм.~Осн.борг~в вал', '', null, 19, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'DAT_FS', 'D', 'План~Дата~розр~фін стану', '', null, 38, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'DAT_INSU', 'D', 'План~Дата~перев~страховки', '', null, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'DAT_ZAL', 'D', 'План~Дата~перев~застави', '', null, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'SF', 'N', 'До сплати~всього~в вал', '', null, 26, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'TELM', 'C', 'Тел~моб', '', null, 13, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 1, 'ASC ');

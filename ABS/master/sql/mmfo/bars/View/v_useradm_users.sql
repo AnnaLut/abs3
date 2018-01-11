@@ -62,7 +62,9 @@ PROMPT *** Create  view V_USERADM_USERS ***
 
 PROMPT *** Create  grants  V_USERADM_USERS ***
 grant SELECT                                                                 on V_USERADM_USERS to ABS_ADMIN;
+grant SELECT                                                                 on V_USERADM_USERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USERADM_USERS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_USERADM_USERS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_USERADM_USERS to WR_ALL_RIGHTS;
 
 

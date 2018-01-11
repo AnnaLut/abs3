@@ -34,8 +34,10 @@ PROMPT *** Create  view V_LIST_TAR ***
    ORDER BY e.rnk, a2.nls;
 
 PROMPT *** Create  grants  V_LIST_TAR ***
+grant SELECT                                                                 on V_LIST_TAR      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_LIST_TAR      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_LIST_TAR      to RCC_DEAL;
+grant SELECT                                                                 on V_LIST_TAR      to UPLD;
 
 
 

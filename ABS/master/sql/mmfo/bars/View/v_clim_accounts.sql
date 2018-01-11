@@ -61,7 +61,9 @@ PROMPT *** Create  view V_CLIM_ACCOUNTS ***
          WHERE nbs LIKE '100%' AND (dazs IS NULL OR dazs >= clim_ru_pack.get_startdate)) a;
 
 PROMPT *** Create  grants  V_CLIM_ACCOUNTS ***
+grant SELECT                                                                 on V_CLIM_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CLIM_ACCOUNTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CLIM_ACCOUNTS to UPLD;
 
 
 

@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции VAZ
-prompt Наименование операции: Виграш по лот.бiлетах "Ще один бiлет"
+prompt Наименование операции: VAZ Виграш по лот.бiлетах "Ще один бiлет"
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('VAZ', 'Виграш по лот.бiлетах "Ще один бiлет"', 1, null, 980, null, 980, null, null, null, null, 0, 0, 0, 0, '1', null, null, null, null, null, '0000100000000001100000000000000000010000000000000000000000000000', '#(VA_NC) , Виграш "Ще один бiлет"');
+    values ('VAZ', 'VAZ Виграш по лот.бiлетах "Ще один бiлет"', 1, null, 980, null, 980, null, null, null, null, 0, 0, 0, 0, '1', null, null, null, null, null, '0000100000000001100000000000000000010000000000000000000000000000', '#(VA_NC) , Виграш "Ще один бiлет"');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='VAZ', name='Виграш по лот.бiлетах "Ще один бiлет"', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='1', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000001100000000000000000010000000000000000000000000000', nazn='#(VA_NC) , Виграш "Ще один бiлет"'
+         set tt='VAZ', name='VAZ Виграш по лот.бiлетах "Ще один бiлет"', dk=1, nlsm=null, kv=980, nlsk=null, kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='1', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000001100000000000000000010000000000000000000000000000', nazn='#(VA_NC) , Виграш "Ще один бiлет"'
        where tt='VAZ';
   end;
   --------------------------------

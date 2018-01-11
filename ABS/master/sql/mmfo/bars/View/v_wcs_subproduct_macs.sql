@@ -37,7 +37,9 @@ PROMPT *** Create  view V_WCS_SUBPRODUCT_MACS ***
  order by sm.subproduct_id, sm.mac_id;
 
 PROMPT *** Create  grants  V_WCS_SUBPRODUCT_MACS ***
+grant SELECT                                                                 on V_WCS_SUBPRODUCT_MACS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SUBPRODUCT_MACS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_SUBPRODUCT_MACS to UPLD;
 
 
 

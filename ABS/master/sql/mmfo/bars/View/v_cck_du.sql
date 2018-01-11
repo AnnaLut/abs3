@@ -66,8 +66,10 @@ PROMPT *** Create  view V_CCK_DU ***
                OR x.DINDU IS NOT NULL AND x.DO_DU IS NULL);
 
 PROMPT *** Create  grants  V_CCK_DU ***
+grant SELECT                                                                 on V_CCK_DU        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_CCK_DU        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_CCK_DU        to RCC_DEAL;
+grant SELECT                                                                 on V_CCK_DU        to UPLD;
 
 
 

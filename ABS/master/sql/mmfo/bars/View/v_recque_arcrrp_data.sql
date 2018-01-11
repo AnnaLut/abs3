@@ -44,7 +44,9 @@ PROMPT *** Create  view V_RECQUE_ARCRRP_DATA ***
 ;
 
 PROMPT *** Create  grants  V_RECQUE_ARCRRP_DATA ***
+grant SELECT                                                                 on V_RECQUE_ARCRRP_DATA to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RECQUE_ARCRRP_DATA to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_RECQUE_ARCRRP_DATA to UPLD;
 
 
 

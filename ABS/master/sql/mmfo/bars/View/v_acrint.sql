@@ -37,7 +37,9 @@ ORDER BY a.ID, s.kv, SUBSTR (s.nls, 1, 4) || SUBSTR (s.nls, 6), a.fdat
  ;
 
 PROMPT *** Create  grants  V_ACRINT ***
+grant SELECT                                                                 on V_ACRINT        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACRINT        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ACRINT        to UPLD;
 grant SELECT                                                                 on V_ACRINT        to WR_ACRINT;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ACRINT        to WR_ALL_RIGHTS;
 

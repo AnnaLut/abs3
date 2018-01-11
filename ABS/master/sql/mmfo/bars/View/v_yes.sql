@@ -11,8 +11,10 @@ PROMPT *** Create  view V_YES ***
   SELECT 'Taê' name, 'YES' id FROM DUAL;
 
 PROMPT *** Create  grants  V_YES ***
+grant SELECT                                                                 on V_YES           to BARSREADER_ROLE;
 grant SELECT                                                                 on V_YES           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_YES           to START1;
+grant SELECT                                                                 on V_YES           to UPLD;
 
 
 

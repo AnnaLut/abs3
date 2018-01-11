@@ -66,7 +66,7 @@ begin
                            ' ('||nlchr||
                            '  select K.FDAT, O.ID, O.NAME NAMO, K.USERID, F.FIO,'||nlchr||
                            '         K.KV, T.NAME NAME, K.TT, S.NAME NT, K.KOLPROV, K.S_NOM, K.S_EQV,  koldok  KOLDOC'||nlchr||
-                           '  from staff    f,'||nlchr||
+                           '  from staff$base f,'||nlchr||
                            '       tabval   t,'||nlchr||
                            '       tts      s,'||nlchr||
                            '       OTDEL    o,'||nlchr||

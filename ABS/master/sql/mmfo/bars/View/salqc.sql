@@ -86,8 +86,10 @@ select    -- дата предыдущей переоценки относительно отчетной
       and a.bdat = s.bdat(+);
 
 PROMPT *** Create  grants  SALQC ***
+grant SELECT                                                                 on SALQC           to BARSREADER_ROLE;
 grant SELECT                                                                 on SALQC           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SALQC           to START1;
+grant SELECT                                                                 on SALQC           to UPLD;
 
 
 

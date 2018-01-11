@@ -7,22 +7,18 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_NBUR_#3B_DTL ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_NBUR_#3B_DTL ("REPORT_DATE", "KF", "VERSION_ID", "NBUC", "FIELD_CODE", "SEG_01", "SEG_02", "SEG_03", "SEG_04", "SEG_05", "SEG_06", "SEG_07", "SEG_08", "SEG_09", "SEG_10", "FIELD_VALUE", "DESCRIPTION", "ACC_ID", "ACC_NUM", "KV", "MATURITY_DATE", "CUST_ID", "CUST_CODE", "CUST_NAME", "ND", "AGRM_NUM", "BEG_DT", "END_DT", "REF", "BRANCH") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_NBUR_#3B_DTL ("REPORT_DATE", "KF", "VERSION_ID", "NBUC", "FIELD_CODE", "SEG_01", "SEG_02", "SEG_03", "SEG_04", "SEG_05", "SEG_06", "FIELD_VALUE", "DESCRIPTION", "ACC_ID", "ACC_NUM", "KV", "MATURITY_DATE", "CUST_ID", "CUST_CODE", "CUST_NAME", "ND", "AGRM_NUM", "BEG_DT", "END_DT", "REF", "BRANCH") AS 
   select p.REPORT_DATE
      , p.KF
      , p.VERSION_ID
      , p.NBUC
      , p.FIELD_CODE
-     , SUBSTR(p.FIELD_CODE,1,1) as SEG_01
-     , SUBSTR(p.FIELD_CODE,2,5) as SEG_02
-     , SUBSTR(p.FIELD_CODE,7,1) as SEG_03
-     , SUBSTR(p.FIELD_CODE,8,2) as SEG_04
-     , SUBSTR(p.FIELD_CODE,10,1) as SEG_05
-     , SUBSTR(p.FIELD_CODE,11,2) as SEG_06
-     , SUBSTR(p.FIELD_CODE,13,5) as SEG_07
-     , SUBSTR(p.FIELD_CODE,18,1) as SEG_08
-     , SUBSTR(p.FIELD_CODE,19,1) as SEG_09
-     , SUBSTR(p.FIELD_CODE,20,1) as SEG_10
+     , SUBSTR(p.FIELD_CODE,1,2) as SEG_01
+     , SUBSTR(p.FIELD_CODE,3,1) as SEG_02
+     , SUBSTR(p.FIELD_CODE,4,1) as SEG_03
+     , SUBSTR(p.FIELD_CODE,5,1) as SEG_04
+     , SUBSTR(p.FIELD_CODE,6,5) as SEG_05
+     , SUBSTR(p.FIELD_CODE,11,10) as SEG_06
      , p.FIELD_VALUE
      , p.DESCRIPTION
      , p.ACC_ID
@@ -30,12 +26,12 @@ PROMPT *** Create  view V_NBUR_#3B_DTL ***
      , p.KV
      , p.MATURITY_DATE
      , p.CUST_ID
-     , c.CUST_CODE
-     , c.CUST_NAME
+     , c.OKPO CUST_CODE
+     , c.NMK  CUST_NAME
      , p.ND
-     , a.AGRM_NUM
-     , a.BEG_DT
-     , a.END_DT
+     , a.CC_ID AGRM_NUM
+     , a.SDATE BEG_DT
+     , a.WDATE END_DT
      , p.REF
      , p.BRANCH
   from NBUR_DETAIL_PROTOCOLS_ARCH p
@@ -46,21 +42,19 @@ PROMPT *** Create  view V_NBUR_#3B_DTL ***
          v.KF          = p.KF          and
          v.VERSION_ID  = p.VERSION_ID  and
          v.FILE_ID     = f.ID )           
-  left outer
-  join V_NBUR_DM_CUSTOMERS c
-    on ( p.REPORT_DATE = c.REPORT_DATE and
-         p.KF          = c.KF          and
-         p.CUST_ID    = c.CUST_ID )
-  left outer
-  join V_NBUR_DM_AGREEMENTS a
-    on ( p.REPORT_DATE = a.REPORT_DATE and
-         p.KF          = a.KF          and
-         p.nd          = a.AGRM_ID )
+  LEFT OUTER JOIN CUSTOMER c
+    on ( p.KF          = c.KF          and
+         p.CUST_ID     = c.RNK )
+  LEFT OUTER JOIN CC_DEAL a 
+    on ( p.KF          = a.KF          and
+         p.nd          = a.ND )
  where p.REPORT_CODE = '#3B'
    and v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED' );
 
 PROMPT *** Create  grants  V_NBUR_#3B_DTL ***
+grant SELECT                                                                 on V_NBUR_#3B_DTL  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_#3B_DTL  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_NBUR_#3B_DTL  to UPLD;
 
 
 

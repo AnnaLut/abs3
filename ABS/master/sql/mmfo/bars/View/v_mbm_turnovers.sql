@@ -39,7 +39,9 @@ PROMPT *** Create  view V_MBM_TURNOVERS ***
      where op.sos = 5;
 
 PROMPT *** Create  grants  V_MBM_TURNOVERS ***
+grant SELECT                                                                 on V_MBM_TURNOVERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBM_TURNOVERS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_MBM_TURNOVERS to UPLD;
 
 
 

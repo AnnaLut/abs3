@@ -13,8 +13,10 @@ from customer c, (select B,E,KOD3K,rnk,sos, Sum(s) S from V_FXANI_0P group by B,
 where f.rnk = c.rnk ;
 
 PROMPT *** Create  grants  V_FXANI_3K ***
+grant SELECT                                                                 on V_FXANI_3K      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FXANI_3K      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FXANI_3K      to START1;
+grant SELECT                                                                 on V_FXANI_3K      to UPLD;
 
 
 

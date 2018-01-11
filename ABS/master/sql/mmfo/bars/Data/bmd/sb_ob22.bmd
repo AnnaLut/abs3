@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Коди OB22 для рахунків';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'SB_OB22';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,17 +124,28 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'A010', 'C', 'Код~звітного~файлу', 1, 2, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'COD_ACT', 'C', 'Код~активності', 1, 1, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'D_CLOSE', 'D', 'Дата~закриття', 1, 7, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'D_OPEN', 'D', 'Дата~відкриття', 1, 7, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'OB22', 'C', 'Код~OB22', 1, 2, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'PRIZ', 'C', 'Ознака', 1, 1, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'R020', 'C', 'Бал~рахунок', 1, 4, 2, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'TXT', 'C', 'Назва~аналіт.~рахунку', 4, 254, 5, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'A010', 'C', 'Код~звітного~файлу', '1', 2, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'COD_ACT', 'C', 'Код~активності', '1', 1, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'D_CLOSE', 'D', 'Дата~закриття', '1', 7, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'D_OPEN', 'D', 'Дата~відкриття', '1', 7, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'OB22', 'C', 'Код~OB22', '1', 2, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'PRIZ', 'C', 'Ознака', '1', 1, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'R020', 'C', 'Бал~рахунок', '1', 4, 2, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'TXT', 'C', 'Назва~аналіт.~рахунку', '4', 254, 5, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 1, '21.06.2017 Згорнення  Вал.поз на рівень МФО', 'c_3800 ( :KF) ', ':KF(SEM=МФО балансової установи,REF=BANKS_RU)
+', 'ONCE', 'Виконати Згорнення Вал.поз на рівень МФО ?', 'Виконано !', '', '', '', null);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 2, '01.07.2017 Зміни в плані рах  по 6204 (в Матриці) ', 'c_6204 ( :KF) ', ':KF(SEM=МФО балансової установи,REF=BANKS_RU)', 'ONCE', 'Примінити Зміни в плані рах по 6204 ?', 'Виконано !', '', '', '', null);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 3, '21.06.2017 Для 300465 - Зміни по ФОРЕКС', 'p_forex_ob22  ( :KF ) ', ':KF(SEM=МФО балансової установи,REF=BANKS_RU)
+', 'ONCE', 'Примінити зміни для ФОРЕКС  ?', 'Виконано !', '', '', '', null);
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop

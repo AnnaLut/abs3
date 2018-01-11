@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Довідник по батькові';
   l_tablinesdef := '50';
+  l_tabselect_statement := '';
   l_tabname     := 'V_MIDDLE_NAMES';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,22 +124,22 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'MIDDLEID', 'N', 'Код', .5, 10, 1, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'MIDDLEUA', 'C', 'По батькові~(укр)', null, 50, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'MIDDLERU', 'C', 'По батькові~(рос)', null, 50, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'SEXID', 'C', 'Стать~(1-Ч/2-Ж)', .9, 1, 4, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'FIRSTID', 'N', 'Ім''я~походження', 1.1, 10, 5, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'MIDDLEUAOF', 'C', 'Звернення~(укр)', null, 50, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'MIDDLEUAROD', 'C', 'Родовий відмінок~(укр)', null, 50, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'MIDDLEUADAT', 'C', 'Давальний відмінок~(укр)', null, 50, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'MIDDLEUAVIN', 'C', 'Знахідний відмінок~(укр)', null, 50, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'MIDDLEUATVO', 'C', 'Орудний відмінок~(укр)', null, 50, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'MIDDLEUAPRE', 'C', 'Місцевий відмінок~(укр)', null, 50, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'MIDDLERUROD', 'C', 'Родовий відмінок~(рос)', null, 50, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'MIDDLERUDAT', 'C', 'Давальний відмінок~(рос)', null, 50, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'MIDDLERUVIN', 'C', 'Знахідний відмінок~(рос)', null, 50, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'MIDDLERUTVO', 'C', 'Орудний відмінок~(рос)', null, 50, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'MIDDLERUPRE', 'C', 'Місцевий відмінок~(рос)', null, 50, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'MIDDLEID', 'N', 'Код', '.5', 10, 1, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'MIDDLEUA', 'C', 'По батькові~(укр)', '', 50, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'MIDDLERU', 'C', 'По батькові~(рос)', '', 50, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'SEXID', 'C', 'Стать~(1-Ч/2-Ж)', '.9', 1, 4, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'FIRSTID', 'N', 'Ім''я~походження', '1.1', 10, 5, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'MIDDLEUAOF', 'C', 'Звернення~(укр)', '', 50, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'MIDDLEUAROD', 'C', 'Родовий відмінок~(укр)', '', 50, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'MIDDLEUADAT', 'C', 'Давальний відмінок~(укр)', '', 50, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'MIDDLEUAVIN', 'C', 'Знахідний відмінок~(укр)', '', 50, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'MIDDLEUATVO', 'C', 'Орудний відмінок~(укр)', '', 50, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'MIDDLEUAPRE', 'C', 'Місцевий відмінок~(укр)', '', 50, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'MIDDLERUROD', 'C', 'Родовий відмінок~(рос)', '', 50, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'MIDDLERUDAT', 'C', 'Давальний відмінок~(рос)', '', 50, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'MIDDLERUVIN', 'C', 'Знахідний відмінок~(рос)', '', 50, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'MIDDLERUTVO', 'C', 'Орудний відмінок~(рос)', '', 50, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'MIDDLERUPRE', 'C', 'Місцевий відмінок~(рос)', '', 50, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('V_FIRST_NAMES');

@@ -22,7 +22,9 @@ select a.codeoper, a.name, a.rolename
 
 PROMPT *** Create  grants  V_APPADM_ALL_OPER ***
 grant SELECT                                                                 on V_APPADM_ALL_OPER to ABS_ADMIN;
+grant SELECT                                                                 on V_APPADM_ALL_OPER to BARSREADER_ROLE;
 grant SELECT                                                                 on V_APPADM_ALL_OPER to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_APPADM_ALL_OPER to UPLD;
 
 
 

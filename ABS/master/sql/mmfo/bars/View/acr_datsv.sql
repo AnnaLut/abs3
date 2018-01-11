@@ -19,6 +19,8 @@ PROMPT *** Create  view ACR_DATSV ***
  ;
 
 PROMPT *** Create  grants  ACR_DATSV ***
+grant SELECT                                                                 on ACR_DATSV       to BARSREADER_ROLE;
+grant SELECT                                                                 on ACR_DATSV       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACR_DATSV       to WR_ALL_RIGHTS;
 
 

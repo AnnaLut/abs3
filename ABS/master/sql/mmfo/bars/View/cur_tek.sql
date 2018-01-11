@@ -16,8 +16,10 @@ where r.kv=c.kv and r.vdate<=bankdate
 group by r.kv);
 
 PROMPT *** Create  grants  CUR_TEK ***
+grant SELECT                                                                 on CUR_TEK         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUR_TEK         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUR_TEK         to START1;
+grant SELECT                                                                 on CUR_TEK         to UPLD;
 
 
 

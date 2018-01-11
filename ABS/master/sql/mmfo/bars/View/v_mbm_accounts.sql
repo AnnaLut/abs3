@@ -59,7 +59,9 @@ PROMPT *** Create  view V_MBM_ACCOUNTS ***
         and a.RNK = c.RNK;
 
 PROMPT *** Create  grants  V_MBM_ACCOUNTS ***
+grant SELECT                                                                 on V_MBM_ACCOUNTS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBM_ACCOUNTS  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_MBM_ACCOUNTS  to UPLD;
 
 
 

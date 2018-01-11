@@ -23,8 +23,10 @@ from (select MDAT, kv, vidd, round(sum(nvl(ar,0)),0)  ar ,
       );
 
 PROMPT *** Create  grants  PRVN_BV_ALL ***
+grant SELECT                                                                 on PRVN_BV_ALL     to BARSREADER_ROLE;
 grant SELECT                                                                 on PRVN_BV_ALL     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRVN_BV_ALL     to START1;
+grant SELECT                                                                 on PRVN_BV_ALL     to UPLD;
 
 
 

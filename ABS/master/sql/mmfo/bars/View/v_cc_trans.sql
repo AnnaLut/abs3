@@ -26,8 +26,10 @@ PROMPT *** Create  view V_CC_TRANS ***
 WHERE t.acc = a.acc;
 
 PROMPT *** Create  grants  V_CC_TRANS ***
+grant SELECT                                                                 on V_CC_TRANS      to BARSREADER_ROLE;
 grant FLASHBACK,SELECT,UPDATE                                                on V_CC_TRANS      to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_CC_TRANS      to RCC_DEAL;
+grant SELECT                                                                 on V_CC_TRANS      to UPLD;
 
 
 

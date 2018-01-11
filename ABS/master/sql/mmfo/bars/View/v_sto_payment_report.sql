@@ -1,35 +1,14 @@
-PROMPT =====================================================================================
+
+
+PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_STO_PAYMENT_REPORT.sql =========*** R
-PROMPT =====================================================================================
+PROMPT ===================================================================================== 
 
 
 PROMPT *** Create  view V_STO_PAYMENT_REPORT ***
 
-CREATE OR REPLACE FORCE VIEW BARS.V_STO_PAYMENT_REPORT
-(
-   "ORDER_NUM",
-   "VALUE_DATE",
-   "PAYER_ACCOUNT",
-   "PAYER_IPN",
-   "PAYMENT_AMOUNT",
-   "FEE_AMOUNT",
-   "PAYMENT_CURRENCY",
-   "PAYER_MFO",
-   "RECEIVER_ACCOUNT",
-   "RECEIVER_MFO",
-   "RECEIVER_NAME",
-   "RECEIVER_EDRPOU",
-   "PURPOSE",
-   "EXTRA_PAYMENT_INFO",
-   "ORDER_USER_ID",
-   "ORDER_BRANCH",
-   "ORDER_DATE_TIME",
-   "WITHDRAWAL_DATE_TIME",
-   "PAYMENT_STATE",
-   "SBON_PROVIDER_ID"
-)
-AS
-   SELECT /*View for report 'Реєстр здійснених платежів',date created = 09.04.2015 */
+  CREATE OR REPLACE FORCE VIEW BARS.V_STO_PAYMENT_REPORT ("ORDER_NUM", "VALUE_DATE", "PAYER_ACCOUNT", "PAYER_IPN", "PAYMENT_AMOUNT", "FEE_AMOUNT", "PAYMENT_CURRENCY", "PAYER_MFO", "RECEIVER_ACCOUNT", "RECEIVER_MFO", "RECEIVER_NAME", "RECEIVER_EDRPOU", "PURPOSE", "EXTRA_PAYMENT_INFO", "ORDER_USER_ID", "ORDER_BRANCH", "ORDER_DATE_TIME", "WITHDRAWAL_DATE_TIME", "PAYMENT_STATE", "SBON_PROVIDER_ID") AS 
+  SELECT /*View for report 'Реєстр здійснених платежів',date created = 09.04.2015 */
          ROW_NUMBER () OVER (ORDER BY ROWNUM) order_num,
           p.value_date,
           a.nls payer_account,                          -- Рахунок відправника
@@ -121,10 +100,12 @@ AS
           LEFT JOIN bars.sto_sbon_order_no_contr sbonnc ON sbonnc.id = o.id;
 
 PROMPT *** Create  grants  V_STO_PAYMENT_REPORT ***
-GRANT SELECT ON V_STO_PAYMENT_REPORT TO BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STO_PAYMENT_REPORT to BARSREADER_ROLE;
+grant SELECT                                                                 on V_STO_PAYMENT_REPORT to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STO_PAYMENT_REPORT to UPLD;
 
 
 
-PROMPT =====================================================================================
+PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_STO_PAYMENT_REPORT.sql =========*** E
-PROMPT =====================================================================================
+PROMPT ===================================================================================== 

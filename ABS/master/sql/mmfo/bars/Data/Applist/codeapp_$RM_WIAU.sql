@@ -1,5 +1,3 @@
-SET SERVEROUTPUT ON 
-SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_WIAU.sql =========*
 PROMPT ===================================================================================== 
@@ -18,11 +16,11 @@ PROMPT *** Create/replace  ARM  $RM_WIAU ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-    d integer := 0;
+	d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_WIAU створюємо (або оновлюємо) АРМ АРМ Страхування ЮО (Адміністратор) ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
-                             P_ARM_NAME              => l_application_name, 
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
+                             P_ARM_NAME              => l_application_name,
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -30,116 +28,116 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Атрибути СК та типів СД ЮО ********** ');
           --  Створюємо функцію Атрибути СК та типів СД ЮО
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Атрибути СК та типів СД ЮО',
                                                   p_funcname => '/barsroot/ins/partner_type_attrs.aspx?custtype=2',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Атрибути
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Атрибути',
-                                                              p_funcname => '/barsroot/ins/attrs.aspx',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Атрибути',
+															  p_funcname => '/barsroot/ins/attrs.aspx',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Доступність СК у відділеннях ********** ');
           --  Створюємо функцію Доступність СК у відділеннях
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Доступність СК у відділеннях',
                                                   p_funcname => '/barsroot/ins/partner_type_branches.aspx?custtype=2',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Прив`язка сканкопій до СК та типів ********** ');
           --  Створюємо функцію Прив`язка сканкопій до СК та типів
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Прив`язка сканкопій до СК та типів',
                                                   p_funcname => '/barsroot/ins/partner_type_scans.aspx?custtype=2',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Сканкопії
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Сканкопії',
-                                                              p_funcname => '/barsroot/ins/scans.aspx',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Сканкопії',
+															  p_funcname => '/barsroot/ins/scans.aspx',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Акредитовані СК ********** ');
           --  Створюємо функцію Акредитовані СК
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Акредитовані СК',
                                                   p_funcname => '/barsroot/ins/partners.aspx?custtype=2',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Обмеження на тарифи
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Обмеження на тарифи',
-                                                              p_funcname => '/barsroot/ins/tariffs.aspx',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Обмеження на тарифи',
+															  p_funcname => '/barsroot/ins/tariffs.aspx',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію РНК СК у відділеннях
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'РНК СК у відділеннях',
-                                                              p_funcname => '/barsroot/ins/branch_rnk.aspx?partner_id=\d+',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'РНК СК у відділеннях',
+															  p_funcname => '/barsroot/ins/branch_rnk.aspx?partner_id=\d+',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Ліміти
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Ліміти',
-                                                              p_funcname => '/barsroot/ins/limits.aspx',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Ліміти',
+															  p_funcname => '/barsroot/ins/limits.aspx',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Комісії
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Комісії',
-                                                              p_funcname => '/barsroot/ins/fees.aspx',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Комісії',
+															  p_funcname => '/barsroot/ins/fees.aspx',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довідники NEW ********** ');
           --  Створюємо функцію Довідники NEW
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Довідники NEW',
                                                   p_funcname => '/barsroot/referencebook/referencelist/',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_WIAU) - АРМ Страхування ЮО (Адміністратор)  ');
     l := l_function_ids.first;
@@ -147,8 +145,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-     
-     
+
+
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -162,6 +160,7 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
+commit;
 end;
 /
 

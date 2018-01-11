@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции !ZP
-prompt Наименование операции: STOP-контроль (Зарплата)
+prompt Наименование операции: !ZP STOP-контроль (Зарплата)
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!ZP', 'STOP-контроль (Зарплата)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_CHECK_ZP(#(REF))', null, null, null, null, null, '0040M0000000000000000000040M000000000000000000000000000000000000', null);
+    values ('!ZP', '!ZP STOP-контроль (Зарплата)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_CHECK_ZP(#(REF))', null, null, null, '0', null, '0040M0000000000000000000040M000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!ZP', name='STOP-контроль (Зарплата)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_ZP(#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0040M0000000000000000000040M000000000000000000000000000000000000', nazn=null
+         set tt='!ZP', name='!ZP STOP-контроль (Зарплата)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_ZP(#(REF))', s2=null, sk=null, proc=null, s3800='0', rang=null, flags='0040M0000000000000000000040M000000000000000000000000000000000000', nazn=null
        where tt='!ZP';
   end;
   --------------------------------
@@ -89,7 +89,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции CL1
-prompt Наименование операции: Internet-Banking CorpLight: Внутрішня
+prompt Наименование операции: CL1 Internet-Banking CorpLight: Внутрішня
 declare
   cnt_  number;
 begin
@@ -98,11 +98,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CL1', 'Internet-Banking CorpLight: Внутрішня', 1, null, null, '#(NBS_OB22_NLS_RNK(''2603'',''05'',#(NLSA),#(NLSB),#(KVA) ))', null, null, null, null, null, 1, 0, 0, 0, null, null, null, null, null, null, '1001000000000000000000000000000000010000000000000000000000000000', null);
+    values ('CL1', 'CL1 Internet-Banking CorpLight: Внутрішня', 1, null, null, '#(NBS_OB22_NLS_RNK(''2603'',''05'',#(NLSA),#(NLSB),#(KVA) ))', null, null, null, null, null, 1, 0, 0, 0, null, null, null, null, null, null, '1001000000000000000000000000000000010000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CL1', name='Internet-Banking CorpLight: Внутрішня', dk=1, nlsm=null, kv=null, nlsk='#(NBS_OB22_NLS_RNK(''2603'',''05'',#(NLSA),#(NLSB),#(KVA) ))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1001000000000000000000000000000000010000000000000000000000000000', nazn=null
+         set tt='CL1', name='CL1 Internet-Banking CorpLight: Внутрішня', dk=1, nlsm=null, kv=null, nlsk='#(NBS_OB22_NLS_RNK(''2603'',''05'',#(NLSA),#(NLSB),#(KVA) ))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1001000000000000000000000000000000010000000000000000000000000000', nazn=null
        where tt='CL1';
   end;
   --------------------------------

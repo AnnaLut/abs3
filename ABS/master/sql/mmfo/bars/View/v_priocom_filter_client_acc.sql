@@ -22,8 +22,10 @@ from accounts a, cust_acc c
 where a.acc=c.acc;
 
 PROMPT *** Create  grants  V_PRIOCOM_FILTER_CLIENT_ACC ***
+grant SELECT                                                                 on V_PRIOCOM_FILTER_CLIENT_ACC to BARSREADER_ROLE;
 grant SELECT                                                                 on V_PRIOCOM_FILTER_CLIENT_ACC to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_PRIOCOM_FILTER_CLIENT_ACC to START1;
+grant SELECT                                                                 on V_PRIOCOM_FILTER_CLIENT_ACC to UPLD;
 
 
 

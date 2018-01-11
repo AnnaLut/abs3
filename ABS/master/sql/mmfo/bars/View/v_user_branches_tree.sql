@@ -31,7 +31,9 @@ connect by prior b.branch = substr(b.branch, 1, instr(b.branch, '/', -2))
 start with b.branch = '/';
 
 PROMPT *** Create  grants  V_USER_BRANCHES_TREE ***
+grant SELECT                                                                 on V_USER_BRANCHES_TREE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USER_BRANCHES_TREE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_USER_BRANCHES_TREE to UPLD;
 
 
 

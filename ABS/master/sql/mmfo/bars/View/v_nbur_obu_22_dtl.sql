@@ -53,7 +53,9 @@ PROMPT *** Create  view V_NBUR_OBU_22_DTL ***
    and v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED' );
 
 PROMPT *** Create  grants  V_NBUR_OBU_22_DTL ***
+grant SELECT                                                                 on V_NBUR_OBU_22_DTL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_OBU_22_DTL to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_NBUR_OBU_22_DTL to UPLD;
 
 
 

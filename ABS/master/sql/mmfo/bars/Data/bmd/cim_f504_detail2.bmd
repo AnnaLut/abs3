@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'форма №504(35) Показники по контракту  (Валютний Контроль)';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'CIM_F504_DETAIL2';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,17 +124,17 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'F504_ID', 'N', 'Ідентифікатор ~запису в головній', null, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'INDICATOR_ID', 'N', 'Код ~показнику', null, 4, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'INDICATOR_NAME', 'C', 'Назва ~коду ~показнику', 5, 25, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'RRRR', 'C', 'Роки', null, 4, 5, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'W', 'C', 'Місяці', null, 1, 6, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'VAL', 'N', 'Значення', null, 10, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'DATE_REG', 'D', 'Створено', null, null, 8, 0, 0, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'USER_REG', 'C', 'Користувач ~додав у звіт', null, 30, 9, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'DATE_CH', 'D', 'Остання ~зміна', null, null, 10, 0, 0, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'USER_CH', 'C', 'Користувач ~редагування', null, 30, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'F504_DET_ID', 'N', 'Унікальний ідентифікатор', null, null, 12, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'F504_ID', 'N', 'Ідентифікатор ~запису в головній', '', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'INDICATOR_ID', 'N', 'Код ~показнику', '', 4, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'INDICATOR_NAME', 'C', 'Назва ~коду ~показнику', '5', 25, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'RRRR', 'C', 'Роки', '', 4, 5, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'W', 'C', 'Місяці', '', 1, 6, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'VAL', 'N', 'Значення', '', 10, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'DATE_REG', 'D', 'Створено', '', null, 8, 0, 0, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'USER_REG', 'C', 'Користувач ~додав у звіт', '', 30, 9, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'DATE_CH', 'D', 'Остання ~зміна', '', null, 10, 0, 0, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'USER_CH', 'C', 'Користувач ~редагування', '', 30, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'F504_DET_ID', 'N', 'Унікальний ідентифікатор', '', null, 12, 0, 1, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('v_cim_years');

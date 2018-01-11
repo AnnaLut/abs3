@@ -30,9 +30,11 @@ PROMPT *** Create  view ACC_NU_DUAL ***
  ;
 
 PROMPT *** Create  grants  ACC_NU_DUAL ***
+grant SELECT                                                                 on ACC_NU_DUAL     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ACC_NU_DUAL     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on ACC_NU_DUAL     to NALOG;
 grant SELECT                                                                 on ACC_NU_DUAL     to START1;
+grant SELECT                                                                 on ACC_NU_DUAL     to UPLD;
 grant FLASHBACK,SELECT                                                       on ACC_NU_DUAL     to WR_REFREAD;
 
 

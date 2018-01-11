@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Цiнностi  та рахунки';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'VALUABLES_NLS';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,14 +124,14 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'BRANCH', 3, 30, 99, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'OB22', 'C', 'Код~(БР+OB22)~цiнностi', 1, 6, 2, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NLS_2805', 'C', '2805~для~виплати', 1, 15, 12, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NLS_2905', 'C', '2905~для~продажу', 1, 15, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NLS_9812', 'C', 'Рах~облiку~сплаченої~цінності', 1, 15, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NLS_9819', 'C', 'Рах~облiку~нової~цінності', 1, 15, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NLS_9899', 'C', 'Рах~дороги~нової~цінності', 1, 15, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NLS_9899SPL', 'C', 'Рах~дороги~сплаченої~цінності', 1, 15, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'BRANCH', '3', 30, 99, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'OB22', 'C', 'Код~(БР+OB22)~цiнностi', '1', 6, 2, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NLS_2805', 'C', '2805~для~виплати', '1', 15, 12, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NLS_2905', 'C', '2905~для~продажу', '1', 15, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NLS_9812', 'C', 'Рах~облiку~сплаченої~цінності', '1', 15, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NLS_9819', 'C', 'Рах~облiку~нової~цінності', '1', 15, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NLS_9899', 'C', 'Рах~дороги~нової~цінності', '1', 15, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NLS_9899SPL', 'C', 'Рах~дороги~сплаченої~цінності', '1', 15, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('BRANCH');
@@ -161,7 +166,7 @@ begin
   l_newcolid := bars_metabase.get_colid(l_newtabid, 'OB22');
   l_varcolid := bars_metabase.get_colid(l_newtabid, 'OB22');
   if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_browsetbl(l_tabid, l_newtabid, '', '2', l_newcolid, l_varcolid, 'OB22');
+    bars_metabase.add_browsetbl(l_tabid, l_newtabid, '', '2', l_newcolid, l_varcolid, 'Код~OB22');
   else
     dbms_output.put_line('В БМД не описана таблица SB_OB22 для описания условий фильтра таблицы VALUABLES_NLS.');
   end if;

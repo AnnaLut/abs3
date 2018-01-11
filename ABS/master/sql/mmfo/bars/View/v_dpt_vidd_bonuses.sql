@@ -25,8 +25,10 @@ SELECT v.vidd, v.type_cod, v.type_name, decode(v.flag, 0, 'N', 'Y'),
  ;
 
 PROMPT *** Create  grants  V_DPT_VIDD_BONUSES ***
+grant SELECT                                                                 on V_DPT_VIDD_BONUSES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_VIDD_BONUSES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_VIDD_BONUSES to DPT_ADMIN;
+grant SELECT                                                                 on V_DPT_VIDD_BONUSES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_VIDD_BONUSES to WR_ALL_RIGHTS;
 
 

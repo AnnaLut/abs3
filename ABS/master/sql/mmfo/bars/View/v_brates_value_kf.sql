@@ -27,7 +27,9 @@ PROMPT *** Create  view V_BRATES_VALUE_KF ***
      FROM BR_normal_EDIT;
 
 PROMPT *** Create  grants  V_BRATES_VALUE_KF ***
+grant SELECT                                                                 on V_BRATES_VALUE_KF to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BRATES_VALUE_KF to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_BRATES_VALUE_KF to UPLD;
 
 
 

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Фільтр по переадресації СВІФТ-повідомлень на /262*';
   l_tablinesdef := '30';
+  l_tabselect_statement := '';
   l_tabname     := 'VEST_SWT_RU';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,18 +124,18 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'VM', 'C', 'Ключ пошуку 59 /262*.', 4, null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KOL', 'N', 'Оброблено~в періоді', null, null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'REF', 'N', 'Мах~Реф', null, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF', 'DocViewContentsEx(hWndForm, :REF) ', 0);
-  bars_metabase.add_column(l_tabid, 4, 'MFOB', 'C', 'МФО РУ~отримувача', null, null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NLSB', 'C', 'Транзит-рах в РУ', null, null, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NAM_B', 'C', 'Назва-Котел ', null, null, 91, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'KV', 'N', 'Вал~остан док', null, null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'S', 'N', 'Сума~остан док', null, null, 13, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'VDAT', 'D', 'Дата~остан док', null, null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NAME', 'C', 'Назва РУ~отримувача', null, null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'TT', 'C', 'Код.оп.~остан док', null, null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'REF_CLI', 'N', 'Мах~Реф_CLI', null, null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF_CLI', 'DocViewContentsEx(hWndForm, :REF_CLI) ', 0);
+  bars_metabase.add_column(l_tabid, 1, 'VM', 'C', 'Ключ пошуку 59 /262*.', '4', null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KOL', 'N', 'Оброблено~в періоді', '', null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'REF', 'N', 'Мах~Реф', '', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF', 'DocViewContentsEx(hWndForm, :REF) ', 0);
+  bars_metabase.add_column(l_tabid, 4, 'MFOB', 'C', 'МФО РУ~отримувача', '', null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NLSB', 'C', 'Транзит-рах в РУ', '', null, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NAM_B', 'C', 'Назва-Котел ', '', null, 91, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'KV', 'N', 'Вал~остан док', '', null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'S', 'N', 'Сума~остан док', '', null, 13, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'VDAT', 'D', 'Дата~остан док', '', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NAME', 'C', 'Назва РУ~отримувача', '', null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'TT', 'C', 'Код.оп.~остан док', '', null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'REF_CLI', 'N', 'Мах~Реф_CLI', '', null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF_CLI', 'DocViewContentsEx(hWndForm, :REF_CLI) ', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

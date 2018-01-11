@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_CCK_NF ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_NF ("ISP", "ND", "CC_ID", "VIDD", "RNK", "KV", "S", "GPK", "DSDATE", "DWDATE", "PR", "OSTC", "SOS", "VIDD_NAME", "SOS_NAME", "NAMK", "ACC8", "DAZS", "BRANCH", "CUSTTYPE", "PROD", "SDOG", "NDI", "TR") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_NF ("ISP", "ND", "CC_ID", "VIDD", "RNK", "KV", "S", "GPK", "DSDATE", "DWDATE", "PR", "OSTC", "SOS", "VIDD_NAME", "SOS_NAME", "NAMK", "ACC8", "DAZS", "BRANCH", "CUSTTYPE", "PROD", "SDOG", "NDI", "TR", "CHGDATE") AS 
   SELECT x.isp
       ,x.nd
       ,x.cc_id
@@ -38,6 +38,7 @@ PROMPT *** Create  view V_CCK_NF ***
          ELSE
           0
        END tr
+     ,/*to_char(*/(Select min(cu.chgdate ) from cc_deal_update cu where cu.CHGACTION='I' and cu.nd=x.nd)/*,'YYYY-MM-DD HH:MM:SS')*/ chgdate
   FROM (SELECT d.user_id isp
               ,d.nd
               ,d.cc_id
@@ -79,10 +80,13 @@ PROMPT *** Create  view V_CCK_NF ***
                    AND tag = 'CCSRC'
                    AND nd = d.nd)
            AND d.vidd IN (11, 12, 13)
-           AND d.sos = 0) x;
+           AND d.sos = 0) x where x.branch like  SYS_CONTEXT ('bars_context', 'user_branch_mask')
+;
 
 PROMPT *** Create  grants  V_CCK_NF ***
+grant SELECT                                                                 on V_CCK_NF        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CCK_NF        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CCK_NF        to UPLD;
 
 
 

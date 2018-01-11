@@ -14,8 +14,10 @@ PROMPT *** Create  view V_P_L_2C ***
 ;
 
 PROMPT *** Create  grants  V_P_L_2C ***
+grant SELECT                                                                 on V_P_L_2C        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_P_L_2C        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_P_L_2C        to START1;
+grant SELECT                                                                 on V_P_L_2C        to UPLD;
 
 
 

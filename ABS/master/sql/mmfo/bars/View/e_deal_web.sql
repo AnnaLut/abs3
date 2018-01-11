@@ -31,8 +31,10 @@ PROMPT *** Create  view E_DEAL_WEB ***
    ORDER BY e.rnk, id;
 
 PROMPT *** Create  grants  E_DEAL_WEB ***
+grant SELECT                                                                 on E_DEAL_WEB      to BARSREADER_ROLE;
 grant SELECT                                                                 on E_DEAL_WEB      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on E_DEAL_WEB      to START1;
+grant SELECT                                                                 on E_DEAL_WEB      to UPLD;
 grant FLASHBACK,SELECT                                                       on E_DEAL_WEB      to WR_ALL_RIGHTS;
 
 

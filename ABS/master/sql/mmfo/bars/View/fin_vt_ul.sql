@@ -23,8 +23,10 @@ WHERE C.OKPO = f0.OKPO(+) and C.OKPO = f1.OKPO(+) and
  ;
 
 PROMPT *** Create  grants  FIN_VT_UL ***
+grant SELECT                                                                 on FIN_VT_UL       to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_VT_UL       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_VT_UL       to R_FIN2;
+grant SELECT                                                                 on FIN_VT_UL       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_VT_UL       to WR_ALL_RIGHTS;
 
 

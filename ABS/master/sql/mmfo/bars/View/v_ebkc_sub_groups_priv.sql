@@ -49,7 +49,9 @@ PROMPT *** Create  view V_EBKC_SUB_GROUPS_PRIV ***
      from ebkc_sub_groups esg );
 
 PROMPT *** Create  grants  V_EBKC_SUB_GROUPS_PRIV ***
+grant SELECT                                                                 on V_EBKC_SUB_GROUPS_PRIV to BARSREADER_ROLE;
 grant SELECT                                                                 on V_EBKC_SUB_GROUPS_PRIV to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_EBKC_SUB_GROUPS_PRIV to UPLD;
 
 
 

@@ -17,8 +17,10 @@ PROMPT *** Create  view NOTA_YESNO ***
   FROM   DUAL;
 
 PROMPT *** Create  grants  NOTA_YESNO ***
+grant SELECT                                                                 on NOTA_YESNO      to BARSREADER_ROLE;
 grant SELECT                                                                 on NOTA_YESNO      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NOTA_YESNO      to START1;
+grant SELECT                                                                 on NOTA_YESNO      to UPLD;
 
 
 

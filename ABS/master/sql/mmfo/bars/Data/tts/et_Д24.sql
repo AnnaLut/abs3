@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции Д24
-prompt Наименование операции: ПРИХІД КАСИ. Зарахування готівки на транзит
+prompt Наименование операции: Д24 ПРИХІД КАСИ. Зарахування готівки на транзит
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('Д24', 'ПРИХІД КАСИ. Зарахування готівки на транзит', 1, null, null, null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, 0, 0, 0, 0, null, null, 2, null, null, null, '1100100001000000000000000000000000000000000000000000000000000000', null);
+    values ('Д24', 'Д24 ПРИХІД КАСИ. Зарахування готівки на транзит', 1, null, null, null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, null, 0, 0, 0, 0, null, null, 2, null, null, null, '1100100001000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='Д24', name='ПРИХІД КАСИ. Зарахування готівки на транзит', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=2, proc=null, s3800=null, rang=null, flags='1100100001000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='Д24', name='Д24 ПРИХІД КАСИ. Зарахування готівки на транзит', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=2, proc=null, s3800=null, rang=null, flags='1100100001000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='Д24';
   end;
   --------------------------------

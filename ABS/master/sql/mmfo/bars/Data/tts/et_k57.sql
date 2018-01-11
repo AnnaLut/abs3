@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции K57
-prompt Наименование операции: (доч.CAF) Комісія за прийом переказу по системі "Contact" (ближн)
+prompt Наименование операции: K57 (доч.CAF) Комісія за прийом переказу по системі "Contact" (ближн)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K57', '(доч.CAF) Комісія за прийом переказу по системі "Contact" (ближн)', 0, '#(nbs_ob22 (''2909'',''64''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'CAF_KOM (''K57'',#(KVA), #(S) )', 'CAF_KOM (''K57'',#(KVA), #(S) )', 5, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('K57', 'K57 (доч.CAF) Комісія за прийом переказу по системі "Contact" (ближн)', 0, '#(nbs_ob22 (''2909'',''64''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'CAF_KOM (''K57'',#(KVA), #(S) )', 'CAF_KOM (''K57'',#(KVA), #(S) )', 5, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K57', name='(доч.CAF) Комісія за прийом переказу по системі "Contact" (ближн)', dk=0, nlsm='#(nbs_ob22 (''2909'',''64''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='CAF_KOM (''K57'',#(KVA), #(S) )', s2='CAF_KOM (''K57'',#(KVA), #(S) )', sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='K57', name='K57 (доч.CAF) Комісія за прийом переказу по системі "Contact" (ближн)', dk=0, nlsm='#(nbs_ob22 (''2909'',''64''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='CAF_KOM (''K57'',#(KVA), #(S) )', s2='CAF_KOM (''K57'',#(KVA), #(S) )', sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='K57';
   end;
   --------------------------------

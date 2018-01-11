@@ -25,8 +25,10 @@ from pawn_acc pw,   (select * from accounts where dazs is null) a9,  (select * f
 where a9.acc = pw.acc  and pw.pawn = nw.pawn and a9.acc = zz.acc and zz.nd = dd.nd    and pw.DEPOSIT_ID  = dp.id  (+);
 
 PROMPT *** Create  grants  CC_PAWN_DP ***
+grant SELECT                                                                 on CC_PAWN_DP      to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_PAWN_DP      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_PAWN_DP      to START1;
+grant SELECT                                                                 on CC_PAWN_DP      to UPLD;
 
 
 

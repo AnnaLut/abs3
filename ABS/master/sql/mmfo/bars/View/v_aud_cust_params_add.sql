@@ -23,9 +23,11 @@ PROMPT *** Create  view V_AUD_CUST_PARAMS_ADD ***
           and c.custtype=2;
 
 PROMPT *** Create  grants  V_AUD_CUST_PARAMS_ADD ***
+grant SELECT                                                                 on V_AUD_CUST_PARAMS_ADD to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_AUD_CUST_PARAMS_ADD to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_AUD_CUST_PARAMS_ADD to CUST001;
 grant SELECT,UPDATE                                                          on V_AUD_CUST_PARAMS_ADD to PYOD001;
+grant SELECT                                                                 on V_AUD_CUST_PARAMS_ADD to UPLD;
 
 
 

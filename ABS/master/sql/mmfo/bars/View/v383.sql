@@ -12,8 +12,10 @@ PROMPT *** Create  view V383 ***
  from saldoa s,accounts a where a.acc=s.acc and s.acc in (select acc from t383);
 
 PROMPT *** Create  grants  V383 ***
+grant SELECT                                                                 on V383            to BARSREADER_ROLE;
 grant SELECT                                                                 on V383            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V383            to START1;
+grant SELECT                                                                 on V383            to UPLD;
 
 
 

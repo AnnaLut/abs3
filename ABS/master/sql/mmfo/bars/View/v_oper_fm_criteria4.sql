@@ -28,8 +28,10 @@ PROMPT *** Create  view V_OPER_FM_CRITERIA4 ***
    and gl.p_icurval(nvl(o.kv, 980), nvl(o.s, 0), p.fdat) >= 15000000;
 
 PROMPT *** Create  grants  V_OPER_FM_CRITERIA4 ***
+grant SELECT                                                                 on V_OPER_FM_CRITERIA4 to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OPER_FM_CRITERIA4 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OPER_FM_CRITERIA4 to START1;
+grant SELECT                                                                 on V_OPER_FM_CRITERIA4 to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OPER_FM_CRITERIA4 to WR_ALL_RIGHTS;
 
 

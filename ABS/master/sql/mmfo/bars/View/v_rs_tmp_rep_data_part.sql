@@ -31,7 +31,9 @@ PROMPT *** Create  view V_RS_TMP_REP_DATA_PART ***
  where table_name = 'RS_TMP_REPORT_DATA' and table_owner = 'BARS';
 
 PROMPT *** Create  grants  V_RS_TMP_REP_DATA_PART ***
+grant SELECT                                                                 on V_RS_TMP_REP_DATA_PART to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RS_TMP_REP_DATA_PART to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_RS_TMP_REP_DATA_PART to UPLD;
 
 
 

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'CP_KOD: Коди ЦП (Власна емісія)';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'CP_KOD2';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,43 +124,43 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'COUNTRY', 'N', 'Країна~емітента~ЦП', null, null, 19, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'CP_ID', 'C', 'ISIN~Зовнішний~код ЦП', null, null, 1, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DATP', 'D', 'Дата~погашення~номіналу', null, null, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'IR', 'N', 'Річна~номінальна~% ставка', null, null, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KV', 'N', 'Валюта~емісії~ЦП', null, null, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NAME', 'C', 'Назва~емітента ЦП', null, null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'DOX', 'N', 'Вид~доходності ЦП~(довідник)', null, null, 12, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'EMI', 'N', 'Вид~емітента~(довідник)', null, null, 10, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'ID', 'N', 'Номер п/п -~первинний ключ~внутр. код ЦП~ID', null, null, 0, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'TIP', 'N', 'Разміщення~(чужі ЦП)~Залучення~(свої ЦП)', null, null, 7, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'DAT_EM', 'D', 'Дата емісії', null, null, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'AMORT', 'N', 'Код варт-ті~Аморт.варт. = 1,~Справ.варт. =0', null, null, 20, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'DCP', 'N', '1-є в ДЦП,~0-немає', null, null, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'CENA', 'N', 'Поточна~Номiнальна~вартiсть ЦП', null, null, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'BASEY', 'N', 'Код бази~нарахування', null, null, 3, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'CENA_KUP', 'N', 'Ціна~купону~1 шт. ЦП~(в грн.коп)', null, null, 30, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'KY', 'N', 'Кiл-сть~сплат~купону~в році', null, null, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'DOK', 'D', 'Дата сплати~Остан. Купону', null, null, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=V_CP_DATES[NSIFUNCTION][PROC=>PUL.PUT(''CP_ID'',:ID)][EXEC=>BEFORE][ACCESSCODE=>0][CONDITIONS=>ID= :ID][showDialogWindow=>false]', 'Sel008( hWndMDI, 49, :ID ,"Пл.Календар", "  " )', 0);
-  bars_metabase.add_column(l_tabid, 19, 'DNK', 'D', 'Дата сплати~Наступ.Купону', null, null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=V_CP_DATES[NSIFUNCTION][PROC=>PUL.PUT(''CP_ID'',:ID)][EXEC=>BEFORE][ACCESSCODE=>0][CONDITIONS=>ID= :ID][showDialogWindow=>false]', 'Sel008( hWndMDI, 49, :ID ,"Пл.Календар", "  " )', 0);
-  bars_metabase.add_column(l_tabid, 20, 'RNK', 'N', 'Реєстраційний~№~емітента ЦП', null, null, 17, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'PERIOD_KUP', 'N', 'Купонний~період (днів)', null, null, 31, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'IDT', 'C', 'Тип ЦП~довід-к~(CP_TYPE)', null, null, 999, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'PR1_KUP', 'N', 'Спосіб округлення~купону~на 1 ЦП/на пакет~(2/1)', null, null, 31, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'PR_AMR', 'N', '5=~Аморт. Диск/Прем~по еф.ставці~(алг-м Куценко)', null, null, 32, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'PR_AKT', 'N', 'Ознака~актуальності~ЦП~для банку', null, null, 25, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'CENA_START', 'N', 'Стартова~Номiнальна~вартiсть ЦП', null, null, 35, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'METR', 'N', 'Метод~нарах-ня~купону~(metr)', null, null, 36, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'QUOT_SIGN', 'N', 'Ознака~котирування~на біржі~ 1/0', null, null, 35, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'IN_BR', 'N', 'Включено~до біржового~реєстру 0/1', null, null, 29, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'K23', 'N', 'Коеф-т~Показник~ризику~по НБУ-23', null, null, 30, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'EXPIRY', 'N', 'Кількість~днів~прострочення', null, null, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 36, 'ZAL_CP', 'N', 'Забезпечення~на~1 шт. ЦП', null, null, 38, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 37, 'PAWN', 'N', 'Вид~забезпечення', null, null, 37, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 38, 'HIERARCHY_ID', 'N', 'Рівень~ієрархії', null, null, 39, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 39, 'VNCRP', 'C', 'Первинний ВКР', null, null, 41, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 40, 'VNCRR', 'C', 'Внутрiшнiй~кредитний~рейтiнг', null, null, 42, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 41, 'KAT23', 'C', 'Категорiя~якостi~за кредитом~по НБУ-23', null, null, 30, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'COUNTRY', 'N', 'Країна~емітента~ЦП', '', null, 19, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'CP_ID', 'C', 'ISIN~Зовнішний~код ЦП', '', null, 1, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DATP', 'D', 'Дата~погашення~номіналу', '', null, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'IR', 'N', 'Річна~номінальна~% ставка', '', null, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KV', 'N', 'Валюта~емісії~ЦП', '', null, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NAME', 'C', 'Назва~емітента ЦП', '', null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'DOX', 'N', 'Вид~доходності ЦП~(довідник)', '', null, 12, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'EMI', 'N', 'Вид~емітента~(довідник)', '', null, 10, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'ID', 'N', 'Номер п/п -~первинний ключ~внутр. код ЦП~ID', '', null, 0, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'TIP', 'N', 'Разміщення~(чужі ЦП)~Залучення~(свої ЦП)', '', null, 7, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'DAT_EM', 'D', 'Дата емісії', '', null, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'AMORT', 'N', 'Код варт-ті~Аморт.варт. = 1,~Справ.варт. =0', '', null, 20, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'DCP', 'N', '1-є в ДЦП,~0-немає', '', null, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'CENA', 'N', 'Поточна~Номiнальна~вартiсть ЦП', '', null, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'BASEY', 'N', 'Код бази~нарахування', '', null, 3, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'CENA_KUP', 'N', 'Ціна~купону~1 шт. ЦП~(в грн.коп)', '', null, 30, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'KY', 'N', 'Кiл-сть~сплат~купону~в році', '', null, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'DOK', 'D', 'Дата сплати~Остан. Купону', '', null, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=V_CP_DATES[NSIFUNCTION][PROC=>PUL.PUT(''CP_ID'',:ID)][EXEC=>BEFORE][ACCESSCODE=>0][CONDITIONS=>ID= :ID][showDialogWindow=>false]', 'Sel008( hWndMDI, 49, :ID ,"Пл.Календар", "  " )', 0);
+  bars_metabase.add_column(l_tabid, 19, 'DNK', 'D', 'Дата сплати~Наступ.Купону', '', null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=V_CP_DATES[NSIFUNCTION][PROC=>PUL.PUT(''CP_ID'',:ID)][EXEC=>BEFORE][ACCESSCODE=>0][CONDITIONS=>ID= :ID][showDialogWindow=>false]', 'Sel008( hWndMDI, 49, :ID ,"Пл.Календар", "  " )', 0);
+  bars_metabase.add_column(l_tabid, 20, 'RNK', 'N', 'Реєстраційний~№~емітента ЦП', '', null, 17, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'PERIOD_KUP', 'N', 'Купонний~період (днів)', '', null, 31, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'IDT', 'C', 'Тип ЦП~довід-к~(CP_TYPE)', '', null, 999, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'PR1_KUP', 'N', 'Спосіб округлення~купону~на 1 ЦП/на пакет~(2/1)', '', null, 31, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'PR_AMR', 'N', '5=~Аморт. Диск/Прем~по еф.ставці~(алг-м Куценко)', '', null, 32, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'PR_AKT', 'N', 'Ознака~актуальності~ЦП~для банку', '', null, 25, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'CENA_START', 'N', 'Стартова~Номiнальна~вартiсть ЦП', '', null, 35, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'METR', 'N', 'Метод~нарах-ня~купону~(metr)', '', null, 36, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'QUOT_SIGN', 'N', 'Ознака~котирування~на біржі~ 1/0', '', null, 35, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'IN_BR', 'N', 'Включено~до біржового~реєстру 0/1', '', null, 29, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'K23', 'N', 'Коеф-т~Показник~ризику~по НБУ-23', '', null, 30, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'EXPIRY', 'N', 'Кількість~днів~прострочення', '', null, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'ZAL_CP', 'N', 'Забезпечення~на~1 шт. ЦП', '', null, 38, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'PAWN', 'N', 'Вид~забезпечення', '', null, 37, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'HIERARCHY_ID', 'N', 'Рівень~ієрархії', '', null, 39, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'VNCRP', 'C', 'Первинний ВКР', '', null, 41, 1, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'VNCRR', 'C', 'Внутрiшнiй~кредитний~рейтiнг', '', null, 42, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 41, 'KAT23', 'C', 'Категорiя~якостi~за кредитом~по НБУ-23', '', null, 30, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CP_DOX');

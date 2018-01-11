@@ -19,8 +19,10 @@ PROMPT *** Create  view V_GQ_QUERY_ACTIVE ***
  ;
 
 PROMPT *** Create  grants  V_GQ_QUERY_ACTIVE ***
+grant SELECT                                                                 on V_GQ_QUERY_ACTIVE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GQ_QUERY_ACTIVE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_GQ_QUERY_ACTIVE to DPT_ROLE;
+grant SELECT                                                                 on V_GQ_QUERY_ACTIVE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_GQ_QUERY_ACTIVE to WR_ALL_RIGHTS;
 
 

@@ -1,5 +1,14 @@
-create or replace view v_tobo_accounts_lite as
-select s.acc,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_TOBO_ACCOUNTS_LITE.sql =========*** R
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_TOBO_ACCOUNTS_LITE ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_TOBO_ACCOUNTS_LITE ("ACC", "NLS", "NLSALT", "KV", "LCV", "DIG", "DENOM", "KF", "BRANCH", "TOBO", "NBS", "NBS2", "DAOS", "DAPP", "ISP", "RNK", "NMS", "LIM", "OST", "OSTB", "OSTC", "OSTF", "OSTQ", "OSTX", "DOS", "KOS", "DOSQ", "KOSQ", "PAP", "TIP", "VID", "TRCN", "MDATE", "DAZS", "SEC", "ACCC", "BLKD", "BLKK", "POS", "SECI", "SECO", "GRP", "OB22", "NOTIFIER_REF", "BDATE", "OPT", "DAPPQ", "INTACCN", "FIO", "R011", "R013", "S180", "S240", "OKPO") AS 
+  select s.acc,
        s.nls,
        s.nlsalt,
        s.kv,
@@ -60,11 +69,17 @@ left join specparam p on ( p.acc = s.acc )
 cross join ( select bankdate_g as bnk_dt from dual ) d
 where s.branch in (select b.branch from v_user_allowed_branches b);
 
-show err
+PROMPT *** Create  grants  V_TOBO_ACCOUNTS_LITE ***
+grant SELECT                                                                 on V_TOBO_ACCOUNTS_LITE to BARSREADER_ROLE;
+grant SELECT                                                                 on V_TOBO_ACCOUNTS_LITE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_TOBO_ACCOUNTS_LITE to UPLD;
+grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_TOBO_ACCOUNTS_LITE to WR_ALL_RIGHTS;
+grant SELECT                                                                 on V_TOBO_ACCOUNTS_LITE to WR_CUSTLIST;
+grant SELECT                                                                 on V_TOBO_ACCOUNTS_LITE to WR_TOBO_ACCOUNTS_LIST;
+grant SELECT                                                                 on V_TOBO_ACCOUNTS_LITE to WR_VIEWACC;
 
-grant select on bars.v_tobo_accounts_lite to bars_access_defrole;
-grant select on bars.v_tobo_accounts_lite to wr_all_rights;
-grant select on bars.v_tobo_accounts_lite to wr_custlist;
-grant select on bars.v_tobo_accounts_lite to wr_tobo_accounts_list;
-grant select on bars.v_tobo_accounts_lite to wr_viewacc;
 
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_TOBO_ACCOUNTS_LITE.sql =========*** E
+PROMPT ===================================================================================== 

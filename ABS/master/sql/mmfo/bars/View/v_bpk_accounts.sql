@@ -13,8 +13,10 @@ PROMPT *** Create  view V_BPK_ACCOUNTS ***
  where o.acc_pk = a.acc;
 
 PROMPT *** Create  grants  V_BPK_ACCOUNTS ***
+grant SELECT                                                                 on V_BPK_ACCOUNTS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BPK_ACCOUNTS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BPK_ACCOUNTS  to START1;
+grant SELECT                                                                 on V_BPK_ACCOUNTS  to UPLD;
 
 
 

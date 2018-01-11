@@ -30,8 +30,10 @@ PROMPT *** Create  view V_REZ_OVER ***
      FROM TEST_MANY_OVR;
 
 PROMPT *** Create  grants  V_REZ_OVER ***
+grant SELECT                                                                 on V_REZ_OVER      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REZ_OVER      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_REZ_OVER      to START1;
+grant SELECT                                                                 on V_REZ_OVER      to UPLD;
 
 
 

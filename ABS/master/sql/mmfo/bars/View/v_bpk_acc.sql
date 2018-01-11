@@ -35,9 +35,11 @@ PROMPT *** Create  view V_BPK_ACC ***
    and substr(a.branch,1,length(sys_context ('bars_context', 'user_branch'))) = sys_context ('bars_context', 'user_branch');
 
 PROMPT *** Create  grants  V_BPK_ACC ***
+grant SELECT                                                                 on V_BPK_ACC       to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BPK_ACC       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BPK_ACC       to OBPC;
 grant SELECT                                                                 on V_BPK_ACC       to START1;
+grant SELECT                                                                 on V_BPK_ACC       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BPK_ACC       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_BPK_ACC       to WR_REFREAD;
 

@@ -15,8 +15,10 @@ SELECT t.tt, to_number(SUBSTR(p.column_value,2,2)) fcode,to_number(SUBSTR(p.colu
 
 PROMPT *** Create  grants  TTS_FLAGS ***
 grant SELECT                                                                 on TTS_FLAGS       to ABS_ADMIN;
+grant SELECT                                                                 on TTS_FLAGS       to BARSREADER_ROLE;
 grant SELECT                                                                 on TTS_FLAGS       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TTS_FLAGS       to OW;
+grant SELECT                                                                 on TTS_FLAGS       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TTS_FLAGS       to WR_ALL_RIGHTS;
 
 

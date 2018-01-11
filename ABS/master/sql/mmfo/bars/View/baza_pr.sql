@@ -14,8 +14,10 @@ from accounts a, int_accn i
 where a.acc=i.acc and (a.mdate>bankdate or ostc<>0);
 
 PROMPT *** Create  grants  BAZA_PR ***
+grant SELECT                                                                 on BAZA_PR         to BARSREADER_ROLE;
 grant SELECT                                                                 on BAZA_PR         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BAZA_PR         to START1;
+grant SELECT                                                                 on BAZA_PR         to UPLD;
 
 
 

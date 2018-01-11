@@ -28,7 +28,9 @@ where gt.id = a.grantee_type_id
   and a.resolution_user_id = u2.id (+);
 
 PROMPT *** Create  grants  M_ROLE_ARTEM ***
+grant SELECT                                                                 on M_ROLE_ARTEM    to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_ARTEM    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on M_ROLE_ARTEM    to UPLD;
 
 
 

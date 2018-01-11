@@ -23,9 +23,11 @@ PROMPT *** Create  view V_FM_OSC_RULE1 ***
    and gl.p_icurval(nvl(o.kv,980), nvl(o.s,0), o.vdat) >= 15000000 ;
 
 PROMPT *** Create  grants  V_FM_OSC_RULE1 ***
+grant SELECT                                                                 on V_FM_OSC_RULE1  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FM_OSC_RULE1  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FM_OSC_RULE1  to FINMON01;
 grant SELECT                                                                 on V_FM_OSC_RULE1  to START1;
+grant SELECT                                                                 on V_FM_OSC_RULE1  to UPLD;
 
 
 

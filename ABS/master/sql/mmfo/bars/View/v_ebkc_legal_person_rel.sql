@@ -51,7 +51,9 @@ where c.custtype = 2
   and c.rnk = p.rnk;
 
 PROMPT *** Create  grants  V_EBKC_LEGAL_PERSON_REL ***
+grant SELECT                                                                 on V_EBKC_LEGAL_PERSON_REL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_EBKC_LEGAL_PERSON_REL to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_EBKC_LEGAL_PERSON_REL to UPLD;
 
 
 

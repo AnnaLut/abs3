@@ -25,7 +25,9 @@ from (SELECT a.tobo, a.kv, a.nbs, a.acc, b.fdat,
  ;
 
 PROMPT *** Create  grants  V_BALANS ***
+grant SELECT                                                                 on V_BALANS        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BALANS        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_BALANS        to UPLD;
 grant SELECT                                                                 on V_BALANS        to WEB_BALANS;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BALANS        to WR_ALL_RIGHTS;
 

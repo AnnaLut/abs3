@@ -36,8 +36,10 @@ PROMPT *** Create  view V_1001S ***
    GROUP BY branch;
 
 PROMPT *** Create  grants  V_1001S ***
+grant SELECT                                                                 on V_1001S         to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_1001S         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_1001S         to SALGL;
+grant SELECT                                                                 on V_1001S         to UPLD;
 grant FLASHBACK,SELECT                                                       on V_1001S         to WR_REFREAD;
 
 

@@ -339,8 +339,10 @@ FROM (  SELECT    SUBSTR (TO_CHAR (srok), 7, 2)
            GROUP BY kv);
 
 PROMPT *** Create  grants  V_ANI33 ***
+grant SELECT                                                                 on V_ANI33         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ANI33         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ANI33         to START1;
+grant SELECT                                                                 on V_ANI33         to UPLD;
 
 
 

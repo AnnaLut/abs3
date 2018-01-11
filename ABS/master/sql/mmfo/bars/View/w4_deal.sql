@@ -35,8 +35,10 @@ PROMPT *** Create  view W4_DEAL ***
    and a.branch like sys_context ('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  W4_DEAL ***
+grant SELECT                                                                 on W4_DEAL         to BARSREADER_ROLE;
 grant SELECT                                                                 on W4_DEAL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on W4_DEAL         to OW;
+grant SELECT                                                                 on W4_DEAL         to UPLD;
 
 
 

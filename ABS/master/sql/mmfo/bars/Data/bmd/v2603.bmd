@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := '2603:Сума зменшення перерахування (частка)';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'V2603';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,22 +124,22 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'АСС', null, null, 99, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=1', 'Show_Sal_Day_P(:ACC, STRING_Null, NUMBER_Null, GetBankDate()-10, GetBankDate()) ', 0);
-  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Бранч', null, null, 99, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'IDG', 'N', 'Ід.~групи перек.', null, null, 52, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'IDS', 'N', 'Ід~.схеми~перекр.', null, null, 51, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NLS', 'C', 'Рахунок', null, null, 1, 0, 0, 0, 0, '', '', 1, 0, 'Count(*) ', 0, 0, 1, 'sPar=PEREKR_B[ACCESSCODE=>2][CONDITIONS=>IDS = :IDS]', 'FunNSIEditFFiltered("PEREKR_B",2,"IDS = " || Str(:IDS) ) ', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NMS', 'C', 'Назва~рах', null, null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'OB22', 'C', 'Об.22', null, null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'OSTB', 'N', 'План~залиш~на рах.2603', null, null, 4, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (OSTB)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'OSTC', 'N', 'Факт~залиш~на рах.2603', null, null, 3, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (OSTC)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'OSTV', 'N', 'Вхідн~залиш~на рах.2603', null, null, 2, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (OSTV)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'RNK', 'N', 'РНК', null, null, 9, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'SA', 'N', 'Нова~Сума~зменшення', null, null, 10, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (SA)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SR', 'N', 'Залишок~Поперед~Суми зменш', null, null, 15, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SR)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SPS', 'N', 'Спосіб ~ "залишку"', null, null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'KAZ', 'N', 'Сума~до~розподілу', null, null, 5, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum( KAZ )', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'SALL', 'N', 'РАЗОМ~Сума~зменшення', null, null, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (SA+SR) ', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'АСС', '', null, 99, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=1', 'Show_Sal_Day_P(:ACC, STRING_Null, NUMBER_Null, GetBankDate()-10, GetBankDate()) ', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Бранч', '', null, 99, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'IDG', 'N', 'Ід.~групи перек.', '', null, 52, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'IDS', 'N', 'Ід~.схеми~перекр.', '', null, 51, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NLS', 'C', 'Рахунок', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, 'Count(*) ', 0, 0, 1, 'sPar=PEREKR_B[ACCESSCODE=>2][CONDITIONS=>IDS = :IDS]', 'FunNSIEditFFiltered("PEREKR_B",2,"IDS = " || Str(:IDS) ) ', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NMS', 'C', 'Назва~рах', '', null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'OB22', 'C', 'Об.22', '', null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'OSTB', 'N', 'План~залиш~на рах.2603', '', null, 4, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (OSTB)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'OSTC', 'N', 'Факт~залиш~на рах.2603', '', null, 3, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (OSTC)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'OSTV', 'N', 'Вхідн~залиш~на рах.2603', '', null, 2, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (OSTV)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'RNK', 'N', 'РНК', '', null, 9, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'SA', 'N', 'Нова~Сума~зменшення', '', null, 10, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (SA)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SR', 'N', 'Залишок~Поперед~Суми зменш', '', null, 15, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SR)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SPS', 'N', 'Спосіб ~ "залишку"', '', null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'KAZ', 'N', 'Сума~до~розподілу', '', null, 5, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum( KAZ )', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'SALL', 'N', 'РАЗОМ~Сума~зменшення', '', null, 16, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (SA+SR) ', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('PEREKR_G');

@@ -12,8 +12,10 @@ PROMPT *** Create  view CC_SOB_TXT_U ***
      FROM bars.CC_SOB_TXT;
 
 PROMPT *** Create  grants  CC_SOB_TXT_U ***
+grant SELECT                                                                 on CC_SOB_TXT_U    to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_SOB_TXT_U    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CC_SOB_TXT_U    to START1;
+grant SELECT                                                                 on CC_SOB_TXT_U    to UPLD;
 
 
 

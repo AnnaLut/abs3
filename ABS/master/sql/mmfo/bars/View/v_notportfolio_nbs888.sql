@@ -20,7 +20,9 @@ PROMPT *** Create  view V_NOTPORTFOLIO_NBS888 ***
      FROM ps p JOIN notportfolio_kd888 n ON p.nbs = n.nbs;
 
 PROMPT *** Create  grants  V_NOTPORTFOLIO_NBS888 ***
+grant SELECT                                                                 on V_NOTPORTFOLIO_NBS888 to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NOTPORTFOLIO_NBS888 to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_NOTPORTFOLIO_NBS888 to UPLD;
 
 
 

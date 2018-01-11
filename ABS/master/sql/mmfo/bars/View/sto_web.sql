@@ -40,8 +40,10 @@ PROMPT *** Create  view STO_WEB ***
           AND a.BRANCH LIKE SYS_CONTEXT ('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  STO_WEB ***
+grant SELECT                                                                 on STO_WEB         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on STO_WEB         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_WEB         to PYOD001;
+grant SELECT                                                                 on STO_WEB         to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on STO_WEB         to WR_REFREAD;
 
 

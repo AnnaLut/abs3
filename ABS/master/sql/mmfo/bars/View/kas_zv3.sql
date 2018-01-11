@@ -14,8 +14,10 @@ PROMPT *** Create  view KAS_ZV3 ***
     WHERE vid = 3 AND sos = 0;
 
 PROMPT *** Create  grants  KAS_ZV3 ***
+grant SELECT                                                                 on KAS_ZV3         to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_ZV3         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on KAS_ZV3         to PYOD001;
+grant SELECT                                                                 on KAS_ZV3         to UPLD;
 
 
 

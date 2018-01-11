@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Клієнти';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_CUSTOMER';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,48 +124,48 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'RNK', 'N', 'Реєстр. № контрагента', null, null, 1, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '/barsroot/clientregister/registration.aspx?readonly=1'||chr(38)||'rnk=:RNK', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NMK', 'C', 'Найменування контрагента', null, null, 3, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'COUNTRY', 'N', 'Код країни', null, null, 26, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'ADR', 'C', 'Адреса', null, null, 12, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'C_DST', 'N', 'Код район.ДПІ', null, null, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'CODCAGENT', 'N', 'Хар-ка', null, null, 34, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'C_REG', 'N', 'Код обл.    ДПІ', null, null, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'CRISK', 'N', 'Категорія ризику', null, null, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'CUSTTYPE', 'N', 'Тип (1=Банк,2=ЮО,3=ФО)', null, null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'DATE_OFF', 'D', 'Дата закриття', null, null, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'DATE_ON', 'D', 'Дата відкриття', null, null, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'OKPO', 'C', 'Код ЗКПО', null, null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'PRINSIDER', 'N', 'Код інсайдера', null, null, 24, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'SAB', 'C', 'Ел.код', null, null, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'STMT', 'N', 'Формат виписки', null, null, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'TGR', 'N', 'ТГР (1=ЄДР.,2=ДРФ.,3=тимчас)', null, null, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'ND', 'C', '№ дог', null, null, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 43, 'ADM', 'C', 'Адмін.орган', null, null, 46, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 44, 'BC', 'N', 'Ознака НЕклієнта банку (1)', null, null, 47, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 45, 'BRANCH', 'C', 'Відділення', null, null, 48, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 48, 'ISP', 'N', 'Менеджер клієнта (відп. виконавець)', null, null, 29, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 51, 'MB', 'C', 'Належність до малого бізнесу', null, null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 52, 'NMKK', 'C', 'Коротке Найменування контрагента', null, null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 55, 'NOTES', 'C', 'Коментар', null, 140, 27, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 56, 'NOTESEC', 'C', 'Коментар служби безпеки', null, 256, 28, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 58, 'RGADM', 'C', 'Реєстр.номер в Адміністрації', null, null, 32, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 59, 'DATEA', 'D', 'Дата реєстрації в Адміністрації', null, null, 35, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 60, 'DATET', 'D', 'DATET', null, null, 36, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 61, 'FS', 'C', 'FS', null, null, 37, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 62, 'ISE', 'C', 'IНСТ СЕКТОР ЕКОНОМ(K070)', null, null, 38, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 64, 'LIM', 'N', 'Ліміт', null, null, 39, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 65, 'NMKV', 'C', 'NMKV', null, null, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 66, 'NOMPDV', 'N', 'NOMPDV', null, null, 41, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 67, 'OE', 'C', 'OE', null, null, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 68, 'PINCODE', 'C', 'PINCODE', null, null, 43, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 69, 'RGTAX', 'C', 'RGTAX', null, null, 44, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 70, 'RNKP', 'N', 'RNKP', null, null, 45, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 71, 'SED', 'C', 'Код отрасли экономики', null, null, 33, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 72, 'TAXF', 'N', 'TAXF', null, null, 30, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 73, 'TOBO', 'C', 'Код Відділення', null, null, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 74, 'VED', 'C', 'Вид экон. діяльності', null, null, 49, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 75, 'K050', 'C', 'K050', null, null, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'RNK', 'N', 'Реєстр. № контрагента', '', null, 1, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 1, '/barsroot/clientregister/registration.aspx?readonly=1'||chr(38)||'rnk=:RNK', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NMK', 'C', 'Найменування контрагента', '', null, 3, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'COUNTRY', 'N', 'Код країни', '', null, 26, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'ADR', 'C', 'Адреса', '', null, 12, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'C_DST', 'N', 'Код район.ДПІ', '', null, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'CODCAGENT', 'N', 'Хар-ка', '', null, 34, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'C_REG', 'N', 'Код обл.    ДПІ', '', null, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'CRISK', 'N', 'Категорія ризику', '', null, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'CUSTTYPE', 'N', 'Тип (1=Банк,2=ЮО,3=ФО)', '', null, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'DATE_OFF', 'D', 'Дата закриття', '', null, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'DATE_ON', 'D', 'Дата відкриття', '', null, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'OKPO', 'C', 'Код ЗКПО', '', null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'PRINSIDER', 'N', 'Код інсайдера', '', null, 24, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'SAB', 'C', 'Ел.код', '', null, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'STMT', 'N', 'Формат виписки', '', null, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'TGR', 'N', 'ТГР (1=ЄДР.,2=ДРФ.,3=тимчас)', '', null, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'ND', 'C', '№ дог', '', null, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 43, 'ADM', 'C', 'Адмін.орган', '', null, 46, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 44, 'BC', 'N', 'Ознака НЕклієнта банку (1)', '', null, 47, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 45, 'BRANCH', 'C', 'Відділення', '', null, 48, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 48, 'ISP', 'N', 'Менеджер клієнта (відп. виконавець)', '', null, 29, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 51, 'MB', 'C', 'Належність до малого бізнесу', '', null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 52, 'NMKK', 'C', 'Коротке Найменування контрагента', '', null, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 55, 'NOTES', 'C', 'Коментар', '', 140, 27, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 56, 'NOTESEC', 'C', 'Коментар служби безпеки', '', 256, 28, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 58, 'RGADM', 'C', 'Реєстр.номер в Адміністрації', '', null, 32, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 59, 'DATEA', 'D', 'Дата реєстрації в Адміністрації', '', null, 35, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 60, 'DATET', 'D', 'DATET', '', null, 36, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 61, 'FS', 'C', 'FS', '', null, 37, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 62, 'ISE', 'C', 'IНСТ СЕКТОР ЕКОНОМ(K070)', '', null, 38, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 64, 'LIM', 'N', 'Ліміт', '', null, 39, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 65, 'NMKV', 'C', 'NMKV', '', null, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 66, 'NOMPDV', 'N', 'NOMPDV', '', null, 41, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 67, 'OE', 'C', 'OE', '', null, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 68, 'PINCODE', 'C', 'PINCODE', '', null, 43, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 69, 'RGTAX', 'C', 'RGTAX', '', null, 44, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 70, 'RNKP', 'N', 'RNKP', '', null, 45, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 71, 'SED', 'C', 'Код отрасли экономики', '', null, 33, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 72, 'TAXF', 'N', 'TAXF', '', null, 30, 1, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 73, 'TOBO', 'C', 'Код Відділення', '', null, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 74, 'VED', 'C', 'Вид экон. діяльності', '', null, 49, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 75, 'K050', 'C', 'K050', '', null, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('PRINSIDER');

@@ -59,7 +59,9 @@ PROMPT *** Create  view V_ACCOUNTS ***
      FROM v_tobo_accounts_lite;
 
 PROMPT *** Create  grants  V_ACCOUNTS ***
+grant SELECT                                                                 on V_ACCOUNTS      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACCOUNTS      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ACCOUNTS      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ACCOUNTS      to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_ACCOUNTS      to WR_DEPOSIT_U;
 

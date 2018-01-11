@@ -39,7 +39,9 @@ PROMPT *** Create  view V_ZAY_DEALER ***
                  1);
 
 PROMPT *** Create  grants  V_ZAY_DEALER ***
+grant SELECT                                                                 on V_ZAY_DEALER    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY_DEALER    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ZAY_DEALER    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ZAY_DEALER    to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_ZAY_DEALER    to ZAY;
 

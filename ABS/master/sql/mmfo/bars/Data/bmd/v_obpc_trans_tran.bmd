@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'ПЦ. Транзити відділення в розрізі типів операцій і типів карток';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_OBPC_TRANS_TRAN';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,23 +124,23 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'TRAN_TYPE', 'C', 'Код~операції~ПЦ', .8, 2, 1, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'TIP', 'C', 'Тип~рахунку', .8, 3, 2, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'T980', 'C', 'Транзитний~рахунок~UAH', 2, 14, 3, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'T840', 'C', 'Транзитний~рахунок~USD', 2, 14, 4, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'V840', 'C', 'Вал.~тр.рах.~USD', .8, 3, 5, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'T980_F_SHORT', 'C', 'Рахунок для~додаткової проводки~UAH для ФО,~термін дії<=12міс.', 2, 14, 6, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'T840_F_SHORT', 'C', 'Рахунок для~додаткової проводки~USD для ФО,~термін дії<=12міс.', 2, 14, 7, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'V840_F_SHORT', 'C', 'Вал.~рах.~USD', .8, 3, 8, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'T980_F_LONG', 'C', 'Рахунок для~додаткової проводки~UAH для ФО,~термін дії>12міс.', 2, 14, 9, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'T840_F_LONG', 'C', 'Рахунок для~додаткової проводки~USD для ФО,~термін дії>12міс.', 2, 14, 10, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'V840_F_LONG', 'C', 'Вал.~рах.~USD', .8, 3, 11, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'T980_U_SHORT', 'C', 'Рахунок для~додаткової проводки~UAH для ЮО,~термін дії<=12міс.', 2, 14, 12, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'T840_U_SHORT', 'C', 'Рахунок для~додаткової проводки~USD для ЮО,~термін дії<=12міс.', 2, 14, 13, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'V840_U_SHORT', 'C', 'Вал.~рах.~USD', .8, 3, 14, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'T980_U_LONG', 'C', 'Рахунок для~додаткової проводкик~UAH для ЮО,~термін дії>12міс.', 2, 14, 15, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'T840_U_LONG', 'C', 'Рахунок для~додаткової проводки~USD для ЮО,~термін дії>12міс.', 2, 14, 16, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'V840_U_LONG', 'C', 'Вал.~рах.~USD', .8, 3, 17, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'TRAN_TYPE', 'C', 'Код~операції~ПЦ', '.8', 2, 1, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'TIP', 'C', 'Тип~рахунку', '.8', 3, 2, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'T980', 'C', 'Транзитний~рахунок~UAH', '2', 14, 3, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'T840', 'C', 'Транзитний~рахунок~USD', '2', 14, 4, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'V840', 'C', 'Вал.~тр.рах.~USD', '.8', 3, 5, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'T980_F_SHORT', 'C', 'Рахунок для~додаткової проводки~UAH для ФО,~термін дії<=12міс.', '2', 14, 6, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'T840_F_SHORT', 'C', 'Рахунок для~додаткової проводки~USD для ФО,~термін дії<=12міс.', '2', 14, 7, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'V840_F_SHORT', 'C', 'Вал.~рах.~USD', '.8', 3, 8, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'T980_F_LONG', 'C', 'Рахунок для~додаткової проводки~UAH для ФО,~термін дії>12міс.', '2', 14, 9, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'T840_F_LONG', 'C', 'Рахунок для~додаткової проводки~USD для ФО,~термін дії>12міс.', '2', 14, 10, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'V840_F_LONG', 'C', 'Вал.~рах.~USD', '.8', 3, 11, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'T980_U_SHORT', 'C', 'Рахунок для~додаткової проводки~UAH для ЮО,~термін дії<=12міс.', '2', 14, 12, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'T840_U_SHORT', 'C', 'Рахунок для~додаткової проводки~USD для ЮО,~термін дії<=12міс.', '2', 14, 13, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'V840_U_SHORT', 'C', 'Вал.~рах.~USD', '.8', 3, 14, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'T980_U_LONG', 'C', 'Рахунок для~додаткової проводкик~UAH для ЮО,~термін дії>12міс.', '2', 14, 15, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'T840_U_LONG', 'C', 'Рахунок для~додаткової проводки~USD для ЮО,~термін дії>12міс.', '2', 14, 16, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'V840_U_LONG', 'C', 'Вал.~рах.~USD', '.8', 3, 17, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('OBPC_TRANS');

@@ -32,7 +32,9 @@ PROMPT *** Create  view V_WCS_SRV_BID_TEMPLATES ***
  order by bt.bid_id, bt.template_id;
 
 PROMPT *** Create  grants  V_WCS_SRV_BID_TEMPLATES ***
+grant SELECT                                                                 on V_WCS_SRV_BID_TEMPLATES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SRV_BID_TEMPLATES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_SRV_BID_TEMPLATES to UPLD;
 
 
 

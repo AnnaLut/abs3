@@ -19,8 +19,10 @@ PROMPT *** Create  view V_FINMON_PUBLIC_RELS ***
 from FINMON_PUBLIC_RELS;
 
 PROMPT *** Create  grants  V_FINMON_PUBLIC_RELS ***
+grant SELECT                                                                 on V_FINMON_PUBLIC_RELS to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_FINMON_PUBLIC_RELS to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_FINMON_PUBLIC_RELS to FINMON01;
+grant SELECT                                                                 on V_FINMON_PUBLIC_RELS to UPLD;
 grant FLASHBACK,SELECT                                                       on V_FINMON_PUBLIC_RELS to WR_REFREAD;
 
 

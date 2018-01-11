@@ -12,8 +12,10 @@ PROMPT *** Create  view V_ICCK ***
 from CCK_AN_TMP;
 
 PROMPT *** Create  grants  V_ICCK ***
+grant SELECT                                                                 on V_ICCK          to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ICCK          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ICCK          to SALGL;
+grant SELECT                                                                 on V_ICCK          to UPLD;
 
 
 

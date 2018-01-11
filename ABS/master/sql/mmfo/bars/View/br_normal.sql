@@ -63,12 +63,14 @@ PROMPT *** Create  view BR_NORMAL ***
                                         AND e.kv = c.kv));
 
 PROMPT *** Create  grants  BR_NORMAL ***
+grant SELECT                                                                 on BR_NORMAL       to BARSREADER_ROLE;
 grant SELECT                                                                 on BR_NORMAL       to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BR_NORMAL       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BR_NORMAL       to DPT_ADMIN;
 grant SELECT                                                                 on BR_NORMAL       to KLBX;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BR_NORMAL       to SALGL;
 grant SELECT                                                                 on BR_NORMAL       to START1;
+grant SELECT                                                                 on BR_NORMAL       to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BR_NORMAL       to VKLAD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BR_NORMAL       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on BR_NORMAL       to WR_REFREAD;

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Счета и спецпараметры';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'ACCOUNTS_SPECPARAM';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,43 +124,43 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 2, 'NLS', 'C', 'Номер счета', 2, 15, 2, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'OB22', 'C', 'OB22', .8, 2, 20, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NMS', 'C', 'Наименование счета', 5, 75, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'LCV', 'C', 'Вал~юта', .6, 3, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NBS', 'C', 'Баланс.~счет', .9, 4, 1, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'RNK', 'N', 'РНК', 1, 6, 10, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'OSTC', 'N', 'Факт.остаток~(номинал)', 2.2, 20, 5, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'S031', 'C', 'S031~Вид~забезпечення', 1.5, 2, 21, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'DAOS', 'D', 'Дата откр.~счета', 2, 10, 7, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'DAZS', 'D', 'Дата закр.~счета', 2, 10, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'ISP', 'N', '№~исп.', .5, 3, 15, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'FIO', 'C', 'Исполнитель (ФИО)', 3.5, 40, 16, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'OSTQ', 'N', 'Факт.остаток~(эквивалент)', 2.2, 20, 6, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'S240', 'C', 'S240~Код срока~"до погашения"', 1.7, 2, 22, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'R013', 'C', 'R013', .7, 2, 23, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'S080', 'C', 'S080~Категория~риска', 1.2, 2, 24, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'FDAT', 'D', 'Дата остатка', 2, 10, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'INSIDER', 'N', 'Признак~инсайдера', 1.3, 2, 25, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'KV', 'N', 'Код~валюты', .6, 3, 3, 1, 0, 0, 0, '', '#0', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'BRATE', 'N', '% ставка', 1, 6, 9, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'R011', 'C', 'R011', .7, 2, 26, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'S180', 'C', 'S180', .7, 3, 27, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'S181', 'C', 'S181', .7, 3, 28, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'S182', 'C', 'S182', .7, 3, 29, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'S190', 'C', 'S190', .7, 3, 30, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'S200', 'C', 'S200', .7, 3, 31, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'S230', 'C', 'S230', .7, 3, 32, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'S260', 'C', 'S260', .7, 3, 33, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'S270', 'C', 'S270', .7, 3, 34, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'NKD', 'C', '№ договора', 2, 20, 40, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'MDATE', 'D', 'Дата погаш.~остатка', 2, 10, 41, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'NMK', 'C', 'Наименование клиента', 4, 40, 11, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 34, 'OKPO', 'C', 'Код ЄДРПОУ /~Ідентифікац.код', 1.8, 10, 12, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'DAPP', 'D', 'Дата послед.~движения', 2, 10, 43, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 36, 'R014', 'C', 'R014~Дистанц.управление~счетом', 1.6, 2, 23, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 37, 'K051', 'C', 'K051', .7, 2, 35, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 38, 'S580', 'C', 'S580', .7, 2, 35, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'NLS', 'C', 'Номер счета', '2', 15, 2, 1, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'OB22', 'C', 'OB22', '.8', 2, 20, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NMS', 'C', 'Наименование счета', '5', 75, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'LCV', 'C', 'Вал~юта', '.6', 3, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NBS', 'C', 'Баланс.~счет', '.9', 4, 1, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'RNK', 'N', 'РНК', '1', 6, 10, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'OSTC', 'N', 'Факт.остаток~(номинал)', '2.2', 20, 5, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'S031', 'C', 'S031~Вид~забезпечення', '1.5', 2, 21, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'DAOS', 'D', 'Дата откр.~счета', '2', 10, 7, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'DAZS', 'D', 'Дата закр.~счета', '2', 10, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'ISP', 'N', '№~исп.', '.5', 3, 15, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'FIO', 'C', 'Исполнитель (ФИО)', '3.5', 40, 16, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'OSTQ', 'N', 'Факт.остаток~(эквивалент)', '2.2', 20, 6, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'S240', 'C', 'S240~Код срока~"до погашения"', '1.7', 2, 22, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'R013', 'C', 'R013', '.7', 2, 23, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'S080', 'C', 'S080~Категория~риска', '1.2', 2, 24, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'FDAT', 'D', 'Дата остатка', '2', 10, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'INSIDER', 'N', 'Признак~инсайдера', '1.3', 2, 25, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'KV', 'N', 'Код~валюты', '.6', 3, 3, 1, 0, 0, 0, '', '#0', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'BRATE', 'N', '% ставка', '1', 6, 9, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'R011', 'C', 'R011', '.7', 2, 26, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'S180', 'C', 'S180', '.7', 3, 27, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'S181', 'C', 'S181', '.7', 3, 28, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'S182', 'C', 'S182', '.7', 3, 29, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'S190', 'C', 'S190', '.7', 3, 30, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'S200', 'C', 'S200', '.7', 3, 31, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'S230', 'C', 'S230', '.7', 3, 32, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'S260', 'C', 'S260', '.7', 3, 33, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'S270', 'C', 'S270', '.7', 3, 34, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'NKD', 'C', '№ договора', '2', 20, 40, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'MDATE', 'D', 'Дата погаш.~остатка', '2', 10, 41, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'NMK', 'C', 'Наименование клиента', '4', 40, 11, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'OKPO', 'C', 'Код ЄДРПОУ /~Ідентифікац.код', '1.8', 10, 12, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'DAPP', 'D', 'Дата послед.~движения', '2', 10, 43, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'R014', 'C', 'R014~Дистанц.управление~счетом', '1.6', 2, 23, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'K051', 'C', 'K051', '.7', 2, 35, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'S580', 'C', 'S580', '.7', 2, 35, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

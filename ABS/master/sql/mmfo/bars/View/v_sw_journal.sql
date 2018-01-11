@@ -20,7 +20,9 @@ PROMPT *** Create  view V_SW_JOURNAL ***
   ORDER BY SW_JOURNAL.swref desc;
 
 PROMPT *** Create  grants  V_SW_JOURNAL ***
+grant SELECT                                                                 on V_SW_JOURNAL    to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_SW_JOURNAL    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_SW_JOURNAL    to UPLD;
 
 
 
