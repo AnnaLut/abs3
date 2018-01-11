@@ -75,6 +75,19 @@ exception when others then
  end;
 /
 
+begin   
+ execute immediate 'alter table CP_ZAL drop constraint XPK_CPZAL cascade';
+exception when others then
+  if  sqlcode=-2443  then null; else raise; end if;
+ end;
+/
+
+begin   
+ execute immediate 'drop index XPK_CPZAL';
+exception when others then
+  if  sqlcode=-1418  then null; else raise; end if;
+ end;
+/
 
 
 declare
