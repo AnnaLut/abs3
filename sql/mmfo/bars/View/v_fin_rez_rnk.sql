@@ -14,8 +14,10 @@ FROM CCK_AN_TMP t, customer c
 where t.nd=c.rnk ;
 
 PROMPT *** Create  grants  V_FIN_REZ_RNK ***
+grant SELECT                                                                 on V_FIN_REZ_RNK   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FIN_REZ_RNK   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FIN_REZ_RNK   to START1;
+grant SELECT                                                                 on V_FIN_REZ_RNK   to UPLD;
 
 
 

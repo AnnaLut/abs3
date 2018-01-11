@@ -28,8 +28,10 @@ PROMPT *** Create  view A_CCK_DU ***
      FROM CCK_AN_TMP_UPB;
 
 PROMPT *** Create  grants  A_CCK_DU ***
+grant SELECT                                                                 on A_CCK_DU        to BARSREADER_ROLE;
 grant SELECT                                                                 on A_CCK_DU        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on A_CCK_DU        to RCC_DEAL;
+grant SELECT                                                                 on A_CCK_DU        to UPLD;
 
 
 

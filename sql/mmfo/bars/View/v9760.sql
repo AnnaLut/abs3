@@ -93,8 +93,10 @@ where a.nbs='9760' and a.kv=980 and a.acc=s.acc (+)
 having  sum ( a.ostc ) is not null;
 
 PROMPT *** Create  grants  V9760 ***
+grant SELECT                                                                 on V9760           to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V9760           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V9760           to SALGL;
+grant SELECT                                                                 on V9760           to UPLD;
 grant FLASHBACK,SELECT                                                       on V9760           to WR_REFREAD;
 
 

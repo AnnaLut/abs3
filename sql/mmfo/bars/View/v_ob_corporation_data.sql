@@ -53,8 +53,10 @@ PROMPT *** Create  view V_OB_CORPORATION_DATA ***
      where corpd.kv = tab1.kv and corpd.dockv = tab2.kv;
 
 PROMPT *** Create  grants  V_OB_CORPORATION_DATA ***
+grant SELECT                                                                 on V_OB_CORPORATION_DATA to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OB_CORPORATION_DATA to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OB_CORPORATION_DATA to CORP_CLIENT;
+grant SELECT                                                                 on V_OB_CORPORATION_DATA to UPLD;
 
 
 

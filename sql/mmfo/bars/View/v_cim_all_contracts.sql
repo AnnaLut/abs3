@@ -58,8 +58,10 @@ PROMPT *** Create  view V_CIM_ALL_CONTRACTS ***
             cc.branch LIKE SYS_CONTEXT ('bars_context', 'user_branch_mask') );
 
 PROMPT *** Create  grants  V_CIM_ALL_CONTRACTS ***
+grant SELECT                                                                 on V_CIM_ALL_CONTRACTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_ALL_CONTRACTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CIM_ALL_CONTRACTS to CIM_ROLE;
+grant SELECT                                                                 on V_CIM_ALL_CONTRACTS to UPLD;
 
 
 

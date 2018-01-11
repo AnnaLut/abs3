@@ -1,5 +1,14 @@
-CREATE OR REPLACE VIEW W4_DEAL_WEB AS
-SELECT o.nd,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/W4_DEAL_WEB.sql =========*** Run *** ==
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view W4_DEAL_WEB ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.W4_DEAL_WEB ("ND", "BRANCH", "CARD_CODE", "PRODUCT_CODE", "ACC_ACC", "ACC_NLS", "ACC_KV", "ACC_LCV", "ACC_OB22", "ACC_TIP", "ACC_TIPNAME", "ACC_OST", "ACC_DAOS", "ACC_DAZS", "CUST_RNK", "CUST_NAME", "CUST_OKPO", "CUST_TYPE", "CARD_IDAT", "CARD_IDAT2", "CARD_IDAT_BANKDATE", "DOC_ID", "BARCOD", "COBRANDID", "ISDKBO", "DKBO_ID", "DKBO_NUMBER", "DKBO_DATE_FROM", "DKBO_DATE_TO", "DEAL_TYPE_ID", "DEAL_STATE_ID", "CARD_DATE_FROM", "CARD_DATE_TO", "SED", "IS_ACC_CLOSE", "PASS_DATE", "PASS_STATE") AS 
+  SELECT o.nd,
           o.branch,
           o.card_code,
           o.product_code,
@@ -72,7 +81,7 @@ SELECT o.nd,
           CASE WHEN o.dazs IS NULL THEN 0 WHEN o.dazs IS NOT NULL THEN 1 END
              is_acc_close,
            o.pass_date,
-           o.pass_state 
+           o.pass_state
      FROM (SELECT o.nd,
                   a.branch,
                   o.card_code,
@@ -133,4 +142,13 @@ SELECT o.nd,
     WHERE (   NVL (TRIM (o.workb), 0) <> '1'
            OR o.branch LIKE SYS_CONTEXT ('bars_context', 'user_branch_mask'));
 
-grant SELECT                                                                 on W4_DEAL_WEB   to BARS_ACCESS_DEFROLE;
+PROMPT *** Create  grants  W4_DEAL_WEB ***
+grant SELECT                                                                 on W4_DEAL_WEB     to BARSREADER_ROLE;
+grant SELECT                                                                 on W4_DEAL_WEB     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on W4_DEAL_WEB     to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/W4_DEAL_WEB.sql =========*** End *** ==
+PROMPT ===================================================================================== 

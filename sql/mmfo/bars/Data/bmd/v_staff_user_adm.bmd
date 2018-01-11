@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Адміністрування користувачів';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_STAFF_USER_ADM';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,16 +124,16 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ADM_COMMENTS', 'C', 'Примітки', 3, 4000, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'AUTHENTICATION_MODE_ID', 'C', 'Ідентифікатор режиму автентифікації', null, 30, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'AUTHENTICATION_MODE_NAME', 'C', 'Режим автентифікації', 3, 300, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'BRANCH_CODE', 'C', 'Домашнє відділення', 2.4, 30, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'BRANCH_NAME', 'C', 'Назва домашнього відділення', null, 4000, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'ID', 'N', 'Ідентифікатор', 1, 22, 1, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=V_STAFF_USER_ADM_META[ACCESSCODE=>2][CONDITIONS=>id=:ID]', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'LOGIN_NAME', 'C', 'Логін користувача', null, 30, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'STATE_ID', 'N', 'Ідентифікатор стану користувача', null, 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'STATE_NAME', 'C', 'Стан користувача', null, 10, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'USER_NAME', 'C', 'Повне ім''я~користувача', 4, 60, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ADM_COMMENTS', 'C', 'Примітки', '3', 4000, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'AUTHENTICATION_MODE_ID', 'C', 'Ідентифікатор режиму автентифікації', '', 30, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'AUTHENTICATION_MODE_NAME', 'C', 'Режим автентифікації', '3', 300, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'BRANCH_CODE', 'C', 'Домашнє відділення', '2.4', 30, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'BRANCH_NAME', 'C', 'Назва домашнього відділення', '', 4000, null, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'ID', 'N', 'Ідентифікатор', '1', 22, 1, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=V_STAFF_USER_ADM_META[ACCESSCODE=>2][CONDITIONS=>id=:ID]', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'LOGIN_NAME', 'C', 'Логін користувача', '', 30, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'STATE_ID', 'N', 'Ідентифікатор стану користувача', '', 22, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'STATE_NAME', 'C', 'Стан користувача', '', 10, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'USER_NAME', 'C', 'Повне ім''я~користувача', '4', 60, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 1, 'ASC ');

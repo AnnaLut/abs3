@@ -51,8 +51,10 @@ select g.tran_type, t.tip, null, null, null, null, null, null, null, null, null,
        (select tran_type, tip from obpc_trans_tran where branch = sys_context('bars_context','user_branch'));
 
 PROMPT *** Create  grants  V_OBPC_TRANS_TRAN ***
+grant SELECT                                                                 on V_OBPC_TRANS_TRAN to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_TRANS_TRAN to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OBPC_TRANS_TRAN to OBPC;
+grant SELECT                                                                 on V_OBPC_TRANS_TRAN to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_TRANS_TRAN to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_OBPC_TRANS_TRAN to WR_REFREAD;
 

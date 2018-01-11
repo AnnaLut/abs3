@@ -24,8 +24,10 @@ PROMPT *** Create  view V_FM_KLIENT ***
 ;
 
 PROMPT *** Create  grants  V_FM_KLIENT ***
+grant SELECT                                                                 on V_FM_KLIENT     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FM_KLIENT     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FM_KLIENT     to FINMON01;
+grant SELECT                                                                 on V_FM_KLIENT     to UPLD;
 
 
 

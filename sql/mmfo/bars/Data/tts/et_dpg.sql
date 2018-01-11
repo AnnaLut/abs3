@@ -45,62 +45,8 @@ begin
   delete from folders_tts where tt='!DK';
 end;
 /
-prompt Создание / Обновление операции !DV
-prompt Наименование операции: !Стоп-правило пост.160  03 березня 2015 р (15 тис в екв для вал. опер)
-declare
-  cnt_  number;
-begin
-  --------------------------------
-  -- Основные свойства операции --
-  --------------------------------
-  begin
-    insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!DV', '!Стоп-правило пост.160  03 березня 2015 р (15 тис в екв для вал. опер)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(160,#(KVA),#(NLSA),#(S), #(REF))', null, null, null, null, 0, '0000100000000000000000000000000000000100000000000000000000000000', null);
-  exception
-    when dup_val_on_index then 
-      update tts
-         set tt='!DV', name='!Стоп-правило пост.160  03 березня 2015 р (15 тис в екв для вал. опер)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(160,#(KVA),#(NLSA),#(S), #(REF))', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
-       where tt='!DV';
-  end;
-  --------------------------------
-  ----------- Реквизиты ----------
-  --------------------------------
-  delete from op_rules where tt='!DV';
-  --------------------------------
-  ------ Связанные операции ------
-  --------------------------------
-  delete from ttsap where tt='!DV';
-  --------------------------------
-  ------- Балансовые счета -------
-  --------------------------------
-  delete from ps_tts where tt='!DV';
-  --------------------------------
-  -------- Виды документов -------
-  --------------------------------
-  delete from tts_vob where tt='!DV';
-  --------------------------------
-  -------- Группы контроля -------
-  --------------------------------
-  delete from chklist_tts where tt='!DV';
-  --------------------------------
-  ------------- Папки ------------
-  --------------------------------
-  delete from folders_tts where tt='!DV';
-  begin
-    insert into folders_tts(idfo, tt)
-    values (1, '!DV');
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (folders_tts: 1, ''!DV'') - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-end;
-/
 prompt Создание / Обновление операции DPG
-prompt Наименование операции: Повернення суми вкладу в ін.валюті готівкою
+prompt Наименование операции: DPG Повернення суми вкладу в ін.валюті готівкою
 declare
   cnt_  number;
 begin
@@ -109,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DPG', 'Повернення суми вкладу в ін.валюті готівкою', 1, null, null, null, null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000000000000000000000', 'Повернення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DPG', 'DPG Повернення суми вкладу в ін.валюті готівкою', 1, null, null, null, null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000000000000000000000', 'Повернення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DPG', name='Повернення суми вкладу в ін.валюті готівкою', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn='Повернення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DPG', name='DPG Повернення суми вкладу в ін.валюті готівкою', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn='Повернення коштів згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DPG';
   end;
   --------------------------------
@@ -319,17 +265,6 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (ttsap: ''!DK'', ''DPG'', 0) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into ttsap(ttap, tt, dk)
-    values ('!DV', 'DPG', 0);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ttsap: ''!DV'', ''DPG'', 0) - первичный ключ не найден!');
       else raise;
       end if;
   end;

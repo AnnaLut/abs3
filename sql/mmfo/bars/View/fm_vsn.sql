@@ -15,9 +15,11 @@ UNION ALL
 select 'Невизначений' name, '0' id from dual;
 
 PROMPT *** Create  grants  FM_VSN ***
+grant SELECT                                                                 on FM_VSN          to BARSREADER_ROLE;
 grant SELECT                                                                 on FM_VSN          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FM_VSN          to CUST001;
 grant SELECT                                                                 on FM_VSN          to FINMON01;
+grant SELECT                                                                 on FM_VSN          to UPLD;
 
 
 

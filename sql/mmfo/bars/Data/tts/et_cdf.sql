@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции CDF
-prompt Наименование операции: (доч.CAF) Комісія агента за прийом переказу по сист."Contact" (ближн)
+prompt Наименование операции: CDF (доч.CAF) Комісія агента за прийом переказу по сист."Contact" (бли
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CDF', '(доч.CAF) Комісія агента за прийом переказу по сист."Contact" (ближн)', 1, '#(nbs_ob22 (''2909'',''64''))', 980, '#(nbs_ob22 (''2909'',''64''))', null, null, null, null, null, 0, 0, 1, 0, 'gl.p_icurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)', 'CAF_KOM (''CDF'',#(KVA), #(S) )', null, null, '#(nbs_ob22 (''3800'',''03''))', null, '0000100000000000000000000000000000000000000000000000000000000000', 'gl.p_ncurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)');
+    values ('CDF', 'CDF (доч.CAF) Комісія агента за прийом переказу по сист."Contact" (бли', 1, '#(nbs_ob22 (''2909'',''64''))', 980, '#(nbs_ob22 (''2909'',''64''))', null, null, null, null, null, 0, 0, 1, 0, 'gl.p_icurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)', 'CAF_KOM (''CDF'',#(KVA), #(S) )', null, null, '#(nbs_ob22 (''3800'',''03''))', null, '0000100000000000000000000000000000000000000000000000000000000000', 'gl.p_ncurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CDF', name='(доч.CAF) Комісія агента за прийом переказу по сист."Contact" (ближн)', dk=1, nlsm='#(nbs_ob22 (''2909'',''64''))', kv=980, nlsk='#(nbs_ob22 (''2909'',''64''))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='gl.p_icurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)', s2='CAF_KOM (''CDF'',#(KVA), #(S) )', sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='gl.p_ncurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)'
+         set tt='CDF', name='CDF (доч.CAF) Комісія агента за прийом переказу по сист."Contact" (бли', dk=1, nlsm='#(nbs_ob22 (''2909'',''64''))', kv=980, nlsk='#(nbs_ob22 (''2909'',''64''))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='gl.p_icurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)', s2='CAF_KOM (''CDF'',#(KVA), #(S) )', sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='gl.p_ncurval(#(KVA),CAF_KOM (''CDF'',#(KVA), #(S) ),SYSDATE)'
        where tt='CDF';
   end;
   --------------------------------

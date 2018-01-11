@@ -38,8 +38,10 @@ from   kp_kom_test B
  ;
 
 PROMPT *** Create  grants  KP_FILE ***
+grant SELECT                                                                 on KP_FILE         to BARSREADER_ROLE;
 grant SELECT                                                                 on KP_FILE         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KP_FILE         to R_KP;
+grant SELECT                                                                 on KP_FILE         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on KP_FILE         to WR_ALL_RIGHTS;
 
 

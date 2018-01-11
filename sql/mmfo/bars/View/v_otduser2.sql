@@ -42,6 +42,10 @@ PROMPT *** Create  view V_OTDUSER2 ***
             7,
             9;
 
+PROMPT *** Create  grants  V_OTDUSER2 ***
+grant SELECT                                                                 on V_OTDUSER2      to BARSREADER_ROLE;
+grant SELECT                                                                 on V_OTDUSER2      to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -38,8 +38,10 @@ PROMPT *** Create  view V_DEB_REG_TMP ***
     WHERE deb_reg_tmp.kv = tabval.kv;
 
 PROMPT *** Create  grants  V_DEB_REG_TMP ***
+grant SELECT                                                                 on V_DEB_REG_TMP   to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DEB_REG_TMP   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DEB_REG_TMP   to DEB_REG;
+grant SELECT                                                                 on V_DEB_REG_TMP   to UPLD;
 
 
 

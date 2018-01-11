@@ -258,17 +258,6 @@ begin
       else raise;
       end if;
   end;
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (20, '225', 3, null, 'substr(nlsa,1,4)=''1811''', null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 20, ''225'', 3, null, ''substr(nlsa,1,4)=''''1811'''''', null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
   --------------------------------
   ------------- Папки ------------
   --------------------------------

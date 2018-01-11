@@ -1,5 +1,3 @@
-SET SERVEROUTPUT ON 
-SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_OTCN.sql =========*** R
 PROMPT ===================================================================================== 
@@ -18,11 +16,11 @@ PROMPT *** Create/replace  ARM  OTCN ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-    d integer := 0;
+	d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' OTCN створюємо (або оновлюємо) АРМ Звітність ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
-                             P_ARM_NAME              => l_application_name, 
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
+                             P_ARM_NAME              => l_application_name,
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
@@ -30,71 +28,71 @@ begin
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Звітність Ощадного Банку ********** ');
           --  Створюємо функцію Звітність Ощадного Банку
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Звітність Ощадного Банку',
                                                   p_funcname => 'ShowFilesInt(hWndMDI)',
-                                                  p_rolename => 'RPBN002' ,    
+                                                  p_rolename => 'RPBN002' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Моніторинг обробки запитів КМ
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Моніторинг обробки запитів КМ',
-                                                              p_funcname => '/barsroot/pfu/pfu/monitorenquirykm',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Моніторинг обробки запитів КМ',
+															  p_funcname => '/barsroot/pfu/pfu/monitorenquirykm',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Моніторинг портфелю ЕПП в ЦА
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Моніторинг портфелю ЕПП в ЦА',
-                                                              p_funcname => '/barsroot/pfu/pfu/EppPortfolio',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Моніторинг портфелю ЕПП в ЦА',
+															  p_funcname => '/barsroot/pfu/pfu/EppPortfolio',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію ЦП. Фiнiш. Авто-завершення купонного перiоду (WEB) 
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'ЦП. Фiнiш. Авто-завершення купонного перiоду (WEB) ',
-                                                              p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_CP_DOK_DNK[PROC=>CP.DOK_DNK(bankdate)][EXEC=>BEFORE][QST=>Виконати ?][MSG=>Готово!]',
-                                                              p_rolename => 'CP_ROLE' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'ЦП. Фiнiш. Авто-завершення купонного перiоду (WEB) ',
+															  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_CP_DOK_DNK[PROC=>CP.DOK_DNK(bankdate)][EXEC=>BEFORE][QST=>Виконати ?][MSG=>Готово!]',
+															  p_rolename => 'CP_ROLE' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Установка спецпараметру НБУ для БС
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Установка спецпараметру НБУ для БС',
-                                                              p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=[PROC=>bars.p_set_accspecparam(:Par0,:Par1,:Par2)][PAR=>:Par0(SEM=Балансовый счет),:Par1(SEM=Спецпараметр НБУ,REF=SPARAM_LIST),:Par2(SEM=Значение)][EXEC=>BEFORE][QST=>Выполнить измен./уст. спецпараметра?][MSG=>Измен./уст. спецпараметра произведено!]',
-                                                              p_rolename => 'BARS_ACCESS_DEFROLE' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Установка спецпараметру НБУ для БС',
+															  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=[PROC=>bars.p_set_accspecparam(:Par0,:Par1,:Par2)][PAR=>:Par0(SEM=Балансовый счет),:Par1(SEM=Спецпараметр НБУ,REF=SPARAM_LIST),:Par2(SEM=Значение)][EXEC=>BEFORE][QST=>Выполнить измен./уст. спецпараметра?][MSG=>Измен./уст. спецпараметра произведено!]',
+															  p_rolename => 'BARS_ACCESS_DEFROLE' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Довiдник Бранчiв та їх типiв
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Довiдник Бранчiв та їх типiв',
-                                                              p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&tableName=V_BRANCH_TIP',
-                                                              p_rolename => 'BARS_ACCESS_DEFROLE' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Довiдник Бранчiв та їх типiв',
+															  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&tableName=V_BRANCH_TIP',
+															  p_rolename => 'BARS_ACCESS_DEFROLE' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Звітність в НБУ ********** ');
           --  Створюємо функцію Звітність в НБУ
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Звітність в НБУ',
                                                   p_funcname => 'ShowFilesNbu(hWndMDI) ',
-                                                  p_rolename => 'RPBN002' ,    
+                                                  p_rolename => 'RPBN002' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу (OTCN) - Звітність  ');
     l := l_function_ids.first;
@@ -102,8 +100,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-     
-     
+
+
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -117,6 +115,7 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
+commit;
 end;
 /
 

@@ -18,7 +18,9 @@ where nvl(m.tabldel,0)<>0
 
 PROMPT *** Create  grants  V_TABLDEL ***
 grant SELECT                                                                 on V_TABLDEL       to ABS_ADMIN;
+grant SELECT                                                                 on V_TABLDEL       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TABLDEL       to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_TABLDEL       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_TABLDEL       to WR_ALL_RIGHTS;
 
 

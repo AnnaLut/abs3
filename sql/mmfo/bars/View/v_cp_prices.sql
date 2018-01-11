@@ -106,7 +106,9 @@ GROUP BY CP_KOD.ID,
 ORDER BY CP_KOD.DATP);
 
 PROMPT *** Create  grants  V_CP_PRICES ***
+grant SELECT                                                                 on V_CP_PRICES     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_PRICES     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CP_PRICES     to UPLD;
 
 
 

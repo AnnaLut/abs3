@@ -1,5 +1,14 @@
-create or replace view v_interest_to_payment as
-select r.id,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_INTEREST_TO_PAYMENT.sql =========*** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_INTEREST_TO_PAYMENT ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_INTEREST_TO_PAYMENT ("ID", "ACCOUNT_ID", "INTEREST_KIND_ID", "ACCOUNT_NUMBER", "CURRENCY_ID", "OKPO", "ACCOUNT_NAME", "INTEREST_ACCOUNT_NUMBER", "DATE_FROM", "DATE_THROUGH", "INTEREST_AMOUNT", "RECEIVER_MFO", "RECEIVER_ACCOUNT", "RECEIVER_CURRENCY_ID", "PAYMENT_PURPOSE", "STATE_ID", "RECKONING_STATE", "STATE_COMMENT", "MANAGER_ID", "MANAGER_NAME", "CORPORATION_CODE", "CORPORATION_NAME") AS 
+  select r.id,
        r.account_id,
        r.interest_kind_id,
        a.nls account_number,
@@ -40,15 +49,11 @@ where  r.grouping_line_id is null and
        i.id = 1 -- пасиви
 order by a.nls, r.date_from;
 
-comment on column v_interest_to_payment.account_id              is 'Ідентифікатор рахунку';
-comment on column v_interest_to_payment.interest_kind_id        is 'Ідентифікатор виду нарахування';
-comment on column v_interest_to_payment.account_number          is 'Номер рахунку';
-comment on column v_interest_to_payment.currency_id             is 'Валюта';
-comment on column v_interest_to_payment.account_name            is 'Назва рахунку';
-comment on column v_interest_to_payment.okpo                    is 'ОКПО клієнта';
-comment on column v_interest_to_payment.interest_account_number is 'Рахунок відсотків';
-comment on column v_interest_to_payment.date_from               is 'Дата з';
-comment on column v_interest_to_payment.date_through            is 'Дата по';
-comment on column v_interest_to_payment.interest_amount         is 'Сума відсотків';
-comment on column v_interest_to_payment.reckoning_state         is 'Стан обробки';
+PROMPT *** Create  grants  V_INTEREST_TO_PAYMENT ***
+grant SELECT                                                                 on V_INTEREST_TO_PAYMENT to UPLD;
 
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_INTEREST_TO_PAYMENT.sql =========*** 
+PROMPT ===================================================================================== 

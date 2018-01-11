@@ -11,7 +11,9 @@ PROMPT *** Create  view V_DOC_SCHEME_FR ***
   select "ID","NAME","PRINT_ON_BLANK","TEMPLATE","HEADER","FOOTER","HEADER_EX","D_CLOSE","FR","FILE_NAME" from doc_scheme where fr = 1;
 
 PROMPT *** Create  grants  V_DOC_SCHEME_FR ***
+grant SELECT                                                                 on V_DOC_SCHEME_FR to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOC_SCHEME_FR to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DOC_SCHEME_FR to UPLD;
 
 
 

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Довідник імен';
   l_tablinesdef := '50';
+  l_tabselect_statement := '';
   l_tabname     := 'V_FIRST_NAMES';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,25 +124,25 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'FIRSTID', 'N', 'Код', .3, 22, 1, 0, 1, 0, 0, '', '', 1, 1, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'FIRSTRU', 'C', 'Ім''я~(рос)', null, 50, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'FIRSTUA', 'C', 'Ім''я~(укр)', null, 50, 3, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'SEXID', 'C', 'Стать~(1-Ч/2-Ж)', .9, 1, 4, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'MIDDLEUAM', 'C', 'По батькові чол. ~(укр)', null, 50, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'MIDDLEUAF', 'C', 'По батькові жін.~(укр)', null, 50, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'MIDDLERUM', 'C', 'По батькові чол.~(рос)', null, 50, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'MIDDLERUF', 'C', 'По батькові жін.~(рос)', null, 50, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'FIRSTUAOF', 'C', 'Звернення~(укр)', null, 50, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'FIRSTUAROD', 'C', 'Родовий відмінок~(укр)', null, 50, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'FIRSTUADAT', 'C', 'Давальний відмінок~(укр)', null, 50, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'FIRSTUAVIN', 'C', 'Знахідний відмінок~(укр)', null, 50, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'FIRSTUATVO', 'C', 'Орудний відмінок~(укр)', null, 50, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'FIRSTUAPRE', 'C', 'Місцевий відмінок~(укр)', null, 50, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'FIRSTRUROD', 'C', 'Родовий відмінок~(рос)', null, 50, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'FIRSTRUDAT', 'C', 'Давальний відмінок~(рос)', null, 50, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'FIRSTRUVIN', 'C', 'Знахідний відмінок~(рос)', null, 50, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'FIRSTRUTVO', 'C', 'Орудний відмінок~(рос)', null, 50, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'FIRSTRUPRE', 'C', 'Місцевий відмінок~(рос)', null, 50, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'FIRSTID', 'N', 'Код', '.3', 22, 1, 0, 1, 0, 0, '', '', 1, 1, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'FIRSTRU', 'C', 'Ім''я~(рос)', '', 50, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'FIRSTUA', 'C', 'Ім''я~(укр)', '', 50, 3, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'SEXID', 'C', 'Стать~(1-Ч/2-Ж)', '.9', 1, 4, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'MIDDLEUAM', 'C', 'По батькові чол. ~(укр)', '', 50, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'MIDDLEUAF', 'C', 'По батькові жін.~(укр)', '', 50, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'MIDDLERUM', 'C', 'По батькові чол.~(рос)', '', 50, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'MIDDLERUF', 'C', 'По батькові жін.~(рос)', '', 50, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'FIRSTUAOF', 'C', 'Звернення~(укр)', '', 50, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'FIRSTUAROD', 'C', 'Родовий відмінок~(укр)', '', 50, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'FIRSTUADAT', 'C', 'Давальний відмінок~(укр)', '', 50, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'FIRSTUAVIN', 'C', 'Знахідний відмінок~(укр)', '', 50, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'FIRSTUATVO', 'C', 'Орудний відмінок~(укр)', '', 50, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'FIRSTUAPRE', 'C', 'Місцевий відмінок~(укр)', '', 50, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'FIRSTRUROD', 'C', 'Родовий відмінок~(рос)', '', 50, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'FIRSTRUDAT', 'C', 'Давальний відмінок~(рос)', '', 50, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'FIRSTRUVIN', 'C', 'Знахідний відмінок~(рос)', '', 50, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'FIRSTRUTVO', 'C', 'Орудний відмінок~(рос)', '', 50, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'FIRSTRUPRE', 'C', 'Місцевий відмінок~(рос)', '', 50, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 3, 1, 'ASC ');

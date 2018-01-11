@@ -19,8 +19,10 @@ PROMPT *** Create  view V_SV_VOICE ***
  where v.owner_id_to = o.id;
 
 PROMPT *** Create  grants  V_SV_VOICE ***
+grant SELECT                                                                 on V_SV_VOICE      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SV_VOICE      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SV_VOICE      to RPBN002;
+grant SELECT                                                                 on V_SV_VOICE      to UPLD;
 
 
 

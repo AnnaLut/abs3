@@ -19,9 +19,11 @@ PROMPT *** Create  view V_BANK_METALS_UPD ***
     WHERE u.kod = m.kod AND u.action_id = a.ID AND s.ID = u.isp;
 
 PROMPT *** Create  grants  V_BANK_METALS_UPD ***
+grant SELECT                                                                 on V_BANK_METALS_UPD to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BANK_METALS_UPD to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BANK_METALS_UPD to PYOD001;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BANK_METALS_UPD to START1;
+grant SELECT                                                                 on V_BANK_METALS_UPD to UPLD;
 grant FLASHBACK,SELECT                                                       on V_BANK_METALS_UPD to WR_REFREAD;
 
 

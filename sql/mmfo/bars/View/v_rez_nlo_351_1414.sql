@@ -76,8 +76,10 @@ PROMPT *** Create  view V_REZ_NLO_351_1414 ***
                   OST_KORR (a.acc,  NVL (TO_DATE (pul.get_mas_ini_val ('zFdat1'), 'dd.mm.yyyy'), gl.bd), z23.di, a.nbs) < 0);
 
 PROMPT *** Create  grants  V_REZ_NLO_351_1414 ***
+grant SELECT                                                                 on V_REZ_NLO_351_1414 to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REZ_NLO_351_1414 to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_REZ_NLO_351_1414 to START1;
+grant SELECT                                                                 on V_REZ_NLO_351_1414 to UPLD;
 
 
 

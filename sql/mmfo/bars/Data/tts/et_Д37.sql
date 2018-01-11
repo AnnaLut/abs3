@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции Д37
-prompt Наименование операции: БЕЗГОТІВКОВІ. Відсотки: капіталізація
+prompt Наименование операции: Д37 БЕЗГОТІВКОВІ. Відсотки: капіталізація
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('Д37', 'БЕЗГОТІВКОВІ. Відсотки: капіталізація', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1100100000000000000000000000000000000000000000000000000000000000', 'Капіталізовано відсотки');
+    values ('Д37', 'Д37 БЕЗГОТІВКОВІ. Відсотки: капіталізація', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '1100100000000000000000000000000000000000000000000000000000000000', 'Капіталізовано відсотки');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='Д37', name='БЕЗГОТІВКОВІ. Відсотки: капіталізація', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1100100000000000000000000000000000000000000000000000000000000000', nazn='Капіталізовано відсотки'
+         set tt='Д37', name='Д37 БЕЗГОТІВКОВІ. Відсотки: капіталізація', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1100100000000000000000000000000000000000000000000000000000000000', nazn='Капіталізовано відсотки'
        where tt='Д37';
   end;
   --------------------------------

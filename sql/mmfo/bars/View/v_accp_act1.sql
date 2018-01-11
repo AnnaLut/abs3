@@ -1,6 +1,14 @@
-create or replace force view bars.v_accp_act1
-as
-   select ao.name,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ACCP_ACT1.sql =========*** Run *** ==
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_ACCP_ACT1 ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_ACCP_ACT1 ("NAME", "NDOG", "DDOG", "OKPO", "SCOPE_DOG", "ORDER_FEE", "AMOUNT_FEE", "FEE_MFO", "FEE_NLS", "FEE_OKPO", "SUM_PAYS", "SUM_FEE", "CNT_PAYS", "PERIOD_START", "PERIOD_END", "AFEE", "SF_1", "SF_2", "SF_3") AS 
+  select ao.name,
           ao.ndog,
           ao.ddog,
           ao.okpo,
@@ -11,20 +19,20 @@ as
           ao.fee_nls,
           ao.fee_okpo,
           s as sum_pays,
-          case 
+          case
            when ao.order_fee=2 then sf_2
            when ao.order_fee=3 then sf_3
            else sf_1
-          end as sum_fee,          
+          end as sum_fee,
           cnt_pays,
           period_start,
           period_end,
           afee,
-          sf_1, 
-          sf_2, 
+          sf_1,
+          sf_2,
           sf_3
-    from    
-     ( 
+    from
+     (
       select okpo,
             sum(s)     s,        -- сума платежів
             sum(sf_1)  sf_1,     -- сума комісій по кожному платежу
@@ -38,5 +46,12 @@ as
       group by okpo) op
      ,accp_orgs ao
     WHERE ao.okpo = op.okpo;
-    
-grant select on bars.v_accp_act1 to bars_access_defrole;    
+
+PROMPT *** Create  grants  V_ACCP_ACT1 ***
+grant SELECT                                                                 on V_ACCP_ACT1     to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ACCP_ACT1.sql =========*** End *** ==
+PROMPT ===================================================================================== 

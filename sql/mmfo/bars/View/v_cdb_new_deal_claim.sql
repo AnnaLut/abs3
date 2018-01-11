@@ -11,7 +11,9 @@ PROMPT *** Create  view V_CDB_NEW_DEAL_CLAIM ***
   select "ID","DEAL_NUMBER","OPEN_DATE","EXPIRY_DATE","LENDER_CODE","LENDER_NAME","BORROWER_CODE","BORROWER_NAME","AMOUNT","CURRENCY_ID","INTEREST_RATE","INTEREST_CALENDAR_ID","INTEREST_CALENDAR","ALLEGRO_COMMENT","ALLEGRO_CLAIM_ID","SYS_TIME","CLAIM_STATE_ID","CLAIM_STATE" from cdb.v_cdb_new_deal_claim;
 
 PROMPT *** Create  grants  V_CDB_NEW_DEAL_CLAIM ***
+grant SELECT                                                                 on V_CDB_NEW_DEAL_CLAIM to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CDB_NEW_DEAL_CLAIM to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CDB_NEW_DEAL_CLAIM to UPLD;
 
 
 

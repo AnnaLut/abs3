@@ -40,8 +40,10 @@ WHERE
 
 PROMPT *** Create  grants  BE_CHANGES_LOG ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on BE_CHANGES_LOG  to ABS_ADMIN;
+grant SELECT                                                                 on BE_CHANGES_LOG  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on BE_CHANGES_LOG  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BE_CHANGES_LOG  to START1;
+grant SELECT                                                                 on BE_CHANGES_LOG  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on BE_CHANGES_LOG  to WR_ALL_RIGHTS;
 
 

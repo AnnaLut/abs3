@@ -13,7 +13,9 @@ PROMPT *** Create  view V_EBKC_GROUPS_PRIVATE ***
  order by id;
 
 PROMPT *** Create  grants  V_EBKC_GROUPS_PRIVATE ***
+grant SELECT                                                                 on V_EBKC_GROUPS_PRIVATE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_EBKC_GROUPS_PRIVATE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_EBKC_GROUPS_PRIVATE to UPLD;
 
 
 

@@ -24,8 +24,10 @@ PROMPT *** Create  view V_DPT_CHGINT4INDIVIDUAL ***
  ;
 
 PROMPT *** Create  grants  V_DPT_CHGINT4INDIVIDUAL ***
+grant SELECT                                                                 on V_DPT_CHGINT4INDIVIDUAL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_CHGINT4INDIVIDUAL to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_CHGINT4INDIVIDUAL to DPT_ADMIN;
+grant SELECT                                                                 on V_DPT_CHGINT4INDIVIDUAL to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_CHGINT4INDIVIDUAL to WR_ALL_RIGHTS;
 
 

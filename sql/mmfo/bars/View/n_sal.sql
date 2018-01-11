@@ -17,8 +17,10 @@ PROMPT *** Create  view N_SAL ***
 OR acc IN (SELECT acc FROM id_acc WHERE id=(SELECT id FROM staff WHERE logname=USER));
 
 PROMPT *** Create  grants  N_SAL ***
+grant SELECT                                                                 on N_SAL           to BARSREADER_ROLE;
 grant SELECT                                                                 on N_SAL           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on N_SAL           to START1;
+grant SELECT                                                                 on N_SAL           to UPLD;
 
 
 

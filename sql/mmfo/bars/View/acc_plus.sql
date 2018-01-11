@@ -13,8 +13,10 @@ UNION ALL
 SELECT kv,NBS,OSTB, tip FROM ACC_PLUS1;
 
 PROMPT *** Create  grants  ACC_PLUS ***
+grant SELECT                                                                 on ACC_PLUS        to BARSREADER_ROLE;
 grant SELECT                                                                 on ACC_PLUS        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACC_PLUS        to START1;
+grant SELECT                                                                 on ACC_PLUS        to UPLD;
 
 
 

@@ -17,7 +17,9 @@ PROMPT *** Create  view OKKKLOOK ***
 
 PROMPT *** Create  grants  OKKKLOOK ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OKKKLOOK        to ABS_ADMIN;
+grant SELECT                                                                 on OKKKLOOK        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OKKKLOOK        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on OKKKLOOK        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OKKKLOOK        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on OKKKLOOK        to WR_REFREAD;
 

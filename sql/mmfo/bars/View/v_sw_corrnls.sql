@@ -23,8 +23,10 @@ PROMPT *** Create  view V_SW_CORRNLS ***
           LEFT OUTER JOIN accounts at ON at.acc = ba.TRANSIT;
 
 PROMPT *** Create  grants  V_SW_CORRNLS ***
+grant SELECT                                                                 on V_SW_CORRNLS    to BARSREADER_ROLE;
 grant FLASHBACK,INSERT,SELECT,UPDATE                                         on V_SW_CORRNLS    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SW_CORRNLS    to START1;
+grant SELECT                                                                 on V_SW_CORRNLS    to UPLD;
 grant FLASHBACK,SELECT                                                       on V_SW_CORRNLS    to WR_REFREAD;
 
 

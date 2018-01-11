@@ -1,8 +1,10 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TAU_ACCOUNTS_OVER_LIM.sql =========*
 PROMPT ===================================================================================== 
 
-/*
+
 PROMPT *** Create  trigger TAU_ACCOUNTS_OVER_LIM ***
 
   CREATE OR REPLACE TRIGGER BARS.TAU_ACCOUNTS_OVER_LIM AFTER UPDATE OF Ostb  ON ACCOUNTS   FOR EACH ROW
@@ -17,18 +19,6 @@ BEGIN
 END TAU_ACCOUNTS_OVER_LIM ;
 /
 ALTER TRIGGER BARS.TAU_ACCOUNTS_OVER_LIM ENABLE;
-*/
-
-declare
-    trigger_doesnt_exist exception;
-    pragma exception_init(trigger_doesnt_exist, -4080);
-begin
-    execute immediate 'drop trigger TAU_ACCOUNTS_OVER_LIM';
-exception
-    when trigger_doesnt_exist then
-         null;
-end;
-/
 
 
 PROMPT ===================================================================================== 

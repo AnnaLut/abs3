@@ -26,8 +26,10 @@ PROMPT *** Create  view V_FIL_87 ***
    and f.file_id=i.file_id;
 
 PROMPT *** Create  grants  V_FIL_87 ***
+grant SELECT                                                                 on V_FIL_87        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FIL_87        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FIL_87        to NALOG;
+grant SELECT                                                                 on V_FIL_87        to UPLD;
 
 
 

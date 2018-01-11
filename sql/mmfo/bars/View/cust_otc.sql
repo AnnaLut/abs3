@@ -11,8 +11,10 @@ PROMPT *** Create  view CUST_OTC ***
   select "RNK","TGR","CUSTTYPE","COUNTRY","NMK","NMKV","NMKK","CODCAGENT","PRINSIDER","OKPO","ADR","SAB","TAXF","C_REG","C_DST","RGTAX","DATET","ADM","DATEA","STMT","DATE_ON","DATE_OFF","NOTES","NOTESEC","CRISK","PINCODE","ISE","FS","OE","VED","SED","RNKP","ND" from customer;
 
 PROMPT *** Create  grants  CUST_OTC ***
+grant SELECT                                                                 on CUST_OTC        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_OTC        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CUST_OTC        to CUST001;
+grant SELECT                                                                 on CUST_OTC        to UPLD;
 
 
 

@@ -32,7 +32,9 @@ select o.nd, a.branch, a.acc, a.nls, a.kv, decode(a.kv,980,'UAH','USD') lcv, p.c
    and a.branch like sys_context('bars_context', 'user_branch_mask') );
 
 PROMPT *** Create  grants  OBPC_DEAL_WEB ***
+grant SELECT                                                                 on OBPC_DEAL_WEB   to BARSREADER_ROLE;
 grant SELECT                                                                 on OBPC_DEAL_WEB   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on OBPC_DEAL_WEB   to UPLD;
 
 
 

@@ -15,6 +15,8 @@ PROMPT *** Create  view V_ARC_DPT_REQ_DELDEALS ***
  ;
 
 PROMPT *** Create  grants  V_ARC_DPT_REQ_DELDEALS ***
+grant SELECT                                                                 on V_ARC_DPT_REQ_DELDEALS to BARSREADER_ROLE;
+grant SELECT                                                                 on V_ARC_DPT_REQ_DELDEALS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_ARC_DPT_REQ_DELDEALS to WR_ALL_RIGHTS;
 
 

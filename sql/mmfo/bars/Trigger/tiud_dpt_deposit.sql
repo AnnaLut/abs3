@@ -7,8 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TIUD_DPT_DEPOSIT ***
 
-
-CREATE OR REPLACE TRIGGER TIUD_DPT_DEPOSIT
+  CREATE OR REPLACE TRIGGER BARS.TIUD_DPT_DEPOSIT 
 after insert or update or delete ON BARS.DPT_DEPOSIT for each row
 declare
   --------------------
@@ -165,11 +164,9 @@ begin
 
 end;
 /
-
 ALTER TRIGGER BARS.TIUD_DPT_DEPOSIT ENABLE;
 
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TIUD_DPT_DEPOSIT.sql =========*** En
 PROMPT ===================================================================================== 
-

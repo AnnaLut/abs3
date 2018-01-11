@@ -16,8 +16,10 @@ where c.rnk=cu.rnk and cu.acc=a.acc and a.mdate<bankdate and
 a.ostc <0 and a.nbs=p.nbs and p.nbsn is not null;
 
 PROMPT *** Create  grants  DEB_REG_V ***
+grant SELECT                                                                 on DEB_REG_V       to BARSREADER_ROLE;
 grant SELECT                                                                 on DEB_REG_V       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DEB_REG_V       to START1;
+grant SELECT                                                                 on DEB_REG_V       to UPLD;
 
 
 

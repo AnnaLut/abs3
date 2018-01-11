@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Cвернутый КП: Отчет за  Квартал';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_TEST_MART';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,34 +124,34 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', '*Код~Бранча', null, null, 1, 0, 1, 0, 0, '', '', 1, 1, '''И Т О Г''', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KPOG_01', 'N', 'м1.ГГГГ~Факт-пл.~Комис.~грн. экв', null, null, 52, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( KPOG_01 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KPOG_02', 'N', 'м2.ГГГГ~Факт-пл.~Комис.~грн. экв', null, null, 62, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( KPOG_02 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'KPOG_03', 'N', 'м3.ГГГГ~Факт-пл.~Комис.~грн. экв', null, null, 72, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( KPOG_03 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'KV', 'N', '*Вал', null, null, 29, 0, 1, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NAME_PP', 'C', 'Название~ПП', null, null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NAME_RU', 'C', 'Название~РУ', null, null, 10, 0, 0, 0, 0, '', '', 0, 0, 'Count(*)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'ND', 'N', '*Колич~КД', null, null, 0, 0, 0, 0, 0, '', '', 1, 1, 'Sum (ND)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'OST_SN', 'N', 'м3.ГГГГ~Остаток~Норм.Проц.~грн.экв. ', null, null, 42, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( OST_SN )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'OST_SP', 'N', 'м3.ГГГГ~Остаток~Проср.Тело~грн.экв. ', null, null, 44, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( OST_SP )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'OST_SPN', 'N', 'м3.ГГГГ~Остаток~Проср.Проц~грн.экв. ', null, null, 46, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( OST_SPN )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'OST_SS', 'N', 'м3.ГГГГ~Остаток~Норм.Тело~ грн.экв. ', null, null, 40, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( OST_SS )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'PPOG_01', 'N', 'м1.ГГГГ~Факт-пл.~Проц.~грн. экв', null, null, 51, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( PPOG_01 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'PPOG_02', 'N', 'м2.ГГГГ~Факт-пл.~Проц.~грн. экв', null, null, 61, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( PPOG_02 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'PPOG_03', 'N', 'м3.ГГГГ~Факт-пл.~Проц.~грн. экв', null, null, 71, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( PPOG_03 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'PROD', 'C', '*Код~продукта', null, null, 2, 0, 1, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'SEGMENT', 'N', '*Сегмент~бизнеса', null, null, 14, 0, 1, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'SPOK', 'C', '*Код~СПОК', null, null, 26, 0, 1, 0, 1, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'SUMG', 'N', 'м3.ГГГГ~План-пл.~Тело экв', null, null, 33, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (SUMG)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'SUMK', 'N', 'м3.ГГГГ~План-пл.~Комис. экв', null, null, 36, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (SUMK)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'SUMP', 'N', 'м3.ГГГГ~План-пл.~Проц. экв', null, null, 34, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (SUMP)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'TPOG_01', 'N', 'м1.ГГГГ~Факт-пл.~Тело~грн. экв', null, null, 50, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( TPOG_01 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'TPOG_02', 'N', 'м2.ГГГГ~Факт-пл.~Тело~грн. экв ', null, null, 60, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( TPOG_02 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'TPOG_03', 'N', 'м3.ГГГГ~Факт-пл.~Тело~грн. экв ', null, null, 70, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( TPOG_03 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'TXT', 'C', 'Наименование~Продукта', null, 100, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'SDOG', 'N', 'Сумма~по КД~в вал ', null, null, 30, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( SDOG )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'OST_NOM', 'N', 'Остаток~по телу~ кредита~ в валюте', null, null, 31, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( OST_NOM )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'ALL_PR', 'N', 'Общий~Остаток~Проср.~грн.экв. ', null, null, 32, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( ALL_PR )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', '*Код~Бранча', '', null, 1, 0, 1, 0, 0, '', '', 1, 1, '''И Т О Г''', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KPOG_01', 'N', 'м1.ГГГГ~Факт-пл.~Комис.~грн. экв', '', null, 52, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( KPOG_01 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KPOG_02', 'N', 'м2.ГГГГ~Факт-пл.~Комис.~грн. экв', '', null, 62, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( KPOG_02 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'KPOG_03', 'N', 'м3.ГГГГ~Факт-пл.~Комис.~грн. экв', '', null, 72, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( KPOG_03 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'KV', 'N', '*Вал', '', null, 29, 0, 1, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NAME_PP', 'C', 'Название~ПП', '', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'NAME_RU', 'C', 'Название~РУ', '', null, 10, 0, 0, 0, 0, '', '', 0, 0, 'Count(*)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'ND', 'N', '*Колич~КД', '', null, 0, 0, 0, 0, 0, '', '', 1, 1, 'Sum (ND)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'OST_SN', 'N', 'м3.ГГГГ~Остаток~Норм.Проц.~грн.экв. ', '', null, 42, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( OST_SN )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'OST_SP', 'N', 'м3.ГГГГ~Остаток~Проср.Тело~грн.экв. ', '', null, 44, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( OST_SP )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'OST_SPN', 'N', 'м3.ГГГГ~Остаток~Проср.Проц~грн.экв. ', '', null, 46, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( OST_SPN )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'OST_SS', 'N', 'м3.ГГГГ~Остаток~Норм.Тело~ грн.экв. ', '', null, 40, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( OST_SS )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'PPOG_01', 'N', 'м1.ГГГГ~Факт-пл.~Проц.~грн. экв', '', null, 51, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( PPOG_01 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'PPOG_02', 'N', 'м2.ГГГГ~Факт-пл.~Проц.~грн. экв', '', null, 61, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( PPOG_02 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'PPOG_03', 'N', 'м3.ГГГГ~Факт-пл.~Проц.~грн. экв', '', null, 71, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( PPOG_03 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'PROD', 'C', '*Код~продукта', '', null, 2, 0, 1, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'SEGMENT', 'N', '*Сегмент~бизнеса', '', null, 14, 0, 1, 0, 0, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'SPOK', 'C', '*Код~СПОК', '', null, 26, 0, 1, 0, 1, '', '', 1, 1, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'SUMG', 'N', 'м3.ГГГГ~План-пл.~Тело экв', '', null, 33, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (SUMG)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'SUMK', 'N', 'м3.ГГГГ~План-пл.~Комис. экв', '', null, 36, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (SUMK)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'SUMP', 'N', 'м3.ГГГГ~План-пл.~Проц. экв', '', null, 34, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum (SUMP)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'TPOG_01', 'N', 'м1.ГГГГ~Факт-пл.~Тело~грн. экв', '', null, 50, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( TPOG_01 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'TPOG_02', 'N', 'м2.ГГГГ~Факт-пл.~Тело~грн. экв ', '', null, 60, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( TPOG_02 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'TPOG_03', 'N', 'м3.ГГГГ~Факт-пл.~Тело~грн. экв ', '', null, 70, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( TPOG_03 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'TXT', 'C', 'Наименование~Продукта', '', 100, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'SDOG', 'N', 'Сумма~по КД~в вал ', '', null, 30, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( SDOG )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'OST_NOM', 'N', 'Остаток~по телу~ кредита~ в валюте', '', null, 31, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( OST_NOM )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'ALL_PR', 'N', 'Общий~Остаток~Проср.~грн.экв. ', '', null, 32, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( ALL_PR )', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CC_NF_SPOK');

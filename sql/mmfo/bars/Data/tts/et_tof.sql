@@ -202,12 +202,12 @@ begin
   delete from tts_vob where tt='TOF';
   begin
     insert into tts_vob(vob, tt, ord)
-    values (58, 'TOF', null);
+    values (57, 'TOF', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (tts_vob: 58, ''TOF'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (tts_vob: 57, ''TOF'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

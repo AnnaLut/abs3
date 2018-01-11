@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Трансформаційні проводки по МФСЗ за 2014 + 2015.1 роки';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'VREZ14';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,48 +124,48 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'EVENT', 'B', 'Знецін~Актив~~~EVENT', null, null, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'Код~вал~КД~~KV', null, null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'MFO', 'C', 'Код ~МФО~ РУ~~MFO', null, null, 90, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'ND', 'N', 'Реф~КД~~~ND', null, null, 3, 0, 0, 0, 0, '', '', 1, 0, 'Count(*)', 0, 0, 1, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"exists(select 1 from nd_acc where nd=:ND and acc=a.acc) and a.kv = :KV ")', 0);
-  bars_metabase.add_column(l_tabid, 5, 'P14', 'N', 'Невизнані~ %%~31.12.2014~екв.~P14', null, null, 50, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P14 ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'P15', 'N', 'Невизнані~ %%~30.06.2015~екв.~P15', null, null, 55, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P15 ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'REF', 'N', 'Референс~пров~в АБС~Рез-2014~REF', null, null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REF )', 0);
-  bars_metabase.add_column(l_tabid, 8, 'RNK', 'N', 'РНК~ кл~~~RNK', null, null, 80, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'Z14', 'N', 'Рез-МСФЗ~Бал~31.12.2014~екв.~Z14', null, null, 10, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( Z14 ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'Z15', 'N', 'Рез-МСФЗ~Бал.~30.06.2015~екв.~Z15', null, null, 30, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( Z15 ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'P152', 'N', 'Розр.~Невиз %%~30.11.2015~екв.~P152', null, null, 60, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P152 ) ', 0, 0, 0, '', 'FunNSIEditF("NVP_152[PROC=>Z2014.p152( :ND, :KV)][EXEC=>BEFORE]", 2)', 0);
-  bars_metabase.add_column(l_tabid, 12, 'Z14N', 'N', 'Рез-НБУ.23~Бал.~31.12.2014~екв.~Z14N', null, null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( Z14N ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'Z15N', 'N', 'Рез-НБУ.23~Бал.~30.11.2015~екв.~Z15N', null, null, 36, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( Z15N ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'V14', 'N', 'Рез-МСФЗ~9кл.~31.12.2014~екв.~V14', null, null, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( V14 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'V15', 'N', 'Рез-МСФЗ~9кл.~30.06.2015~екв.~V15', null, null, 40, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( V15 ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'V14N', 'N', 'Рез-НБУ.23~9кл.~31.12.2014~екв.~V14N', null, null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( V14N )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'V15N', 'N', 'Рез-НБУ.23~9кл.~30.11.2015~екв.~V15N', null, null, 46, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( V15N ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'PF', 'N', 'Пртф~Метд~~~PF', null, null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'NZ15', 'N', 'Рез-МСФЗ~Бал.~30.11.2015~ном.~NZ15', null, null, 32, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'NV15', 'N', 'Рез-МСФЗ~9кл.~30.11.2015~ном.~NV15', null, null, 42, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'QZ15', 'N', 'Рез-МСФЗ~Бал.~30.11.2015~екв.~QZ15', null, null, 34, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( QZ15 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'QV15', 'N', 'Рез-МСФЗ~9кл.~30.11.2015~екв.~QV15', null, null, 44, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( QV15 ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'VIDD', 'N', 'ОК !~****~Вид~КД~VIDD', null, null, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', 'F1_Select(12, "Z2014.ALL1( 8,  :RI ) " ) ', 0);
-  bars_metabase.add_column(l_tabid, 24, 'NZ15U', 'N', '~~ВРАХОВАНО~ном.~NZ15U', null, null, 33, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'NV15U', 'N', '~~ВРАХОВАНО~ном.~NV15U', null, null, 43, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'QZ15U', 'N', '~~ВРАХОВАНО~екв.~QZ15U', null, null, 35, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( QZ15U )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'QV15U', 'N', '~~ВРАХОВАНО~екв.~QV15U', null, null, 45, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( QV15U ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'Z14U', 'N', '~~ВРАХОВАНО~екв.~Z14U', null, null, 11, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( Z14U ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'V14U', 'N', '~~ВРАХОВАНО~екв.~V14U', null, null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( V14U )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'REF15', 'N', 'Референс~пров~в АБС~Рез-2015~REF15', null, null, 26, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REF15 )', 0);
-  bars_metabase.add_column(l_tabid, 31, 'BVQ14', 'N', 'BV~бал.~31.12.2014~екв.~BVQ14', null, null, 9, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( BVQ14 ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'B9Q14', 'N', 'BV~9 кл.~31.12.2014~екв.~B9Q14', null, null, 19, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( B9Q14 ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'BVQ15', 'N', 'BV~бал.~30.11.2015~екв.~BVQ15', null, null, 29, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( BVQ15 ) ', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 34, 'B9Q15', 'N', 'BV~9 кл.~30.11.2015~екв.~B9Q15', null, null, 39, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( B9Q15 )', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'REFP14', 'N', 'Реф АБС~НЕвизн~дох~31.12.2014~REFP14', null, null, 49, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REFP14 )', 0);
-  bars_metabase.add_column(l_tabid, 36, 'REFP15', 'N', 'Реф АБС~НЕвизн~дох~30.06.2015~REFP15', null, null, 54, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REFP15 )', 0);
-  bars_metabase.add_column(l_tabid, 37, 'REF152', 'N', 'Реф АБС~НЕвизн~дох~30.11.2015~REF152', null, null, 59, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REF152 )', 0);
-  bars_metabase.add_column(l_tabid, 38, 'REF153', 'N', 'Реф АБС~НЕвизн~дох~31.12.2015~REF153', null, null, 69, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REF153 )', 0);
-  bars_metabase.add_column(l_tabid, 39, 'P153', 'N', 'Розр.~Невиз %%~31.12.2015~екв.~P153', null, null, 70, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P153) ', 0, 0, 0, '', 'FunNSIEditF("NVP_152[PROC=>Z2014.p153( :ND, :KV)][EXEC=>BEFORE]", 2)', 0);
-  bars_metabase.add_column(l_tabid, 40, 'TIPA', 'N', 'Вид~акт', null, null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 41, 'NLS', 'C', 'Осн.рах.', null, null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions," a.NLS = :NLS and a.KV = :KV ")', 0);
-  bars_metabase.add_column(l_tabid, 42, 'RI', 'C', 'RI', null, null, 99, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'EVENT', 'B', 'Знецін~Актив~~~EVENT', '', null, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KV', 'N', 'Код~вал~КД~~KV', '', null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'MFO', 'C', 'Код ~МФО~ РУ~~MFO', '', null, 90, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ND', 'N', 'Реф~КД~~~ND', '', null, 3, 0, 0, 0, 0, '', '', 1, 0, 'Count(*)', 0, 0, 1, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"exists(select 1 from nd_acc where nd=:ND and acc=a.acc) and a.kv = :KV ")', 0);
+  bars_metabase.add_column(l_tabid, 5, 'P14', 'N', 'Невизнані~ %%~31.12.2014~екв.~P14', '', null, 50, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P14 ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'P15', 'N', 'Невизнані~ %%~30.06.2015~екв.~P15', '', null, 55, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P15 ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'REF', 'N', 'Референс~пров~в АБС~Рез-2014~REF', '', null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REF )', 0);
+  bars_metabase.add_column(l_tabid, 8, 'RNK', 'N', 'РНК~ кл~~~RNK', '', null, 80, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'Z14', 'N', 'Рез-МСФЗ~Бал~31.12.2014~екв.~Z14', '', null, 10, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( Z14 ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'Z15', 'N', 'Рез-МСФЗ~Бал.~30.06.2015~екв.~Z15', '', null, 30, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( Z15 ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'P152', 'N', 'Розр.~Невиз %%~30.11.2015~екв.~P152', '', null, 60, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P152 ) ', 0, 0, 0, '', 'FunNSIEditF("NVP_152[PROC=>Z2014.p152( :ND, :KV)][EXEC=>BEFORE]", 2)', 0);
+  bars_metabase.add_column(l_tabid, 12, 'Z14N', 'N', 'Рез-НБУ.23~Бал.~31.12.2014~екв.~Z14N', '', null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( Z14N ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'Z15N', 'N', 'Рез-НБУ.23~Бал.~30.11.2015~екв.~Z15N', '', null, 36, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( Z15N ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'V14', 'N', 'Рез-МСФЗ~9кл.~31.12.2014~екв.~V14', '', null, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( V14 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'V15', 'N', 'Рез-МСФЗ~9кл.~30.06.2015~екв.~V15', '', null, 40, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( V15 ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'V14N', 'N', 'Рез-НБУ.23~9кл.~31.12.2014~екв.~V14N', '', null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( V14N )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'V15N', 'N', 'Рез-НБУ.23~9кл.~30.11.2015~екв.~V15N', '', null, 46, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum ( V15N ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'PF', 'N', 'Пртф~Метд~~~PF', '', null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'NZ15', 'N', 'Рез-МСФЗ~Бал.~30.11.2015~ном.~NZ15', '', null, 32, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'NV15', 'N', 'Рез-МСФЗ~9кл.~30.11.2015~ном.~NV15', '', null, 42, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'QZ15', 'N', 'Рез-МСФЗ~Бал.~30.11.2015~екв.~QZ15', '', null, 34, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( QZ15 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'QV15', 'N', 'Рез-МСФЗ~9кл.~30.11.2015~екв.~QV15', '', null, 44, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( QV15 ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'VIDD', 'N', 'ОК !~****~Вид~КД~VIDD', '', null, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', 'F1_Select(12, "Z2014.ALL1( 8,  :RI ) " ) ', 0);
+  bars_metabase.add_column(l_tabid, 24, 'NZ15U', 'N', '~~ВРАХОВАНО~ном.~NZ15U', '', null, 33, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'NV15U', 'N', '~~ВРАХОВАНО~ном.~NV15U', '', null, 43, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'QZ15U', 'N', '~~ВРАХОВАНО~екв.~QZ15U', '', null, 35, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( QZ15U )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'QV15U', 'N', '~~ВРАХОВАНО~екв.~QV15U', '', null, 45, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( QV15U ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'Z14U', 'N', '~~ВРАХОВАНО~екв.~Z14U', '', null, 11, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( Z14U ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'V14U', 'N', '~~ВРАХОВАНО~екв.~V14U', '', null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( V14U )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'REF15', 'N', 'Референс~пров~в АБС~Рез-2015~REF15', '', null, 26, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REF15 )', 0);
+  bars_metabase.add_column(l_tabid, 31, 'BVQ14', 'N', 'BV~бал.~31.12.2014~екв.~BVQ14', '', null, 9, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( BVQ14 ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'B9Q14', 'N', 'BV~9 кл.~31.12.2014~екв.~B9Q14', '', null, 19, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( B9Q14 ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'BVQ15', 'N', 'BV~бал.~30.11.2015~екв.~BVQ15', '', null, 29, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( BVQ15 ) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'B9Q15', 'N', 'BV~9 кл.~30.11.2015~екв.~B9Q15', '', null, 39, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( B9Q15 )', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'REFP14', 'N', 'Реф АБС~НЕвизн~дох~31.12.2014~REFP14', '', null, 49, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REFP14 )', 0);
+  bars_metabase.add_column(l_tabid, 36, 'REFP15', 'N', 'Реф АБС~НЕвизн~дох~30.06.2015~REFP15', '', null, 54, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REFP15 )', 0);
+  bars_metabase.add_column(l_tabid, 37, 'REF152', 'N', 'Реф АБС~НЕвизн~дох~30.11.2015~REF152', '', null, 59, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REF152 )', 0);
+  bars_metabase.add_column(l_tabid, 38, 'REF153', 'N', 'Реф АБС~НЕвизн~дох~31.12.2015~REF153', '', null, 69, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REF153 )', 0);
+  bars_metabase.add_column(l_tabid, 39, 'P153', 'N', 'Розр.~Невиз %%~31.12.2015~екв.~P153', '', null, 70, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum ( P153) ', 0, 0, 0, '', 'FunNSIEditF("NVP_152[PROC=>Z2014.p153( :ND, :KV)][EXEC=>BEFORE]", 2)', 0);
+  bars_metabase.add_column(l_tabid, 40, 'TIPA', 'N', 'Вид~акт', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 41, 'NLS', 'C', 'Осн.рах.', '', null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions," a.NLS = :NLS and a.KV = :KV ")', 0);
+  bars_metabase.add_column(l_tabid, 42, 'RI', 'C', 'RI', '', null, 99, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

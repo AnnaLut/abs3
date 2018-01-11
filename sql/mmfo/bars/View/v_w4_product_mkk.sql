@@ -13,7 +13,9 @@ PROMPT *** Create  view V_W4_PRODUCT_MKK ***
  where t.grp_code = 'INSTANT_MMSB' and t.kv = 980 and t.nbs = '2605';
 
 PROMPT *** Create  grants  V_W4_PRODUCT_MKK ***
+grant SELECT                                                                 on V_W4_PRODUCT_MKK to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_PRODUCT_MKK to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_W4_PRODUCT_MKK to UPLD;
 
 
 

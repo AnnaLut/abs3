@@ -22,8 +22,10 @@ PROMPT *** Create  view V_S_AND_T_UKRAINE ***
    ORDER BY   a.dat_a, b.nb;
 
 PROMPT *** Create  grants  V_S_AND_T_UKRAINE ***
+grant SELECT                                                                 on V_S_AND_T_UKRAINE to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_S_AND_T_UKRAINE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_S_AND_T_UKRAINE to START1;
+grant SELECT                                                                 on V_S_AND_T_UKRAINE to UPLD;
 grant FLASHBACK,SELECT                                                       on V_S_AND_T_UKRAINE to WR_REFREAD;
 
 

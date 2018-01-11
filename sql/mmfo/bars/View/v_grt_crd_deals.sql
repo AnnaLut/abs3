@@ -34,7 +34,9 @@ from
 where d.nd = g.nd;
 
 PROMPT *** Create  grants  V_GRT_CRD_DEALS ***
+grant SELECT                                                                 on V_GRT_CRD_DEALS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GRT_CRD_DEALS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_GRT_CRD_DEALS to UPLD;
 
 
 

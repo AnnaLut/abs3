@@ -25,7 +25,9 @@ PROMPT *** Create  view V_KPK ***
    ORDER BY 6, 1,4;
 
 PROMPT *** Create  grants  V_KPK ***
+grant SELECT                                                                 on V_KPK           to BARSREADER_ROLE;
 grant SELECT                                                                 on V_KPK           to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_KPK           to UPLD;
 
 
 

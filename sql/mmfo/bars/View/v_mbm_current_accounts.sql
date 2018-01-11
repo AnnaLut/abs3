@@ -38,7 +38,9 @@ PROMPT *** Create  view V_MBM_CURRENT_ACCOUNTS ***
 	 where type_id = 'CURRENT';
 
 PROMPT *** Create  grants  V_MBM_CURRENT_ACCOUNTS ***
+grant SELECT                                                                 on V_MBM_CURRENT_ACCOUNTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBM_CURRENT_ACCOUNTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_MBM_CURRENT_ACCOUNTS to UPLD;
 
 
 

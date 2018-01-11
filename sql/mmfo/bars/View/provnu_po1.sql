@@ -25,8 +25,10 @@ select null,null,null,null,null, null,null,null from dk where dk=0
  ;
 
 PROMPT *** Create  grants  PROVNU_PO1 ***
+grant SELECT                                                                 on PROVNU_PO1      to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on PROVNU_PO1      to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on PROVNU_PO1      to NALOG;
+grant SELECT                                                                 on PROVNU_PO1      to UPLD;
 
 
 

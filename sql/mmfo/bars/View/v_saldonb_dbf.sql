@@ -30,8 +30,10 @@ x0.dapp ,
     ((x0.acc = x1.acc ) AND (x0.nls >= '90000000000000'));
 
 PROMPT *** Create  grants  V_SALDONB_DBF ***
+grant SELECT                                                                 on V_SALDONB_DBF   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SALDONB_DBF   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SALDONB_DBF   to START1;
+grant SELECT                                                                 on V_SALDONB_DBF   to UPLD;
 
 
 

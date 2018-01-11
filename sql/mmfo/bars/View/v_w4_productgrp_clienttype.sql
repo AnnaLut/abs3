@@ -29,8 +29,10 @@ select code, name, scheme_id, 2
    and nvl(date_close,bankdate+1) > bankdate;
 
 PROMPT *** Create  grants  V_W4_PRODUCTGRP_CLIENTTYPE ***
+grant SELECT                                                                 on V_W4_PRODUCTGRP_CLIENTTYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_PRODUCTGRP_CLIENTTYPE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_W4_PRODUCTGRP_CLIENTTYPE to OW;
+grant SELECT                                                                 on V_W4_PRODUCTGRP_CLIENTTYPE to UPLD;
 
 
 

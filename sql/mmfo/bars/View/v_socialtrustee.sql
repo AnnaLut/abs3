@@ -28,8 +28,10 @@ PROMPT *** Create  view V_SOCIALTRUSTEE ***
  ;
 
 PROMPT *** Create  grants  V_SOCIALTRUSTEE ***
+grant SELECT                                                                 on V_SOCIALTRUSTEE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SOCIALTRUSTEE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SOCIALTRUSTEE to DPT_ROLE;
+grant SELECT                                                                 on V_SOCIALTRUSTEE to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SOCIALTRUSTEE to WR_ALL_RIGHTS;
 
 

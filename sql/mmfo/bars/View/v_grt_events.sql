@@ -15,7 +15,9 @@ from grt_events e, grt_event_types et
 where e.type_id = et.event_id;
 
 PROMPT *** Create  grants  V_GRT_EVENTS ***
+grant SELECT                                                                 on V_GRT_EVENTS    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GRT_EVENTS    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_GRT_EVENTS    to UPLD;
 
 
 

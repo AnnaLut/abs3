@@ -20,8 +20,10 @@ where
 ORDER BY b.fdat, substr(a.nls,1,4), substr(a.nls,6,9), a.kv;
 
 PROMPT *** Create  grants  CHECK_80A ***
+grant SELECT                                                                 on CHECK_80A       to BARSREADER_ROLE;
 grant SELECT                                                                 on CHECK_80A       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHECK_80A       to START1;
+grant SELECT                                                                 on CHECK_80A       to UPLD;
 
 
 

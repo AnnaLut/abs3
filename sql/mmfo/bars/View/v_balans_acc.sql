@@ -18,7 +18,9 @@ where b.acc=a.acc  and d.caldt_ID=b.caldt_ID and a.nbs not like '8%'
  ;
 
 PROMPT *** Create  grants  V_BALANS_ACC ***
+grant SELECT                                                                 on V_BALANS_ACC    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BALANS_ACC    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_BALANS_ACC    to UPLD;
 grant SELECT                                                                 on V_BALANS_ACC    to WEB_BALANS;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BALANS_ACC    to WR_ALL_RIGHTS;
 

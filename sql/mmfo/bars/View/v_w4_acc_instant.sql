@@ -14,8 +14,10 @@ PROMPT *** Create  view V_W4_ACC_INSTANT ***
    and w.card_code = c.code;
 
 PROMPT *** Create  grants  V_W4_ACC_INSTANT ***
+grant SELECT                                                                 on V_W4_ACC_INSTANT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_ACC_INSTANT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_W4_ACC_INSTANT to OW;
+grant SELECT                                                                 on V_W4_ACC_INSTANT to UPLD;
 
 
 

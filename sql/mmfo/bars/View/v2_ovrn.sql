@@ -1,5 +1,14 @@
-create or replace view v2_ovrn as
-select x.ND, x.cc_id, x.sdate, x.wdate, x.kv, x.RNK, x.sos, x.nls, x.RNK1, x.mdate, x.IRA, x.IRP, x.IRB, x.NMK1, x.okpo, x.DATVZ, x.TERM,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V2_OVRN.sql =========*** Run *** ======
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V2_OVRN ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V2_OVRN ("ND", "CC_ID", "SDATE", "WDATE", "KV", "RNK", "SOS", "NLS", "RNK1", "MDATE", "IRA", "IRP", "IRB", "NMK1", "OKPO", "DATVZ", "TERM", "DATSP", "SP", "SPN", "RLIM", "PK", "DONOR", "NK", "OSTC", "OST_FREE", "ACCC", "ACC", "TARIF", "LIM", "ACC_ADD") AS 
+  select x.ND, x.cc_id, x.sdate, x.wdate, x.kv, x.RNK, x.sos, x.nls, x.RNK1, x.mdate, x.IRA, x.IRP, x.IRB, x.NMK1, x.okpo, x.DATVZ, x.TERM,
        x.DATSP, x.SP, x.SPN, x.RLIM, x.PK , x.DONOR, x.NK,  x.OSTC, x.OST_free, x.accc, x.acc ,  '¬вести' TARIF ,
  decode (x.sos, 0,
                (select lim/100 from ovr_lim where acc=x.acc and fdat=(select min(fdat) from ovr_lim where acc=x.acc)) ,
@@ -25,5 +34,14 @@ from ( select d.ND, d.cc_id,  d.sdate, d.wdate,  a.kv, d.RNK, d.sos, a.nls, a.rn
      ) x
 ;
 
-grant select on  BARS.v2_ovrn  to start1 ;
-grant select on  BARS.v2_ovrn  to BARS_ACCESS_DEFROLE ; 
+PROMPT *** Create  grants  V2_OVRN ***
+grant SELECT                                                                 on V2_OVRN         to BARSREADER_ROLE;
+grant SELECT                                                                 on V2_OVRN         to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V2_OVRN         to START1;
+grant SELECT                                                                 on V2_OVRN         to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V2_OVRN.sql =========*** End *** ======
+PROMPT ===================================================================================== 

@@ -19,8 +19,10 @@ select "FN","DAT","N","MFO","OKPO","RTYPE","OTYPE","ODATE","NLS","NLSM","KV","RE
    and dat = (select max(dat) from lines_f where nls=f.nls and kv=f.kv and otype in (3,5));
 
 PROMPT *** Create  grants  V_LINES_F ***
+grant SELECT                                                                 on V_LINES_F       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_LINES_F       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_LINES_F       to CC_DOC;
+grant SELECT                                                                 on V_LINES_F       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_LINES_F       to WR_ALL_RIGHTS;
 
 

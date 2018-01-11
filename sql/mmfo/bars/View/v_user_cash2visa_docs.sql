@@ -8,8 +8,7 @@ PROMPT =========================================================================
 PROMPT *** Create  view V_USER_CASH2VISA_DOCS ***
 
   CREATE OR REPLACE FORCE VIEW BARS.V_USER_CASH2VISA_DOCS ("COLOR1", "COLOR2", "VDAT", "REF", "TT", "NLSA", "NLSB", "MFOB", "NB_B", "S", "S_", "DK", "SK", "LCV1", "DIG1", "USERID", "FIO", "CHK", "NAZN", "LCV2", "DIG2", "S2", "S2_", "ND", "NEXTVISAGRP", "KV", "KV2", "FLAGS", "DEAL_TAG", "DATD", "PDAT", "PRTY", "SOS", "NAM_B", "MFOA", "NB_A", "DATP", "VOB", "NAM_A", "BRANCH", "ID_A", "ID_B") AS 
-  SELECT
-         SIGN (a.vdat - bankdate) AS color1,
+  SELECT  SIGN (a.vdat - bankdate) AS color1,
           NVL (a.sk, 0) AS color2,
           a.vdat,
           a.REF,
@@ -51,7 +50,9 @@ PROMPT *** Create  view V_USER_CASH2VISA_DOCS ***
           a.branch,
           a.id_a,
           a.id_b
-     FROM (select k.* from  oper k , ref_que r where r.ref = k.ref)  a,
+     FROM (SELECT /*+ leading(r k) full(r) index(k pk_oper) */ k.*
+             FROM oper k, ref_que r
+            WHERE r.REF = k.REF) a,
           tabval$global v1,
           tabval$global v2,
           tts tt,
@@ -66,12 +67,14 @@ PROMPT *** Create  view V_USER_CASH2VISA_DOCS ***
           AND a.nextvisagrp = '04'          -- 04 - группа визировани€ —ховище
           AND a.mfoa = ba.mfo
           AND a.mfob = bb.mfo
-          and a.userid = us.id
+          AND a.userid = us.id
           AND INSTR (a.next_visa_branches,
-                     SYS_CONTEXT ('bars_context', 'user_branch') || ',') > 0  -- совпадает один из бранчей;
+                     SYS_CONTEXT ('bars_context', 'user_branch') || ',') > 0 -- совпадает один из бранчей;
 
 PROMPT *** Create  grants  V_USER_CASH2VISA_DOCS ***
+grant SELECT                                                                 on V_USER_CASH2VISA_DOCS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USER_CASH2VISA_DOCS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_USER_CASH2VISA_DOCS to UPLD;
 grant SELECT                                                                 on V_USER_CASH2VISA_DOCS to WR_CHCKINNR_CASH;
 
 

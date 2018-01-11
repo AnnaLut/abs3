@@ -132,12 +132,34 @@ begin
   end;
   begin
     insert into ps_tts(nbs, tt, dk)
+    values ('2083', 'NE3', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2083'', ''NE3'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
     values ('2083', 'NE3', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2083'', ''NE3'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
+    values ('2087', 'NE3', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2087'', ''NE3'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -204,6 +226,28 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (ps_tts: ''2658'', ''NE3'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
+    values ('9000', 'NE3', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''9000'', ''NE3'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
+    values ('9000', 'NE3', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''9000'', ''NE3'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;

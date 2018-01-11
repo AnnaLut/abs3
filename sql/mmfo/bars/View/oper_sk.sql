@@ -12,18 +12,20 @@ PROMPT *** Create  view OPER_SK ***
      FROM oper op
     WHERE  op.vdat >= SYSDATE - 35 and op.pdat >= sysdate - 35 and
            (op.sk IS NOT NULL or
-            exists(select 1 
+            exists(select 1
                    from opldok o
                    where op.ref = o.ref and op.sk is null and
                          o.acc in (select acc from accounts a where a.nbs in ('1001','1002','1003','1004') and kv = 980)
                     )
-           ) 
+           )
  ;
 
 PROMPT *** Create  grants  OPER_SK ***
+grant SELECT                                                                 on OPER_SK         to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on OPER_SK         to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on OPER_SK         to PYOD001;
 grant UPDATE                                                                 on OPER_SK         to START1;
+grant SELECT                                                                 on OPER_SK         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OPER_SK         to WR_ALL_RIGHTS;
 
 

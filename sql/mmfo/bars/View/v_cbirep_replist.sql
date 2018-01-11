@@ -40,7 +40,9 @@ PROMPT *** Create  view V_CBIREP_REPLIST ***
  where app.codeapp = rep.codeapp;
 
 PROMPT *** Create  grants  V_CBIREP_REPLIST ***
+grant SELECT                                                                 on V_CBIREP_REPLIST to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CBIREP_REPLIST to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CBIREP_REPLIST to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CBIREP_REPLIST to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_CBIREP_REPLIST to WR_CBIREP;
 

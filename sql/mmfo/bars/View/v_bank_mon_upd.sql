@@ -15,9 +15,11 @@ PROMPT *** Create  view V_BANK_MON_UPD ***
                and s.id= m.isp;
 
 PROMPT *** Create  grants  V_BANK_MON_UPD ***
+grant SELECT                                                                 on V_BANK_MON_UPD  to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BANK_MON_UPD  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BANK_MON_UPD  to PYOD001;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BANK_MON_UPD  to START1;
+grant SELECT                                                                 on V_BANK_MON_UPD  to UPLD;
 grant FLASHBACK,SELECT                                                       on V_BANK_MON_UPD  to WR_REFREAD;
 
 

@@ -37,9 +37,11 @@ PROMPT *** Create  view V_ACC_TARIF_SCALE ***
    and t.kod = f.kod;
 
 PROMPT *** Create  grants  V_ACC_TARIF_SCALE ***
+grant SELECT                                                                 on V_ACC_TARIF_SCALE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ACC_TARIF_SCALE to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ACC_TARIF_SCALE to CUST001;
 grant SELECT                                                                 on V_ACC_TARIF_SCALE to START1;
+grant SELECT                                                                 on V_ACC_TARIF_SCALE to UPLD;
 
 
 

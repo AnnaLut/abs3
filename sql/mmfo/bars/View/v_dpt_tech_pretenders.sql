@@ -36,8 +36,10 @@ WHERE d.vidd = v.vidd
  ;
 
 PROMPT *** Create  grants  V_DPT_TECH_PRETENDERS ***
+grant SELECT                                                                 on V_DPT_TECH_PRETENDERS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_TECH_PRETENDERS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_TECH_PRETENDERS to DPT_ROLE;
+grant SELECT                                                                 on V_DPT_TECH_PRETENDERS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_TECH_PRETENDERS to WR_ALL_RIGHTS;
 
 

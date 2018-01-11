@@ -16,8 +16,10 @@ PROMPT *** Create  view V_OBPC_ZP_FILES ***
  ;
 
 PROMPT *** Create  grants  V_OBPC_ZP_FILES ***
+grant SELECT                                                                 on V_OBPC_ZP_FILES to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_ZP_FILES to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_OBPC_ZP_FILES to OBPC;
+grant SELECT                                                                 on V_OBPC_ZP_FILES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OBPC_ZP_FILES to WR_ALL_RIGHTS;
 
 

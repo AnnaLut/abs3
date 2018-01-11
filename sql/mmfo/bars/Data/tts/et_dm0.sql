@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции DM0
-prompt Наименование операции: Поповнення поточного металевого рахунку (готів.)
+prompt Наименование операции: DM0 Поповнення поточного металевого рахунку (готів.)
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DM0', 'Поповнення поточного металевого рахунку (готів.)', 0, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', null, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000100000000000000000', 'Поповнення згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DM0', 'DM0 Поповнення поточного металевого рахунку (готів.)', 0, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', null, null, null, '#(tobopack.GetTOBOParam(''CASH11''))', null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000100000000000000000', 'Поповнення згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DM0', name='Поповнення поточного металевого рахунку (готів.)', dk=0, nlsm=null, kv=null, nlsk='#(tobopack.GetTOBOParam(''CASH11''))', kvk=null, nlss=null, nlsa=null, nlsb='#(tobopack.GetTOBOParam(''CASH11''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000100000000000000000', nazn='Поповнення згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DM0', name='DM0 Поповнення поточного металевого рахунку (готів.)', dk=0, nlsm=null, kv=null, nlsk='#(tobopack.GetTOBOParam(''CASH11''))', kvk=null, nlss=null, nlsa=null, nlsb='#(tobopack.GetTOBOParam(''CASH11''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000100000000000000000', nazn='Поповнення згідно договору #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DM0';
   end;
   --------------------------------

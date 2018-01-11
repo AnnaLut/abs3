@@ -282,17 +282,6 @@ begin
   delete from chklist_tts where tt='IB2';
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (5, 'IB2', 1, null, null, 3);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''IB2'', 1, null, null, 3) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
     values (7, 'IB2', 2, null, 'kv<>980', null);
   exception
     when dup_val_on_index then null;
@@ -304,12 +293,23 @@ begin
   end;
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (11, 'IB2', 7, null, null, null);
+    values (11, 'IB2', 4, null, '((substr(NLSA,1,4) in (''2062'',''2063'',''2072'',''2073'',''2082'',''2083'',''2102'',''2103'',''2112'',''2113'',''2122'',''2123'',''2132'',''2133'')) or kv<>980 )', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 11, ''IB2'', 7, null, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 11, ''IB2'', 4, null, ''((substr(NLSA,1,4) in (''''2062'''',''''2063'''',''''2072'''',''''2073'''',''''2082'''',''''2083'''',''''2102'''',''''2103'''',''''2112'''',''''2113'''',''''2122'''',''''2123'''',''''2132'''',''''2133'''')) or kv<>980 )'', null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
+    values (25, 'IB2', 1, null, null, 3);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 25, ''IB2'', 1, null, null, 3) - первичный ключ не найден!');
       else raise;
       end if;
   end;

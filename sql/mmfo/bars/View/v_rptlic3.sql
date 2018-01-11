@@ -158,8 +158,10 @@ PROMPT *** Create  view V_RPTLIC3 ***
    where o.acc = t.acc(+);
 
 PROMPT *** Create  grants  V_RPTLIC3 ***
+grant SELECT                                                                 on V_RPTLIC3       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RPTLIC3       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_RPTLIC3       to START1;
+grant SELECT                                                                 on V_RPTLIC3       to UPLD;
 
 
 

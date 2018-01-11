@@ -12,8 +12,10 @@ PROMPT *** Create  view V_NAEK_HEADERS_3 ***
  ;
 
 PROMPT *** Create  grants  V_NAEK_HEADERS_3 ***
+grant SELECT                                                                 on V_NAEK_HEADERS_3 to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_NAEK_HEADERS_3 to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_NAEK_HEADERS_3 to TOSS;
+grant SELECT                                                                 on V_NAEK_HEADERS_3 to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_NAEK_HEADERS_3 to WR_ALL_RIGHTS;
 
 

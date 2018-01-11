@@ -14,8 +14,10 @@ PROMPT *** Create  view V_WEB_MAIL_USER_OUT ***
     where b.mail_sender_id = bars.user_id;
 
 PROMPT *** Create  grants  V_WEB_MAIL_USER_OUT ***
+grant SELECT                                                                 on V_WEB_MAIL_USER_OUT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WEB_MAIL_USER_OUT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_WEB_MAIL_USER_OUT to START1;
+grant SELECT                                                                 on V_WEB_MAIL_USER_OUT to UPLD;
 
 
 

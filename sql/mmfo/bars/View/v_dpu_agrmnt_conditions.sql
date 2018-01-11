@@ -1,46 +1,22 @@
--- ======================================================================================
--- Module : DPU
--- Author : BAA
--- Date   : 07.08.2017
--- ======================================================================================
--- create view V_DPU_AGRMNT_CONDITIONS
--- ======================================================================================
 
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET ECHO         OFF
-SET LINES        500
-SET PAGES        500
 
-prompt -- ======================================================
-prompt -- create view V_DPU_AGRMNT_CONDITIONS
-prompt -- ======================================================
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_DPU_AGRMNT_CONDITIONS.sql =========**
+PROMPT ===================================================================================== 
 
-create or replace view V_DPU_AGRMNT_CONDITIONS
-( DPU_ID
-, RNK
-, ND
-, FREQV
-, COMPROC
-, STOP_ID
-, AGRMNT_NEXT_NUM
-, AGRMNT_NEXT_END_DATE
-, KV
-, FL_AUTOEXTEND
-, TERM_TYPE
-, MIN_AMNT
-, MAX_AMNT
-, DAT_END_MIN
-, DAT_END_MAX
-) as
-select d.DPU_ID
+
+PROMPT *** Create  view V_DPU_AGRMNT_CONDITIONS ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_DPU_AGRMNT_CONDITIONS ("DPU_ID", "RNK", "ND", "FREQV", "COMPROC", "STOP_ID", "AGRMNT_NEXT_NUM", "AGRMNT_NEXT_END_DATE", "KV", "FL_AUTOEXTEND", "TERM_TYPE", "MIN_AMNT", "MAX_AMNT", "DAT_END_MIN", "DAT_END_MAX") AS 
+  select d.DPU_ID
      , d.RNK
      , nvl2(d.DPU_GEN,(select ND from DPU_DEAL where DPU_ID = d.DPU_GEN),d.ND) as ND
      , d.FREQV
      , d.COMPROC
      , d.ID_STOP as STOP_ID
-     , ( select count(1) + 1 
+     , ( select count(1) + 1
            from DPU_AGREEMENTS a
-          where a.DPU_ID = d.DPU_ID 
+          where a.DPU_ID = d.DPU_ID
        ) as AGRMNT_NEXT_NUM
      , DPU_AGR.GET_NEXT_END_DATE(d.DPU_ID) AGRMNT_NEXT_END_DATE
      , v.KV
@@ -55,10 +31,12 @@ select d.DPU_ID
     on ( v.VIDD = d.VIDD )
  where d.CLOSED = 0;
 
-show error
+PROMPT *** Create  grants  V_DPU_AGRMNT_CONDITIONS ***
+grant SELECT                                                                 on V_DPU_AGRMNT_CONDITIONS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DPU_AGRMNT_CONDITIONS to UPLD;
 
-prompt -- ======================================================
-prompt -- Grants
-prompt -- ======================================================
 
-grant select on V_DPU_AGRMNT_CONDITIONS to BARS_ACCESS_DEFROLE;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_DPU_AGRMNT_CONDITIONS.sql =========**
+PROMPT ===================================================================================== 

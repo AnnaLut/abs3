@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'РКО. Індивідуальні тарифи та процентні ставки';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_RKO_TARIF';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,12 +124,12 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC', null, 22, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'INDPAR', 'N', 'Тип інд.~параметру', 1, 22, 2, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'INDPAR_NAME', 'C', 'Тип інд.~параметру', 3, 100, 3, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'ORGAN', 'N', 'Орган~управління', 1, 22, 4, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DATE_OPEN', 'D', 'Дата рішення~про встановленя~інд.тарифів / %ставки', 2, 10, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'DATE_CLOSE', 'D', 'Дата закінчення дії~інд.тарифів / %ставки', 2, 10, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC', '', 22, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'INDPAR', 'N', 'Тип інд.~параметру', '1', 22, 2, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'INDPAR_NAME', 'C', 'Тип інд.~параметру', '3', 100, 3, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ORGAN', 'N', 'Орган~управління', '1', 22, 4, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DATE_OPEN', 'D', 'Дата рішення~про встановленя~інд.тарифів / %ставки', '2', 10, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'DATE_CLOSE', 'D', 'Дата закінчення дії~інд.тарифів / %ставки', '2', 10, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('RKO_ORGAN');

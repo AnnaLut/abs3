@@ -62,8 +62,10 @@ PROMPT *** Create  view NADA5 ***
     WHERE a.nbs || a.ob22 = o.kod(+);
 
 PROMPT *** Create  grants  NADA5 ***
+grant SELECT                                                                 on NADA5           to BARSREADER_ROLE;
 grant SELECT                                                                 on NADA5           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on NADA5           to SALGL;
+grant SELECT                                                                 on NADA5           to UPLD;
 
 
 

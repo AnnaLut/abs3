@@ -20,8 +20,10 @@ l.acc6204=c.acc
 ;
 
 PROMPT *** Create  grants  V_VP_LIST ***
+grant SELECT                                                                 on V_VP_LIST       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_VP_LIST       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_VP_LIST       to START1;
+grant SELECT                                                                 on V_VP_LIST       to UPLD;
 
 
 

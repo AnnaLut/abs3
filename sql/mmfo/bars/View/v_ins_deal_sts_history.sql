@@ -23,7 +23,9 @@ PROMPT *** Create  view V_INS_DEAL_STS_HISTORY ***
  order by dsh.id desc;
 
 PROMPT *** Create  grants  V_INS_DEAL_STS_HISTORY ***
+grant SELECT                                                                 on V_INS_DEAL_STS_HISTORY to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_DEAL_STS_HISTORY to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_INS_DEAL_STS_HISTORY to UPLD;
 
 
 

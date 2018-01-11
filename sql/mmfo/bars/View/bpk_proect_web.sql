@@ -12,7 +12,9 @@ PROMPT *** Create  view BPK_PROECT_WEB ***
   from bpk_proect;
 
 PROMPT *** Create  grants  BPK_PROECT_WEB ***
+grant SELECT                                                                 on BPK_PROECT_WEB  to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_PROECT_WEB  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on BPK_PROECT_WEB  to UPLD;
 
 
 

@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('C65', 'C65 Комiсiя для 065 ЧЕК Укрпошта 1001/02 (комic. з 3570)', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''3570_UKRPOSTA'',0))', 980, '#(nbs_ob22 (''6110'',''78''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(32, #(KVA),#(NLSA), #(S))', null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
+    values ('C65', 'C65 Комiсiя для 065 ЧЕК Укрпошта 1001/02 (комic. з 3570)', 1, '#(BRANCH_USR.GET_BRANCH_PARAM2(''3570_UKRPOSTA'',0))', 980, '#(nbs_ob22 (''6510'',''78''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(32, #(KVA),#(NLSA), #(S))', null, null, null, null, null, '0000100000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='C65', name='C65 Комiсiя для 065 ЧЕК Укрпошта 1001/02 (комic. з 3570)', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''3570_UKRPOSTA'',0))', kv=980, nlsk='#(nbs_ob22 (''6110'',''78''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(32, #(KVA),#(NLSA), #(S))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='C65', name='C65 Комiсiя для 065 ЧЕК Укрпошта 1001/02 (комic. з 3570)', dk=1, nlsm='#(BRANCH_USR.GET_BRANCH_PARAM2(''3570_UKRPOSTA'',0))', kv=980, nlsk='#(nbs_ob22 (''6510'',''78''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(32, #(KVA),#(NLSA), #(S))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='C65';
   end;
   --------------------------------

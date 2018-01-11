@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Заголовки виписки MT950';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_SW950_ALL_HEADER';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,31 +124,31 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'LORO_ACCNUM', 'C', 'Номер~рахунку~LORO', 1, 35, 8, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'NOSTRO_ACCCODE', 'N', 'Внутрішній~номер рахунку~NOSTRO', 1, 22, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NOSTRO_ACCNAME', 'C', 'Назва~рахунку~NOSTRO', 1, 70, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NOSTRO_ACCNUM', 'C', 'Номер~рахунку~NOSTRO', 1, 15, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NOSTRO_REST_IN', 'N', 'Вхідний~залишок~по NOSTRO', 1, 22, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NOSTRO_REST_OUT', 'N', 'Вихідний~залишок~по NOSTRO', 1, 22, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NOSTRO_TRN_COUNT', 'N', 'Кількість~операцій~по NOSTRO', 1, 22, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'SENDER_BIC', 'C', 'BIC-код~відправника', 1, 11, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'STMT_BEG_DATE', 'D', 'Початкова~дата виписки', 1, 10, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'STMT_CURRCODE', 'N', 'Код~валюти~виписки', 1, 22, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'STMT_CURRENCY', 'C', 'Валюта~виписки', 1, 3, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'STMT_DATE_IN', 'D', 'STMT_DATE_IN', 1, 11, 17, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'STMT_DATE_OUT', 'D', 'STMT_DATE_OUT', 1, 11, 18, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'STMT_DETAIL_COUNT', 'N', 'Кількість~рядків~виписки', 1, 22, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'STMT_END_DATE', 'D', 'Кінцева~дата~виписки', 1, 10, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'STMT_MT', 'N', 'Тип~виписки', 1, 22, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'STMT_NPROC_COUNT', 'N', 'Кількість~необроблених~рядків виписки', 1, 22, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'STMT_NUM', 'C', 'STMT_NUM', 1, 35, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'STMT_PAGE', 'C', 'STMT_PAGE', 1, 30, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'STMT_PROCESSED', 'N', 'Ознака~кінцевої~обробки', 1, 22, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'STMT_REF', 'N', 'Реф.~виписки', 1, 22, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'STMT_REST_IN', 'N', 'Вхідний~залишок~по виписці', 1, 22, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'STMT_REST_OUT', 'N', 'Вихідний~залишок~по виписці', 1, 22, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'STMT_TRN', 'C', 'Ідентиф.~виписки', 1, 16, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'STMT_VALUE_DATE', 'D', 'Дата~валютирования~виписки', 1, 10, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'LORO_ACCNUM', 'C', 'Номер~рахунку~LORO', '1', 35, 8, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'NOSTRO_ACCCODE', 'N', 'Внутрішній~номер рахунку~NOSTRO', '1', 22, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NOSTRO_ACCNAME', 'C', 'Назва~рахунку~NOSTRO', '1', 70, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NOSTRO_ACCNUM', 'C', 'Номер~рахунку~NOSTRO', '1', 15, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NOSTRO_REST_IN', 'N', 'Вхідний~залишок~по NOSTRO', '1', 22, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NOSTRO_REST_OUT', 'N', 'Вихідний~залишок~по NOSTRO', '1', 22, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NOSTRO_TRN_COUNT', 'N', 'Кількість~операцій~по NOSTRO', '1', 22, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'SENDER_BIC', 'C', 'BIC-код~відправника', '1', 11, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'STMT_BEG_DATE', 'D', 'Початкова~дата виписки', '1', 10, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'STMT_CURRCODE', 'N', 'Код~валюти~виписки', '1', 22, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'STMT_CURRENCY', 'C', 'Валюта~виписки', '1', 3, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'STMT_DATE_IN', 'D', 'STMT_DATE_IN', '1', 11, 17, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'STMT_DATE_OUT', 'D', 'STMT_DATE_OUT', '1', 11, 18, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'STMT_DETAIL_COUNT', 'N', 'Кількість~рядків~виписки', '1', 22, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'STMT_END_DATE', 'D', 'Кінцева~дата~виписки', '1', 10, 14, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'STMT_MT', 'N', 'Тип~виписки', '1', 22, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'STMT_NPROC_COUNT', 'N', 'Кількість~необроблених~рядків виписки', '1', 22, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'STMT_NUM', 'C', 'STMT_NUM', '1', 35, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'STMT_PAGE', 'C', 'STMT_PAGE', '1', 30, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'STMT_PROCESSED', 'N', 'Ознака~кінцевої~обробки', '1', 22, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'STMT_REF', 'N', 'Реф.~виписки', '1', 22, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'STMT_REST_IN', 'N', 'Вхідний~залишок~по виписці', '1', 22, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'STMT_REST_OUT', 'N', 'Вихідний~залишок~по виписці', '1', 22, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'STMT_TRN', 'C', 'Ідентиф.~виписки', '1', 16, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'STMT_VALUE_DATE', 'D', 'Дата~валютирования~виписки', '1', 10, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

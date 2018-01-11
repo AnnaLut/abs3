@@ -22,7 +22,9 @@ PROMPT *** Create  view V_DPU_RESOURCE_DAILY ***
 ;
 
 PROMPT *** Create  grants  V_DPU_RESOURCE_DAILY ***
+grant SELECT                                                                 on V_DPU_RESOURCE_DAILY to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPU_RESOURCE_DAILY to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DPU_RESOURCE_DAILY to UPLD;
 
 
 

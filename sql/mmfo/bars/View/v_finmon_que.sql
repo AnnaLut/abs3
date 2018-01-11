@@ -41,8 +41,10 @@ select f.id, a.ref, a.rec, a.dk, null, a.nd, a.datd, a.dat_a, null, null,
    and a.rec = q.rec(+);
 
 PROMPT *** Create  grants  V_FINMON_QUE ***
+grant SELECT                                                                 on V_FINMON_QUE    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FINMON_QUE    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FINMON_QUE    to FINMON01;
+grant SELECT                                                                 on V_FINMON_QUE    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_FINMON_QUE    to WR_ALL_RIGHTS;
 
 

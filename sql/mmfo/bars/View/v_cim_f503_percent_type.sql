@@ -16,7 +16,9 @@ select 0, 'одержання кредиту без процентних нарахувань' from dual
 ;
 
 PROMPT *** Create  grants  V_CIM_F503_PERCENT_TYPE ***
+grant SELECT                                                                 on V_CIM_F503_PERCENT_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_F503_PERCENT_TYPE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_F503_PERCENT_TYPE to UPLD;
 
 
 

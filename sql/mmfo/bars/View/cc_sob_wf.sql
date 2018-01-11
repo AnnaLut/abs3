@@ -129,7 +129,9 @@ PROMPT *** Create  view CC_SOB_WF ***
            and v.e) x;
 
 PROMPT *** Create  grants  CC_SOB_WF ***
+grant SELECT                                                                 on CC_SOB_WF       to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_SOB_WF       to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CC_SOB_WF       to UPLD;
 
 
 

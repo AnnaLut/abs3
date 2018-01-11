@@ -28,8 +28,10 @@ PROMPT *** Create  view OBPC_DEAL ***
    and a.branch like sys_context ('bars_context', 'user_branch_mask');
 
 PROMPT *** Create  grants  OBPC_DEAL ***
+grant SELECT                                                                 on OBPC_DEAL       to BARSREADER_ROLE;
 grant SELECT                                                                 on OBPC_DEAL       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OBPC_DEAL       to OBPC;
+grant SELECT                                                                 on OBPC_DEAL       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OBPC_DEAL       to WR_ALL_RIGHTS;
 
 

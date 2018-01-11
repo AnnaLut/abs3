@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'BRAG-1) Довідник ЮО, що працюють в СТП / MONEX_UO';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'MONEX_UO';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,12 +124,12 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'NAME', 'C', 'Назва ЮО,~ що працює в СТП~БРАНЧІ ЮО', null, null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=BRANCH_UO[CONDITIONS=>BRANCH_UO.IDPDR=:ID][ACCESSCODE=>0][showDialogWindow=>false]', 'FunNSIEditFFiltered ("BRANCH_UO" , 0 , "IDPDR=" || Str( :ID )   )', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ID', 'N', '№ ~п/п ЮО~СТП ЮО', null, null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=MONEX_MV_UO[CONDITIONS=>MONEX_MV_UO.UO=:ID][ACCESSCODE=>0][showDialogWindow=>false]', 'FunNSIEditFFiltered ("MONEX_MV_UO" , 0 , "UO=" || Str( :ID )   )', 0);
-  bars_metabase.add_column(l_tabid, 3, 'MFO', 'C', 'ПЛ.рекв ЮО:~МФО', null, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NLS', 'C', 'ПЛ.рекв ЮО:~Рахунок', null, null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'OKPO', 'C', 'ПЛ.рекв ЮО:~Ід.код', null, null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'RNK', 'N', 'РНК,~ (за наявності)', null, null, 50, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'NAME', 'C', 'Назва ЮО,~ що працює в СТП~БРАНЧІ ЮО', '', null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=BRANCH_UO[CONDITIONS=>BRANCH_UO.IDPDR=:ID][ACCESSCODE=>0][showDialogWindow=>false]', 'FunNSIEditFFiltered ("BRANCH_UO" , 0 , "IDPDR=" || Str( :ID )   )', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ID', 'N', '№ ~п/п ЮО~СТП ЮО', '', null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=MONEX_MV_UO[CONDITIONS=>MONEX_MV_UO.UO=:ID][ACCESSCODE=>0][showDialogWindow=>false]', 'FunNSIEditFFiltered ("MONEX_MV_UO" , 0 , "UO=" || Str( :ID )   )', 0);
+  bars_metabase.add_column(l_tabid, 3, 'MFO', 'C', 'ПЛ.рекв ЮО:~МФО', '', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NLS', 'C', 'ПЛ.рекв ЮО:~Рахунок', '', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'OKPO', 'C', 'ПЛ.рекв ЮО:~Ід.код', '', null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'RNK', 'N', 'РНК,~ (за наявності)', '', null, 50, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

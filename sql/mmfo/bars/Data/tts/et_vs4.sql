@@ -107,17 +107,6 @@ begin
   end;
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (2, 'VS4', 2, null, null, 0);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 2, ''VS4'', 2, null, null, 0) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
     values (5, 'VS4', 1, null, null, null);
   exception
     when dup_val_on_index then null;

@@ -145,6 +145,17 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('KODPL', 'HO6', 'O', 1, 8, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''KODPL'', ''HO6'', ''O'', 1, 8, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
     values ('NATIO', 'HO6', 'O', 1, 32, null, null);
   exception
     when dup_val_on_index then null;
@@ -206,17 +217,6 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''PHONW'', ''HO6'', ''O'', 1, 35, null, null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('KODPL', 'HO6', 'O', 1, 8, null, null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''KODPL'', ''HO6'', ''O'', 1, 8, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

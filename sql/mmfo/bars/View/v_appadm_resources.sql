@@ -26,7 +26,9 @@ select s.res_id, s.res_name, tg.tabid, tg.tabname, tg.semantic, ta.tabid, ta.tab
 
 PROMPT *** Create  grants  V_APPADM_RESOURCES ***
 grant SELECT                                                                 on V_APPADM_RESOURCES to ABS_ADMIN;
+grant SELECT                                                                 on V_APPADM_RESOURCES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_APPADM_RESOURCES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_APPADM_RESOURCES to UPLD;
 
 
 

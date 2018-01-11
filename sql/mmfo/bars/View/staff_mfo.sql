@@ -14,8 +14,10 @@ PROMPT *** Create  view STAFF_MFO ***
    ORDER BY 1;
 
 PROMPT *** Create  grants  STAFF_MFO ***
+grant SELECT                                                                 on STAFF_MFO       to BARSREADER_ROLE;
 grant SELECT                                                                 on STAFF_MFO       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on STAFF_MFO       to START1;
+grant SELECT                                                                 on STAFF_MFO       to UPLD;
 
 
 

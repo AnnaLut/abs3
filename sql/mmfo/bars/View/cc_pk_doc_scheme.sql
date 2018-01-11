@@ -14,6 +14,8 @@ where s.ID in (select ID from DOC_ROOT where VIDD = d.VIDD)
  ;
 
 PROMPT *** Create  grants  CC_PK_DOC_SCHEME ***
+grant SELECT                                                                 on CC_PK_DOC_SCHEME to BARSREADER_ROLE;
+grant SELECT                                                                 on CC_PK_DOC_SCHEME to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CC_PK_DOC_SCHEME to WR_ALL_RIGHTS;
 
 

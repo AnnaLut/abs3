@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции KKS
-prompt Наименование операции: --KKS/КП. STOP-правило на перебільшення ЛІМІТа
+prompt Наименование операции: KKS --KKS/КП. STOP-правило на перебільшення ЛІМІТа
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('KKS', '--KKS/КП. STOP-правило на перебільшення ЛІМІТа', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'STOP_KK ( #(REF) )', null, null, null, null, null, '0000100000000000000000000000000000000000000000100000000000000000', null);
+    values ('KKS', 'KKS --KKS/КП. STOP-правило на перебільшення ЛІМІТа', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'STOP_KK ( #(REF) )', null, null, null, null, null, '0000100000000000000000000000000000000000000000100000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='KKS', name='--KKS/КП. STOP-правило на перебільшення ЛІМІТа', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='STOP_KK ( #(REF) )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000100000000000000000', nazn=null
+         set tt='KKS', name='KKS --KKS/КП. STOP-правило на перебільшення ЛІМІТа', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='STOP_KK ( #(REF) )', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000100000000000000000', nazn=null
        where tt='KKS';
   end;
   --------------------------------

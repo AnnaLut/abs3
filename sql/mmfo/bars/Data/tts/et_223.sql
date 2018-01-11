@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('223', '223-Виявлення нестачі готівки в ІВ', 1, null, 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', null, null, null, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''03''))', null, '1100100000000000000000000000000000010000000000000000000000000000', ' Визнання доходу на суму нестачі готівки в ІВ');
+    values ('223', '223-Виявлення нестачі готівки в ІВ', 1, null, 980, '#(get_nls_tt(''223'',''NLSK''))', null, null, null, '#(get_nls_tt(''223'',''NLSB''))', null, 0, 0, 1, 0, null, null, null, null, '#(nbs_ob22 (''3800'',''03''))', null, '1100100000000000000000000000000000010000000000000000000000000000', ' Визнання доходу на суму нестачі готівки в ІВ');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='223', name='223-Виявлення нестачі готівки в ІВ', dk=1, nlsm=null, kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', kvk=null, nlss=null, nlsa=null, nlsb='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASHS'',0))', mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='1100100000000000000000000000000000010000000000000000000000000000', nazn=' Визнання доходу на суму нестачі готівки в ІВ'
+         set tt='223', name='223-Виявлення нестачі готівки в ІВ', dk=1, nlsm=null, kv=980, nlsk='#(get_nls_tt(''223'',''NLSK''))', kvk=null, nlss=null, nlsa=null, nlsb='#(get_nls_tt(''223'',''NLSB''))', mfob=null, flc=0, fli=0, flv=1, flr=0, s=null, s2=null, sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='1100100000000000000000000000000000010000000000000000000000000000', nazn=' Визнання доходу на суму нестачі готівки в ІВ'
        where tt='223';
   end;
   --------------------------------

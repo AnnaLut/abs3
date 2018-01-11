@@ -27,7 +27,9 @@ PROMPT *** Create  view V_CP_RATES ***
   FROM CP_RATES cr;
 
 PROMPT *** Create  grants  V_CP_RATES ***
+grant SELECT                                                                 on V_CP_RATES      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CP_RATES      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CP_RATES      to UPLD;
 
 
 

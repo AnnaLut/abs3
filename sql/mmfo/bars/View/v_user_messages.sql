@@ -24,7 +24,9 @@ PROMPT *** Create  view V_USER_MESSAGES ***
 from user_messages t where t.msg_done=0 and t.user_id = bars.user_id;
 
 PROMPT *** Create  grants  V_USER_MESSAGES ***
+grant SELECT                                                                 on V_USER_MESSAGES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_USER_MESSAGES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_USER_MESSAGES to UPLD;
 
 
 

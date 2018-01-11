@@ -1,11 +1,14 @@
-CREATE OR REPLACE FORCE VIEW BARS.V_STZAH
-(
-   ID,
-   ZAHID,
-   PRODU
-)
-AS
-   SELECT '1' id,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_STZAH.sql =========*** Run *** ======
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_STZAH ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_STZAH ("ID", "ZAHID", "PRODU") AS 
+  SELECT '1' id,
           '1 Котли з використанням будь-яких видів палива та енергії (за винятком природного газу та електроенергії (крім  електричного теплоакумуляційного обігріву та гарячого водопостачання) та відповідного додаткового обладнання і матеріалів до них'
              ZAHID,
           decode(NEWNBS.GET_STATE,0,'220257','220380') PRODU
@@ -281,8 +284,14 @@ AS
           '220348' PRODU
      FROM DUAL;
 
+PROMPT *** Create  grants  V_STZAH ***
+grant SELECT                                                                 on V_STZAH         to BARSREADER_ROLE;
+grant SELECT                                                                 on V_STZAH         to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STZAH         to START1;
+grant SELECT                                                                 on V_STZAH         to UPLD;
 
 
-GRANT SELECT ON BARS.V_STZAH TO BARS_ACCESS_DEFROLE;
 
-GRANT SELECT ON BARS.V_STZAH TO START1;
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_STZAH.sql =========*** End *** ======
+PROMPT ===================================================================================== 

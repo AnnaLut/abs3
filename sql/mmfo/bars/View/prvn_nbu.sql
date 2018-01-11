@@ -29,8 +29,10 @@ PROMPT *** Create  view PRVN_NBU ***
     WHERE n.fdat = v.B;
 
 PROMPT *** Create  grants  PRVN_NBU ***
+grant SELECT                                                                 on PRVN_NBU        to BARSREADER_ROLE;
 grant SELECT                                                                 on PRVN_NBU        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRVN_NBU        to START1;
+grant SELECT                                                                 on PRVN_NBU        to UPLD;
 
 
 

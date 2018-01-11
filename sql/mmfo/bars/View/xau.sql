@@ -11,8 +11,10 @@ PROMPT *** Create  view XAU ***
   select file_id,parameter,value from RNBU_IN_INF_RECORDS;
 
 PROMPT *** Create  grants  XAU ***
+grant SELECT                                                                 on XAU             to BARSREADER_ROLE;
 grant SELECT                                                                 on XAU             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on XAU             to START1;
+grant SELECT                                                                 on XAU             to UPLD;
 
 
 

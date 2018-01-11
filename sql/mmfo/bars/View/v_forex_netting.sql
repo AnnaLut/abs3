@@ -118,9 +118,11 @@ PROMPT *** Create  view V_FOREX_NETTING ***
     WHERE a.DEAL_TAG = b.DEAL_TAG AND (A.SA <> 0 OR B.SB <> 0);
 
 PROMPT *** Create  grants  V_FOREX_NETTING ***
+grant SELECT                                                                 on V_FOREX_NETTING to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_FOREX_NETTING to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_FOREX_NETTING to FOREX;
 grant SELECT,UPDATE                                                          on V_FOREX_NETTING to START1;
+grant SELECT                                                                 on V_FOREX_NETTING to UPLD;
 
 
 

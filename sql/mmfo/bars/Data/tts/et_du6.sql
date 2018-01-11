@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DU8', '+Позасистемний облік депозитних ліній ЮО', 1, '#(dpu.get_nls4pay(#(REF),#(NLSA),#(KVA)))', null, '#(dpu.get_nls4pay(#(REF),#(NLSB),#(KVB)))', null, null, null, null, null, 0, 0, 0, 0, 'case when dpu.is_line(#(REF)) is null then 0 else #(S) end', null, null, null, null, 0, '0000000000000000000000000000000000000100000000000000000000000000', null);
+    values ('DU8', '+Позасистемний облік депозитних ліній ЮО', 1, '#(dpu.get_nls4pay(#(REF),#(NLSA),#(KVA)))', null, '#(dpu.get_nls4pay(#(REF),#(NLSB),#(KVB)))', null, null, null, null, null, 0, 0, 0, 0, 'case when dpu.is_line(#(REF)) is null then 0 else #(S) end', null, null, null, null, 0, '1000000000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DU8', name='+Позасистемний облік депозитних ліній ЮО', dk=1, nlsm='#(dpu.get_nls4pay(#(REF),#(NLSA),#(KVA)))', kv=null, nlsk='#(dpu.get_nls4pay(#(REF),#(NLSB),#(KVB)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='case when dpu.is_line(#(REF)) is null then 0 else #(S) end', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000000000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='DU8', name='+Позасистемний облік депозитних ліній ЮО', dk=1, nlsm='#(dpu.get_nls4pay(#(REF),#(NLSA),#(KVA)))', kv=null, nlsk='#(dpu.get_nls4pay(#(REF),#(NLSB),#(KVB)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='case when dpu.is_line(#(REF)) is null then 0 else #(S) end', s2=null, sk=null, proc=null, s3800=null, rang=0, flags='1000000000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='DU8';
   end;
   --------------------------------
@@ -68,7 +68,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции DU6
-prompt Наименование операции: Погашення депозиту в ін.валюті (міжбанк)
+prompt Наименование операции: DU6 Погашення депозиту в ін.валюті (міжбанк)
 declare
   cnt_  number;
 begin
@@ -77,11 +77,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DU6', 'Погашення депозиту в ін.валюті (міжбанк)', 1, null, null, '#(case sys_context(''bars_context'',''user_mfo'') when ''300465'' then #(NLSB) else get_proc_nls(''T00'',#(KVA)) end)', null, null, null, '191992', '300465', 1, 1, 0, 0, null, null, null, null, null, 9, '0200100000000000000000000000000000010000000000000000000000000000', 'Повернення депозиту згідно #{DPU.F_NAZN(''U'',#(ND))}');
+    values ('DU6', 'DU6 Погашення депозиту в ін.валюті (міжбанк)', 1, null, null, '#(case sys_context(''bars_context'',''user_mfo'') when ''300465'' then #(NLSB) else get_proc_nls(''T00'',#(KVA)) end)', null, null, null, '191992', '300465', 1, 1, 0, 0, null, null, null, null, null, 9, '0200100000000000000000000000000000010000000000000000000000000000', 'Повернення депозиту згідно #{DPU.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DU6', name='Погашення депозиту в ін.валюті (міжбанк)', dk=1, nlsm=null, kv=null, nlsk='#(case sys_context(''bars_context'',''user_mfo'') when ''300465'' then #(NLSB) else get_proc_nls(''T00'',#(KVA)) end)', kvk=null, nlss=null, nlsa=null, nlsb='191992', mfob='300465', flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=9, flags='0200100000000000000000000000000000010000000000000000000000000000', nazn='Повернення депозиту згідно #{DPU.F_NAZN(''U'',#(ND))}'
+         set tt='DU6', name='DU6 Погашення депозиту в ін.валюті (міжбанк)', dk=1, nlsm=null, kv=null, nlsk='#(case sys_context(''bars_context'',''user_mfo'') when ''300465'' then #(NLSB) else get_proc_nls(''T00'',#(KVA)) end)', kvk=null, nlss=null, nlsa=null, nlsb='191992', mfob='300465', flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=9, flags='0200100000000000000000000000000000010000000000000000000000000000', nazn='Повернення депозиту згідно #{DPU.F_NAZN(''U'',#(ND))}'
        where tt='DU6';
   end;
   --------------------------------

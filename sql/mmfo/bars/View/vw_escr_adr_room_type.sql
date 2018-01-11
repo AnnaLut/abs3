@@ -18,7 +18,9 @@ SELECT 3 id, 'ξτ³ρ' NAME, 'ξτ.' VALUE
   FROM dual;
 
 PROMPT *** Create  grants  VW_ESCR_ADR_ROOM_TYPE ***
+grant SELECT                                                                 on VW_ESCR_ADR_ROOM_TYPE to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_ADR_ROOM_TYPE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VW_ESCR_ADR_ROOM_TYPE to UPLD;
 
 
 

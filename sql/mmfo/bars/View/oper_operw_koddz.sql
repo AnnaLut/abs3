@@ -65,8 +65,10 @@ PROMPT *** Create  view OPER_OPERW_KODDZ ***
 
 PROMPT *** Create  grants  OPER_OPERW_KODDZ ***
 grant FLASHBACK,SELECT                                                       on OPER_OPERW_KODDZ to ABS_ADMIN;
+grant SELECT                                                                 on OPER_OPERW_KODDZ to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on OPER_OPERW_KODDZ to BARS_ACCESS_DEFROLE;
 grant FLASHBACK,SELECT                                                       on OPER_OPERW_KODDZ to START1;
+grant SELECT                                                                 on OPER_OPERW_KODDZ to UPLD;
 grant FLASHBACK,SELECT                                                       on OPER_OPERW_KODDZ to WR_REFREAD;
 
 

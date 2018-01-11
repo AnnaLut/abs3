@@ -14,9 +14,11 @@ where  substr(nls,1,4)='3400' and  dazs is null and acc not in
  ;
 
 PROMPT *** Create  grants  V_OB22_N34 ***
+grant SELECT                                                                 on V_OB22_N34      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OB22_N34      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OB22_N34      to NALOG;
 grant SELECT                                                                 on V_OB22_N34      to START1;
+grant SELECT                                                                 on V_OB22_N34      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OB22_N34      to WR_ALL_RIGHTS;
 
 

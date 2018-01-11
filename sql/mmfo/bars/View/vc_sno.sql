@@ -25,7 +25,9 @@ PROMPT *** Create  view VC_SNO ***
    AND r.acc = a.acc;
 
 PROMPT *** Create  grants  VC_SNO ***
+grant SELECT                                                                 on VC_SNO          to BARSREADER_ROLE;
 grant SELECT                                                                 on VC_SNO          to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VC_SNO          to UPLD;
 
 
 

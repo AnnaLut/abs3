@@ -12,8 +12,10 @@ PROMPT *** Create  view V_SV_VOICE_TO ***
      FROM sv_owner o;
 
 PROMPT *** Create  grants  V_SV_VOICE_TO ***
+grant SELECT                                                                 on V_SV_VOICE_TO   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SV_VOICE_TO   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SV_VOICE_TO   to RPBN002;
+grant SELECT                                                                 on V_SV_VOICE_TO   to UPLD;
 
 
 

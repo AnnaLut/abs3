@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции DML
-prompt Наименование операции: Виплата відсотків по депозитному металевого рахунку (внутр.)
+prompt Наименование операции: DML Виплата відсотків по депозитному металевого рахунку (внутр.)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DML', 'Виплата відсотків по депозитному металевого рахунку (внутр.)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000000000000000000000', 'Виплата відсотків по договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DML', 'DML Виплата відсотків по депозитному металевого рахунку (внутр.)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, 0, '0000100000000000000000000000000000010000000000000000000000000000', 'Виплата відсотків по договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DML', name='Виплата відсотків по депозитному металевого рахунку (внутр.)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn='Виплата відсотків по договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DML', name='DML Виплата відсотків по депозитному металевого рахунку (внутр.)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0000100000000000000000000000000000010000000000000000000000000000', nazn='Виплата відсотків по договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DML';
   end;
   --------------------------------

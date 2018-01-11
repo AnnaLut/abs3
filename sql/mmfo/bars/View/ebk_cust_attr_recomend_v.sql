@@ -29,7 +29,9 @@ from tmp_ebk_req_updcard_attr terua,
 where terua.name = eca.name;
 
 PROMPT *** Create  grants  EBK_CUST_ATTR_RECOMEND_V ***
+grant SELECT                                                                 on EBK_CUST_ATTR_RECOMEND_V to BARSREADER_ROLE;
 grant SELECT                                                                 on EBK_CUST_ATTR_RECOMEND_V to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on EBK_CUST_ATTR_RECOMEND_V to UPLD;
 
 
 

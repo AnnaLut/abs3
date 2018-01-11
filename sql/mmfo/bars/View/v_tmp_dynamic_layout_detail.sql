@@ -24,6 +24,10 @@ PROMPT *** Create  view V_TMP_DYNAMIC_LAYOUT_DETAIL ***
 from bars.tmp_dynamic_layout_detail v
 where  v.userid = bars.user_id;
 
+PROMPT *** Create  grants  V_TMP_DYNAMIC_LAYOUT_DETAIL ***
+grant SELECT                                                                 on V_TMP_DYNAMIC_LAYOUT_DETAIL to BARSREADER_ROLE;
+grant SELECT                                                                 on V_TMP_DYNAMIC_LAYOUT_DETAIL to UPLD;
+
 
 
 PROMPT ===================================================================================== 

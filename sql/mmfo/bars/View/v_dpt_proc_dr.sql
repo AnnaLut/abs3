@@ -15,9 +15,11 @@ PROMPT *** Create  view V_DPT_PROC_DR ***
 
 PROMPT *** Create  grants  V_DPT_PROC_DR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPT_PROC_DR   to ABS_ADMIN;
+grant SELECT                                                                 on V_DPT_PROC_DR   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_PROC_DR   to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPT_PROC_DR   to DPT;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPT_PROC_DR   to DPT_ADMIN;
+grant SELECT                                                                 on V_DPT_PROC_DR   to UPLD;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPT_PROC_DR   to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on V_DPT_PROC_DR   to WR_REFREAD;
 

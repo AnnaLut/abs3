@@ -28,8 +28,10 @@ where a.kv   = 980
  and o.fdat <= d.fdat2 ;
 
 PROMPT *** Create  grants  V_DOKTIME ***
+grant SELECT                                                                 on V_DOKTIME       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DOKTIME       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DOKTIME       to SALGL;
+grant SELECT                                                                 on V_DOKTIME       to UPLD;
 
 
 

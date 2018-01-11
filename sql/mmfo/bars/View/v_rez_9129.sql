@@ -27,8 +27,10 @@ PROMPT *** Create  view V_REZ_9129 ***
    WHERE x.rnk = c.rnk AND x.acc = p.acc;
 
 PROMPT *** Create  grants  V_REZ_9129 ***
+grant SELECT                                                                 on V_REZ_9129      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REZ_9129      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_REZ_9129      to START1;
+grant SELECT                                                                 on V_REZ_9129      to UPLD;
 
 
 

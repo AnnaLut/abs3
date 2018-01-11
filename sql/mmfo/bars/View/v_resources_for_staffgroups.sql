@@ -38,6 +38,10 @@ PROMPT *** Create  view V_RESOURCES_FOR_STAFFGROUPS ***
           AND ga.id = gua.ida
           AND sec.fit_gmask (a.sec, ga.id) > 0;
 
+PROMPT *** Create  grants  V_RESOURCES_FOR_STAFFGROUPS ***
+grant SELECT                                                                 on V_RESOURCES_FOR_STAFFGROUPS to BARSREADER_ROLE;
+grant SELECT                                                                 on V_RESOURCES_FOR_STAFFGROUPS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

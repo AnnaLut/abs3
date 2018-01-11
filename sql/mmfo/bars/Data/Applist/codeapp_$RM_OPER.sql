@@ -1,5 +1,3 @@
-SET SERVEROUTPUT ON 
-SET DEFINE OFF 
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_OPER.sql =========*
 PROMPT ===================================================================================== 
@@ -18,845 +16,980 @@ PROMPT *** Create/replace  ARM  $RM_OPER ***
     l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
     l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
     l integer := 0;
-    d integer := 0;
+	d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_OPER створюємо (або оновлюємо) АРМ АРМ Операціоніста (Бек) ');
-     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code, 
-                             P_ARM_NAME              => l_application_name, 
+     user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
+                             P_ARM_NAME              => l_application_name,
                              P_APPLICATION_TYPE_ID   => l_application_type_id);
 
         -- отримуємо ідентифікатор створеного АРМу
      l_application_id := user_menu_utl.get_arm_id(l_application_code); 
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Реанімація рахунків ********** ');
+          --  Створюємо функцію Реанімація рахунків
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Реанімація рахунків',
+                                                  p_funcname => '/barsroot/AccountRestore/AccountRestore/index',
+                                                  p_rolename => '' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
+
+
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перегляд документів відділення ********** ');
           --  Створюємо функцію Перегляд документів відділення
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Перегляд документів відділення',
                                                   p_funcname => '/barsroot/DocView/Docs/DocumentDateFilter?type=0',
-                                                  p_rolename => 'WR_DOCLIST_TOBO' ,    
+                                                  p_rolename => 'WR_DOCLIST_TOBO' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Перелік усіх документів за дату
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Перелік усіх документів за дату',
-                                                              p_funcname => '/barsroot/documentsview/documents.aspx?type=0&par=21&date=\d{2}\.\d{2}\.\d{4}',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Перелік усіх документів за дату',
+															  p_funcname => '/barsroot/documentsview/documents.aspx?type=0&par=21&date=\d{2}\.\d{2}\.\d{4}',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Перелік отриманих документів відділення за період
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Перелік отриманих документів відділення за період',
-                                                              p_funcname => '/barsroot/documentsview/documents.aspx?type=0&par=22&dateb=\d{2}\.\d{2}\.\d{4}&datef=\d{2}\.\d{2}\.\d{4}',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Перелік отриманих документів відділення за період',
+															  p_funcname => '/barsroot/documentsview/documents.aspx?type=0&par=22&dateb=\d{2}\.\d{2}\.\d{4}&datef=\d{2}\.\d{2}\.\d{4}',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Перелік усіх документів відділення за період
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Перелік усіх документів відділення за період',
-                                                              p_funcname => '/barsroot/documentsview/documents.aspx?type=0&par=21&dateb=\d{2}\.\d{2}\.\d{4}&datef=\d{2}\.\d{2}\.\d{4}',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Перелік усіх документів відділення за період',
+															  p_funcname => '/barsroot/documentsview/documents.aspx?type=0&par=21&dateb=\d{2}\.\d{2}\.\d{4}&datef=\d{2}\.\d{2}\.\d{4}',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Перелік усіх документів за сьогодні
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Перелік усіх документів за сьогодні',
-                                                              p_funcname => '/barsroot/documentsview/documents.aspx?type=0&par=11',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Перелік усіх документів за сьогодні',
+															  p_funcname => '/barsroot/documentsview/documents.aspx?type=0&par=11',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Перегляд картки документу
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Перегляд картки документу',
-                                                              p_funcname => '/barsroot/documentview/default.aspx?ref=\S+',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Перегляд картки документу',
+															  p_funcname => '/barsroot/documentview/default.aspx?ref=\S+',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Перелік отриманих документів відділення за дату
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Перелік отриманих документів відділення за дату',
-                                                              p_funcname => '/barsroot/documentsview/documents.aspx?type=0&par=22&date=\d{2}\.\d{2}\.\d{4}',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Перелік отриманих документів відділення за дату',
+															  p_funcname => '/barsroot/documentsview/documents.aspx?type=0&par=22&date=\d{2}\.\d{2}\.\d{4}',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Перелік отриманих документів відділення за сьогодні
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Перелік отриманих документів відділення за сьогодні',
-                                                              p_funcname => '/barsroot/documentsview/documents.aspx?type=0&par=12',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Перелік отриманих документів відділення за сьогодні',
+															  p_funcname => '/barsroot/documentsview/documents.aspx?type=0&par=12',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перегляд інформаційних документів ********** ');
+          --  Створюємо функцію Перегляд інформаційних документів
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Перегляд інформаційних документів',
+                                                  p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_docum_inf',
+                                                  p_rolename => 'START1' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію NL9 Картотека 2909 внутрібанк(тип NL9) ********** ');
           --  Створюємо функцію NL9 Картотека 2909 внутрібанк(тип NL9)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'NL9 Картотека 2909 внутрібанк(тип NL9)',
                                                   p_funcname => '/barsroot/barsweb/dynform.aspx?form=frm_nl__kart&nls_tip=nl9',
-                                                  p_rolename => 'START1' ,    
+                                                  p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію  
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => ' ',
-                                                              p_funcname => '/barsroot/docinput/docinput.aspx?\S*',
-                                                              p_rolename => 'START1' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => ' ',
+															  p_funcname => '/barsroot/docinput/docinput.aspx?\S*',
+															  p_rolename => 'START1' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Перегляд картки документу
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Перегляд картки документу',
-                                                              p_funcname => '/barsroot/documentview/default.aspx?ref=\S+',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Перегляд картки документу',
+															  p_funcname => '/barsroot/documentview/default.aspx?ref=\S+',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Історія рахунку
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Історія рахунку',
-                                                              p_funcname => '/barsroot/customerlist/showhistory.aspx?acc=\d+&type=\d{1}',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Історія рахунку',
+															  p_funcname => '/barsroot/customerlist/showhistory.aspx?acc=\d+&type=\d{1}',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію <<ЮО:Комiсiя за послуги>> ********** ');
           --  Створюємо функцію <<ЮО:Комiсiя за послуги>>
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '<<ЮО:Комiсiя за послуги>>',
                                                   p_funcname => '/barsroot/barsweb/references/refbook.aspx?tabid=3787&mode=ro&force=1',
-                                                  p_rolename => 'PYOD001' ,    
+                                                  p_rolename => 'PYOD001' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Коригування СК за 35 днів ********** ');
           --  Створюємо функцію Коригування СК за 35 днів
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Коригування СК за 35 днів',
                                                   p_funcname => '/barsroot/barsweb/references/refbook.aspx?tabname=OPER_SK&mode=RW&force=1&rwflag=2',
-                                                  p_rolename => 'START1' ,    
+                                                  p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Друк звітів ********** ');
           --  Створюємо функцію Друк звітів
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Друк звітів',
                                                   p_funcname => '/barsroot/cbirep/rep_list.aspx?codeapp=\S*',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Друк звітів
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Друк звітів',
-                                                              p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Друк звітів',
+															  p_funcname => '/barsroot/cbirep/rep_print.aspx?query_id=\d+\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Друк звітів
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Друк звітів',
-                                                              p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Друк звітів',
+															  p_funcname => '/barsroot/cbirep/rep_query.aspx?repid=\d+\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Візування "своїх" операцій ********** ');
           --  Створюємо функцію Візування "своїх" операцій
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Візування "своїх" операцій',
                                                   p_funcname => '/barsroot/checkinner/default.aspx?type=0',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Візування "своїх" операцій
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Візування "своїх" операцій',
-                                                              p_funcname => '/barsroot/checkinner/documents.aspx?type=0&grpid=\w+',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Візування "своїх" операцій',
+															  p_funcname => '/barsroot/checkinner/documents.aspx?type=0&grpid=\w+',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Сервіс додатку BarsWeb.CheckInner
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Сервіс додатку BarsWeb.CheckInner',
-                                                              p_funcname => '/barsroot/checkinner/service.asmx',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Сервіс додатку BarsWeb.CheckInner',
+															  p_funcname => '/barsroot/checkinner/service.asmx',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Сховище.Оприбуткування монет та футлярiв ********** ');
           --  Створюємо функцію Сховище.Оприбуткування монет та футлярiв
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Сховище.Оприбуткування монет та футлярiв',
                                                   p_funcname => '/barsroot/coin/coin_invoice.aspx',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перегляд рахунків по доступу(за межами відділення) ********** ');
+          --  Створюємо функцію Перегляд рахунків по доступу(за межами відділення)
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Перегляд рахунків по доступу(за межами відділення)',
+                                                  p_funcname => '/barsroot/customerlist/custacc.aspx?type=1',
+                                                  p_rolename => 'WR_USER_ACCOUNTS_LIST' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
+
+
+      --  Створюємо дочірню функцію Сервіс додатку CustomerList
+                     l_function_deps  :=   abs_utils.add_func(
+															  p_name     => 'Сервіс додатку CustomerList',
+															  p_funcname => '/barsroot/customerlist/custservice.asmx',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Історія змін параметрів рахунків/контрагентів
+                     l_function_deps  :=   abs_utils.add_func(
+															  p_name     => 'Історія змін параметрів рахунків/контрагентів',
+															  p_funcname => '/barsroot/customerlist/custhistory.aspx?mode=\d{1}&rnk=\d+',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Історія рахунку
+                     l_function_deps  :=   abs_utils.add_func(
+															  p_name     => 'Історія рахунку',
+															  p_funcname => '/barsroot/customerlist/showhistory.aspx?acc=\d+&type=\d{1}',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Історія змін параметрів рахунку\контрагента
+                     l_function_deps  :=   abs_utils.add_func(
+															  p_name     => 'Історія змін параметрів рахунку\контрагента',
+															  p_funcname => '/barsroot/customerlist/custhistory.aspx?mode=\d{1}&rnk=\d+&type=\d+',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Перегляд атрибутів рахунку
+                     l_function_deps  :=   abs_utils.add_func(
+															  p_name     => 'Перегляд атрибутів рахунку',
+															  p_funcname => '/barsroot/viewaccounts/accountform.aspx?type=\d+&acc=\d+&rnk=\d*&accessmode=0',
+															  p_rolename => 'WR_VIEWACC' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Імпорт та обробка файлів зарахувань (новий формат) ********** ');
+          --  Створюємо функцію Імпорт та обробка файлів зарахувань (новий формат)
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Імпорт та обробка файлів зарахувань (новий формат)',
+                                                  p_funcname => '/barsroot/deposit/depositfileshow_ext.aspx',
+                                                  p_rolename => 'DPT_ROLE' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
+
+
+      --  Створюємо дочірню функцію Сторінка  deposit/Default.aspx
+                     l_function_deps  :=   abs_utils.add_func(
+															  p_name     => 'Сторінка  deposit/Default.aspx',
+															  p_funcname => '/barsroot/deposit/default.aspx\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію 4. Виплата відсотків ********** ');
           --  Створюємо функцію 4. Виплата відсотків
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => '4. Виплата відсотків',
                                                   p_funcname => '/barsroot/deposit/depositsearch.aspx?action=percent&extended=0',
-                                                  p_rolename => 'DPT_ROLE' ,    
+                                                  p_rolename => 'DPT_ROLE' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Сторінка  deposit/Default.aspx
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Сторінка  deposit/Default.aspx',
-                                                              p_funcname => '/barsroot/deposit/default.aspx\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Сторінка  deposit/Default.aspx',
+															  p_funcname => '/barsroot/deposit/default.aspx\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Операції з цінностями ********** ');
           --  Створюємо функцію Операції з цінностями
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Операції з цінностями',
                                                   p_funcname => '/barsroot/docinput/depository.aspx',
-                                                  p_rolename => 'WR_DOC_INPUT' ,    
+                                                  p_rolename => 'WR_DOC_INPUT' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довведення дод. реквізитів - всі документи відділення(WEB) ********** ');
           --  Створюємо функцію Довведення дод. реквізитів - всі документи відділення(WEB)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Довведення дод. реквізитів - всі документи відділення(WEB)',
                                                   p_funcname => '/barsroot/docinput/editprops.aspx?mode=0',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Довведення дод. реквізитів по реф.(WEB)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Довведення дод. реквізитів по реф.(WEB)',
-                                                              p_funcname => '/barsroot/docinput/editprops.aspx?ref=\d+',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Довведення дод. реквізитів по реф.(WEB)',
+															  p_funcname => '/barsroot/docinput/editprops.aspx?ref=\d+',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довведення дод. реквізитів - документи користувача(WEB) ********** ');
           --  Створюємо функцію Довведення дод. реквізитів - документи користувача(WEB)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Довведення дод. реквізитів - документи користувача(WEB)',
                                                   p_funcname => '/barsroot/docinput/editprops.aspx?mode=1',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Довведення дод. реквізитів по реф.(WEB)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Довведення дод. реквізитів по реф.(WEB)',
-                                                              p_funcname => '/barsroot/docinput/editprops.aspx?ref=\d+',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Довведення дод. реквізитів по реф.(WEB)',
+															  p_funcname => '/barsroot/docinput/editprops.aspx?ref=\d+',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Введення документів ********** ');
           --  Створюємо функцію Введення документів
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Введення документів',
                                                   p_funcname => '/barsroot/docinput/ttsinput.aspx',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Вікно вводу документів
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Вікно вводу документів',
-                                                              p_funcname => '/barsroot/docinput/docinput.aspx\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Вікно вводу документів',
+															  p_funcname => '/barsroot/docinput/docinput.aspx\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Створення розпорядження по вибору ********** ');
           --  Створюємо функцію Створення розпорядження по вибору
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Створення розпорядження по вибору',
                                                   p_funcname => '/barsroot/dynamicLayout/static_layout.aspx',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Way4. Несквитовані документи (web)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Way4. Несквитовані документи (web)',
-                                                              p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_OW_PKKQUE_1&accessCode=1&sPar=[NSIFUNCTION][CONDITIONS=>pkk_sos= 1]',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Way4. Несквитовані документи (web)',
+															  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_OW_PKKQUE_1&accessCode=1&sPar=[NSIFUNCTION][CONDITIONS=>pkk_sos= 1]',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ФМ. Відбір документів [ВХІДНІ ДОКУМЕНТИ] ********** ');
           --  Створюємо функцію ФМ. Відбір документів [ВХІДНІ ДОКУМЕНТИ]
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'ФМ. Відбір документів [ВХІДНІ ДОКУМЕНТИ]',
                                                   p_funcname => '/barsroot/finmon/doc.aspx?filter=input',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію ФМ. Відбір документів [СВОЇ ДОКУМЕНТИ] ********** ');
           --  Створюємо функцію ФМ. Відбір документів [СВОЇ ДОКУМЕНТИ]
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'ФМ. Відбір документів [СВОЇ ДОКУМЕНТИ]',
                                                   p_funcname => '/barsroot/finmon/doc.aspx?filter=user',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію NL9 Картотека надходжень на конс. бал/рахунок 2909 (тип NL9) межб. ********** ');
           --  Створюємо функцію NL9 Картотека надходжень на конс. бал/рахунок 2909 (тип NL9) межб.
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'NL9 Картотека надходжень на конс. бал/рахунок 2909 (тип NL9) межб.',
                                                   p_funcname => '/barsroot/gl/nl/index?tip=nl9&tt=010',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію NL9 Картотека 2909 зарахування на картковi рахунки (тип NL9) ********** ');
           --  Створюємо функцію NL9 Картотека 2909 зарахування на картковi рахунки (тип NL9)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'NL9 Картотека 2909 зарахування на картковi рахунки (тип NL9)',
                                                   p_funcname => '/barsroot/gl/nl/index?tip=nl9&tt=PKR',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Прийом MOPER ********** ');
           --  Створюємо функцію Прийом MOPER
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Прийом MOPER',
                                                   p_funcname => '/barsroot/moper/default.aspx?int=I00&ext=I01',
-                                                  p_rolename => 'START1' ,    
+                                                  p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перегляд прогнозних номерів рахунків ********** ');
+          --  Створюємо функцію Перегляд прогнозних номерів рахунків
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Перегляд прогнозних номерів рахунків',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&tableName=V_TRANS2017_FORECAST_BRANCH',
+                                                  p_rolename => '' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Нарахування %% на залишки по рахункам ********** ');
           --  Створюємо функцію Нарахування %% на залишки по рахункам
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Нарахування %% на залишки по рахункам',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&tableName=V_NOTPORTFOLIO_INT_RECKONING&sPar=[PROC=>npi_ui.prepare_portfolio_interest(:p_nbs,:currency,:date_to)][PAR=>:p_nbs(SEM=Балансовий рахунок,TYPE=C,REF=V_NOTPORTFOLIO_NBS),:currency(SEM=Код_Вал,TYPE=C),:date_to(SEM=Дата по,TYPE=D)][EXEC=>BEFORE][NSIFUNCTION][showDialogWindow=>false]',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Незавізовані документи ********** ');
           --  Створюємо функцію Незавізовані документи
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Незавізовані документи',
                                                   p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_DOC_NOT_VISA_REF&accessCode=1',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довідники NEW ********** ');
           --  Створюємо функцію Довідники NEW
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Довідники NEW',
                                                   p_funcname => '/barsroot/referencebook/referencelist/',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Обробка запитів ********** ');
           --  Створюємо функцію Обробка запитів
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Обробка запитів',
                                                   p_funcname => '/barsroot/requestsProcessing/requestsProcessing',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Iмпорт 4: ФАЙЛИ ІНКАСАЦІЇ ********** ');
           --  Створюємо функцію Iмпорт 4: ФАЙЛИ ІНКАСАЦІЇ
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Iмпорт 4: ФАЙЛИ ІНКАСАЦІЇ',
                                                   p_funcname => '/barsroot/sberutls/importex.aspx?imptype=ik',
-                                                  p_rolename => 'WR_XMLIMP' ,    
+                                                  p_rolename => 'WR_XMLIMP' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Iмпорт : Розбiр документiв
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Iмпорт : Розбiр документiв',
-                                                              p_funcname => '/barsroot/sberutls/importproc.aspx?tp=1',
-                                                              p_rolename => 'WR_XMLIMP' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Iмпорт : Розбiр документiв',
+															  p_funcname => '/barsroot/sberutls/importproc.aspx?tp=1',
+															  p_rolename => 'WR_XMLIMP' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Iмпорт 4.1:Інше списание (tt=PKD) ********** ');
           --  Створюємо функцію Iмпорт 4.1:Інше списание (tt=PKD)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Iмпорт 4.1:Інше списание (tt=PKD)',
                                                   p_funcname => '/barsroot/sberutls/importex.aspx?imptype=ik&config=imp_4_1',
-                                                  p_rolename => 'WR_XMLIMP' ,    
+                                                  p_rolename => 'WR_XMLIMP' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Імпорт 4.3: Імпорт коригуючих (096) ********** ');
           --  Створюємо функцію Імпорт 4.3: Імпорт коригуючих (096)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Імпорт 4.3: Імпорт коригуючих (096)',
                                                   p_funcname => '/barsroot/sberutls/importex.aspx?imptype=ik&config=imp_4_3',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Iмпорт 2: КОМУНАЛЬНI ПЛАТЕЖI ********** ');
           --  Створюємо функцію Iмпорт 2: КОМУНАЛЬНI ПЛАТЕЖI
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Iмпорт 2: КОМУНАЛЬНI ПЛАТЕЖI',
                                                   p_funcname => '/barsroot/sberutls/importex.aspx?imptype=kp',
-                                                  p_rolename => 'WR_XMLIMP' ,    
+                                                  p_rolename => 'WR_XMLIMP' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Iмпорт : Розбiр документiв
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Iмпорт : Розбiр документiв',
-                                                              p_funcname => '/barsroot/sberutls/importproc.aspx?tp=1',
-                                                              p_rolename => 'WR_XMLIMP' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Iмпорт : Розбiр документiв',
+															  p_funcname => '/barsroot/sberutls/importproc.aspx?tp=1',
+															  p_rolename => 'WR_XMLIMP' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Iмпорт 1: ЛОКАЛЬНI ЗАДАЧI (ЩОДЕННИК) ********** ');
           --  Створюємо функцію Iмпорт 1: ЛОКАЛЬНI ЗАДАЧI (ЩОДЕННИК)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Iмпорт 1: ЛОКАЛЬНI ЗАДАЧI (ЩОДЕННИК)',
                                                   p_funcname => '/barsroot/sberutls/importex.aspx?imptype=lz',
-                                                  p_rolename => 'WR_XMLIMP' ,    
+                                                  p_rolename => 'WR_XMLIMP' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Iмпорт : Розбiр документiв
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Iмпорт : Розбiр документiв',
-                                                              p_funcname => '/barsroot/sberutls/importproc.aspx?tp=1',
-                                                              p_rolename => 'WR_XMLIMP' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Iмпорт : Розбiр документiв',
+															  p_funcname => '/barsroot/sberutls/importproc.aspx?tp=1',
+															  p_rolename => 'WR_XMLIMP' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Iмпорт 5.5: Імпорт Інші(Зарплата + Міжбанк tt = PKS,I01) ********** ');
+          --  Створюємо функцію Iмпорт 5.5: Імпорт Інші(Зарплата + Міжбанк tt = PKS,I01)
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Iмпорт 5.5: Імпорт Інші(Зарплата + Міжбанк tt = PKS,I01)',
+                                                  p_funcname => '/barsroot/sberutls/importex.aspx?imptype=lz&config=imp_5_3',
+                                                  p_rolename => 'WR_XMLIMP' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Iмпорт 3.1: Зарплатнi файли (tt=PKS,sk=84) ********** ');
           --  Створюємо функцію Iмпорт 3.1: Зарплатнi файли (tt=PKS,sk=84)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Iмпорт 3.1: Зарплатнi файли (tt=PKS,sk=84)',
                                                   p_funcname => '/barsroot/sberutls/importex.aspx?imptype=zp&config=imp_3_1',
-                                                  p_rolename => 'WR_XMLIMP' ,    
+                                                  p_rolename => 'WR_XMLIMP' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Iмпорт : Розбiр документiв
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Iмпорт : Розбiр документiв',
-                                                              p_funcname => '/barsroot/sberutls/importproc.aspx?tp=1',
-                                                              p_rolename => 'WR_XMLIMP' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Iмпорт : Розбiр документiв',
+															  p_funcname => '/barsroot/sberutls/importproc.aspx?tp=1',
+															  p_rolename => 'WR_XMLIMP' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Iмпорт 3.2: Пенсiйнi файли (tt=PKX,sk=87) ********** ');
           --  Створюємо функцію Iмпорт 3.2: Пенсiйнi файли (tt=PKX,sk=87)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Iмпорт 3.2: Пенсiйнi файли (tt=PKX,sk=87)',
                                                   p_funcname => '/barsroot/sberutls/importex.aspx?imptype=zp&config=imp_3_2',
-                                                  p_rolename => 'WR_XMLIMP' ,    
+                                                  p_rolename => 'WR_XMLIMP' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Iмпорт : Розбiр документiв
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Iмпорт : Розбiр документiв',
-                                                              p_funcname => '/barsroot/sberutls/importproc.aspx?tp=1',
-                                                              p_rolename => 'WR_XMLIMP' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Iмпорт : Розбiр документiв',
+															  p_funcname => '/barsroot/sberutls/importproc.aspx?tp=1',
+															  p_rolename => 'WR_XMLIMP' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Iмпорт 3.3: Iншi зарахувння (tt=PKR,sk=88) ********** ');
           --  Створюємо функцію Iмпорт 3.3: Iншi зарахувння (tt=PKR,sk=88)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Iмпорт 3.3: Iншi зарахувння (tt=PKR,sk=88)',
                                                   p_funcname => '/barsroot/sberutls/importex.aspx?imptype=zp&config=imp_3_3',
-                                                  p_rolename => 'WR_XMLIMP' ,    
+                                                  p_rolename => 'WR_XMLIMP' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Імпорт 4.2: Імпорт річних коригуючих ********** ');
           --  Створюємо функцію Імпорт 4.2: Імпорт річних коригуючих
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Імпорт 4.2: Імпорт річних коригуючих',
                                                   p_funcname => '/barsroot/sberutls/importex.aspx?imptype=zp&config=imp_4_2',
-                                                  p_rolename => 'bars_access_defrole' ,    
+                                                  p_rolename => 'BARS_ACCESS_DEFROLE' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Iмпорт : Розбiр документiв ********** ');
           --  Створюємо функцію Iмпорт : Розбiр документiв
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Iмпорт : Розбiр документiв',
                                                   p_funcname => '/barsroot/sberutls/importproc.aspx?tp=1',
-                                                  p_rolename => 'WR_XMLIMP' ,    
+                                                  p_rolename => 'WR_XMLIMP' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Iмпорт : Редагування iмпортованого документа
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Iмпорт : Редагування iмпортованого документа',
-                                                              p_funcname => '/barsroot/sberutls/importproced.aspx',
-                                                              p_rolename => 'WR_XMLIMP' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Iмпорт : Редагування iмпортованого документа',
+															  p_funcname => '/barsroot/sberutls/importproced.aspx\S*',
+															  p_rolename => 'WR_XMLIMP' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+
+      --  Створюємо дочірню функцію Iмпорт : Редагування iмпортованого документа
+                     l_function_deps  :=   abs_utils.add_func(
+															  p_name     => 'Iмпорт : Редагування iмпортованого документа',
+															  p_funcname => '/barsroot/sberutls/importproced.aspx',
+															  p_rolename => 'WR_XMLIMP' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію СЕП. Розбір нез'ясованих відповідних сум 3720 (ГРН) ********** ');
           --  Створюємо функцію СЕП. Розбір нез'ясованих відповідних сум 3720 (ГРН)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'СЕП. Розбір нез'ясованих відповідних сум 3720 (ГРН)',
                                                   p_funcname => '/barsroot/sep/sep3720/index?mode=hrivna',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Розбір 3720  (список документів)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Розбір 3720  (список документів)',
-                                                              p_funcname => '/barsroot/sep/sep3720/getsep3720list\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Розбір 3720  (список документів)',
+															  p_funcname => '/barsroot/sep/sep3720/getsep3720list\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Розбір 3720 (видалення документа)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Розбір 3720 (видалення документа)',
-                                                              p_funcname => '/barsroot/sep/sep3720/deleterecord\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Розбір 3720 (видалення документа)',
+															  p_funcname => '/barsroot/sep/sep3720/deleterecord\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Розбір 3720  (отримати альтернативний рахунок)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Розбір 3720  (отримати альтернативний рахунок)',
-                                                              p_funcname => '/barsroot/sep/sep3720/getaltaccount\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Розбір 3720  (отримати альтернативний рахунок)',
+															  p_funcname => '/barsroot/sep/sep3720/getaltaccount\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Розбір 3720 (отримання рахунку)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Розбір 3720 (отримання рахунку)',
-                                                              p_funcname => '/barsroot/sep/sep3720/getaccount\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Розбір 3720 (отримання рахунку)',
+															  p_funcname => '/barsroot/sep/sep3720/getaccount\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Розбір 3720 (виконати запит)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Розбір 3720 (виконати запит)',
-                                                              p_funcname => '/barsroot/sep/sep3720/setrequest\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Розбір 3720 (виконати запит)',
+															  p_funcname => '/barsroot/sep/sep3720/setrequest\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Розбір 3720  (на альтернативний рахунок)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Розбір 3720  (на альтернативний рахунок)',
-                                                              p_funcname => '/barsroot/sep/sep3720/toaltaccounts\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Розбір 3720  (на альтернативний рахунок)',
+															  p_funcname => '/barsroot/sep/sep3720/toaltaccounts\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію СЕП. Розбір нез'ясованих відповідних сум 3720 (ВАЛ) ********** ');
           --  Створюємо функцію СЕП. Розбір нез'ясованих відповідних сум 3720 (ВАЛ)
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'СЕП. Розбір нез'ясованих відповідних сум 3720 (ВАЛ)',
                                                   p_funcname => '/barsroot/sep/sep3720/index?mode=valuta',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Розбір 3720  (список документів)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Розбір 3720  (список документів)',
-                                                              p_funcname => '/barsroot/sep/sep3720/getsep3720list\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Розбір 3720  (список документів)',
+															  p_funcname => '/barsroot/sep/sep3720/getsep3720list\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Розбір 3720 (видалення документа)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Розбір 3720 (видалення документа)',
-                                                              p_funcname => '/barsroot/sep/sep3720/deleterecord\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Розбір 3720 (видалення документа)',
+															  p_funcname => '/barsroot/sep/sep3720/deleterecord\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Розбір 3720  (отримати альтернативний рахунок)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Розбір 3720  (отримати альтернативний рахунок)',
-                                                              p_funcname => '/barsroot/sep/sep3720/getaltaccount\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Розбір 3720  (отримати альтернативний рахунок)',
+															  p_funcname => '/barsroot/sep/sep3720/getaltaccount\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Розбір 3720 (отримання рахунку)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Розбір 3720 (отримання рахунку)',
-                                                              p_funcname => '/barsroot/sep/sep3720/getaccount\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Розбір 3720 (отримання рахунку)',
+															  p_funcname => '/barsroot/sep/sep3720/getaccount\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Розбір 3720 (виконати запит)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Розбір 3720 (виконати запит)',
-                                                              p_funcname => '/barsroot/sep/sep3720/setrequest\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Розбір 3720 (виконати запит)',
+															  p_funcname => '/barsroot/sep/sep3720/setrequest\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Розбір 3720  (на альтернативний рахунок)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Розбір 3720  (на альтернативний рахунок)',
-                                                              p_funcname => '/barsroot/sep/sep3720/toaltaccounts\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Розбір 3720  (на альтернативний рахунок)',
+															  p_funcname => '/barsroot/sep/sep3720/toaltaccounts\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію СЕП. Інформаційні запити ********** ');
           --  Створюємо функцію СЕП. Інформаційні запити
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'СЕП. Інформаційні запити',
                                                   p_funcname => '/barsroot/sep/septz/',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
       --  Створюємо дочірню функцію Запити на уточ.рекв.по плат.з рах.Відділ.і підлег. (сформ. реєстр)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Запити на уточ.рекв.по плат.з рах.Відділ.і підлег. (сформ. реєстр)',
-                                                              p_funcname => '/barsroot/sep/septz/getreport\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Запити на уточ.рекв.по плат.з рах.Відділ.і підлег. (сформ. реєстр)',
+															  p_funcname => '/barsroot/sep/septz/getreport\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Запити на уточ.рекв.по плат.з рах.Відділ.і підлег. (видал. запис)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Запити на уточ.рекв.по плат.з рах.Відділ.і підлег. (видал. запис)',
-                                                              p_funcname => '/barsroot/sep/septz/deleterow\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Запити на уточ.рекв.по плат.з рах.Відділ.і підлег. (видал. запис)',
+															  p_funcname => '/barsroot/sep/septz/deleterow\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Запити на уточ.рекв.по платежах всього Банку (док.інф.)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Запити на уточ.рекв.по платежах всього Банку (док.інф.)',
-                                                              p_funcname => '/barsroot/sep/septz/getrowref\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Запити на уточ.рекв.по платежах всього Банку (док.інф.)',
+															  p_funcname => '/barsroot/sep/septz/getrowref\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Запити на уточ.рекв.по плат.з рах.Відділ.і підлег. (уточ. рекв.)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Запити на уточ.рекв.по плат.з рах.Відділ.і підлег. (уточ. рекв.)',
-                                                              p_funcname => '/barsroot/sep/septz/rowreply\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Запити на уточ.рекв.по плат.з рах.Відділ.і підлег. (уточ. рекв.)',
+															  p_funcname => '/barsroot/sep/septz/rowreply\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Запити на уточ.рекв.по плат.з рах.Відділ.і підлег. (список док-ів)
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Запити на уточ.рекв.по плат.з рах.Відділ.і підлег. (список док-ів)',
-                                                              p_funcname => '/barsroot/sep/septz/getseptzlist\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Запити на уточ.рекв.по плат.з рах.Відділ.і підлег. (список док-ів)',
+															  p_funcname => '/barsroot/sep/septz/getseptzlist\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
       --  Створюємо дочірню функцію Запити на уточ.рекв.по плат.з рах.Відділ.і підлег.
                      l_function_deps  :=   abs_utils.add_func(
-                                                              p_name     => 'Запити на уточ.рекв.по плат.з рах.Відділ.і підлег.',
-                                                              p_funcname => '/barsroot/sep/septz/getzaga\S*',
-                                                              p_rolename => '' ,    
-                                                              p_frontend => l_application_type_id
-                                                              );
-                     abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+															  p_name     => 'Запити на уточ.рекв.по плат.з рах.Відділ.і підлег.',
+															  p_funcname => '/barsroot/sep/septz/getzaga\S*',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Запити на уточ.рекв.по плат. з рах.Вiддiл.i пiдлег ********** ');
           --  Створюємо функцію Запити на уточ.рекв.по плат. з рах.Вiддiл.i пiдлег
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Запити на уточ.рекв.по плат. з рах.Вiддiл.i пiдлег',
                                                   p_funcname => '/barsroot/sep/septz/index?mode=depNUsers',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Друк документів по валютним платежам corp2 ********** ');
           --  Створюємо функцію Друк документів по валютним платежам corp2
       l := l +1;
-      l_function_ids.extend(l);      
+      l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Друк документів по валютним платежам corp2',
                                                   p_funcname => '/barsroot/tools/Load_corp2_docs.aspx',
-                                                  p_rolename => '' ,    
+                                                  p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-     
+
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_OPER) - АРМ Операціоніста (Бек)  ');
     l := l_function_ids.first;
@@ -864,8 +997,8 @@ begin
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-     
-     
+
+
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
               from   adm_resource_activity a
@@ -879,6 +1012,108 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
+umu.add_report2arm(1,'$RM_OPER');
+umu.add_report2arm(2,'$RM_OPER');
+umu.add_report2arm(3,'$RM_OPER');
+umu.add_report2arm(4,'$RM_OPER');
+umu.add_report2arm(5,'$RM_OPER');
+umu.add_report2arm(6,'$RM_OPER');
+umu.add_report2arm(7,'$RM_OPER');
+umu.add_report2arm(8,'$RM_OPER');
+umu.add_report2arm(11,'$RM_OPER');
+umu.add_report2arm(12,'$RM_OPER');
+umu.add_report2arm(16,'$RM_OPER');
+umu.add_report2arm(17,'$RM_OPER');
+umu.add_report2arm(35,'$RM_OPER');
+umu.add_report2arm(43,'$RM_OPER');
+umu.add_report2arm(63,'$RM_OPER');
+umu.add_report2arm(66,'$RM_OPER');
+umu.add_report2arm(67,'$RM_OPER');
+umu.add_report2arm(73,'$RM_OPER');
+umu.add_report2arm(107,'$RM_OPER');
+umu.add_report2arm(112,'$RM_OPER');
+umu.add_report2arm(119,'$RM_OPER');
+umu.add_report2arm(120,'$RM_OPER');
+umu.add_report2arm(121,'$RM_OPER');
+umu.add_report2arm(122,'$RM_OPER');
+umu.add_report2arm(125,'$RM_OPER');
+umu.add_report2arm(126,'$RM_OPER');
+umu.add_report2arm(130,'$RM_OPER');
+umu.add_report2arm(147,'$RM_OPER');
+umu.add_report2arm(171,'$RM_OPER');
+umu.add_report2arm(185,'$RM_OPER');
+umu.add_report2arm(187,'$RM_OPER');
+umu.add_report2arm(205,'$RM_OPER');
+umu.add_report2arm(214,'$RM_OPER');
+umu.add_report2arm(237,'$RM_OPER');
+umu.add_report2arm(238,'$RM_OPER');
+umu.add_report2arm(243,'$RM_OPER');
+umu.add_report2arm(245,'$RM_OPER');
+umu.add_report2arm(246,'$RM_OPER');
+umu.add_report2arm(247,'$RM_OPER');
+umu.add_report2arm(256,'$RM_OPER');
+umu.add_report2arm(257,'$RM_OPER');
+umu.add_report2arm(259,'$RM_OPER');
+umu.add_report2arm(261,'$RM_OPER');
+umu.add_report2arm(262,'$RM_OPER');
+umu.add_report2arm(263,'$RM_OPER');
+umu.add_report2arm(264,'$RM_OPER');
+umu.add_report2arm(265,'$RM_OPER');
+umu.add_report2arm(268,'$RM_OPER');
+umu.add_report2arm(269,'$RM_OPER');
+umu.add_report2arm(270,'$RM_OPER');
+umu.add_report2arm(276,'$RM_OPER');
+umu.add_report2arm(279,'$RM_OPER');
+umu.add_report2arm(286,'$RM_OPER');
+umu.add_report2arm(287,'$RM_OPER');
+umu.add_report2arm(288,'$RM_OPER');
+umu.add_report2arm(312,'$RM_OPER');
+umu.add_report2arm(332,'$RM_OPER');
+umu.add_report2arm(335,'$RM_OPER');
+umu.add_report2arm(340,'$RM_OPER');
+umu.add_report2arm(342,'$RM_OPER');
+umu.add_report2arm(343,'$RM_OPER');
+umu.add_report2arm(344,'$RM_OPER');
+umu.add_report2arm(370,'$RM_OPER');
+umu.add_report2arm(375,'$RM_OPER');
+umu.add_report2arm(376,'$RM_OPER');
+umu.add_report2arm(380,'$RM_OPER');
+umu.add_report2arm(412,'$RM_OPER');
+umu.add_report2arm(421,'$RM_OPER');
+umu.add_report2arm(481,'$RM_OPER');
+umu.add_report2arm(491,'$RM_OPER');
+umu.add_report2arm(494,'$RM_OPER');
+umu.add_report2arm(566,'$RM_OPER');
+umu.add_report2arm(579,'$RM_OPER');
+umu.add_report2arm(684,'$RM_OPER');
+umu.add_report2arm(687,'$RM_OPER');
+umu.add_report2arm(688,'$RM_OPER');
+umu.add_report2arm(701,'$RM_OPER');
+umu.add_report2arm(702,'$RM_OPER');
+umu.add_report2arm(703,'$RM_OPER');
+umu.add_report2arm(764,'$RM_OPER');
+umu.add_report2arm(766,'$RM_OPER');
+umu.add_report2arm(767,'$RM_OPER');
+umu.add_report2arm(771,'$RM_OPER');
+umu.add_report2arm(778,'$RM_OPER');
+umu.add_report2arm(881,'$RM_OPER');
+umu.add_report2arm(999,'$RM_OPER');
+umu.add_report2arm(1000,'$RM_OPER');
+umu.add_report2arm(1001,'$RM_OPER');
+umu.add_report2arm(1002,'$RM_OPER');
+umu.add_report2arm(1102,'$RM_OPER');
+umu.add_report2arm(3012,'$RM_OPER');
+umu.add_report2arm(3102,'$RM_OPER');
+umu.add_report2arm(3119,'$RM_OPER');
+umu.add_report2arm(5701,'$RM_OPER');
+umu.add_report2arm(5702,'$RM_OPER');
+umu.add_report2arm(5703,'$RM_OPER');
+umu.add_report2arm(5706,'$RM_OPER');
+umu.add_report2arm(7111,'$RM_OPER');
+umu.add_report2arm(100260,'$RM_OPER');
+umu.add_report2arm(100566,'$RM_OPER');
+umu.add_report2arm(100953,'$RM_OPER');
+commit;
 end;
 /
 

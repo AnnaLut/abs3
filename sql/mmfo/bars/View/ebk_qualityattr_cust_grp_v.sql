@@ -18,7 +18,9 @@ PROMPT *** Create  view EBK_QUALITYATTR_CUST_GRP_V ***
  where eqg.qg_name <> 'card';
 
 PROMPT *** Create  grants  EBK_QUALITYATTR_CUST_GRP_V ***
+grant SELECT                                                                 on EBK_QUALITYATTR_CUST_GRP_V to BARSREADER_ROLE;
 grant SELECT                                                                 on EBK_QUALITYATTR_CUST_GRP_V to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on EBK_QUALITYATTR_CUST_GRP_V to UPLD;
 
 
 

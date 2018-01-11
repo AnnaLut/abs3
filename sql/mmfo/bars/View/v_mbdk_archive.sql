@@ -47,11 +47,16 @@ join   cc_vidd v on v.vidd = d.vidd
 left join int_accn i on i.acc = a.acc and i.id = a.pap - 1
 left join accounts ia on ia.acc = i.acra
 where  d.sos = 15 and
-       mbk.check_if_deal_belong_to_mbdk(v.vidd) = 'Y'
+       --mbk.check_if_deal_belong_to_mbdk(v.vidd) = 'Y'
+	    d.vidd in (1211, 1310, 1312,1322,1327,
+                  1510,1511,1512,1517,1521,1522,1523,1524,1527,
+                  1610,1611,1612,1613,1617,1621,1622,1623,1624,1627)
 order by d.nd desc;
 
 PROMPT *** Create  grants  V_MBDK_ARCHIVE ***
+grant SELECT                                                                 on V_MBDK_ARCHIVE  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBDK_ARCHIVE  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_MBDK_ARCHIVE  to UPLD;
 
 
 

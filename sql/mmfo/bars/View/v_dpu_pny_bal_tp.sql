@@ -13,6 +13,10 @@ PROMPT *** Create  view V_DPU_PNY_BAL_TP ***
   from DPT_SHOST
 ;
 
+PROMPT *** Create  grants  V_DPU_PNY_BAL_TP ***
+grant SELECT                                                                 on V_DPU_PNY_BAL_TP to BARSREADER_ROLE;
+grant SELECT                                                                 on V_DPU_PNY_BAL_TP to UPLD;
+
 
 
 PROMPT ===================================================================================== 

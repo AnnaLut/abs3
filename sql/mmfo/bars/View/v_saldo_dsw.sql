@@ -26,7 +26,9 @@ PROMPT *** Create  view V_SALDO_DSW ***
      from saldo_dsw;
 
 PROMPT *** Create  grants  V_SALDO_DSW ***
+grant SELECT                                                                 on V_SALDO_DSW     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SALDO_DSW     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_SALDO_DSW     to UPLD;
 
 
 

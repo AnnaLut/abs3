@@ -89,7 +89,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции 03B
-prompt Наименование операции: 03B-Приймання платежів від ФО на користь благодійних організацій
+prompt Наименование операции: 03B-Приймання платежів на користь благодійних організац та казначейст
 declare
   cnt_  number;
 begin
@@ -98,11 +98,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('03B', '03B-Приймання платежів від ФО на користь благодійних організацій', 1, '#(nbs_ob22 (''2902'',''06''))', 980, '#(get_proc_nls(''T00'',#(KVA)))', 980, null, '#(nbs_ob22 (''2902'',''06''))', null, null, 1, 1, 0, 0, null, null, 5, null, null, null, '1201100000000000000001000000000000110000000000000000000000000000', null);
+    values ('03B', '03B-Приймання платежів на користь благодійних організац та казначейст', 1, '#(nbs_ob22 (''2902'',''06''))', 980, '#(get_proc_nls(''T00'',#(KVA)))', 980, null, '#(nbs_ob22 (''2902'',''06''))', null, null, 1, 1, 0, 0, null, null, 5, null, '0', null, '1201100000000000000001000000000000110000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='03B', name='03B-Приймання платежів від ФО на користь благодійних організацій', dk=1, nlsm='#(nbs_ob22 (''2902'',''06''))', kv=980, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''2902'',''06''))', nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=5, proc=null, s3800=null, rang=null, flags='1201100000000000000001000000000000110000000000000000000000000000', nazn=null
+         set tt='03B', name='03B-Приймання платежів на користь благодійних організац та казначейст', dk=1, nlsm='#(nbs_ob22 (''2902'',''06''))', kv=980, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''2902'',''06''))', nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=5, proc=null, s3800='0', rang=null, flags='1201100000000000000001000000000000110000000000000000000000000000', nazn=null
        where tt='03B';
   end;
   --------------------------------

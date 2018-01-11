@@ -14,8 +14,10 @@ PROMPT *** Create  view V_CC_START_PARAMS ***
  ;
 
 PROMPT *** Create  grants  V_CC_START_PARAMS ***
+grant SELECT                                                                 on V_CC_START_PARAMS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CC_START_PARAMS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CC_START_PARAMS to START1;
+grant SELECT                                                                 on V_CC_START_PARAMS to UPLD;
 
 
 

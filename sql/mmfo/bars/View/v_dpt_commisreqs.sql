@@ -67,9 +67,11 @@ with read only
  ;
 
 PROMPT *** Create  grants  V_DPT_COMMISREQS ***
+grant SELECT                                                                 on V_DPT_COMMISREQS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_COMMISREQS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_COMMISREQS to DPT_ADMIN;
 grant SELECT                                                                 on V_DPT_COMMISREQS to DPT_ROLE;
+grant SELECT                                                                 on V_DPT_COMMISREQS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_COMMISREQS to WR_ALL_RIGHTS;
 
 

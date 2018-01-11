@@ -49,7 +49,9 @@ PROMPT *** Create  view V_SKRYNKA_PORT ***
      FROM TABLE (t_skrynka.f_SKRYNKA_PORT);
 
 PROMPT *** Create  grants  V_SKRYNKA_PORT ***
+grant SELECT                                                                 on V_SKRYNKA_PORT  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SKRYNKA_PORT  to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_SKRYNKA_PORT  to UPLD;
 
 
 

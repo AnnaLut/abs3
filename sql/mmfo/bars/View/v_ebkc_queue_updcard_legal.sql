@@ -82,7 +82,9 @@ PROMPT *** Create  view V_EBKC_QUEUE_UPDCARD_LEGAL ***
                    and lp.status=0 );
 
 PROMPT *** Create  grants  V_EBKC_QUEUE_UPDCARD_LEGAL ***
+grant SELECT                                                                 on V_EBKC_QUEUE_UPDCARD_LEGAL to BARSREADER_ROLE;
 grant SELECT                                                                 on V_EBKC_QUEUE_UPDCARD_LEGAL to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_EBKC_QUEUE_UPDCARD_LEGAL to UPLD;
 
 
 

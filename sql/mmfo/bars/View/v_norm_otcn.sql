@@ -13,8 +13,10 @@ PROMPT *** Create  view V_NORM_OTCN ***
     WHERE par LIKE 'NOR%';
 
 PROMPT *** Create  grants  V_NORM_OTCN ***
+grant SELECT                                                                 on V_NORM_OTCN     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_NORM_OTCN     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_NORM_OTCN     to RPBN002;
+grant SELECT                                                                 on V_NORM_OTCN     to UPLD;
 
 
 

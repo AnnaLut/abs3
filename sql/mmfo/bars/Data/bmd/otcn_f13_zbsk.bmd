@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Таблиця для заповнення позабалансових символів';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'OTCN_F13_ZBSK';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,19 +124,21 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 3, 'FDAT', 'D', 'Дата операцiї', null, 10, 1, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'ISP', 'N', 'Код виконавця', null, 22, 11, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KO', 'N', 'Код областi', null, 22, 13, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KV', 'N', 'Код валюти', null, 22, 6, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NAZN', 'C', 'Призначення платежу', null, 160, 10, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NLSD', 'C', 'Рах. Дт', null, 15, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NLSK', 'C', 'Рах. Кт', null, 15, 5, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'REF', 'N', 'Референс док-та', null, 22, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'S', 'N', 'Сума док-та~номiнал', null, 22, 7, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SK_ZB', 'N', 'Позабал. символ', null, 22, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SQ', 'N', 'Сума док-та~еквiвалент', null, 22, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'TOBO', 'C', 'Код ТОБО', null, 12, 12, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'TT', 'C', 'Код операцiї', null, 3, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'FDAT', 'D', 'Дата операцiї', '1.5', 10, 1, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ISP', 'N', 'Код виконавця', '', 22, 11, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KO', 'N', 'Код~областi', '1', 22, 13, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KV', 'N', 'Код~валюти', '1', 22, 6, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NAZN', 'C', 'Призначення платежу', '5', 160, 10, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NLSD', 'C', 'Рах. Дт', '', 15, 4, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NLSK', 'C', 'Рах. Кт', '', 15, 5, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'REF', 'N', 'Референс док-та', '', 22, 2, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'S', 'N', 'Сума док-та~номiнал', '', 22, 7, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SK_ZB', 'N', 'Позабал.~символ', '1', 2, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SQ', 'N', 'Сума док-та~еквiвалент', '', 22, 8, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'TOBO', 'C', 'Код ТОБО', '', 12, 12, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'TT', 'C', 'Код~операцiї', '1', 3, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'RECID', 'N', 'Ключ', '', 38, 17, 0, 1, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'STMT', 'N', 'STMT', '', 38, 18, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 3, 1, 'ASC ');

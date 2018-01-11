@@ -76,7 +76,9 @@ PROMPT *** Create  view V_ZAY_SALFORM ***
    ORDER BY id DESC;
 
 PROMPT *** Create  grants  V_ZAY_SALFORM ***
+grant SELECT                                                                 on V_ZAY_SALFORM   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAY_SALFORM   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ZAY_SALFORM   to UPLD;
 grant SELECT                                                                 on V_ZAY_SALFORM   to ZAY;
 
 

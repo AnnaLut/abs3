@@ -18,8 +18,10 @@ PROMPT *** Create  view V_OB22NU_REF_FO ***
  ;
 
 PROMPT *** Create  grants  V_OB22NU_REF_FO ***
+grant SELECT                                                                 on V_OB22NU_REF_FO to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OB22NU_REF_FO to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OB22NU_REF_FO to START1;
+grant SELECT                                                                 on V_OB22NU_REF_FO to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_OB22NU_REF_FO to WR_ALL_RIGHTS;
 
 

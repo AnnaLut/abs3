@@ -17,8 +17,10 @@ WHERE C.OKPO=f0.OKPO(+) AND C.OKPO=f4.OKPO(+) and C.custtype in (3,23)
  ;
 
 PROMPT *** Create  grants  FIN_VT_FL ***
+grant SELECT                                                                 on FIN_VT_FL       to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_VT_FL       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_VT_FL       to R_FIN2;
+grant SELECT                                                                 on FIN_VT_FL       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_VT_FL       to WR_ALL_RIGHTS;
 
 

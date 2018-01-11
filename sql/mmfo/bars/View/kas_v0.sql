@@ -21,8 +21,10 @@ from kas_VID v )
 ;
 
 PROMPT *** Create  grants  KAS_V0 ***
+grant SELECT                                                                 on KAS_V0          to BARSREADER_ROLE;
 grant SELECT                                                                 on KAS_V0          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on KAS_V0          to PYOD001;
+grant SELECT                                                                 on KAS_V0          to UPLD;
 
 
 

@@ -1,4 +1,13 @@
-CREATE OR REPLACE TRIGGER TIUD_EDEAL
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TIUD_EDEAL.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  trigger TIUD_EDEAL ***
+
+  CREATE OR REPLACE TRIGGER BARS.TIUD_EDEAL 
 instead of insert or update or delete ON BARS.E_DEAL for each row
 declare
   -- version 1.6  15/04-16
@@ -75,7 +84,7 @@ begin
         when ( l_ob22t in ('-5'))
         then raise_application_error( -20444, l_nls36||' Недопустиме значення параметра ОБ22! '||l_ob22, true );
         else null;
-      end case;        
+      end case;
       end if;
 
       exception
@@ -157,3 +166,9 @@ begin
 
 end TIUD_EDEAL;
 /
+ALTER TRIGGER BARS.TIUD_EDEAL ENABLE;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TIUD_EDEAL.sql =========*** End *** 
+PROMPT ===================================================================================== 

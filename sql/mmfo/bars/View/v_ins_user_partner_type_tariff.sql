@@ -40,7 +40,9 @@ PROMPT *** Create  view V_INS_USER_PARTNER_TYPE_TARIFF ***
     WHERE t0.tariff_id = t.id(+);
 
 PROMPT *** Create  grants  V_INS_USER_PARTNER_TYPE_TARIFF ***
+grant SELECT                                                                 on V_INS_USER_PARTNER_TYPE_TARIFF to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_USER_PARTNER_TYPE_TARIFF to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_INS_USER_PARTNER_TYPE_TARIFF to UPLD;
 
 
 

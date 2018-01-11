@@ -9,12 +9,14 @@ PROMPT *** Create  trigger TAU_ACCOUNTS_SMS ***
 
   CREATE OR REPLACE TRIGGER BARS.TAU_ACCOUNTS_SMS 
    AFTER UPDATE OF ostc
-   ON ACCOUNTS
+   ON BARS.ACCOUNTS
    FOR EACH ROW
-    WHEN (    new.send_sms = 'Y'
+ WHEN (
+new.send_sms = 'Y'
          AND (   old.ostc <> new.ostc
               OR old.dos <> new.dos
-              OR old.kos <> new.kos)) DECLARE
+              OR old.kos <> new.kos)
+      ) DECLARE
    l_nlsb   VARCHAR2 (15);
    l_nlsa   VARCHAR2 (15);
    l_kf     VARCHAR2 (6);
@@ -36,7 +38,7 @@ BEGIN
                                     nlsb,
                                     nlsa,
                                     KF)
-      SELECT s_accbalch.NEXTVAL,
+      SELECT bars_sqnc.get_nextval('s_accbalch'),
              SYSDATE,
              :new.rnk,
              :new.acc,

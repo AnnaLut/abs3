@@ -24,8 +24,10 @@ PROMPT *** Create  view FIN_VR_UL ***
  ;
 
 PROMPT *** Create  grants  FIN_VR_UL ***
+grant SELECT                                                                 on FIN_VR_UL       to BARSREADER_ROLE;
 grant SELECT                                                                 on FIN_VR_UL       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on FIN_VR_UL       to R_FIN2;
+grant SELECT                                                                 on FIN_VR_UL       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on FIN_VR_UL       to WR_ALL_RIGHTS;
 
 

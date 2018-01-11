@@ -26,8 +26,10 @@ from (select * from applist where nvl(frontend,0) = 0
 where b.RESOURCE_ID = a.id (+)   and b.RESOURCE_ID = d.GRANTEE_ID (+);
 
 PROMPT *** Create  grants  M_ROLE_ARMC ***
+grant SELECT                                                                 on M_ROLE_ARMC     to BARSREADER_ROLE;
 grant SELECT                                                                 on M_ROLE_ARMC     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on M_ROLE_ARMC     to START1;
+grant SELECT                                                                 on M_ROLE_ARMC     to UPLD;
 
 
 

@@ -13,8 +13,10 @@ PROMPT *** Create  view V_OPER_KODPL ***
    where tag='KODPL';
 
 PROMPT *** Create  grants  V_OPER_KODPL ***
+grant SELECT                                                                 on V_OPER_KODPL    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_OPER_KODPL    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_OPER_KODPL    to START1;
+grant SELECT                                                                 on V_OPER_KODPL    to UPLD;
 
 
 

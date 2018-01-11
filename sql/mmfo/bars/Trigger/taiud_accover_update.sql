@@ -140,7 +140,7 @@ begin
 
 end TAIUD_ACCOVER_UPDATE;
 /
-ALTER TRIGGER BARS.TAIUD_ACCOVER_UPDATE DISABLE;
+ALTER TRIGGER BARS.TAIUD_ACCOVER_UPDATE ENABLE;
 
 
 PROMPT ===================================================================================== 

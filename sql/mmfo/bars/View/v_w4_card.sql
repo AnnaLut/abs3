@@ -16,8 +16,10 @@ PROMPT *** Create  view V_W4_CARD ***
    and nvl(c.date_close,bankdate+1) > bankdate;
 
 PROMPT *** Create  grants  V_W4_CARD ***
+grant SELECT                                                                 on V_W4_CARD       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_W4_CARD       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_W4_CARD       to OW;
+grant SELECT                                                                 on V_W4_CARD       to UPLD;
 
 
 

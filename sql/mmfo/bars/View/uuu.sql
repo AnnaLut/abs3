@@ -20,8 +20,10 @@ where a.acc=s.acc and
    c.fdat <= B.fdat);
 
 PROMPT *** Create  grants  UUU ***
+grant SELECT                                                                 on UUU             to BARSREADER_ROLE;
 grant SELECT                                                                 on UUU             to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on UUU             to START1;
+grant SELECT                                                                 on UUU             to UPLD;
 
 
 

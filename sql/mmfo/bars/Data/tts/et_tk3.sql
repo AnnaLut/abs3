@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции TK3
-prompt Наименование операции: Розподіл сум для компенсаційних вкладів по Укрпошті
+prompt Наименование операции: TK3 Розподіл сум для компенсаційних вкладів по Укрпошті
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('TK3', 'Розподіл сум для компенсаційних вкладів по Укрпошті', 1, null, null, null, null, null, null, '2906301301', null, 0, 0, 0, 0, null, null, null, null, null, null, '0000000000000000000000000000000000000100000000000000000000000000', null);
+    values ('TK3', 'TK3 Розподіл сум для компенсаційних вкладів по Укрпошті', 1, null, null, null, null, null, null, '2906301301', null, 0, 0, 0, 0, null, null, null, null, null, null, '0000000000000000000000000000000000000100000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='TK3', name='Розподіл сум для компенсаційних вкладів по Укрпошті', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb='2906301301', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000000000000000000000000000100000000000000000000000000', nazn=null
+         set tt='TK3', name='TK3 Розподіл сум для компенсаційних вкладів по Укрпошті', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb='2906301301', mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000000000000000000000000000000000000100000000000000000000000000', nazn=null
        where tt='TK3';
   end;
   --------------------------------

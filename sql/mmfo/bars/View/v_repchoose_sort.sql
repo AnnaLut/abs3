@@ -16,8 +16,10 @@ select 'рахунку', 'по рахунку в звіті',  2 from dual
  ;
 
 PROMPT *** Create  grants  V_REPCHOOSE_SORT ***
+grant SELECT                                                                 on V_REPCHOOSE_SORT to BARSREADER_ROLE;
 grant SELECT                                                                 on V_REPCHOOSE_SORT to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_REPCHOOSE_SORT to RPBN001;
+grant SELECT                                                                 on V_REPCHOOSE_SORT to UPLD;
 
 
 

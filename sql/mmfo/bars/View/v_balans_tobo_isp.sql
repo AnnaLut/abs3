@@ -20,7 +20,9 @@ group by s.tobo, s.fdat, s.nbs, s.isp, f.fio
  ;
 
 PROMPT *** Create  grants  V_BALANS_TOBO_ISP ***
+grant SELECT                                                                 on V_BALANS_TOBO_ISP to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BALANS_TOBO_ISP to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_BALANS_TOBO_ISP to UPLD;
 grant SELECT                                                                 on V_BALANS_TOBO_ISP to WEB_BALANS;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_BALANS_TOBO_ISP to WR_ALL_RIGHTS;
 

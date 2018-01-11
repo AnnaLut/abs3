@@ -35,10 +35,12 @@ select r.rel_rnk, r.rnk, r.rel_id, r.rel_rnk, c.nmk,
    and c.rnk=u.rnk(+);
 
 PROMPT *** Create  grants  CUST_BUN ***
+grant SELECT                                                                 on CUST_BUN        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUST_BUN        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_BUN        to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUST_BUN        to REF0000;
 grant SELECT                                                                 on CUST_BUN        to START1;
+grant SELECT                                                                 on CUST_BUN        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUST_BUN        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CUST_BUN        to WR_REFREAD;
 

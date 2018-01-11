@@ -19,7 +19,9 @@ PROMPT *** Create  view V_MBDK_PROLONGATION ***
    ORDER BY p.fdat, p.npp;
 
 PROMPT *** Create  grants  V_MBDK_PROLONGATION ***
+grant SELECT                                                                 on V_MBDK_PROLONGATION to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBDK_PROLONGATION to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_MBDK_PROLONGATION to UPLD;
 
 
 

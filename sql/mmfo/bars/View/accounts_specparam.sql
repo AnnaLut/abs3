@@ -63,8 +63,10 @@ PROMPT *** Create  view ACCOUNTS_SPECPARAM ***
             AND a.acc = s4.acc;
 
 PROMPT *** Create  grants  ACCOUNTS_SPECPARAM ***
+grant SELECT                                                                 on ACCOUNTS_SPECPARAM to BARSREADER_ROLE;
 grant SELECT                                                                 on ACCOUNTS_SPECPARAM to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ACCOUNTS_SPECPARAM to START1;
+grant SELECT                                                                 on ACCOUNTS_SPECPARAM to UPLD;
 
 
 

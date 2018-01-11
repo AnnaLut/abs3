@@ -18,7 +18,9 @@ select a.idchk, a.name
 
 PROMPT *** Create  grants  V_STAFFTIPADM_ALL_CHKGRPS ***
 grant SELECT                                                                 on V_STAFFTIPADM_ALL_CHKGRPS to ABS_ADMIN;
+grant SELECT                                                                 on V_STAFFTIPADM_ALL_CHKGRPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFFTIPADM_ALL_CHKGRPS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STAFFTIPADM_ALL_CHKGRPS to UPLD;
 
 
 

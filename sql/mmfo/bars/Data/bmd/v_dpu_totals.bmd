@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Підсумки депозитного портфелю ЮО';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_DPU_TOTALS';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,30 +124,30 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'AC_CLS_QTY', 'N', 'К-ть закритих~ рахунків', null, 10, 25, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'AC_INPT_QTY', 'N', 'К-ть рахунків~на початок', null, 10, 23, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'AC_OPN_QTY', 'N', 'К-ть відкритих~рахунків', null, 10, 24, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'AC_OTPT_QTY', 'N', 'К-ть рахунків~на кінець', null, 10, 26, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'BRANCH', 'C', 'Код~підрозділу~(ТВБВ)', null, 30, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'CCY_CODE', 'C', 'Код~валюти', null, 3, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'DEP_BAL_INPT', 'N', 'Залишок депозитів~на початок~(номінал)', null, 22, 7, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'DEP_BAL_INPT_UAH', 'N', 'Залишок депозитів~на початок~(еквівалент)', null, 22, 8, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'DEP_BAL_OTPT', 'N', 'Залишок депозитів~на кінець періоду~(номінал)', null, 22, 13, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'DEP_BAL_OTPT_UAH', 'N', 'Залишки депозитів~на кінець періоду~(еквівалент)', null, 22, 14, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'DEP_DOS', 'N', 'Дт. обороти~(номінал)', null, 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'DEP_KOS', 'N', 'обороти~(номінал)', null, 22, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'INT_BAL_INPT', 'N', 'Залишок відсотків~на початок~(номінал)', null, 22, 15, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'INT_BAL_OTPT', 'N', 'Залишок відсотків~на кінець~(номінал)', null, 22, 21, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'INT_DOS', 'N', 'Дт. обороти~(номінал)', null, 22, 17, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'INT_KOS', 'N', 'обороти~(номінал)', null, 22, 19, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'KF', 'C', 'Код~філіалу', null, 6, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'NBS', 'C', 'Балансовий~рахунок', null, 4, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'RATE_AVG_INPT', 'N', 'Середньозважена~% ставка~на початок періоду', null, 22, 27, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'RATE_AVG_OTPT', 'N', 'Середньозважена~% ставка~на кінець періоду', null, 22, 28, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'TYPE_NAME', 'C', 'Назва депозитного~продукту', null, 100, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'USER_NM', 'C', 'П.І.Б.~користувача', null, 60, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'START_RPT_DT', 'D', 'Дата~початку~періоду', null, 10, 31, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'FINISH_RPT_DT', 'D', 'Дата~кінця~періоду', null, 10, 32, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'AC_CLS_QTY', 'N', 'К-ть закритих~ рахунків', '', 10, 25, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'AC_INPT_QTY', 'N', 'К-ть рахунків~на початок', '', 10, 23, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'AC_OPN_QTY', 'N', 'К-ть відкритих~рахунків', '', 10, 24, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'AC_OTPT_QTY', 'N', 'К-ть рахунків~на кінець', '', 10, 26, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'BRANCH', 'C', 'Код~підрозділу~(ТВБВ)', '', 30, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'CCY_CODE', 'C', 'Код~валюти', '', 3, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'DEP_BAL_INPT', 'N', 'Залишок депозитів~на початок~(номінал)', '', 22, 7, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'DEP_BAL_INPT_UAH', 'N', 'Залишок депозитів~на початок~(еквівалент)', '', 22, 8, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'DEP_BAL_OTPT', 'N', 'Залишок депозитів~на кінець періоду~(номінал)', '', 22, 13, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'DEP_BAL_OTPT_UAH', 'N', 'Залишки депозитів~на кінець періоду~(еквівалент)', '', 22, 14, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'DEP_DOS', 'N', 'Дт. обороти~(номінал)', '', 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'DEP_KOS', 'N', 'обороти~(номінал)', '', 22, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'INT_BAL_INPT', 'N', 'Залишок відсотків~на початок~(номінал)', '', 22, 15, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'INT_BAL_OTPT', 'N', 'Залишок відсотків~на кінець~(номінал)', '', 22, 21, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'INT_DOS', 'N', 'Дт. обороти~(номінал)', '', 22, 17, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'INT_KOS', 'N', 'обороти~(номінал)', '', 22, 19, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'KF', 'C', 'Код~філіалу', '', 6, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'NBS', 'C', 'Балансовий~рахунок', '', 4, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'RATE_AVG_INPT', 'N', 'Середньозважена~% ставка~на початок періоду', '', 22, 27, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'RATE_AVG_OTPT', 'N', 'Середньозважена~% ставка~на кінець періоду', '', 22, 28, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'TYPE_NAME', 'C', 'Назва депозитного~продукту', '', 100, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'USER_NM', 'C', 'П.І.Б.~користувача', '', 60, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'START_RPT_DT', 'D', 'Дата~початку~періоду', '', 10, 31, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'FINISH_RPT_DT', 'D', 'Дата~кінця~періоду', '', 10, 32, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

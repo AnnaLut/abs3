@@ -7,28 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_DPT_AGREEMENTS ***
 
-CREATE OR REPLACE FORCE VIEW BARS.V_DPT_AGREEMENTS
-(
-   AGRMNT_ID,
-   AGRMNT_DATE,
-   AGRMNT_NUM,
-   AGRMNT_TYPE,
-   AGRMNT_TYPENAME,
-   DPT_ID,
-   BRANCH,
-   OWNER_ID,
-   BANKDATE,
-   TEMPLATE_ID,
-   TRUST_ID,
-   TRUSTEE_ID,
-   TRUSTEE_NAME,
-   AGRMNT_STATE,
-   FL_ACTIVITY,
-   COMMENTS,
-   WB
-)
-AS
-   SELECT                                /* все доп.соглашения о 3-их лицах */
+  CREATE OR REPLACE FORCE VIEW BARS.V_DPT_AGREEMENTS ("AGRMNT_ID", "AGRMNT_DATE", "AGRMNT_NUM", "AGRMNT_TYPE", "AGRMNT_TYPENAME", "DPT_ID", "BRANCH", "OWNER_ID", "BANKDATE", "TEMPLATE_ID", "TRUST_ID", "TRUSTEE_ID", "TRUSTEE_NAME", "AGRMNT_STATE", "FL_ACTIVITY", "COMMENTS", "WB") AS 
+  SELECT                                /* все доп.соглашения о 3-их лицах */
          x.agrmnt_id,
           x.agrmnt_date,
           x.agrmnt_num,
@@ -68,7 +48,7 @@ AS
                               ' - триває'
                         END)
               END),
-            (select wb from dpt_deposit where deposit_id = x.dpt_id) wb  
+            (select wb from dpt_deposit where deposit_id = x.dpt_id) wb
      FROM dpt_vidd_flags f,
           customer c,
           (SELECT da.agrmnt_id,
@@ -140,14 +120,16 @@ AS
                   1, 'активна',
                   0, 'закрита',
                   'сторнована'),
-         (select wb from dpt_deposit where deposit_id = da.dpt_id) wb  
+         (select wb from dpt_deposit where deposit_id = da.dpt_id) wb
      FROM dpt_agreements da, dpt_vidd_flags f
     WHERE     da.agrmnt_type = f.id
           AND (da.trustee_id IS NULL OR da.agrmnt_type = 7);
 
 PROMPT *** Create  grants  V_DPT_AGREEMENTS ***
+grant SELECT                                                                 on V_DPT_AGREEMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_AGREEMENTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_AGREEMENTS to DPT_ROLE;
+grant SELECT                                                                 on V_DPT_AGREEMENTS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_AGREEMENTS to WR_ALL_RIGHTS;
 
 

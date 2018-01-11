@@ -21,7 +21,9 @@ where w.deal_id = d.deal_id
   and d.status_id > 0;
 
 PROMPT *** Create  grants  V_GRT_DEALS_WARN ***
+grant SELECT                                                                 on V_GRT_DEALS_WARN to BARSREADER_ROLE;
 grant SELECT                                                                 on V_GRT_DEALS_WARN to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_GRT_DEALS_WARN to UPLD;
 
 
 

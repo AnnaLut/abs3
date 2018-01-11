@@ -17,7 +17,9 @@ PROMPT *** Create  view V_WCS_SOLVENCIES ***
  order by s.id;
 
 PROMPT *** Create  grants  V_WCS_SOLVENCIES ***
+grant SELECT                                                                 on V_WCS_SOLVENCIES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SOLVENCIES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_SOLVENCIES to UPLD;
 
 
 

@@ -18,9 +18,11 @@ PROMPT *** Create  view V_DPU_VIP_MANAGER ***
 
 PROMPT *** Create  grants  V_DPU_VIP_MANAGER ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPU_VIP_MANAGER to ABS_ADMIN;
+grant SELECT                                                                 on V_DPU_VIP_MANAGER to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPU_VIP_MANAGER to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPU_VIP_MANAGER to DPT_ADMIN;
 grant SELECT                                                                 on V_DPU_VIP_MANAGER to START1;
+grant SELECT                                                                 on V_DPU_VIP_MANAGER to UPLD;
 grant FLASHBACK,SELECT                                                       on V_DPU_VIP_MANAGER to WR_REFREAD;
 
 

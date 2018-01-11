@@ -13,6 +13,10 @@ from  nd_txt
 where tag in (select tag from mos_tag) 
 ;
 
+PROMPT *** Create  grants  MOS_OPERW ***
+grant SELECT                                                                 on MOS_OPERW       to BARSREADER_ROLE;
+grant SELECT                                                                 on MOS_OPERW       to UPLD;
+
 
 
 PROMPT ===================================================================================== 

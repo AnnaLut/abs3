@@ -87,8 +87,10 @@ PROMPT *** Create  view V_VISALIST ***
           AND chk.doc_is_valid (o.REF, ct.SQLVAL) = 1;
 
 PROMPT *** Create  grants  V_VISALIST ***
+grant SELECT                                                                 on V_VISALIST      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_VISALIST      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_VISALIST      to START1;
+grant SELECT                                                                 on V_VISALIST      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_VISALIST      to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_VISALIST      to WR_CHCKINNR_ALL;
 grant SELECT                                                                 on V_VISALIST      to WR_CHCKINNR_CASH;

@@ -13,9 +13,11 @@ PROMPT *** Create  view MS_NX_K ***
  ;
 
 PROMPT *** Create  grants  MS_NX_K ***
+grant SELECT                                                                 on MS_NX_K         to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MS_NX_K         to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on MS_NX_K         to CC_AIM;
 grant SELECT                                                                 on MS_NX_K         to RCC_DEAL;
+grant SELECT                                                                 on MS_NX_K         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on MS_NX_K         to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on MS_NX_K         to WR_REFREAD;
 

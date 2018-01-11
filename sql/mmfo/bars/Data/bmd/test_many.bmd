@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Грошовi потоки по КД';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'TEST_MANY';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,25 +124,25 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'FDAT', 'D', 'План~Дата~потоку', null, null, 9, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'FAKT', 'N', 'Ф А К Т~Тiло+Прц', null, null, 19, 0, 0, 0, 0, '', '', 0, 0, 'Sum(FAKT)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'P1_SN', 'N', 'План~Проц~потоку', null, null, 15, 0, 0, 0, 0, '', '', 0, 0, 'Sum(P1_SN)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'P1_SS', 'N', 'План~Тiло~потоку', null, null, 10, 0, 0, 0, 0, '', '', 0, 0, 'Sum(P1_SS)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'PLAN1', 'N', 'План~(Т+П-Д)~потоку', null, null, 16, 0, 0, 0, 0, '', '', 0, 0, 'Sum(PLAN1)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'IR', 'N', '%Ст', null, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'GPK', 'N', '1=кл~2-кiн~3-ан', null, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'IRR', 'N', 'IRR0~поч Еф.ст.', null, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'PV', 'N', 'Теп.варт~КД~PV*(1-K)', null, null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'K', 'N', 'Пок~риз~K', null, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'SDI', 'N', 'Поч~Диск~потоку', null, null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'LIM1', 'N', 'Прогноз~Вх.Залиш~Тiло', null, null, 50, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'LIM2', 'N', 'Прогноз~вих.Залиш~Тiло', null, null, 55, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'ND', 'N', 'Реф~КД', null, null, 0, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'DAT', 'D', 'Звiтна~дата', null, null, 77, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'ID', 'N', 'Вик.', null, null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'PVZ', 'N', 'Теп.вар.~Забез.~PVZ', null, null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'ZAL', 'N', 'План~(Забез.)~потоку', null, null, 17, 0, 0, 0, 0, '', '', 0, 0, 'Sum(ZAL)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'PLAN2', 'N', 'Теп.варт~Одного пл~Pv1*(1-K)', null, null, 7, 0, 0, 0, 0, '', '', 0, 0, 'Sum(PLAN2)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'FDAT', 'D', 'План~Дата~потоку', '', null, 9, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'FAKT', 'N', 'Ф А К Т~Тiло+Прц', '', null, 19, 0, 0, 0, 0, '', '', 0, 0, 'Sum(FAKT)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'P1_SN', 'N', 'План~Проц~потоку', '', null, 15, 0, 0, 0, 0, '', '', 0, 0, 'Sum(P1_SN)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'P1_SS', 'N', 'План~Тiло~потоку', '', null, 10, 0, 0, 0, 0, '', '', 0, 0, 'Sum(P1_SS)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'PLAN1', 'N', 'План~(Т+П-Д)~потоку', '', null, 16, 0, 0, 0, 0, '', '', 0, 0, 'Sum(PLAN1)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'IR', 'N', '%Ст', '', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'GPK', 'N', '1=кл~2-кiн~3-ан', '', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'IRR', 'N', 'IRR0~поч Еф.ст.', '', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'PV', 'N', 'Теп.варт~КД~PV*(1-K)', '', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'K', 'N', 'Пок~риз~K', '', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'SDI', 'N', 'Поч~Диск~потоку', '', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'LIM1', 'N', 'Прогноз~Вх.Залиш~Тiло', '', null, 50, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'LIM2', 'N', 'Прогноз~вих.Залиш~Тiло', '', null, 55, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'ND', 'N', 'Реф~КД', '', null, 0, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'DAT', 'D', 'Звiтна~дата', '', null, 77, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'ID', 'N', 'Вик.', '', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'PVZ', 'N', 'Теп.вар.~Забез.~PVZ', '', null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'ZAL', 'N', 'План~(Забез.)~потоку', '', null, 17, 0, 0, 0, 0, '', '', 0, 0, 'Sum(ZAL)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'PLAN2', 'N', 'Теп.варт~Одного пл~Pv1*(1-K)', '', null, 7, 0, 0, 0, 0, '', '', 0, 0, 'Sum(PLAN2)', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 1, 'ASC ');

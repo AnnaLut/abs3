@@ -28,8 +28,10 @@ PROMPT *** Create  view V_RNK_ACC ***
     WHERE   u.acc = a.acc AND u.rnk = c.rnk;
 
 PROMPT *** Create  grants  V_RNK_ACC ***
+grant SELECT                                                                 on V_RNK_ACC       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_RNK_ACC       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_RNK_ACC       to START1;
+grant SELECT                                                                 on V_RNK_ACC       to UPLD;
 
 
 

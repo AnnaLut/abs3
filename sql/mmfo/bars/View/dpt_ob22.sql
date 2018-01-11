@@ -28,9 +28,11 @@ PROMPT *** Create  view DPT_OB22 ***
       AND v.vidd = p.vidd(+);
 
 PROMPT *** Create  grants  DPT_OB22 ***
+grant SELECT                                                                 on DPT_OB22        to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_OB22        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_OB22        to DPT_ADMIN;
 grant SELECT                                                                 on DPT_OB22        to SALGL;
+grant SELECT                                                                 on DPT_OB22        to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_OB22        to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on DPT_OB22        to WR_REFREAD;
 

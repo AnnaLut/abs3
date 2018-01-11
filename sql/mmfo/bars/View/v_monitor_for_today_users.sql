@@ -21,6 +21,10 @@ from   (select s.logname, s.fio,
         group by s.logname, s.fio) d
 ;
 
+PROMPT *** Create  grants  V_MONITOR_FOR_TODAY_USERS ***
+grant SELECT                                                                 on V_MONITOR_FOR_TODAY_USERS to BARSREADER_ROLE;
+grant SELECT                                                                 on V_MONITOR_FOR_TODAY_USERS to UPLD;
+
 
 
 PROMPT ===================================================================================== 

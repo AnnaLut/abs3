@@ -53,8 +53,10 @@ PROMPT *** Create  view DYN_FIL_CUSTOM ***
             WHERE p.rnk = b.rnk AND b.amount > 0 AND p.amount > b.amount);
 
 PROMPT *** Create  grants  DYN_FIL_CUSTOM ***
+grant SELECT                                                                 on DYN_FIL_CUSTOM  to BARSREADER_ROLE;
 grant SELECT                                                                 on DYN_FIL_CUSTOM  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DYN_FIL_CUSTOM  to START1;
+grant SELECT                                                                 on DYN_FIL_CUSTOM  to UPLD;
 
 
 

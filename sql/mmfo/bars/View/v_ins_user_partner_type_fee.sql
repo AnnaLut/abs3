@@ -38,7 +38,9 @@ PROMPT *** Create  view V_INS_USER_PARTNER_TYPE_FEE ***
     WHERE t0.fee_id = t.id(+);
 
 PROMPT *** Create  grants  V_INS_USER_PARTNER_TYPE_FEE ***
+grant SELECT                                                                 on V_INS_USER_PARTNER_TYPE_FEE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_USER_PARTNER_TYPE_FEE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_INS_USER_PARTNER_TYPE_FEE to UPLD;
 
 
 

@@ -29,8 +29,10 @@ PROMPT *** Create  view V_CC_KOMIS ***
    ORDER BY nmk;
 
 PROMPT *** Create  grants  V_CC_KOMIS ***
+grant SELECT                                                                 on V_CC_KOMIS      to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on V_CC_KOMIS      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_CC_KOMIS      to RCC_DEAL;
+grant SELECT                                                                 on V_CC_KOMIS      to UPLD;
 
 
 

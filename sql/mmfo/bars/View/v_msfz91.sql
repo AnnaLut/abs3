@@ -27,6 +27,10 @@ PROMPT *** Create  view V_MSFZ91 ***
  group by d.vidd, d.nd,  d.sdate, d.wdate , d.sos, a.kv , d.rnk, d.cc_id
  ) x;
 
+PROMPT *** Create  grants  V_MSFZ91 ***
+grant SELECT                                                                 on V_MSFZ91        to BARSREADER_ROLE;
+grant SELECT                                                                 on V_MSFZ91        to UPLD;
+
 
 
 PROMPT ===================================================================================== 

@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Клієнти та картки для CardMake';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_CM_CLIENT';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,77 +124,77 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ADDR1_CITYNAME', 'C', 'Місто~(прописки/реєстрації)', null, 100, 34, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ADDR1_DOMAIN', 'C', 'Область~(прописки/реєстрації)', null, 48, 36, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'ADDR1_PCODE', 'C', 'Індекс~(прописки/реєстрації)', null, 10, 35, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'ADDR1_REGION', 'C', 'Район~(прописки/реєстрації)', null, 48, 37, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'ADDR1_STREET', 'C', 'Вулиця,~будинок, квартира~(прописки/реєстрації)', null, 100, 38, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'ADDR2_CITYNAME', 'C', 'Місто~(проживання)', null, 100, 39, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'ADDR2_DOMAIN', 'C', 'Область~(проживання)', null, 48, 41, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'ADDR2_PCODE', 'C', 'Індекс~(проживання)', null, 10, 40, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'ADDR2_REGION', 'C', 'Район~(проживання)', null, 48, 42, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'ADDR2_STREET', 'C', 'Вулиця,~будинок, квартира~(проживання)', null, 100, 43, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'BIRTHDATE', 'D', 'дата~народження', null, 10, 31, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'BIRTHPLACE', 'C', 'місце~народження', null, 1024, 32, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'BRANCH', 'C', 'Код установи~банку', null, 30, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'CARD_TYPE', 'C', 'Код~Картковий~субпродукт', null, 24, 61, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'CLIENTTYPE', 'N', 'тип~клієнта', null, 22, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'CNTM', 'N', 'Количество~месяцев~действия~карты', null, 22, 62, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'COMPANYNAME', 'C', 'Назва організації', null, 200, 26, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'CONTACTPERSON', 'C', 'Прізвище~контактної~особи', null, 105, 30, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'CONTRACTNUMBER', 'C', 'Номер~аналітичного~рахунку 2625', null, 19, 59, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'COUNTRY', 'C', 'Громадянство', null, 3, 19, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'DATEIN', 'D', 'Дата~добавления~заявки', null, 10, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'DATEMOD', 'D', 'Дата~модификации~заявки', null, 10, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'DATE_W', 'D', 'Дата~принятия~на работу', null, 10, 23, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'EMAIL', 'C', 'e-mail', null, 32, 44, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'ENGFIRSTNAME', 'C', 'Ім’я~що ембосується~(на англійський )', null, 64, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'ENGLASTNAME', 'C', 'Прізвище~що ембосується~(на англійський)', null, 64, 18, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'FAX', 'C', 'Факс', null, 12, 48, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'FIRSTNAME', 'C', 'Ім’я', null, 105, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'FOREIGNPASPDATE', 'D', 'дата видачі~закордонного~паспорту', null, 10, 56, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'FOREIGNPASPENDDATE', 'D', 'закордонний~паспорт~дійсний до', null, 10, 57, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'FOREIGNPASPISSUER', 'C', 'ким виданий~закордонний~паспорт', null, 128, 58, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'FOREIGNPASPNUM', 'C', 'номер~закордонного~паспорту', null, 16, 54, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'FOREIGNPASPSERIES', 'C', 'серія~закордонного~паспорту', null, 16, 55, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 34, 'GENDER', 'C', 'пол', null, 1, 33, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'ID', 'N', 'Ід.', null, 22, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 36, 'ISVIP', 'C', 'Признак~VIP клиента', null, 1, 24, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 37, 'K060', 'C', 'Признак~инсайдера', null, 2, 25, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 38, 'KLAS_CLIENT_ID', 'N', 'Юр.~статус', null, 22, 29, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 39, 'KOD_SYSORG', 'N', 'код~подразделения~системной~организации', null, 22, 65, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 40, 'LASTNAME', 'C', 'Прізвище', null, 105, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 41, 'MIDDLENAME', 'C', 'По-батькові', null, 105, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 42, 'OFFICE', 'C', 'Посада', null, 32, 22, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 43, 'OKPO_SYSORG', 'C', 'ОКПО~системной~организации', null, 10, 64, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 44, 'OPENDATE', 'D', 'дата~відкриття~клієнта', null, 10, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 45, 'OPER_STATUS', 'N', 'Статус~операции', null, 22, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 46, 'OPER_TYPE', 'N', 'Тип~операции', null, 22, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 47, 'PASPDATE', 'D', 'дата видачі~документу~що засвідчує особу', null, 10, 52, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 48, 'PASPISSUER', 'C', 'ким виданий~документ~що засвідчує особу', null, 128, 53, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 49, 'PASPNUM', 'C', 'номер~документу~що засвідчує особу', null, 16, 50, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 50, 'PASPSERIES', 'C', 'серія~документу~що засвідчує особу', null, 16, 51, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 51, 'PERSONALISATIONNAME', 'C', 'Назва компанії~що ембосується~(на англ.)', null, 32, 28, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 52, 'PHONENUMBER', 'C', 'Телефон', null, 12, 45, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 53, 'PHONENUMBER_DOD', 'C', 'Телефон~додатковий', null, 12, 47, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 54, 'PHONENUMBER_MOB', 'C', 'Телефон~мобільний', null, 12, 46, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 55, 'PIND', 'C', 'Таємне~слово', null, 32, 63, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 56, 'PRODUCTCODE', 'C', 'Код~продукту', null, 32, 60, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 57, 'REGNUMBERCLIENT', 'N', 'РНК~владельца~счета~в АБС', null, 22, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 58, 'REGNUMBEROWNER', 'N', 'РНК~держателя~карты~в АБС', null, 22, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 59, 'RESIDENT', 'N', 'ознака~резидента', null, 22, 20, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 60, 'RESP_TXT', 'C', 'Описание~ошибки', null, 1000, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 61, 'SHORTCOMPANYNAME', 'C', 'Краткое~наименование~организации', null, 32, 27, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 62, 'SHORTNAME', 'C', 'найменуванню клієнта~українською ', null, 105, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 63, 'TAXPAYERIDENTIFIER', 'C', 'Ід. код~клиента', null, 10, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 64, 'TYPEDOC', 'N', 'Тип~документа', null, 22, 49, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 65, 'WORK', 'C', 'Місце роботи', null, 32, 21, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 66, 'RNK', 'N', 'РНК', null, 22, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 67, 'CL_RNK', 'C', 'РНК~кліента~в ЦРВ', null, 32, 67, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 68, 'CL_DT_ISS', 'D', 'Дата видачи~карти кліенту', null, 10, 68, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 69, 'CARD_BR_ISS', 'C', 'Номер відділення,~де буде~видаватися картка', null, 30, 69, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 70, 'CARD_ADDR_ISS', 'C', 'Адрес відділення,~де буде~видаватися картка', null, 100, 70, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 71, 'DELIVERY_BR', 'C', 'Код відділення,~куди треба~доставити картку', null, 30, 71, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ADDR1_CITYNAME', 'C', 'Місто~(прописки/реєстрації)', '', 100, 34, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ADDR1_DOMAIN', 'C', 'Область~(прописки/реєстрації)', '', 48, 36, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'ADDR1_PCODE', 'C', 'Індекс~(прописки/реєстрації)', '', 10, 35, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ADDR1_REGION', 'C', 'Район~(прописки/реєстрації)', '', 48, 37, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'ADDR1_STREET', 'C', 'Вулиця,~будинок, квартира~(прописки/реєстрації)', '', 100, 38, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'ADDR2_CITYNAME', 'C', 'Місто~(проживання)', '', 100, 39, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'ADDR2_DOMAIN', 'C', 'Область~(проживання)', '', 48, 41, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'ADDR2_PCODE', 'C', 'Індекс~(проживання)', '', 10, 40, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'ADDR2_REGION', 'C', 'Район~(проживання)', '', 48, 42, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'ADDR2_STREET', 'C', 'Вулиця,~будинок, квартира~(проживання)', '', 100, 43, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'BIRTHDATE', 'D', 'дата~народження', '', 10, 31, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'BIRTHPLACE', 'C', 'місце~народження', '', 1024, 32, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'BRANCH', 'C', 'Код установи~банку', '', 30, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'CARD_TYPE', 'C', 'Код~Картковий~субпродукт', '', 24, 61, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'CLIENTTYPE', 'N', 'тип~клієнта', '', 22, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'CNTM', 'N', 'Количество~месяцев~действия~карты', '', 22, 62, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'COMPANYNAME', 'C', 'Назва організації', '', 200, 26, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'CONTACTPERSON', 'C', 'Прізвище~контактної~особи', '', 105, 30, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'CONTRACTNUMBER', 'C', 'Номер~аналітичного~рахунку 2625', '', 19, 59, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'COUNTRY', 'C', 'Громадянство', '', 3, 19, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'DATEIN', 'D', 'Дата~добавления~заявки', '', 10, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'DATEMOD', 'D', 'Дата~модификации~заявки', '', 10, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'DATE_W', 'D', 'Дата~принятия~на работу', '', 10, 23, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'EMAIL', 'C', 'e-mail', '', 32, 44, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'ENGFIRSTNAME', 'C', 'Ім’я~що ембосується~(на англійський )', '', 64, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'ENGLASTNAME', 'C', 'Прізвище~що ембосується~(на англійський)', '', 64, 18, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'FAX', 'C', 'Факс', '', 12, 48, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'FIRSTNAME', 'C', 'Ім’я', '', 105, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'FOREIGNPASPDATE', 'D', 'дата видачі~закордонного~паспорту', '', 10, 56, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'FOREIGNPASPENDDATE', 'D', 'закордонний~паспорт~дійсний до', '', 10, 57, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'FOREIGNPASPISSUER', 'C', 'ким виданий~закордонний~паспорт', '', 128, 58, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'FOREIGNPASPNUM', 'C', 'номер~закордонного~паспорту', '', 16, 54, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'FOREIGNPASPSERIES', 'C', 'серія~закордонного~паспорту', '', 16, 55, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'GENDER', 'C', 'пол', '', 1, 33, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'ID', 'N', 'Ід.', '', 22, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'ISVIP', 'C', 'Признак~VIP клиента', '', 1, 24, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'K060', 'C', 'Признак~инсайдера', '', 2, 25, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'KLAS_CLIENT_ID', 'N', 'Юр.~статус', '', 22, 29, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'KOD_SYSORG', 'N', 'код~подразделения~системной~организации', '', 22, 65, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'LASTNAME', 'C', 'Прізвище', '', 105, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 41, 'MIDDLENAME', 'C', 'По-батькові', '', 105, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 42, 'OFFICE', 'C', 'Посада', '', 32, 22, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 43, 'OKPO_SYSORG', 'C', 'ОКПО~системной~организации', '', 10, 64, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 44, 'OPENDATE', 'D', 'дата~відкриття~клієнта', '', 10, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 45, 'OPER_STATUS', 'N', 'Статус~операции', '', 22, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 46, 'OPER_TYPE', 'N', 'Тип~операции', '', 22, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 47, 'PASPDATE', 'D', 'дата видачі~документу~що засвідчує особу', '', 10, 52, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 48, 'PASPISSUER', 'C', 'ким виданий~документ~що засвідчує особу', '', 128, 53, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 49, 'PASPNUM', 'C', 'номер~документу~що засвідчує особу', '', 16, 50, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 50, 'PASPSERIES', 'C', 'серія~документу~що засвідчує особу', '', 16, 51, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 51, 'PERSONALISATIONNAME', 'C', 'Назва компанії~що ембосується~(на англ.)', '', 32, 28, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 52, 'PHONENUMBER', 'C', 'Телефон', '', 12, 45, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 53, 'PHONENUMBER_DOD', 'C', 'Телефон~додатковий', '', 12, 47, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 54, 'PHONENUMBER_MOB', 'C', 'Телефон~мобільний', '', 12, 46, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 55, 'PIND', 'C', 'Таємне~слово', '', 32, 63, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 56, 'PRODUCTCODE', 'C', 'Код~продукту', '', 32, 60, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 57, 'REGNUMBERCLIENT', 'N', 'РНК~владельца~счета~в АБС', '', 22, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 58, 'REGNUMBEROWNER', 'N', 'РНК~держателя~карты~в АБС', '', 22, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 59, 'RESIDENT', 'N', 'ознака~резидента', '', 22, 20, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 60, 'RESP_TXT', 'C', 'Описание~ошибки', '', 1000, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 61, 'SHORTCOMPANYNAME', 'C', 'Краткое~наименование~организации', '', 32, 27, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 62, 'SHORTNAME', 'C', 'найменуванню клієнта~українською ', '', 105, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 63, 'TAXPAYERIDENTIFIER', 'C', 'Ід. код~клиента', '', 10, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 64, 'TYPEDOC', 'N', 'Тип~документа', '', 22, 49, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 65, 'WORK', 'C', 'Місце роботи', '', 32, 21, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 66, 'RNK', 'N', 'РНК', '', 22, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 67, 'CL_RNK', 'C', 'РНК~кліента~в ЦРВ', '', 32, 67, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 68, 'CL_DT_ISS', 'D', 'Дата видачи~карти кліенту', '', 10, 68, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 69, 'CARD_BR_ISS', 'C', 'Номер відділення,~де буде~видаватися картка', '', 30, 69, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 70, 'CARD_ADDR_ISS', 'C', 'Адрес відділення,~де буде~видаватися картка', '', 100, 70, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 71, 'DELIVERY_BR', 'C', 'Код відділення,~куди треба~доставити картку', '', 30, 71, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

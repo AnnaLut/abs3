@@ -40,7 +40,9 @@ from   (select u.id user_id,
 ;
 
 PROMPT *** Create  grants  V_STAFF_USER_ROLE ***
+grant SELECT                                                                 on V_STAFF_USER_ROLE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFF_USER_ROLE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STAFF_USER_ROLE to UPLD;
 
 
 

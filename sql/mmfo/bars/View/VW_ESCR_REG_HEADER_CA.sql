@@ -1,5 +1,14 @@
-CREATE OR REPLACE VIEW VW_ESCR_REG_HEADER_CA AS
-SELECT rh.customer_id
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/VW_ESCR_REG_HEADER_CA.sql =========*** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view VW_ESCR_REG_HEADER_CA ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.VW_ESCR_REG_HEADER_CA ("CUSTOMER_ID", "CUSTOMER_NAME", "CUSTOMER_OKPO", "CUSTOMER_REGION", "CUSTOMER_FULL_ADDRESS", "CUSTOMER_TYPE", "SUBS_NUMB", "SUBS_DATE", "SUBS_DOC_TYPE", "DEAL_ID", "DEAL_NUMBER", "DEAL_DATE_FROM", "DEAL_DATE_TO", "DEAL_TERM", "DEAL_PRODUCT", "DEAL_STATE", "DEAL_TYPE_CODE", "DEAL_TYPE_NAME", "DEAL_SUM", "CREDIT_STATUS_ID", "CREDIT_STATUS_NAME", "CREDIT_STATUS_CODE", "CREDIT_COMMENT", "STATE_FOR_UI", "GOOD_COST", "NLS", "ACC", "DOC_DATE", "MONEY_DATE", "COMP_SUM", "VALID_STATUS", "BRANCH_CODE", "BRANCH_NAME", "MFO", "USER_ID", "USER_NAME", "REG_TYPE_ID", "REG_KIND_ID", "REG_ID", "CREATE_DATE", "DATE_FROM", "DATE_TO", "CREDIT_COUNT", "REG_KIND_CODE", "REG_TYPE_CODE", "REG_KIND_NAME", "REG_TYPE_NAME", "PAYMENT_REF", "OUTER_NUMBER", "NEW_GOOD_COST", "NEW_DEAL_SUM", "NEW_COMP_SUM") AS 
+  SELECT rh.customer_id
       ,rh.customer_name
       ,rh.customer_okpo
       ,rh.customer_region
@@ -95,26 +104,12 @@ SELECT rh.customer_id
   JOIN escr_reg_types et
     ON tt.reg_type_id = et.id
 ;
-comment on table VW_ESCR_REG_HEADER_CA is 'Кредитні договори,включені в реєстр';
-comment on column VW_ESCR_REG_HEADER_CA.CUSTOMER_ID is 'Реєстраційний номер  картки платника';
-comment on column VW_ESCR_REG_HEADER_CA.CUSTOMER_NAME is 'Прізвище, ім’я,  по-батькові фізичної особи-позичальника';
-comment on column VW_ESCR_REG_HEADER_CA.CUSTOMER_OKPO is 'ІНН особи-позичальника або дані паспорту ';
-comment on column VW_ESCR_REG_HEADER_CA.CUSTOMER_REGION is 'Клієнт адреса проживання (область)';
-comment on column VW_ESCR_REG_HEADER_CA.CUSTOMER_FULL_ADDRESS is 'Клієнт повна адреса проживання';
-comment on column VW_ESCR_REG_HEADER_CA.CUSTOMER_TYPE is 'Тип клієнта (довідково)';
-comment on column VW_ESCR_REG_HEADER_CA.SUBS_NUMB is 'Номер субсидії (довідково)';
-comment on column VW_ESCR_REG_HEADER_CA.SUBS_DATE is 'Дата субсидії (довідково)';
-comment on column VW_ESCR_REG_HEADER_CA.SUBS_DOC_TYPE is 'Документ про субсидію';
-comment on column VW_ESCR_REG_HEADER_CA.DEAL_ID is 'ID кредитного договору (довідково)';
-comment on column VW_ESCR_REG_HEADER_CA.DEAL_NUMBER is 'Номер кредитного договору';
-comment on column VW_ESCR_REG_HEADER_CA.DEAL_DATE_FROM is 'Дата початку дії кредитного договору';
-comment on column VW_ESCR_REG_HEADER_CA.DEAL_DATE_TO is 'Дата закінчення дії кредитного договору (довідково)';
-comment on column VW_ESCR_REG_HEADER_CA.DEAL_TERM is 'Строк дії (у місяцях)';
-comment on column VW_ESCR_REG_HEADER_CA.DEAL_PRODUCT is 'Продукт (довідково)';
-comment on column VW_ESCR_REG_HEADER_CA.DEAL_SUM is 'Сума кредитного договору';
-comment on column VW_ESCR_REG_HEADER_CA.GOOD_COST is 'Загальна вартість придбаного енергоефективного обладнання та/або матеріалів та відповідних робіт з їх впровадження (у гривнях)';
-comment on column VW_ESCR_REG_HEADER_CA.NLS is 'Рахунок кредитного договору';
-comment on column VW_ESCR_REG_HEADER_CA.DOC_DATE is 'Дата отримання підтверджуючих документів';
-comment on column VW_ESCR_REG_HEADER_CA.MONEY_DATE is 'Дата отримання компенсації';
-comment on column VW_ESCR_REG_HEADER_CA.COMP_SUM is 'Сума компенсації (довідково)';
-comment on column VW_ESCR_REG_HEADER_CA.USER_NAME is 'Відповідальний працівник,який створив реєстр';
+
+PROMPT *** Create  grants  VW_ESCR_REG_HEADER_CA ***
+grant SELECT                                                                 on VW_ESCR_REG_HEADER_CA to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/VW_ESCR_REG_HEADER_CA.sql =========*** 
+PROMPT ===================================================================================== 

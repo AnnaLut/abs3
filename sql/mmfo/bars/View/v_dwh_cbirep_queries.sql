@@ -26,7 +26,9 @@ PROMPT *** Create  view V_DWH_CBIREP_QUERIES ***
      where q.userid = user_id;
 
 PROMPT *** Create  grants  V_DWH_CBIREP_QUERIES ***
+grant SELECT                                                                 on V_DWH_CBIREP_QUERIES to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DWH_CBIREP_QUERIES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DWH_CBIREP_QUERIES to UPLD;
 
 
 

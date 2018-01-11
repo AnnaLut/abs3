@@ -19,7 +19,9 @@ where
     a.TYPE_ID = b.TYPE_ID;
 
 PROMPT *** Create  grants  V_MBM_NBS_ACC_TYPES ***
+grant SELECT                                                                 on V_MBM_NBS_ACC_TYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_MBM_NBS_ACC_TYPES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_MBM_NBS_ACC_TYPES to UPLD;
 
 
 

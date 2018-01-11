@@ -12,8 +12,10 @@ PROMPT *** Create  view V_FXANI_2D ***
  group by B, E, KOD3K, NVL(swap_tag,deal_tag) , dat, rnk, sos , ntik;
 
 PROMPT *** Create  grants  V_FXANI_2D ***
+grant SELECT                                                                 on V_FXANI_2D      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FXANI_2D      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FXANI_2D      to START1;
+grant SELECT                                                                 on V_FXANI_2D      to UPLD;
 
 
 

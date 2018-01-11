@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Рахунки 2924 з залишком, що підлягають квитовці';
   l_tablinesdef := '25';
+  l_tabselect_statement := '';
   l_tabname     := 'V_KWT_2924';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,19 +124,19 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'АСС', 1.5, null, 99, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Бранч', 2, null, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DATVZ', 'D', '<= Дата-2~виник.заборг', 1.3, null, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'IXK', 'N', 'Кред~залишок', 1.5, null, 13, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NLS', 'C', 'Рахунок~2924*', 1.5, null, 10, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=1', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'OB22', 'C', 'Об22', .3, null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'IXD', 'N', 'Дебет~залишок', 1.5, null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'KV', 'N', 'Код~вал', .3, null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'DAOS', 'D', '<= Дата-1 ~відкр.рах', 1.3, null, 60, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'DAT_KWT', 'D', '<= Дата-4 ~по яку сквит', 1.3, null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'TXT', 'C', 'Назва  аналітики', 3, null, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'KOL', 'N', 'Кіл~НЕсквит~сум', .5, null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=VAT_KWT_2924[NSIFUNCTION][ACCESSCODE=>2][PROC=>PUL.PUT(''ACC'', :ACC) ][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'DAPP', 'D', '<= Дата-3 ~остан.руху', 1.3, null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'АСС', '1.5', null, 99, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Бранч', '2', null, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DATVZ', 'D', '<= Дата-2~виник.заборг', '1.3', null, 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'IXK', 'N', 'Кред~залишок', '1.5', null, 13, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NLS', 'C', 'Рахунок~2924*', '1.5', null, 10, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=1', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'OB22', 'C', 'Об22', '.3', null, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'IXD', 'N', 'Дебет~залишок', '1.5', null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'KV', 'N', 'Код~вал', '.3', null, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'DAOS', 'D', '<= Дата-1 ~відкр.рах', '1.3', null, 60, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'DAT_KWT', 'D', '<= Дата-4 ~по яку сквит', '1.3', null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'TXT', 'C', 'Назва  аналітики', '3', null, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'KOL', 'N', 'Кіл~НЕсквит~сум', '.5', null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=V_KWT_AT_2924[NSIFUNCTION][ACCESSCODE=>2][PROC=>PUL.PUT(''ACC'', :ACC) ][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'DAPP', 'D', '<= Дата-3 ~остан.руху', '1.3', null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 2, 3, 'ASC ');

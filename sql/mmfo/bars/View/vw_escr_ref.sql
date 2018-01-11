@@ -1,19 +1,14 @@
-CREATE OR REPLACE FORCE VIEW BARS.VW_ESCR_REF
-(
-   GOOD_ID,
-   GOOD_NAME,
-   EVENT_ID,
-   EVENT_NAME,
-   EVENT_DATE_FROM,
-   EVENT_DATE_TO,
-   EVENT_TYPE,
-   EVENT_TYPE_ID,
-   BUILD_TYPE,
-   BUILD_TYPE_ID,
-   OB22
-)
-AS
-   SELECT t.good_id,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/VW_ESCR_REF.sql =========*** Run *** ==
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view VW_ESCR_REF ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.VW_ESCR_REF ("GOOD_ID", "GOOD_NAME", "EVENT_ID", "EVENT_NAME", "EVENT_DATE_FROM", "EVENT_DATE_TO", "EVENT_TYPE", "EVENT_TYPE_ID", "BUILD_TYPE", "BUILD_TYPE_ID", "OB22") AS 
+  SELECT t.good_id,
           t.good_name,
           t.event_id,
           t.event_name,
@@ -83,7 +78,13 @@ AS
                             AND ev.date_to IS NULL) tt
            ORDER BY tt.good_id, tt.event_id) t;
 
+PROMPT *** Create  grants  VW_ESCR_REF ***
+grant SELECT                                                                 on VW_ESCR_REF     to BARSREADER_ROLE;
+grant SELECT                                                                 on VW_ESCR_REF     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VW_ESCR_REF     to UPLD;
 
-GRANT SELECT ON BARS.VW_ESCR_REF TO BARS_ACCESS_DEFROLE;
 
-GRANT SELECT ON BARS.VW_ESCR_REF TO UPLD;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/VW_ESCR_REF.sql =========*** End *** ==
+PROMPT ===================================================================================== 

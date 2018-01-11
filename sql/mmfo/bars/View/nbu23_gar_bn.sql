@@ -13,8 +13,10 @@ PROMPT *** Create  view NBU23_GAR_BN ***
   and exists (select 1 from customer where rnk= d.rnk and custtype = 1);
 
 PROMPT *** Create  grants  NBU23_GAR_BN ***
+grant SELECT                                                                 on NBU23_GAR_BN    to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on NBU23_GAR_BN    to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on NBU23_GAR_BN    to START1;
+grant SELECT                                                                 on NBU23_GAR_BN    to UPLD;
 
 
 

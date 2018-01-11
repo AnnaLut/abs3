@@ -39,6 +39,7 @@ PROMPT *** Create  grants  VR_9819 ***
 grant SELECT                                                                 on VR_9819         to BARSREADER_ROLE;
 grant SELECT                                                                 on VR_9819         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VR_9819         to RCC_DEAL;
+grant SELECT                                                                 on VR_9819         to UPLD;
 
 
 

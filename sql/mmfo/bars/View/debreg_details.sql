@@ -31,8 +31,10 @@ PROMPT *** Create  view DEBREG_DETAILS ***
           AND q.filedate IS NOT NULL;
 
 PROMPT *** Create  grants  DEBREG_DETAILS ***
+grant SELECT                                                                 on DEBREG_DETAILS  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEBREG_DETAILS  to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on DEBREG_DETAILS  to DEB_REG;
+grant SELECT                                                                 on DEBREG_DETAILS  to UPLD;
 
 
 

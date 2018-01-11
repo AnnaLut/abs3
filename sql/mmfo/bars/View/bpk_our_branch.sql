@@ -15,8 +15,10 @@ PROMPT *** Create  view BPK_OUR_BRANCH ***
  ;
 
 PROMPT *** Create  grants  BPK_OUR_BRANCH ***
+grant SELECT                                                                 on BPK_OUR_BRANCH  to BARSREADER_ROLE;
 grant SELECT                                                                 on BPK_OUR_BRANCH  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BPK_OUR_BRANCH  to OBPC;
+grant SELECT                                                                 on BPK_OUR_BRANCH  to UPLD;
 
 
 

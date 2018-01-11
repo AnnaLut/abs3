@@ -19,8 +19,10 @@ PROMPT *** Create  view V_SEC_AUDIT ***
    from sec_audit;
 
 PROMPT *** Create  grants  V_SEC_AUDIT ***
+grant SELECT                                                                 on V_SEC_AUDIT     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SEC_AUDIT     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SEC_AUDIT     to START1;
+grant SELECT                                                                 on V_SEC_AUDIT     to UPLD;
 
 
 

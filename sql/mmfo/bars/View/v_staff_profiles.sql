@@ -14,7 +14,9 @@ readonly
 
 PROMPT *** Create  grants  V_STAFF_PROFILES ***
 grant SELECT                                                                 on V_STAFF_PROFILES to ABS_ADMIN;
+grant SELECT                                                                 on V_STAFF_PROFILES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFF_PROFILES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STAFF_PROFILES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_STAFF_PROFILES to WR_ALL_RIGHTS;
 
 

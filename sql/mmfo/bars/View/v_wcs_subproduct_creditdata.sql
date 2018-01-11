@@ -34,7 +34,9 @@ PROMPT *** Create  view V_WCS_SUBPRODUCT_CREDITDATA ***
  order by t.ord;
 
 PROMPT *** Create  grants  V_WCS_SUBPRODUCT_CREDITDATA ***
+grant SELECT                                                                 on V_WCS_SUBPRODUCT_CREDITDATA to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_SUBPRODUCT_CREDITDATA to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_SUBPRODUCT_CREDITDATA to UPLD;
 
 
 

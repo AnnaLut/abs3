@@ -81,8 +81,10 @@ PROMPT *** Create  view V_TARIF_RKO ***
 
 PROMPT *** Create  grants  V_TARIF_RKO ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_TARIF_RKO     to ABS_ADMIN;
+grant SELECT                                                                 on V_TARIF_RKO     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_TARIF_RKO     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TARIF_RKO     to START1;
+grant SELECT                                                                 on V_TARIF_RKO     to UPLD;
 grant FLASHBACK,SELECT                                                       on V_TARIF_RKO     to WR_REFREAD;
 
 

@@ -19,8 +19,10 @@ PROMPT *** Create  view AUD_CUSTW_UUDV ***
    ORDER BY c.rnk;
 
 PROMPT *** Create  grants  AUD_CUSTW_UUDV ***
+grant SELECT                                                                 on AUD_CUSTW_UUDV  to BARSREADER_ROLE;
 grant SELECT                                                                 on AUD_CUSTW_UUDV  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on AUD_CUSTW_UUDV  to SALGL;
+grant SELECT                                                                 on AUD_CUSTW_UUDV  to UPLD;
 
 
 

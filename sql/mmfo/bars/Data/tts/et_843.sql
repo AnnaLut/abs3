@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('843', '843d доч. до 845 (Вал)', 1, '6204290007561', 980, null, null, null, null, null, null, 0, 0, 1, 0, 'GL.P_ICURVAL(#(KVB),#(S2),SYSDATE)', '#(S2)', null, null, '#(nbs_ob22 (''3800'',''10''))', null, '0000000000000000000000000000000000000000000000000000000000000000', null);
+    values ('843', '843d доч. до 845 (Вал)', 0, '#(nbs_ob22 (''6214'',''03''))', 980, null, null, null, null, null, null, 0, 1, 1, 0, 'GL.P_ICURVAL(#(KVB),#(S2),SYSDATE)', '#(S2)', null, null, '#(nbs_ob22 (''3800'',''10''))', null, '0200000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='843', name='843d доч. до 845 (Вал)', dk=1, nlsm='6204290007561', kv=980, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='GL.P_ICURVAL(#(KVB),#(S2),SYSDATE)', s2='#(S2)', sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=null, flags='0000000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='843', name='843d доч. до 845 (Вал)', dk=0, nlsm='#(nbs_ob22 (''6214'',''03''))', kv=980, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=1, flv=1, flr=0, s='GL.P_ICURVAL(#(KVB),#(S2),SYSDATE)', s2='#(S2)', sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=null, flags='0200000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='843';
   end;
   --------------------------------

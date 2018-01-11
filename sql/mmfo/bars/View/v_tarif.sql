@@ -24,9 +24,11 @@ PROMPT *** Create  view V_TARIF ***
      where a.kf =case when sys_context('bars_context','user_mfo') is null then '300465' else sys_context('bars_context','user_mfo') end;
 
 PROMPT *** Create  grants  V_TARIF ***
+grant SELECT                                                                 on V_TARIF         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TARIF         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_TARIF         to CUST001;
 grant SELECT                                                                 on V_TARIF         to START1;
+grant SELECT                                                                 on V_TARIF         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_TARIF         to WR_ALL_RIGHTS;
 
 

@@ -12,7 +12,9 @@ PROMPT *** Create  view V_TOBO_CUST ***
      FROM v_customer c;
 
 PROMPT *** Create  grants  V_TOBO_CUST ***
+grant SELECT                                                                 on V_TOBO_CUST     to BARSREADER_ROLE;
 grant SELECT                                                                 on V_TOBO_CUST     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_TOBO_CUST     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_TOBO_CUST     to WR_ALL_RIGHTS;
 grant SELECT                                                                 on V_TOBO_CUST     to WR_CUSTLIST;
 grant SELECT                                                                 on V_TOBO_CUST     to WR_CUSTREG;

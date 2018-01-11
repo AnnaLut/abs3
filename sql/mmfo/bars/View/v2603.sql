@@ -33,8 +33,10 @@ PROMPT *** Create  view V2603 ***
           AND s.idg = TO_NUMBER (pul.Get_Mas_Ini_Val ('IDG'));
 
 PROMPT *** Create  grants  V2603 ***
+grant SELECT                                                                 on V2603           to BARSREADER_ROLE;
 grant SELECT                                                                 on V2603           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V2603           to START1;
+grant SELECT                                                                 on V2603           to UPLD;
 
 
 

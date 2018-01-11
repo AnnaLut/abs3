@@ -39,7 +39,9 @@ PROMPT *** Create  view V_INS_PARTNER_TYPE_BRANCHES ***
  order by ptb.branch, ptb.partner_id, ptb.type_id;
 
 PROMPT *** Create  grants  V_INS_PARTNER_TYPE_BRANCHES ***
+grant SELECT                                                                 on V_INS_PARTNER_TYPE_BRANCHES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_PARTNER_TYPE_BRANCHES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_INS_PARTNER_TYPE_BRANCHES to UPLD;
 
 
 

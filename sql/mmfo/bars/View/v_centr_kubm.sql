@@ -24,8 +24,10 @@ PROMPT *** Create  view V_CENTR_KUBM ***
           );
 
 PROMPT *** Create  grants  V_CENTR_KUBM ***
+grant SELECT                                                                 on V_CENTR_KUBM    to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on V_CENTR_KUBM    to BARS_ACCESS_DEFROLE;
 grant SELECT,UPDATE                                                          on V_CENTR_KUBM    to SALGL;
+grant SELECT                                                                 on V_CENTR_KUBM    to UPLD;
 
 
 

@@ -35,8 +35,10 @@ SELECT a.agrmnt_id, 1, c.rnk, c.nmk, c.okpo, c.adr, p.teld,
  ;
 
 PROMPT *** Create  grants  V_DPT_AGREEMENTS_CUSTDETAILS ***
+grant SELECT                                                                 on V_DPT_AGREEMENTS_CUSTDETAILS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_AGREEMENTS_CUSTDETAILS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_AGREEMENTS_CUSTDETAILS to DPT_ROLE;
+grant SELECT                                                                 on V_DPT_AGREEMENTS_CUSTDETAILS to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_AGREEMENTS_CUSTDETAILS to WR_ALL_RIGHTS;
 
 

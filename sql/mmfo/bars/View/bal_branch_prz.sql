@@ -19,8 +19,10 @@ from (select c.caldt_date,a.nbs, a.branch,  m.DOSq, m.KOSq,
       ) group by caldt_date, nbs, branch;
 
 PROMPT *** Create  grants  BAL_BRANCH_PRZ ***
+grant SELECT                                                                 on BAL_BRANCH_PRZ  to BARSREADER_ROLE;
 grant SELECT                                                                 on BAL_BRANCH_PRZ  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on BAL_BRANCH_PRZ  to SALGL;
+grant SELECT                                                                 on BAL_BRANCH_PRZ  to UPLD;
 
 
 

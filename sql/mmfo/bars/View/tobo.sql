@@ -15,6 +15,7 @@ PROMPT *** Create  grants  TOBO ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TOBO            to ABS_ADMIN;
 grant FLASHBACK,REFERENCES,SELECT                                            on TOBO            to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on TOBO            to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on TOBO            to BARSREADER_ROLE;
 grant SELECT                                                                 on TOBO            to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TOBO            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TOBO            to PYOD001;
@@ -23,6 +24,7 @@ grant SELECT                                                                 on 
 grant SELECT                                                                 on TOBO            to SALGL;
 grant SELECT                                                                 on TOBO            to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TOBO            to TOBO;
+grant SELECT                                                                 on TOBO            to UPLD;
 grant SELECT                                                                 on TOBO            to WEB_BALANS;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TOBO            to WR_ALL_RIGHTS;
 grant SELECT                                                                 on TOBO            to WR_CUSTREG;

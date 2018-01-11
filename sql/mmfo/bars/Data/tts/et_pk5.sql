@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции PK5
-prompt Наименование операции: p) П-Дебет картрахунку (плата за кредит)
+prompt Наименование операции: PK5 p) П-Дебет картрахунку (плата за кредит)
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('PK5', 'p) П-Дебет картрахунку (плата за кредит)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000110000000000000000000000000', null);
+    values ('PK5', 'PK5 p) П-Дебет картрахунку (плата за кредит)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0000100000000000000000000000000000000110000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='PK5', name='p) П-Дебет картрахунку (плата за кредит)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000110000000000000000000000000', nazn=null
+         set tt='PK5', name='PK5 p) П-Дебет картрахунку (плата за кредит)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000110000000000000000000000000', nazn=null
        where tt='PK5';
   end;
   --------------------------------

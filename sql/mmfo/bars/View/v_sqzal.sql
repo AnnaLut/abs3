@@ -15,8 +15,10 @@ PROMPT *** Create  view V_SQZAL ***
    SELECT 'Області' name, 3 id FROM DUAL;
 
 PROMPT *** Create  grants  V_SQZAL ***
+grant SELECT                                                                 on V_SQZAL         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SQZAL         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SQZAL         to START1;
+grant SELECT                                                                 on V_SQZAL         to UPLD;
 
 
 

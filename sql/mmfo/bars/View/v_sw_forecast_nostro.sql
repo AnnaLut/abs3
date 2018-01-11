@@ -28,7 +28,9 @@ AND accounts.dazs IS NULL AND accounts.kv=tabval.kv
 ORDER BY accounts.nls ;
 
 PROMPT *** Create  grants  V_SW_FORECAST_NOSTRO ***
+grant SELECT                                                                 on V_SW_FORECAST_NOSTRO to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW_FORECAST_NOSTRO to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_SW_FORECAST_NOSTRO to UPLD;
 
 
 

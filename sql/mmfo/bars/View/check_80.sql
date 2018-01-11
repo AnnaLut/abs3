@@ -21,8 +21,10 @@ where
 ORDER BY z.fdat, z.nlsd;
 
 PROMPT *** Create  grants  CHECK_80 ***
+grant SELECT                                                                 on CHECK_80        to BARSREADER_ROLE;
 grant SELECT                                                                 on CHECK_80        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CHECK_80        to START1;
+grant SELECT                                                                 on CHECK_80        to UPLD;
 
 
 

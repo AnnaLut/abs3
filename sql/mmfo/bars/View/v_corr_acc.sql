@@ -28,7 +28,9 @@ PROMPT *** Create  view V_CORR_ACC ***
           AND at.acc(+) = bic_acc.TRANSIT;
 
 PROMPT *** Create  grants  V_CORR_ACC ***
+grant SELECT                                                                 on V_CORR_ACC      to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_CORR_ACC      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CORR_ACC      to UPLD;
 
 
 

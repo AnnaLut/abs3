@@ -31,7 +31,9 @@ PROMPT *** Create  view EBK_QUEUE_RELATEDPERSON_V ***
    and exists (select null from EBK_QUEUE_UPDATECARD where rnk = c.rnk );
 
 PROMPT *** Create  grants  EBK_QUEUE_RELATEDPERSON_V ***
+grant SELECT                                                                 on EBK_QUEUE_RELATEDPERSON_V to BARSREADER_ROLE;
 grant SELECT                                                                 on EBK_QUEUE_RELATEDPERSON_V to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on EBK_QUEUE_RELATEDPERSON_V to UPLD;
 
 
 

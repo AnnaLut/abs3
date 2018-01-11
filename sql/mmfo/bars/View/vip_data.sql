@@ -14,8 +14,10 @@ WHERE C.RNK = P.RNK and c.rnk in (select rnk from customer_update where doneby i
 ORDER BY C.NMK;
 
 PROMPT *** Create  grants  VIP_DATA ***
+grant SELECT                                                                 on VIP_DATA        to BARSREADER_ROLE;
 grant SELECT                                                                 on VIP_DATA        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on VIP_DATA        to START1;
+grant SELECT                                                                 on VIP_DATA        to UPLD;
 
 
 

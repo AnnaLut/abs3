@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции CDB
-prompt Наименование операции: (доч.CD1) Комісія агента за прийом переказу для Вестерн Юніон
+prompt Наименование операции: CDB (доч.CD1) Комісія агента за прийом переказу для Вестерн Юніон
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CDB', '(доч.CD1) Комісія агента за прийом переказу для Вестерн Юніон', 1, '#(nbs_ob22 (''2909'',''27''))', 980, '#(nbs_ob22 (''2909'',''27''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(47,#(KVA),#(NLSA),#(S))*(.775)', 'F_TARIF(47,#(KVA),#(NLSA),#(S))*(.775)', null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('CDB', 'CDB (доч.CD1) Комісія агента за прийом переказу для Вестерн Юніон', 1, '#(nbs_ob22 (''2909'',''27''))', 980, '#(nbs_ob22 (''2909'',''27''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF(47,#(KVA),#(NLSA),#(S))*(.775)', 'F_TARIF(47,#(KVA),#(NLSA),#(S))*(.775)', null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CDB', name='(доч.CD1) Комісія агента за прийом переказу для Вестерн Юніон', dk=1, nlsm='#(nbs_ob22 (''2909'',''27''))', kv=980, nlsk='#(nbs_ob22 (''2909'',''27''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(47,#(KVA),#(NLSA),#(S))*(.775)', s2='F_TARIF(47,#(KVA),#(NLSA),#(S))*(.775)', sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='CDB', name='CDB (доч.CD1) Комісія агента за прийом переказу для Вестерн Юніон', dk=1, nlsm='#(nbs_ob22 (''2909'',''27''))', kv=980, nlsk='#(nbs_ob22 (''2909'',''27''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF(47,#(KVA),#(NLSA),#(S))*(.775)', s2='F_TARIF(47,#(KVA),#(NLSA),#(S))*(.775)', sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='CDB';
   end;
   --------------------------------

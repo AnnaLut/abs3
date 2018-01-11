@@ -17,8 +17,10 @@ from FDAT D,  accounts a2,accounts a3,specparam_int b
  ;
 
 PROMPT *** Create  grants  SB_NAL1 ***
+grant SELECT                                                                 on SB_NAL1         to BARSREADER_ROLE;
 grant SELECT                                                                 on SB_NAL1         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SB_NAL1         to NALOG;
+grant SELECT                                                                 on SB_NAL1         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SB_NAL1         to WR_ALL_RIGHTS;
 
 

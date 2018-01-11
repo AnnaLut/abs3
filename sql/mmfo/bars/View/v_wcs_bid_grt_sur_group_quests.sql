@@ -70,7 +70,9 @@ PROMPT *** Create  view V_WCS_BID_GRT_SUR_GROUP_QUESTS ***
     or next_rectype_id != 'SECTION';
 
 PROMPT *** Create  grants  V_WCS_BID_GRT_SUR_GROUP_QUESTS ***
+grant SELECT                                                                 on V_WCS_BID_GRT_SUR_GROUP_QUESTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_WCS_BID_GRT_SUR_GROUP_QUESTS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_WCS_BID_GRT_SUR_GROUP_QUESTS to UPLD;
 
 
 

@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('DPM', 'DPM-Виплата відсотків в ін.валюті (міжбанк)', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 1, 1, 0, 0, null, null, null, null, null, 0, '0300100000000000000000000000000000010000000000000000000000000000', 'Виплата відсотків по договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}');
+    values ('DPM', 'DPM-Виплата відсотків в ін.валюті (міжбанк)', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 1, 1, 0, 0, null, null, null, null, '0', 0, '0300100000000000000000000000000000010000000000000000000000000000', 'Виплата відсотків по договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='DPM', name='DPM-Виплата відсотків в ін.валюті (міжбанк)', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=0, flags='0300100000000000000000000000000000010000000000000000000000000000', nazn='Виплата відсотків по договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}'
+         set tt='DPM', name='DPM-Виплата відсотків в ін.валюті (міжбанк)', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800='0', rang=0, flags='0300100000000000000000000000000000010000000000000000000000000000', nazn='Виплата відсотків по договору № #{DPT_WEB.F_NAZN(''U'',#(ND))}'
        where tt='DPM';
   end;
   --------------------------------

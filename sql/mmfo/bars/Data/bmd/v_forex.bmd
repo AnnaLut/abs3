@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'FOREX/SWAP- Угоди';
   l_tablinesdef := '20';
+  l_tabselect_statement := '';
   l_tabname     := 'V_FOREX';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,30 +124,30 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'DAT', 'D', 'Дата~заключення', null, null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DAT_A', 'D', 'Дата~А', null, null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'DAT_B', 'D', 'Дата~Б', null, null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DEAL_TAG', 'N', 'Реф~вкладення', null, null, 5, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KVA', 'N', 'Вал~А', null, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'KVB', 'N', 'Вал~ Б', null, null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'NTIK', 'C', 'Тiкет', null, null, 7, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'QA1', 'N', 'Спр.варт.А~попередня', null, null, 30, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(QA1)', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'QA2', 'N', 'Спр.варт.А~поточна', null, null, 31, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(QA2)', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'QB1', 'N', 'Спр.варт.Б~попередня', null, null, 32, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(QB1)', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'QB2', 'N', 'Спр.варт.-Б~поточна', null, null, 33, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(QB2)', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'RNK', 'N', 'РНК~партнера', null, null, 16, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'SUMA', 'N', 'Сума~А', null, null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'SUMB', 'N', 'Сума~Б', null, null, 15, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'SWAP_TAG', 'N', 'Реф~гол.угоди', null, null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'KOD', 'C', 'Вид~Угоди', null, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'PRGN_R', 'N', 'Переоцiка 9*~Прогноз', null, null, 40, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(PRGN_R)', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'FAKT_R', 'N', 'Результат дня ~ (Факт)', null, null, 41, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(FAKT_R)', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'REF', 'N', 'Реф~розкриття', null, null, 51, 0, 0, 0, 0, '', '', 0, 0, 'Count(*)', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF'||chr(38)||'OpenInWindow=true', 'DocViewContentsEx(hWndForm, :REF )', 0);
-  bars_metabase.add_column(l_tabid, 28, 'REFA', 'N', 'Реф/А~надходження', null, null, 52, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFA'||chr(38)||'OpenInWindow=true', 'DocViewContentsEx(hWndForm, :REFA)', 0);
-  bars_metabase.add_column(l_tabid, 29, 'REFB', 'N', 'Реф/Б~вiправки', null, null, 53, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFB'||chr(38)||'OpenInWindow=true', 'DocViewContentsEx(hWndForm, :REFB)', 0);
-  bars_metabase.add_column(l_tabid, 30, 'B', 'D', 'Звiтна дата', null, null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'NPP', 'C', '№ пп', null, null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'SOS', 'N', 'Поточний~Стан~Угоди', null, null, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'DAT', 'D', 'Дата~заключення', '', null, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DAT_A', 'D', 'Дата~А', '', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'DAT_B', 'D', 'Дата~Б', '', null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'DEAL_TAG', 'N', 'Реф~вкладення', '', null, 5, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KVA', 'N', 'Вал~А', '', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'KVB', 'N', 'Вал~ Б', '', null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'NTIK', 'C', 'Тiкет', '', null, 7, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'QA1', 'N', 'Спр.варт.А~попередня', '', null, 30, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(QA1)', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'QA2', 'N', 'Спр.варт.А~поточна', '', null, 31, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(QA2)', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'QB1', 'N', 'Спр.варт.Б~попередня', '', null, 32, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(QB1)', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'QB2', 'N', 'Спр.варт.-Б~поточна', '', null, 33, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(QB2)', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'RNK', 'N', 'РНК~партнера', '', null, 16, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'SUMA', 'N', 'Сума~А', '', null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'SUMB', 'N', 'Сума~Б', '', null, 15, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'SWAP_TAG', 'N', 'Реф~гол.угоди', '', null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'KOD', 'C', 'Вид~Угоди', '', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'PRGN_R', 'N', 'Переоцiка 9*~Прогноз', '', null, 40, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(PRGN_R)', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'FAKT_R', 'N', 'Результат дня ~ (Факт)', '', null, 41, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'sum(FAKT_R)', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'REF', 'N', 'Реф~розкриття', '', null, 51, 0, 0, 0, 0, '', '', 0, 0, 'Count(*)', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF'||chr(38)||'OpenInWindow=true', 'DocViewContentsEx(hWndForm, :REF )', 0);
+  bars_metabase.add_column(l_tabid, 28, 'REFA', 'N', 'Реф/А~надходження', '', null, 52, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFA'||chr(38)||'OpenInWindow=true', 'DocViewContentsEx(hWndForm, :REFA)', 0);
+  bars_metabase.add_column(l_tabid, 29, 'REFB', 'N', 'Реф/Б~вiправки', '', null, 53, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFB'||chr(38)||'OpenInWindow=true', 'DocViewContentsEx(hWndForm, :REFB)', 0);
+  bars_metabase.add_column(l_tabid, 30, 'B', 'D', 'Звiтна дата', '', null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'NPP', 'C', '№ пп', '', null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'SOS', 'N', 'Поточний~Стан~Угоди', '', null, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

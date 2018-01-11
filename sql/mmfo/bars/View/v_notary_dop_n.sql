@@ -18,8 +18,10 @@ PROMPT *** Create  view V_NOTARY_DOP_N ***
     WHERE n.id = a.notary_id AND A.CLOSE_DATE IS NULL;
 
 PROMPT *** Create  grants  V_NOTARY_DOP_N ***
+grant SELECT                                                                 on V_NOTARY_DOP_N  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NOTARY_DOP_N  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NOTARY_DOP_N  to START1;
+grant SELECT                                                                 on V_NOTARY_DOP_N  to UPLD;
 
 
 

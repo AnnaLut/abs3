@@ -18,7 +18,9 @@ where  t.resource_code = 'STAFF_ROLE'
 ;
 
 PROMPT *** Create  grants  V_ROLE_RESOURCE_ACCESS_MODE ***
+grant SELECT                                                                 on V_ROLE_RESOURCE_ACCESS_MODE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ROLE_RESOURCE_ACCESS_MODE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ROLE_RESOURCE_ACCESS_MODE to UPLD;
 
 
 

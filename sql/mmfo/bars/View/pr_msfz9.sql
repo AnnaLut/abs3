@@ -15,7 +15,9 @@ from bars.cc_deal d, bars.accounts a  , bars.nd_acc_old n
 where a.acc= n.acc and d.nd = n.nd and d.ndi  = bars.pul.get ('ND')  and ( a.dazs is null  or a.dazs > gl.bd);
 
 PROMPT *** Create  grants  PR_MSFZ9 ***
+grant SELECT                                                                 on PR_MSFZ9        to BARSREADER_ROLE;
 grant SELECT                                                                 on PR_MSFZ9        to START1;
+grant SELECT                                                                 on PR_MSFZ9        to UPLD;
 
 
 

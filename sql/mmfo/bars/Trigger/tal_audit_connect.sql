@@ -27,7 +27,7 @@ end;
 
 
 /
-ALTER TRIGGER BARS.TAL_AUDIT_CONNECT DISABLE;
+ALTER TRIGGER BARS.TAL_AUDIT_CONNECT ENABLE;
 
 
 PROMPT ===================================================================================== 

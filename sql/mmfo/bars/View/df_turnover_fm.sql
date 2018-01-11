@@ -58,8 +58,10 @@ PROMPT *** Create  view DF_TURNOVER_FM ***
             WHERE p.rnk = b.rnk AND b.amount >100000000 AND p.amount > b.amount);
 
 PROMPT *** Create  grants  DF_TURNOVER_FM ***
+grant SELECT                                                                 on DF_TURNOVER_FM  to BARSREADER_ROLE;
 grant SELECT                                                                 on DF_TURNOVER_FM  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on DF_TURNOVER_FM  to CUST001;
+grant SELECT                                                                 on DF_TURNOVER_FM  to UPLD;
 
 
 

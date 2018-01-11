@@ -3,7 +3,7 @@ set trimspool on
 set serveroutput on size 1000000
 
 prompt Создание / Обновление операции !C1
-prompt Наименование операции: STOP-правило на суму переказу 15000,00
+prompt Наименование операции: !C1 STOP-правило на суму переказу 15000,00
 declare
   cnt_  number;
 begin
@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!C1', 'STOP-правило на суму переказу 15000,00', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(101,#(KVA),'''',#(S),#(REF))', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('!C1', '!C1 STOP-правило на суму переказу 15000,00', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(101,#(KVA),'''',#(S),#(REF))', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!C1', name='STOP-правило на суму переказу 15000,00', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(101,#(KVA),'''',#(S),#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='!C1', name='!C1 STOP-правило на суму переказу 15000,00', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(101,#(KVA),'''',#(S),#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='!C1';
   end;
   --------------------------------
@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции !CA
-prompt Наименование операции: STOP-правило на суму переказу 5000,00
+prompt Наименование операции: !CA STOP-правило на суму переказу 5000,00
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!CA', 'STOP-правило на суму переказу 5000,00', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(103,#(KVA),'''',#(S))', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('!CA', '!CA STOP-правило на суму переказу 5000,00', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(103,#(KVA),'''',#(S))', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='!CA', name='STOP-правило на суму переказу 5000,00', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(103,#(KVA),'''',#(S))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='!CA', name='!CA STOP-правило на суму переказу 5000,00', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(103,#(KVA),'''',#(S))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='!CA';
   end;
   --------------------------------
@@ -89,7 +89,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции CBG
-prompt Наименование операции: (доч.CAG) Комісія агента за прийом переказу для MIGOM
+prompt Наименование операции: CBG (доч.CAG) Комісія агента за прийом переказу для MIGOM
 declare
   cnt_  number;
 begin
@@ -98,11 +98,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CBG', '(доч.CAG) Комісія агента за прийом переказу для MIGOM', 1, '#(nbs_ob22 (''2909'',''40''))', 980, '#(nbs_ob22 (''2909'',''40''))', 978, null, null, null, null, 0, 0, 1, 0, 'F_TARIF_OP(4, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', 'F_TARIF_OP(3, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', null, null, '#(nbs_ob22 (''3800'',''03''))', null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('CBG', 'CBG (доч.CAG) Комісія агента за прийом переказу для MIGOM', 1, '#(nbs_ob22 (''2909'',''40''))', 980, '#(nbs_ob22 (''2909'',''40''))', 978, null, null, null, null, 0, 0, 1, 0, 'F_TARIF_OP(4, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', 'F_TARIF_OP(3, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', null, null, '#(nbs_ob22 (''3800'',''03''))', null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CBG', name='(доч.CAG) Комісія агента за прийом переказу для MIGOM', dk=1, nlsm='#(nbs_ob22 (''2909'',''40''))', kv=980, nlsk='#(nbs_ob22 (''2909'',''40''))', kvk=978, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='F_TARIF_OP(4, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', s2='F_TARIF_OP(3, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='CBG', name='CBG (доч.CAG) Комісія агента за прийом переказу для MIGOM', dk=1, nlsm='#(nbs_ob22 (''2909'',''40''))', kv=980, nlsk='#(nbs_ob22 (''2909'',''40''))', kvk=978, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=1, flr=0, s='F_TARIF_OP(4, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', s2='F_TARIF_OP(3, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', sk=null, proc=null, s3800='#(nbs_ob22 (''3800'',''03''))', rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='CBG';
   end;
   --------------------------------
@@ -143,7 +143,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции CCG
-prompt Наименование операции: (доч.CAG) Комісія банку за прийом переказу для MIGOM
+prompt Наименование операции: CCG (доч.CAG) Комісія банку за прийом переказу для MIGOM
 declare
   cnt_  number;
 begin
@@ -152,11 +152,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CCG', '(доч.CAG) Комісія банку за прийом переказу для MIGOM', 1, '#(nbs_ob22 (''2909'',''40''))', 980, '#(nbs_ob22 (''6110'',''72''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF_OP(5, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('CCG', 'CCG (доч.CAG) Комісія банку за прийом переказу для MIGOM', 1, '#(nbs_ob22 (''2909'',''40''))', 980, '#(nbs_ob22 (''6510'',''72''))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF_OP(5, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', null, null, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CCG', name='(доч.CAG) Комісія банку за прийом переказу для MIGOM', dk=1, nlsm='#(nbs_ob22 (''2909'',''40''))', kv=980, nlsk='#(nbs_ob22 (''6110'',''72''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF_OP(5, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='CCG', name='CCG (доч.CAG) Комісія банку за прийом переказу для MIGOM', dk=1, nlsm='#(nbs_ob22 (''2909'',''40''))', kv=980, nlsk='#(nbs_ob22 (''6510'',''72''))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF_OP(5, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='CCG';
   end;
   --------------------------------
@@ -208,7 +208,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции K49
-prompt Наименование операции: (доч.CAG) Комісія за прийом переказу для MIGOM
+prompt Наименование операции: K49 (доч.CAG) Комісія за прийом переказу для MIGOM
 declare
   cnt_  number;
 begin
@@ -217,11 +217,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K49', '(доч.CAG) Комісія за прийом переказу для MIGOM', 0, '#(nbs_ob22 (''2909'',''40''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF_OP(2, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', null, 5, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
+    values ('K49', 'K49 (доч.CAG) Комісія за прийом переказу для MIGOM', 0, '#(nbs_ob22 (''2909'',''40''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'F_TARIF_OP(2, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', null, 5, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K49', name='(доч.CAG) Комісія за прийом переказу для MIGOM', dk=0, nlsm='#(nbs_ob22 (''2909'',''40''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF_OP(2, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='K49', name='K49 (доч.CAG) Комісія за прийом переказу для MIGOM', dk=0, nlsm='#(nbs_ob22 (''2909'',''40''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_TARIF_OP(2, 49, #(KVA), #(S), #(NLSA),''CAG'', 0.635)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='K49';
   end;
   --------------------------------

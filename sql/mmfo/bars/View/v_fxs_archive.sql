@@ -94,7 +94,9 @@ PROMPT *** Create  view V_FXS_ARCHIVE ***
             KVB;
 
 PROMPT *** Create  grants  V_FXS_ARCHIVE ***
+grant SELECT                                                                 on V_FXS_ARCHIVE   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FXS_ARCHIVE   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_FXS_ARCHIVE   to UPLD;
 
 
 

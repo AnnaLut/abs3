@@ -11,7 +11,9 @@ PROMPT *** Create  view V_CDB_OPERATION ***
   select "ID","DEAL_ID","CLAIM_ID","DEAL_NUMBER","OPERATION_TYPE_ID","OPERATION_TYPE","SYS_TIME","OPERATION_STATE_ID","OPERATION_STATE" from cdb.v_cdb_operation;
 
 PROMPT *** Create  grants  V_CDB_OPERATION ***
+grant SELECT                                                                 on V_CDB_OPERATION to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CDB_OPERATION to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CDB_OPERATION to UPLD;
 
 
 

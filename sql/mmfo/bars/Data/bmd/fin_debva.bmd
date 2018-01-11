@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Портфель: "ФІНАНСОВА ДЕБІТОРКА". Підсумки по продуктам.';
   l_tablinesdef := '30';
+  l_tabselect_statement := '';
   l_tabname     := 'FIN_DEBVA';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,20 +124,20 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 4, 'OSTN', 'N', 'Сума Деб~Нормальної~ВСЬОГО', null, null, 15, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NBS_N', 'C', 'Код~продукту', null, null, 1, 0, 1, 1, 1, '', '', 1, 0, '', 0, 0, 1, '/barsroot/GL/Portfel?MOD_ABS=:MOD_ABS'||chr(38)||'NBS_N=:NBS_N', 'Sel040( hWndMDI, 2015, :MOD_ABS , :NBS_N, "" ) ', 0);
-  bars_metabase.add_column(l_tabid, 8, 'KV', 'N', 'Вал', null, null, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'OSTP', 'N', 'Сума Деб~Простроч.~ВСЬОГО', null, null, 17, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'KOL', 'N', 'Кільк~рахунків~ВСЬОГО', null, null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/customerlist/custacc.aspx?type=2'||chr(38)||'kv=:KV'||chr(38)||'nbs=:NBS'||chr(38)||'ob22=:OB22', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions, "a.acc in  (select  acc from accounts where nbs || ob22 =:NBS_N and dazs IS NULL and kv = :KV)" )', 0);
-  bars_metabase.add_column(l_tabid, 11, 'OSTD', 'N', 'Сума Деб~Нормальної~в ПОРТФЕЛІ', null, null, 30, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'MOD_ABS', 'N', 'Код мод', null, null, 35, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'OSTK', 'N', 'Сума~Крд~заборгов', null, null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'NBS_P', 'C', 'Код~прстр', null, null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'NBS_K', 'C', 'Код~крд~заборгов', null, null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'TACC', 'C', 'Добавити~Вилучити~в портфелі 0,1', null, null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=FIN_DEBVC[NSIFUNCTION][ACCESSCODE=>0][CONDITIONS=>FIN_DEBVC.PROD= :NBS_N]', 'FunNSIEditFFiltered("FIN_DEBVC" , 0, " PROD=" || :NBS_N  )', 0);
-  bars_metabase.add_column(l_tabid, 17, 'POM', 'C', 'Протокол~помилок', null, null, 25, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=FIN_DEBVX[ACCESSCODE=>2][CONDITIONS=>FIN_DEBVX.KV=:KV AND FIN_DEBVX.NBS_N=:NBS_N]', 'FunNSIEditFFiltered("FIN_DEBVX",2," kv = "|| Str(:KV) || " and nbs_n = ''"|| :NBS_N || "''"  )', 0);
-  bars_metabase.add_column(l_tabid, 18, 'NBS', 'N', 'Вал', null, null, 3, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'OB22', 'C', 'Вал', null, null, 3, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'OSTN', 'N', 'Сума Деб~Нормальної~ВСЬОГО', '', null, 15, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NBS_N', 'C', 'Код~продукту', '', null, 1, 0, 1, 1, 1, '', '', 1, 0, '', 0, 0, 1, '/barsroot/GL/Portfel?MOD_ABS=:MOD_ABS'||chr(38)||'NBS_N=:NBS_N', 'Sel040( hWndMDI, 2015, :MOD_ABS , :NBS_N, "" ) ', 0);
+  bars_metabase.add_column(l_tabid, 8, 'KV', 'N', 'Вал', '', null, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'OSTP', 'N', 'Сума Деб~Простроч.~ВСЬОГО', '', null, 17, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'KOL', 'N', 'Кільк~рахунків~ВСЬОГО', '', null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '/barsroot/customerlist/custacc.aspx?type=2'||chr(38)||'kv=:KV'||chr(38)||'nbs=:NBS'||chr(38)||'ob22=:OB22', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions, "a.acc in  (select  acc from accounts where nbs || ob22 =:NBS_N and dazs IS NULL and kv = :KV)" )', 0);
+  bars_metabase.add_column(l_tabid, 11, 'OSTD', 'N', 'Сума Деб~Нормальної~в ПОРТФЕЛІ', '', null, 30, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'MOD_ABS', 'N', 'Код мод', '', null, 35, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'OSTK', 'N', 'Сума~Крд~заборгов', '', null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'NBS_P', 'C', 'Код~прстр', '', null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'NBS_K', 'C', 'Код~крд~заборгов', '', null, 20, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'TACC', 'C', 'Добавити~Вилучити~в портфелі 0,1', '', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=FIN_DEBVC[NSIFUNCTION][ACCESSCODE=>0][CONDITIONS=>FIN_DEBVC.PROD= :NBS_N]', 'FunNSIEditFFiltered("FIN_DEBVC" , 0, " PROD=" || :NBS_N  )', 0);
+  bars_metabase.add_column(l_tabid, 17, 'POM', 'C', 'Протокол~помилок', '', null, 25, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=FIN_DEBVX[ACCESSCODE=>2][CONDITIONS=>FIN_DEBVX.KV=:KV AND FIN_DEBVX.NBS_N=:NBS_N]', 'FunNSIEditFFiltered("FIN_DEBVX",2," kv = "|| Str(:KV) || " and nbs_n = ''"|| :NBS_N || "''"  )', 0);
+  bars_metabase.add_column(l_tabid, 18, 'NBS', 'N', 'Вал', '', null, 3, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'OB22', 'C', 'Вал', '', null, 3, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('V_NBSOB22');

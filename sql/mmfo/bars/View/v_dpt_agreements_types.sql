@@ -50,8 +50,10 @@ PROMPT *** Create  view V_DPT_AGREEMENTS_TYPES ***
      AND d.deposit_id = chg.dpt_id;
 
 PROMPT *** Create  grants  V_DPT_AGREEMENTS_TYPES ***
+grant SELECT                                                                 on V_DPT_AGREEMENTS_TYPES to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_AGREEMENTS_TYPES to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_AGREEMENTS_TYPES to DPT_ROLE;
+grant SELECT                                                                 on V_DPT_AGREEMENTS_TYPES to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_AGREEMENTS_TYPES to WR_ALL_RIGHTS;
 
 

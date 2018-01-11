@@ -76,7 +76,9 @@ PROMPT *** Create  view V_NRU_NLS ***
                   and a.acc = n.acc(+)) x;
 
 PROMPT *** Create  grants  V_NRU_NLS ***
+grant SELECT                                                                 on V_NRU_NLS       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NRU_NLS       to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_NRU_NLS       to UPLD;
 
 
 

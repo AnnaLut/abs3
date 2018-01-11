@@ -34,9 +34,11 @@ SELECT q.survey_id, q.qgrp_id, g.grp_ord,
  ;
 
 PROMPT *** Create  grants  V_SURVEYANSWER ***
+grant SELECT                                                                 on V_SURVEYANSWER  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SURVEYANSWER  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_SURVEYANSWER  to DPT_ROLE;
 grant SELECT                                                                 on V_SURVEYANSWER  to SUR_ROLE;
+grant SELECT                                                                 on V_SURVEYANSWER  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SURVEYANSWER  to WR_ALL_RIGHTS;
 
 

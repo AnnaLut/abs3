@@ -20,8 +20,10 @@ PROMPT *** Create  view V_NBUR_AGG_PROTOCOLS ***
      FROM NBUR_AGG_PROTOCOLS_ARCH;
 
 PROMPT *** Create  grants  V_NBUR_AGG_PROTOCOLS ***
+grant SELECT                                                                 on V_NBUR_AGG_PROTOCOLS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NBUR_AGG_PROTOCOLS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_NBUR_AGG_PROTOCOLS to RPBN002;
+grant SELECT                                                                 on V_NBUR_AGG_PROTOCOLS to UPLD;
 
 
 

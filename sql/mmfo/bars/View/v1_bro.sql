@@ -63,8 +63,10 @@ from customer c, v_gl a, nd_acc n,
 where  x.rnk  = c.rnk   and a.rnk  = c.rnk   and x.nd   = n.nd   and n.acc  = a.acc ;
 
 PROMPT *** Create  grants  V1_BRO ***
+grant SELECT                                                                 on V1_BRO          to BARSREADER_ROLE;
 grant SELECT                                                                 on V1_BRO          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V1_BRO          to START1;
+grant SELECT                                                                 on V1_BRO          to UPLD;
 
 
 

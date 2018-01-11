@@ -40,8 +40,10 @@ PROMPT *** Create  view V23_PAWN ***
     WHERE c.pawn = ad.pawn(+);
 
 PROMPT *** Create  grants  V23_PAWN ***
+grant SELECT                                                                 on V23_PAWN        to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V23_PAWN        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V23_PAWN        to START1;
+grant SELECT                                                                 on V23_PAWN        to UPLD;
 
 
 

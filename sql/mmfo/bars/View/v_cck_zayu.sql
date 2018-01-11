@@ -1,13 +1,14 @@
-CREATE OR REPLACE FORCE VIEW BARS.V_CCK_ZAYU
-(
-   PROD,
-   NAME,
-   TERM,
-   AIM,
-   VVOD
-)
-AS
-   SELECT c.NBS || c.ob22 prod,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CCK_ZAYU.sql =========*** Run *** ===
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_CCK_ZAYU ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_ZAYU ("PROD", "NAME", "TERM", "AIM", "VVOD") AS 
+  SELECT c.NBS || c.ob22 prod,
           SUBSTR (s.txt, 1, 100) name,
           DECODE (SUBSTR (cck_dop.get_prod_old(c.NBS || c.ob22), 4, 1),
                   '3', 'Довгий',
@@ -38,26 +39,17 @@ AS
                         decode(NEWNBS.GET_STATE,0,'2082','2083'),
                         '2083');
 
-COMMENT ON TABLE BARS.V_CCK_ZAYU IS 'Заявка на кредит для ЮО';
+PROMPT *** Create  grants  V_CCK_ZAYU ***
+grant SELECT                                                                 on V_CCK_ZAYU      to BARSREADER_ROLE;
+grant FLASHBACK,SELECT                                                       on V_CCK_ZAYU      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CCK_ZAYU      to RCC_DEAL;
+grant SELECT                                                                 on V_CCK_ZAYU      to UPLD;
+grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CCK_ZAYU      to WR_ALL_RIGHTS;
+grant SELECT                                                                 on V_CCK_ZAYU      to WR_CREDIT;
+grant FLASHBACK,SELECT                                                       on V_CCK_ZAYU      to WR_REFREAD;
 
-COMMENT ON COLUMN BARS.V_CCK_ZAYU.PROD IS 'Код Продукту';
-
-COMMENT ON COLUMN BARS.V_CCK_ZAYU.NAME IS 'Назва Продукту';
-
-COMMENT ON COLUMN BARS.V_CCK_ZAYU.VVOD IS 'Сформувати';
 
 
-
-GRANT SELECT ON BARS.V_CCK_ZAYU TO BARSREADER_ROLE;
-
-GRANT SELECT, FLASHBACK ON BARS.V_CCK_ZAYU TO BARS_ACCESS_DEFROLE;
-
-GRANT SELECT ON BARS.V_CCK_ZAYU TO RCC_DEAL;
-
-GRANT SELECT ON BARS.V_CCK_ZAYU TO UPLD;
-
-GRANT DELETE, INSERT, SELECT, UPDATE, FLASHBACK ON BARS.V_CCK_ZAYU TO WR_ALL_RIGHTS;
-
-GRANT SELECT ON BARS.V_CCK_ZAYU TO WR_CREDIT;
-
-GRANT SELECT, FLASHBACK ON BARS.V_CCK_ZAYU TO WR_REFREAD;
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CCK_ZAYU.sql =========*** End *** ===
+PROMPT ===================================================================================== 

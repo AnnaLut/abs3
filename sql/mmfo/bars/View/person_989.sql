@@ -18,8 +18,10 @@ where c.rnk=p.rnk and p.rnk in
  ;
 
 PROMPT *** Create  grants  PERSON_989 ***
+grant SELECT                                                                 on PERSON_989      to BARSREADER_ROLE;
 grant SELECT                                                                 on PERSON_989      to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PERSON_989      to PYOD001;
+grant SELECT                                                                 on PERSON_989      to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on PERSON_989      to WR_ALL_RIGHTS;
 
 

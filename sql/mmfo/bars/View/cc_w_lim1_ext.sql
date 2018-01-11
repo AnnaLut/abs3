@@ -85,7 +85,9 @@ PROMPT *** Create  view CC_W_LIM1_EXT ***
 ;
 
 PROMPT *** Create  grants  CC_W_LIM1_EXT ***
+grant SELECT                                                                 on CC_W_LIM1_EXT   to BARSREADER_ROLE;
 grant SELECT                                                                 on CC_W_LIM1_EXT   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on CC_W_LIM1_EXT   to UPLD;
 
 
 

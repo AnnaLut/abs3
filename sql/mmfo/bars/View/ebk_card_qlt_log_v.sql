@@ -15,7 +15,9 @@ l.date_updated
 from ebk_card_qlt_log l;
 
 PROMPT *** Create  grants  EBK_CARD_QLT_LOG_V ***
+grant SELECT                                                                 on EBK_CARD_QLT_LOG_V to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on EBK_CARD_QLT_LOG_V to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on EBK_CARD_QLT_LOG_V to UPLD;
 
 
 

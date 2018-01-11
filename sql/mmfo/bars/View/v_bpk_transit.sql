@@ -17,8 +17,10 @@ PROMPT *** Create  view V_BPK_TRANSIT ***
  ;
 
 PROMPT *** Create  grants  V_BPK_TRANSIT ***
+grant SELECT                                                                 on V_BPK_TRANSIT   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BPK_TRANSIT   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BPK_TRANSIT   to OBPC;
+grant SELECT                                                                 on V_BPK_TRANSIT   to UPLD;
 grant FLASHBACK,SELECT                                                       on V_BPK_TRANSIT   to WR_REFREAD;
 
 

@@ -156,8 +156,10 @@ select 1 arc, id,
  where chgaction = 3 or (chgaction = 2 and oper_status = 3);
 
 PROMPT *** Create  grants  V_CM_CLIENT ***
+grant SELECT                                                                 on V_CM_CLIENT     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_CM_CLIENT     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_CM_CLIENT     to OW;
+grant SELECT                                                                 on V_CM_CLIENT     to UPLD;
 grant FLASHBACK,SELECT                                                       on V_CM_CLIENT     to WR_REFREAD;
 
 

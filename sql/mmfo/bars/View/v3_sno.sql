@@ -16,8 +16,10 @@ PROMPT *** Create  view V3_SNO ***
    AND o.acc = a.acc;
 
 PROMPT *** Create  grants  V3_SNO ***
+grant SELECT                                                                 on V3_SNO          to BARSREADER_ROLE;
 grant SELECT                                                                 on V3_SNO          to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V3_SNO          to START1;
+grant SELECT                                                                 on V3_SNO          to UPLD;
 
 
 

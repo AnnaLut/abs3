@@ -14,8 +14,10 @@ PROMPT *** Create  view V_BRANCH_OBU ***
    and (closedate is null or to_date(closedate,'dd.mm.yyyy') > bankdate);
 
 PROMPT *** Create  grants  V_BRANCH_OBU ***
+grant SELECT                                                                 on V_BRANCH_OBU    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_BRANCH_OBU    to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_BRANCH_OBU    to OW;
+grant SELECT                                                                 on V_BRANCH_OBU    to UPLD;
 
 
 

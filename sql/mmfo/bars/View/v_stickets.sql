@@ -13,7 +13,9 @@ PROMPT *** Create  view V_STICKETS ***
      where stiket is not null);
 
 PROMPT *** Create  grants  V_STICKETS ***
+grant SELECT                                                                 on V_STICKETS      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STICKETS      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STICKETS      to UPLD;
 
 
 

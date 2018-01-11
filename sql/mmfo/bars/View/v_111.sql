@@ -13,8 +13,10 @@ PROMPT *** Create  view V_111 ***
    and  n.sdate > to_date('28-12-2008','dd-mm-yyyy'));
 
 PROMPT *** Create  grants  V_111 ***
+grant SELECT                                                                 on V_111           to BARSREADER_ROLE;
 grant SELECT                                                                 on V_111           to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_111           to START1;
+grant SELECT                                                                 on V_111           to UPLD;
 
 
 

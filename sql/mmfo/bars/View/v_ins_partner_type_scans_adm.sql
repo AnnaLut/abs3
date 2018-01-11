@@ -27,7 +27,9 @@ PROMPT *** Create  view V_INS_PARTNER_TYPE_SCANS_ADM ***
  order by pts.partner_id, pts.type_id;
 
 PROMPT *** Create  grants  V_INS_PARTNER_TYPE_SCANS_ADM ***
+grant SELECT                                                                 on V_INS_PARTNER_TYPE_SCANS_ADM to BARSREADER_ROLE;
 grant SELECT                                                                 on V_INS_PARTNER_TYPE_SCANS_ADM to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_INS_PARTNER_TYPE_SCANS_ADM to UPLD;
 
 
 

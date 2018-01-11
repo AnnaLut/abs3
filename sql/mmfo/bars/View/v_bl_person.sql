@@ -13,7 +13,9 @@ PROMPT *** Create  view V_BL_PERSON ***
      FROM bl_person;
 
 PROMPT *** Create  grants  V_BL_PERSON ***
+grant SELECT                                                                 on V_BL_PERSON     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_BL_PERSON     to RBL;
+grant SELECT                                                                 on V_BL_PERSON     to UPLD;
 
 
 

@@ -30,7 +30,9 @@ PROMPT *** Create  view V_CLIM_BRANCH ***
     WHERE LENGTH (branch) > 1;
 
 PROMPT *** Create  grants  V_CLIM_BRANCH ***
+grant SELECT                                                                 on V_CLIM_BRANCH   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CLIM_BRANCH   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CLIM_BRANCH   to UPLD;
 
 
 

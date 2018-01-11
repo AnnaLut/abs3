@@ -46,7 +46,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции K61
-prompt Наименование операции: Комісія за виплату переказів із-за кордону в ІВ готівкою
+prompt Наименование операции: K61 Комісія за виплату переказів із-за кордону в ІВ готівкою
 declare
   cnt_  number;
 begin
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('K61', 'Комісія за виплату переказів із-за кордону в ІВ готівкою', 0, '#(nbs_ob22 (''6114'',''15''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'GL.P_ICURVAL(#(KVA),F_TARIF(61,#(KVA),#(NLSA),#(S)),SYSDATE)', null, 5, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', 'Комісія за виплату переказів із-за кордону в ІВ готівкою');
+    values ('K61', 'K61 Комісія за виплату переказів із-за кордону в ІВ готівкою', 0, '#(nbs_ob22 (''6514'',''15''))', 980, '#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', 980, null, null, null, null, 0, 0, 0, 0, 'GL.P_ICURVAL(#(KVA),F_TARIF(61,#(KVA),#(NLSA),#(S)),SYSDATE)', null, 5, null, null, null, '0000100000000000000000000000000000000000000000000000000000000000', 'Комісія за виплату переказів із-за кордону в ІВ готівкою');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='K61', name='Комісія за виплату переказів із-за кордону в ІВ готівкою', dk=0, nlsm='#(nbs_ob22 (''6114'',''15''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='GL.P_ICURVAL(#(KVA),F_TARIF(61,#(KVA),#(NLSA),#(S)),SYSDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='Комісія за виплату переказів із-за кордону в ІВ готівкою'
+         set tt='K61', name='K61 Комісія за виплату переказів із-за кордону в ІВ готівкою', dk=0, nlsm='#(nbs_ob22 (''6514'',''15''))', kv=980, nlsk='#(BRANCH_USR.GET_BRANCH_PARAM2(''CASH'',0))', kvk=980, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='GL.P_ICURVAL(#(KVA),F_TARIF(61,#(KVA),#(NLSA),#(S)),SYSDATE)', s2=null, sk=5, proc=null, s3800=null, rang=null, flags='0000100000000000000000000000000000000000000000000000000000000000', nazn='Комісія за виплату переказів із-за кордону в ІВ готівкою'
        where tt='K61';
   end;
   --------------------------------
@@ -100,7 +100,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции MVQ
-prompt Наименование операции: Викуп нерозм.монети
+prompt Наименование операции: MVQ Викуп нерозм.монети
 declare
   cnt_  number;
 begin
@@ -109,11 +109,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('MVQ', 'Викуп нерозм.монети', 1, '#(tobopack.GetToboCASH)', null, '#(tobopack.GetToboCASH)', 980, null, '#(tobopack.GetToboCASH)', '#(tobopack.GetToboCASH)', null, 0, 0, 1, 0, 'f_buy_some(F_CHECK_PAYMENT(#(REF),1), #(KVA))', 'f_buy_some(F_CHECK_PAYMENT(#(REF),1), #(KVA),''E'')', 56, null, '#(nbs_ob22 (''3800'',''10''))', null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('MVQ', 'MVQ Викуп нерозм.монети', 1, '#(tobopack.GetToboCASH)', null, '#(tobopack.GetToboCASH)', 980, null, '#(tobopack.GetToboCASH)', '#(tobopack.GetToboCASH)', null, 0, 0, 1, 0, 'f_buy_some(F_CHECK_PAYMENT(#(REF),1), #(KVA))', 'f_buy_some(F_CHECK_PAYMENT(#(REF),1), #(KVA),''E'')', 56, null, '#(nbs_ob22 (''3800'',''10''))', null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='MVQ', name='Викуп нерозм.монети', dk=1, nlsm='#(tobopack.GetToboCASH)', kv=null, nlsk='#(tobopack.GetToboCASH)', kvk=980, nlss=null, nlsa='#(tobopack.GetToboCASH)', nlsb='#(tobopack.GetToboCASH)', mfob=null, flc=0, fli=0, flv=1, flr=0, s='f_buy_some(F_CHECK_PAYMENT(#(REF),1), #(KVA))', s2='f_buy_some(F_CHECK_PAYMENT(#(REF),1), #(KVA),''E'')', sk=56, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='MVQ', name='MVQ Викуп нерозм.монети', dk=1, nlsm='#(tobopack.GetToboCASH)', kv=null, nlsk='#(tobopack.GetToboCASH)', kvk=980, nlss=null, nlsa='#(tobopack.GetToboCASH)', nlsb='#(tobopack.GetToboCASH)', mfob=null, flc=0, fli=0, flv=1, flr=0, s='f_buy_some(F_CHECK_PAYMENT(#(REF),1), #(KVA))', s2='f_buy_some(F_CHECK_PAYMENT(#(REF),1), #(KVA),''E'')', sk=56, proc=null, s3800='#(nbs_ob22 (''3800'',''10''))', rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='MVQ';
   end;
   --------------------------------
@@ -143,7 +143,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции MVX
-prompt Наименование операции: 2909/OB22 - 1002 - Для виплати (екв <150 тис)
+prompt Наименование операции: MVX 2909/OB22 - 1002 - Для виплати (екв <150 тис)
 declare
   cnt_  number;
 begin
@@ -152,11 +152,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('MVX', '2909/OB22 - 1002 - Для виплати (екв <150 тис)', 1, null, null, ' #(tobopack.GetToboCASH)', null, null, null, '#(tobopack.GetToboCASH)', null, 0, 0, 0, 0, 'F_CHECK_PAYMENT(#(REF),1)', 'F_CHECK_PAYMENT(#(REF),1)', null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('MVX', 'MVX 2909/OB22 - 1002 - Для виплати (екв <150 тис)', 1, null, null, ' #(tobopack.GetToboCASH)', null, null, null, '#(tobopack.GetToboCASH)', null, 0, 0, 0, 0, 'F_CHECK_PAYMENT(#(REF),1)', 'F_CHECK_PAYMENT(#(REF),1)', null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='MVX', name='2909/OB22 - 1002 - Для виплати (екв <150 тис)', dk=1, nlsm=null, kv=null, nlsk=' #(tobopack.GetToboCASH)', kvk=null, nlss=null, nlsa=null, nlsb='#(tobopack.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_PAYMENT(#(REF),1)', s2='F_CHECK_PAYMENT(#(REF),1)', sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='MVX', name='MVX 2909/OB22 - 1002 - Для виплати (екв <150 тис)', dk=1, nlsm=null, kv=null, nlsk=' #(tobopack.GetToboCASH)', kvk=null, nlss=null, nlsa=null, nlsb='#(tobopack.GetToboCASH)', mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_PAYMENT(#(REF),1)', s2='F_CHECK_PAYMENT(#(REF),1)', sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='MVX';
   end;
   --------------------------------
@@ -186,7 +186,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции MVY
-prompt Наименование операции: 2909/OB22 - 2900/01 Для обов.продажу  (екв ,>=150 тис)
+prompt Наименование операции: MVY 2909/OB22 - 2900/01 Для обов.продажу  (екв ,>=150 тис)
 declare
   cnt_  number;
 begin
@@ -195,11 +195,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('MVY', '2909/OB22 - 2900/01 Для обов.продажу  (екв ,>=150 тис)', 1, null, null, '#(nbs_ob22 (''2900'',''01''))', null, null, null, '#(nbs_ob22 (''2900'',''01''))', null, 0, 0, 0, 0, 'F_CHECK_PAYMENT(#(REF),2)', 'F_CHECK_PAYMENT(#(REF),2)', null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('MVY', 'MVY 2909/OB22 - 2900/01 Для обов.продажу  (екв ,>=150 тис)', 1, null, null, '#(nbs_ob22 (''2900'',''01''))', null, null, null, '#(nbs_ob22 (''2900'',''01''))', null, 0, 0, 0, 0, 'F_CHECK_PAYMENT(#(REF),2)', 'F_CHECK_PAYMENT(#(REF),2)', null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='MVY', name='2909/OB22 - 2900/01 Для обов.продажу  (екв ,>=150 тис)', dk=1, nlsm=null, kv=null, nlsk='#(nbs_ob22 (''2900'',''01''))', kvk=null, nlss=null, nlsa=null, nlsb='#(nbs_ob22 (''2900'',''01''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_PAYMENT(#(REF),2)', s2='F_CHECK_PAYMENT(#(REF),2)', sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='MVY', name='MVY 2909/OB22 - 2900/01 Для обов.продажу  (екв ,>=150 тис)', dk=1, nlsm=null, kv=null, nlsk='#(nbs_ob22 (''2900'',''01''))', kvk=null, nlss=null, nlsa=null, nlsb='#(nbs_ob22 (''2900'',''01''))', mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_CHECK_PAYMENT(#(REF),2)', s2='F_CHECK_PAYMENT(#(REF),2)', sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='MVY';
   end;
   --------------------------------
@@ -229,7 +229,7 @@ begin
 end;
 /
 prompt Создание / Обновление операции ZZZ
-prompt Наименование операции: LCS. Стоп правило на перевірку лімітів. 
+prompt Наименование операции: ZZZ LCS. Стоп правило на перевірку лімітів.
 declare
   cnt_  number;
 begin
@@ -238,11 +238,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('ZZZ', 'LCS. Стоп правило на перевірку лімітів. ', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'LCS_PACK_SERVICE.F_STOP(#(REF))', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('ZZZ', 'ZZZ LCS. Стоп правило на перевірку лімітів.', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'LCS_PACK_SERVICE.F_STOP(#(REF))', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
   exception
     when dup_val_on_index then 
       update tts
-         set tt='ZZZ', name='LCS. Стоп правило на перевірку лімітів. ', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='LCS_PACK_SERVICE.F_STOP(#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='ZZZ', name='ZZZ LCS. Стоп правило на перевірку лімітів.', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='LCS_PACK_SERVICE.F_STOP(#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
        where tt='ZZZ';
   end;
   --------------------------------

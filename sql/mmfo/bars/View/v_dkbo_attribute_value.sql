@@ -95,7 +95,9 @@ END attribute_value
          ORDER BY tt.deal_number, tt.customer_id) r;
 
 PROMPT *** Create  grants  V_DKBO_ATTRIBUTE_VALUE ***
+grant SELECT                                                                 on V_DKBO_ATTRIBUTE_VALUE to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DKBO_ATTRIBUTE_VALUE to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_DKBO_ATTRIBUTE_VALUE to UPLD;
 
 
 

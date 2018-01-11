@@ -27,6 +27,7 @@ WITH   CHECK OPTION;
 PROMPT *** Create  grants  CUR_RATES ***
 grant FLASHBACK,REFERENCES,SELECT                                            on CUR_RATES       to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on CUR_RATES       to BARSAQ_ADM with grant option;
+grant SELECT                                                                 on CUR_RATES       to BARSREADER_ROLE;
 grant SELECT                                                                 on CUR_RATES       to BARSUPL;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUR_RATES       to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUR_RATES       to CUR_RATES;
@@ -35,6 +36,7 @@ grant DELETE,INSERT,SELECT,UPDATE                                            on 
 grant SELECT                                                                 on CUR_RATES       to RPBN001;
 grant SELECT                                                                 on CUR_RATES       to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CUR_RATES       to TECH005;
+grant SELECT                                                                 on CUR_RATES       to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUR_RATES       to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CUR_RATES       to WR_REFREAD;
 

@@ -30,8 +30,10 @@ from (select x.DAT_UG, x.CP_ID, x.KV, aa.NBS, aa.NMS, x.DATP,  x.KOL, x.cena_kup
 ) ;
 
 PROMPT *** Create  grants  V1_CP_REP_DOX ***
+grant SELECT                                                                 on V1_CP_REP_DOX   to BARSREADER_ROLE;
 grant SELECT                                                                 on V1_CP_REP_DOX   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V1_CP_REP_DOX   to START1;
+grant SELECT                                                                 on V1_CP_REP_DOX   to UPLD;
 
 
 

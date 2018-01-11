@@ -41,9 +41,11 @@ SELECT d.dpt_id,arc.nd, d.rnk, t.id, t.name, c.nmk,
  ;
 
 PROMPT *** Create  grants  V_DPT_COOWNERS ***
+grant SELECT                                                                 on V_DPT_COOWNERS  to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_COOWNERS  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_COOWNERS  to DPT_ROLE;
 grant SELECT                                                                 on V_DPT_COOWNERS  to RPBN001;
+grant SELECT                                                                 on V_DPT_COOWNERS  to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPT_COOWNERS  to WR_ALL_RIGHTS;
 
 

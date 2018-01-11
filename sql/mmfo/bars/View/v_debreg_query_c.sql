@@ -19,8 +19,10 @@ PROMPT *** Create  view V_DEBREG_QUERY_C ***
        ORDER BY OKPO;
 
 PROMPT *** Create  grants  V_DEBREG_QUERY_C ***
+grant SELECT                                                                 on V_DEBREG_QUERY_C to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DEBREG_QUERY_C to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V_DEBREG_QUERY_C to DEB_REG;
+grant SELECT                                                                 on V_DEBREG_QUERY_C to UPLD;
 
 
 

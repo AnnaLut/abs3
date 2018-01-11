@@ -61,7 +61,9 @@ GROUP BY a.ID,
          a.CERTIFICATE_CANCELATION_DATE;
 
 PROMPT *** Create  grants  V_NOTARY ***
+grant SELECT                                                                 on V_NOTARY        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_NOTARY        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_NOTARY        to UPLD;
 
 
 

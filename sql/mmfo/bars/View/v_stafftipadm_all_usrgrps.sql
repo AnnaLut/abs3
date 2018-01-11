@@ -18,7 +18,9 @@ select a.id, a.name
 
 PROMPT *** Create  grants  V_STAFFTIPADM_ALL_USRGRPS ***
 grant SELECT                                                                 on V_STAFFTIPADM_ALL_USRGRPS to ABS_ADMIN;
+grant SELECT                                                                 on V_STAFFTIPADM_ALL_USRGRPS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STAFFTIPADM_ALL_USRGRPS to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STAFFTIPADM_ALL_USRGRPS to UPLD;
 
 
 

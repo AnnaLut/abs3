@@ -127,8 +127,10 @@ SELECT q."ACC",
  WHERE ABS(ROUND (sumn * 0.15, 0) - sumu) > 2;
 
 PROMPT *** Create  grants  V_DELTA15 ***
+grant SELECT                                                                 on V_DELTA15       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DELTA15       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DELTA15       to START1;
+grant SELECT                                                                 on V_DELTA15       to UPLD;
 
 
 

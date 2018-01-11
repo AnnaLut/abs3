@@ -64,8 +64,10 @@ PROMPT *** Create  view MBK7 ***
                         WHERE custtype = 1);
 
 PROMPT *** Create  grants  MBK7 ***
+grant SELECT                                                                 on MBK7            to BARSREADER_ROLE;
 grant SELECT                                                                 on MBK7            to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MBK7            to START1;
+grant SELECT                                                                 on MBK7            to UPLD;
 
 
 

@@ -23,8 +23,10 @@ PROMPT *** Create  view V_ADVANCE_CONTRACT_PAYMENTS ***
  ORDER BY t.rnk, t.pid, p.fdat;
 
 PROMPT *** Create  grants  V_ADVANCE_CONTRACT_PAYMENTS ***
+grant SELECT                                                                 on V_ADVANCE_CONTRACT_PAYMENTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ADVANCE_CONTRACT_PAYMENTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ADVANCE_CONTRACT_PAYMENTS to START1;
+grant SELECT                                                                 on V_ADVANCE_CONTRACT_PAYMENTS to UPLD;
 
 
 

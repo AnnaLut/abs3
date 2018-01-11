@@ -29,6 +29,10 @@ PROMPT *** Create  view V_SHOW_BALANCE ***
             row_type DESC,
             kv;
 
+PROMPT *** Create  grants  V_SHOW_BALANCE ***
+grant SELECT                                                                 on V_SHOW_BALANCE  to BARSREADER_ROLE;
+grant SELECT                                                                 on V_SHOW_BALANCE  to UPLD;
+
 
 
 PROMPT ===================================================================================== 

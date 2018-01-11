@@ -8,8 +8,7 @@ PROMPT =========================================================================
 PROMPT *** Create  trigger TIUD_DPT_VIDD ***
 
   CREATE OR REPLACE TRIGGER BARS.TIUD_DPT_VIDD 
-before  insert or update or delete ON BARS.DPT_VIDD
-for each row
+before  insert or update or delete ON BARS.DPT_VIDD for each row
 declare
   l_userid  staff.id%type := gl.auid;
   l_actid   number(1);
@@ -25,39 +24,16 @@ begin
 
   if l_actid = 2 then
      insert into dpt_vidd_update
-       (idu, useru, dateu, typeu,
-        vidd, deposit_cod, type_name, type_cod,
-        flag, kv, freq_n, freq_k, bsd, bsn, bsa,
-        br_id, br_id_l, basem,
-        nls_k, nlsn_k, comproc,
-        basey, metr, amr_metr, tip_ost, acc7,
-        duration, duration_days, term_type,
-        id_stop, br_wd, min_summ, limit, max_limit,
-        term_add, fl_dubl, term_dubl, extension_id, fl_2620,
-        comments, idg, ids)
+       (idu, useru, dateu, typeu, vidd, deposit_cod, type_name, type_cod, flag, kv, freq_n, freq_k, bsd, bsn, bsa, br_id, br_id_l, basem, nls_k, nlsn_k, comproc, basey, metr, amr_metr, tip_ost, acc7, duration, duration_days, term_type, id_stop, br_wd, min_summ, limit, max_limit, term_add, fl_dubl, term_dubl, extension_id, fl_2620, comments, idg, ids)
      values
-       (0, l_userid, sysdate, l_actid,
-        :OLD.vidd, :OLD.deposit_cod, :OLD.type_name, :OLD.type_cod,
-        :OLD.flag, :OLD.kv, :OLD.freq_n, :OLD.freq_k, :OLD.bsd, :OLD.bsn, :OLD.bsa,
-        :OLD.br_id, :OLD.br_id_l, :OLD.basem,
-        :OLD.nls_k, :OLD.nlsn_k, :OLD.comproc,
-        :OLD.basey, :OLD.metr, :OLD.amr_metr, :OLD.tip_ost, :OLD.acc7,
-        :OLD.duration, :OLD.duration_days, :OLD.term_type,
-        :OLD.id_stop, :OLD.br_wd, :OLD.min_summ, :OLD.limit, :OLD.max_limit,
-        :OLD.term_add, :OLD.fl_dubl, :OLD.term_dubl, :OLD.extension_id, :OLD.fl_2620,
-        :OLD.comments, :OLD.idg, :OLD.ids);
+       (0, l_userid, sysdate, l_actid, :OLD.vidd, :OLD.deposit_cod, :OLD.type_name, :OLD.type_cod, :OLD.flag, :OLD.kv, :OLD.freq_n, :OLD.freq_k, :OLD.bsd, :OLD.bsn, :OLD.bsa, :OLD.br_id, :OLD.br_id_l, :OLD.basem, :OLD.nls_k, :OLD.nlsn_k, :OLD.comproc,
+        :OLD.basey, :OLD.metr, :OLD.amr_metr, :OLD.tip_ost, :OLD.acc7, :OLD.duration, :OLD.duration_days, :OLD.term_type,:OLD.id_stop, :OLD.br_wd, :OLD.min_summ, :OLD.limit, :OLD.max_limit,
+        :OLD.term_add, :OLD.fl_dubl, :OLD.term_dubl, :OLD.extension_id, :OLD.fl_2620, :OLD.comments, :OLD.idg, :OLD.ids);
   else
      insert into dpt_vidd_update
-       (idu, useru, dateu, typeu,
-        vidd, deposit_cod, type_name, type_cod,
-        flag, kv, freq_n, freq_k, bsd, bsn, bsa,
-        br_id, br_id_l, basem,
-        nls_k, nlsn_k, comproc,
-        basey, metr, amr_metr, tip_ost, acc7,
-        duration, duration_days, term_type,
-        id_stop, br_wd, min_summ, limit, max_limit,
-        term_add, fl_dubl, term_dubl, extension_id, fl_2620,
-        comments, idg, ids)
+       (idu, useru, dateu, typeu, vidd, deposit_cod, type_name, type_cod, flag, kv, freq_n, freq_k, bsd, bsn, bsa, br_id, br_id_l, basem,
+        nls_k, nlsn_k, comproc, basey, metr, amr_metr, tip_ost, acc7, duration, duration_days, term_type, id_stop, br_wd, min_summ, limit, max_limit,
+        term_add, fl_dubl, term_dubl, extension_id, fl_2620, comments, idg, ids)
      values
        (0, l_userid, sysdate, l_actid,
         :NEW.vidd, :NEW.deposit_cod, :NEW.type_name, :NEW.type_cod,
@@ -81,7 +57,7 @@ begin
   end if;
 end;
 /
-ALTER TRIGGER BARS.TIUD_DPT_VIDD DISABLE;
+ALTER TRIGGER BARS.TIUD_DPT_VIDD ENABLE;
 
 
 PROMPT ===================================================================================== 

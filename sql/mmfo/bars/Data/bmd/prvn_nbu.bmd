@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Скорочений Протокол розрахунку резерву по НБУ-23';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'PRVN_NBU';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,23 +124,23 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Бранч~~~~~1', null, null, 99, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'BV', 'N', 'Бал.варт~Ном~BV~~~13', null, null, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(BV)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'FDAT', 'D', 'Звiтна~дата~~~~38', null, null, 50, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'KV', 'N', 'Валюта~~~~~5', null, null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'ND', 'N', '"Реф"~ дог~~~~3', null, null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'NLS', 'C', '№~рах~~~~6', null, null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'REZ', 'N', 'Резерв~(сформован.)~Ном~~~19(а)', null, null, 26, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(REZ)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'REZQ', 'N', 'Резерв~(сформован.)~Екв.~~~19(б)', null, null, 27, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(REZQ)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'RNK', 'N', 'Рег №~клієнта~~~~28', null, null, 39, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'BVQ', 'N', 'Бал.варт~екв~BVq~~~14', null, null, 21, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(BVQ)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'NMK', 'C', 'Назва~клієнта~~~~29', null, null, 40, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 70, 'REZ23', 'N', 'Резерв(23)~(расч.)~Ном~REZ=~BV-PV-PVZ~20(в)', null, null, 30, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(REZ23)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 71, 'REZ39', 'N', 'Резерв(39)~МСФЗ~из~FINEVARE~(ном.)~20(а)', null, null, 28, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(REZ39)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 72, 'REZQ23', 'N', 'Резерв(23)~(расч.)~екв~REZq=~BVq-PVq-PVZq~20(г)', null, null, 31, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(REZQ23)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 73, 'REZQ39', 'N', 'Резерв(39)~МСФЗ~из~FINEVARE~(екв.)~20(б)', null, null, 29, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(REZQ39)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 74, 'ID', 'C', 'Ід.~запису', null, null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 75, 'TIP', 'C', 'Тип~рах', null, null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Бранч~~~~~1', '', null, 99, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'BV', 'N', 'Бал.варт~Ном~BV~~~13', '', null, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(BV)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'FDAT', 'D', 'Звiтна~дата~~~~38', '', null, 50, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'KV', 'N', 'Валюта~~~~~5', '', null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'ND', 'N', '"Реф"~ дог~~~~3', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'NLS', 'C', '№~рах~~~~6', '', null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'REZ', 'N', 'Резерв~(сформован.)~Ном~~~19(а)', '', null, 26, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(REZ)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'REZQ', 'N', 'Резерв~(сформован.)~Екв.~~~19(б)', '', null, 27, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(REZQ)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'RNK', 'N', 'Рег №~клієнта~~~~28', '', null, 39, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'BVQ', 'N', 'Бал.варт~екв~BVq~~~14', '', null, 21, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(BVQ)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'NMK', 'C', 'Назва~клієнта~~~~29', '', null, 40, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 70, 'REZ23', 'N', 'Резерв(23)~(расч.)~Ном~REZ=~BV-PV-PVZ~20(в)', '', null, 30, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(REZ23)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 71, 'REZ39', 'N', 'Резерв(39)~МСФЗ~из~FINEVARE~(ном.)~20(а)', '', null, 28, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(REZ39)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 72, 'REZQ23', 'N', 'Резерв(23)~(расч.)~екв~REZq=~BVq-PVq-PVZq~20(г)', '', null, 31, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(REZQ23)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 73, 'REZQ39', 'N', 'Резерв(39)~МСФЗ~из~FINEVARE~(екв.)~20(б)', '', null, 29, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum(REZQ39)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 74, 'ID', 'C', 'Ід.~запису', '', null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 75, 'TIP', 'C', 'Тип~рах', '', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

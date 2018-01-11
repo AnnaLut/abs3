@@ -87,7 +87,9 @@ PROMPT *** Create  view V_STO_BANK_VIPISKA ***
     WHERE val.kv = sp.payment_currency           --AND sp.payment_state_id = 5;
 
 PROMPT *** Create  grants  V_STO_BANK_VIPISKA ***
+grant SELECT                                                                 on V_STO_BANK_VIPISKA to BARSREADER_ROLE;
 grant SELECT                                                                 on V_STO_BANK_VIPISKA to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_STO_BANK_VIPISKA to UPLD;
 
 
 

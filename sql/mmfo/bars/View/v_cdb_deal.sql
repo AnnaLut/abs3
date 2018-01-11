@@ -11,7 +11,9 @@ PROMPT *** Create  view V_CDB_DEAL ***
   select "ID","DEAL_NUMBER","LENDER_MFO","LENDER_NAME","BORROWER_MFO","BORROWER_NAME","OPEN_DATE","EXPIRY_DATE","CLOSE_DATE","AMOUNT","CURRENCY_ID","INTEREST_RATE","INTEREST_CALENDAR_ID","INTEREST_CALENDAR" from cdb.v_cdb_deal;
 
 PROMPT *** Create  grants  V_CDB_DEAL ***
+grant SELECT                                                                 on V_CDB_DEAL      to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CDB_DEAL      to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CDB_DEAL      to UPLD;
 
 
 

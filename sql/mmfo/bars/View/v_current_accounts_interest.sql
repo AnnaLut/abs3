@@ -1,5 +1,14 @@
-create or replace view v_current_accounts_interest as
-select a.acc account_id,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CURRENT_ACCOUNTS_INTEREST.sql =======
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_CURRENT_ACCOUNTS_INTEREST ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_CURRENT_ACCOUNTS_INTEREST ("ACCOUNT_ID", "INTEREST_KIND_ID", "CUSTOMER_ID", "CURRENCY_ID", "ACCOUNT_NUMBER", "ACCOUNT_NAME", "OKPO", "INTEREST_ACCOUNT_NUMBER", "INTEREST_RATE", "LAST_ACCRUAL_DATE", "LAST_PAYMENT_DATE", "LAST_RECKONING_DATE", "END_OF_ACCRUAL", "AMOUNT_TO_ACCRUAL", "AMOUNT_TO_PAYMENT", "PLANNED_INTEREST_REST", "CURRENT_INTEREST_REST", "RECEIVER_MFO", "RECEIVER_ACCOUNT", "RECEIVER_CURRENCY_ID", "USER_ID", "USER_NAME", "CORPORATION_CODE", "CORPORATION_NAME") AS 
+  select a.acc account_id,
        i.id interest_kind_id,
        c.rnk customer_id,
        a.kv currency_id,
@@ -71,30 +80,11 @@ where  a.dazs is null and
                  where  n.portfolio_code = 'CURRENT_ACCOUNT' and
                         (n.userid = sys_context('bars_global', 'user_id') or n.userid is null));
 
+PROMPT *** Create  grants  V_CURRENT_ACCOUNTS_INTEREST ***
+grant SELECT                                                                 on V_CURRENT_ACCOUNTS_INTEREST to UPLD;
 
 
-comment on column v_current_accounts_interest.account_id                is 'Ідентифікатор рахунку';
-comment on column v_current_accounts_interest.interest_kind_id          is 'Ідентифікатор виду нарахування';
-comment on column v_current_accounts_interest.customer_id               is 'Ідентифікатор клієнта';
-comment on column v_current_accounts_interest.currency_id               is 'Валюта';
-comment on column v_current_accounts_interest.account_number            is 'Номер рахунку';
-comment on column v_current_accounts_interest.account_name              is 'Назва рахунку';
-comment on column v_current_accounts_interest.okpo                      is 'ЄДРПОУ';
-comment on column v_current_accounts_interest.interest_account_number   is 'Рахунок відсотків';
-comment on column v_current_accounts_interest.interest_rate             is 'Ставка';
-comment on column v_current_accounts_interest.last_accrual_date         is 'Дата нарахування';
-comment on column v_current_accounts_interest.last_payment_date         is 'Дата виплати';
-comment on column v_current_accounts_interest.last_reckoning_date       is 'Дата прогнозу';
-comment on column v_current_accounts_interest.end_of_accrual            is 'Завершення нарахування';
-comment on column v_current_accounts_interest.amount_to_accrual         is 'Сума до нарахування';
-comment on column v_current_accounts_interest.amount_to_payment         is 'Сума до виплати';
-comment on column v_current_accounts_interest.planned_interest_rest     is 'Плановий залишок відсотків';
-comment on column v_current_accounts_interest.current_interest_rest     is 'Фактичний залишок відсотків';
-comment on column v_current_accounts_interest.receiver_mfo              is 'МФО отримувача';
-comment on column v_current_accounts_interest.receiver_account          is 'Рахунок отримувача';
-comment on column v_current_accounts_interest.receiver_currency_id      is 'Валюта отримувача';
-comment on column v_current_accounts_interest.user_id                   is 'Код виконавця';
-comment on column v_current_accounts_interest.user_name                 is 'Виконавець по рахунку';
-comment on column v_current_accounts_interest.corporation_code          is 'Код корпорації';
-comment on column v_current_accounts_interest.corporation_name          is 'Назва корпорації';
 
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CURRENT_ACCOUNTS_INTEREST.sql =======
+PROMPT ===================================================================================== 

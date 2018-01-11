@@ -14,9 +14,11 @@ PROMPT *** Create  view TOBO_PARAMS ***
 PROMPT *** Create  grants  TOBO_PARAMS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on TOBO_PARAMS     to ABS_ADMIN;
 grant SELECT                                                                 on TOBO_PARAMS     to BARS009;
+grant SELECT                                                                 on TOBO_PARAMS     to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on TOBO_PARAMS     to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT                                                   on TOBO_PARAMS     to R_KP;
 grant SELECT                                                                 on TOBO_PARAMS     to START1;
+grant SELECT                                                                 on TOBO_PARAMS     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TOBO_PARAMS     to WR_ALL_RIGHTS;
 
 

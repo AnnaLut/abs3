@@ -17,7 +17,9 @@ PROMPT *** Create  view V_SW_CORRACC ***
 
 PROMPT *** Create  grants  V_SW_CORRACC ***
 grant SELECT                                                                 on V_SW_CORRACC    to BARS013;
+grant SELECT                                                                 on V_SW_CORRACC    to BARSREADER_ROLE;
 grant SELECT                                                                 on V_SW_CORRACC    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_SW_CORRACC    to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_SW_CORRACC    to WR_ALL_RIGHTS;
 
 

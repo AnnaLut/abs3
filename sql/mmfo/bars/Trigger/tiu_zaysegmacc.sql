@@ -7,8 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TIU_ZAYSEGMACC ***
 
-
-  CREATE OR REPLACE TRIGGER BARS.tiu_zaysegmacc
+  CREATE OR REPLACE TRIGGER BARS.TIU_ZAYSEGMACC 
 before insert or update ON BARS.ZAY_SEGM_ACC
 for each row
 declare
@@ -23,9 +22,8 @@ end;
 
 
 /
-
 ALTER TRIGGER BARS.TIU_ZAYSEGMACC ENABLE;
-/
+
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TIU_ZAYSEGMACC.sql =========*** End 

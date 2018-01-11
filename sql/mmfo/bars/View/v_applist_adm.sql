@@ -13,7 +13,9 @@ from applist a
 ;
 
 PROMPT *** Create  grants  V_APPLIST_ADM ***
+grant SELECT                                                                 on V_APPLIST_ADM   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_APPLIST_ADM   to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_APPLIST_ADM   to UPLD;
 
 
 

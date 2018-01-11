@@ -45,8 +45,10 @@ PROMPT *** Create  view V_FOREX_A ***
 ;
 
 PROMPT *** Create  grants  V_FOREX_A ***
+grant SELECT                                                                 on V_FOREX_A       to BARSREADER_ROLE;
 grant SELECT                                                                 on V_FOREX_A       to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_FOREX_A       to FOREX;
+grant SELECT                                                                 on V_FOREX_A       to UPLD;
 
 
 

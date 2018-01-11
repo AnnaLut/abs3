@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'SWIFT.Перегляд журналу повідомлень';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'V_SW_JOURNAL';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,31 +124,31 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACCD', 'N', 'ACCD', null, 22, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ACCK', 'N', 'ACCK', null, 22, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'AMOUNT', 'N', 'Сума', null, 22, 11, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'CURRENCY', 'C', 'Вал', null, 3, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'DATE_IN', 'C', 'Дата вх.', null, 30, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'DATE_OUT', 'C', 'Дата вих.', null, 30, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'DATE_PAY', 'D', 'Дата оплати', null, 10, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'DATE_REC', 'D', 'Дата REC', null, 10, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'ID', 'N', 'ID', null, 22, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'IO_IND', 'C', 'Тип', null, 1, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'MT', 'N', 'МТ', null, 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'NLS_D', 'C', 'Рахунок Д', null, 15, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'NLS_K', 'C', 'Рахунок К', null, 15, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'PAGE', 'C', 'PAGE', null, 30, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'PAYEE', 'C', 'Отримувач', null, 35, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'PAYER', 'C', 'Платник', null, 35, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'RECEIVER', 'C', 'BIC отримувач', null, 11, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'SENDER', 'C', 'BIC відправник', null, 11, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'SOS', 'N', 'SOS', null, 22, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'SWREF', 'N', 'SWREF', null, 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/view_swift.aspx?swref=:SWREF', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'SW_950_REF', 'N', 'SW_950_REF', null, 22, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'SW_OPER_REF', 'N', 'Реф. АБС', null, 22, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:SW_OPER_REF', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'TRANSIT', 'C', 'TRANSIT', null, 200, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'TRN', 'C', 'Референс', null, 16, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'VDATE', 'D', 'Дата валютування', null, 10, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACCD', 'N', 'ACCD', '', 22, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ACCK', 'N', 'ACCK', '', 22, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'AMOUNT', 'N', 'Сума', '', 22, 11, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'CURRENCY', 'C', 'Вал', '', 3, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DATE_IN', 'C', 'Дата вх.', '', 30, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'DATE_OUT', 'C', 'Дата вих.', '', 30, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'DATE_PAY', 'D', 'Дата оплати', '', 10, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'DATE_REC', 'D', 'Дата REC', '', 10, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'ID', 'N', 'ID', '', 22, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'IO_IND', 'C', 'Тип', '', 1, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'MT', 'N', 'МТ', '', 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'NLS_D', 'C', 'Рахунок Д', '', 15, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'NLS_K', 'C', 'Рахунок К', '', 15, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'PAGE', 'C', 'PAGE', '', 30, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'PAYEE', 'C', 'Отримувач', '', 35, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'PAYER', 'C', 'Платник', '', 35, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'RECEIVER', 'C', 'BIC отримувач', '', 11, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'SENDER', 'C', 'BIC відправник', '', 11, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'SOS', 'N', 'SOS', '', 22, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'SWREF', 'N', 'SWREF', '', 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/view_swift.aspx?swref=:SWREF', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'SW_950_REF', 'N', 'SW_950_REF', '', 22, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'SW_OPER_REF', 'N', 'Реф. АБС', '', 22, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:SW_OPER_REF', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'TRANSIT', 'C', 'TRANSIT', '', 200, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'TRN', 'C', 'Референс', '', 16, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'VDATE', 'D', 'Дата валютування', '', 10, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

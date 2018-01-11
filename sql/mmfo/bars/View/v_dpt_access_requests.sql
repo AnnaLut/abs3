@@ -28,9 +28,11 @@ PROMPT *** Create  view V_DPT_ACCESS_REQUESTS ***
 );
 
 PROMPT *** Create  grants  V_DPT_ACCESS_REQUESTS ***
+grant SELECT                                                                 on V_DPT_ACCESS_REQUESTS to BARSREADER_ROLE;
 grant SELECT                                                                 on V_DPT_ACCESS_REQUESTS to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_DPT_ACCESS_REQUESTS to DPT_ADMIN;
 grant SELECT                                                                 on V_DPT_ACCESS_REQUESTS to START1;
+grant SELECT                                                                 on V_DPT_ACCESS_REQUESTS to UPLD;
 grant SELECT                                                                 on V_DPT_ACCESS_REQUESTS to WR_ALL_RIGHTS;
 
 

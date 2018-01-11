@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Репо: Зв`язок МБК та ЦП';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'V_MBK_CP';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,27 +124,27 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACCZ', 'N', 'ACC рах~ 9500/9510', null, null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ID', 'N', 'Вн.№~ ЦП~в АБС', null, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'FunNSIEditFFiltered("CP_KOD", 6, " ID = :ID ")', 0);
-  bars_metabase.add_column(l_tabid, 3, 'KOL', 'N', 'ЦП шт~в заставі~по угоді', null, null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'Sel008 ( hWndMDI,22,0, " AND exists (select 1 from operw where ref=CP_V.ref and tag=''ND'' and value= :ND )", " and id=:ID " )', 0);
-  bars_metabase.add_column(l_tabid, 4, 'ND', 'N', 'Pеф~угоди~МБДК', null, null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'Sel008( hWndMDI, 14 , :ND , "0" , "0")', 0);
-  bars_metabase.add_column(l_tabid, 5, 'REF', 'N', 'Pеф блоку~проводок по~забезпеченню', null, null, 20, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REF)', 0);
-  bars_metabase.add_column(l_tabid, 6, 'SASIN', 'B', 'V~право~власності', null, null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'KVZ', 'N', 'Вал~ЦП~забезпеч', null, null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NLSZ', 'C', 'Рах~по врахуванню~забезпечення', null, null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'SZ', 'N', 'Залишок~Рах~забезпечення', null, null, 24, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'RNKZ', 'N', 'РНК~емітенту~ЦП', null, null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NMKZ', 'C', 'Назва~емітенту~ЦП', null, null, 26, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'KVM', 'N', 'Вал~РЕПО~позики', null, null, 32, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'NLSM', 'C', 'Рах~РЕПО~позики', null, null, 33, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'ACCM', 'N', 'ACC рах~ 1522/1622', null, null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'SM', 'N', 'Сума~РЕПО~позики', null, null, 34, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'RNKM', 'N', 'РНК~партнера~по РЕПО', null, null, 35, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'NMKM', 'C', 'Назва~партнера~по РЕПО', null, null, 36, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'CP_ID', 'C', 'Зовніш.~код ЦП~ПЛ.календар', null, null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'Sel008( hWndMDI, 49, :ID ,"Пл.Календар", "  " )', 0);
-  bars_metabase.add_column(l_tabid, 19, 'CC_ID', 'C', '№ РЕПО~угоди~МБДК', null, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'CP_BLK', 'N', 'ЦП шт~з них в~заставах', null, null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'CP_ALL', 'N', 'ЦП шт~ Всього~в портф.ЦП', null, null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'Sel008 ( hWndMDI, 22, 0 ,"", "and id=:ID" )', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACCZ', 'N', 'ACC рах~ 9500/9510', '', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ID', 'N', 'Вн.№~ ЦП~в АБС', '', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'FunNSIEditFFiltered("CP_KOD", 6, " ID = :ID ")', 0);
+  bars_metabase.add_column(l_tabid, 3, 'KOL', 'N', 'ЦП шт~в заставі~по угоді', '', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'Sel008 ( hWndMDI,22,0, " AND exists (select 1 from operw where ref=CP_V.ref and tag=''ND'' and value= :ND )", " and id=:ID " )', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ND', 'N', 'Pеф~угоди~МБДК', '', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'Sel008( hWndMDI, 14 , :ND , "0" , "0")', 0);
+  bars_metabase.add_column(l_tabid, 5, 'REF', 'N', 'Pеф блоку~проводок по~забезпеченню', '', null, 20, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REF)', 0);
+  bars_metabase.add_column(l_tabid, 6, 'SASIN', 'B', 'V~право~власності', '', null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'KVZ', 'N', 'Вал~ЦП~забезпеч', '', null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NLSZ', 'C', 'Рах~по врахуванню~забезпечення', '', null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'SZ', 'N', 'Залишок~Рах~забезпечення', '', null, 24, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'RNKZ', 'N', 'РНК~емітенту~ЦП', '', null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NMKZ', 'C', 'Назва~емітенту~ЦП', '', null, 26, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'KVM', 'N', 'Вал~РЕПО~позики', '', null, 32, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'NLSM', 'C', 'Рах~РЕПО~позики', '', null, 33, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'ACCM', 'N', 'ACC рах~ 1522/1622', '', null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'SM', 'N', 'Сума~РЕПО~позики', '', null, 34, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'RNKM', 'N', 'РНК~партнера~по РЕПО', '', null, 35, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'NMKM', 'C', 'Назва~партнера~по РЕПО', '', null, 36, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'CP_ID', 'C', 'Зовніш.~код ЦП~ПЛ.календар', '', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'Sel008( hWndMDI, 49, :ID ,"Пл.Календар", "  " )', 0);
+  bars_metabase.add_column(l_tabid, 19, 'CC_ID', 'C', '№ РЕПО~угоди~МБДК', '', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'CP_BLK', 'N', 'ЦП шт~з них в~заставах', '', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'CP_ALL', 'N', 'ЦП шт~ Всього~в портф.ЦП', '', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', 'Sel008 ( hWndMDI, 22, 0 ,"", "and id=:ID" )', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

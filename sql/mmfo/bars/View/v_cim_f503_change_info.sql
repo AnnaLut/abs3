@@ -17,7 +17,9 @@ union all select '6' as id, '6 - анулювання реєстраційного свідоцтва' as info fr
 union all select '7' as id, '7 - інше' as info from dual;
 
 PROMPT *** Create  grants  V_CIM_F503_CHANGE_INFO ***
+grant SELECT                                                                 on V_CIM_F503_CHANGE_INFO to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_F503_CHANGE_INFO to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_F503_CHANGE_INFO to UPLD;
 
 
 

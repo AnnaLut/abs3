@@ -23,7 +23,9 @@ PROMPT *** Create  view V_CIM_UNBOUND_VMD ***
    where b.benef_id=a.benef_id and c.rnk=a.rnk and a.s>a.bound_sum;
 
 PROMPT *** Create  grants  V_CIM_UNBOUND_VMD ***
+grant SELECT                                                                 on V_CIM_UNBOUND_VMD to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CIM_UNBOUND_VMD to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CIM_UNBOUND_VMD to UPLD;
 
 
 
