@@ -66,7 +66,9 @@ PROMPT *** Create  view VW_ESCR_REG_CREDIT_COUNT ***
    GROUP BY t2.in_doc_id, t4.reg_union_flag;
 
 PROMPT *** Create  grants  VW_ESCR_REG_CREDIT_COUNT ***
+grant SELECT                                                                 on VW_ESCR_REG_CREDIT_COUNT to BARSREADER_ROLE;
 grant SELECT                                                                 on VW_ESCR_REG_CREDIT_COUNT to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on VW_ESCR_REG_CREDIT_COUNT to UPLD;
 
 
 

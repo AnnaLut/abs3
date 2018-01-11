@@ -46,45 +46,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_UPLCONSTRAINTS_FKPRIORITY ***
-begin   
- execute immediate '
-  ALTER TABLE BARSUPL.UPL_CONSTRAINTS ADD CONSTRAINT FK_UPLCONSTRAINTS_FKPRIORITY FOREIGN KEY (PRIORITY)
-	  REFERENCES BARSUPL.UPL_FKPRIORITY (FK_PRIORITY_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_UPLCONSTRAINTS_FILEID ***
-begin   
- execute immediate '
-  ALTER TABLE BARSUPL.UPL_CONSTRAINTS ADD CONSTRAINT FK_UPLCONSTRAINTS_FILEID FOREIGN KEY (FILE_ID)
-	  REFERENCES BARSUPL.UPL_FILES (FILE_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_UPLCONSTRAINTS_FKFILEID ***
-begin   
- execute immediate '
-  ALTER TABLE BARSUPL.UPL_CONSTRAINTS ADD CONSTRAINT FK_UPLCONSTRAINTS_FKFILEID FOREIGN KEY (FK_FILEID)
-	  REFERENCES BARSUPL.UPL_FILES (FILE_ID) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_UPLCONSTRAINTS ***
 begin   
  execute immediate '
@@ -97,6 +58,10 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  UPL_CONSTRAINTS ***
+grant SELECT                                                                 on UPL_CONSTRAINTS to BARSREADER_ROLE;
+grant SELECT                                                                 on UPL_CONSTRAINTS to UPLD;
 
 
 

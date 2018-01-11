@@ -85,6 +85,7 @@ exception when others then
 
 PROMPT *** Create  grants  ZAYAVKA_ID_MAP ***
 grant SELECT                                                                 on ZAYAVKA_ID_MAP  to BARS with grant option;
+grant SELECT                                                                 on ZAYAVKA_ID_MAP  to BARSREADER_ROLE;
 grant SELECT                                                                 on ZAYAVKA_ID_MAP  to BARS_ACCESS_DEFROLE;
 
 

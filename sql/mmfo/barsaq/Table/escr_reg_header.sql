@@ -110,10 +110,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_USER_NAME ***
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_CUSTOMER23 ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_USER_NAME CHECK (USER_NAME IS NOT NULL) ENABLE';
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_CUSTOMER23 CHECK (CUSTOMER_REGION IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -122,10 +122,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_ID ***
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_CUSTOMER1 ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_ID CHECK (ID IS NOT NULL) ENABLE';
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_CUSTOMER1 CHECK (CUSTOMER_FULL_ADDRESS IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -134,12 +134,202 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint UK_ESCR_REG_HEADER ***
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT UK_ESCR_REG_HEADER UNIQUE (CUSTOMER_ID, DEAL_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE AQTS  ENABLE';
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_ID CHECK (DEAL_ID IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_NUMBER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_NUMBER CHECK (DEAL_NUMBER IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_DAT4 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_DAT4 CHECK (DEAL_DATE_FROM IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_DAT5 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_DAT5 CHECK (DEAL_DATE_TO IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_TERM ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_TERM CHECK (DEAL_TERM IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_PRO7 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_PRO7 CHECK (DEAL_PRODUCT IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_STATE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_STATE CHECK (DEAL_STATE IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_TYP9 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_TYP9 CHECK (DEAL_TYPE_NAME IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_SUM ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_SUM CHECK (DEAL_SUM IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_NLS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_NLS CHECK (NLS IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DOC_DATE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DOC_DATE CHECK (DOC_DATE IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_COMP_SUM ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_COMP_SUM CHECK (COMP_SUM IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_BRANCH_CODE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_BRANCH_CODE CHECK (BRANCH_CODE IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_BRANCH_NAME ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_BRANCH_NAME CHECK (BRANCH_NAME IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_MFO ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_MFO CHECK (MFO IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_USER_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_USER_ID CHECK (USER_ID IS NOT NULL) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_CUSTOMER_ID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_CUSTOMER_ID CHECK (CUSTOMER_ID IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -162,10 +352,12 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_CUSTOMER_ID ***
+PROMPT *** Create  constraint UK_ESCR_REG_HEADER ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_CUSTOMER_ID CHECK (CUSTOMER_ID IS NOT NULL) ENABLE';
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT UK_ESCR_REG_HEADER UNIQUE (CUSTOMER_ID, DEAL_ID)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE AQTS  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -174,10 +366,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_USER_ID ***
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_USER_ID CHECK (USER_ID IS NOT NULL) ENABLE';
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_ID CHECK (ID IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -186,202 +378,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_MFO ***
+PROMPT *** Create  constraint CC_ESCR_REG_HEADER_USER_NAME ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_MFO CHECK (MFO IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_BRANCH_NAME ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_BRANCH_NAME CHECK (BRANCH_NAME IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_BRANCH_CODE ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_BRANCH_CODE CHECK (BRANCH_CODE IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_COMP_SUM ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_COMP_SUM CHECK (COMP_SUM IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DOC_DATE ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DOC_DATE CHECK (DOC_DATE IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_NLS ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_NLS CHECK (NLS IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_SUM ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_SUM CHECK (DEAL_SUM IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_TYP9 ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_TYP9 CHECK (DEAL_TYPE_NAME IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_STATE ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_STATE CHECK (DEAL_STATE IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_PRO7 ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_PRO7 CHECK (DEAL_PRODUCT IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_TERM ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_TERM CHECK (DEAL_TERM IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_DAT5 ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_DAT5 CHECK (DEAL_DATE_TO IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_DAT4 ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_DAT4 CHECK (DEAL_DATE_FROM IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_NUMBER ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_NUMBER CHECK (DEAL_NUMBER IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_DEAL_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_DEAL_ID CHECK (DEAL_ID IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_CUSTOMER1 ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_CUSTOMER1 CHECK (CUSTOMER_FULL_ADDRESS IS NOT NULL) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ESCR_REG_HEADER_CUSTOMER23 ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_CUSTOMER23 CHECK (CUSTOMER_REGION IS NOT NULL) ENABLE';
+  ALTER TABLE BARSAQ.ESCR_REG_HEADER ADD CONSTRAINT CC_ESCR_REG_HEADER_USER_NAME CHECK (USER_NAME IS NOT NULL) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -416,6 +416,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  ESCR_REG_HEADER ***
+grant SELECT                                                                 on ESCR_REG_HEADER to BARSREADER_ROLE;
 
 
 

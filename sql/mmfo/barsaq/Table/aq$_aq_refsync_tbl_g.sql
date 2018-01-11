@@ -65,6 +65,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  AQ$_AQ_REFSYNC_TBL_G ***
+grant SELECT                                                                 on AQ$_AQ_REFSYNC_TBL_G to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

@@ -56,6 +56,7 @@ COMMENT ON COLUMN BARSAQ.TMP_REFSYNC_XML_DOCPAYED.SYSTEM_CHANGE_NUMBER IS '';
 
 PROMPT *** Create  grants  TMP_REFSYNC_XML_DOCPAYED ***
 grant DELETE,INSERT,SELECT                                                   on TMP_REFSYNC_XML_DOCPAYED to BARS;
+grant SELECT                                                                 on TMP_REFSYNC_XML_DOCPAYED to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT                                                   on TMP_REFSYNC_XML_DOCPAYED to KLBX;
 grant SELECT                                                                 on TMP_REFSYNC_XML_DOCPAYED to REFSYNC_USR;
 

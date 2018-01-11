@@ -57,6 +57,7 @@ exception when others then
 
 PROMPT *** Create  grants  UPL_TAG_TABLES ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on UPL_TAG_TABLES  to BARS;
+grant SELECT                                                                 on UPL_TAG_TABLES  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on UPL_TAG_TABLES  to UPLD;
 
 

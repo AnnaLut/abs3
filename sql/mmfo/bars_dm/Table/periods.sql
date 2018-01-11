@@ -46,19 +46,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_PERIODS_TYPE_PERIODTYPES_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.PERIODS ADD CONSTRAINT FK_PERIODS_TYPE_PERIODTYPES_ID FOREIGN KEY (TYPE)
-	  REFERENCES BARS_DM.PERIOD_TYPE (ID) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_PERIODS_TYPE_NN ***
 begin   
  execute immediate '
@@ -123,7 +110,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  PERIODS ***
+grant SELECT                                                                 on PERIODS         to BARSREADER_ROLE;
 grant SELECT                                                                 on PERIODS         to BARSUPL;
+grant SELECT                                                                 on PERIODS         to UPLD;
 
 
 

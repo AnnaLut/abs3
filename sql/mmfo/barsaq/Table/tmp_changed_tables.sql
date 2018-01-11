@@ -47,6 +47,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  TMP_CHANGED_TABLES ***
+grant SELECT                                                                 on TMP_CHANGED_TABLES to BARSREADER_ROLE;
 grant SELECT                                                                 on TMP_CHANGED_TABLES to REFSYNC_USR;
 
 

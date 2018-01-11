@@ -124,68 +124,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ICONTRACTS_PID_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.IBANK_CONTRACTS MODIFY (PID CONSTRAINT CC_ICONTRACTS_PID_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ICONTRACTS_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.IBANK_CONTRACTS MODIFY (KF CONSTRAINT CC_ICONTRACTS_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ICONTRACTS_OPERATION_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.IBANK_CONTRACTS MODIFY (OPERATION CONSTRAINT CC_ICONTRACTS_OPERATION_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ICONTRACTS_COUNTRIES2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.IBANK_CONTRACTS ADD CONSTRAINT FK_ICONTRACTS_COUNTRIES2 FOREIGN KEY (BANKCOUNTRY)
-	  REFERENCES BARS.COUNTRY (COUNTRY) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ICONTRACTS_COUNTRIES ***
-begin   
- execute immediate '
-  ALTER TABLE BARSAQ.IBANK_CONTRACTS ADD CONSTRAINT FK_ICONTRACTS_COUNTRIES FOREIGN KEY (BENEFCOUNTRY)
-	  REFERENCES BARS.COUNTRY (COUNTRY) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint CC_ICONTRACTS_IMPEXP_CC ***
 begin   
  execute immediate '
@@ -210,11 +148,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ICONTRACTS_BANKS ***
+PROMPT *** Create  constraint CC_ICONTRACTS_OPERATION_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.IBANK_CONTRACTS ADD CONSTRAINT FK_ICONTRACTS_BANKS FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) DISABLE';
+  ALTER TABLE BARSAQ.IBANK_CONTRACTS MODIFY (OPERATION CONSTRAINT CC_ICONTRACTS_OPERATION_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -223,11 +160,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ICONTRACTS_CUSTOMERS ***
+PROMPT *** Create  constraint CC_ICONTRACTS_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.IBANK_CONTRACTS ADD CONSTRAINT FK_ICONTRACTS_CUSTOMERS FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) DISABLE';
+  ALTER TABLE BARSAQ.IBANK_CONTRACTS MODIFY (KF CONSTRAINT CC_ICONTRACTS_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -236,11 +172,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_ICONTRACTS_TABVAL ***
+PROMPT *** Create  constraint CC_ICONTRACTS_PID_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARSAQ.IBANK_CONTRACTS ADD CONSTRAINT FK_ICONTRACTS_TABVAL FOREIGN KEY (KV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) DISABLE';
+  ALTER TABLE BARSAQ.IBANK_CONTRACTS MODIFY (PID CONSTRAINT CC_ICONTRACTS_PID_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -261,6 +196,9 @@ exception when others then
 /
 
 
+
+PROMPT *** Create  grants  IBANK_CONTRACTS ***
+grant SELECT                                                                 on IBANK_CONTRACTS to BARSREADER_ROLE;
 
 
 

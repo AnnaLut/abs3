@@ -9,41 +9,41 @@ PROMPT *** Create  table DEPOSITS ***
 begin 
   execute immediate '
   CREATE TABLE BARS_DM.DEPOSITS 
-  (	PER_ID NUMBER, 
-  DEPOSIT_ID NUMBER, 
-  BRANCH VARCHAR2(30), 
-  KF VARCHAR2(12), 
-  RNK NUMBER(38,0), 
-  ND VARCHAR2(35), 
-  DAT_BEGIN DATE, 
-  DAT_END DATE, 
-  NLS VARCHAR2(15), 
-  VIDD NUMBER(38,0), 
-  TERM NUMBER(*,0), 
-  SDOG NUMBER, 
-  MASSA NUMBER, 
-  KV NUMBER(3,0), 
-  INTRATE NUMBER, 
-  SDOG_BEGIN NUMBER, 
-  LAST_ADD_DATE DATE, 
-  LAST_ADD_SUMA NUMBER, 
-  OSTC NUMBER, 
-  SUMA_PROC NUMBER, 
-  SUMA_PROC_PLAN NUMBER, 
-  DPT_STATUS NUMBER(1,0), 
-  SUMA_PROC_PAYOFF NUMBER, 
-  DATE_PROC_PAYOFF DATE, 
-  DATE_DEP_PAYOFF DATE, 
-  DATZ DATE, 
-  DAZS DATE, 
-  BLKD NUMBER(3,0), 
-  BLKK NUMBER(3,0), 
-  CNT_DUBL NUMBER, 
-  ARCHDOC_ID NUMBER,
-  WB CHAR(1)
-  ) SEGMENT CREATION IMMEDIATE 
+   (	PER_ID NUMBER, 
+	DEPOSIT_ID NUMBER, 
+	BRANCH VARCHAR2(30), 
+	KF VARCHAR2(12), 
+	RNK NUMBER(38,0), 
+	ND VARCHAR2(35), 
+	DAT_BEGIN DATE, 
+	DAT_END DATE, 
+	NLS VARCHAR2(15), 
+	VIDD NUMBER(38,0), 
+	TERM NUMBER(*,0), 
+	SDOG NUMBER, 
+	MASSA NUMBER, 
+	KV NUMBER(3,0), 
+	INTRATE NUMBER, 
+	SDOG_BEGIN NUMBER, 
+	LAST_ADD_DATE DATE, 
+	LAST_ADD_SUMA NUMBER, 
+	OSTC NUMBER, 
+	SUMA_PROC NUMBER, 
+	SUMA_PROC_PLAN NUMBER, 
+	DPT_STATUS NUMBER(1,0), 
+	SUMA_PROC_PAYOFF NUMBER, 
+	DATE_PROC_PAYOFF DATE, 
+	DATE_DEP_PAYOFF DATE, 
+	DATZ DATE, 
+	DAZS DATE, 
+	BLKD NUMBER(3,0), 
+	BLKK NUMBER(3,0), 
+	CNT_DUBL NUMBER, 
+	ARCHDOC_ID NUMBER, 
+	WB CHAR(1)
+   ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
-  NOCOMPRESS LOGGING
+ NOCOMPRESS LOGGING
   TABLESPACE BRSDYND ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
@@ -52,6 +52,7 @@ end;
 
 
 COMMENT ON TABLE BARS_DM.DEPOSITS IS 'Депозити';
+COMMENT ON COLUMN BARS_DM.DEPOSITS.WB IS 'Ознака, що депозит відкрито в веб-банкінгу';
 COMMENT ON COLUMN BARS_DM.DEPOSITS.PER_ID IS 'Ідентифікатор періоду';
 COMMENT ON COLUMN BARS_DM.DEPOSITS.DEPOSIT_ID IS '';
 COMMENT ON COLUMN BARS_DM.DEPOSITS.BRANCH IS 'Відділення';
@@ -86,28 +87,6 @@ COMMENT ON COLUMN BARS_DM.DEPOSITS.ARCHDOC_ID IS 'Ідентифікатор депозитного дого
 
 
 
-
-
-PROMPT *** Create  constraint FK_DEPOSITS_PERID_PERIOD_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS_DM.DEPOSITS ADD CONSTRAINT FK_DEPOSITS_PERID_PERIOD_ID FOREIGN KEY (PER_ID)
-	  REFERENCES BARS_DM.PERIODS (ID) DISABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-prompt add column wb
-begin
-    execute immediate 'alter table bars_dm.deposits add wb char(1)';
-exception
-    when others then
-        if sqlcode = -1430 then null; else raise; end if;
-end;
-/
-
-COMMENT ON COLUMN BARS_DM.DEPOSITS.WB IS 'Ознака, що депозит відкрито в веб-банкінгу';
 
 PROMPT *** Create  constraint CC_DEPOSITS_PERID_NN ***
 begin   
@@ -172,7 +151,9 @@ exception when others then
 
 PROMPT *** Create  grants  DEPOSITS ***
 grant SELECT                                                                 on DEPOSITS        to BARS;
+grant SELECT                                                                 on DEPOSITS        to BARSREADER_ROLE;
 grant SELECT                                                                 on DEPOSITS        to BARSUPL;
+grant SELECT                                                                 on DEPOSITS        to UPLD;
 
 
 

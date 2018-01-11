@@ -141,6 +141,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  STREAMS_STATUSES ***
+grant SELECT                                                                 on STREAMS_STATUSES to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

@@ -20,6 +20,7 @@ end;
  
 PROMPT *** Create  grants  F_GET_VAL_FUNC ***
 grant EXECUTE                                                                on F_GET_VAL_FUNC  to BARSUPL;
+grant EXECUTE                                                                on F_GET_VAL_FUNC  to UPLD;
 
  
  

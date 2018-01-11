@@ -129,6 +129,9 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  CUST_COMPANIES ***
+grant SELECT                                                                 on CUST_COMPANIES  to BARSREADER_ROLE;
+
 
 
 PROMPT ===================================================================================== 

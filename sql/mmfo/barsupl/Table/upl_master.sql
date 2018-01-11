@@ -55,6 +55,10 @@ exception when others then
 
 
 
+PROMPT *** Create  grants  UPL_MASTER ***
+grant SELECT                                                                 on UPL_MASTER      to BARSREADER_ROLE;
+grant SELECT                                                                 on UPL_MASTER      to UPLD;
+
 
 
 PROMPT ===================================================================================== 
